@@ -147,7 +147,7 @@ public static partial class Application // Mouse handling
         //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.ScreenPosition);
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (mouseEvent.ScreenPosition);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse.LastOrDefault ();
 
@@ -341,7 +341,7 @@ public static partial class Application // Mouse handling
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.
     /// </summary>
     /// <param name="screenPosition">The position of the mouse.</param>
-    /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderMouse().</param>
+    /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderLocation().</param>
     internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
         // Tell any views that are no longer under the mouse that the mouse has left

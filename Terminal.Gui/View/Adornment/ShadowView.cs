@@ -30,7 +30,7 @@ internal class ShadowView : View
         //    }
         //    else
         //    {
-        //        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (FrameToScreen ().Location);
+        //        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (FrameToScreen ().Location);
         //        View? underView = currentViewsUnderMouse!.LastOrDefault (view => !IsInHierarchy (adornment!.Parent!.SuperView, view, true));
         //        attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
         //    }
@@ -192,7 +192,7 @@ internal class ShadowView : View
             return Attribute.Default;
         }
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location);
         View? underView = currentViewsUnderMouse!.LastOrDefault (/*view => !IsInHierarchy (adornment!.Parent!.SuperView, view, true)*/);
         Attribute attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 

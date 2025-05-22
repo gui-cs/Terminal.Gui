@@ -3,7 +3,7 @@
 namespace Terminal.Gui.ViewMouseTests;
 
 [Trait ("Category", "Input")]
-public class GetViewsUnderMouseTests
+public class GetViewsUnderLocationTests
 {
     [Theory]
     [InlineData (0, 0)]
@@ -20,7 +20,7 @@ public class GetViewsUnderMouseTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location);
 
         // Assert
         Assert.Empty (viewsUnderMouse);
@@ -42,7 +42,7 @@ public class GetViewsUnderMouseTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location);
 
         // Assert
         Assert.Empty (viewsUnderMouse);

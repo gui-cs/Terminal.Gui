@@ -1153,6 +1153,191 @@ public partial class View // Layout APIs
             return superView!;
     }
 
+
+    /// <summary>
+    ///    Gets the Views that are under <paramref name="location"/>, including Adornments.
+    /// </summary>
+    /// <param name="location">Screen-relative location.</param>
+    /// <param name="ignoreTransparent">If <see langword="true"/> any <see cref="ViewportSettings.TransparentMouse"/> views will be ignored.</param>
+    /// <returns></returns>
+    public static List<View?> GetViewsUnderLocation (in Point location, bool ignoreTransparent = false)
+    {
+        // PopoverHost - If visible, start with it instead of Top
+        if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover && !ignoreTransparent)
+        {
+            // BUGBUG: We do not traverse all visible toplevels if there's an active popover. This may be a bug.
+            List<View?> result =
+            [
+                Application.Top
+            ];
+
+            result.AddRange (GetViewsUnderLocationForRoot (visiblePopover, location, ignoreTransparent));
+
+            if (result.Count > 1)
+            {
+                return result;
+            }
+        }
+
+        var checkedTop = false;
+
+        // Traverse all visible toplevels, topmost first (reverse stack order)
+        if (Application.TopLevels.Count > 0)
+        {
+            foreach (Toplevel toplevel in Application.TopLevels)
+            {
+                if (toplevel.Visible && toplevel.Contains (location))
+                {
+                    List<View?> result = GetViewsUnderLocationForRoot (toplevel, location, ignoreTransparent);
+
+                    // Only return if the result is not empty AND the result contains the toplevel itself or a non-transparent child.
+                    if (result.Count > 0)
+                    {
+                        // If the result contains only the toplevel, but the margin is TransparentMouse, skip this toplevel.
+                        // If the result contains the margin, but the margin is TransparentMouse, skip this toplevel.
+                        // If the result contains the toplevel and/or margin and neither is TransparentMouse, return as before.
+                        // If the result contains only subviews, return as before.
+
+                        // If the result contains the toplevel, but the point is in a TransparentMouse margin, skip.
+                        // BUGBUG: This should not be specific to Margin, but any Adornment with TransparentMouse set.
+                        Margin? margin = toplevel.Margin;
+
+                        bool isTransparentMargin =
+                            margin is { } && margin.Contains (location) && margin.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse);
+
+                        // If the result contains only the toplevel, and the margin is transparent, skip.
+                        if (isTransparentMargin && result.All (v => v == toplevel))
+                        {
+                            continue; // skip this toplevel, try next
+                        }
+
+                        // If the result contains only the toplevel and the margin, and the margin is transparent, skip.
+                        if (isTransparentMargin && result.All (v => v == toplevel || v == margin))
+                        {
+                            continue; // skip this toplevel, try next
+                        }
+
+                        return result;
+                    }
+                }
+
+                if (toplevel == Application.Top)
+                {
+                    checkedTop = true;
+                }
+            }
+        }
+
+        // Fallback: If TopLevels is empty or Top is not in TopLevels, check Top directly (for test compatibility)
+        if (!checkedTop && Application.Top is { Visible: true } top)
+        {
+            // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
+            List<View?> result = GetViewsUnderLocationForRoot (top, location, ignoreTransparent);
+
+            if (result.Count > 0)
+            {
+                return result;
+            }
+        }
+
+        return new ();
+    }
+
+    /// <summary>
+    ///     INTERNAL: Helper that contains the original GetViewsUnderLocation logic, but starts from a given root view
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="location"></param>
+    /// <param name="ignoreTransparent"></param>
+    /// <returns></returns>
+    internal static List<View?> GetViewsUnderLocationForRoot (View root, in Point location, bool ignoreTransparent)
+    {
+        // BUGBUG: There's a bug in here somewhere where Adornments and Subviews of Adornments are
+        // BUGBUG: nt being returned.
+
+        List<View?> viewsUnderLocation = [];
+        Point currentLocation = location;
+
+        // Normal logic: only traverse if the point is inside the view
+        while (root is { Visible: true } && root.Contains (currentLocation))
+        {
+            if (!root.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+            {
+                viewsUnderLocation.Add (root);
+            }
+
+            Adornment? found = null;
+
+            if (root is not Adornment)
+            {
+                if (root.Margin is { } && root.Margin.Contains (currentLocation))
+                {
+                    found = root.Margin;
+                }
+                else if (root.Border is { } && root.Border.Contains (currentLocation))
+                {
+                    found = root.Border;
+                }
+                else if (root.Padding is { } && root.Padding.Contains (currentLocation))
+                {
+                    found = root.Padding;
+                }
+            }
+
+            Point viewportOffset = root.GetViewportOffsetFromFrame ();
+
+            if (found is { })
+            {
+                // If the adornment is transparent to mouse, skip adding it, but continue traversal as if it was found.
+                if (!found.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                {
+                    viewsUnderLocation.Add (found);
+                }
+
+                root = found;
+                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
+            }
+
+            int startOffsetX = currentLocation.X - (root.Frame.X + viewportOffset.X);
+            int startOffsetY = currentLocation.Y - (root.Frame.Y + viewportOffset.Y);
+
+            View? subview = null;
+
+            for (int i = root.InternalSubViews.Count - 1; i >= 0; i--)
+            {
+                if (root.InternalSubViews [i].Visible
+                    && root.InternalSubViews [i].Contains (new (startOffsetX + root.Viewport.X, startOffsetY + root.Viewport.Y))
+                    && (!ignoreTransparent || !root.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
+                {
+                    subview = root.InternalSubViews [i];
+                    currentLocation.X = startOffsetX + root.Viewport.X;
+                    currentLocation.Y = startOffsetY + root.Viewport.Y;
+
+                    break;
+                }
+            }
+
+            if (subview is null)
+            {
+                if (!ignoreTransparent && root.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                {
+                    viewsUnderLocation.AddRange (GetViewsUnderLocationForRoot (root, location, true));
+
+                    // De-dupe
+                    HashSet<View?> hashSet = [.. viewsUnderLocation];
+                    viewsUnderLocation = [.. hashSet];
+                }
+
+                return viewsUnderLocation;
+            }
+
+            root = subview;
+        }
+
+        return viewsUnderLocation;
+    }
+
+
     #endregion Utilities
 
     #region Diagnostics and Verification
