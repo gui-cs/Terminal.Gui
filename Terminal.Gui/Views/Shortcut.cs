@@ -472,6 +472,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (CommandView.Margin is { })
         {
             CommandView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            CommandView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -532,6 +534,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (HelpView.Margin is { })
         {
             HelpView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            HelpView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -663,6 +667,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (KeyView.Margin is { })
         {
             KeyView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            KeyView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
