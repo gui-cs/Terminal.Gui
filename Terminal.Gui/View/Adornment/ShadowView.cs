@@ -12,37 +12,45 @@ internal class ShadowView : View
     private ShadowStyle _shadowStyle;
 
     /// <inheritdoc />
-    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    /// <inheritdoc />
+    protected override bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute newAttribute)
     {
-        if (role == VisualRole.Normal)
-        {
-            if (SuperView is not Adornment adornment)
-            {
-                return false;
-            }
+        //if (role == VisualRole.Normal)
+        //{
+        //    if (SuperView is not Adornment adornment)
+        //    {
+        //        return false;
+        //    }
 
-            var attr = Attribute.Default;
+        //    var attr = Attribute.Default;
 
-            if (adornment.Parent?.SuperView is { })
-            {
-                attr = adornment.Parent.SuperView.GetAttributeForRole (VisualRole.Normal);
-            }
-            else if (Application.Top is { })
-            {
-                attr = Application.Top.GetAttributeForRole (VisualRole.Normal);
-            }
+        //    if (adornment.Parent?.SuperView is { })
+        //    {
+        //        attr = adornment.Parent.SuperView.GetAttributeForRole (VisualRole.Normal);
+        //    }
+        //    else
+        //    {
+        //        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (FrameToScreen ().Location);
+        //        View? underView = currentViewsUnderMouse!.LastOrDefault (view => !IsInHierarchy (adornment!.Parent!.SuperView, view, true));
+        //        attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
+        //    }
 
-            currentAttribute =
-                        new Attribute (
-                                       ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
-                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor (),
-                                       attr.Style);
+        //    newAttribute =
+        //                new Attribute (
+        //                               ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
+        //                               ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor (),
+        //                               attr.Style);
 
+        //    // If either fg or bg are DarkGray, GetDarkerColor gave up. Use Style = Faint
+        //    if (newAttribute.Foreground == Color.DarkGray)
+        //    {
+        //        newAttribute = attr;// new Attribute (attr.Foreground, currentAttribute.Background);
+        //    }
 
-            return true;
-        }
+        //    //return true;
+        //}
 
-        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+        return true;//base.OnSettingAttributeForRole (in role, in currentAttribute, ref newAttribute);
     }
 
     /// <inheritdoc />
@@ -61,7 +69,6 @@ internal class ShadowView : View
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        SetAttribute (GetAttributeForRole (VisualRole.Normal));
         switch (ShadowStyle)
         {
             case ShadowStyle.Opaque:
@@ -77,10 +84,6 @@ internal class ShadowView : View
                 break;
 
             case ShadowStyle.Transparent:
-                //Attribute prevAttr = Driver.GetAttribute ();
-                //var attr = new Attribute (prevAttr.Foreground, prevAttr.Background);
-                //SetAttribute (attr);
-
                 if (Orientation == Orientation.Vertical)
                 {
                     DrawVerticalShadowTransparent (Viewport);
@@ -89,8 +92,6 @@ internal class ShadowView : View
                 {
                     DrawHorizontalShadowTransparent (Viewport);
                 }
-
-                //SetAttribute (prevAttr);
 
                 break;
         }
@@ -110,21 +111,26 @@ internal class ShadowView : View
         {
             Visible = value != ShadowStyle.None;
             _shadowStyle = value;
+
+            ViewportSettings |= ViewportSettings.TransparentMouse;
         }
     }
 
     private void DrawHorizontalShadowOpaque (Rectangle rectangle)
     {
         // Draw the start glyph
+        SetAttribute (GetAttributeUnderLocation (ViewportToScreen (new Point (0, 0))));
         AddRune (0, 0, Glyphs.ShadowHorizontalStart);
 
         // Fill the rest of the rectangle with the glyph - note we skip the last since vertical will draw it
         for (var i = 1; i < rectangle.Width - 1; i++)
         {
+            SetAttribute (GetAttributeUnderLocation (ViewportToScreen (new Point (i, 0))));
             AddRune (i, 0, Glyphs.ShadowHorizontal);
         }
 
         // Last is special
+        SetAttribute (GetAttributeUnderLocation (ViewportToScreen (new Point (rectangle.Width - 1, 0))));
         AddRune (rectangle.Width - 1, 0, Glyphs.ShadowHorizontalEnd);
     }
 
@@ -137,7 +143,7 @@ internal class ShadowView : View
             for (int c = Math.Max (0, screen.X + 1); c < screen.X + screen.Width; c++)
             {
                 Driver?.Move (c, r);
-
+                SetAttribute (GetAttributeUnderLocation (new (c, r)));
                 if (c < Driver?.Contents!.GetLength (1) && r < Driver?.Contents?.GetLength (0))
                 {
                     Driver.AddRune (Driver.Contents [r, c].Rune);
@@ -149,11 +155,13 @@ internal class ShadowView : View
     private void DrawVerticalShadowOpaque (Rectangle viewport)
     {
         // Draw the start glyph
+        SetAttribute (GetAttributeUnderLocation (ViewportToScreen (new Point (0, 0))));
         AddRune (0, 0, Glyphs.ShadowVerticalStart);
 
         // Fill the rest of the rectangle with the glyph
         for (var i = 1; i < viewport.Height - 1; i++)
         {
+            SetAttribute (GetAttributeUnderLocation (ViewportToScreen (new Point (0, i))));
             AddRune (0, i, Glyphs.ShadowVertical);
         }
     }
@@ -168,12 +176,38 @@ internal class ShadowView : View
             for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
             {
                 Driver?.Move (c, r);
-
+                SetAttribute (GetAttributeUnderLocation (new (c, r)));
                 if (Driver?.Contents is { } && screen.X < Driver.Contents.GetLength (1) && r < Driver.Contents.GetLength (0))
                 {
                     Driver.AddRune (Driver.Contents [r, c].Rune);
                 }
             }
         }
+    }
+
+    private Attribute GetAttributeUnderLocation (Point location)
+    {
+        if (SuperView is not Adornment adornment)
+        {
+            return Attribute.Default;
+        }
+
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (location);
+        View? underView = currentViewsUnderMouse!.LastOrDefault (/*view => !IsInHierarchy (adornment!.Parent!.SuperView, view, true)*/);
+        Attribute attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
+
+        Attribute newAttribute =
+            new Attribute (
+                           ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
+                           ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor (),
+                           attr.Style);
+
+        // If either fg or bg are DarkGray, GetDarkerColor gave up. Use Style = Faint
+        if (newAttribute.Foreground == Color.DarkGray)
+        {
+            newAttribute = attr;// new Attribute (attr.Foreground, currentAttribute.Background);
+        }
+
+        return newAttribute;
     }
 }

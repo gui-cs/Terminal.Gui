@@ -36,6 +36,10 @@ public class Margin : Adornment
 
         // Margin should not be focusable
         CanFocus = false;
+
+        // Margins are transparent to mouse
+        ViewportSettings |= ViewportSettings.TransparentMouse;
+
     }
 
     // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views

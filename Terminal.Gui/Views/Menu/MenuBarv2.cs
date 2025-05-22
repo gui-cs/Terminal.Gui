@@ -504,7 +504,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
 
-        Id = "DemonuBar";
+        Id = "DemoBar";
 
         var bordersCb = new CheckBox
         {

@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -23,6 +22,20 @@ namespace Terminal.Gui;
 ///         Scheme, create a new one with the desired values, using the <see cref="Scheme(Scheme)"/>
 ///         constructor.
 ///     </para>
+///     <para>
+///         The Normal attribute must always be set. All other attributes are optional.
+///         If a Scheme does not have a value set for a specific <see cref="VisualRole"/>, then a derived value is used.
+///         The algorithm for deriving the value is as follows:
+///             - For roles that have a "Hot" variant (e.g., <see cref="VisualRole.Normal"/> has <see cref="VisualRole.HotNormal"/> as it's "Hot" variant):
+///                 - If the "Hot" variant is not set, it will be derived from the Normal attribute by adding the underline style.
+///                 - If the non-"Hot" variant is not set, it will be derived from the "Hot" variant, removing the underline style.
+///             - For roles that have a "Focus" variant (e.g., <see cref="VisualRole.Normal"/> has <see cref="VisualRole.Focus"/> as it's "Focus" variant):
+///                 - If the "Focus" variant is not set, it will be derived from the Normal attribute by changing the background color to the highlight color.
+///             - If "Highlight" is not set, it will be derived from the Normal attribute by using the GetHighlightColor method.
+///             - If "Editable" is not set, the Base "Editable" attribute will be used.
+///             - If "ReadOnly" is not set, it will be derived from the "Editable" attribute by adding the italic and faint style.
+///                 
+///     </para>
 /// </remarks>
 [JsonConverter (typeof (SchemeJsonConverter))]
 public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
@@ -32,97 +45,106 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     ///     unit tests that don't depend on ConfigurationManager.
     /// </summary>
     /// <returns></returns>
-
-    internal static ImmutableDictionary<string, Scheme?> GetHardCodedSchemes ()
+    internal static ImmutableDictionary<string, Scheme> GetHardCodedSchemes ()
     {
         return ImmutableDictionary.CreateRange (
-            StringComparer.InvariantCultureIgnoreCase,
-            new []
-            {
-            new KeyValuePair<string, Scheme?>(
-                SchemeManager.SchemesToSchemeName(Schemes.Base)!,
-                new Scheme
-                {
-                    Normal = new Attribute(new Color("LightGray"), new Color("RaisinBlack"), TextStyle.None),
-                    Focus = new Attribute(new Color("White"), new Color("DarkGray"), TextStyle.Bold),
-                    HotNormal = new Attribute(new Color("Silver"), new Color("RaisinBlack"), TextStyle.Underline),
-                    Disabled = new Attribute(new Color("DarkGray"), new Color("RaisinBlack"), TextStyle.Faint),
-                    HotFocus = new Attribute(new Color("White"), new Color("DarkGray"), TextStyle.Underline | TextStyle.Bold),
-                    Active = new Attribute(new Color("White"), new Color("Charcoal"), TextStyle.None),
-                    HotActive = new Attribute(new Color("White"), new Color("Charcoal"), TextStyle.Underline),
-                    Highlight = new Attribute(new Color("White"), new Color("Onyx"), TextStyle.None),
-                    Editable = new Attribute(new Color("LightYellow"), new Color("OuterSpace"), TextStyle.None),
-                    ReadOnly = new Attribute(new Color("Gray"), new Color("RaisinBlack"), TextStyle.Italic)
-                }
-            ),
-            new KeyValuePair<string, Scheme?>(
-                SchemeManager.SchemesToSchemeName(Schemes.Toplevel)!,
-                new Scheme
-                {
-                    Normal = new Attribute(new Color("Gainsboro"), new Color("OuterSpace"), TextStyle.None),
-                    Focus = new Attribute(new Color("White"), new Color("SlateGray"), TextStyle.None),
-                    HotNormal = new Attribute(new Color("LightGray"), new Color("OuterSpace"), TextStyle.Underline),
-                    Disabled = new Attribute(new Color("DimGray"), new Color("OuterSpace"), TextStyle.Faint),
-                    HotFocus = new Attribute(new Color("White"), new Color("SlateGray"), TextStyle.Underline),
-                    Active = new Attribute(new Color("White"), new Color("DarkSlateGray"), TextStyle.Bold),
-                    HotActive = new Attribute(new Color("White"), new Color("DarkSlateGray"), TextStyle.Underline | TextStyle.Bold),
-                    Highlight = new Attribute(new Color("White"), new Color("Onyx"), TextStyle.None),
-                    Editable = new Attribute(new Color("LemonChiffon"), new Color("RaisinBlack"), TextStyle.None),
-                    ReadOnly = new Attribute(new Color("Silver"), new Color("OuterSpace"), TextStyle.Italic)
-                }
-            ),
-            new KeyValuePair<string, Scheme?>(
-                SchemeManager.SchemesToSchemeName(Schemes.Error)!,
-                new Scheme
-                {
-                    Normal = new Attribute(new Color("IndianRed"), new Color("RaisinBlack"), TextStyle.None),
-                    Focus = new Attribute(new Color("White"), new Color("IndianRed"), TextStyle.None),
-                    HotNormal = new Attribute(new Color("LightCoral"), new Color("RaisinBlack"), TextStyle.Underline),
-                    Disabled = new Attribute(new Color("DarkGray"), new Color("RaisinBlack"), TextStyle.Faint),
-                    HotFocus = new Attribute(new Color("White"), new Color("IndianRed"), TextStyle.Underline),
-                    Active = new Attribute(new Color("White"), new Color("LightCoral"), TextStyle.Bold),
-                    HotActive = new Attribute(new Color("White"), new Color("LightCoral"), TextStyle.Underline | TextStyle.Bold),
-                    Highlight = new Attribute(new Color("White"), new Color("IndianRed"), TextStyle.None),
-                    Editable = new Attribute(new Color("LemonChiffon"), new Color("RaisinBlack"), TextStyle.None),
-                    ReadOnly = new Attribute(new Color("Silver"), new Color("RaisinBlack"), TextStyle.Italic)
-                }
-            ),
-            new KeyValuePair<string, Scheme?>(
-                SchemeManager.SchemesToSchemeName(Schemes.Dialog)!,
-                new Scheme
-                {
-                    Normal = new Attribute(new Color("Gainsboro"), new Color("SlateGray"), TextStyle.None),
-                    Focus = new Attribute(new Color("Black"), new Color("Gainsboro"), TextStyle.None),
-                    HotNormal = new Attribute(new Color("WhiteSmoke"), new Color("SlateGray"), TextStyle.Underline),
-                    Disabled = new Attribute(new Color("Gray"), new Color("SlateGray"), TextStyle.Faint),
-                    HotFocus = new Attribute(new Color("Black"), new Color("Gainsboro"), TextStyle.Underline),
-                    Active = new Attribute(new Color("Black"), new Color("WhiteSmoke"), TextStyle.Bold),
-                    HotActive = new Attribute(new Color("Black"), new Color("WhiteSmoke"), TextStyle.Underline | TextStyle.Bold),
-                    Highlight = new Attribute(new Color("Black"), new Color("Gainsboro"), TextStyle.None),
-                    Editable = new Attribute(new Color("Black"), new Color("LemonChiffon"), TextStyle.None),
-                    ReadOnly = new Attribute(new Color("Silver"), new Color("SlateGray"), TextStyle.Italic)
-                }
-            ),
-            new KeyValuePair<string, Scheme?>(
-                SchemeManager.SchemesToSchemeName(Schemes.Menu)!,
-                new Scheme
-                {
-                    Normal = new Attribute(new Color("Charcoal"), new Color("WhiteSmoke"), TextStyle.Bold),
-                    Focus = new Attribute(new Color("Black"), new Color("SlateGray"), TextStyle.Bold),
-                    HotNormal = new Attribute(new Color("Charcoal"), new Color("WhiteSmoke"), TextStyle.Underline | TextStyle.Bold),
-                    Disabled = new Attribute(new Color("Gray"), new Color("Gainsboro"), TextStyle.Faint),
-                    HotFocus = new Attribute(new Color("Black"), new Color("SlateGray"), TextStyle.Underline | TextStyle.Bold),
-                    Active = new Attribute(new Color("White"), new Color("LightGray"), TextStyle.Bold),
-                    HotActive = new Attribute(new Color("White"), new Color("LightGray"), TextStyle.Underline | TextStyle.Bold),
-                    Highlight = new Attribute(new Color("White"), new Color("SlateGray"), TextStyle.None),
-                    Editable = new Attribute(new Color("Charcoal"), new Color("WhiteSmoke"), TextStyle.None),
-                    ReadOnly = new Attribute(new Color("Silver"), new Color("WhiteSmoke"), TextStyle.Italic)
-                }
-            )
-            }
-        );
-    }
+                                                StringComparer.InvariantCultureIgnoreCase,
+                                                [
+                                                    new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Base)!, CreateBase ()),
+                                                    new (SchemeManager.SchemesToSchemeName (Schemes.Toplevel)!, CreateToplevel ()),
+                                                    new (SchemeManager.SchemesToSchemeName (Schemes.Error)!, CreateError ()),
+                                                    new (SchemeManager.SchemesToSchemeName (Schemes.Dialog)!, CreateDialog ()),
+                                                    new (SchemeManager.SchemesToSchemeName (Schemes.Menu)!, CreateMenu ())
+                                                ]
+                                               );
 
+        Scheme CreateBase ()
+        {
+            Color highlight = new Color ("LightGray");
+            highlight = highlight.GetHighlightColor ();
+            return new ()
+            {
+                Normal = new ("LightGray", "RaisinBlack"),
+                Focus = new ("White", "DarkGray", "Bold"),
+                HotNormal = new ("Silver", "RaisinBlack", "Underline"),
+                Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
+                HotFocus = new ("White", "DarkGray", "Underline,Bold"),
+                Active = new ("White", "Charcoal"),
+                HotActive = new ("White", "Charcoal", "Underline"),
+                Highlight = new (highlight, new Color("RaisinBlack")),
+                Editable = new ("LightYellow", "OuterSpace"),
+                //use algo: ReadOnly = new ("Gray", "RaisinBlack", "Italic")
+            };
+        }
+
+        Scheme CreateToplevel ()
+        {
+            return new ()
+            {
+                Normal = new ("Gainsboro", "OuterSpace"),
+                Focus = new ("White", "SlateGray"),
+                HotNormal = new ("LightGray", "OuterSpace", "Underline"),
+                Disabled = new ("DimGray", "OuterSpace", "Faint"),
+                HotFocus = new ("White", "SlateGray", "Underline"),
+                Active = new ("White", "DarkSlateGray", "Bold"),
+                HotActive = new ("White", "DarkSlateGray", "Underline,Bold"),
+                Highlight = new ("White", "Onyx"),
+                Editable = new ("LemonChiffon", "RaisinBlack"),
+                ReadOnly = new ("Silver", "OuterSpace", "Italic")
+            };
+        }
+
+        Scheme CreateError ()
+        {
+            return new ()
+            {
+                Normal = new ("IndianRed", "RaisinBlack"),
+                Focus = new ("White", "IndianRed"),
+                HotNormal = new ("LightCoral", "RaisinBlack", "Underline"),
+                Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
+                HotFocus = new ("White", "IndianRed", "Underline"),
+                Active = new ("White", "LightCoral", "Bold"),
+                HotActive = new ("White", "LightCoral", "Underline,Bold"),
+                Highlight = new ("White", "IndianRed"),
+                Editable = new ("LemonChiffon", "RaisinBlack"),
+                ReadOnly = new ("Silver", "RaisinBlack", "Italic")
+            };
+        }
+
+        Scheme CreateDialog ()
+        {
+            return new ()
+            {
+                Normal = new ("Gainsboro", "SlateGray"),
+                Focus = new ("Black", "Gainsboro"),
+                HotNormal = new ("WhiteSmoke", "SlateGray", "Underline"),
+                Disabled = new ("Gray", "SlateGray", "Faint"),
+                HotFocus = new ("Black", "Gainsboro", "Underline"),
+                Active = new ("Black", "WhiteSmoke", "Bold"),
+                HotActive = new ("Black", "WhiteSmoke", "Underline,Bold"),
+                Highlight = new ("Black", "Gainsboro"),
+                Editable = new ("Black", "LemonChiffon"),
+                ReadOnly = new ("Silver", "SlateGray", "Italic")
+            };
+        }
+
+        Scheme CreateMenu ()
+        {
+            return new ()
+            {
+                Normal = new ("Charcoal", "WhiteSmoke", "Bold"),
+                Focus = new ("Black", "SlateGray", "Bold"),
+                HotNormal = new ("Charcoal", "WhiteSmoke", "Underline,Bold"),
+                Disabled = new ("Gray", "Gainsboro", "Faint"),
+                HotFocus = new ("Black", "SlateGray", "Underline,Bold"),
+                Active = new ("White", "LightGray", "Bold"),
+                HotActive = new ("White", "LightGray", "Underline,Bold"),
+                Highlight = new ("White", "SlateGray"),
+                Editable = new ("Charcoal", "WhiteSmoke"),
+                ReadOnly = new ("Silver", "WhiteSmoke", "Italic")
+            };
+        }
+    }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
     public Scheme () : this (Attribute.Default.AsExplicitlySet ()) { }
@@ -178,19 +200,19 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     {
         // Get the base attribute for the role
         Attribute attr = role switch
-        {
-            VisualRole.Normal => Normal,
-            VisualRole.HotNormal => HotNormal,
-            VisualRole.Focus => Focus,
-            VisualRole.HotFocus => HotFocus,
-            VisualRole.Active => Active,
-            VisualRole.HotActive => HotActive,
-            VisualRole.Highlight => Highlight,
-            VisualRole.Editable => Editable,
-            VisualRole.ReadOnly => ReadOnly,
-            VisualRole.Disabled => Disabled,
-            _ => Normal
-        };
+                         {
+                             VisualRole.Normal => Normal,
+                             VisualRole.HotNormal => HotNormal,
+                             VisualRole.Focus => Focus,
+                             VisualRole.HotFocus => HotFocus,
+                             VisualRole.Active => Active,
+                             VisualRole.HotActive => HotActive,
+                             VisualRole.Highlight => Highlight,
+                             VisualRole.Editable => Editable,
+                             VisualRole.ReadOnly => ReadOnly,
+                             VisualRole.Disabled => Disabled,
+                             _ => Normal
+                         };
 
         // If explicitly set or it's the Normal role (which must always be set), return as is
         if (attr.IsExplicitlySet || role == VisualRole.Normal)
@@ -208,34 +230,34 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     private Attribute DeriveAttributeForRole (VisualRole role)
     {
         return role switch
-        {
-            VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
-            VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-            VisualRole.HotFocus => GetDerivedAttribute (VisualRole.Focus) with
-            {
-                Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Underline,
-                IsExplicitlySet = false
-            },
-            VisualRole.Active => GetDerivedAttribute (VisualRole.Focus) with
-            {
-                Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Bold,
-                IsExplicitlySet = false
-            },
-            VisualRole.HotActive => GetDerivedAttribute (VisualRole.Active) with
-            {
-                Style = GetDerivedAttribute (VisualRole.Active).Style | TextStyle.Underline,
-                IsExplicitlySet = false
-            },
-            VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-            VisualRole.Editable => Normal with { Foreground = new ("LightYellow"), IsExplicitlySet = false },
-            VisualRole.ReadOnly => GetDerivedAttribute (VisualRole.Editable) with
-            {
-                Style = GetDerivedAttribute (VisualRole.Editable).Style | TextStyle.Italic,
-                IsExplicitlySet = false
-            },
-            VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
-            _ => Normal
-        };
+               {
+                   VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
+                   VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+                   VisualRole.HotFocus => GetDerivedAttribute (VisualRole.Focus) with
+                   {
+                       Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Underline,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.Active => GetDerivedAttribute (VisualRole.Focus) with
+                   {
+                       Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Bold,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.HotActive => GetDerivedAttribute (VisualRole.Active) with
+                   {
+                       Style = GetDerivedAttribute (VisualRole.Active).Style | TextStyle.Underline,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+                   VisualRole.Editable => Normal with { Foreground = new ("LightYellow"), IsExplicitlySet = false },
+                   VisualRole.ReadOnly => GetDerivedAttribute (VisualRole.Editable) with
+                   {
+                       Style = GetDerivedAttribute (VisualRole.Editable).Style | TextStyle.Italic,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
+                   _ => Normal
+               };
     }
 
     /// <summary>
@@ -245,19 +267,19 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     private Attribute GetDerivedAttribute (VisualRole role)
     {
         Attribute attr = role switch
-        {
-            VisualRole.Normal => Normal,
-            VisualRole.HotNormal => HotNormal,
-            VisualRole.Focus => Focus,
-            VisualRole.HotFocus => HotFocus,
-            VisualRole.Active => Active,
-            VisualRole.HotActive => HotActive,
-            VisualRole.Highlight => Highlight,
-            VisualRole.Editable => Editable,
-            VisualRole.ReadOnly => ReadOnly,
-            VisualRole.Disabled => Disabled,
-            _ => Normal
-        };
+                         {
+                             VisualRole.Normal => Normal,
+                             VisualRole.HotNormal => HotNormal,
+                             VisualRole.Focus => Focus,
+                             VisualRole.HotFocus => HotFocus,
+                             VisualRole.Active => Active,
+                             VisualRole.HotActive => HotActive,
+                             VisualRole.Highlight => Highlight,
+                             VisualRole.Editable => Editable,
+                             VisualRole.ReadOnly => ReadOnly,
+                             VisualRole.Disabled => Disabled,
+                             _ => Normal
+                         };
 
         if (attr.IsExplicitlySet || role == VisualRole.Normal)
         {
@@ -266,33 +288,33 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
         // Direct derivation for each role to avoid recursion issues
         return role switch
-        {
-            VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
-            VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-            VisualRole.HotFocus => Normal with
-            {
-                Background = Normal.Background.GetHighlightColor (),
-                Style = Normal.Style | TextStyle.Underline,
-                IsExplicitlySet = false
-            },
-            VisualRole.Active => Normal with
-            {
-                Background = Normal.Background.GetHighlightColor (),
-                Style = Normal.Style | TextStyle.Bold,
-                IsExplicitlySet = false
-            },
-            VisualRole.HotActive => Normal with
-            {
-                Background = Normal.Background.GetHighlightColor (),
-                Style = Normal.Style | TextStyle.Bold | TextStyle.Underline,
-                IsExplicitlySet = false
-            },
-            VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-            VisualRole.Editable => Normal with { Foreground = new ("LightYellow"), IsExplicitlySet = false },
-            VisualRole.ReadOnly => Normal with { Foreground = new ("LightYellow"), Style = Normal.Style | TextStyle.Italic, IsExplicitlySet = false },
-            VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
-            _ => Normal
-        };
+               {
+                   VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
+                   VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+                   VisualRole.HotFocus => Normal with
+                   {
+                       Background = Normal.Background.GetHighlightColor (),
+                       Style = Normal.Style | TextStyle.Underline,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.Active => Normal with
+                   {
+                       Background = Normal.Background.GetHighlightColor (),
+                       Style = Normal.Style | TextStyle.Bold,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.HotActive => Normal with
+                   {
+                       Background = Normal.Background.GetHighlightColor (),
+                       Style = Normal.Style | TextStyle.Bold | TextStyle.Underline,
+                       IsExplicitlySet = false
+                   },
+                   VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+                   VisualRole.Editable => Normal with { Foreground = new ("LightYellow"), IsExplicitlySet = false },
+                   VisualRole.ReadOnly => Normal with { Foreground = new ("LightYellow"), Style = Normal.Style | TextStyle.Italic, IsExplicitlySet = false },
+                   VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
+                   _ => Normal
+               };
     }
 
     /// <summary>

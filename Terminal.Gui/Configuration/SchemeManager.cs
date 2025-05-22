@@ -57,15 +57,15 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
     private static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
-        if (!ConfigurationManager.IsInitialized ())
-        {
-            throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
-        }
-
-        Debug.Assert (value is { });
-
         lock (_schemesLock)
         {
+            if (!ConfigurationManager.IsInitialized ())
+            {
+                throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
+            }
+
+            Debug.Assert (value is { });
+
             // Update the backing store
             ThemeManager.GetCurrentTheme () ["Schemes"].UpdateFrom (value);
         }
@@ -168,15 +168,15 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <returns></returns>
     public static Dictionary<string, Scheme?> GetSchemesForCurrentTheme ()
     {
-        if (!ConfigurationManager.IsInitialized ())
-        {
-            Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
-
-            return hardCoded;
-        }
-
         lock (_schemesLock)
         {
+            if (!ConfigurationManager.IsInitialized ())
+            {
+                Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
+
+                return hardCoded;
+            }
+
             Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
             if (schemes is null)
             {

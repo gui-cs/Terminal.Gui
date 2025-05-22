@@ -9,7 +9,7 @@ public class GetViewsUnderMouseTests
     [InlineData (0, 0)]
     [InlineData (2, 1)]
     [InlineData (20, 20)]
-    public void GetViewsUnderMouse_Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
+    public void Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
     {
         // Arrange
         var view = new View
@@ -30,7 +30,7 @@ public class GetViewsUnderMouseTests
     [InlineData (0, 0)]
     [InlineData (2, 1)]
     [InlineData (20, 20)]
-    public void GetViewsUnderMouse_Returns_Null_If_Start_Not_Visible (int testX, int testY)
+    public void Returns_Null_If_Start_Not_Visible (int testX, int testY)
     {
         // Arrange
         var view = new View

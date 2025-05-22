@@ -773,7 +773,8 @@ public partial class View // Mouse APIs
                     var cs = new Scheme (GetScheme ())
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (GetScheme ().Focus.Background,
+                        Normal = new (
+                                      GetScheme ().Focus.Background,
                                       GetScheme ().Normal.Foreground,
                                       GetScheme ().Focus.Style)
                     };
@@ -801,26 +802,103 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: Gets the Views that are under the mouse at <paramref name="location"/>, including Adornments.
     /// </summary>
-    /// <param name="location"></param>
+    /// <param name="location">Screen-relative location.</param>
     /// <param name="ignoreTransparent">If <see langword="true"/> any transparent views will be ignored.</param>
     /// <returns></returns>
     internal static List<View?> GetViewsUnderMouse (in Point location, bool ignoreTransparent = false)
     {
-        List<View?> viewsUnderMouse = new ();
-
-        View? start = Application.Top;
-
         // PopoverHost - If visible, start with it instead of Top
         if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover && !ignoreTransparent)
         {
-            start = visiblePopover;
+            List<View?> result = GetViewsUnderMouseForRoot (visiblePopover, location, ignoreTransparent);
 
-            // Put Top on stack next
-            viewsUnderMouse.Add (Application.Top);
+            if (result.Count > 0)
+            {
+                result.Add (Application.Top);
+                return result;
+            }
         }
 
+        var checkedTop = false;
+
+        // Traverse all visible toplevels, topmost first (reverse stack order)
+        if (Application.TopLevels.Count > 0)
+        {
+            foreach (Toplevel toplevel in Application.TopLevels)
+            {
+                if (toplevel.Visible && toplevel.Contains (location))
+                {
+                    List<View?> result = GetViewsUnderMouseForRoot (toplevel, location, ignoreTransparent);
+
+                    // Only return if the result is not empty AND the result contains the toplevel itself or a non-transparent child.
+                    if (result.Count > 0)
+                    {
+                        // If the result contains only the toplevel, but the margin is TransparentMouse, skip this toplevel.
+                        // If the result contains the margin, but the margin is TransparentMouse, skip this toplevel.
+                        // If the result contains the toplevel and/or margin and neither is TransparentMouse, return as before.
+                        // If the result contains only subviews, return as before.
+
+                        // If the result contains the toplevel, but the point is in a TransparentMouse margin, skip.
+                        Margin? margin = toplevel.Margin as Margin;
+                        bool isTransparentMargin =
+                            margin is { } &&
+                            margin.Contains (location) &&
+                            margin.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse);
+
+                        // If the result contains only the toplevel, and the margin is transparent, skip.
+                        if (isTransparentMargin &&
+                            result.All (v => v == toplevel))
+                        {
+                            continue; // skip this toplevel, try next
+                        }
+
+                        // If the result contains only the toplevel and the margin, and the margin is transparent, skip.
+                        if (isTransparentMargin &&
+                            result.All (v => v == toplevel || v == margin))
+                        {
+                            continue; // skip this toplevel, try next
+                        }
+
+                        return result;
+                    }
+                }
+
+
+                if (toplevel == Application.Top)
+                {
+                    checkedTop = true;
+                }
+            }
+        }
+
+        // Fallback: If TopLevels is empty or Top is not in TopLevels, check Top directly (for test compatibility)
+        if (!checkedTop && Application.Top is { Visible: true } top)
+        {
+            // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
+            List<View?> result = GetViewsUnderMouseForRoot (top, location, ignoreTransparent);
+
+            if (result.Count > 0)
+            {
+                return result;
+            }
+        }
+
+        return new ();
+    }
+
+    /// <summary>
+    /// INTERNAL: Helper that contains the original GetViewsUnderMouse logic, but starts from a given root view
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="location"></param>
+    /// <param name="ignoreTransparent"></param>
+    /// <returns></returns>
+    internal static List<View?> GetViewsUnderMouseForRoot (View start, in Point location, bool ignoreTransparent)
+    {
+        List<View?> viewsUnderMouse = new ();
         Point currentLocation = location;
 
+        // Normal logic: only traverse if the point is inside the view
         while (start is { Visible: true } && start.Contains (currentLocation))
         {
             if (!start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
@@ -850,8 +928,12 @@ public partial class View // Mouse APIs
 
             if (found is { })
             {
+                // If the adornment is transparent to mouse, skip adding it, but continue traversal as if it was found.
+                if (!found.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                {
+                    viewsUnderMouse.Add (found);
+                }
                 start = found;
-                viewsUnderMouse.Add (start);
                 viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
             }
 
@@ -870,33 +952,30 @@ public partial class View // Mouse APIs
                     currentLocation.X = startOffsetX + start.Viewport.X;
                     currentLocation.Y = startOffsetY + start.Viewport.Y;
 
-                    // start is the deepest subview under the mouse; stop searching the subviews
                     break;
                 }
             }
 
             if (subview is null)
             {
-                // In the case start is transparent, recursively add all it's subviews etc...
-                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                if (!ignoreTransparent && start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
                 {
-                    viewsUnderMouse.AddRange (GetViewsUnderMouse (location, true));
+                    viewsUnderMouse.AddRange (GetViewsUnderMouseForRoot (start, location, true));
 
-                    // De-dupe viewsUnderMouse
+                    // De-dupe
                     HashSet<View?> hashSet = [.. viewsUnderMouse];
                     viewsUnderMouse = [.. hashSet];
                 }
 
-                // No subview was found that's under the mouse, so we're done
                 return viewsUnderMouse;
             }
 
-            // We found a subview of start that's under the mouse, continue...
             start = subview;
         }
 
         return viewsUnderMouse;
     }
+
 
     private void DisposeMouse () { }
 }

@@ -12,7 +12,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     [InlineData (1, 0, true)]
     [InlineData (1, 1, true)]
     [InlineData (2, 1, true)]
-    public void Adornment_WithSubView_GetViewsUnderMouse_Finds (int viewMargin, int subViewMargin, bool expectedFound)
+    public void Adornment_WithSubView_Finds (int viewMargin, int subViewMargin, bool expectedFound)
     {
         Application.Top = new Toplevel()
         {
@@ -41,7 +41,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Adornment_WithNonVisibleSubView_GetViewsUnderMouse_Finds_Adornment ()
+    public void Adornment_WithNonVisibleSubView_Finds_Adornment ()
     {
         Application.Top = new Toplevel ()
         {

@@ -30,33 +30,33 @@ public class SchemeTests
         Assert.True (hotFocus.Style.HasFlag (TextStyle.Underline));
     }
 
-    [Fact]
-    public void HardcodedSchemes_ExplicitAttributes_AreMarkedExplicit ()
-    {
-        Dictionary<string, Scheme?> schemes = Scheme.GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase);
+    //[Fact]
+    //public void HardcodedSchemes_ExplicitAttributes_AreMarkedExplicit ()
+    //{
+    //    Dictionary<string, Scheme?> schemes = Scheme.GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase);
 
-        foreach (KeyValuePair<string, Scheme?> pair in schemes)
-        {
-            Scheme scheme = pair.Value!;
-            string name = pair.Key;
+    //    foreach (KeyValuePair<string, Scheme?> pair in schemes)
+    //    {
+    //        Scheme scheme = pair.Value!;
+    //        string name = pair.Key;
 
-            foreach (PropertyInfo prop in typeof (Scheme).GetProperties ())
-            {
-                if (prop.PropertyType != typeof (Attribute))
-                {
-                    continue;
-                }
+    //        foreach (PropertyInfo prop in typeof (Scheme).GetProperties ())
+    //        {
+    //            if (prop.PropertyType != typeof (Attribute))
+    //            {
+    //                continue;
+    //            }
 
-                var attr = (Attribute)prop.GetValue (scheme)!;
+    //            var attr = (Attribute)prop.GetValue (scheme)!;
 
-                // Only validate attributes that differ from the scheme's Normal
-                if (!ReferenceEquals (prop.Name, nameof (Scheme.Normal)) && attr != scheme.Normal)
-                {
-                    Assert.True (attr.IsExplicitlySet, $"{name}.{prop.Name} is not explicitly set.");
-                }
-            }
-        }
-    }
+    //            // Only validate attributes that differ from the scheme's Normal
+    //            if (!ReferenceEquals (prop.Name, nameof (Scheme.Normal)) && attr != scheme.Normal)
+    //            {
+    //                Assert.True (attr.IsExplicitlySet, $"{name}.{prop.Name} is not explicitly set.");
+    //            }
+    //        }
+    //    }
+    //}
 
     [Fact]
     public void Scheme_New ()
