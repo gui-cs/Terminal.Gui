@@ -18,14 +18,20 @@ public class ConfigPropertyTests
         int numTasks = 20;
         var values = new string [numTasks];
         for (int i = 0; i < numTasks; i++)
+        {
             values [i] = $"Value_{i}";
+        }
 
         Parallel.For (0, numTasks, i =>
-        {
-            configProperty.PropertyValue = values [i];
-            Assert.Equal (values [i], configProperty.PropertyValue);
-        });
+                                   {
+                                       configProperty.PropertyValue = values [i];
+                                       // Remove the per-thread assertion, as it is not valid in a concurrent context.
+                                       // Optionally, you can check that the value is one of the expected values:
+                                       var currentValue = configProperty.PropertyValue as string;
+                                       Assert.Contains (currentValue, values);
+                                   });
     }
+
 
     [Fact]
     public void UpdateFrom_CanBeCalledConcurrently ()

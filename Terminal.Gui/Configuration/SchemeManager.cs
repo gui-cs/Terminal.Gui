@@ -175,15 +175,17 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
             return hardCoded;
         }
 
-        Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-
-        if (schemes is null)
+        lock (_schemesLock)
         {
-            // Most likely because "Schemes": was left out of the config
-            throw new InvalidOperationException ("Current Theme does not have a Scheme.");
-        }
+            Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+            if (schemes is null)
+            {
+                // Most likely because "Schemes": was left out of the config
+                throw new InvalidOperationException ("Current Theme does not have a Scheme.");
+            }
 
-        return schemes!;
+            return schemes!;
+        }
     }
 
     /// <summary>

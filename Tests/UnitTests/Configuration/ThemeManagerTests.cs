@@ -23,22 +23,6 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
             // Default theme exists
             Assert.NotNull (ThemeManager.Themes? [ThemeManager.DEFAULT_THEME_NAME]);
-
-            //// Schemes exists, but is not initialized
-            //Assert.Null (manager ["Default"].);
-
-            //manager.RetrieveValues ();
-
-            //Assert.NotEmpty (manager);
-
-            //// Schemes exists, and has correct # of eleements
-            //var schemes = manager ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
-            //Assert.NotNull (schemes);
-            //Assert.Equal (5, schemes!.Count);
-
-            //// Base has correct values
-            //var baseSchemee = schemes ["Base"];
-            //Assert.Equal (new Attribute (Color.White, Color.Blue), baseSchemee.Normal);
         }
         finally
         {

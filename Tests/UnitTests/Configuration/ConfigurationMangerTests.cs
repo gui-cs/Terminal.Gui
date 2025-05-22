@@ -988,13 +988,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
             Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
 
-            //Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
-            //Assert.Equal (Color.Blue, SchemeManager.GetSchemes ()! ["Base"].Normal.Background);
-
-            //Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)ThemeManager.Themes!.First ().Value ["Schemes"].PropertyValue;
-            //Assert.Equal (Color.White, schemes! ["Base"].Normal.Foreground);
-            //Assert.Equal (Color.Blue, schemes ["Base"].Normal.Background);
-
             // Now re-apply
             Apply ();
 
