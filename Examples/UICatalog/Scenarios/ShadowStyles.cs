@@ -18,7 +18,7 @@ public class ShadowStyles : Scenario
 
         Window app = new ()
         {
-            Id= "app",
+            Id = "app",
             Title = GetQuitKeyAndName ()
         };
 
@@ -71,13 +71,21 @@ public class ShadowStyles : Scenario
             ShadowStyle = ShadowStyle.Opaque
         };
 
-        ColorPicker16 colorPicker16 = new ColorPicker16 ()
+        ColorPicker colorPicker = new ()
         {
+            Title = "ColorPicker to illustrate highlight (currently broken)",
+            BorderStyle = LineStyle.Dotted,
             Id = "colorPicker16",
-            X = 0,
-            Y = Pos.AnchorEnd(),
+            X = Pos.Center (),
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Percent(80),
         };
-        app.Add (button, colorPicker16);
+        colorPicker.ColorChanged += (sender, args) =>
+                                    {
+                                        var normal = app.GetScheme ().Normal;
+                                        app.SetScheme (app.GetScheme() with {Normal = new Attribute(normal.Foreground, args.CurrentValue)});
+                                    };
+        app.Add (button, colorPicker);
 
         editor.AutoSelectViewToEdit = true;
         editor.AutoSelectSuperView = app;
