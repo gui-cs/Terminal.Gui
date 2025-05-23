@@ -112,6 +112,25 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Attribute"/> struct from string representations of colors and style.
+    /// </summary>
+    /// <param name="foreground">Foreground color as a string (name, hex, or rgb).</param>
+    /// <param name="background">Background color as a string (name, hex, or rgb).</param>
+    /// <param name="style">Optional style as a string (e.g., "Bold,Underline").</param>
+    /// <exception cref="ArgumentException">Thrown if color parsing fails.</exception>
+    public Attribute (string foreground, string background, string? style = null)
+    {
+        Foreground = Color.Parse (foreground);
+        Background = Color.Parse (background);
+        Style = style is { } && Enum.TryParse<TextStyle> (style, true, out var parsedStyle)
+                    ? parsedStyle
+                    : TextStyle.None;
+        IsExplicitlySet = true;
+        PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
+    }
+
+
+    /// <summary>
     ///     INTERNAL: Initializes a new instance with a <see cref="ColorName16"/> value. Both <see cref="Foreground"/> and
     ///     <see cref="Background"/> will be set to the specified color.
     /// </summary>

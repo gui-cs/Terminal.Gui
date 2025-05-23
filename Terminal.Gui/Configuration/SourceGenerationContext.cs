@@ -30,6 +30,7 @@ namespace Terminal.Gui;
 [JsonSerializable (typeof (Dictionary<string, Color>))]
 
 [JsonSerializable (typeof (Dictionary<string, ConfigProperty>))]
+[JsonSerializable (typeof (ConcurrentDictionary<string, ConfigProperty>))]
 [JsonSerializable (typeof (ConfigProperty))]
 
 [JsonSerializable (typeof (Scope<string>))]

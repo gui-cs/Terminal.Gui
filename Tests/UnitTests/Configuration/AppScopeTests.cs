@@ -15,7 +15,7 @@ public class AppSettingsScopeTests
         Assert.NotNull (Settings! ["AppSettings"].PropertyValue);
 
         AppSettingsScope? appSettings = (Settings! ["AppSettings"].PropertyValue as AppSettingsScope);
-        Assert.Equal (4, appSettings!.Count); // 4 properties on AppSettingsTestClass
+        Assert.Equal (10, appSettings!.Count); // 10 test properties
 
         Assert.Equal ("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue);
     }
@@ -28,7 +28,7 @@ public class AppSettingsScopeTests
         Assert.NotNull (Settings! ["AppSettings"].PropertyValue);
 
         AppSettingsScope? appSettings = (Settings! ["AppSettings"].PropertyValue as AppSettingsScope);
-        Assert.Equal (4, appSettings!.Count); // 4 properties on AppSettingsTestClass
+        Assert.Equal (10, appSettings!.Count); // 10 test properties
         Assert.Equal ("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue);
 
         Disable (resetToHardCodedDefaults: true);
@@ -75,13 +75,19 @@ public class AppSettingsScopeTests
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
         ResetToCurrentValues ();
+        Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
+
         Apply ();
+        Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
         AppSettingsTestClass.NullableValueProperty = true;
         ResetToCurrentValues ();
+        Assert.True ((bool)AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue!);
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
         Apply ();
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
 
         Disable (resetToHardCodedDefaults: true);

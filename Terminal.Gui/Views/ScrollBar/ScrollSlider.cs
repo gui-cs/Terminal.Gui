@@ -268,7 +268,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
     public event EventHandler<EventArgs<int>>? Scrolled;
 
     /// <inheritdoc />
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal)
         {

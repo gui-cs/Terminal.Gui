@@ -7,11 +7,12 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Configuration Editor", "Edits Terminal.Gui Config Files.")]
+[ScenarioMetadata ("Configuration Editor", "Editor of Terminal.Gui Config Files")]
 [ScenarioCategory ("TabView")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
+[ScenarioCategory ("Configuration")]
 public class ConfigurationEditor : Scenario
 {
     //private static Scheme _editorScheme = SchemeManager.GetScheme (Schemes.Base);

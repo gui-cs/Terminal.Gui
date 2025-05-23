@@ -42,10 +42,11 @@ Users can change settings on a global or per-application basis by providing JSON
 
 ## CM is Disabled by Default
 
-The `ConfigurationManager` class is disabled by default. To enable it, call @Terminal.Gui.ConfigurationManager.Enable() in your application's `Main` method.
+The `ConfigurationManager` must be enabled explicitly by calling  @Terminal.Gui.ConfigurationManager.Enable() in an application's `Main` method.
 
 ```csharp
-ConfigurationManager.Enable();
+// Enable configuration with all sources  
+ConfigurationManager.Enable(ConfigLocations.All);
 ```
 
 If `ConfigurationManager.Enable()` is not called (`ConfigurationManager.IsEnabled` is 'false'), all configuration settings are ignored and ConfigurationManager will effectively be a no-op. All `[ConfigurationProperty]` properties will initially be their hard-coded default values. Calling @Terminal.Gui.ConfigurationManager.Reset will reset all configuration properties back to their hard-coded default values.
@@ -54,13 +55,13 @@ Other than that, no other ConfigurationManager APIs will have any effect.
 
 ## Loading and Applying Configuration
 
-The `ConfigurationManager` class provides a `Load` method that loads the configuration from the given location. The `Load` method does not apply the settings to the application; that happens when the `Apply` method is called.
+Optionally, developers can more granularly control the loading and applying of configuration by calling the `Load` and `Apply` methods directly.
 
 When a configuration has been loaded, the @Terminal.Gui.ConfigurationManager.Apply method must be called to apply the settings to the application. This method uses reflection to find all static fields decorated with the `[ConfigurationProperty]` attribute and applies the settings to the corresponding properties.
 
 ```csharp
 // Load the configuration from just the users home directory.
-ConfigurationManager.Enable();
+ConfigurationManager.Enable(ConfigLocations.HardCoded);
 ConfigurationManager.Load(ConfigLocations.GlobalHome);
 ConfigurationManager.Apply();
 ```
@@ -71,9 +72,10 @@ ConfigurationManager.Apply();
 
 ## Configuration Types and Scopes
 
-Terminal.Gui supports three main configuration scopes:
+Terminal.Gui supports three main configuration scopes. See the section below titled [What Can Be Configured](#what-can-be-configured) for more details.
 
 ### SettingsScope
+
 System-level settings that affect Terminal.Gui behavior:
 ```csharp
 [ConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -96,17 +98,6 @@ public static string MyAppSetting { get; set; } = "default";
 
 ## Configuration Precedence
 
-Configuration values are applied in the following order (later sources override earlier ones):
-
-1. Hard-coded defaults (lowest precedence)
-2. Terminal.Gui assembly defaults
-3. Runtime configuration
-4. App resources
-5. App-specific user home directory
-6. App-specific current directory
-7. Global user home directory
-8. Global current directory (highest precedence)
-
 ```mermaid
 graph TD
     A[Hard-coded Defaults] --> B[Terminal.Gui Defaults]
@@ -117,6 +108,31 @@ graph TD
     F --> G[Global Home Directory]
     G --> H[Global Current Directory]
 ```
+
+Settings are applied using the following precedence (higher precedence settings overwrite lower precedence settings):
+
+1. Hard-coded default values in any static property decorated with the `[ConfigurationProperty]` attribute.
+
+2. @Terminal.Gui.ConfigLocations.Default - Default settings in the Terminal.Gui assembly -- Lowest precedence.
+
+3. @Terminal.Gui.ConfigLocations.Runtime - Settings stored in the @Terminal.Gui.ConfigurationManager.RuntimeConfig static property.
+
+4. @Terminal.Gui.ConfigLocations.AppResources - App settings in app resources (`Resources/config.json`).
+
+5. @Terminal.Gui.ConfigLocations.AppHome - App-specific settings in the users's home directory (`~/.tui/appname.config.json`). 
+
+6. @Terminal.Gui.ConfigLocations.AppCurrent - App-specific settings in the directory the app was launched from (`./.tui/appname.config.json`).
+
+7. @Terminal.Gui.ConfigLocations.GlobalHome - Global settings in the the user's home directory (`~/.tui/config.json`).
+
+8. @Terminal.Gui.ConfigLocations.GlobalCurrent - Global settings in the directory the app was launched from (`./.tui/config.json`) --- Hightest precedence.
+
+
+The [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) will look for configuration files in the `.tui` folder in the user's home directory (e.g. `C:/Users/username/.tui` or `/usr/username/.tui`), the folder where the Terminal.Gui application was launched from (e.g. `./.tui`), or as a resource within the Terminal.Gui application's main assembly.
+
+Settings that will apply to all applications (global settings) reside in files named `config.json`. Settings that will apply to a specific Terminal.Gui application reside in files named `appname.config.json`, where *appname* is the assembly name of the application (e.g. `UICatalog.config.json`).
+
+
 
 ## Configuration Events
 
@@ -137,7 +153,7 @@ ConfigurationManager.ThemeChanged += (sender, e) => {
 
 ## How Settings are Defined 
 
-Application Developers define settings by decorating static properties with the `[ConfigurationProperty]` attribute.
+Application developers define settings by decorating static properties with the `[ConfigurationProperty]` attribute.
 
 ```csharp
 class MyApp
@@ -147,7 +163,7 @@ class MyApp
 }
 ```
 
-Configuration Properties must be `public` or `internal` static properties.
+Configuration Properties must be `public` or `internal` `static` properties.
 
 The above example will define a configuration property in the `AppSettings` scope. The name of the property will be `MyApp.MySetting` and will appear in JSON as:
 
@@ -173,38 +189,17 @@ Terminal.Gui library developers can use the `SettingsScope` and `ThemeScope` att
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 ```
 
-## Precedence
-
-Settings are applied using the following precedence (higher precedence settings overwrite lower precedence settings):
-
-1. Hard-coded default values in any static property decorated with the `[ConfigurationProperty]` attribute.
-
-2. @Terminal.Gui.ConfigLocations.Default - Default settings in the Terminal.Gui assembly -- Lowest precedence.
-
-3. @Terminal.Gui.ConfigLocations.Runtime - Settings stored in the @Terminal.Gui.ConfigurationManager.RuntimeConfig static property.
-
-4. @Terminal.Gui.ConfigLocations.AppResources - App settings in app resources (`Resources/config.json`).
-
-5. @Terminal.Gui.ConfigLocations.AppHome - App-specific settings in the users's home directory (`~/.tui/appname.config.json`). 
-
-6. @Terminal.Gui.ConfigLocations.AppCurrent - App-specific settings in the directory the app was launched from (`./.tui/appname.config.json`).
-
-7. @Terminal.Gui.ConfigLocations.GlobalHome - Global settings in the the user's home directory (`~/.tui/config.json`).
-
-8. @Terminal.Gui.ConfigLocations.GlobalCurrent - Global settings in the directory the app was launched from (`./.tui/config.json`) --- Hightest precedence.
-
-
-The [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) will look for configuration files in the `.tui` folder in the user's home directory (e.g. `C:/Users/username/.tui` or `/usr/username/.tui`), the folder where the Terminal.Gui application was launched from (e.g. `./.tui`), or as a resource within the Terminal.Gui application's main assembly.
-
-Settings that will apply to all applications (global settings) reside in files named `config.json`. Settings that will apply to a specific Terminal.Gui application reside in files named `appname.config.json`, where *appname* is the assembly name of the application (e.g. `UICatalog.config.json`).
-
 # Sample Code
 
-The `UICatalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class to load and save configuration files. The `Configuration Editor` scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) to reload them; allowing users to change settings without having to restart the application.
+The `UICatalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class to load and save configuration files. 
+
+The `Configuration Editor` Scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) to reload them; allowing users to change settings without having to restart the application.
+
+The `Themes` Scenario in the UI Catalog provides a viewer for the themes defined in the configuration files.
 
 # What Can Be Configured
 
-The `ConfigurationManager` class provides the following features:
+`ConfigurationManager` provides the following features:
 
 1) **Settings**. Settings are applied to the [`Application`](~/api/Terminal.Gui.Application.yml) class. Settings are accessed via the `Settings` property of [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml). E.g. `Settings["Application.QuitKey"]`
 2) **Themes**. Themes are a named collection of settings impacting how applications look. The default theme is named "Default". Two other built-in themes are provided: "Dark", and "Light". Additional themes can be defined in the configuration files. `Settings ["Themes"]` is a dictionary of theme names to theme settings.
@@ -228,22 +223,43 @@ Themes support defining Schemes (a set of colors and styles that define the appe
 
 ### Theme Configuration
 
-Themes provide a way to bundle visual settings together. Themes can inherit from other themes:
+Themes provide a way to bundle visual settings together. When @Terminal.Gui.ConfigurationManager.Apply is called, the theme settings are applied to the application. 
 
 ```json
-{
-  "Themes": [
-    "MyCustomTheme": {
-      "BasedOn": "Default",
-      "Colors": {
-        "Normal": {
-          "Foreground": "White",
-          "Background": "Blue"
-        }
-      }
-    }
-  ]
-}
+// ...
+ "Dark": {
+   "Dialog.DefaultButtonAlignment": "End",
+   "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
+   "Dialog.DefaultBorderStyle": "Heavy",
+   "Dialog.DefaultShadow": "Transparent",
+   "FrameView.DefaultBorderStyle": "Single",
+   "Window.DefaultBorderStyle": "Single",
+   "MessageBox.DefaultButtonAlignment": "Center",
+   "MessageBox.DefaultBorderStyle": "Heavy",
+   "Button.DefaultShadow": "Opaque",
+   "Schemes": [
+     {
+       "TopLevel": {
+         "Normal": {
+           "Foreground": "LightGray",
+           "Background": "Black",
+           "Style": "None"
+         },
+// etc...
+```
+
+Only properties that are defined in the theme will be applied, meaning that themes can be used to override the a previously applied theme.
+
+To ensure a theme inherits from the default theme, first apply the default theme, then apply the new theme, like this:
+
+```csharp
+// Apply the default theme
+  ThemeManager.Theme = "Default";
+ConfigurationManager.Apply();
+
+// Apply the new theme
+ThemeManager.Theme = "MyCustomTheme";
+ConfigurationManager.Apply();
 ```
 
 ### Glyphs
@@ -304,9 +320,7 @@ Dictionary<string, Scheme> schemes = SchemeManager.GetCurrentSchemes();
 ImmutableList<string> schemeNames = SchemeManager.GetSchemeNames();
 
 // Access specific schemes
-Scheme topLevelScheme = SchemeManager.Schemes["TopLevel"];
-Scheme dialogScheme = SchemeManager.Schemes["Dialog"];
-Scheme menuScheme = SchemeManager.Schemes["Menu"];
+Scheme topLevelScheme = SchemeManager.GetScheme("TopLevel");
 
 // Listen for scheme changes
 SchemeManager.CollectionChanged += (sender, e) => {
@@ -316,7 +330,7 @@ SchemeManager.CollectionChanged += (sender, e) => {
 
 ### Built-in Schemes
 
-The following schemes are available by default:
+The following Schemes are available by default:
 
 - **TopLevel**: Used for the application's top-level windows
 - **Base**: Default scheme for most views
@@ -324,7 +338,7 @@ The following schemes are available by default:
 - **Menu**: Used for menus and status bars
 - **Error**: Used for error messages and dialogs
 
-Each scheme defines colors and attributes for different view states (Normal, Focus, HotNormal, HotFocus, Disabled).
+Each Scheme defines the attributes for different VisualRoles.
 
 ## Application Settings
 
@@ -346,7 +360,7 @@ Terminal.Gui provides several top-level application settings:
 
 ### View-Specific Settings
 
-Settings that control specific view behaviors:
+Examples of settings that control specific view behaviors:
 
 ```json
 {
@@ -366,30 +380,6 @@ Key bindings are defined in the `KeyBindings` property of the configuration file
 
 - `Key`: The key to bind to. The format is a string describing the key (e.g. "q", "Q,  "Ctrl+Q"). Function keys are specified as "F1", "F2", etc. 
 
-## Loading And Applying Configuration
-
-```csharp
-// Enable configuration with specific locations
-ConfigurationManager.Enable();
-ConfigurationManager.Locations = ConfigLocations.Global | ConfigLocations.User;
-ConfigurationManager.Load();
-ConfigurationManager.Apply();
-```
-
-## Configuration Events
-
-```csharp
-// Configuration applied event
-ConfigurationManager.Applied += (s, e) => {
-    // Handle configuration changes
-};
-
-// Configuration loading event
-ConfigurationManager.Loading += (s, e) => {
-    Console.WriteLine($"Loading from: {e.Location}");
-};
-```
-
 # Error Handling
 
 ```json
@@ -400,31 +390,11 @@ ConfigurationManager.Loading += (s, e) => {
 
 Set to `true` to throw exceptions on JSON parsing errors instead of silent failures.
 
-
-# AOT Support
-
-When using AOT compilation:
-
-```csharp
-[JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(Configuration))]
-internal partial class ConfigurationContext : JsonSerializerContext { }
-
-// Enable with AOT support
-ConfigurationManager.Enable(options => {
-    options.JsonSerializerContext = ConfigurationContext.Default;
-});
-```
-
 # Configuration File Schema
 
 Settings are defined in JSON format, according to the schema found here:
 
 https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
-
-## Schema
-
-[!code-json[tui-config-schema.json](../schemas/tui-config-schema.json)]
 
 ## The Default Config File
 

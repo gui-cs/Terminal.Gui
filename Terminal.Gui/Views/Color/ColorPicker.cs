@@ -17,7 +17,7 @@ public partial class ColorPicker : View, IDesignable
         CanFocus = true;
         TabStop = TabBehavior.TabStop;
         Height = Dim.Auto ();
-        Width = Dim.Auto ();
+        Width = Dim.Auto (minimumContentDim: 32);
         ApplyStyleChanges ();
     }
 

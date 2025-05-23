@@ -26,6 +26,14 @@ public enum StandardColor
     AntiqueWhite = 0xFAEBD7,
 
     /// <summary>
+    ///     Amber Phosphor RGB(255, 191, 0).
+    /// <para>
+    ///     Matches the Amber Phosphor color used on classic terminals.
+    /// </para>
+    /// </summary>
+    AmberPhosphor = 0xFFBF00,
+
+    /// <summary>
     ///     Aqua RGB(0, 255, 255).
     ///     <para>
     ///         A bright cyan color, often associated with water.
@@ -377,6 +385,15 @@ public enum StandardColor
     /// </summary>
     FloralWhite = 0xFFFAF0,
 
+
+    /// <summary>
+    ///     Fluorescent Orange - Same as Amber Phosphor RGB(255, 191, 0).
+    /// <para>
+    ///     Matches the Amber Phosphor color used on classic terminals.
+    /// </para>
+    /// </summary>
+    FluorescentOrange = AmberPhosphor,
+
     /// <summary>
     ///     Forest green RGB(34, 139, 34).
     ///     <para>
@@ -442,6 +459,14 @@ public enum StandardColor
     Green = 0x008000,
 
     /// <summary>
+    ///     Green Phosphor RGB(0, 255, 102).
+    /// <para>
+    ///     Matches the Green Phosphor color used on classic terminals.
+    /// </para>
+    /// </summary>
+    GreenPhosphor = 0x00FF66,
+
+    /// <summary>
     ///     Green yellow RGB(173, 255, 47).
     ///     <para>
     ///         A bright yellowish-green color.
@@ -456,6 +481,14 @@ public enum StandardColor
     ///     </para>
     /// </summary>
     Grey = Gray,
+
+    /// <summary>
+    ///     Guppie Green - Same as Green Phosphor RGB(0, 255, 102).
+    /// <para>
+    ///     Matches the Green Phosphor color used on classic terminals.
+    /// </para>
+    /// </summary>
+    GuppieGreen = GreenYellow,
 
     /// <summary>
     ///     Honey dew RGB(240, 255, 240).

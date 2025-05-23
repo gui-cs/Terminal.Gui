@@ -1,7 +1,7 @@
 #nullable enable
 namespace Terminal.Gui;
 
-public class HistoryText
+internal class HistoryText
 {
     private readonly List<HistoryTextItemEventArgs> _historyTextItems = [];
     private int _idxHistoryText = -1;

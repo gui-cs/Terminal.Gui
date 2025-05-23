@@ -23,7 +23,7 @@ public class PosEditor : EditorBase
     private RadioGroup? _posRadioGroup;
     private TextField? _valueEdit;
 
-    protected override void OnUpdateSettings ()
+    protected override void OnUpdateLayoutSettings ()
     {
         Enabled = ViewToEdit is not Adornment;
 
@@ -130,7 +130,7 @@ public class PosEditor : EditorBase
 
     private void PosChanged ()
     {
-        if (ViewToEdit == null || UpdatingSettings)
+        if (ViewToEdit == null || UpdatingLayoutSettings)
         {
             return;
         }

@@ -1390,7 +1390,7 @@ public class TextView : View, IDesignable
     public List<Cell> GetLine (int line) { return _model.GetLine (line); }
 
     /// <inheritdoc/>
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal)
         {
@@ -2228,23 +2228,20 @@ public class TextView : View, IDesignable
     /// <param name="idxRow">The row index.</param>
     protected virtual void OnDrawReadOnlyColor (List<Cell> line, int idxCol, int idxRow)
     {
-        //(int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        //var ev = new CellEventArgs (line, idxCol, unwrappedPos);
-        //DrawReadOnlyColor?.Invoke (this, ev);
+        (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
+        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
+        DrawReadOnlyColor?.Invoke (this, ev);
 
-        //Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : GetAttributeForRole (VisualRole.ReadOnly);
-        //Attribute attribute;
+        Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : GetAttributeForRole (VisualRole.ReadOnly);
 
-        //if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
-        //{
-        //    attribute = new (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style);
-        //}
-        //else
-        //{
-        //    attribute = new (cellAttribute.Value.Foreground, GetAttributeForRole (VisualRole.Focus).Background, cellAttribute.Value.Style);
-        //}
-
-        SetAttributeForRole (VisualRole.ReadOnly);
+        if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
+        {
+            SetAttribute(new (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style));
+        }
+        else
+        {
+            SetAttributeForRole (VisualRole.ReadOnly);
+        }
     }
 
     /// <summary>

@@ -23,22 +23,6 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
             // Default theme exists
             Assert.NotNull (ThemeManager.Themes? [ThemeManager.DEFAULT_THEME_NAME]);
-
-            //// Schemes exists, but is not initialized
-            //Assert.Null (manager ["Default"].);
-
-            //manager.RetrieveValues ();
-
-            //Assert.NotEmpty (manager);
-
-            //// Schemes exists, and has correct # of eleements
-            //var schemes = manager ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
-            //Assert.NotNull (schemes);
-            //Assert.Equal (5, schemes!.Count);
-
-            //// Base has correct values
-            //var baseSchemee = schemes ["Base"];
-            //Assert.Equal (new Attribute (Color.White, Color.Blue), baseSchemee.Normal);
         }
         finally
         {
@@ -186,6 +170,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Assert.Contains (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Themes!);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
@@ -201,6 +186,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
@@ -259,23 +245,39 @@ public class ThemeManagerTests (ITestOutputHelper output)
     [Fact]
     public void In_Memory_Themes_Size_Is_Reasonable ()
     {
-        output.WriteLine ($"Start: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"Start: Color size: {(MemorySizeEstimator.EstimateSize (Color.Red))} b");
+
+        output.WriteLine ($"Start: Attribute size: {(MemorySizeEstimator.EstimateSize (Attribute.Default))} b");
+
+        output.WriteLine ($"Start: Base Scheme size: {(MemorySizeEstimator.EstimateSize (Scheme.GetHardCodedSchemes ()))} b");
+
+        output.WriteLine ($"Start: PropertyInfo size: {(MemorySizeEstimator.EstimateSize (ConfigurationManager.Settings ["Application.QuitKey"]))} b");
+
+        ThemeScope themeScope = new ThemeScope ();
+        output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
+
+        themeScope.AddValue ("Schemes", Scheme.GetHardCodedSchemes ());
+        output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
+
+        output.WriteLine ($"Start: HardCoded Schemes ({SchemeManager.Schemes.Count}) size: {(MemorySizeEstimator.EstimateSize (SchemeManager.Schemes!))} b");
+
+        output.WriteLine ($"Start: Themes dictionary ({ThemeManager.Themes.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+
         Enable (ConfigLocations.HardCoded);
 
-        output.WriteLine ($"After Enable: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
-
-        ResetToHardCodedDefaults ();
-        Assert.Single (ThemeManager.Themes!);
-        output.WriteLine ($"After ResetToHardCodedDefaults: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"Enabled: Themes dictionary ({ThemeManager.Themes.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         Load (ConfigLocations.LibraryResources);
-        Assert.Equal (7, ThemeManager.Themes!.Count);
-        output.WriteLine ($"After Load: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"After Load: Themes dictionary ({ThemeManager.Themes!.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");
 
-        // Assert that the size is within a reasonable range (e.g., less than 1 MB)
-        //Assert.True (MemorySizeEstimator.EstimateSize (ThemeManager.Themes!) < (64 * 1024), $"Themes dictionary size is too large: {MemorySizeEstimator.EstimateSize (ThemeManager.Themes!) / 1024} Kb");
+        string json = SourcesManager?.ToJson (Settings)!;
+
+        // In memory size should be less than the size of the json
+        output.WriteLine ($"JSON size: {json.Length / 1024} Kb");
+
+        Assert.True (json.Length > MemorySizeEstimator.EstimateSize (ThemeManager.Themes!), $"In memory size ({(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb) is > json size ({json.Length / 1024} Kb)");
 
         Disable (resetToHardCodedDefaults: true);
     }

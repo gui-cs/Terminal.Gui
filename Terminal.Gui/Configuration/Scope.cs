@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace Terminal.Gui;
 
@@ -22,21 +23,58 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
         "Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
-        // Populate the dictionary with uninitialized, mutable, properties
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? props = ConfigurationManager.GetConfigPropertiesByScope (typeof (T).Name);
-        foreach (KeyValuePair<string, ConfigProperty> p in props!)
+    }
+
+    /// <summary>
+    ///     INTERNAL: Adds a new ConfigProperty given a <paramref name="value"/>. Determines the correct PropertyInfo etc... by retrieving the
+    ///     hard coded value for <paramref name="name"/>.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    internal void AddValue (string name, object? value)
+    {
+        ConfigProperty? configProperty = GetHardCodedProperty (name);
+
+        if (configProperty is null)
         {
-            TryAdd (
-                p.Key,
-                new ConfigProperty
-                {
-                    // Copy just the PropertyInfo, NOT PropertyValue
-                    PropertyInfo = p.Value.PropertyInfo,
-                    OmitClassName = p.Value.OmitClassName,
-                    ScopeType = p.Value.ScopeType,
-                    Immutable = false
-                });
+            throw new InvalidOperationException ($@"{name} is not a hard coded property.");
         }
+
+        TryAdd (name, ConfigProperty.CreateCopy (configProperty));
+        this [name].PropertyValue = configProperty.PropertyValue;
+
+    }
+
+    internal ConfigProperty? GetHardCodedProperty (string name)
+    {
+        ConfigProperty? configProperty = ConfigurationManager.GetHardCodedConfigPropertiesByScope (typeof (T).Name)!
+                                                             .FirstOrDefault (hardCodedKeyValuePair => hardCodedKeyValuePair.Key == name).Value;
+
+        if (configProperty is null)
+        {
+            return null;
+        }
+
+        ConfigProperty copy = ConfigProperty.CreateCopy (configProperty);
+        copy.PropertyValue = configProperty.PropertyValue;
+
+        return copy;
+    }
+
+    internal ConfigProperty GetUninitializedProperty (string name)
+    {
+        ConfigProperty? configProperty = ConfigurationManager.GetUninitializedConfigPropertiesByScope (typeof (T).Name)!
+                                                             .FirstOrDefault (hardCodedKeyValuePair => hardCodedKeyValuePair.Key == name).Value;
+
+        if (configProperty is null)
+        {
+            throw new InvalidOperationException ($@"{name} is not a ConfigProperty.");
+        }
+        ConfigProperty  copy = ConfigProperty.CreateCopy (configProperty);
+        copy.PropertyValue = configProperty.PropertyValue;
+
+        return copy;
+
     }
 
     /// <summary>
@@ -53,17 +91,13 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     }
 
     /// <summary>
-    ///     INTERNAL: Updates the values of the properties of this scope to their corresponding hard-coded original values.
+    ///     INTERNAL: Updates the values of all properties of this scope to their corresponding hard-coded original values.
     /// </summary>
     internal void LoadHardCodedDefaults ()
     {
         foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in ConfigurationManager.GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
         {
-            if (!ContainsKey (hardCodedKeyValuePair.Key))
-            {
-                continue;
-            }
-
+            TryAdd (hardCodedKeyValuePair.Key, ConfigProperty.CreateCopy (hardCodedKeyValuePair.Value));
             this [hardCodedKeyValuePair.Key].PropertyValue = hardCodedKeyValuePair.Value.PropertyValue;
         }
     }
@@ -92,14 +126,8 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
                 }
 
                 // Add an empty (HasValue = false) property to this scope
-                var copy = new ConfigProperty
-                {
-                    Immutable = false,
-                    PropertyInfo = prop.Value.PropertyInfo,
-                    OmitClassName = prop.Value.OmitClassName,
-                    ScopeType = prop.Value.ScopeType,
-                    HasValue = false
-                };
+                ConfigProperty copy = ConfigProperty.CreateCopy (prop.Value);
+                copy.PropertyValue = prop.Value.PropertyValue;
                 TryAdd (prop.Key, copy);
             }
 
@@ -150,5 +178,13 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
         }
 
         return set;
+    }
+
+    internal virtual void Validate ()
+    {
+        if (IsEmpty)
+        {
+            throw new JsonException ($@"Empty!");
+        }
     }
 }

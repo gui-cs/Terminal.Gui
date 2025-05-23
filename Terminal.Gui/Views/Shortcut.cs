@@ -472,6 +472,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (CommandView.Margin is { })
         {
             CommandView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            CommandView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -532,6 +534,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (HelpView.Margin is { })
         {
             HelpView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            HelpView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -635,7 +639,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public ShortcutKeyView KeyView { get; } = new ();
+    public View KeyView { get; } = new ();
 
     private int _minimumKeyTextSize;
 
@@ -663,6 +667,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (KeyView.Margin is { })
         {
             KeyView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            KeyView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -675,7 +681,21 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        HelpView.HighlightStyle = HighlightStyle.None;
+        KeyView.HighlightStyle = HighlightStyle.None;
+
+        KeyView.GettingAttributeForRole += (sender, args) =>
+                                           {
+                                               if (args.Role == VisualRole.Normal)
+                                               {
+                                                   args.NewValue = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
+                                                   args.Cancel = true;
+                                               }
+                                           };
+        KeyView.ClearingViewport += (sender, args) =>
+                                          {
+                                              // Do not clear; otherwise spaces will be printed with underlines
+                                              args.Cancel = true;
+                                          };
     }
 
     private void UpdateKeyBindings (Key oldKey)
@@ -727,7 +747,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (!HasFocus)
         {

@@ -159,13 +159,10 @@ public static class ThemeManager
             throw new InvalidOperationException ("Hard coded theme properties are null.");
         }
 
-        Dictionary<string, ConfigProperty>? dict = hardCodedThemeProperties?.ToDictionary ();
-
         var hardCodedThemeScope = new ThemeScope ();
-
-        foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeScope)
+        foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeProperties)
         {
-            p.Value.PropertyValue = dict! [p.Key].PropertyValue;
+            hardCodedThemeScope.AddValue (p.Key, p.Value.PropertyValue);
         }
 
         return hardCodedThemeScope;
@@ -242,27 +239,22 @@ public static class ThemeManager
                 Logging.Warning ($"{value} is not a valid theme name.");
             }
 
-            // When a new theme is set, that's not default, we need to ensure it has values for every
-            // property. We use the hard-coded theme as the source of truth.
-            if (value != DEFAULT_THEME_NAME)
-            {
-                ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
-                if (hardCodedThemeScope is null)
-                {
-                    throw new InvalidOperationException ("Hard coded theme scope is null.");
-                }
-                //  Themes [value].UpdateFrom (hardCodedThemeScope);
-            }
+            //if (value == DEFAULT_THEME_NAME)
+            //{
+            //    ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
+            //    if (hardCodedThemeScope is null)
+            //    {
+            //        throw new InvalidOperationException ("Hard coded theme scope is null.");
+            //    }
+            //    Themes [DEFAULT_THEME_NAME].UpdateFrom (hardCodedThemeScope);
+            //}
 
             // Update the backing store
             ConfigurationManager.Settings! ["Theme"].PropertyValue = value;
 
-            OnThemeChanged (previousThemeValue);
+            OnThemeChanged (previousThemeValue, value);
         }
     }
-
-    /// <summary>Event fired when the selected theme has changed.</summary>
-    public static event EventHandler<ThemeManagerEventArgs>? ThemeChanged;
 
     /// <summary>
     ///     INTERNAL: Updates <see cref="Themes"/> to the current values of the static
@@ -307,9 +299,24 @@ public static class ThemeManager
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
-    internal static void OnThemeChanged (string theme)
+    internal static void OnThemeChanged (string previousThemeName, string newThemeName)
     {
-        Logging.Debug ($"Themes.OnThemeChanged({theme}) -> {Theme}");
-        ThemeChanged?.Invoke (null, new (theme));
+        Logging.Debug ($"Themes.OnThemeChanged({previousThemeName}) -> {Theme}");
+        StringPropertyEventArgs args = new StringPropertyEventArgs (in previousThemeName, ref newThemeName!);
+        ThemeChanged?.Invoke (null, args);
+    }
+
+    /// <summary>Raised when the selected theme has changed.</summary>
+    public static event EventHandler<StringPropertyEventArgs>? ThemeChanged;
+
+    /// <summary>
+    ///     Validates all themes in the <see cref="Themes"/> dictionary.
+    /// </summary>
+    public static void Validate ()
+    {
+        foreach (ThemeScope theme in Themes!.Values)
+        {
+            theme.Validate ();
+        }
     }
 }

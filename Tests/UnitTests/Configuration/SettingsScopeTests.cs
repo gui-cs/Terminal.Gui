@@ -78,7 +78,7 @@ public class SettingsScopeTests
         // assert
         Assert.Equal (2, ThemeManager.GetThemes ().Count);
         Assert.Equal (HighlightStyle.None, (HighlightStyle)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStyle"].PropertyValue!);
-        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.GetThemes() ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.GetThemes () ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
 
         RuntimeConfig = """
                         {
@@ -145,8 +145,11 @@ public class SettingsScopeTests
         Settings ["Application.QuitKey"].PropertyValue = Key.End;
 
         var updatedSettings = new SettingsScope ();
+        updatedSettings.LoadHardCodedDefaults ();
 
         // Don't set Quitkey
+        updatedSettings ["Application.QuitKey"].HasValue = false;
+        updatedSettings ["Application.QuitKey"].PropertyValue = null;
         updatedSettings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
         updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
@@ -195,17 +198,18 @@ public class SettingsScopeTests
 
 
     [Fact]
-    public void ResetToHardCodedDefaults_Resets ()
+    public void LoadHardCodedDefaults_Resets ()
     {
         // Arrange
-        CM.Enable (ConfigLocations.HardCoded);
         Assert.Equal (Key.Esc, Application.QuitKey);
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
 
         // Act
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q;
         settingsScope.Apply ();
         Assert.Equal (Key.Q, Application.QuitKey);
+
         settingsScope.LoadHardCodedDefaults ();
         settingsScope.Apply ();
 

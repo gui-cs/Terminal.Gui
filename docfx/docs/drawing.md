@@ -9,7 +9,7 @@ Terminal.Gui provides a set of APIs for formatting text, line drawing, and chara
 | **Attribute** | Defines the concrete visual styling for a visual element, including Foreground color, Background color, and TextStyle. |
 | **BackgroundColor** | A property of `Attribute` that describes the color of background text. |
 | **Color** | Base terminal color (part of the color palette; supports TrueColor and named values like White, Black, Cyan, etc.). |
-| **Cell** | A single character and its attributes which occupies a particular row and column in the terminal. See @Terminal.Gui.Cell |
+| **Cell** | A single character and its attributes which occupies a particular row and column in the terminal. Not exposed directly to the developer, but used internally by drivers. See @Terminal.Gui.Cell |
 | **ForegroundColor** | A property of `Attribute` that describes the color of foreground text. |
 | **Scheme** | A Scheme is a mapping from `VisualRole`s (e.g. `VisualRole.Focus`) to `Attribute`s, defining how a `View` should look based on its purpose (e.g. Menu or Dialog). |
 | **Style** | A property of `Attribute` that captures additional font-like hints such as bold, italic, underline, beyond color. |
@@ -105,10 +105,10 @@ In the above example a hard-coded Attribute is set. Normally, developers will us
 
 ```cs
 // Modify the View's Scheme such that Focus is Red on Black Underlined
-Scheme = new Scheme (Scheme)
+SetScheme (new Scheme (Scheme)
     {
         Focus = new Attribute (Color.Red, Color.Black, Style.Underline)
-    };
+    });
     
 SetAttributeForRole (VisualRole.Focus);
 AddStr ("Red on Black Underlined.");
@@ -118,7 +118,7 @@ AddStr ("Red on Black Underlined.");
 
 Color is supported on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
 
-The `Color` class represents a color. It provides automatic mapping between the legacy 4-bit (16-color) system and 24-bit colors. It contains properties for the red, green, and blue components of the color. The `Color` class also contains a static property for each of the 16 ANSI colors.
+The `Color` class represents a color. It provides automatic mapping between the legacy 4-bit (16-color) system and 24-bit colors. It contains properties for the red, green, and blue components of the color. The `StandardColor` enum provides a set of predefined colors.
 
 ## VisualRole
 
@@ -127,8 +127,6 @@ Represents the semantic visual role of a visual element rendered by a View (e.g.
 @Terminal.Gui.VisualRole provides a set of predefined VisualRoles:
 
 [!code-csharp[VisualRole.cs](../../Terminal.Gui/Drawing/VisualRole.cs)]
-
-Change the colors of a view by setting the @Terminal.Gui.View.ColorScheme property.
 
 ## Schemes
 

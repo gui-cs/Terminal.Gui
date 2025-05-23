@@ -587,7 +587,7 @@ public class TextField : View, IDesignable
         SetNeedsDraw ();
     }
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
+    /// <summary>Clears the history.</summary>
     public void ClearHistoryChanges () { _historyText.Clear ([Cell.StringToCells (Text)]); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
@@ -722,7 +722,7 @@ public class TextField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal)
         {

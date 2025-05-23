@@ -28,6 +28,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
 
         var json = """
@@ -108,6 +109,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
 
         var json = """
@@ -142,8 +144,8 @@ public class SourcesManagerTests
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
-
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         var filePath = "locked.json";
         var json = "{\"Application.UseSystemConsole\": true}";
         File.WriteAllText (filePath, json);
@@ -196,6 +198,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
 
         var json = """
@@ -225,6 +228,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
 
         var assembly = Assembly.GetExecutingAssembly ();
@@ -269,7 +273,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.LibraryResources;
         sourcesManager.Load (settingsScope, assembly!, resourceName, location);
 
-        Assert.Equal(Key.Esc, settingsScope ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Esc, settingsScope ["Application.QuitKey"].PropertyValue);
 
         var runtimeJson = """
                           {
@@ -304,6 +308,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
 
         // Act
@@ -319,6 +324,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
 
         // Act
@@ -374,7 +380,7 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
 
-        ConfigLocations[] locations =
+        ConfigLocations [] locations =
         [
             ConfigLocations.LibraryResources,
             ConfigLocations.Runtime,
@@ -397,7 +403,7 @@ public class SourcesManagerTests
             Assert.Equal ($"config-{location}.json", sourcesManager.Sources [location]);
         }
     }
-    
+
     [Fact]
     public void Load_AddsResourceSourceToCollection ()
     {

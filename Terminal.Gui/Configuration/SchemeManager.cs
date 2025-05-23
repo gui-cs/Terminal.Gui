@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -18,10 +19,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
 
     internal static void ResetToHardCodedDefaults ()
     {
-        lock (_schemesLock)
-        {
-            SetSchemes (GetHardCodedSchemes ());
-        }
+        SetSchemes (GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase));
     }
 
     /// <summary>
@@ -29,7 +27,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    public static Dictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
+    public static ImmutableDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
@@ -44,53 +42,70 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     }
 
     /// <summary>INTERNAL: Gets the dictionary of defined <see cref="Scheme"/>s. The get method for <see cref="Schemes"/>.</summary>
-    internal static Dictionary<string, Scheme?>? GetSchemes ()
+    internal static Dictionary<string, Scheme?> GetSchemes ()
     {
         if (!ConfigurationManager.IsInitialized ())
         {
             // We're being called from the module initializer.
             // Hard coded default value
-            return GetHardCodedSchemes ();
+            return GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
         }
 
         return GetSchemesForCurrentTheme ();
     }
 
-    /// <summary>INTERNAL: Gets the dictionary of defined <see cref="Scheme"/>s. The set method for <see cref="Schemes"/>.</summary>
+    /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
     private static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
-        if (!ConfigurationManager.IsInitialized ())
+        lock (_schemesLock)
         {
-            throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
+            if (!ConfigurationManager.IsInitialized ())
+            {
+                throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
+            }
+
+            Debug.Assert (value is { });
+
+            // Update the backing store
+            ThemeManager.GetCurrentTheme () ["Schemes"].UpdateFrom (value);
         }
-
-        Debug.Assert (value is { });
-
-        // Update the backing store
-        ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].UpdateFrom (value);
 
         //Instance.OnThemeChanged (prevousValue);
     }
 
     /// <summary>
-    ///     Adds a new <see cref="Scheme"/> to <see cref="SchemeManager"/>.
+    ///     Adds a new <see cref="Scheme"/> to <see cref="SchemeManager"/>. If the Scheme has already been added,
+    ///     it will be updated to <paramref name="scheme"/>.
     /// </summary>
     /// <param name="schemeName">The name of the Scheme. This must be unique.</param>
     /// <param name="scheme"></param>
     /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    /// <exception cref="ArgumentException"></exception>
     public static void AddScheme (string schemeName, Scheme scheme)
     {
-        if (GetSchemes () is null)
-        {
-            throw new InvalidOperationException ("Schemes is not set.");
-        }
-
         if (!GetSchemes ()!.TryAdd (schemeName, scheme))
         {
-            throw new ArgumentException ($"Scheme with name {schemeName} already exists.");
+            GetSchemes () [schemeName] = scheme;
         }
+    }
+
+    /// <summary>
+    ///     Removes a Scheme from <see cref="SchemeManager"/>.
+    /// </summary>
+    /// <param name="schemeName"></param>
+    /// <exception cref="InvalidOperationException">If the scheme is a built-in Scheme or was not previously added.</exception>
+    public static void RemoveScheme (string schemeName)
+    {
+        if (SchemeNameToSchemes (schemeName) is { })
+        {
+            throw new InvalidOperationException ($@"{schemeName}: Cannot remove a built-in Scheme.");
+        }
+
+        if (!GetSchemes ().TryGetValue (schemeName, out _))
+        {
+            throw new InvalidOperationException ($@"{schemeName}: Does not exist in Schemes.");
+        }
+
+        GetSchemes ().Remove (schemeName);
     }
 
     /// <summary>
@@ -153,16 +168,24 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <returns></returns>
     public static Dictionary<string, Scheme?> GetSchemesForCurrentTheme ()
     {
-        if (!ConfigurationManager.IsInitialized ())
+        lock (_schemesLock)
         {
-            Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ();
+            if (!ConfigurationManager.IsInitialized ())
+            {
+                Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
 
-            return hardCoded;
+                return hardCoded;
+            }
+
+            Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+            if (schemes is null)
+            {
+                // Most likely because "Schemes": was left out of the config
+                throw new InvalidOperationException ("Current Theme does not have a Scheme.");
+            }
+
+            return schemes!;
         }
-
-        Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-
-        return schemes!;
     }
 
     /// <summary>

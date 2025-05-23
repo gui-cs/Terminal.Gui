@@ -751,11 +751,6 @@ public partial class View // Mouse APIs
             {
                 _savedHighlightScheme = GetScheme ();
 
-                if (GetScheme () is null)
-                {
-                    return false;
-                }
-
                 if (CanFocus)
                 {
                     var cs = new Scheme (GetScheme ())
@@ -773,7 +768,8 @@ public partial class View // Mouse APIs
                     var cs = new Scheme (GetScheme ())
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (GetScheme ().Focus.Background,
+                        Normal = new (
+                                      GetScheme ().Focus.Background,
                                       GetScheme ().Normal.Foreground,
                                       GetScheme ().Focus.Style)
                     };
@@ -797,106 +793,6 @@ public partial class View // Mouse APIs
     }
 
     #endregion Highlight Handling
-
-    /// <summary>
-    ///     INTERNAL: Gets the Views that are under the mouse at <paramref name="location"/>, including Adornments.
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="ignoreTransparent">If <see langword="true"/> any transparent views will be ignored.</param>
-    /// <returns></returns>
-    internal static List<View?> GetViewsUnderMouse (in Point location, bool ignoreTransparent = false)
-    {
-        List<View?> viewsUnderMouse = new ();
-
-        View? start = Application.Top;
-
-        // PopoverHost - If visible, start with it instead of Top
-        if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover && !ignoreTransparent)
-        {
-            start = visiblePopover;
-
-            // Put Top on stack next
-            viewsUnderMouse.Add (Application.Top);
-        }
-
-        Point currentLocation = location;
-
-        while (start is { Visible: true } && start.Contains (currentLocation))
-        {
-            if (!start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-            {
-                viewsUnderMouse.Add (start);
-            }
-
-            Adornment? found = null;
-
-            if (start is not Adornment)
-            {
-                if (start.Margin is { } && start.Margin.Contains (currentLocation))
-                {
-                    found = start.Margin;
-                }
-                else if (start.Border is { } && start.Border.Contains (currentLocation))
-                {
-                    found = start.Border;
-                }
-                else if (start.Padding is { } && start.Padding.Contains (currentLocation))
-                {
-                    found = start.Padding;
-                }
-            }
-
-            Point viewportOffset = start.GetViewportOffsetFromFrame ();
-
-            if (found is { })
-            {
-                start = found;
-                viewsUnderMouse.Add (start);
-                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
-            }
-
-            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
-
-            View? subview = null;
-
-            for (int i = start.InternalSubViews.Count - 1; i >= 0; i--)
-            {
-                if (start.InternalSubViews [i].Visible
-                    && start.InternalSubViews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
-                    && (!ignoreTransparent || !start.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
-                {
-                    subview = start.InternalSubViews [i];
-                    currentLocation.X = startOffsetX + start.Viewport.X;
-                    currentLocation.Y = startOffsetY + start.Viewport.Y;
-
-                    // start is the deepest subview under the mouse; stop searching the subviews
-                    break;
-                }
-            }
-
-            if (subview is null)
-            {
-                // In the case start is transparent, recursively add all it's subviews etc...
-                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-                {
-                    viewsUnderMouse.AddRange (GetViewsUnderMouse (location, true));
-
-                    // De-dupe viewsUnderMouse
-                    HashSet<View?> hashSet = [.. viewsUnderMouse];
-                    viewsUnderMouse = [.. hashSet];
-                }
-
-                // No subview was found that's under the mouse, so we're done
-                return viewsUnderMouse;
-            }
-
-            // We found a subview of start that's under the mouse, continue...
-            start = subview;
-        }
-
-        return viewsUnderMouse;
-    }
 
     private void DisposeMouse () { }
 }

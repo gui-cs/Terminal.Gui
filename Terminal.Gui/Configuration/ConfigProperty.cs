@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
@@ -44,6 +45,9 @@ public class ConfigProperty
             {
                 throw new InvalidOperationException ($"Property {PropertyInfo?.Name} is immutable and cannot be set.");
             }
+
+            // TODO: Verify value is correct type?
+
             _propertyValue = value;
             HasValue = true;
         }
@@ -99,14 +103,32 @@ public class ConfigProperty
     }
 
     /// <summary>
-    /// INTERNAL: Create a ConfigProperty with cached attribute information
+    /// INTERNAL: Creates a copy of a ConfigProperty with the same metadata but no value.
+    /// </summary>
+    /// <param name="source">The source ConfigProperty.</param>
+    /// <returns>A new ConfigProperty instance.</returns>
+    internal static ConfigProperty CreateCopy (ConfigProperty source)
+    {
+        return new ConfigProperty
+        {
+            Immutable = false,
+            PropertyInfo = source.PropertyInfo,
+            OmitClassName = source.OmitClassName,
+            ScopeType = source.ScopeType,
+            HasValue = false
+        };
+    }
+
+    /// <summary>
+    /// INTERNAL: Create an immutable ConfigProperty with cached attribute information
     /// </summary>
     /// <param name="propertyInfo">The PropertyInfo to create from</param>
     /// <returns>A new ConfigProperty with attribute data cached</returns>
     [RequiresDynamicCode ("Uses reflection to access custom attributes")]
-    internal static ConfigProperty CreateWithAttributeInfo (PropertyInfo propertyInfo)
+    internal static ConfigProperty CreateImmutableWithAttributeInfo (PropertyInfo propertyInfo)
     {
         var attr = propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) as ConfigurationPropertyAttribute;
+
         return new ConfigProperty
         {
             PropertyInfo = propertyInfo,
@@ -321,6 +343,8 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ThemeScope dictionary.</param>
     /// <param name="destination">The destination ThemeScope dictionary.</param>
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Scope<T>.UpdateFrom(Scope<T>)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.UpdateFrom(Scope<T>)")]
     private static void UpdateThemeScopeDictionary (
         ConcurrentDictionary<string, ThemeScope> source,
         ConcurrentDictionary<string, ThemeScope> destination)
@@ -342,7 +366,9 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    private void UpdateConfigPropertyConcurrentDictionary (
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    private static void UpdateConfigPropertyConcurrentDictionary (
         ConcurrentDictionary<string, ConfigProperty> source,
         ConcurrentDictionary<string, ConfigProperty> destination)
     {
@@ -357,7 +383,7 @@ public class ConfigProperty
             if (!destination.ContainsKey (sourceProp.Key))
             {
                 // Add the property to the destination
-                var copy = CreateConfigPropertyCopy (sourceProp.Value);
+                var copy = CreateCopy (sourceProp.Value);
                 destination.TryAdd (sourceProp.Key, copy);
             }
 
@@ -371,7 +397,9 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    private void UpdateConfigPropertyDictionary (
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    private static void UpdateConfigPropertyDictionary (
         Dictionary<string, ConfigProperty> source,
         Dictionary<string, ConfigProperty> destination)
     {
@@ -386,7 +414,7 @@ public class ConfigProperty
             if (!destination.ContainsKey (sourceProp.Key))
             {
                 // Add the property to the destination
-                var copy = CreateConfigPropertyCopy (sourceProp.Value);
+                var copy = CreateCopy (sourceProp.Value);
                 destination.Add (sourceProp.Key, copy);
             }
 
@@ -400,7 +428,7 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    private void UpdateSchemeDictionary (
+    private static void UpdateSchemeDictionary (
         Dictionary<string, Scheme> source,
         Dictionary<string, Scheme> destination)
     {
@@ -417,23 +445,6 @@ public class ConfigProperty
             // Schemes are structs are passed by val
             destination [sourceProp.Key] = sourceProp.Value;
         }
-    }
-
-    /// <summary>
-    /// Creates a copy of a ConfigProperty with the same metadata but no value.
-    /// </summary>
-    /// <param name="source">The source ConfigProperty.</param>
-    /// <returns>A new ConfigProperty instance.</returns>
-    private static ConfigProperty CreateConfigPropertyCopy (ConfigProperty source)
-    {
-        return new ConfigProperty
-        {
-            Immutable = false,
-            PropertyInfo = source.PropertyInfo,
-            OmitClassName = source.OmitClassName,
-            ScopeType = source.ScopeType,
-            HasValue = false
-        };
     }
 
     #region Initialization
@@ -556,7 +567,7 @@ public class ConfigProperty
                 }
 
                 // Create config property with cached attribute data
-                ConfigProperty configProperty = CreateWithAttributeInfo (propertyInfo);
+                ConfigProperty configProperty = CreateImmutableWithAttributeInfo (propertyInfo);
 
                 // Use cached attribute data to determine the key
                 string key = configProperty.OmitClassName

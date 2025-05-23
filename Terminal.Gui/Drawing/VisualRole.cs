@@ -1,10 +1,12 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Represents the semantic visual role of a visual element rendered by a <see cref="View"/> (e.g., Normal text, Focused item, Active selection).
+///     Represents the semantic visual role of a visual element rendered by a <see cref="View"/>. Each VisualRole maps to
+///     a property of <see cref="Scheme"/> (e.g., <see cref="Scheme.Normal"/>).
 /// </summary>
 /// <remarks>
-///     A single View may render as one or multiple elements. Each element can be associated with a different <see cref="VisualRole"/>.
+///     A single View may render as one or multiple elements. Each element can be associated with a different
+///     <see cref="VisualRole"/>.
 /// </remarks>
 public enum VisualRole
 {
@@ -14,7 +16,7 @@ public enum VisualRole
     Normal,
 
     /// <summary>
-    ///     The visual role for hot elements (typically those with HotKey indicators) that are unfocused.
+    ///     The visual role for <see cref="Normal"/> elements with a <see cref="View.HotKey"/> indicator.
     /// </summary>
     HotNormal,
 
@@ -24,22 +26,24 @@ public enum VisualRole
     Focus,
 
     /// <summary>
-    ///     The visual role when the element is focused and has an active HotKey indicator.
+    ///     The visual role for <see cref="Focus"/> elements with a <see cref="View.HotKey"/> indicator.
     /// </summary>
     HotFocus,
 
     /// <summary>
-    ///     The visual role for elements that are active or selected (e.g., selected item in a ListView).
+    ///     The visual role for elements that are active or selected (e.g., selected item in a <see cref="ListView"/>). Also
+    ///     used
+    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/> and  <see cref="TabView"/>.
     /// </summary>
     Active,
 
     /// <summary>
-    ///     The visual role for elements that are active and have a HotKey indicator.
+    ///     The visual role for <see cref="Active"/> elements with a <see cref="View.HotKey"/> indicator.
     /// </summary>
     HotActive,
 
     /// <summary>
-    ///     The visual role for elements that are highlighted (e.g., when the mouse is hovering over a Button).
+    ///     The visual role for elements that are highlighted (e.g., when the mouse is hovering over a <see cref="Button"/>).
     /// </summary>
     Highlight,
 
@@ -49,7 +53,7 @@ public enum VisualRole
     Disabled,
 
     /// <summary>
-    ///     The visual role for elements that are editible
+    ///     The visual role for elements that are editable (e.g., <see cref="TextField"/> and <see cref="TextView"/>).
     /// </summary>
     Editable,
 

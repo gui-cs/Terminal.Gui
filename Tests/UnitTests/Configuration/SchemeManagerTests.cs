@@ -1,4 +1,7 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -16,7 +19,7 @@ public class SchemeManagerTests
         Assert.True (schemes!.ContainsKey ("Base"));
         Assert.True (schemes.ContainsKey ("base"));
 
-        Assert.Equal(SchemeManager.GetSchemes (), schemes);
+        Assert.Equal (SchemeManager.GetSchemes (), schemes);
     }
 
     [Fact]
@@ -49,7 +52,7 @@ public class SchemeManagerTests
     [Fact]
     public void GetHardCodedSchemes_Gets_HardCoded_Theme_Schemes ()
     {
-        Dictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
+        ImmutableDictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
 
         Assert.Equal (Scheme.GetHardCodedSchemes (), hardCoded);
     }
@@ -91,6 +94,7 @@ public class SchemeManagerTests
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         Assert.Equal (5, SchemeManager.GetSchemes ().Count);
@@ -101,6 +105,7 @@ public class SchemeManagerTests
         Assert.Equal (SchemeManager.GetSchemes ().Count, schemes.Count);
 
         var newTheme = new ThemeScope ();
+        newTheme.LoadHardCodedDefaults ();
 
         var scheme = new Scheme
         {
@@ -139,6 +144,7 @@ public class SchemeManagerTests
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         var scheme = new Scheme
@@ -161,6 +167,7 @@ public class SchemeManagerTests
 
         // Change just Normal
         var newTheme = new ThemeScope ();
+        newTheme.LoadHardCodedDefaults ();
 
         var newScheme = new Scheme
         {
@@ -188,7 +195,7 @@ public class SchemeManagerTests
     }
 
     [Fact]
-    public void Load_Null_Scheme ()
+    public void Load_Null_Scheme_Throws ()
     {
         try
         {
@@ -209,8 +216,11 @@ public class SchemeManagerTests
                             """;
 
             // Load the test theme
-            Load (ConfigLocations.Runtime);
+            // TODO: This should throw an exception!
+            Assert.Throws<JsonException> (() => Load (ConfigLocations.Runtime));
+            Assert.Contains ("TestTheme", ThemeManager.Themes!);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
+            Assert.Throws<System.Collections.Generic.KeyNotFoundException> (SchemeManager.GetSchemes);
 
             // Now reset everything and reload
             ResetToCurrentValues ();

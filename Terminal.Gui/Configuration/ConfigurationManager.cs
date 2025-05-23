@@ -56,9 +56,11 @@ public static class ConfigurationManager
     ///     deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
-    internal static SettingsScope? _settings;
+    private static SettingsScope? _settings;
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly ReaderWriterLockSlim _settingsLockSlim = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     The root object of Terminal.Gui configuration settings / JSON schema.
@@ -99,7 +101,9 @@ public static class ConfigurationManager
     // Once initialized, the ConfigurationManager is never un-initialized.
     // The _initialized field is set to true when the module is loaded and the ConfigurationManager is initialized.
     private static bool _initialized;
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _initializedLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     INTERNAL: For Testing - Indicates whether the <see cref="ConfigurationManager"/> has been initialized.
@@ -118,7 +122,9 @@ public static class ConfigurationManager
     ///     A cache of all<see cref="ConfigurationPropertyAttribute"/> properties and their hard coded values.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
+#pragma warning disable IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
+#pragma warning restore IDE1006 // Naming Styles
 
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
     {
@@ -132,14 +138,16 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     An immutable cache of all <see cref="ConfigProperty"/>s in module decorated with the
-    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Bott the dictionary and the contained
+    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Both the dictionary and the contained
     ///     <see cref="ConfigProperty"/>s
     ///     are immutable.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
-    internal static ImmutableSortedDictionary<string, ConfigProperty>? _allConfigPropertiesCache;
+    private static ImmutableSortedDictionary<string, ConfigProperty>? _uninitializedConfigPropertiesCache;
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _allConfigPropertiesCacheLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     INTERNAL: Initializes the <see cref="ConfigurationManager"/>.
@@ -175,10 +183,11 @@ public static class ConfigurationManager
             // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
 
             // Note GetAllConfigProperties returns a new instance and all the properties !HasValue and Immutable.
-            _allConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
+            _uninitializedConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
         }
 
-        _hardCodedConfigPropertyCache = _allConfigPropertiesCache.ToFrozenDictionary ();
+        // Create a COPY of the _allConfigPropertiesCache to ensure that the original is not modified.
+        _hardCodedConfigPropertyCache = ConfigProperty.GetAllConfigProperties ().ToFrozenDictionary ();
 
         foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
         {
@@ -201,7 +210,9 @@ public static class ConfigurationManager
     #region Enable/Disable
 
     private static bool _enabled;
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _enabledLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets whether <see cref="ConfigurationManager"/> is enabled or not.
@@ -263,6 +274,8 @@ public static class ConfigurationManager
     ///     initial, hard-coded
     ///     defaults.
     /// </param>
+    [RequiresUnreferencedCode ("Calls ResetToHardCodedDefaults")]
+    [RequiresDynamicCode ("Calls ResetToHardCodedDefaults")]
     public static void Disable (bool resetToHardCodedDefaults = false)
     {
         lock (_enabledLock)
@@ -301,6 +314,7 @@ public static class ConfigurationManager
         try
         {
             _settings = new ();
+            _settings.LoadHardCodedDefaults ();
         }
         finally
         {
@@ -309,6 +323,7 @@ public static class ConfigurationManager
 
         Settings!.LoadCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
+        AppSettings!.LoadCurrentValues ();
     }
 
     /// <summary>
@@ -354,6 +369,7 @@ public static class ConfigurationManager
         Settings = new ();
         Settings!.LoadHardCodedDefaults ();
         ThemeManager.ResetToHardCodedDefaults ();
+        AppSettings!.LoadHardCodedDefaults ();
     }
 
     /// <summary>
@@ -425,6 +441,10 @@ public static class ConfigurationManager
         {
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
+
+        Settings!.Validate ();
+        ThemeManager.Validate ();
+        AppSettings!.Validate ();
     }
 
     // TODO: Rename to Loaded?
@@ -474,6 +494,8 @@ public static class ConfigurationManager
         InternalApply ();
     }
 
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
     private static void InternalApply ()
     {
         var settings = false;
@@ -482,9 +504,8 @@ public static class ConfigurationManager
 
         try
         {
-            // Apply Themes first so that ???
-            themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
             settings = Settings?.Apply () ?? false;
+            themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
             appSettings = AppSettings?.Apply () ?? false;
         }
         catch (JsonException e)
@@ -597,7 +618,7 @@ public static class ConfigurationManager
                 // We're being called from the module initializer.
                 // Hard coded default value is an empty AppSettingsScope
                 var appSettings = new AppSettingsScope ();
-                appSettings.LoadCurrentValues ();
+                appSettings.LoadHardCodedDefaults ();
 
                 return appSettings;
             }
@@ -654,7 +675,9 @@ public static class ConfigurationManager
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool? ThrowOnJsonErrors { get; set; } = false;
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _jsonErrorsLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     internal static void AddJsonError (string error)
     {
@@ -681,7 +704,7 @@ public static class ConfigurationManager
         {
             if (_jsonErrors.Length > 0)
             {
-                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"+
+                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files" +
                                    @"(set ThrowOnJsonErrors to have these caught during execution):");
                 Console.WriteLine (_jsonErrors.ToString ());
             }
@@ -705,6 +728,7 @@ public static class ConfigurationManager
     public static string GetHardCodedConfig ()
     {
         var emptyScope = new SettingsScope ();
+        emptyScope.LoadHardCodedDefaults ();
         IEnumerable<KeyValuePair<string, ConfigProperty>>? settings = GetHardCodedConfigPropertiesByScope ("SettingsScope");
 
         if (settings is null)
@@ -730,28 +754,31 @@ public static class ConfigurationManager
     ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
     ///     cache. They do not have values and have <see cref="ConfigProperty.Immutable"/> set.
     /// </summary>
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetConfigPropertiesByScope (string scopeType)
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetUninitializedConfigPropertiesByScope (string scopeType)
     {
         // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
         // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
         // and is not using any dynamic code. In addition, ScopeType are registered in SourceGenerationContext.
 
-        if (_allConfigPropertiesCache is null)
+        if (_uninitializedConfigPropertiesCache is null)
         {
             throw new InvalidOperationException ("_allConfigPropertiesCache has not been set.");
         }
 
         if (string.IsNullOrEmpty (scopeType))
         {
-            return _allConfigPropertiesCache;
+            return _uninitializedConfigPropertiesCache;
         }
 
         // Filter properties by scope using the cached ScopeType property instead of reflection
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _allConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
 
         Debug.Assert (filtered is { });
 
-        return filtered;
+        IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope = filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
+        Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
+
+        return configPropertiesByScope;
     }
 
     /// <summary>

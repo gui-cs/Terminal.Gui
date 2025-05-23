@@ -3,13 +3,13 @@
 namespace Terminal.Gui.ViewMouseTests;
 
 [Trait ("Category", "Input")]
-public class GetViewsUnderMouseTests
+public class GetViewsUnderLocationTests
 {
     [Theory]
     [InlineData (0, 0)]
     [InlineData (2, 1)]
     [InlineData (20, 20)]
-    public void GetViewsUnderMouse_Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
+    public void Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
     {
         // Arrange
         var view = new View
@@ -20,7 +20,7 @@ public class GetViewsUnderMouseTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location);
 
         // Assert
         Assert.Empty (viewsUnderMouse);
@@ -30,7 +30,7 @@ public class GetViewsUnderMouseTests
     [InlineData (0, 0)]
     [InlineData (2, 1)]
     [InlineData (20, 20)]
-    public void GetViewsUnderMouse_Returns_Null_If_Start_Not_Visible (int testX, int testY)
+    public void Returns_Null_If_Start_Not_Visible (int testX, int testY)
     {
         // Arrange
         var view = new View
@@ -42,7 +42,7 @@ public class GetViewsUnderMouseTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location);
 
         // Assert
         Assert.Empty (viewsUnderMouse);

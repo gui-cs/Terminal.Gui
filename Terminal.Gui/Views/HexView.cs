@@ -7,6 +7,7 @@
 // TODO: Support shrinking the stream (e.g. del/backspace should work).
 // 
 
+using System;
 using System.Buffers;
 
 namespace Terminal.Gui;
@@ -21,7 +22,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>Users can switch from one side to the other by using the tab key.</para>
 ///     <para>
-///         To enable editing, set <see cref="AllowEdits"/> to true. When <see cref="AllowEdits"/> is true the user can
+///         To enable editing, set <see cref="ReadOnly"/> to true. When <see cref="ReadOnly"/> is true the user can
 ///         make changes to the hexadecimal values of the <see cref="Stream"/>. Any changes are tracked in the
 ///         <see cref="Edits"/> property (a <see cref="SortedDictionary{TKey, TValue}"/>) indicating the position where the
 ///         changes were made and the new values. A convenience method, <see cref="ApplyEdits"/> will apply the edits to
@@ -125,10 +126,9 @@ public class HexView : View, IDesignable
 
     /// <summary>
     ///     Gets or sets whether this <see cref="HexView"/> allows editing of the <see cref="Stream"/> of the underlying
-    ///     <see cref="Stream"/>.
+    ///     <see cref="Stream"/>. The default is <see langword="false"/>.
     /// </summary>
-    /// <value><c>true</c> to allow edits; otherwise, <c>false</c>.</value>
-    public bool AllowEdits { get; set; } = true;
+    public bool ReadOnly { get; set; } = false;
 
     /// <summary>Gets the current edit position.</summary>
     /// <param name="address"></param>
@@ -440,11 +440,6 @@ public class HexView : View, IDesignable
             return true;
         }
 
-        var currentAttribute = Attribute.Default;
-        Attribute current = GetAttributeForRole (VisualRole.Focus);
-        SetAttribute (current);
-        Move (-Viewport.X, 0);
-
         long addressOfFirstLine = Viewport.Y * BytesPerLine;
 
         int nBlocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
@@ -452,26 +447,18 @@ public class HexView : View, IDesignable
         Source.Position = addressOfFirstLine;
         long bytesRead = Source!.Read (data, 0, data.Length);
 
-        Attribute selectedAttribute = GetAttributeForRole (VisualRole.HotNormal);
+        Attribute selectedAttribute = GetAttributeForRole (VisualRole.Active);
 
-        var editedAttribute = new Attribute (
-                                             GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (),
-                                             GetAttributeForRole (VisualRole.Normal).Background,
-                                             GetAttributeForRole (VisualRole.Normal).Style);
-
-        var editingAttribute = new Attribute (
-                                              GetAttributeForRole (VisualRole.Focus).Background,
-                                              GetAttributeForRole (VisualRole.Focus).Foreground,
-                                              GetAttributeForRole (VisualRole.Focus).Style);
-
-        var addressAttribute = new Attribute (
-                                              GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (),
-                                              GetAttributeForRole (VisualRole.Normal).Background,
-                                              GetAttributeForRole (VisualRole.Normal).Style);
+        Attribute editedAttribute = GetAttributeForRole (VisualRole.Editable);
+        editedAttribute = editedAttribute with { Style = editedAttribute.Style | TextStyle.Italic | TextStyle.Underline };
+        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
+        Attribute addressAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
 
         for (var line = 0; line < Viewport.Height; line++)
         {
-            Move (-Viewport.X, line);
+            int max  = -Viewport.X;
+
+            Move (max, line);
             long addressOfLine = addressOfFirstLine + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN;
 
             if (addressOfLine <= GetEditedSize ())
@@ -480,17 +467,13 @@ public class HexView : View, IDesignable
             }
             else
             {
-                SetAttribute (
-                              new (
-                                   GetAttributeForRole (VisualRole.Normal).Background.GetHighlightColor (),
-                                   addressAttribute.Background,
-                                   GetAttributeForRole (VisualRole.Normal).Style));
+                SetAttributeForRole (VisualRole.Disabled);
             }
 
             var address = $"{addressOfLine:x8}";
             AddStr ($"{address.Substring (8 - AddressWidth)}");
 
-            SetAttribute (GetAttributeForRole (VisualRole.Normal));
+            SetAttribute (editingAttribute);
 
             if (AddressWidth > 0)
             {
@@ -507,15 +490,15 @@ public class HexView : View, IDesignable
                     if (offset + addressOfFirstLine == Address)
                     {
                         // Selected
-                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : selectedAttribute);
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : GetAttributeForRole (VisualRole.Focus));
                     }
                     else
                     {
-                        SetAttribute (edited ? editedAttribute : GetAttributeForRole (VisualRole.Normal));
+                        SetAttribute (edited ? editedAttribute : editingAttribute);
                     }
 
                     AddStr (offset >= bytesRead && !edited ? "  " : $"{value:x2}");
-                    SetAttribute (GetAttributeForRole (VisualRole.Normal));
+                    SetAttribute (editingAttribute);
                     AddRune (_spaceCharRune);
                 }
 
@@ -543,18 +526,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
-                        {
-                            byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                            while (status == OperationStatus.NeedMoreData)
                             {
-                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                            }
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
-                            break;
-                        }
+                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                                while (status == OperationStatus.NeedMoreData)
+                                {
+                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+                                }
+
+                                break;
+                            }
                         default:
                             Rune.DecodeFromUtf8 (new (ref b), out c, out _);
 
@@ -569,7 +552,7 @@ public class HexView : View, IDesignable
                 }
                 else
                 {
-                    SetAttribute (edited ? editedAttribute : GetAttributeForRole (VisualRole.Normal));
+                    SetAttribute (edited ? editedAttribute : editingAttribute);
                 }
 
                 AddRune (c);
@@ -579,6 +562,13 @@ public class HexView : View, IDesignable
                     byteIndex++;
                     AddRune (_periodCharRune);
                 }
+            }
+
+            SetAttribute (editingAttribute);
+            // Fill rest of line
+            for (int x = max; x < Viewport.Width; x++)
+            {
+                AddRune (new Rune (' '));
             }
         }
 
@@ -622,7 +612,7 @@ public class HexView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
-        if (!AllowEdits || _source is null)
+        if (ReadOnly || _source is null)
         {
             return false;
         }

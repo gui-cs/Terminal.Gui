@@ -14,7 +14,7 @@
     },
     "UICatalog --driver v2win": {
       "commandName": "Project",
-      "commandLineArgs": "--driver v2win"
+      "commandLineArgs": "--driver v2win -dl Trace"
     },
     "UICatalog --driver v2net": {
       "commandName": "Project",
@@ -61,10 +61,6 @@
       "commandName": "Project",
       "commandLineArgs": "\"All Views Tester\" -b -t 5000"
     },
-    "Charmap": {
-      "commandName": "Project",
-      "commandLineArgs": "Bars -b"
-    },
     "UICatalog --disable-cm": {
       "commandName": "Project",
       "commandLineArgs": "--disable-cm\r\n"
@@ -72,6 +68,10 @@
     "UICatalog --disable-cm --driver v2win": {
       "commandName": "Project",
       "commandLineArgs": "--disable-cm --driver v2win"
+    },
+    "Themes": {
+      "commandName": "Project",
+      "commandLineArgs": "Themes"
     }
   }
 }

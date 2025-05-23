@@ -105,6 +105,31 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Disable ();
     }
 
+
+    [Fact]
+    public void Apply_Applies_Theme ()
+    {
+        Assert.False (IsEnabled);
+        Enable (ConfigLocations.HardCoded);
+
+        var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
+        Assert.NotEmpty (theme);
+
+        Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
+        Assert.Equal (2, ThemeManager.Themes.Count);
+
+        Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
+        theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
+
+        ThemeManager.Theme = "testTheme";
+        ConfigurationManager.Apply ();
+
+        Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
+
+        Disable (resetToHardCodedDefaults: true);
+    }
+
     [Fact]
     public void Apply_Raises_Applied ()
     {
@@ -409,10 +434,39 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             string json = SourcesManager?.ToJson (Settings);
 
             // Write the JSON string to the file
-            File.WriteAllText ("config.json", json);
+            File.WriteAllText ("hard_coded_defaults_config.json", json);
 
             // Verify the file was created
-            Assert.True (File.Exists ("config.json"), "Failed to create config.json file");
+            Assert.True (File.Exists ("hard_coded_defaults_config.json"), "Failed to create config.json file");
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    /// <summary>Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.</summary>
+    /// <remarks>
+    ///     IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties are all
+    ///     static and thus can be overwritten by other tests.
+    /// </remarks>
+    [Fact]
+    public void Save_Library_Defaults_To_config_json ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.LibraryResources);
+
+            // Serialize to a JSON string
+            string json = SourcesManager?.ToJson (Settings);
+
+            // Write the JSON string to the file
+            File.WriteAllText ("library_defaults_config.json", json);
+
+            // Verify the file was created
+            Assert.True (File.Exists ("library_defaults_config.json"), "Failed to create config.json file");
         }
         finally
         {
@@ -933,13 +987,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
             Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
-
-            //Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
-            //Assert.Equal (Color.Blue, SchemeManager.GetSchemes ()! ["Base"].Normal.Background);
-
-            //Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)ThemeManager.Themes!.First ().Value ["Schemes"].PropertyValue;
-            //Assert.Equal (Color.White, schemes! ["Base"].Normal.Foreground);
-            //Assert.Equal (Color.Blue, schemes ["Base"].Normal.Background);
 
             // Now re-apply
             Apply ();

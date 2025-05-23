@@ -383,7 +383,7 @@ public class DeepClonerTests
 
         Assert.NotNull (result);
         Assert.NotSame (source, result);
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (source ["Disabled"], result ["Disabled"]);
     }
 
@@ -530,7 +530,7 @@ public class DeepClonerTests
     [Fact]
     public void ConfigProperty_CreatesDeepCopy ()
     {
-        ConfigProperty? source = ConfigProperty.CreateWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
+        ConfigProperty? source = ConfigProperty.CreateImmutableWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
         source.Immutable = false;
         source.PropertyValue = Key.A;
         ConfigProperty? result = DeepCloner.DeepClone (source);
@@ -575,7 +575,7 @@ public class DeepClonerTests
         ((Dictionary<string, int>)result ["Counts"].PropertyValue!).Add ("Y", 2);
         Assert.Equal ("Dark", source.Theme);
         Assert.True (((Key)source ["KeyBinding"].PropertyValue!).Handled);
-        Assert.Equal (1, ((Dictionary<string, int>)source ["Counts"].PropertyValue!).Count);
+        Assert.Single ((Dictionary<string, int>)source ["Counts"].PropertyValue!);
     }
 
     [Fact]
@@ -583,9 +583,11 @@ public class DeepClonerTests
     {
         // Arrange: Create a ThemeScope and verify a property exists
         var defaultThemeScope = new ThemeScope ();
+        defaultThemeScope.LoadHardCodedDefaults ();
         Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         var darkThemeScope = new ThemeScope ();
+        darkThemeScope.LoadHardCodedDefaults ();
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         // Create a Themes list with two themes
@@ -597,6 +599,7 @@ public class DeepClonerTests
 
         // Create a SettingsScope and set the Themes property
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         Assert.True (settingsScope.ContainsKey ("Themes"));
         settingsScope ["Themes"].PropertyValue = themesList;
 

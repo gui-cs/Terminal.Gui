@@ -341,6 +341,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                                                    break;
 
                                                case VisualRole.HotNormal:
+                                                   e.Cancel = true;
                                                    if (!HasFocus)
                                                    {
                                                        e.NewValue = GetAttributeForRole (VisualRole.HotFocus);

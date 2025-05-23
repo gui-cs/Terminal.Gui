@@ -45,13 +45,22 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             propertyName = reader.GetString ();
             reader.Read ();
 
-            if (propertyName is { } && scope!.TryGetValue (propertyName, out ConfigProperty? configProp))
-            {
-                // This property name was found in the Scope's ScopeProperties dictionary
-                // Figure out if it needs a JsonConverter and if so, create one
-                Type? propertyType = configProp?.PropertyInfo?.PropertyType!;
+            // Get the hardcoded property from the TscopeT (e.g. ThemeScope.GetHardCodedProperty)
+            ConfigProperty? configProperty = scope.GetHardCodedProperty (propertyName!);
 
-                if (configProp?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
+            if (propertyName is { } && configProperty is { })
+            {
+                // This property name was found in the cached hard-coded scope dict.
+
+                // Add it, with no value
+                configProperty.HasValue = false;
+                configProperty.PropertyValue = null;
+                scope.TryAdd (propertyName, configProperty);
+
+                // Figure out if it needs a JsonConverter and if so, create one
+                Type? propertyType = configProperty?.PropertyInfo?.PropertyType!;
+
+                if (configProperty?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
                     JsonConverterAttribute jca)
                 {
                     object? converter = Activator.CreateInstance (jca.ConverterType!)!;
@@ -82,27 +91,14 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     }
                     catch (TargetInvocationException)
                     {
-                        try
-                        {
-                            scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
-                        }
-                        catch (Exception)
-                        {
-                            // Logging.Trace ($"scopeT Read: {ex}");
-                        }
+                        // QUESTION: Should we try/catch here?
+                        scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
                     }
                 }
                 else
                 {
-                    try
-                    {
-                        scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
-                    }
-                    catch (Exception)
-                    {
-                        // Logging.Trace ($"scopeT Read: {ex}");
-                    }
+                    // QUESTION: Should we try/catch here?
+                    scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
                 }
 
                 //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
@@ -195,7 +191,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                                                ConfigurationPropertyAttribute scp
                                                                            && scp?.Scope == typeof (TScopeT)
                                                                       )
-                                                           where p.Value.PropertyValue != null
+                                                           where p.Value.HasValue
                                                            select p)
         {
             writer.WritePropertyName (p.Key);
@@ -227,7 +223,14 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             else
             {
                 object? prop = p.Value.PropertyValue;
-                JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
+                if (prop == null)
+                {
+                    writer.WriteNullValue ();
+                }
+                else
+                {
+                    JsonSerializer.Serialize (writer, prop, prop.GetType (), ConfigurationManager.SerializerContext);
+                }
             }
         }
 

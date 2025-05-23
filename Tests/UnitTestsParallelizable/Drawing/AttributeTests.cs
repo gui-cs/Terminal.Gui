@@ -5,6 +5,53 @@ namespace Terminal.Gui.DrawingTests;
 public class AttributeTests
 {
     [Fact]
+    public void Constructor_ParsesNamedColorsAndStyle ()
+    {
+        var attr = new Attribute ("Red", "Black", "Bold,Underline");
+        Assert.Equal (Color.Parse ("Red"), attr.Foreground);
+        Assert.Equal (Color.Parse ("Black"), attr.Background);
+        Assert.True (attr.Style.HasFlag (TextStyle.Bold));
+        Assert.True (attr.Style.HasFlag (TextStyle.Underline));
+        Assert.True (attr.IsExplicitlySet);
+    }
+
+    [Fact]
+    public void Constructor_ParsesHexColors ()
+    {
+        var attr = new Attribute ("#FF0000", "#000000", "Italic");
+        Assert.Equal (Color.Parse ("#FF0000"), attr.Foreground);
+        Assert.Equal (Color.Parse ("#000000"), attr.Background);
+        Assert.Equal (TextStyle.Italic, attr.Style);
+    }
+
+    [Fact]
+    public void Constructor_ParsesRgbColors ()
+    {
+        var attr = new Attribute ("rgb(0,255,0)", "rgb(0,0,255)", "Faint");
+        Assert.Equal (Color.Parse ("rgb(0,255,0)"), attr.Foreground);
+        Assert.Equal (Color.Parse ("rgb(0,0,255)"), attr.Background);
+        Assert.Equal (TextStyle.Faint, attr.Style);
+    }
+
+    [Fact]
+    public void Constructor_DefaultsToNoneStyle_WhenStyleIsNullOrEmpty ()
+    {
+        var attr1 = new Attribute ("White", "Black");
+        var attr2 = new Attribute ("White", "Black", null);
+        var attr3 = new Attribute ("White", "Black", "");
+        Assert.Equal (TextStyle.None, attr1.Style);
+        Assert.Equal (TextStyle.None, attr2.Style);
+        Assert.Equal (TextStyle.None, attr3.Style);
+    }
+
+    [Fact]
+    public void Constructor_DefaultsToNoneStyle_WhenStyleIsInvalid ()
+    {
+        var attr = new Attribute ("White", "Black", "NotAStyle");
+        Assert.Equal (TextStyle.None, attr.Style);
+    }
+
+    [Fact]
     public void AsExplicitlySet_CopiesData ()
     {
         var original = new Attribute (Color.Red, Color.Black, TextStyle.Italic);
