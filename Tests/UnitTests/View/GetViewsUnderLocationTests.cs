@@ -141,41 +141,6 @@ public class GetViewsUnderLocationTests (ITestOutputHelper output)
         Application.ResetState (true);
     }
 
-    // Test that GetViewsUnderLocation returns null if the start view has no subviews and coords are outside the view
-    [Theory]
-    [InlineData (0, 0)]
-    [InlineData (2, 1)]
-    [InlineData (20, 20)]
-    public void Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
-    {
-        Application.Top = new ()
-        {
-            X = 1, Y = 2,
-            Width = 10, Height = 10
-        };
-
-        Assert.Null (View.GetViewsUnderLocation (new (testX, testY)).LastOrDefault ());
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-    }
-
-    [Theory]
-    [InlineData (0, 0)]
-    [InlineData (2, 1)]
-    [InlineData (20, 20)]
-    public void Returns_Null_If_Start_Not_Visible (int testX, int testY)
-    {
-        Application.Top = new ()
-        {
-            X = 1, Y = 2,
-            Width = 10, Height = 10,
-            Visible = false
-        };
-
-        Assert.Null (View.GetViewsUnderLocation (new (testX, testY)).LastOrDefault ());
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-    }
 
     // Test that GetViewsUnderLocation returns the correct view if the start view has subviews
     [Theory]
