@@ -8,77 +8,81 @@ namespace Terminal.Gui.ViewMouseTests;
 public class GetViewsUnderLocationTests (ITestOutputHelper output)
 {
     [Theory]
-    [InlineData (0, 0, 0, 0, 0, -1, -1, null)]
-    [InlineData (0, 0, 0, 0, 0, 0, 0, typeof (Toplevel))]
-    [InlineData (0, 0, 0, 0, 0, 1, 1, typeof (Toplevel))]
-    [InlineData (0, 0, 0, 0, 0, 4, 4, typeof (Toplevel))]
-    [InlineData (0, 0, 0, 0, 0, 9, 9, typeof (Toplevel))]
-    [InlineData (0, 0, 0, 0, 0, 10, 10, null)]
-    [InlineData (1, 1, 0, 0, 0, -1, -1, null)]
-    [InlineData (1, 1, 0, 0, 0, 0, 0, null)]
-    [InlineData (1, 1, 0, 0, 0, 1, 1, typeof (Toplevel))]
-    [InlineData (1, 1, 0, 0, 0, 4, 4, typeof (Toplevel))]
-    [InlineData (1, 1, 0, 0, 0, 9, 9, typeof (Toplevel))]
-    [InlineData (1, 1, 0, 0, 0, 10, 10, typeof (Toplevel))]
-    [InlineData (0, 0, 1, 0, 0, -1, -1, null)]
-    [InlineData (0, 0, 1, 0, 0, 0, 0, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 0, 0, 1, 1, typeof (Toplevel))]
-    [InlineData (0, 0, 1, 0, 0, 4, 4, typeof (Toplevel))]
-    [InlineData (0, 0, 1, 0, 0, 9, 9, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 0, 0, 10, 10, null)]
-    [InlineData (0, 0, 1, 1, 0, -1, -1, null)]
-    [InlineData (0, 0, 1, 1, 0, 0, 0, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 1, 0, 1, 1, typeof (Border))]
-    [InlineData (0, 0, 1, 1, 0, 4, 4, typeof (Toplevel))]
-    [InlineData (0, 0, 1, 1, 0, 9, 9, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 1, 0, 10, 10, null)]
-    [InlineData (0, 0, 1, 1, 1, -1, -1, null)]
-    [InlineData (0, 0, 1, 1, 1, 0, 0, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 1, 1, 1, 1, typeof (Border))]
-    [InlineData (0, 0, 1, 1, 1, 2, 2, typeof (Padding))]
-    [InlineData (0, 0, 1, 1, 1, 4, 4, typeof (Toplevel))]
-    [InlineData (0, 0, 1, 1, 1, 9, 9, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 1, 1, 10, 10, null)]
-    [InlineData (1, 1, 1, 0, 0, -1, -1, null)]
-    [InlineData (1, 1, 1, 0, 0, 0, 0, null)]
-    [InlineData (1, 1, 1, 0, 0, 1, 1, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, 1, 0, 0, 4, 4, typeof (Toplevel))]
-    [InlineData (1, 1, 1, 0, 0, 9, 9, typeof (Toplevel))]
-    [InlineData (1, 1, 1, 0, 0, 10, 10, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, 1, 1, 0, -1, -1, null)]
-    [InlineData (1, 1, 1, 1, 0, 0, 0, null)]
-    [InlineData (1, 1, 1, 1, 0, 1, 1, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, 1, 1, 0, 4, 4, typeof (Toplevel))]
-    [InlineData (1, 1, 1, 1, 0, 9, 9, typeof (Border))]
-    [InlineData (1, 1, 1, 1, 0, 10, 10, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, 1, 1, 1, -1, -1, null)]
-    [InlineData (1, 1, 1, 1, 1, 0, 0, null)]
-    [InlineData (1, 1, 1, 1, 1, 1, 1, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, 1, 1, 1, 2, 2, typeof (Border))]
-    [InlineData (1, 1, 1, 1, 1, 3, 3, typeof (Padding))]
-    [InlineData (1, 1, 1, 1, 1, 4, 4, typeof (Toplevel))]
-    [InlineData (1, 1, 1, 1, 1, 8, 8, typeof (Padding))]
-    [InlineData (1, 1, 1, 1, 1, 9, 9, typeof (Border))]
-    [InlineData (1, 1, 1, 1, 1, 10, 10, typeof (Toplevel))] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 0, 0, 0, -1, -1, new string [] { })]
+    [InlineData (0, 0, 0, 0, 0, 0, 0, new [] { "Top" })]
+    [InlineData (0, 0, 0, 0, 0, 1, 1, new [] { "Top" })]
+    [InlineData (0, 0, 0, 0, 0, 4, 4, new [] { "Top" })]
+    [InlineData (0, 0, 0, 0, 0, 9, 9, new [] { "Top" })]
+    [InlineData (0, 0, 0, 0, 0, 10, 10, new string [] { })]
+    [InlineData (1, 1, 0, 0, 0, -1, -1, new string [] { })]
+    [InlineData (1, 1, 0, 0, 0, 0, 0, new string [] { })]
+    [InlineData (1, 1, 0, 0, 0, 1, 1, new [] { "Top" })]
+    [InlineData (1, 1, 0, 0, 0, 4, 4, new [] { "Top" })]
+    [InlineData (1, 1, 0, 0, 0, 9, 9, new [] { "Top" })]
+    [InlineData (1, 1, 0, 0, 0, 10, 10, new [] { "Top" })]
+    [InlineData (0, 0, 1, 0, 0, -1, -1, new string [] { })]
+    [InlineData (0, 0, 1, 0, 0, 0, 0, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 1, 0, 0, 1, 1, new [] { "Top" })]
+    [InlineData (0, 0, 1, 0, 0, 4, 4, new [] { "Top" })]
+    [InlineData (0, 0, 1, 0, 0, 9, 9, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 1, 0, 0, 10, 10, new string [] { })]
+    [InlineData (0, 0, 1, 1, 0, -1, -1, new string [] { })]
+    [InlineData (0, 0, 1, 1, 0, 0, 0, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 1, 1, 0, 1, 1, new [] { "Top", "Border" })]
+    [InlineData (0, 0, 1, 1, 0, 4, 4, new [] { "Top" })]
+    [InlineData (0, 0, 1, 1, 0, 9, 9, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 1, 1, 0, 10, 10, new string [] { })]
+    [InlineData (0, 0, 1, 1, 1, -1, -1, new string [] { })]
+    [InlineData (0, 0, 1, 1, 1, 0, 0, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 1, 1, 1, 1, 1, new [] { "Top", "Border" })]
+    [InlineData (0, 0, 1, 1, 1, 2, 2, new [] { "Top", "Padding" })]
+    [InlineData (0, 0, 1, 1, 1, 4, 4, new [] { "Top" })]
+    [InlineData (0, 0, 1, 1, 1, 9, 9, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (0, 0, 1, 1, 1, 10, 10, new string [] { })]
+    [InlineData (1, 1, 1, 0, 0, -1, -1, new string [] { })]
+    [InlineData (1, 1, 1, 0, 0, 0, 0, new string [] { })]
+    [InlineData (1, 1, 1, 0, 0, 1, 1, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (1, 1, 1, 0, 0, 4, 4, new [] { "Top" })]
+    [InlineData (1, 1, 1, 0, 0, 9, 9, new [] { "Top" })]
+    [InlineData (1, 1, 1, 0, 0, 10, 10, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (1, 1, 1, 1, 0, -1, -1, new string [] { })]
+    [InlineData (1, 1, 1, 1, 0, 0, 0, new string [] { })]
+    [InlineData (1, 1, 1, 1, 0, 1, 1, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (1, 1, 1, 1, 0, 4, 4, new [] { "Top" })]
+    [InlineData (1, 1, 1, 1, 0, 9, 9, new [] { "Top", "Border" })]
+    [InlineData (1, 1, 1, 1, 0, 10, 10, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (1, 1, 1, 1, 1, -1, -1, new string [] { })]
+    [InlineData (1, 1, 1, 1, 1, 0, 0, new string [] { })]
+    [InlineData (1, 1, 1, 1, 1, 1, 1, new string [] { })] //margin is ViewportSettings.TransparentToMouse
+    [InlineData (1, 1, 1, 1, 1, 2, 2, new [] { "Top", "Border" })]
+    [InlineData (1, 1, 1, 1, 1, 3, 3, new [] { "Top", "Padding" })]
+    [InlineData (1, 1, 1, 1, 1, 4, 4, new [] { "Top" })]
+    [InlineData (1, 1, 1, 1, 1, 8, 8, new [] { "Top", "Padding" })]
+    [InlineData (1, 1, 1, 1, 1, 9, 9, new [] { "Top", "Border" })]
+    [InlineData (1, 1, 1, 1, 1, 10, 10, new string [] { })] //margin is ViewportSettings.TransparentToMouse
     public void Top_Adornments_Returns_Correct_View (
-        int frameX,
-        int frameY,
-        int marginThickness,
-        int borderThickness,
-        int paddingThickness,
-        int testX,
-        int testY,
-        Type? expectedViewType
-    )
+     int frameX,
+     int frameY,
+     int marginThickness,
+     int borderThickness,
+     int paddingThickness,
+     int testX,
+     int testY,
+     string [] expectedViewsFound
+ )
     {
         // Arrange
         Application.Top = new ()
         {
+            Id = "Top",
             Frame = new (frameX, frameY, 10, 10)
         };
         Application.Top.Margin!.Thickness = new (marginThickness);
+        Application.Top.Margin.Id = "Margin";
         Application.Top.Border!.Thickness = new (borderThickness);
+        Application.Top.Border.Id = "Border";
         Application.Top.Padding!.Thickness = new (paddingThickness);
+        Application.Top.Padding.Id = "Padding";
 
         var location = new Point (testX, testY);
 
@@ -86,19 +90,19 @@ public class GetViewsUnderLocationTests (ITestOutputHelper output)
         List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location);
 
         // Assert
-        if (expectedViewType == null)
+        if (expectedViewsFound.Length == 0)
         {
             Assert.Empty (viewsUnderMouse);
         }
         else
         {
-            Assert.Contains (viewsUnderMouse, v => v?.GetType () == expectedViewType);
+            string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
+            Assert.Equal (expectedViewsFound, foundIds);
         }
 
         Application.Top.Dispose ();
         Application.ResetState (true);
     }
-
     [Theory]
     [InlineData (0, 0)]
     [InlineData (1, 1)]
@@ -141,41 +145,6 @@ public class GetViewsUnderLocationTests (ITestOutputHelper output)
         Application.ResetState (true);
     }
 
-    // Test that GetViewsUnderLocation returns null if the start view has no subviews and coords are outside the view
-    [Theory]
-    [InlineData (0, 0)]
-    [InlineData (2, 1)]
-    [InlineData (20, 20)]
-    public void Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
-    {
-        Application.Top = new ()
-        {
-            X = 1, Y = 2,
-            Width = 10, Height = 10
-        };
-
-        Assert.Null (View.GetViewsUnderLocation (new (testX, testY)).LastOrDefault ());
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-    }
-
-    [Theory]
-    [InlineData (0, 0)]
-    [InlineData (2, 1)]
-    [InlineData (20, 20)]
-    public void Returns_Null_If_Start_Not_Visible (int testX, int testY)
-    {
-        Application.Top = new ()
-        {
-            X = 1, Y = 2,
-            Width = 10, Height = 10,
-            Visible = false
-        };
-
-        Assert.Null (View.GetViewsUnderLocation (new (testX, testY)).LastOrDefault ());
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-    }
 
     // Test that GetViewsUnderLocation returns the correct view if the start view has subviews
     [Theory]
@@ -369,66 +338,115 @@ public class GetViewsUnderLocationTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, typeof (Toplevel))] // margin is ViewportSettings.TransparentToMouse
-    [InlineData (9, 9, typeof (Toplevel))] // margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, typeof (Border))]
-    [InlineData (8, 8, typeof (Border))]
-    [InlineData (2, 2, typeof (Padding))]
-    [InlineData (7, 7, typeof (Padding))]
-    [InlineData (5, 5, typeof (Toplevel))]
-    public void Returns_Adornment_If_Start_Has_Adornments (int testX, int testY, Type expectedAdornmentType)
+    [InlineData (0, 0, new string [] { })]
+    [InlineData (9, 9, new string [] { })]
+    [InlineData (1, 1, new [] { "Top", "Border" })]
+    [InlineData (8, 8, new [] { "Top", "Border" })]
+    [InlineData (2, 2, new [] { "Top", "Padding" })]
+    [InlineData (7, 7, new [] { "Top", "Padding" })]
+    [InlineData (5, 5, new [] { "Top" })]
+    public void Returns_Adornment_If_Start_Has_Adornments (int testX, int testY, string [] expectedViewsFound)
     {
         Application.ResetState (true);
         Application.Top = new ()
         {
+            Id = "Top",
             Width = 10, Height = 10
         };
         Application.Top.Margin!.Thickness = new (1);
+        Application.Top.Margin.Id = "Margin";
         Application.Top.Border!.Thickness = new (1);
+        Application.Top.Border.Id = "Border";
         Application.Top.Padding!.Thickness = new (1);
+        Application.Top.Padding.Id = "Padding";
 
         var subview = new View
         {
+            Id = "SubView",
             X = 1, Y = 1,
             Width = 1, Height = 1
         };
         Application.Top.Add (subview);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY)).LastOrDefault ();
-        Assert.Equal (expectedAdornmentType, found!.GetType ());
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY));
+        string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
+
+        Assert.Equal (expectedViewsFound, foundIds);
         Application.Top.Dispose ();
         Application.ResetState (true);
     }
 
     // Test that GetViewsUnderLocation works if the subview has positive Adornments
     [Theory]
-    [InlineData (0, 0, false)]
-    [InlineData (1, 1, false)]
-    [InlineData (9, 9, false)]
-    [InlineData (10, 10, false)]
-    [InlineData (7, 8, false)]
-    [InlineData (6, 7, false)]
-    [InlineData (1, 2, true)] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (5, 6, true)] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (2, 3, true)]
-    public void Returns_Correct_If_SubView_Has_Adornments (int testX, int testY, bool expectedSubViewFound)
+    [InlineData (0, 0, new[] { "Top" })]
+    [InlineData (1, 1, new[] { "Top" })]
+    [InlineData (9, 9, new[] { "Top" })]
+    [InlineData (10, 10, new string[] { })]
+    [InlineData (7, 8, new[] { "Top" })]
+    [InlineData (6, 7, new[] { "Top" })]
+    [InlineData (1, 2, new[] { "Top", "subview", "border" })]
+    [InlineData (5, 6, new[] { "Top", "subview", "border" })]
+    [InlineData (2, 3, new[] { "Top", "subview" })]
+    public void Returns_Correct_If_SubView_Has_Adornments (int testX, int testY, string[] expectedViewsFound)
     {
         Application.Top = new ()
         {
+            Id = "Top",
             Width = 10, Height = 10
         };
 
         var subview = new View
         {
+            Id = "subview",
             X = 1, Y = 2,
             Width = 5, Height = 5
         };
-        subview.Margin!.Thickness = new (1);
+        subview.Border!.Thickness = new (1);
+        subview.Border.Id = "border";
         Application.Top.Add (subview);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY)).LastOrDefault ();
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY));
+        string[] foundIds = viewsUnderMouse.Select(v => v!.Id).ToArray();
 
-        Assert.Equal (expectedSubViewFound, found == subview);
+        Assert.Equal(expectedViewsFound, foundIds);
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+    }
+
+    // Test that GetViewsUnderLocation works if the subview has positive Adornments
+    [Theory]
+    [InlineData (0, 0, new[] { "Top" })]
+    [InlineData (1, 1, new[] { "Top" })]
+    [InlineData (9, 9, new[] { "Top" })]
+    [InlineData (10, 10, new string[] { })]
+    [InlineData (7, 8, new[] { "Top" })]
+    [InlineData (6, 7, new[] { "Top" })]
+    [InlineData (1, 2, new[] { "Top" })]
+    [InlineData (5, 6, new[] { "Top" })]
+    [InlineData (2, 3, new[] { "Top", "subview" })]
+    public void Returns_Correct_If_SubView_Has_Adornments_With_TransparentMouse (int testX, int testY, string[] expectedViewsFound)
+    {
+        Application.Top = new ()
+        {
+            Id = "Top",
+            Width = 10, Height = 10
+        };
+
+        var subview = new View
+        {
+            Id = "subview",
+            X = 1, Y = 2,
+            Width = 5, Height = 5
+        };
+        subview.Border!.Thickness = new (1);
+        subview.Border.ViewportSettings = ViewportSettings.TransparentMouse;
+        subview.Border.Id = "border";
+        Application.Top.Add (subview);
+
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY));
+        string[] foundIds = viewsUnderMouse.Select(v => v!.Id).ToArray();
+
+        Assert.Equal(expectedViewsFound, foundIds);
         Application.Top.Dispose ();
         Application.ResetState (true);
     }

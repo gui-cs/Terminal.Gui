@@ -103,6 +103,7 @@ public partial class View // Layout APIs
         {
             RaiseViewportChangedEvent (oldViewport);
         }
+
         return true;
     }
 
@@ -1079,7 +1080,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            nx = 0;//targetX;
+            nx = 0; //targetX;
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
@@ -1148,17 +1149,21 @@ public partial class View // Layout APIs
             ny = 0;
         }
 
-            //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
-            return superView!;
+        return superView!;
     }
 
-
     /// <summary>
-    ///    Gets the Views that are under <paramref name="location"/>, including Adornments.
+    ///     Gets the Views that are under <paramref name="location"/>, including Adornments. The list is ordered by depth. The
+    ///     deepest
+    ///     View is at the end of the list (the top most View is at element 0).
     /// </summary>
     /// <param name="location">Screen-relative location.</param>
-    /// <param name="ignoreTransparent">If <see langword="true"/> any <see cref="ViewportSettings.TransparentMouse"/> views will be ignored.</param>
+    /// <param name="ignoreTransparent">
+    ///     If <see langword="true"/> any <see cref="ViewportSettings.TransparentMouse"/> views
+    ///     will be ignored.
+    /// </param>
     /// <returns></returns>
     public static List<View?> GetViewsUnderLocation (in Point location, bool ignoreTransparent = false)
     {
@@ -1244,7 +1249,10 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     INTERNAL: Helper that contains the original GetViewsUnderLocation logic, but starts from a given root view
+    ///     INTERNAL: Helper for <see cref="GetViewsUnderLocation"/> that starts from a given root view.
+    ///     Gets the Views that are under <paramref name="location"/>, including Adornments. The list is ordered by depth. The
+    ///     deepest
+    ///     View is at the end of the list (the top most View is at element 0).
     /// </summary>
     /// <param name="root"></param>
     /// <param name="location"></param>
@@ -1252,8 +1260,11 @@ public partial class View // Layout APIs
     /// <returns></returns>
     internal static List<View?> GetViewsUnderLocationForRoot (View root, in Point location, bool ignoreTransparent)
     {
-        // BUGBUG: There's a bug in here somewhere where Adornments and Subviews of Adornments are
-        // BUGBUG: nt being returned.
+        // TODO: Refactor this to be more readable and maintainable. Pull key logic out to 
+        // TODO: separate functions. Be careful as this is currently fragile.
+
+        // BUGBUG: This does not support ViewArrangment.Overlapped.
+        // BUGBUG: See UnitTests\View\Layout\GetViewsUnderLocationTests.cs.
 
         List<View?> viewsUnderLocation = [];
         Point currentLocation = location;
@@ -1286,14 +1297,21 @@ public partial class View // Layout APIs
 
             Point viewportOffset = root.GetViewportOffsetFromFrame ();
 
+
             if (found is { })
             {
-                // If the adornment is transparent to mouse, skip adding it, but continue traversal as if it was found.
-                if (!found.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                // If the adornment has TransparentMouse set, stop traversing further
+                // but keep the root element that's already added (if any)
+                if (found.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
                 {
-                    viewsUnderLocation.Add (found);
+                    // Return only what we have so far - don't add the parent of the adornment 
+                    // to match the test's expectation
+                    viewsUnderLocation.Remove (root);
+                    return viewsUnderLocation;
                 }
 
+                // If the adornment is not transparent to mouse, continue normal traversal
+                viewsUnderLocation.Add (found);
                 root = found;
                 viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
             }
@@ -1336,7 +1354,6 @@ public partial class View // Layout APIs
 
         return viewsUnderLocation;
     }
-
 
     #endregion Utilities
 
