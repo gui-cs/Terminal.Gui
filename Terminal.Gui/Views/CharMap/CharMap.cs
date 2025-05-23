@@ -261,8 +261,8 @@ public class CharMap : View, IDesignable
             return true;
         }
 
-        int cursorCol = GetCursor (SelectedCodePoint).X + Viewport.X - RowLabelWidth - 1;
-        int cursorRow = GetCursor (SelectedCodePoint).Y + Viewport.Y - 1;
+        int selectedCol = SelectedCodePoint % 16;
+        int selectedRow = SelectedCodePoint / 16;
 
         // Headers
 
@@ -287,7 +287,8 @@ public class CharMap : View, IDesignable
                 AddStr (" ");
 
                 // Swap Active/Focus so the selected column is highlighted
-                if (cursorCol + firstColumnX == x)
+                if (hexDigit == selectedCol)
+
                 {
                     SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
                 }
@@ -310,7 +311,7 @@ public class CharMap : View, IDesignable
             Move (0, y);
 
             // Swap Active/Focus so the selected row is highlighted
-            if (y + Viewport.Y - 1 == cursorRow)
+            if (y + Viewport.Y - 1 == selectedRow)
             {
                 SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
             }
@@ -347,8 +348,8 @@ public class CharMap : View, IDesignable
 
                 Move (x, y);
 
-                // If we're at the cursor position, and we don't have focus
-                if (row == cursorRow && x == cursorCol && !HasFocus)
+                // If we're at the cursor position highlight the cell
+                if (row == selectedRow && col == selectedCol)
                 {
                     SetAttributeForRole (VisualRole.Active);
                 }
@@ -407,7 +408,7 @@ public class CharMap : View, IDesignable
                 }
 
                 // If we're at the cursor position, and we don't have focus
-                if (row == cursorRow && x == cursorCol && !HasFocus)
+                if (row == selectedRow && col == selectedCol)
                 {
                     SetAttributeForRole (VisualRole.Normal);
                 }
@@ -555,6 +556,13 @@ public class CharMap : View, IDesignable
 
     private bool TryGetCodePointFromPosition (Point position, out int codePoint)
     {
+        if (position.X < RowLabelWidth || position.Y < 1)
+        {
+            codePoint = 0;
+
+            return false;
+        }
+
         int row = (position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
         int col = (position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 

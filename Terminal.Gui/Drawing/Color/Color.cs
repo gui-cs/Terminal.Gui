@@ -335,7 +335,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <returns>
     /// A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
     /// </returns>
-    public Color GetDarkerColor ()
+    public Color GetDimColor ()
     {
         HSL hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
         const double DARKEN_AMOUNT = 0.2;

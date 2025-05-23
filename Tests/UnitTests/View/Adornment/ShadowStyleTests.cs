@@ -43,7 +43,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Attribute.Default,
             new (fg, bg),
             new (Color.Black, bg),
-            new (fg.GetDarkerColor (), bg.GetDarkerColor ())
+            new (fg.GetDimColor (), bg.GetDimColor ())
         };
 
         var superView = new Toplevel

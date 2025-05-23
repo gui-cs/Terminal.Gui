@@ -239,16 +239,6 @@ public static class ThemeManager
                 Logging.Warning ($"{value} is not a valid theme name.");
             }
 
-            //if (value == DEFAULT_THEME_NAME)
-            //{
-            //    ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
-            //    if (hardCodedThemeScope is null)
-            //    {
-            //        throw new InvalidOperationException ("Hard coded theme scope is null.");
-            //    }
-            //    Themes [DEFAULT_THEME_NAME].UpdateFrom (hardCodedThemeScope);
-            //}
-
             // Update the backing store
             ConfigurationManager.Settings! ["Theme"].PropertyValue = value;
 

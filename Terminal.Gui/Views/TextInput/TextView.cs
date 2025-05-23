@@ -1099,7 +1099,7 @@ public class TextView : View, IDesignable
                 return new (attributeSel);
             }
 
-            return GetAttributeForRole (VisualRole.Editable);
+            return GetAttributeForRole (VisualRole.Active);
         }
 
         line = GetCurrentLine ();
@@ -1109,7 +1109,7 @@ public class TextView : View, IDesignable
             return new (attribute);
         }
 
-        return GetAttributeForRole (VisualRole.Editable);
+        return GetAttributeForRole (VisualRole.Active);
     }
 
     /// <summary>
@@ -2236,7 +2236,7 @@ public class TextView : View, IDesignable
 
         if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
         {
-            SetAttribute(new (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style));
+            SetAttribute (new (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style));
         }
         else
         {
@@ -2262,20 +2262,12 @@ public class TextView : View, IDesignable
         if (line [idxCol].Attribute is { })
         {
             Attribute? attribute = line [idxCol].Attribute;
-
-            SetAttribute (
-                          new (attribute!.Value.Background, attribute.Value.Foreground, attribute!.Value.Style)
-                         );
+            Attribute? active = GetAttributeForRole (VisualRole.Active);
+            SetAttribute (new (active!.Value.Foreground, active.Value.Background, attribute!.Value.Style));
         }
         else
         {
-            SetAttribute (
-                          new (
-                               GetAttributeForRole (VisualRole.Focus).Background,
-                               GetAttributeForRole (VisualRole.Focus).Foreground,
-                               GetAttributeForRole (VisualRole.Focus).Style
-                              )
-                         );
+            SetAttributeForRole (VisualRole.Active);
         }
     }
 
@@ -2304,12 +2296,6 @@ public class TextView : View, IDesignable
             SetValidUsedColor (GetAttributeForRole (VisualRole.Focus));
         }
     }
-
-    /// <summary>
-    ///     Sets the driver to the default color for the control where no text is being rendered. Defaults to
-    ///     <see cref="Scheme.Normal"/>.
-    /// </summary>
-    protected virtual void SetNormalColor () { SetAttribute (GetAttributeForRole (VisualRole.Normal)); }
 
     private void Adjust ()
     {
