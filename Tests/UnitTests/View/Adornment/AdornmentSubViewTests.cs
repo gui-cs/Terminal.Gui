@@ -20,6 +20,8 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Height = 10
         };
         Application.Top.Margin.Thickness = new Thickness (viewMargin);
+        // Turn of TransparentMouse for the test
+        Application.Top.Margin.ViewportSettings = ViewportSettings.None;
 
         var subView = new View ()
         {
@@ -29,6 +31,9 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Height = 5
         };
         subView.Margin.Thickness = new Thickness (subViewMargin);
+        // Turn of TransparentMouse for the test
+        subView.Margin.ViewportSettings = ViewportSettings.None;
+
         Application.Top.Margin.Add (subView);
         Application.Top.Layout ();
 

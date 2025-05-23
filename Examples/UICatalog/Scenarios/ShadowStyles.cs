@@ -18,12 +18,14 @@ public class ShadowStyles : Scenario
 
         Window app = new ()
         {
+            Id= "app",
             Title = GetQuitKeyAndName ()
         };
 
 
         var editor = new AdornmentsEditor ()
         {
+            Id = "editor",
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true,
         };
@@ -31,8 +33,10 @@ public class ShadowStyles : Scenario
 
         app.Add (editor);
 
-        Window win = new ()
+        Window shadowWindow = new ()
         {
+
+            Id = "shadowWindow",
             X = Pos.Right (editor),
             Y = 0,
             Width = Dim.Percent (30),
@@ -51,20 +55,29 @@ public class ShadowStyles : Scenario
 
         var buttonInWin = new Button
         {
+            Id = "buttonInWin",
             X = Pos.Center (),
             Y = Pos.Center (), Text = "Button in Window",
             ShadowStyle = ShadowStyle.Opaque
         };
-        win.Add (buttonInWin);
-        app.Add (win);
+        shadowWindow.Add (buttonInWin);
+        app.Add (shadowWindow);
 
         var button = new Button
         {
+            Id = "button",
             X = Pos.Right (editor) + 10,
             Y = Pos.Center (), Text = "Button",
             ShadowStyle = ShadowStyle.Opaque
         };
-        app.Add (button);
+
+        ColorPicker16 colorPicker16 = new ColorPicker16 ()
+        {
+            Id = "colorPicker16",
+            X = 0,
+            Y = Pos.AnchorEnd(),
+        };
+        app.Add (button, colorPicker16);
 
         editor.AutoSelectViewToEdit = true;
         editor.AutoSelectSuperView = app;
