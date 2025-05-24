@@ -52,6 +52,10 @@ public class AnsiKeyboardParserTests
         yield return new object [] { "\u001b[1", null! };
         yield return new object [] { "\u001b[AB", null! };
         yield return new object [] { "\u001b[;A", null! };
+
+
+        // Test data for various ANSI escape sequences and their expected Key values
+        yield return new object [] { "\u001b[3;5~", Key.Delete.WithCtrl };
     }
 
     // Consolidated test for all keyboard events (e.g., arrow keys)
