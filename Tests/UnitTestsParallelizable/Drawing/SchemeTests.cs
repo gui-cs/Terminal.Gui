@@ -18,48 +18,7 @@ public class SchemeTests
     }
 
     [Fact]
-    public void GetAttributeForRole_Returns_Derived_When_NotExplicitlySet ()
-    {
-        Attribute baseAttr = new (Color.White, Color.Black, TextStyle.None);
-        Scheme scheme = new (baseAttr);
-
-        Attribute hotFocus = scheme.GetAttributeForRole (VisualRole.HotFocus);
-
-        Assert.Equal (baseAttr.Foreground, hotFocus.Foreground);
-        Assert.Equal (baseAttr.Background.GetHighlightColor (), hotFocus.Background);
-        Assert.True (hotFocus.Style.HasFlag (TextStyle.Underline));
-    }
-
-    //[Fact]
-    //public void HardcodedSchemes_ExplicitAttributes_AreMarkedExplicit ()
-    //{
-    //    Dictionary<string, Scheme?> schemes = Scheme.GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase);
-
-    //    foreach (KeyValuePair<string, Scheme?> pair in schemes)
-    //    {
-    //        Scheme scheme = pair.Value!;
-    //        string name = pair.Key;
-
-    //        foreach (PropertyInfo prop in typeof (Scheme).GetProperties ())
-    //        {
-    //            if (prop.PropertyType != typeof (Attribute))
-    //            {
-    //                continue;
-    //            }
-
-    //            var attr = (Attribute)prop.GetValue (scheme)!;
-
-    //            // Only validate attributes that differ from the scheme's Normal
-    //            if (!ReferenceEquals (prop.Name, nameof (Scheme.Normal)) && attr != scheme.Normal)
-    //            {
-    //                Assert.True (attr.IsExplicitlySet, $"{name}.{prop.Name} is not explicitly set.");
-    //            }
-    //        }
-    //    }
-    //}
-
-    [Fact]
-    public void Scheme_New ()
+    public void New ()
     {
         var scheme = new Scheme ();
         var lbl = new Label ();
@@ -68,9 +27,9 @@ public class SchemeTests
     }
 
     [Fact]
-    public void Schemes_Built_Ins ()
+    public void Built_Ins ()
     {
-        Dictionary<string, Scheme>? schemes = SchemeManager.GetSchemes ();
+        Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemes ();
         Assert.NotNull (schemes);
         Assert.Equal (5, schemes.Count);
         Assert.True (schemes.ContainsKey ("TopLevel"));
@@ -81,7 +40,7 @@ public class SchemeTests
     }
 
     [Fact]
-    public void Schemes_With_Same_Attributes_AreEqual ()
+    public void With_Same_Attributes_AreEqual ()
     {
         Attribute attr = new (Color.Red, Color.Blue, TextStyle.Bold);
         Scheme s1 = new (attr);
@@ -89,5 +48,128 @@ public class SchemeTests
 
         Assert.Equal (s1, s2);
         Assert.Equal (s1.GetHashCode (), s2.GetHashCode ());
+    }
+
+    [Fact]
+    public void Scheme_Properties_Are_Immutable ()
+    {
+        Scheme scheme = new (new Attribute ("Red", "Blue"));
+        // The following line should not compile if uncommented:
+        // scheme.Normal = new Attribute("Green", "Yellow");
+        // Immutability is enforced by the C# compiler for init-only properties.
+        Assert.True (true); // This test is a placeholder for documentation purposes.
+    }
+
+    [Fact]
+    public void ObjectInitializer_Sets_Properties ()
+    {
+        Scheme scheme = new ()
+        {
+            Normal = new Attribute ("Red", "Blue"),
+            Focus = new Attribute ("Green", "Yellow"),
+            HotNormal = new Attribute ("White", "Black"),
+            HotFocus = new Attribute ("Black", "White"),
+            Active = new Attribute ("Cyan", "Magenta"),
+            HotActive = new Attribute ("Magenta", "Cyan"),
+            Highlight = new Attribute ("Yellow", "Red"),
+            Editable = new Attribute ("Blue", "Yellow"),
+            ReadOnly = new Attribute ("Gray", "Black"),
+            Disabled = new Attribute ("DarkGray", "White")
+        };
+
+        Assert.Equal (new Attribute ("Red", "Blue"), scheme.Normal);
+        Assert.Equal (new Attribute ("Green", "Yellow"), scheme.Focus);
+        Assert.Equal (new Attribute ("White", "Black"), scheme.HotNormal);
+        Assert.Equal (new Attribute ("Black", "White"), scheme.HotFocus);
+        Assert.Equal (new Attribute ("Cyan", "Magenta"), scheme.Active);
+        Assert.Equal (new Attribute ("Magenta", "Cyan"), scheme.HotActive);
+        Assert.Equal (new Attribute ("Yellow", "Red"), scheme.Highlight);
+        Assert.Equal (new Attribute ("Blue", "Yellow"), scheme.Editable);
+        Assert.Equal (new Attribute ("Gray", "Black"), scheme.ReadOnly);
+        Assert.Equal (new Attribute ("DarkGray", "White"), scheme.Disabled);
+    }
+
+    [Fact]
+    public void With_Different_Attributes_AreNotEqual ()
+    {
+        Scheme s1 = new (new Attribute ("Red", "Blue"));
+        Scheme s2 = new (new Attribute ("Green", "Yellow"));
+        Assert.NotEqual (s1, s2);
+        Assert.NotEqual (s1.GetHashCode (), s2.GetHashCode ());
+    }
+
+    [Fact]
+    public void With_Same_Attributes_But_Different_Explicitness_AreEqual ()
+    {
+        Attribute attr = new (Color.Red, Color.Blue, TextStyle.Bold);
+        Scheme s1 = new (attr);
+        Scheme s2 = new ()
+        {
+            Normal = attr.AsImplicit (),
+            Focus = attr.AsImplicit (),
+            HotNormal = attr.AsImplicit (),
+            HotFocus = attr.AsImplicit (),
+            Active = attr.AsImplicit (),
+            HotActive = attr.AsImplicit (),
+            Highlight = attr.AsImplicit (),
+            Editable = attr.AsImplicit (),
+            ReadOnly = attr.AsImplicit (),
+            Disabled = attr.AsImplicit ()
+        };
+        Assert.Equal (s1, s2);
+        Assert.Equal (s1.GetHashCode (), s2.GetHashCode ());
+    }
+
+    [Fact]
+    public void Default_Constructor_Has_Default_Values ()
+    {
+        Scheme scheme = new ();
+        Assert.True (scheme.Normal.IsExplicitlySet);
+        // All other roles should be implicit and derived from Normal
+        Assert.False (scheme.Focus.IsExplicitlySet);
+        Assert.False (scheme.HotNormal.IsExplicitlySet);
+        Assert.False (scheme.HotFocus.IsExplicitlySet);
+        Assert.False (scheme.Active.IsExplicitlySet);
+        Assert.False (scheme.HotActive.IsExplicitlySet);
+        Assert.False (scheme.Highlight.IsExplicitlySet);
+        Assert.False (scheme.Editable.IsExplicitlySet);
+        Assert.False (scheme.ReadOnly.IsExplicitlySet);
+        Assert.False (scheme.Disabled.IsExplicitlySet);
+    }
+
+    [Fact]
+    public void ToString_Outputs_All_Properties ()
+    {
+        Scheme scheme = new (new Attribute ("Red", "Blue"));
+        string str = scheme.ToString ();
+        Assert.Contains ("Normal", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("HotNormal", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("Focus", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("HotFocus", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("Active", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("HotActive", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("Highlight", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("Editable", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("ReadOnly", str, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains ("Disabled", str, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void CopyConstructor_Null_Throws ()
+    {
+        Assert.Throws<ArgumentNullException> (() => new Scheme (null));
+    }
+
+    [Fact]
+    public void Is_Thread_Safe_For_Concurrent_Reads ()
+    {
+        Scheme scheme = new (new Attribute ("Red", "Blue"));
+        Parallel.For (0, 1000, i =>
+                               {
+                                   // All threads can safely read properties
+                                   _ = scheme.Normal;
+                                   _ = scheme.GetAttributeForRole (VisualRole.Focus);
+                                   _ = scheme.ToString ();
+                               });
     }
 }

@@ -6,35 +6,100 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>
-///     A Scheme is a mapping from <see cref="VisualRole"/>s (such as <see cref="VisualRole.Focus"/>) to
-///     <see cref="Attribute"/>s.
-///     A Scheme defines how a `View` should look based on its purpose (e.g. Menu or Dialog).
+///     Represents a theme definition that maps each <see cref="VisualRole"/> (such as <see cref="VisualRole.Focus"/>,
+///     <see cref="VisualRole.Disabled"/>, etc.)
+///     to an <see cref="Attribute"/> describing its foreground color, background color, and text style.
 ///     <para>
-///         Use <see cref="SchemeManager"/> to manage the available schemes.
+///         A <see cref="Scheme"/> enables consistent, semantic theming of UI elements by associating each visual state
+///         with a specific style.
+///         Each property (e.g., <see cref="Normal"/>, <see cref="Focus"/>, <see cref="Disabled"/>) is an
+///         <see cref="Attribute"/>.
+///         If a property is not explicitly set, its value is derived from other roles (typically <see cref="Normal"/>)
+///         using well-defined inheritance rules.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/drawing.html"/> for more info.
+///         <see cref="Scheme"/> objects are immutable. To update a scheme, create a new instance with the desired values.
+///         Use <see cref="SchemeManager"/> to manage available schemes and apply them to views.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/drawing.html"/> for more information.
 ///     </para>
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Scheme objects are immutable. Once constructed, the properties cannot be changed. To change a
-///         Scheme, create a new one with the desired values, using the <see cref="Scheme(Scheme)"/>
-///         constructor.
+///         <b>Immutability:</b> Scheme objects are immutable. Once constructed, their properties cannot be changed. To
+///         modify a Scheme,
+///         create a new instance with the desired values (e.g., using the <see cref="Scheme(Scheme)"/> constructor).
 ///     </para>
 ///     <para>
-///         The Normal attribute must always be set. All other attributes are optional.
-///         If a Scheme does not have a value set for a specific <see cref="VisualRole"/>, then a derived value is used.
-///         The algorithm for deriving the value is as follows:
-///             - For roles that have a "Hot" variant (e.g., <see cref="VisualRole.Normal"/> has <see cref="VisualRole.HotNormal"/> as it's "Hot" variant):
-///                 - If the "Hot" variant is not set, it will be derived from the Normal attribute by adding the underline style.
-///                 - If the non-"Hot" variant is not set, it will be derived from the "Hot" variant, removing the underline style.
-///             - For roles that have a "Focus" variant (e.g., <see cref="VisualRole.Normal"/> has <see cref="VisualRole.Focus"/> as it's "Focus" variant):
-///                 - If the "Focus" variant is not set, it will be derived from the Normal attribute by changing the background color to the highlight color.
-///             - If "Highlight" is not set, it will be derived from the Normal attribute by using the GetHighlightColor method.
-///             - If "Editable" is not set, the Base "Editable" attribute will be used.
-///             - If "ReadOnly" is not set, it will be derived from the "Editable" attribute by adding the italic and faint style.
-///                 
+///         <b>Attribute Resolution Algorithm:</b>
+///         <br/>
+///         Each <see cref="Scheme"/> property corresponds to a <see cref="VisualRole"/> and is an <see cref="Attribute"/>.
+///         The <see cref="Normal"/> attribute must always be set.
+///         All other attributes are optional. If an attribute for a given <see cref="VisualRole"/> is not explicitly set,
+///         its value is derived using the following rules:
+///         <list type="number">
+///             <item>
+///                 <description><b>Normal:</b> Must always be explicitly set.</description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Focus:</b> If not set, derived from <see cref="Normal"/> by swapping foreground and background
+///                     colors, or by applying <see cref="Color.GetHighlightColor"/> to the background.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Highlight:</b> If not set, derived from <see cref="Normal"/> by applying
+///                     <see cref="Color.GetHighlightColor"/> to the background color.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Editable:</b> If not set, derived from <see cref="Normal"/> by setting the foreground
+///                     to <c>LightYellow</c>.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>ReadOnly:</b> If not set, derived from <see cref="Editable"/> by adding
+///                     <see cref="TextStyle.Italic"/> to the style.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Disabled:</b> If not set, derived from <see cref="Normal"/> by adding
+///                     <see cref="TextStyle.Faint"/> to the style.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Active:</b> If not set, derived from <see cref="Focus"/> by adding
+///                     <see cref="TextStyle.Bold"/> to the style.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Hot* variants (e.g., HotNormal, HotFocus, HotActive):</b>
+///                     <list type="bullet">
+///                         <item>
+///                             <description>
+///                                 If the corresponding non-hot variant (e.g., <see cref="Normal"/>, <see cref="Focus"/>,
+///                                 <see cref="Active"/>) is not set, it is first derived as above.
+///                             </description>
+///                         </item>
+///                         <item>
+///                             <description>
+///                                 If the hot variant is not set, it is derived from its non-hot variant by adding
+///                                 <see cref="TextStyle.Underline"/> to the style.
+///                             </description>
+///                         </item>
+///                     </list>
+///                 </description>
+///             </item>
+///         </list>
+///         This algorithm ensures that every <see cref="VisualRole"/> always resolves to a valid <see cref="Attribute"/>,
+///         either explicitly set or derived.
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (SchemeJsonConverter))]
@@ -60,8 +125,9 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
         Scheme CreateBase ()
         {
-            Color highlight = new Color ("LightGray");
+            var highlight = new Color ("LightGray");
             highlight = highlight.GetHighlightColor ();
+
             return new ()
             {
                 Normal = new ("LightGray", "RaisinBlack"),
@@ -71,8 +137,9 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 HotFocus = new ("White", "DarkGray", "Underline,Bold"),
                 Active = new ("White", "Charcoal"),
                 HotActive = new ("White", "Charcoal", "Underline"),
-                Highlight = new (highlight, new Color("RaisinBlack")),
-                Editable = new ("LightYellow", "OuterSpace"),
+                Highlight = new (highlight, new Color ("RaisinBlack")),
+                Editable = new ("LightYellow", "OuterSpace")
+
                 //use algo: ReadOnly = new ("Gray", "RaisinBlack", "Italic")
             };
         }
@@ -82,15 +149,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return new ()
             {
                 Normal = new ("Gainsboro", "OuterSpace"),
-                Focus = new ("White", "SlateGray"),
-                HotNormal = new ("LightGray", "OuterSpace", "Underline"),
-                Disabled = new ("DimGray", "OuterSpace", "Faint"),
-                HotFocus = new ("White", "SlateGray", "Underline"),
-                Active = new ("White", "DarkSlateGray", "Bold"),
-                HotActive = new ("White", "DarkSlateGray", "Underline,Bold"),
-                Highlight = new ("White", "Onyx"),
-                Editable = new ("LemonChiffon", "RaisinBlack"),
-                ReadOnly = new ("Silver", "OuterSpace", "Italic")
+                //Focus = new ("White", "SlateGray"),
+                //HotNormal = new ("LightGray", "OuterSpace", "Underline"),
+                //Disabled = new ("DimGray", "OuterSpace", "Faint"),
+                //HotFocus = new ("White", "SlateGray", "Underline"),
+                //Active = new ("White", "DarkSlateGray", "Bold"),
+                //HotActive = new ("White", "DarkSlateGray", "Underline,Bold"),
+                //Highlight = new ("White", "Onyx"),
+                //Editable = new ("LemonChiffon", "RaisinBlack"),
+                //ReadOnly = new ("Silver", "OuterSpace", "Italic")
             };
         }
 
@@ -198,74 +265,18 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// </returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
-        // Get the base attribute for the role
-        Attribute attr = role switch
-                         {
-                             VisualRole.Normal => Normal,
-                             VisualRole.HotNormal => HotNormal,
-                             VisualRole.Focus => Focus,
-                             VisualRole.HotFocus => HotFocus,
-                             VisualRole.Active => Active,
-                             VisualRole.HotActive => HotActive,
-                             VisualRole.Highlight => Highlight,
-                             VisualRole.Editable => Editable,
-                             VisualRole.ReadOnly => ReadOnly,
-                             VisualRole.Disabled => Disabled,
-                             _ => Normal
-                         };
+        // Use a HashSet to guard against recursion cycles
+        return GetAttributeForRoleCore (role, []);
+    }
 
-        // If explicitly set or it's the Normal role (which must always be set), return as is
-        if (attr.IsExplicitlySet || role == VisualRole.Normal)
+    private Attribute GetAttributeForRoleCore (VisualRole role, HashSet<VisualRole> stack)
+    {
+        // Prevent infinite recursion
+        if (!stack.Add (role))
         {
-            return attr;
+            return Normal; // fallback
         }
 
-        // Otherwise apply inheritance rules
-        return DeriveAttributeForRole (role);
-    }
-
-    /// <summary>
-    ///     PRIVATE: Derives an attribute for a visual role based on inheritance rules.
-    /// </summary>
-    private Attribute DeriveAttributeForRole (VisualRole role)
-    {
-        return role switch
-               {
-                   VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
-                   VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-                   VisualRole.HotFocus => GetDerivedAttribute (VisualRole.Focus) with
-                   {
-                       Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Underline,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.Active => GetDerivedAttribute (VisualRole.Focus) with
-                   {
-                       Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Bold,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.HotActive => GetDerivedAttribute (VisualRole.Active) with
-                   {
-                       Style = GetDerivedAttribute (VisualRole.Active).Style | TextStyle.Underline,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-                   VisualRole.Editable => Normal with { Foreground = new ("LightYellow"), IsExplicitlySet = false },
-                   VisualRole.ReadOnly => GetDerivedAttribute (VisualRole.Editable) with
-                   {
-                       Style = GetDerivedAttribute (VisualRole.Editable).Style | TextStyle.Italic,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
-                   _ => Normal
-               };
-    }
-
-    /// <summary>
-    ///     PRIVATE: Helper method to get an attribute (explicitly set or derived) for a role.
-    ///     Avoids potential infinite recursion by handling each role directly.
-    /// </summary>
-    private Attribute GetDerivedAttribute (VisualRole role)
-    {
         Attribute attr = role switch
                          {
                              VisualRole.Normal => Normal,
@@ -286,35 +297,101 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return attr;
         }
 
-        // Direct derivation for each role to avoid recursion issues
-        return role switch
-               {
-                   VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
-                   VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-                   VisualRole.HotFocus => Normal with
-                   {
-                       Background = Normal.Background.GetHighlightColor (),
-                       Style = Normal.Style | TextStyle.Underline,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.Active => Normal with
-                   {
-                       Background = Normal.Background.GetHighlightColor (),
-                       Style = Normal.Style | TextStyle.Bold,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.HotActive => Normal with
-                   {
-                       Background = Normal.Background.GetHighlightColor (),
-                       Style = Normal.Style | TextStyle.Bold | TextStyle.Underline,
-                       IsExplicitlySet = false
-                   },
-                   VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
-                   VisualRole.Editable => Normal with { Foreground = new ("LightYellow"), IsExplicitlySet = false },
-                   VisualRole.ReadOnly => Normal with { Foreground = new ("LightYellow"), Style = Normal.Style | TextStyle.Italic, IsExplicitlySet = false },
-                   VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
-                   _ => Normal
-               };
+        // Derivation algorithm as documented
+        Attribute result = role switch
+                           {
+                               VisualRole.Focus =>
+
+                                   // Derived from Normal by swapping fg/bg or by applying highlight to background
+                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                                   {
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.Highlight =>
+
+                                   // Derived from Normal by applying highlight to foreground and dim to background
+                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                                   {
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor (),
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetDimColor(),
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.Editable =>
+
+                                   // Derived from Normal by applying highlight to foreground and highlight/dim to background
+                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                                   {
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor(),
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor ().GetDimColor (),
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.ReadOnly =>
+
+                                   // Derived from Editable by adding Faint
+                                   GetAttributeForRoleCore (VisualRole.Editable, stack) with
+                                   {
+                                       Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Faint,
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.Disabled =>
+
+                                   // Derived from Normal by adding Faint
+                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                                   {
+                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Faint,
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.Active =>
+
+                                   // Derived from Focus by adding Bold and by applying highlight to foreground and dim to background
+                                   GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                                   {
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetHighlightColor (),
+                                       Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
+                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold,
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.HotNormal =>
+
+                                   // Derived from Normal by adding Underline
+                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                                   {
+                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Underline,
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.HotFocus =>
+
+                                   // Derived from Focus by adding Underline
+                                   GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                                   {
+                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Underline,
+                                       IsExplicitlySet = false
+                                   },
+
+                               VisualRole.HotActive =>
+
+                                   // Derived from Active by adding Underline
+                                   GetAttributeForRoleCore (VisualRole.Active, stack) with
+                                   {
+                                       Style = GetAttributeForRoleCore (VisualRole.Active, stack).Style | TextStyle.Underline,
+                                       IsExplicitlySet = false
+                                   },
+
+                               _ => GetAttributeForRoleCore (VisualRole.Normal, stack)
+                           };
+
+        stack.Remove (role);
+
+        return result;
     }
 
     /// <summary>
@@ -335,6 +412,9 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
     /// <summary>
     ///     The default visual role for unfocused, unselected, enabled elements.
+    ///     The Normal attribute must always be set. All other attributes are optional, and if not explicitly
+    ///     set, will be automatically generated. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute Normal { get; init; }
 

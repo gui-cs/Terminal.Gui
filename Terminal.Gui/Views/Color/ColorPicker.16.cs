@@ -153,7 +153,7 @@ public class ColorPicker16 : View
                 }
                 else
                 {
-                    SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDarkerColor (), TextStyle.Faint));
+                    SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
                 }
 
                 bool selected = x == Cursor.X && y == Cursor.Y;
