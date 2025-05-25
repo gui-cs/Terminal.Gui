@@ -37,6 +37,7 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
     /// <inheritdoc/>
     public override bool IsMatch (string? input) { return _pattern.IsMatch (input!); }
 
+    /// <inheritdoc/>
     protected override Key? GetKeyImpl (string? input)
     {
         Match match = _pattern.Match (input!);
