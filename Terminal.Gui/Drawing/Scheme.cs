@@ -131,14 +131,14 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return new ()
             {
                 Normal = new ("LightGray", "RaisinBlack"),
-                Focus = new ("White", "DarkGray", "Bold"),
-                HotNormal = new ("Silver", "RaisinBlack", "Underline"),
-                Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
-                HotFocus = new ("White", "DarkGray", "Underline,Bold"),
-                Active = new ("White", "Charcoal"),
-                HotActive = new ("White", "Charcoal", "Underline"),
-                Highlight = new (highlight, new Color ("RaisinBlack")),
-                Editable = new ("LightYellow", "OuterSpace")
+                //Focus = new ("White", "DarkGray", "Bold"),
+                //HotNormal = new ("Silver", "RaisinBlack", "Underline"),
+                //Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
+                //HotFocus = new ("White", "DarkGray", "Underline,Bold"),
+                //Active = new ("White", "Charcoal"),
+                //HotActive = new ("White", "Charcoal", "Underline"),
+                //Highlight = new (highlight, new Color ("RaisinBlack")),
+                //Editable = new ("LightYellow", "OuterSpace")
 
                 //use algo: ReadOnly = new ("Gray", "RaisinBlack", "Italic")
             };
@@ -166,15 +166,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return new ()
             {
                 Normal = new ("IndianRed", "RaisinBlack"),
-                Focus = new ("White", "IndianRed"),
-                HotNormal = new ("LightCoral", "RaisinBlack", "Underline"),
-                Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
-                HotFocus = new ("White", "IndianRed", "Underline"),
-                Active = new ("White", "LightCoral", "Bold"),
-                HotActive = new ("White", "LightCoral", "Underline,Bold"),
-                Highlight = new ("White", "IndianRed"),
-                Editable = new ("LemonChiffon", "RaisinBlack"),
-                ReadOnly = new ("Silver", "RaisinBlack", "Italic")
+                //Focus = new ("White", "IndianRed"),
+                //HotNormal = new ("LightCoral", "RaisinBlack", "Underline"),
+                //Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
+                //HotFocus = new ("White", "IndianRed", "Underline"),
+                //Active = new ("White", "LightCoral", "Bold"),
+                //HotActive = new ("White", "LightCoral", "Underline,Bold"),
+                //Highlight = new ("White", "IndianRed"),
+                //Editable = new ("LemonChiffon", "RaisinBlack"),
+                //ReadOnly = new ("Silver", "RaisinBlack", "Italic")
             };
         }
 
@@ -183,15 +183,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return new ()
             {
                 Normal = new ("Gainsboro", "SlateGray"),
-                Focus = new ("Black", "Gainsboro"),
-                HotNormal = new ("WhiteSmoke", "SlateGray", "Underline"),
-                Disabled = new ("Gray", "SlateGray", "Faint"),
-                HotFocus = new ("Black", "Gainsboro", "Underline"),
-                Active = new ("Black", "WhiteSmoke", "Bold"),
-                HotActive = new ("Black", "WhiteSmoke", "Underline,Bold"),
-                Highlight = new ("Black", "Gainsboro"),
-                Editable = new ("Black", "LemonChiffon"),
-                ReadOnly = new ("Silver", "SlateGray", "Italic")
+                //Focus = new ("Black", "Gainsboro"),
+                //HotNormal = new ("WhiteSmoke", "SlateGray", "Underline"),
+                //Disabled = new ("Gray", "SlateGray", "Faint"),
+                //HotFocus = new ("Black", "Gainsboro", "Underline"),
+                //Active = new ("Black", "WhiteSmoke", "Bold"),
+                //HotActive = new ("Black", "WhiteSmoke", "Underline,Bold"),
+                //Highlight = new ("Black", "Gainsboro"),
+                //Editable = new ("Black", "LemonChiffon"),
+                //ReadOnly = new ("Silver", "SlateGray", "Italic")
             };
         }
 
@@ -200,15 +200,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return new ()
             {
                 Normal = new ("Charcoal", "WhiteSmoke", "Bold"),
-                Focus = new ("Black", "SlateGray", "Bold"),
-                HotNormal = new ("Charcoal", "WhiteSmoke", "Underline,Bold"),
-                Disabled = new ("Gray", "Gainsboro", "Faint"),
-                HotFocus = new ("Black", "SlateGray", "Underline,Bold"),
-                Active = new ("White", "LightGray", "Bold"),
-                HotActive = new ("White", "LightGray", "Underline,Bold"),
-                Highlight = new ("White", "SlateGray"),
-                Editable = new ("Charcoal", "WhiteSmoke"),
-                ReadOnly = new ("Silver", "WhiteSmoke", "Italic")
+                //Focus = new ("Black", "SlateGray", "Bold"),
+                //HotNormal = new ("Charcoal", "WhiteSmoke", "Underline,Bold"),
+                //Disabled = new ("Gray", "Gainsboro", "Faint"),
+                //HotFocus = new ("Black", "SlateGray", "Underline,Bold"),
+                //Active = new ("White", "LightGray", "Bold"),
+                //HotActive = new ("White", "LightGray", "Underline,Bold"),
+                //Highlight = new ("White", "SlateGray"),
+                //Editable = new ("Charcoal", "WhiteSmoke"),
+                //ReadOnly = new ("Silver", "WhiteSmoke", "Italic")
             };
         }
     }
@@ -310,6 +310,18 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                        IsExplicitlySet = false
                                    },
 
+
+                               VisualRole.Active =>
+
+                                   // Derived from Focus by adding Bold and by applying highlight to foreground and dim to background
+                                   GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                                   {
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetHighlightColor (),
+                                       Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
+                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold,
+                                       IsExplicitlySet = false
+                                   },
+
                                VisualRole.Highlight =>
 
                                    // Derived from Normal by applying highlight to foreground and dim to background
@@ -348,16 +360,6 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                        IsExplicitlySet = false
                                    },
 
-                               VisualRole.Active =>
-
-                                   // Derived from Focus by adding Bold and by applying highlight to foreground and dim to background
-                                   GetAttributeForRoleCore (VisualRole.Focus, stack) with
-                                   {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetHighlightColor (),
-                                       Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
-                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold,
-                                       IsExplicitlySet = false
-                                   },
 
                                VisualRole.HotNormal =>
 
