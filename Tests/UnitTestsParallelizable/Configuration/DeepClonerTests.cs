@@ -166,16 +166,6 @@ public class DeepClonerTests
     }
 
     [Fact]
-    public void DoesNotClone_ImmutableStructsCompletely ()
-    {
-        Attribute attr = new (Color.White, Color.Black, TextStyle.Bold);
-        Attribute clone = DeepCloner.DeepClone (attr);
-
-        Assert.True (attr.IsExplicitlySet);
-        Assert.True (clone.IsExplicitlySet); // ❌ fails
-    }
-
-    [Fact]
     public void Scheme_Normal_Set_ReturnsEqualValue ()
     {
         var source = new Scheme (new Scheme (new Attribute (Color.Red, Color.Green, TextStyle.Bold)));
@@ -204,7 +194,17 @@ public class DeepClonerTests
             ReadOnly = new (new ("Gray"), new ("RaisinBlack"), TextStyle.Italic) // Gray italic text for read-only
         };
         Scheme? result = DeepCloner.DeepClone (source);
-        Assert.True (result!.Focus.IsExplicitlySet);
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Focus, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.HotFocus, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.HotActive, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out _));
+        Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
 
         Assert.Equal (source, result);
 

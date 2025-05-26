@@ -449,7 +449,7 @@ public class ConfigPropertyTests
     {
         // Arrange
         PropertyInfo? propertyInfo = typeof (TestConfiguration).GetProperty (nameof (TestConfiguration.TestSchemeProperty));
-        Scheme sourceScheme = new (new Attribute (Color.Red, Color.Blue, TextStyle.Bold).AsExplicitlySet ());
+        Scheme sourceScheme = new (new Attribute (Color.Red, Color.Blue, TextStyle.Bold));
 
         var configProperty = new ConfigProperty
         {

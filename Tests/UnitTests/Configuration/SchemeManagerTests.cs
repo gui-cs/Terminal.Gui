@@ -52,7 +52,7 @@ public class SchemeManagerTests
     [Fact]
     public void GetHardCodedSchemes_Gets_HardCoded_Theme_Schemes ()
     {
-        ImmutableDictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
+        ImmutableSortedDictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
 
         Assert.Equal (Scheme.GetHardCodedSchemes (), hardCoded);
     }

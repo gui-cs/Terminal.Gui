@@ -12,7 +12,6 @@ public class AttributeTests
         Assert.Equal (Color.Parse ("Black"), attr.Background);
         Assert.True (attr.Style.HasFlag (TextStyle.Bold));
         Assert.True (attr.Style.HasFlag (TextStyle.Underline));
-        Assert.True (attr.IsExplicitlySet);
     }
 
     [Fact]
@@ -49,36 +48,6 @@ public class AttributeTests
     {
         var attr = new Attribute ("White", "Black", "NotAStyle");
         Assert.Equal (TextStyle.None, attr.Style);
-    }
-
-    [Fact]
-    public void AsExplicitlySet_CopiesData ()
-    {
-        var original = new Attribute (Color.Red, Color.Black, TextStyle.Italic);
-        Attribute explicitAttr = original.AsExplicitlySet ();
-
-        Assert.Equal (original, explicitAttr);
-        Assert.True (explicitAttr.IsExplicitlySet);
-    }
-
-    [Fact]
-    public void AsExplicitlySet_PreservesStyle ()
-    {
-        var original = new Attribute (Color.White, Color.Black, TextStyle.Faint);
-        Attribute copy = original.AsExplicitlySet ();
-
-        Assert.Equal (original.Style, copy.Style);
-        Assert.True (copy.IsExplicitlySet);
-    }
-
-    [Fact]
-    public void AsImplicit_CopiesData ()
-    {
-        var original = new Attribute (Color.Green, Color.Blue, TextStyle.Underline);
-        Attribute implicitAttr = original.AsImplicit ();
-
-        Assert.Equal (original, implicitAttr);
-        Assert.False (implicitAttr.IsExplicitlySet);
     }
 
     [Fact]
@@ -132,13 +101,6 @@ public class AttributeTests
     }
 
     [Fact]
-    public void Constructor_SetsExplicitByDefault ()
-    {
-        var attr = new Attribute (Color.White, Color.Black, TextStyle.Bold);
-        Assert.True (attr.IsExplicitlySet); // ❌ fails today unless you explicitly set it
-    }
-
-    [Fact]
     public void Constructors_Construct ()
     {
         var driver = new FakeDriver ();
@@ -180,13 +142,6 @@ public class AttributeTests
         Assert.Equal (bg, attr.Background);
 
         driver.End ();
-    }
-
-    [Fact]
-    public void Default_IsImplicit ()
-    {
-        var attr = new Attribute ();
-        Assert.False (attr.IsExplicitlySet);
     }
 
     [Fact]
@@ -317,15 +272,6 @@ public class AttributeTests
     {
         // prove that Color is a value type
         Assert.True (typeof (Attribute).IsValueType);
-    }
-
-    [Fact]
-    public void IsExplicitlySet_DoesNotAffectEquality ()
-    {
-        Attribute attr1 = new Attribute (Color.Red, Color.Black).AsExplicitlySet ();
-        Attribute attr2 = new Attribute (Color.Red, Color.Black).AsImplicit ();
-
-        Assert.Equal (attr1, attr2);
     }
 
     [Fact]

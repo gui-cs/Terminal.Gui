@@ -282,57 +282,57 @@ public class ConfigProperty
         // First, create a clone of the destination to preserve any values
         var updatedScheme = new Scheme (destScheme);
 
-        // Use with expressions to update only explicitly set attributes
-        // For each role, check if the source has an explicitly set attribute
-        if (sourceScheme.Normal.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { Normal = sourceScheme.Normal };
-        }
+        //// Use with expressions to update only explicitly set attributes
+        //// For each role, check if the source has an explicitly set attribute
+        //if (sourceScheme.Normal.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { Normal = sourceScheme.Normal };
+        //}
 
-        if (sourceScheme.HotNormal.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { HotNormal = sourceScheme.HotNormal };
-        }
+        //if (sourceScheme.HotNormal.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { HotNormal = sourceScheme.HotNormal };
+        //}
 
-        if (sourceScheme.Focus.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { Focus = sourceScheme.Focus };
-        }
+        //if (sourceScheme.Focus.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { Focus = sourceScheme.Focus };
+        //}
 
-        if (sourceScheme.HotFocus.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { HotFocus = sourceScheme.HotFocus };
-        }
+        //if (sourceScheme.HotFocus.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { HotFocus = sourceScheme.HotFocus };
+        //}
 
-        if (sourceScheme.Active.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { Active = sourceScheme.Active };
-        }
+        //if (sourceScheme.Active.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { Active = sourceScheme.Active };
+        //}
 
-        if (sourceScheme.HotActive.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { HotActive = sourceScheme.HotActive };
-        }
+        //if (sourceScheme.HotActive.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { HotActive = sourceScheme.HotActive };
+        //}
 
-        if (sourceScheme.Highlight.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { Highlight = sourceScheme.Highlight };
-        }
+        //if (sourceScheme.Highlight.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { Highlight = sourceScheme.Highlight };
+        //}
 
-        if (sourceScheme.Editable.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { Editable = sourceScheme.Editable };
-        }
+        //if (sourceScheme.Editable.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { Editable = sourceScheme.Editable };
+        //}
 
-        if (sourceScheme.ReadOnly.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { ReadOnly = sourceScheme.ReadOnly };
-        }
+        //if (sourceScheme.ReadOnly.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { ReadOnly = sourceScheme.ReadOnly };
+        //}
 
-        if (sourceScheme.Disabled.IsExplicitlySet)
-        {
-            updatedScheme = updatedScheme with { Disabled = sourceScheme.Disabled };
-        }
+        //if (sourceScheme.Disabled.IsExplicitlySet)
+        //{
+        //    updatedScheme = updatedScheme with { Disabled = sourceScheme.Disabled };
+        //}
 
         // Update the PropertyValue with the merged scheme
         PropertyValue = updatedScheme;

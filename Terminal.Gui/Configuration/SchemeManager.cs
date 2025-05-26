@@ -27,7 +27,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    public static ImmutableDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
+    public static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
