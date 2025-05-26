@@ -834,6 +834,12 @@ internal class WindowsDriver : ConsoleDriver
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
             }
 
+            // Backspace (ASCII 127)
+            if (keyInfo.KeyChar == '\u007f')
+            {
+                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
+            }
+
             if (keyInfo.Key != ConsoleKey.None)
             {
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
