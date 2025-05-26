@@ -56,7 +56,11 @@ public sealed class ViewportSettingsEditor : EditorBase
                                                    ? CheckState.Checked
                                                    : CheckState.UnChecked;
 
-            _cbTransparent!.CheckedState = ViewToEdit.ViewportSettings.HasFlag(Terminal.Gui.ViewportSettings.Transparent)
+            _cbTransparent!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.ViewportSettings.Transparent)
+                                               ? CheckState.Checked
+                                               : CheckState.UnChecked;
+
+            _cbTransparentMouse!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.ViewportSettings.TransparentMouse)
                                                ? CheckState.Checked
                                                : CheckState.UnChecked;
 
@@ -76,6 +80,7 @@ public sealed class ViewportSettingsEditor : EditorBase
     private CheckBox? _cbClearContentOnly;
     private CheckBox? _cbClipContentOnly;
     private CheckBox? _cbTransparent;
+    private CheckBox? _cbTransparentMouse;
     private CheckBox? _cbVerticalScrollBar;
     private CheckBox? _cbAutoShowVerticalScrollBar;
     private CheckBox? _cbHorizontalScrollBar;
@@ -83,7 +88,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
     private void ViewportSettingsEditor_Initialized (object? s, EventArgs e)
     {
-        _cbAllowNegativeX = new()
+        _cbAllowNegativeX = new ()
         {
             Title = "Allow X < 0",
             CanFocus = true
@@ -91,7 +96,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         Add (_cbAllowNegativeX);
 
-        _cbAllowNegativeY = new()
+        _cbAllowNegativeY = new ()
         {
             Title = "Allow Y < 0",
             CanFocus = true
@@ -99,7 +104,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         Add (_cbAllowNegativeY);
 
-        _cbAllowXGreaterThanContentWidth = new()
+        _cbAllowXGreaterThanContentWidth = new ()
         {
             Title = "Allow X > Content Width",
             Y = Pos.Bottom (_cbAllowNegativeX),
@@ -135,7 +140,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbAllowYGreaterThanContentHeight = new()
+        _cbAllowYGreaterThanContentHeight = new ()
         {
             Title = "Allow Y > Content Height",
             X = Pos.Right (_cbAllowXGreaterThanContentWidth) + 1,
@@ -181,7 +186,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             Y = Pos.Bottom (_cbAllowYGreaterThanContentHeight)
         };
 
-        _contentSizeWidth = new()
+        _contentSizeWidth = new ()
         {
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize),
@@ -209,7 +214,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             Y = Pos.Top (labelContentSize)
         };
 
-        _contentSizeHeight = new()
+        _contentSizeHeight = new ()
         {
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
@@ -230,7 +235,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             ViewToEdit?.SetContentSize (ViewToEdit.GetContentSize () with { Height = e.NewValue });
         }
 
-        _cbClearContentOnly = new()
+        _cbClearContentOnly = new ()
         {
             Title = "ClearContentOnly",
             X = 0,
@@ -251,7 +256,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbClipContentOnly = new()
+        _cbClipContentOnly = new ()
         {
             Title = "ClipContentOnly",
             X = Pos.Right (_cbClearContentOnly) + 1,
@@ -293,7 +298,28 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbVerticalScrollBar = new()
+        _cbTransparentMouse = new ()
+        {
+            Title = "TransparentMouse",
+            X = Pos.Right (_cbTransparent) + 1,
+            Y = Pos.Bottom (labelContentSize),
+            CanFocus = true
+        };
+        _cbTransparentMouse.CheckedStateChanging += TransparentMouseToggle;
+
+        void TransparentMouseToggle (object? sender, CancelEventArgs<CheckState> e)
+        {
+            if (e.NewValue == CheckState.Checked)
+            {
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewportSettings.TransparentMouse;
+            }
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewportSettings.TransparentMouse;
+            }
+        }
+
+        _cbVerticalScrollBar = new ()
         {
             Title = "VerticalScrollBar",
             X = 0,
@@ -307,7 +333,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             ViewToEdit!.VerticalScrollBar.Visible = e.NewValue == CheckState.Checked;
         }
 
-        _cbAutoShowVerticalScrollBar = new()
+        _cbAutoShowVerticalScrollBar = new ()
         {
             Title = "AutoShow",
             X = Pos.Right (_cbVerticalScrollBar) + 1,
@@ -321,7 +347,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             ViewToEdit!.VerticalScrollBar.AutoShow = e.NewValue == CheckState.Checked;
         }
 
-        _cbHorizontalScrollBar = new()
+        _cbHorizontalScrollBar = new ()
         {
             Title = "HorizontalScrollBar",
             X = 0,
@@ -335,7 +361,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             ViewToEdit!.HorizontalScrollBar.Visible = e.NewValue == CheckState.Checked;
         }
 
-        _cbAutoShowHorizontalScrollBar = new()
+        _cbAutoShowHorizontalScrollBar = new ()
         {
             Title = "AutoShow ",
             X = Pos.Right (_cbHorizontalScrollBar) + 1,
@@ -357,6 +383,7 @@ public sealed class ViewportSettingsEditor : EditorBase
              _cbClearContentOnly,
              _cbClipContentOnly,
              _cbTransparent,
+             _cbTransparentMouse,
              _cbVerticalScrollBar,
              _cbHorizontalScrollBar,
              _cbAutoShowVerticalScrollBar,
