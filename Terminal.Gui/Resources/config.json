@@ -742,339 +742,20 @@
       }
     },
     {
-      "Black & White": {
-        "Schemes": [
-          {
-            "TopLevel": {
-              "Normal": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Faint"
-              },
-              "Active": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Highlight": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "Editable": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "ReadOnly": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic"
-              }
-            }
-          },
-          {
-            "Base": {
-              "Normal": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "Disabled": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Faint"
-              },
-              "Active": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Highlight": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "Editable": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "ReadOnly": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic"
-              }
-            }
-          },
-          {
-            "Dialog": {
-              "Normal": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Faint"
-              },
-              "Active": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Underline,Bold"
-              },
-              "Highlight": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "None"
-              },
-              "Editable": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "None"
-              },
-              "ReadOnly": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Italic"
-              }
-            }
-          },
-          {
-            "Menu": {
-              "Normal": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Faint"
-              },
-              "Active": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Underline,Bold"
-              },
-              "Highlight": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "None"
-              },
-              "Editable": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "None"
-              },
-              "ReadOnly": {
-                "Foreground": "Black",
-                "Background": "White",
-                "Style": "Italic"
-              }
-            }
-          },
-          {
-            "Error": {
-              "Normal": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic"
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic,Bold"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Italic"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Italic,Bold"
-              },
-              "Disabled": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Faint,Italic"
-              },
-              "Active": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Bold,Italic"
-              },
-              "HotActive": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Underline,Bold,Italic"
-              },
-              "Highlight": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic"
-              },
-              "Editable": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic"
-              },
-              "ReadOnly": {
-                "Foreground": "White",
-                "Background": "Black",
-                "Style": "Italic"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "Green Phosphor": {
         "Dialog.DefaultShadow": "None",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "None",
+        "Menuv2.DefaultBorderStyle": "Single",
         "Schemes": [
           {
             "TopLevel": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black"
-              },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor"
-              },
-              "HotNormal": {
-                "Foreground": "GreenPhosphor",
                 "Background": "Black",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Underline"
-              },
-              "Disabled": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Faint"
-              },
-              "Active": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Highlight": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
-              },
-              "Editable": {
-                "Foreground": "GreenPhosphor",
-                "Background": "DarkGreen",
                 "Style": "None"
-              },
-              "ReadOnly": {
-                "Foreground": "GreenPhosphor",
-                "Background": "DarkGreen",
-                "Style": "Faint"
               }
             }
           },
@@ -1082,36 +763,13 @@
             "Base": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black"
-              },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor"
-              },
-              "HotNormal": {
-                "Foreground": "GreenPhosphor",
                 "Background": "Black",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Underline"
-              },
-              "Disabled": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Faint"
+                "Style": "None"
               },
               "Active": {
                 "Foreground": "GreenPhosphor",
                 "Background": "Black",
                 "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
               },
               "Highlight": {
                 "Foreground": "GreenPhosphor",
@@ -1120,12 +778,12 @@
               },
               "Editable": {
                 "Foreground": "GreenPhosphor",
-                "Background": "DarkGreen",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "GreenPhosphor",
-                "Background": "DarkGreen",
+                "Background": "Charcoal",
                 "Style": "Faint"
               }
             }
@@ -1137,35 +795,10 @@
                 "Background": "GreenPhosphor",
                 "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Faint"
-              },
               "Active": {
                 "Foreground": "Black",
                 "Background": "GreenPhosphor",
                 "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Underline,Bold"
               },
               "Highlight": {
                 "Foreground": "Black",
@@ -1173,14 +806,14 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Italic"
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -1191,35 +824,10 @@
                 "Background": "GreenPhosphor",
                 "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Faint"
-              },
               "Active": {
                 "Foreground": "Black",
                 "Background": "GreenPhosphor",
                 "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Underline,Bold"
               },
               "Highlight": {
                 "Foreground": "Black",
@@ -1227,14 +835,14 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
-                "Foreground": "Black",
-                "Background": "GreenPhosphor",
-                "Style": "Italic"
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -1245,35 +853,10 @@
                 "Background": "Black",
                 "Style": "Italic"
               },
-              "Focus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Italic,Bold"
-              },
-              "HotNormal": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Italic"
-              },
-              "HotFocus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Italic,Bold"
-              },
-              "Disabled": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Faint,Italic"
-              },
               "Active": {
                 "Foreground": "GreenPhosphor",
                 "Background": "Black",
                 "Style": "Bold,Italic"
-              },
-              "HotActive": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold,Italic"
               },
               "Highlight": {
                 "Foreground": "GreenPhosphor",
@@ -1282,13 +865,13 @@
               },
               "Editable": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "Charcoal",
                 "Style": "Italic"
               },
               "ReadOnly": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
+                "Background": "Charcoal",
+                "Style": "Faint,Italic"
               }
             }
           }
@@ -1302,7 +885,7 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "None",
+        "Menuv2.DefaultBorderStyle": "Single",
         "Schemes": [
           {
             "TopLevel": {
@@ -1310,51 +893,6 @@
                 "Foreground": "AmberPhosphor",
                 "Background": "Black",
                 "Style": "None"
-              },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Charcoal",
-                "Background": "Black",
-                "Style": "Faint"
-              },
-              "Active": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Highlight": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "None"
-              },
-              "Editable": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Charcoal",
-                "Style": "None"
-              },
-              "ReadOnly": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Charcoal",
-                "Style": "Faint"
               }
             }
           },
@@ -1365,40 +903,15 @@
                 "Background": "Black",
                 "Style": "None"
               },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Charcoal",
-                "Background": "Black",
-                "Style": "Faint"
-              },
               "Active": {
                 "Foreground": "AmberPhosphor",
                 "Background": "Black",
                 "Style": "Bold"
               },
-              "HotActive": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
               "Highlight": {
                 "Foreground": "AmberPhosphor",
                 "Background": "Black",
-                "Style": "None"
+                "Style": "Italic"
               },
               "Editable": {
                 "Foreground": "AmberPhosphor",
@@ -1419,35 +932,10 @@
                 "Background": "AmberPhosphor",
                 "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Faint"
-              },
               "Active": {
                 "Foreground": "Black",
                 "Background": "AmberPhosphor",
                 "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Underline,Bold"
               },
               "Highlight": {
                 "Foreground": "Black",
@@ -1455,14 +943,14 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Italic"
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -1473,35 +961,10 @@
                 "Background": "AmberPhosphor",
                 "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Faint"
-              },
               "Active": {
                 "Foreground": "Black",
                 "Background": "AmberPhosphor",
                 "Style": "Bold"
-              },
-              "HotActive": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Underline,Bold"
               },
               "Highlight": {
                 "Foreground": "Black",
@@ -1509,14 +972,14 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
-                "Foreground": "Black",
-                "Background": "AmberPhosphor",
-                "Style": "Italic"
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -1527,35 +990,10 @@
                 "Background": "Black",
                 "Style": "Italic"
               },
-              "Focus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Italic,Bold"
-              },
-              "HotNormal": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Italic"
-              },
-              "HotFocus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Italic,Bold"
-              },
-              "Disabled": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Faint,Italic"
-              },
               "Active": {
                 "Foreground": "AmberPhosphor",
                 "Background": "Black",
                 "Style": "Bold,Italic"
-              },
-              "HotActive": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold,Italic"
               },
               "Highlight": {
                 "Foreground": "AmberPhosphor",
@@ -1564,13 +1002,13 @@
               },
               "Editable": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "Charcoal",
                 "Style": "Italic"
               },
               "ReadOnly": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
+                "Background": "Charcoal",
+                "Style": "Faint,Italic"
               }
             }
           }

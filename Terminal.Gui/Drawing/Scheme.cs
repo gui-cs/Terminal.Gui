@@ -45,25 +45,76 @@ namespace Terminal.Gui;
 ///             <item>
 ///                 <description>
 ///                     <b>Focus:</b> If not set, derived from <see cref="Normal"/> by swapping foreground and background
-///                     colors, or by applying <see cref="Color.GetHighlightColor"/> to the background.
+///                     colors.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <b>Highlight:</b> If not set, derived from <see cref="Normal"/> by applying
-///                     <see cref="Color.GetHighlightColor"/> to the background color.
+///                     <b>Active:</b> If not set, derived from <see cref="Focus"/> by:
+///                     <list type="bullet">
+///                         <item>
+///                             <description>
+///                                 Setting <c>Foreground</c> to <see cref="Focus"/>'s foreground with
+///                                 <c>GetHighlightColor()</c>.
+///                             </description>
+///                         </item>
+///                         <item>
+///                             <description>
+///                                 Setting <c>Background</c> to <see cref="Focus"/>'s background with
+///                                 <c>GetDimColor()</c>.
+///                             </description>
+///                         </item>
+///                         <item>
+///                             <description>Adding <see cref="TextStyle.Bold"/> to the style.</description>
+///                         </item>
+///                     </list>
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <b>Editable:</b> If not set, derived from <see cref="Normal"/> by setting the foreground
-///                     to <c>LightYellow</c>.
+///                     <b>Highlight:</b> If not set, derived from <see cref="Normal"/> by:
+///                     <list type="bullet">
+///                         <item>
+///                             <description>
+///                                 Setting <c>Foreground</c> to <see cref="Normal"/>'s background with
+///                                 <c>GetHighlightColor()</c>.
+///                             </description>
+///                         </item>
+///                         <item>
+///                             <description>Setting <c>Background</c> to <see cref="Normal"/>'s background.</description>
+///                         </item>
+///                         <item>
+///                             <description>
+///                                 Setting <c>Style</c> to <see cref="Editable"/>'s style with
+///                                 <see cref="TextStyle.Italic"/> added.
+///                             </description>
+///                         </item>
+///                     </list>
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>Editable:</b> If not set, derived from <see cref="Normal"/> by:
+///                     <list type="bullet">
+///                         <item>
+///                             <description>
+///                                 Setting <c>Foreground</c> to <see cref="Normal"/>'s background with
+///                                 <c>GetHighlightColor()</c>.
+///                             </description>
+///                         </item>
+///                         <item>
+///                             <description>
+///                                 Setting <c>Background</c> to <see cref="Normal"/>'s background with
+///                                 <c>GetDimColor()</c>.
+///                             </description>
+///                         </item>
+///                     </list>
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
 ///                     <b>ReadOnly:</b> If not set, derived from <see cref="Editable"/> by adding
-///                     <see cref="TextStyle.Italic"/> to the style.
+///                     <see cref="TextStyle.Faint"/> to the style.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -74,27 +125,20 @@ namespace Terminal.Gui;
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <b>Active:</b> If not set, derived from <see cref="Focus"/> by adding
-///                     <see cref="TextStyle.Bold"/> to the style.
+///                     <b>HotNormal:</b> If not set, derived from <see cref="Normal"/> by adding
+///                     <see cref="TextStyle.Underline"/> to the style.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <b>Hot* variants (e.g., HotNormal, HotFocus, HotActive):</b>
-///                     <list type="bullet">
-///                         <item>
-///                             <description>
-///                                 If the corresponding non-hot variant (e.g., <see cref="Normal"/>, <see cref="Focus"/>,
-///                                 <see cref="Active"/>) is not set, it is first derived as above.
-///                             </description>
-///                         </item>
-///                         <item>
-///                             <description>
-///                                 If the hot variant is not set, it is derived from its non-hot variant by adding
-///                                 <see cref="TextStyle.Underline"/> to the style.
-///                             </description>
-///                         </item>
-///                     </list>
+///                     <b>HotFocus:</b> If not set, derived from <see cref="Focus"/> by adding
+///                     <see cref="TextStyle.Underline"/> to the style.
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <b>HotActive:</b> If not set, derived from <see cref="Active"/> by adding
+///                     <see cref="TextStyle.Underline"/> to the style.
 ///                 </description>
 ///             </item>
 ///         </list>
@@ -130,17 +174,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
             return new ()
             {
-                Normal = new ("LightGray", "RaisinBlack"),
-                //Focus = new ("White", "DarkGray", "Bold"),
-                //HotNormal = new ("Silver", "RaisinBlack", "Underline"),
-                //Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
-                //HotFocus = new ("White", "DarkGray", "Underline,Bold"),
-                //Active = new ("White", "Charcoal"),
-                //HotActive = new ("White", "Charcoal", "Underline"),
-                //Highlight = new (highlight, new Color ("RaisinBlack")),
-                //Editable = new ("LightYellow", "OuterSpace")
-
-                //use algo: ReadOnly = new ("Gray", "RaisinBlack", "Italic")
+                Normal = new ("LightGray", "RaisinBlack")
             };
         }
 
@@ -148,16 +182,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("SlateGray", "OuterSpace"),
-                //Focus = new ("White", "SlateGray"),
-                //HotNormal = new ("LightGray", "OuterSpace", "Underline"),
-                //Disabled = new ("DimGray", "OuterSpace", "Faint"),
-                //HotFocus = new ("White", "SlateGray", "Underline"),
-                //Active = new ("White", "DarkSlateGray", "Bold"),
-                //HotActive = new ("White", "DarkSlateGray", "Underline,Bold"),
-                //Highlight = new ("White", "Onyx"),
-                //Editable = new ("LemonChiffon", "RaisinBlack"),
-                //ReadOnly = new ("Silver", "OuterSpace", "Italic")
+                Normal = new ("SlateGray", "OuterSpace")
             };
         }
 
@@ -165,16 +190,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("IndianRed", "RaisinBlack"),
-                //Focus = new ("White", "IndianRed"),
-                //HotNormal = new ("LightCoral", "RaisinBlack", "Underline"),
-                //Disabled = new ("DarkGray", "RaisinBlack", "Faint"),
-                //HotFocus = new ("White", "IndianRed", "Underline"),
-                //Active = new ("White", "LightCoral", "Bold"),
-                //HotActive = new ("White", "LightCoral", "Underline,Bold"),
-                //Highlight = new ("White", "IndianRed"),
-                //Editable = new ("LemonChiffon", "RaisinBlack"),
-                //ReadOnly = new ("Silver", "RaisinBlack", "Italic")
+                Normal = new ("IndianRed", "RaisinBlack")
             };
         }
 
@@ -182,16 +198,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("Gainsboro", "SlateGray"),
-                //Focus = new ("Black", "Gainsboro"),
-                //HotNormal = new ("WhiteSmoke", "SlateGray", "Underline"),
-                //Disabled = new ("Gray", "SlateGray", "Faint"),
-                //HotFocus = new ("Black", "Gainsboro", "Underline"),
-                //Active = new ("Black", "WhiteSmoke", "Bold"),
-                //HotActive = new ("Black", "WhiteSmoke", "Underline,Bold"),
-                //Highlight = new ("Black", "Gainsboro"),
-                //Editable = new ("Black", "LemonChiffon"),
-                //ReadOnly = new ("Silver", "SlateGray", "Italic")
+                Normal = new ("WhiteSmoke", "OuterSpace")
             };
         }
 
@@ -199,16 +206,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("Charcoal", "WhiteSmoke", "Bold"),
-                //Focus = new ("Black", "SlateGray", "Bold"),
-                //HotNormal = new ("Charcoal", "WhiteSmoke", "Underline,Bold"),
-                //Disabled = new ("Gray", "Gainsboro", "Faint"),
-                //HotFocus = new ("Black", "SlateGray", "Underline,Bold"),
-                //Active = new ("White", "LightGray", "Bold"),
-                //HotActive = new ("White", "LightGray", "Underline,Bold"),
-                //Highlight = new ("White", "SlateGray"),
-                //Editable = new ("Charcoal", "WhiteSmoke"),
-                //ReadOnly = new ("Silver", "WhiteSmoke", "Italic")
+                Normal = new ("Charcoal", "WhiteSmoke", "Bold")
             };
         }
     }
@@ -269,7 +267,6 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             _hotActive = null;
         }
 
-
         if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out Attribute? highlight))
         {
             _highlight = highlight;
@@ -278,7 +275,6 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             _highlight = null;
         }
-
 
         if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out Attribute? editable))
         {
@@ -297,7 +293,6 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             _readOnly = null;
         }
-
 
         if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out Attribute? disabled))
         {
@@ -356,8 +351,11 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                         VisualRole.Disabled => _disabled,
                         _ => null
                     };
-        return attribute is {};
+
+        return attribute is { };
     }
+
+    // TODO: Provide a CWP-based API that lets devs override this algo?
 
     private Attribute GetAttributeForRoleCore (VisualRole role, HashSet<VisualRole> stack)
     {
@@ -368,21 +366,21 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         }
 
         Attribute? attr = role switch
-        {
-            VisualRole.Normal => Normal,
-            VisualRole.HotNormal => _hotNormal,
-            VisualRole.Focus => _focus,
-            VisualRole.HotFocus => _hotFocus,
-            VisualRole.Active => _active,
-            VisualRole.HotActive => _hotActive,
-            VisualRole.Highlight => _highlight,
-            VisualRole.Editable => _editable,
-            VisualRole.ReadOnly => _readOnly,
-            VisualRole.Disabled => _disabled,
-            _ => null
-        };
+                          {
+                              VisualRole.Normal => Normal,
+                              VisualRole.HotNormal => _hotNormal,
+                              VisualRole.Focus => _focus,
+                              VisualRole.HotFocus => _hotFocus,
+                              VisualRole.Active => _active,
+                              VisualRole.HotActive => _hotActive,
+                              VisualRole.Highlight => _highlight,
+                              VisualRole.Editable => _editable,
+                              VisualRole.ReadOnly => _readOnly,
+                              VisualRole.Disabled => _disabled,
+                              _ => null
+                          };
 
-        if (attr is {} || role == VisualRole.Normal)
+        if (attr is { } || role == VisualRole.Normal)
         {
             return attr!.Value;
         }
@@ -391,82 +389,63 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         Attribute result = role switch
                            {
                                VisualRole.Focus =>
-
-                                   // Derived from Normal by swapping fg/bg or by applying highlight to background
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
                                        Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
                                    },
 
-
                                VisualRole.Active =>
-
-                                   // Derived from Focus by adding Bold and by applying highlight to foreground and dim to background
                                    GetAttributeForRoleCore (VisualRole.Focus, stack) with
                                    {
                                        Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetHighlightColor (),
                                        Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
-                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold,
+                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold
                                    },
 
                                VisualRole.Highlight =>
-
-                                   // Derived from Normal by applying highlight to foreground and dim to background
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
                                        Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor (),
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetDimColor(),
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
+                                       Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Italic
                                    },
 
                                VisualRole.Editable =>
-
-                                   // Derived from Normal by applying highlight to foreground and highlight/dim to background
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor(),
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor ().GetDimColor (),
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor (),
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetDimColor ()
                                    },
 
                                VisualRole.ReadOnly =>
-
-                                   // Derived from Editable by adding Faint
                                    GetAttributeForRoleCore (VisualRole.Editable, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Faint,
+                                       Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Faint
                                    },
 
                                VisualRole.Disabled =>
-
-                                   // Derived from Normal by adding Faint
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Faint,
+                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Faint
                                    },
 
-
                                VisualRole.HotNormal =>
-
-                                   // Derived from Normal by adding Underline
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Underline,
+                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Underline
                                    },
 
                                VisualRole.HotFocus =>
-
-                                   // Derived from Focus by adding Underline
                                    GetAttributeForRoleCore (VisualRole.Focus, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Underline,
+                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Underline
                                    },
 
                                VisualRole.HotActive =>
-
-                                   // Derived from Active by adding Underline
                                    GetAttributeForRoleCore (VisualRole.Active, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Active, stack).Style | TextStyle.Underline,
+                                       Style = GetAttributeForRoleCore (VisualRole.Active, stack).Style | TextStyle.Underline
                                    },
 
                                _ => GetAttributeForRoleCore (VisualRole.Normal, stack)
@@ -520,6 +499,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _hotNormal.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.HotNormal, []);
         }
         init => _hotNormal = value;
@@ -538,6 +518,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _focus.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.Focus, []);
         }
         init => _focus = value;
@@ -556,12 +537,13 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _hotFocus.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.HotFocus, []);
         }
         init => _hotFocus = value;
     }
 
-    private readonly Attribute? _active = null;
+    private readonly Attribute? _active;
 
     /// <summary>
     ///     The visual role for elements that are active or selected (e.g., selected item in a <see cref="ListView"/>). Also
@@ -595,6 +577,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _hotActive.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.HotActive, []);
         }
         init => _hotActive = value;
@@ -613,6 +596,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _highlight.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.Highlight, []);
         }
         init => _highlight = value;
@@ -631,6 +615,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _editable.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.Editable, []);
         }
         init => _editable = value;
@@ -649,6 +634,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _readOnly.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.ReadOnly, []);
         }
         init => _readOnly = value;
@@ -667,6 +653,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 return _disabled.Value;
             }
+
             return GetAttributeForRoleCore (VisualRole.Disabled, []);
         }
         init => _disabled = value;

@@ -138,6 +138,8 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// </summary>
     public Attribute (in Color foreground, in ColorName16 backgroundName) : this (in foreground, new Color (in backgroundName)) { }
 
+    // TODO: Add constructor support for StandardColor
+
     /// <summary>
     /// Initializes an instance using a single color for both foreground and background.
     /// </summary>

@@ -37,11 +37,11 @@ internal class ShadowView : View
 
         //    newAttribute =
         //                new Attribute (
-        //                               ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GitDimColor (),
-        //                               ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GitDimColor (),
+        //                               ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
+        //                               ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor (),
         //                               attr.Style);
 
-        //    // If either fg or bg are DarkGray, GitDimColor gave up. Use Style = Faint
+        //    // If either fg or bg are DarkGray, GetDarkerColor gave up. Use Style = Faint
         //    if (newAttribute.Foreground == Color.DarkGray)
         //    {
         //        newAttribute = attr;// new Attribute (attr.Foreground, currentAttribute.Background);
@@ -202,7 +202,7 @@ internal class ShadowView : View
                            ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimColor (),
                            attr.Style);
 
-        // If either fg or bg are DarkGray, GitDimColor gave up. Use Style = Faint
+        // If either fg or bg are DarkGray, GetDarkerColor gave up. Use Style = Faint
         if (newAttribute.Foreground == Color.DarkGray)
         {
             newAttribute = attr;// new Attribute (attr.Foreground, currentAttribute.Background);
