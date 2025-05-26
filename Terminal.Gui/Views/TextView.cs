@@ -267,9 +267,11 @@ internal class TextModel
 
                     if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)))
                     {
+                        List<Cell> line = GetLine (nRow);
+
                         if (lastValidCol > -1)
                         {
-                            nCol = lastValidCol;
+                            nCol = lastValidCol + Math.Max (lastValidCol, line.Count);
                         }
 
                         return;
@@ -5162,8 +5164,24 @@ public class TextView : View
         }
         else if (newPos.HasValue)
         {
-            int restCount = currentLine.Count - CurrentColumn;
-            currentLine.RemoveRange (CurrentColumn, restCount);
+            int restCount;
+
+            if (newPos.Value.row == CurrentRow)
+            {
+                restCount = currentLine.Count - CurrentColumn;
+                currentLine.RemoveRange (CurrentColumn, restCount);
+            }
+            else
+            {
+                while (CurrentRow != newPos.Value.row)
+                {
+                    restCount = currentLine.Count;
+                    currentLine.RemoveRange (0, restCount);
+
+                    CurrentRow--;
+                    currentLine = GetCurrentLine ();
+                }
+            }
 
             if (_wordWrap)
             {
@@ -5808,6 +5826,7 @@ public class TextView : View
     private void ProcessKillWordForward ()
     {
         ResetColumnTrack ();
+        StopSelecting ();
         KillWordForward ();
     }
 
