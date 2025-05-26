@@ -47,30 +47,85 @@
     //  }
     //},
     {
+      "TurboPascal 5": {
+        "Schemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Blue"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "Yellow",
+                "Background": "Blue"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "LightGray"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "Cyan",
+                "Style": "None"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "LightGray",
+                "Style": "None"
+              },
+              "HotNormal": {
+                "Foreground": "BrightRed",
+                "Background": "Cyan",
+                "Style": "None"
+              },
+              "HotFocus": {
+                "Foreground": "BrightRed",
+                "Background": "LightGray",
+                "Style": "None"
+              },
+              "Disabled": {
+                "Foreground": "DarkGray",
+                "Background": "Cyan",
+                "Style": "None"
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "BrightRed",
+                "Background": "LightGray",
+                "Style": "None"
+              }
+            }
+          }
+        ],
+        "Glyphs.CheckStateChecked": "☒",
+        "Glyphs.CheckStateNone": "□",
+        "Glyphs.CheckStateUnChecked": "☐",
+        "Glyphs.LeftBracket": "[",
+        "Glyphs.RightBracket": "]"
+      }
+    },
+    {
       "Anders": {
         "Schemes": [
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "AntiqueWhite",
-                "Background": "DimGray"
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "DarkGray"
-              },
-              "HotNormal": {
-                "Foreground": "AntiqueWhite",
-                "Background": "DimGray",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "DarkGray",
-                "Style": "Underline"
-              },
-              "Disabled": {
-                "Foreground": "Black",
+                "Foreground": "WhiteSmoke",
                 "Background": "DimGray"
               }
             }
@@ -79,27 +134,9 @@
             "Base": {
               "Normal": {
                 "Foreground": "White",
-                "Background": "Blue"
-              },
-              "Focus": {
-                "Foreground": "DarkBlue",
-                "Background": "LightGray"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "Blue",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "DarkBlue",
-                "Background": "LightGray"
-              },
-              "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "Blue",
-                "Style": "Underline"
+                "Background": "DarkBlue"
               }
-            }
+            },
           },
           {
             "Dialog": {
@@ -107,53 +144,15 @@
                 "Foreground": "BrightBlue",
                 "Background": "LightGray"
               },
-              "Focus": {
-                "Foreground": "DarkGray",
-                "Background": "LightGray"
-              },
-              "HotNormal": {
-                "Foreground": "BrightBlue",
-                "Background": "LightGray",
-                "Style": "Underline"
-              },
-              "HotFocus": {
-                "Foreground": "DarkGray",
-                "Background": "LightGray",
-                "Style": "Underline"
-              },
-              "Disabled": {
-                "Foreground": "Gray",
-                "Background": "DarkGray"
-              }
             }
           },
           {
             "Menu": {
               "Normal": {
                 "Foreground": "White",
-                "Background": "DarkBlue",
+                "Background": "Blue",
                 "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "DarkBlue",
-                "Background": "White",
-                "Style": "Bold"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "DarkBlue",
-                "Style": "Underline,Bold"
-              },
-              "HotFocus": {
-                "Foreground": "DarkBlue",
-                "Background": "White",
-                "Style": "Bold,Underline"
-              },
-              "Disabled": {
-                "Foreground": "Gray",
-                "Background": "DarkGray",
-                "Style": "Faint,Bold"
-              }
             }
           },
           {
@@ -163,26 +162,6 @@
                 "Background": "WhiteSmoke",
                 "Style": "Italic"
               },
-              "Focus": {
-                "Foreground": "WhiteSmoke",
-                "Background": "BrightRed",
-                "Style": "Italic"
-              },
-              "HotNormal": {
-                "Foreground": "Red",
-                "Background": "WhiteSmoke",
-                "Style": "Italic,Underline"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "BrightRed",
-                "Style": "Italic,Underline"
-              },
-              "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "WhiteSmoke",
-                "Style": "Italic"
-              }
             }
           }
         ],

@@ -13,11 +13,6 @@ namespace Terminal.Gui;
 ///         in a terminal UI. It wraps color and style information in a platform-independent way and is used
 ///         extensively in <see cref="Scheme"/>, <see cref="VisualRole"/>, and theming infrastructure.
 ///     </para>
-///     <para>
-///         The <see cref="IsExplicitlySet"/> flag is used internally to determine whether the attribute was set directly
-///         or is derived through inheritance logic. This affects how <see cref="Scheme.GetAttributeForRole(VisualRole)"/>
-///         resolves values for different roles.
-///     </para>
 /// </remarks>
 /// <seealso cref="Color"/>
 /// <seealso cref="TextStyle"/>
@@ -29,13 +24,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>Default empty attribute.</summary>
     [JsonIgnore]
     public static Attribute Default => new (Color.White, Color.Black);
-
-    /// <summary>
-    ///     INTERNAL: Indicates whether this attribute was explicitly set or is a default/derived value.
-    ///     Used internally by <see cref="Scheme"/> to determine which attributes should be inherited.
-    /// </summary>
-    [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
-    internal bool IsExplicitlySet { get; init; }
 
     // TODO: Once CursesDriver is dead, remove this property
     /// <summary>INTERNAL: The <see cref="IConsoleDriver"/>-specific color value.</summary>
@@ -63,12 +51,12 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     /// Initializes a new instance of the <see cref="Attribute"/> struct with default values.
     /// </summary>
-    public Attribute () { this = Default with { PlatformColor = -1, IsExplicitlySet = false }; }
+    public Attribute () { this = Default with { PlatformColor = -1 }; }
 
     /// <summary>
     /// Initializes a new <see cref="Attribute"/> from an existing instance, preserving explicit state.
     /// </summary>
-    public Attribute (in Attribute attr) { this = attr with { PlatformColor = -1, IsExplicitlySet = attr.IsExplicitlySet }; }
+    public Attribute (in Attribute attr) { this = attr with { PlatformColor = -1 }; }
 
     /// <summary>INTERNAL: Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="platformColor">platform-dependent color value.</param>
@@ -79,7 +67,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
         PlatformColor = platformColor;
-        IsExplicitlySet = true;
         Style = TextStyle.None;
     }
 
@@ -90,7 +77,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     {
         Foreground = foreground;
         Background = background;
-        IsExplicitlySet = true;
 
         // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
         PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
@@ -105,7 +91,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
         Style = style;
-        IsExplicitlySet = true;
 
         // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
         PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
@@ -125,7 +110,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Style = style is { } && Enum.TryParse<TextStyle> (style, true, out var parsedStyle)
                     ? parsedStyle
                     : TextStyle.None;
-        IsExplicitlySet = true;
         PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
     }
 
@@ -158,18 +142,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// Initializes an instance using a single color for both foreground and background.
     /// </summary>
     public Attribute (in Color color) : this (color, color) { }
-
-    /// <summary>
-    ///     INTERNAL: Creates a version of this attribute marked as explicitly set.
-    /// </summary>
-    /// <returns>A copy of this attribute with IsExplicitlySet = true.</returns>
-    internal Attribute AsExplicitlySet () { return this with { IsExplicitlySet = true }; }
-
-    /// <summary>
-    ///     INTERNAL: Creates a version of this attribute marked as not explicitly set (implicit/derived).
-    /// </summary>
-    /// <returns>A copy of this attribute with IsExplicitlySet = false.</returns>
-    internal Attribute AsImplicit () { return this with { IsExplicitlySet = false }; }
 
     /// <inheritdoc/>
     public bool Equals (Attribute other)

@@ -1309,7 +1309,7 @@ public class TableView : View, IDesignable
             if (render.Length > 0)
             {
                 // invert the color of the current cell for the first character
-                SetAttribute (new (cellAttribute.Background, cellAttribute.Foreground, TextStyle.Reverse));
+                SetAttribute (new (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
                 Driver?.AddRune ((Rune)render [0]);
 
                 if (render.Length > 1)
@@ -1930,7 +1930,7 @@ public class TableView : View, IDesignable
         }
         else
         {
-            attribute = Enabled ? rowScheme?.Normal : rowScheme?.Disabled;
+            attribute = Enabled ? rowScheme?.Normal : rowScheme?.Active;
         }
 
         SetAttribute (attribute.Value);

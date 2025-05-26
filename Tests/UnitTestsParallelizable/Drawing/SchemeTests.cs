@@ -99,42 +99,22 @@ public class SchemeTests
     }
 
     [Fact]
-    public void With_Same_Attributes_But_Different_Explicitness_AreEqual ()
-    {
-        Attribute attr = new (Color.Red, Color.Blue, TextStyle.Bold);
-        Scheme s1 = new (attr);
-        Scheme s2 = new ()
-        {
-            Normal = attr.AsImplicit (),
-            Focus = attr.AsImplicit (),
-            HotNormal = attr.AsImplicit (),
-            HotFocus = attr.AsImplicit (),
-            Active = attr.AsImplicit (),
-            HotActive = attr.AsImplicit (),
-            Highlight = attr.AsImplicit (),
-            Editable = attr.AsImplicit (),
-            ReadOnly = attr.AsImplicit (),
-            Disabled = attr.AsImplicit ()
-        };
-        Assert.Equal (s1, s2);
-        Assert.Equal (s1.GetHashCode (), s2.GetHashCode ());
-    }
-
-    [Fact]
     public void Default_Constructor_Has_Default_Values ()
     {
         Scheme scheme = new ();
-        Assert.True (scheme.Normal.IsExplicitlySet);
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
+
         // All other roles should be implicit and derived from Normal
-        Assert.False (scheme.Focus.IsExplicitlySet);
-        Assert.False (scheme.HotNormal.IsExplicitlySet);
-        Assert.False (scheme.HotFocus.IsExplicitlySet);
-        Assert.False (scheme.Active.IsExplicitlySet);
-        Assert.False (scheme.HotActive.IsExplicitlySet);
-        Assert.False (scheme.Highlight.IsExplicitlySet);
-        Assert.False (scheme.Editable.IsExplicitlySet);
-        Assert.False (scheme.ReadOnly.IsExplicitlySet);
-        Assert.False (scheme.Disabled.IsExplicitlySet);
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Focus, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotFocus, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotActive, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
     }
 
     [Fact]

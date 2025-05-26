@@ -4,11 +4,6 @@ namespace Terminal.Gui.ConfigurationTests;
 
 public class SchemeJsonConverterTests
 {
-    public static readonly JsonSerializerOptions JsonOptions = new ()
-    {
-        Converters = { new AttributeJsonConverter (), new ColorJsonConverter (), new SchemeJsonConverter () }
-    };
-
     //string json = @"
     //	{
     //	""Schemes"": {
@@ -42,19 +37,24 @@ public class SchemeJsonConverterTests
         // Arrange
         var expectedScheme = new Scheme
         {
-            Normal = new Attribute (Color.White, Color.Blue),
-            Focus = new Attribute (Color.Black, Color.Gray),
-            HotNormal = new Attribute (Color.BrightCyan, Color.Blue),
-            HotFocus = new Attribute (Color.BrightBlue, Color.Gray),
-            Disabled = new Attribute (Color.DarkGray, Color.Blue)
+            Normal = new (Color.White, Color.Blue),
+            Focus = new (Color.Black, Color.Gray),
+            HotNormal = new (Color.BrightCyan, Color.Blue),
+            HotFocus = new (Color.BrightBlue, Color.Gray),
+            Active = new (Color.Gray, Color.Black),
+            HotActive = new (Color.Blue, Color.Gray),
+            Highlight = new (Color.Gray, Color.Black),
+            Editable = new (Color.Gray, Color.Black),
+            ReadOnly = new (Color.Gray, Color.Black),
+            Disabled = new (Color.Gray, Color.Black),
         };
 
         string serializedScheme =
-            JsonSerializer.Serialize (expectedScheme, JsonOptions);
+            JsonSerializer.Serialize (expectedScheme, ConfigurationManager.SerializerContext.Options);
 
         // Act
         var actualScheme =
-            JsonSerializer.Deserialize<Scheme> (serializedScheme, JsonOptions);
+            JsonSerializer.Deserialize<Scheme> (serializedScheme, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal (expectedScheme, actualScheme);
@@ -69,11 +69,16 @@ public class SchemeJsonConverterTests
             Focus = new (Color.Black, Color.Gray),
             HotNormal = new (Color.BrightCyan, Color.Blue),
             HotFocus = new (Color.BrightBlue, Color.Gray),
-            Disabled = new (Color.DarkGray, Color.Blue)
+            Active = new (Color.Gray, Color.Black),
+            HotActive = new (Color.Blue, Color.Gray),
+            Highlight = new (Color.Gray, Color.Black),
+            Editable = new (Color.Gray, Color.Black),
+            ReadOnly = new (Color.Gray, Color.Black),
+            Disabled = new (Color.Gray, Color.Black),
         };
 
-        string json = JsonSerializer.Serialize (expected, JsonOptions);
-        Scheme actual = JsonSerializer.Deserialize<Scheme> (json, JsonOptions);
+        string json = JsonSerializer.Serialize (expected, ConfigurationManager.SerializerContext.Options);
+        Scheme actual = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options);
 
         Assert.NotNull (actual);
 
@@ -91,21 +96,31 @@ public class SchemeJsonConverterTests
     {
         const string json = """
                             {
-                              "Normal": { "Foreground": "White", "Background": "Blue" },
-                              "Focus": { "Foreground": "Black", "Background": "Gray" },
-                              "HotNormal": { "Foreground": "BrightCyan", "Background": "Blue" },
-                              "HotFocus": { "Foreground": "BrightBlue", "Background": "Gray" },
-                              "Disabled": { "Foreground": "DarkGray", "Background": "Blue" }
+                                "Normal": { "Foreground": "White", "Background": "Blue" },
+                                "Focus": { "Foreground": "Black", "Background": "Gray" },
+                                "HotNormal": { "Foreground": "BrightCyan", "Background": "Blue" },
+                                "HotFocus": { "Foreground": "BrightBlue", "Background": "Gray" },
+                                "Active": { "Foreground": "DarkGray", "Background": "Blue" },
+                                "HotActive": { "Foreground": "DarkGray", "Background": "Blue" },
+                                "Highlight": { "Foreground": "DarkGray", "Background": "Blue" },
+                                "Editable": { "Foreground": "DarkGray", "Background": "Blue" },
+                                "Readonly": { "Foreground": "DarkGray", "Background": "Blue" },
+                                "Disabled": { "Foreground": "DarkGray", "Background": "Blue" }
                             }
                             """;
 
-        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, JsonOptions)!;
+        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options)!;
 
-        Assert.True (scheme.Normal.IsExplicitlySet, "Normal should be explicitly set");
-        Assert.True (scheme.Focus.IsExplicitlySet, "Focus should be explicitly set");
-        Assert.True (scheme.HotNormal.IsExplicitlySet, "HotNormal should be explicitly set");
-        Assert.True (scheme.HotFocus.IsExplicitlySet, "HotFocus should be explicitly set");
-        Assert.True (scheme.Disabled.IsExplicitlySet, "Disabled should be explicitly set");
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Focus, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotFocus, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotActive, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out _));
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
     }
 
     [Fact]
@@ -117,16 +132,20 @@ public class SchemeJsonConverterTests
                             }
                             """;
 
-        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, JsonOptions)!;
+        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options)!;
 
         // explicitly set
-        Assert.True (scheme.Normal.IsExplicitlySet);
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
 
         // derived from Normal
-        Assert.False (scheme.Focus.IsExplicitlySet);
-        Assert.False (scheme.HotNormal.IsExplicitlySet);
-        Assert.False (scheme.HotFocus.IsExplicitlySet);
-        Assert.False (scheme.Disabled.IsExplicitlySet);
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Focus, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotFocus, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotActive, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
     }
-
 }

@@ -116,7 +116,6 @@ public sealed class Themes : Scenario
 
                                                 if (_view is { })
                                                 {
-                                                    _view.CanFocus = false;
                                                     viewFrame.Add (_view);
                                                     viewPropertiesEditor.ViewToEdit = _view;
                                                 }

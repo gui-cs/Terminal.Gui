@@ -17,8 +17,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
             throw new JsonException ($"Unexpected StartObject token when parsing Scheme: {reader.TokenType}.");
         }
 
-        // Create a default scheme with all attributes marked as implicit
-        var scheme = new Scheme (Attribute.Default.AsImplicit ());
+        var scheme = new Scheme ();
         var propertyName = string.Empty;
 
         while (reader.Read ())
@@ -37,9 +36,12 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
             reader.Read ();
 
             // Make sure attributes are marked as explicitly set when deserialized
-            var attribute = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute)
-                                          .AsExplicitlySet ();
+            object? attrObj = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute);
 
+            if (attrObj is not Attribute attribute)
+            {
+                throw new JsonException ($"After {propertyName}: Expected Attribute but got {attrObj?.GetType ().Name ?? "null"} when parsing Scheme.");
+            }
             if (propertyName is { })
             {
                 scheme = propertyName.ToLowerInvariant () switch
@@ -71,63 +73,18 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
     {
         writer.WriteStartObject ();
 
-        // Always write Normal
-        writer.WritePropertyName ("Normal");
-        AttributeJsonConverter.Instance.Write (writer, value.Normal, options);
-
-        // Only write explicitly set attributes
-        if (value.HotNormal.IsExplicitlySet)
+        foreach (VisualRole role in Enum.GetValues<VisualRole>())
         {
-            writer.WritePropertyName ("HotNormal");
-            AttributeJsonConverter.Instance.Write (writer, value.HotNormal, options);
-        }
+            // Get the attribute for the role
 
-        if (value.Focus.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("Focus");
-            AttributeJsonConverter.Instance.Write (writer, value.Focus, options);
-        }
-
-        if (value.HotFocus.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("HotFocus");
-            AttributeJsonConverter.Instance.Write (writer, value.HotFocus, options);
-        }
-
-        if (value.Active.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("Active");
-            AttributeJsonConverter.Instance.Write (writer, value.Active, options);
-        }
-
-        if (value.HotActive.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("HotActive");
-            AttributeJsonConverter.Instance.Write (writer, value.HotActive, options);
-        }
-
-        if (value.Highlight.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("Highlight");
-            AttributeJsonConverter.Instance.Write (writer, value.Highlight, options);
-        }
-
-        if (value.Editable.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("Editable");
-            AttributeJsonConverter.Instance.Write (writer, value.Editable, options);
-        }
-
-        if (value.ReadOnly.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("ReadOnly");
-            AttributeJsonConverter.Instance.Write (writer, value.ReadOnly, options);
-        }
-
-        if (value.Disabled.IsExplicitlySet)
-        {
-            writer.WritePropertyName ("Disabled");
-            AttributeJsonConverter.Instance.Write (writer, value.Disabled, options);
+            if (!value.TryGetExplicitlySetAttributeForRole (role, out Attribute? attribute))
+            {
+                // Skip attributes that are not explicitly set
+                continue;
+            }
+            writer.WritePropertyName (role.ToString ());
+            // Write the attribute using the AttributeJsonConverter
+            AttributeJsonConverter.Instance.Write (writer, attribute!.Value, options);
         }
 
         writer.WriteEndObject ();

@@ -936,10 +936,7 @@ public class TextField : View, IDesignable
         _isDrawing = true;
 
         // Cache attributes as GetAttributeForRole might raise events
-        Attribute selectedAttribute = new Attribute (
-                                                     GetAttributeForRole (VisualRole.Focus).Background,
-                                                     GetAttributeForRole (VisualRole.Focus).Foreground,
-                                                     GetAttributeForRole (VisualRole.Focus).Style);
+        Attribute selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
         Attribute readonlyAttribute = GetAttributeForRole (VisualRole.ReadOnly);
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Editable);
 
