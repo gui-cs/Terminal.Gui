@@ -19,7 +19,8 @@ public class Arrangement : Scenario
         Window app = new ()
         {
             Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup
+            TabStop = TabBehavior.TabGroup,
+            ShadowStyle = ShadowStyle.None
         };
 
         var adornmentsEditor = new AdornmentsEditor
@@ -185,7 +186,8 @@ public class Arrangement : Scenario
 
         TransparentView transparentView = new ()
         {
-            Id = "transparentView",
+            Title = "Transparent",
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent,
             X = 30,
             Y = 5,
             Width = 35,
@@ -199,7 +201,11 @@ public class Arrangement : Scenario
         testFrame.Add (transparentView);
 
 
-        testFrame.Add (new TransparentView ());
+        testFrame.Add (new TransparentView ()
+        {
+            Title = "Transparent|TransparentMouse",
+            ViewportSettings = Terminal.Gui.ViewportSettings.TransparentMouse | Terminal.Gui.ViewportSettings.Transparent
+        });
 
         adornmentsEditor.AutoSelectSuperView = testFrame;
         arrangementEditor.AutoSelectSuperView = testFrame;
@@ -321,13 +327,13 @@ public class Arrangement : Scenario
         public TransparentView ()
         {
             Title = "Transparent";
-            Text = "Text";
+            Text = "TransparentView Text";
             X = 0;
             Y = 0;
             Width = 30;
             Height = 10;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
 
             Padding!.Thickness = new Thickness (1);
 
@@ -342,56 +348,3 @@ public class Arrangement : Scenario
     }
 }
 
-public class TransparentView : FrameView
-{
-    public TransparentView ()
-    {
-        Title = "Transparent View";
-        base.Text = "View.Text.\nThis should be opaque.\nNote how clipping works?";
-        TextFormatter.Alignment = Alignment.Center;
-        TextFormatter.VerticalAlignment = Alignment.Center;
-        Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
-        BorderStyle = LineStyle.RoundedDotted;
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
-
-        var transparentSubView = new View ()
-        {
-            Text = "Sizable/Movable View with border. Should be opaque. The shadow should be semi-opaque.",
-            Id = "transparentSubView",
-            X = 4,
-            Y = 8,
-            Width = 20,
-            Height = 8,
-            BorderStyle = LineStyle.Dashed,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            ShadowStyle = ShadowStyle.Transparent,
-            //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
-        };
-        transparentSubView.Border.Thickness = new (1, 1, 1, 1);
-        transparentSubView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-
-        Button button = new Button ()
-        {
-            Title = "_Opaque Shadows No Worky",
-            X = Pos.Center (),
-            Y = 4,
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog),
-        };
-
-        button.ClearingViewport += (sender, args) =>
-                                   {
-                                       args.Cancel = true;
-                                   };
-
-
-        base.Add (button);
-        base.Add (transparentSubView);
-    }
-
-    /// <inheritdoc />
-    protected override bool OnClearingViewport () { return false; }
-
-    /// <inheritdoc />
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
-}

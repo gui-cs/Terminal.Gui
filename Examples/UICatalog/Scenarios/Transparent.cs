@@ -45,9 +45,12 @@ public sealed class Transparent : Scenario
             Y = 4,
             Title = "_AppButton",
         };
-        appButton.Accepting += (sender, args) => MessageBox.Query ("AppButton", "Transparency is cool!", "_Ok");
+        appButton.Accepting += (sender, args) =>
+                               {
+                                   MessageBox.Query ("AppButton", "Transparency is cool!", "_Ok");
+                                   args.Handled = true;
+                               };
         appWindow.Add (appButton);
-
 
         var tv = new TransparentView ()
         {
@@ -77,11 +80,11 @@ public sealed class Transparent : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
             BorderStyle = LineStyle.RoundedDotted;
-            SchemeName = "Base";
+            //SchemeName = "Base";
 
             var transparentSubView = new View ()
             {
-                Text = "Sizable/Movable View with border. Should be opaque. The shadow should be semi-opaque.",
+                Text = "Sizable/Movable View with border. Should be opaque. No Shadow.",
                 Id = "transparentSubView",
                 X = 4,
                 Y = 8,
@@ -93,7 +96,7 @@ public sealed class Transparent : Scenario
             };
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
             transparentSubView.SchemeName = "Dialog";
-            transparentSubView.Visible = false;
+            //transparentSubView.Visible = false;
 
             Button button = new Button ()
             {
@@ -102,7 +105,12 @@ public sealed class Transparent : Scenario
                 Y = 2,
                 SchemeName = "Dialog",
             };
-            button.Visible = false;
+            button.Accepting += (sender, args) =>
+                                {
+                                    MessageBox.Query ("Clicked!", "Button in Transparent View", "_Ok");
+                                    args.Handled = true;
+                                };
+            //button.Visible = false;
 
 
             var shortcut = new Shortcut ()
@@ -126,6 +134,12 @@ public sealed class Transparent : Scenario
             base.Add (button);
             base.Add (shortcut);
             base.Add (transparentSubView);
+
+            //Padding.Thickness = new (1);
+            //Padding.SchemeName = "Error";
+
+            Margin.Thickness = new (1);
+           // Margin.ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
         }
 
         /// <inheritdoc />

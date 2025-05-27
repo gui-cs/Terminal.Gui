@@ -204,12 +204,12 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        // if the mouse is outside the Application.Top hierarchy, we don't want to
-        // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (Application.Top, deepestViewUnderMouse, true))
-        {
-            return;
-        }
+        //// if the mouse is outside the Application.Top hierarchy, we don't want to
+        //// send the mouse event to the deepest view under the mouse.
+        //if (!View.IsInHierarchy (Application.Top, deepestViewUnderMouse, true))
+        //{
+        //    return;
+        //}
 
         // Create a view-relative mouse event to send to the view that is under the mouse.
         MouseEventArgs viewMouseEvent;

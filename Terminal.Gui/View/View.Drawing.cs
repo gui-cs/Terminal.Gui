@@ -28,7 +28,7 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
-        // Draw the margins (those whith Shadows) last to ensure they are drawn on top of the content.
+        // Draw the margins (those with Shadows) last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
     }
 
@@ -231,9 +231,9 @@ public partial class View // Drawing APIs
             Padding?.Draw ();
         }
 
-        if (Margin is { } && Margin.Thickness != Thickness.Empty && Margin.ShadowStyle == ShadowStyle.None)
+        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-            Margin?.Draw ();
+           Margin?.Draw ();
         }
     }
 
@@ -656,11 +656,11 @@ public partial class View // Drawing APIs
                 ExcludeFromClip (context!.GetDrawnRegion ());
 
                 // Exclude the Border and Padding from the clip
-                ExcludeFromClip (Border?.Thickness.AsRegion (FrameToScreen ()));
-                ExcludeFromClip (Padding?.Thickness.AsRegion (FrameToScreen ()));
+                ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
+                ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
 
                 // QUESTION: This makes it so that no nesting of transparent views is possible, but is more correct?
-                //context = new DrawContext ();
+                context = new DrawContext ();
             }
             else
             {
@@ -675,7 +675,6 @@ public partial class View // Drawing APIs
                 // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
                 ExcludeFromClip (borderFrame);
 
-                // BUGBUG: There looks like a bug in Region where this Union call is not adding the rectangle right
                 // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
                 // This enables the SuperView to know what was drawn by this view.
                 context?.AddDrawnRectangle (borderFrame);

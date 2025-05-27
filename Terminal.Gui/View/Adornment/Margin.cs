@@ -41,8 +41,13 @@ public class Margin : Adornment
         // Margin should not be focusable
         CanFocus = false;
 
-        // Margins are transparent to mouse
+        // Margins are transparent by default
+        ViewportSettings |= ViewportSettings.Transparent;
+
+        // Margins are transparent to mouse by default
         ViewportSettings |= ViewportSettings.TransparentMouse;
+
+        Text = "margin";
 
     }
 
@@ -56,7 +61,7 @@ public class Margin : Adornment
 
     internal void CacheClip ()
     {
-        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyle.None)
+        if (Thickness != Thickness.Empty /*&& ShadowStyle != ShadowStyle.None*/)
         {
             // PERFORMANCE: How expensive are these clones?
             _cachedClip = GetClip ()?.Clone ();
@@ -68,11 +73,11 @@ public class Margin : Adornment
     ///     INTERNAL API - Draws the margins for the specified views. This is called by the <see cref="Application"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
-    /// <param name="margins"></param>
+    /// <param name="views"></param>
     /// <returns><see langword="true"/></returns>
-    internal static bool DrawMargins (IEnumerable<View> margins)
+    internal static bool DrawMargins (IEnumerable<View> views)
     {
-        Stack<View> stack = new (margins);
+        Stack<View> stack = new (views);
 
         while (stack.Count > 0)
         {
@@ -112,73 +117,12 @@ public class Margin : Adornment
         ShadowStyle = base.ShadowStyle;
     }
 
-    /// <inheritdoc />
-    protected override bool OnGettingScheme (out Scheme? scheme)
-    {
-        scheme = Parent?.SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
-
-        return true;
-    }
-
-
     ///// <inheritdoc />
-    //public override Attribute GetAttributeForRole (VisualRole.Normal)
+    //protected override bool OnGettingScheme (out Scheme? scheme)
     //{
-    //    if (Scheme is { })
-    //    {
-    //        return Scheme.Normal;
-    //    }
-    //    if (Parent is { })
-    //    {
-    //        return Parent.GetAttributeForRole (VisualRole.Normal);
-    //    }
+    //    scheme = Parent?.SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
 
-    //    return base.GetAttributeForRole (VisualRole.Normal);
-    //}
-
-    ///// <inheritdoc />
-    //public override Attribute GetAttributeForRole (VisualRole.HotNormal)
-    //{
-    //    if (Parent is { })
-    //    {
-    //        return Parent.GetAttributeForRole (VisualRole.HotNormal);
-    //    }
-    //    return base.GetAttributeForRole (VisualRole.HotNormal);
-    //}
-
-    ///// <inheritdoc />
-    //public override Attribute GetAttributeForRole (VisualRole.Focus)
-    //{
-    //    if (Parent is { })
-    //    {
-    //        return Parent.GetAttributeForRole (VisualRole.Focus);
-    //    }
-    //    return base.GetAttributeForRole (VisualRole.Focus);
-    //}
-
-    ///// <inheritdoc />
-    //public override Attribute GetAttributeForRole (VisualRole.HotFocus)
-    //{
-    //    if (Parent is { })
-    //    {
-    //        return Parent.GetAttributeForRole (VisualRole.HotFocus);
-    //    }
-
-    //    return base.GetAttributeForRole (VisualRole.HotFocus);
-    //}
-
-    ///// <inheritdoc />
-    //protected override bool OnSettingNormalAttribute ()
-    //{
-    //    if (Parent is { })
-    //    {
-    //        SetAttribute (Parent.GetAttributeForRole (VisualRole.Normal));
-
-    //        return true;
-    //    }
-
-    //    return false;
-
+    //    return true;
     //}
 
     /// <inheritdoc/>

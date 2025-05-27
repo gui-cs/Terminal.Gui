@@ -1173,7 +1173,7 @@ public partial class View // Layout APIs
             // BUGBUG: We do not traverse all visible toplevels if there's an active popover. This may be a bug.
             List<View?> result =
             [
-                Application.Top
+                //Application.Top
             ];
 
             result.AddRange (GetViewsUnderLocationForRoot (visiblePopover, location, ignoreTransparentMouse));
@@ -1205,22 +1205,22 @@ public partial class View // Layout APIs
 
                         // If the result contains the toplevel, but the point is in a TransparentMouse margin, skip.
                         // BUGBUG: This should not be specific to Margin, but any Adornment with TransparentMouse set.
-                        Margin? margin = toplevel.Margin;
+                        //Margin? margin = toplevel.Margin;
 
-                        bool isTransparentMargin =
-                            margin is { } && margin.Contains (location) && margin.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse);
+                        //bool isTransparentMargin =
+                        //    margin is { } && margin.Contains (location) && margin.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse);
 
-                        // If the result contains only the toplevel, and the margin is transparent, skip.
-                        if (isTransparentMargin && result.All (v => v == toplevel))
-                        {
-                            continue; // skip this toplevel, try next
-                        }
+                        //// If the result contains only the toplevel, and the margin is transparent, skip.
+                        //if (isTransparentMargin && result.All (v => v == toplevel))
+                        //{
+                        //    continue; // skip this toplevel, try next
+                        //}
 
-                        // If the result contains only the toplevel and the margin, and the margin is transparent, skip.
-                        if (isTransparentMargin && result.All (v => v == toplevel || v == margin))
-                        {
-                            continue; // skip this toplevel, try next
-                        }
+                        //// If the result contains only the toplevel and the margin, and the margin is transparent, skip.
+                        //if (isTransparentMargin && result.All (v => v == toplevel || v == margin))
+                        //{
+                        //    continue; // skip this toplevel, try next
+                        //}
 
                         return result;
                     }
@@ -1260,99 +1260,235 @@ public partial class View // Layout APIs
     /// <returns></returns>
     internal static List<View?> GetViewsUnderLocationForRoot (View root, in Point location, bool ignoreTransparentMouse)
     {
-        // TODO: Refactor this to be more readable and maintainable. Pull key logic out to 
-        // TODO: separate functions. Be careful as this is currently fragile.
+        List<View?> viewsUnderLocation = GetViewsAtLocation (root, location);
 
-        List<View?> viewsUnderLocation = []; Point currentLocation = location;
-
-        while (root is { Visible: true } && root.Contains (currentLocation))
+        if (!ignoreTransparentMouse)
         {
-            if (!root.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-            {
-                viewsUnderLocation.Add (root);
-            }
+            // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
+            // Because the point was in their adornment, and if the adornment is transparent, they should be removed.
+            viewsUnderLocation.RemoveAll (
+                                          v =>
+                                          {
+                                              if (v is null or Adornment)
+                                              {
+                                                  return false;
+                                              }
 
-            Adornment? found = null;
+                                              bool? ret = null;
 
-            if (root is not Adornment)
-            {
-                if (root.Margin is { } && root.Margin.Contains (currentLocation))
-                {
-                    found = root.Margin;
-                }
-                else if (root.Border is { } && root.Border.Contains (currentLocation))
-                {
-                    found = root.Border;
-                }
-                else if (root.Padding is { } && root.Padding.Contains (currentLocation))
-                {
-                    found = root.Padding;
-                }
-            }
+                                              if (viewsUnderLocation.Contains(v.Margin) && v.Margin!.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                                              {
+                                                  ret = true;
+                                              }
 
-            Point viewportOffset = root.GetViewportOffsetFromFrame ();
+                                              if (viewsUnderLocation.Contains (v.Border) && v.Border!.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                                              {
+                                                  ret = true;
+                                              }
 
-            if (found is { })
-            {
-                // If the adornment has TransparentMouse set, stop traversing further
-                // but keep the root element that's already added (if any)
-                if (found.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-                {
-                    // Return only what we have so far - don't add the parent of the adornment
-                    viewsUnderLocation.Remove (root);
-                    return viewsUnderLocation;
-                }
+                                              if (viewsUnderLocation.Contains (v.Padding) && v.Padding!.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                                              {
+                                                  ret = true;
+                                              }
 
-                // If the adornment is not transparent to mouse, continue normal traversal
-                root = found;
-                viewsUnderLocation.Add (root);
-                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
-            }
+                                              return ret is true;
+                                          });
 
-            int startOffsetX = currentLocation.X - (root.Frame.X + viewportOffset.X);
-            int startOffsetY = currentLocation.Y - (root.Frame.Y + viewportOffset.Y);
-
-            View? subview = null;
-
-            for (int i = root.InternalSubViews.Count - 1; i >= 0; i--)
-            {
-                if (root.InternalSubViews [i].Visible
-                    && root.InternalSubViews [i].Contains (new (startOffsetX + root.Viewport.X, startOffsetY + root.Viewport.Y))
-                    && (!ignoreTransparentMouse || !root.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
-                {
-                    subview = root.InternalSubViews [i];
-                    currentLocation.X = startOffsetX + root.Viewport.X;
-                    currentLocation.Y = startOffsetY + root.Viewport.Y;
-
-                    // root is the deepest subview under the mouse; stop searching the subviews
-                    break;
-                }
-            }
-
-            if (subview is null)
-            {
-                // In the case root is transparent, recursively add all it's subviews as they DO get
-                // mouse events (and get drawn).
-                if (!ignoreTransparentMouse && root.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-                {
-                    List<View?> range = View.GetViewsUnderLocationForRoot (root, location, true);
-                    viewsUnderLocation.AddRange (range);
-
-                    // De-dupe viewsUnderMouse
-                    HashSet<View?> hashSet = [.. viewsUnderLocation];
-                    viewsUnderLocation = [.. hashSet];
-                }
-
-                // No subview was found that's under the mouse, so we're done
-                return viewsUnderLocation;
-            }
-
-            // We found a subview of start that's under the mouse, continue...
-            root = subview;
+            // Now remove all views that have ViewportSettings.TransparentMouse set
+            viewsUnderLocation.RemoveAll (v => v.ViewportSettings.HasFlag(ViewportSettings.TransparentMouse));
         }
 
         return viewsUnderLocation;
+
+
+        //View? initialRoot = root;
+
+        //// TODO: Refactor this to be more readable and maintainable. Pull key logic out to 
+        //// TODO: separate functions. Be careful as this is currently fragile.
+
+        //List<View?> viewsUnderLocation = []; Point currentLocation = location;
+
+        //while (root is { Visible: true } && root.Contains (currentLocation))
+        //{
+        //    if (!root.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+        //    {
+        //        viewsUnderLocation.Add (root);
+        //    }
+
+        //    // Get all Subviews (and their Adornments) that are under the mouse location
+        //    List<View?> subViewsUnderLocation = GetSubviewsUnderLocation (root, in location, ignoreTransparentMouse);
+
+        //    // Get all Adornments (and their Subviews) that are under the mouse location
+        //    //List<Adornment?> adornmentsUnderLocation = GetAdornmentsUnderLocation (root, in location, ignoreTransparentMouse);
+
+        //    Point viewportOffset = root.GetViewportOffsetFromFrame ();
+
+        //    Adornment? rootIsAdornment = null;
+        //    if (root is not Adornment)
+        //    {
+        //        if (root.Margin is { } && root.Margin.Contains (currentLocation))
+        //        {
+        //            rootIsAdornment = root.Margin;
+        //        }
+        //        else if (root.Border is { } && root.Border.Contains (currentLocation))
+        //        {
+        //            rootIsAdornment = root.Border;
+        //        }
+        //        else if (root.Padding is { } && root.Padding.Contains (currentLocation))
+        //        {
+        //            rootIsAdornment = root.Padding;
+        //        }
+        //    }
+
+        //    if (rootIsAdornment is { })
+        //    {
+        //        // If the adornment has TransparentMouse set, stop traversing further
+        //        if (rootIsAdornment.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+        //        {
+        //            // Return only what we have so far - don't add the parent of the adornment
+        //            viewsUnderLocation.Remove (root);
+        //            return viewsUnderLocation;
+        //        }
+
+        //        // If the adornment is not transparent to mouse, continue normal traversal
+        //        root = rootIsAdornment;
+        //        viewsUnderLocation.Add (root);
+        //        viewportOffset = rootIsAdornment.Parent?.Frame.Location ?? Point.Empty;
+        //    }
+
+
+        //    int startOffsetX = currentLocation.X - (root.Frame.X + viewportOffset.X);
+        //    int startOffsetY = currentLocation.Y - (root.Frame.Y + viewportOffset.Y);
+
+        //    View? subview = null;
+        //    for (int i = root.InternalSubViews.Count - 1; i >= 0; i--)
+        //    {
+        //        if (root.InternalSubViews [i].Visible
+        //            && root.InternalSubViews [i].Contains (new (startOffsetX + root.Viewport.X, startOffsetY + root.Viewport.Y))
+        //            && (!ignoreTransparentMouse || !root.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
+        //        {
+        //            subview = root.InternalSubViews [i];
+        //            currentLocation.X = startOffsetX + root.Viewport.X;
+        //            currentLocation.Y = startOffsetY + root.Viewport.Y;
+
+        //            // root is the deepest subview under the mouse; stop searching the subviews
+        //            break;
+        //        }
+        //    }
+
+        //    if (subview is null)
+        //    {
+        //        // In the case root is transparent, recursively add all it's subviews as they DO get
+        //        // mouse events (and get drawn).
+        //        if (!ignoreTransparentMouse && root.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+        //        {
+        //            // Got back to the initial root of the search, so we can add all views under the location
+        //            List<View?> range = View.GetViewsUnderLocationForRoot (initialRoot, location, true);
+        //            viewsUnderLocation.AddRange (range);
+
+        //            // De-dupe viewsUnderMouse
+        //            HashSet<View?> hashSet = [.. viewsUnderLocation];
+        //            viewsUnderLocation = [.. hashSet];
+        //        }
+
+        //        // No subview was found that's under the mouse, so we're done
+        //        return viewsUnderLocation;
+        //    }
+
+        //    // We found a subview of start that's under the mouse, continue...
+        //    root = subview;
+        //}
+
+        //return viewsUnderLocation;
     }
+
+    /// <summary>
+    ///     Retrieves a list of subviews located under a specified point within a given view.
+    /// </summary>
+    /// <param name="superView">The view in which to search for subviews at the specified location.</param>
+    /// <param name="location">The location in screen coordinates.</param>
+    /// <param name="ignoreTransparentMouse">Determines whether to include subviews that are transparent to the mouse in the search results.</param>
+    /// <returns>A list of subviews found at the specified location.</returns>
+    internal static List<View?> GetSubviewsUnderLocation (View superView, in Point location, bool ignoreTransparentMouse)
+    {
+        Point viewportOffset = superView.GetViewportOffsetFromFrame ();
+
+        // Iterate over all subviews in reverse order to find the deepest subview under the mouse location
+        List<View?> viewsUnderLocation = [];
+
+        // Get the initial root of the search
+        View initialRoot = superView;
+
+        View? subview = null;
+
+        for (int i = superView.InternalSubViews.Count - 1; i >= 0; i--)
+        {
+            // location is screen-relative. Need to convert it to the superView's coordinate system
+            Point superViewRelativeLocation = new (
+                location.X - (superView.FrameToScreen ().X + viewportOffset.X),
+                location.Y - (superView.FrameToScreen ().Y + viewportOffset.Y)
+            );
+
+            if (superView.InternalSubViews [i].Visible
+                && superView.InternalSubViews [i].Contains (superViewRelativeLocation)
+                && (!ignoreTransparentMouse || !superView.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
+            {
+                // We found a subview that's at the location. 
+                subview = superView.InternalSubViews [i];
+                viewsUnderLocation.Add (subview);
+            }
+        }
+
+        return [];
+
+    }
+
+    /// <summary>
+    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="superView"/> hierarchcy that are at <paramref name="location"/>,
+    ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="Visible"/> set to <see langword="false"/> will not be included.
+    ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
+    /// </summary>
+    /// <param name="superView">The root view from which the search for subviews begins.</param>
+    /// <param name="location">The screen-relative location where the search for views is focused.</param>
+    /// <returns>A list of views that are located under the specified point.</returns>
+    internal static List<View?> GetViewsAtLocation (View? superView, in Point location)
+    {
+        if (superView is null || !superView.Visible)
+        {
+            return [];
+        }
+
+        if (!superView.FrameToScreen ().Contains (location))
+        {
+            return [];
+        }
+
+        List<View?> result = [superView];
+
+        result.AddRange (Adornment.GetViewsAtLocation (superView.Margin, location));
+        result.AddRange (Adornment.GetViewsAtLocation (superView.Border, location));
+        result.AddRange (Adornment.GetViewsAtLocation (superView.Padding, location));
+
+        // Add subviews
+        foreach (View subview in superView.InternalSubViews)
+        {
+            if (!subview.Visible)
+            {
+                continue;
+            }
+
+            List<View?> subResult = GetViewsAtLocation (subview, location);
+
+            if (subResult.Count > 0)
+            {
+                result.AddRange (subResult);
+            }
+        }
+
+        return result;
+    }
+
+
 
     #endregion Utilities
 
