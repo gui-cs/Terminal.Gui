@@ -81,7 +81,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
 
     public MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
-        var mouseFlags = MouseFlags.ReportMousePosition;
+        var mouseFlags = MouseFlags.None;
 
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button1Pressed, MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
@@ -99,9 +99,6 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             if (_lastWasPressed [2])
             {
                 mouseFlags |= MouseFlags.Button3Released;
-
-                // Removes the moved flag when raising released flags (see https://github.com/gui-cs/Terminal.Gui/issues/4088)
-                mouseFlags &= ~MouseFlags.ReportMousePosition;
 
                 _lastWasPressed [2] = false;
             }
@@ -123,13 +120,43 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             }
         }
 
+        if (e.EventFlags != EventFlags.NoEvent)
+        {
+            switch (e.EventFlags)
+            {
+                case EventFlags.MouseMoved:
+                    mouseFlags |= MouseFlags.ReportMousePosition;
+
+                    break;
+            }
+        }
+
+        if (e.ControlKeyState != ControlKeyState.NoControlKeyPressed)
+        {
+            switch (e.ControlKeyState)
+            {
+                case ControlKeyState.RightAltPressed:
+                case ControlKeyState.LeftAltPressed:
+                    mouseFlags |= MouseFlags.ButtonAlt;
+
+                    break;
+                case ControlKeyState.RightControlPressed:
+                case ControlKeyState.LeftControlPressed:
+                    mouseFlags |= MouseFlags.ButtonCtrl;
+
+                    break;
+                case ControlKeyState.ShiftPressed:
+                    mouseFlags |= MouseFlags.ButtonShift;
+
+                    break;
+            }
+        }
+
         var result = new MouseEventArgs
         {
             Position = new (e.MousePosition.X, e.MousePosition.Y),
             Flags = mouseFlags
         };
-
-        // TODO: Return keys too
 
         return result;
     }
@@ -154,8 +181,6 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             {
                 current |= releasedFlag;
 
-                // Removes the moved flag when raising released flags (see https://github.com/gui-cs/Terminal.Gui/issues/4088)
-                current &= ~MouseFlags.ReportMousePosition;
                 _lastWasPressed [buttonIndex] = false;
             }
         }
