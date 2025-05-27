@@ -3478,6 +3478,7 @@ public class TextView : View
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
+            SetNeedsDraw ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
         {
@@ -3498,6 +3499,7 @@ public class TextView : View
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
+            SetNeedsDraw ();
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
@@ -3508,6 +3510,8 @@ public class TextView : View
             //ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
             //ShowContextMenu ();
         }
+
+        OnUnwrappedCursorPosition ();
 
         return true;
     }
