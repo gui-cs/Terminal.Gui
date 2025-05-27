@@ -3519,7 +3519,7 @@ public class TextView : View
         List<Cell> line = GetCurrentLine ();
         CurrentColumn = line.Count;
         TrackColumn ();
-        PositionCursor ();
+        DoNeededAction ();
     }
 
     /// <summary>Will scroll the <see cref="TextView"/> to the first line and position the cursor there.</summary>
@@ -3530,8 +3530,7 @@ public class TextView : View
         CurrentColumn = 0;
         _leftColumn = 0;
         TrackColumn ();
-        PositionCursor ();
-        SetNeedsDraw ();
+        DoNeededAction ();
     }
 
     /// <summary>
@@ -4440,6 +4439,11 @@ public class TextView : View
 
     private void DoNeededAction ()
     {
+        if (!NeedsDraw && (IsSelecting || _wrapNeeded || !Used))
+        {
+            SetNeedsDraw ();
+        }
+
         if (NeedsDraw)
         {
             Adjust ();
@@ -4447,6 +4451,7 @@ public class TextView : View
         else
         {
             PositionCursor ();
+            OnUnwrappedCursorPosition ();
         }
     }
 
@@ -5367,7 +5372,6 @@ public class TextView : View
             }
         }
 
-        Adjust ();
         DoNeededAction ();
 
         return true;
@@ -5449,10 +5453,6 @@ public class TextView : View
                     _topRow++;
                     SetNeedsDraw ();
                 }
-                else
-                {
-                    return false;
-                }
             }
             else
             {
@@ -5460,7 +5460,6 @@ public class TextView : View
             }
         }
 
-        Adjust ();
         DoNeededAction ();
 
         return true;
@@ -5475,7 +5474,6 @@ public class TextView : View
 
         CurrentColumn = 0;
         _leftColumn = 0;
-        Adjust ();
         DoNeededAction ();
     }
 
@@ -5538,7 +5536,6 @@ public class TextView : View
             CurrentRow = newPos.Value.row;
         }
 
-        Adjust ();
         DoNeededAction ();
     }
 
@@ -5552,7 +5549,6 @@ public class TextView : View
             CurrentRow = newPos.Value.row;
         }
 
-        Adjust ();
         DoNeededAction ();
     }
 
@@ -6374,6 +6370,11 @@ public class TextView : View
 
     private void StopSelecting ()
     {
+        if (IsSelecting)
+        {
+            SetNeedsDraw ();
+        }
+
         _shiftSelecting = false;
         IsSelecting = false;
         _isButtonShift = false;
