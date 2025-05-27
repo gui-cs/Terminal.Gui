@@ -5344,8 +5344,7 @@ public class TextView : View
     private void MoveEndOfLine ()
     {
         List<Cell> currentLine = GetCurrentLine ();
-        CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
-        Adjust ();
+        CurrentColumn = currentLine.Count;
         DoNeededAction ();
     }
 
