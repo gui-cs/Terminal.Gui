@@ -7105,7 +7105,7 @@ line.
         Assert.True (tv.NewMouseEvent (new() { Position = new (0, 3), Flags = MouseFlags.Button1Pressed }));
         tv.Draw ();
         Assert.Equal (new (0, 3), tv.CursorPosition);
-        Assert.Equal (new (13, 0), cp);
+        Assert.Equal (new (12, 0), cp);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
