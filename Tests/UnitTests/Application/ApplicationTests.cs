@@ -333,7 +333,7 @@ public class ApplicationTests
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application.TopLevels);
-            Assert.Empty (Application._cachedViewsUnderMouse);
+            Assert.Empty (Application.CachedViewsUnderMouse);
 
             // Mouse
             // Do not reset _lastMousePosition
@@ -367,7 +367,7 @@ public class ApplicationTests
         Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -379,7 +379,7 @@ public class ApplicationTests
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.D, Command.Cancel);
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 

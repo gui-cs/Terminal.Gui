@@ -205,7 +205,7 @@ public static class MemorySizeEstimator
                 object? value = prop.GetValue (source);
                 size += EstimateSizeInternal (value, visited);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // // Log exception (enable for debugging)
                 // Console.WriteLine($"Error processing property {prop.Name} of {type.FullName}: {ex.Message}");
@@ -224,7 +224,7 @@ public static class MemorySizeEstimator
                     object? fieldValue = field.GetValue (source);
                     size += EstimateSizeInternal (fieldValue, visited);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // // Log exception (enable for debugging)
                     // Console.WriteLine($"Error processing field {field.Name} of {type.FullName}: {ex.Message}");

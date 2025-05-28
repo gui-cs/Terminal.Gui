@@ -204,7 +204,7 @@ public class ToolsView : Window
         _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
-        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
+        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem!); };
         _stylePicker.SelectedItem = (int)RegionDrawStyles.FillOnly;
 
         _regionOpSelector = new ()
@@ -245,7 +245,7 @@ public class RegionOpSelector : View
             Y = 0,
             RadioLabels = Enum.GetNames<RegionOp> ().Select (n => n = "_" + n).ToArray ()
         };
-        _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem); };
+        _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem!); };
         Add (_radioGroup);
     }
 

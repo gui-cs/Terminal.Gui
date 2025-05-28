@@ -46,8 +46,11 @@ public partial class View // Mouse APIs
 
     #region MouseEnterLeave
 
-    private bool _hovering;
-    private Scheme? _savedNonHoverScheme;
+    /// <summary>
+    ///     Gets whether the mouse is currently hovering over the View's <see cref="Viewport"/>. Is <see langword="true"/> after
+    ///     <see cref="MouseEnter"/> has been raised, and before <see cref="MouseLeave"/> is raised.
+    /// </summary>
+    public bool MouseHovering { get; internal set; }
 
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's
@@ -78,36 +81,15 @@ public partial class View // Mouse APIs
 
         MouseEnter?.Invoke (this, eventArgs);
 
-        _hovering = !eventArgs.Cancel;
-
         if (eventArgs.Cancel)
         {
             return true;
         }
 
-        // Post-conditions
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) /* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
+        MouseHovering = true;
+
+        if (HighlightStyle != HighlightStyle.None)
         {
-            HighlightStyle copy = HighlightStyle;
-            var hover = HighlightStyle.Hover;
-            CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
-
-            if (RaiseHighlight (args) || args.Cancel)
-            {
-                return args.Cancel;
-            }
-
-            // BUGBUG: HighlightSty;e impl breaks Schemes - Disable it until fixed
-
-            //if (HasScheme)
-            //{
-            //    Scheme? cs = GetScheme ();
-
-            //    _savedNonHoverScheme = cs;
-
-            //    SetScheme (GetHighlightScheme ());
-            //}
-
             SetNeedsDraw ();
         }
 
@@ -222,21 +204,11 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-        // Post-conditions
-        _hovering = false;
+        MouseHovering = false;
 
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) /* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
+        if (HighlightStyle != HighlightStyle.None)
         {
-            HighlightStyle copy = HighlightStyle;
-            var hover = HighlightStyle.None;
-            RaiseHighlight (new (ref copy, ref hover));
-
-            if (HasScheme && _savedNonHoverScheme is { })
-            {
-                SetScheme (_savedNonHoverScheme);
-                _savedNonHoverScheme = null;
-                SetNeedsDraw ();
-            }
+            SetNeedsDraw ();
         }
     }
 
@@ -656,8 +628,6 @@ public partial class View // Mouse APIs
 
     #region Highlight Handling
 
-    // Used for Pressed highlighting
-    private Scheme? _savedHighlightScheme;
 
     /// <summary>
     ///     Gets or sets whether the <see cref="View"/> will be highlighted visually by mouse interaction.
@@ -678,13 +648,6 @@ public partial class View // Mouse APIs
         }
 
         Highlight?.Invoke (this, args);
-
-        //if (args.Cancel)
-        //{
-        //    return true;
-        //}
-
-        //args.Cancel = InvokeCommandsBoundToMouse (args) == true;
 
         return args.Cancel;
     }
@@ -743,53 +706,7 @@ public partial class View // Mouse APIs
 
         // For 3D Pressed Style - Note we don't care about canceling the event here
         Margin?.RaiseHighlight (args);
-        args.Cancel = false; // Just in case
-
-        if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
-        {
-            if (_savedHighlightScheme is null && HasScheme)
-            {
-                _savedHighlightScheme = GetScheme ();
-
-                if (CanFocus)
-                {
-                    var cs = new Scheme (GetScheme ())
-                    {
-                        // Highlight the foreground focus color
-                        Focus = new (
-                                     GetScheme ().Focus.Foreground.GetBrighterColor (),
-                                     GetScheme ().Focus.Background.GetBrighterColor (),
-                                     GetScheme ().Focus.Style)
-                    };
-                    SetScheme (cs);
-                }
-                else
-                {
-                    var cs = new Scheme (GetScheme ())
-                    {
-                        // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (
-                                      GetScheme ().Focus.Background,
-                                      GetScheme ().Normal.Foreground,
-                                      GetScheme ().Focus.Style)
-                    };
-                    SetScheme (cs);
-                }
-            }
-
-            // Return false since we don't want to eat the event
-            return false;
-        }
-
-        if (HasScheme && args.NewValue == HighlightStyle.None)
-        {
-            // Unhighlight
-            SetScheme (_savedHighlightScheme);
-            _savedHighlightScheme = null;
-            SetNeedsDraw ();
-        }
-
-        return false;
+        return args.Cancel;
     }
 
     #endregion Highlight Handling

@@ -43,13 +43,13 @@ public class SettingsScopeTests
         ThrowOnJsonErrors = true;
 
         ConfigProperty themesConfigProperty = Settings! ["Themes"];
-        ConcurrentDictionary<string, ThemeScope>? dict = themesConfigProperty.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
+        ConcurrentDictionary<string, ThemeScope> dict = themesConfigProperty.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
 
         Assert.NotNull (dict);
         Assert.Single (dict);
         Assert.NotEmpty ((ConcurrentDictionary<string, ThemeScope>)themesConfigProperty.PropertyValue);
 
-        ThemeScope? scope = dict [ThemeManager.DEFAULT_THEME_NAME];
+        ThemeScope scope = dict [ThemeManager.DEFAULT_THEME_NAME];
         Assert.NotNull (scope);
         Assert.Equal (HighlightStyle.Hover | HighlightStyle.Pressed, scope ["Button.DefaultHighlightStyle"].PropertyValue);
 

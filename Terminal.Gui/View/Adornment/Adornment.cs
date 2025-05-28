@@ -238,7 +238,7 @@ public class Adornment : View, IDesignable
     }
 
     /// <summary>
-    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="adornment"/> hierarchcy that are at <paramref name="location"/>,
+    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="location"/>,
     ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="View.Visible"/> set to <see langword="false"/> will not be included.
     ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
     /// </summary>

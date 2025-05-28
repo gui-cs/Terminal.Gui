@@ -496,23 +496,16 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // test that all ConfigProperties have our attribute
             Assert.All (
                         Settings,
-                        item => Assert.NotEmpty (
-                                                 item.Value.PropertyInfo!.CustomAttributes.Where (
-                                                                                                  a => a.AttributeType
+                        item => Assert.Contains (item.Value.PropertyInfo!.CustomAttributes, a => a.AttributeType
                                                                                                        == typeof (ConfigurationPropertyAttribute)
-                                                                                                 )
-                                                )
-                       );
+));
 
 #pragma warning disable xUnit2030
-            Assert.Empty (
-                          Settings.Where (
-                                          cp => cp.Value.PropertyInfo!.GetCustomAttribute (
+            Assert.DoesNotContain (Settings, cp => cp.Value.PropertyInfo!.GetCustomAttribute (
                                                                                            typeof (ConfigurationPropertyAttribute)
                                                                                           )
                                                 == null
-                                         )
-                         );
+);
 #pragma warning restore xUnit2030
 
             // Application is a static class

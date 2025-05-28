@@ -54,7 +54,7 @@ public class SchemeManagerTests
     {
         ImmutableSortedDictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
 
-        Assert.Equal (Scheme.GetHardCodedSchemes (), hardCoded);
+        Assert.Equal (Scheme.GetHardCodedSchemes (), actual: hardCoded!);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class SchemeManagerTests
 
         theme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
 
-        Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
+        Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!;
         Assert.Equal (SchemeManager.GetSchemes ().Count, schemes.Count);
 
         var newTheme = new ThemeScope ();
@@ -122,16 +122,16 @@ public class SchemeManagerTests
         Assert.Equal (5, SchemeManager.GetSchemes ().Count);
 
         // add a new Scheme to the newTheme
-        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["Test"] = scheme;
+        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!) ["Test"] = scheme;
 
-        schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
+        schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!;
         Assert.Equal (SchemeManager.GetSchemes ().Count, schemes.Count);
 
         // Act
         theme.UpdateFrom (newTheme);
 
         // Assert
-        schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
+        schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!;
         Assert.Equal (schemes ["Test"].Normal, scheme.Normal);
         Assert.Equal (schemes ["Test"].Focus, scheme.Focus);
         Disable (true);
@@ -462,12 +462,12 @@ public class SchemeManagerTests
 
         Assert.Equal (
                       new (Color.Red),
-                      ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["test"].Normal.Foreground
+                      ((Dictionary<string, Scheme>)theme["Schemes"].PropertyValue!) ["test"].Normal.Foreground
                      );
 
         Assert.Equal (
                       new (Color.Green),
-                      ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["test"].Normal.Background
+                      ((Dictionary<string, Scheme>)theme["Schemes"].PropertyValue!) ["test"].Normal.Background
                      );
 
         // Act
@@ -476,7 +476,7 @@ public class SchemeManagerTests
         Assert.Equal (5, SchemeManager.GetSchemes ().Count); // base, toplevel, menu, error, dialog
 
         // Assert
-        Scheme updatedScheme = SchemeManager.GetSchemes () ["test"];
+        Scheme updatedScheme = SchemeManager.GetSchemes () ["test"]!;
         Assert.Equal (new (Color.Red), updatedScheme.Normal.Foreground);
         Assert.Equal (new (Color.Green), updatedScheme.Normal.Background);
 

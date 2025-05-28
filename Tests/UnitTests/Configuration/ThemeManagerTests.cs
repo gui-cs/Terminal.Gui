@@ -251,7 +251,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
         output.WriteLine ($"Start: Base Scheme size: {(MemorySizeEstimator.EstimateSize (Scheme.GetHardCodedSchemes ()))} b");
 
-        output.WriteLine ($"Start: PropertyInfo size: {(MemorySizeEstimator.EstimateSize (ConfigurationManager.Settings ["Application.QuitKey"]))} b");
+        output.WriteLine ($"Start: PropertyInfo size: {(MemorySizeEstimator.EstimateSize (ConfigurationManager.Settings! ["Application.QuitKey"]))} b");
 
         ThemeScope themeScope = new ThemeScope ();
         output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
@@ -259,9 +259,9 @@ public class ThemeManagerTests (ITestOutputHelper output)
         themeScope.AddValue ("Schemes", Scheme.GetHardCodedSchemes ());
         output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
 
-        output.WriteLine ($"Start: HardCoded Schemes ({SchemeManager.Schemes.Count}) size: {(MemorySizeEstimator.EstimateSize (SchemeManager.Schemes!))} b");
+        output.WriteLine ($"Start: HardCoded Schemes ({SchemeManager.Schemes!.Count}) size: {(MemorySizeEstimator.EstimateSize (SchemeManager.Schemes!))} b");
 
-        output.WriteLine ($"Start: Themes dictionary ({ThemeManager.Themes.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"Start: Themes dictionary ({ThemeManager.Themes!.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         Enable (ConfigLocations.HardCoded);
 

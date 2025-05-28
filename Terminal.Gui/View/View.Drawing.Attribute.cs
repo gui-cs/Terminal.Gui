@@ -50,6 +50,14 @@ public partial class View
             return args.NewValue;
         }
 
+        if (HighlightStyle != HighlightStyle.None)
+        {
+            if (MouseHovering && HighlightStyle.HasFlag (HighlightStyle.Hover) && role != VisualRole.Highlight && role != VisualRole.Disabled)
+            {
+                schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
+            }
+        }
+
         return Enabled || role == VisualRole.Disabled ? schemeAttribute : GetAttributeForRole (VisualRole.Disabled);
     }
 

@@ -20,8 +20,8 @@ public static partial class Application // Mouse handling
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
 
-    /// <summary>The current <see cref="View"/> object that wants continuous mouse button pressed events.</summary>
-    public static View? WantContinuousButtonPressedView { get; private set; }
+    /// <summary>Gets <see cref="View"/> that has registered to get continuous mouse button pressed events.</summary>
+    public static View? WantContinuousButtonPressedView { get; internal set; }
 
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
@@ -343,7 +343,10 @@ public static partial class Application // Mouse handling
         return false;
     }
 
-    internal static readonly List<View?> _cachedViewsUnderMouse = new ();
+    /// <summary>
+    ///     INTERNAL: Holds the non-<see cref="ViewportSettings.TransparentMouse"/> views that are currently under the mouse.
+    /// </summary>
+    internal static List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.
@@ -353,7 +356,7 @@ public static partial class Application // Mouse handling
     internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
         // Tell any views that are no longer under the mouse that the mouse has left
-        List<View?> viewsToLeave = _cachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
+        List<View?> viewsToLeave = CachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
 
         foreach (View? view in viewsToLeave)
         {
@@ -363,7 +366,7 @@ public static partial class Application // Mouse handling
             }
 
             view.NewMouseLeaveEvent ();
-            _cachedViewsUnderMouse.Remove (view);
+            CachedViewsUnderMouse.Remove (view);
         }
 
         // Tell any views that are now under the mouse that the mouse has entered and add them to the list
@@ -374,12 +377,12 @@ public static partial class Application // Mouse handling
                 continue;
             }
 
-            if (_cachedViewsUnderMouse.Contains (view))
+            if (CachedViewsUnderMouse.Contains (view))
             {
                 continue;
             }
 
-            _cachedViewsUnderMouse.Add (view);
+            CachedViewsUnderMouse.Add (view);
             var raise = false;
 
             if (view is Adornment { Parent: { } } adornmentView)

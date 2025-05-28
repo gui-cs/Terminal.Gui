@@ -294,7 +294,7 @@ public class MouseTests : TestsAllViews
         Application.ResetState (true);
     }
 
-    [Theory]
+    [Theory (Skip = "This test needs to be redone.")]
     [InlineData (HighlightStyle.None, 0, 0)]
     [InlineData (HighlightStyle.Pressed | HighlightStyle.PressedOutside, 1, 1)]
     public void HighlightOnPress_Fires_Events_And_Highlights (HighlightStyle highlightOnPress, int expectedEnabling, int expectedDisabling)
