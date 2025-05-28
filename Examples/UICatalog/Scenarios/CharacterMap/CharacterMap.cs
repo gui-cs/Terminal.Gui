@@ -33,8 +33,7 @@ public class CharacterMap : Scenario
 
         var top = new Window
         {
-            BorderStyle = LineStyle.None,
-            //SchemeName = "Dialog"
+            BorderStyle = LineStyle.None
         };
 
         _charMap = new ()
