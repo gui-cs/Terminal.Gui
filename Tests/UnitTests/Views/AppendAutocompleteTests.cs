@@ -10,6 +10,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
     public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
     {
         TextField tf = GetTextFieldsInViewSuggesting ("fish");
+
         // f is typed and suggestion is "fish"
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         View.SetClipToScreen ();
@@ -167,7 +168,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new List<string> { "FISH" };
+        generator.AllSuggestions = new() { "FISH" };
 
         View.SetClipToScreen ();
         tf.Draw ();
@@ -205,7 +206,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new List<string> { "fish" };
+        generator.AllSuggestions = new() { "fish" };
 
         View.SetClipToScreen ();
         tf.Draw ();
@@ -213,7 +214,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
-        tf.NewKeyDownEvent (new Key ('f'));
+        tf.NewKeyDownEvent (new ('f'));
 
         View.SetClipToScreen ();
         tf.Draw ();
