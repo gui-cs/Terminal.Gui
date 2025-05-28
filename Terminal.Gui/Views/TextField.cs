@@ -995,7 +995,6 @@ public class TextField : View
 
         RenderCaption ();
 
-        DrawAutocomplete ();
         _isDrawing = false;
 
         return true;
@@ -1688,6 +1687,8 @@ public class TextField : View
         }
 
         GenerateSuggestions ();
+
+        DrawAutocomplete ();
     }
 
     private void DrawAutocomplete ()

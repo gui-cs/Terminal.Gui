@@ -43,7 +43,7 @@ public abstract class AutocompleteBase : IAutocomplete
     public virtual Key CloseKey { get; set; } = Key.Esc;
 
     /// <inheritdoc/>
-    public virtual Key Reopen { get; set; } = Key.Space.WithCtrl.WithAlt;
+    public virtual Key Reopen { get; set; } = Key.Space.WithShift;
 
     /// <inheritdoc/>
     public virtual AutocompleteContext Context { get; set; }

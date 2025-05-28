@@ -285,7 +285,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         if (PopupInsideContainer)
         {
             // don't overspill vertically
-            height = Math.Min (HostControl.Viewport.Height - renderAt.Y, MaxHeight);
+            height = Math.Min (Math.Min (HostControl!.Viewport.Height - renderAt.Y, MaxHeight), Suggestions.Count);
 
             // There is no space below, lets see if can popup on top
             if (height < Suggestions.Count && HostControl.Viewport.Height - renderAt.Y >= height)
@@ -419,8 +419,9 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         ClearSuggestions ();
         Visible = false;
         _closed = true;
-        HostControl?.SetNeedsDraw ();
         //RemovePopupFromTop ();
+        _popup.Visible = false;
+        HostControl?.SetNeedsDraw ();
     }
 
     /// <summary>Deletes the text backwards before insert the selected text in the <see cref="HostControl"/>.</summary>
@@ -507,6 +508,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             Visible = true;
             _closed = false;
+            _popup.Visible = true;
             HostControl?.SetNeedsDraw ();
 
             return true;
