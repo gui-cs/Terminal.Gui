@@ -699,7 +699,7 @@ At 0,0
         view.Frame = new (3, 3, 10, 1);
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         //Application.Refresh();
         top.Draw ();
 
@@ -751,7 +751,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         View.SetClipToScreen ();
         top.Draw ();
 
@@ -800,7 +800,7 @@ At 0,0
         view.Frame = new (1, 1, 10, 1);
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         top.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -850,7 +850,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         View.SetClipToScreen ();
 
         top.Draw ();

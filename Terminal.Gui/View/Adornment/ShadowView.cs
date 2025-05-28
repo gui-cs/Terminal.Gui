@@ -168,7 +168,7 @@ internal class ShadowView : View
         // use the Normal attribute from the View under the shadow.
         if (newAttribute.Background== Color.DarkGray)
         {
-            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location);
+            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettings.Transparent);
             View? underView = currentViewsUnderMouse!.LastOrDefault ();
             attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 

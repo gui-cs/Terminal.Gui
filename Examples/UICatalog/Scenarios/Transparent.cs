@@ -138,7 +138,7 @@ public sealed class Transparent : Scenario
             //Padding.Thickness = new (1);
             //Padding.SchemeName = "Error";
 
-            Margin.Thickness = new (1);
+            Margin!.Thickness = new (1);
            // Margin.ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
         }
 

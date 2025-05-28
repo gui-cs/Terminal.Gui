@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Frozen;
 using ColorHelper;
 
@@ -8,7 +9,7 @@ internal static class ColorExtensions
     // TODO: This should be refactored to support all W3CColors (`ColorStrings` and this should be merged).
     // TODO: ColorName and AnsiColorCode are only needed when a driver is in Force16Color mode and we
     // TODO: should be able to remove these from any non-Driver-specific usages.
-    private static FrozenDictionary<Color, ColorName16> colorToNameMap;
+    private static FrozenDictionary<Color, ColorName16>? _colorToNameMap;
 
     static ColorExtensions ()
     {
@@ -59,7 +60,7 @@ internal static class ColorExtensions
     internal static FrozenDictionary<ColorName16, AnsiColorCode> ColorName16ToAnsiColorMap { get; }
 
     /// <summary>Reverse mapping for <see cref="ColorToName16Map"/>.</summary>
-    internal static FrozenDictionary<ColorName16, Color> ColorName16ToColorMap { get; private set; }
+    internal static FrozenDictionary<ColorName16, Color>? ColorName16ToColorMap { get; private set; }
 
     /// <summary>
     ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the
@@ -69,15 +70,18 @@ internal static class ColorExtensions
     ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is
     ///     expensive to create.
     /// </remarks>
-    internal static FrozenDictionary<Color, ColorName16> ColorToName16Map
+    internal static FrozenDictionary<Color, ColorName16>? ColorToName16Map
     {
-        get => colorToNameMap;
+        get => _colorToNameMap;
         set
         {
-            colorToNameMap = value;
+            _colorToNameMap = value;
 
             //Also be sure to set the reverse mapping
-            ColorName16ToColorMap = value.ToFrozenDictionary (static kvp => kvp.Value, static kvp => kvp.Key);
+            if (value is { })
+            {
+                ColorName16ToColorMap = value.ToFrozenDictionary (static kvp => kvp.Value, static kvp => kvp.Key);
+            }
         }
     }
 }

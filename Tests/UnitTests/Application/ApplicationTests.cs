@@ -384,7 +384,7 @@ public class ApplicationTests
         //Application.WantContinuousButtonPressedView = new View ();
 
         // Mouse
-        Application._lastMousePosition = new Point (1, 1);
+        Application.LastMousePosition = new Point (1, 1);
 
         Application.Navigation = new ();
 

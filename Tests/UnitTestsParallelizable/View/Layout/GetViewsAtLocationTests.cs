@@ -27,7 +27,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsEmpty_WhenRootIsNotVisible ()
     {
-        var root = new TestView (0, 0, 10, 10, visible: false);
+        TestView root = new (0, 0, 10, 10, visible: false);
         var result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Empty (result);
     }
@@ -35,7 +35,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsEmpty_WhenPointOutsideRoot ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var result = View.GetViewsAtLocation (root, new Point (20, 20));
         Assert.Empty (result);
     }
@@ -44,8 +44,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsEmpty_WhenPointOutsideRoot_AndSubview ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (5, 5, 2, 2);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (5, 5, 2, 2);
         root.Add (sub);
         var result = View.GetViewsAtLocation (root, new Point (20, 20));
         Assert.Empty (result);
@@ -54,7 +54,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_WhenPointInsideRoot_NoSubviews ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
@@ -64,9 +64,9 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_And_Subview_WhenPointInsideRootMargin ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Margin.Thickness = new (1);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        root.Margin!.Thickness = new (1);
+        TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
         var result = View.GetViewsAtLocation (root, new Point (3, 3));
         Assert.Equal (2, result.Count);
@@ -77,9 +77,9 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_And_Subview_Border_WhenPointInsideRootMargin ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Margin.Thickness = new (1);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        root.Margin!.Thickness = new (1);
+        TestView sub = new (2, 2, 5, 5);
         sub.BorderStyle = LineStyle.Dotted;
         root.Add (sub);
         var result = View.GetViewsAtLocation (root, new Point (3, 3));
@@ -93,8 +93,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_And_Margin_WhenPointInside_With_Margin ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Margin.Thickness = new (1);
+        TestView root = new (0, 0, 10, 10);
+        root.Margin!.Thickness = new (1);
         var result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -104,12 +104,12 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_WhenPointOutsideSubview_With_Margin ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Margin.Thickness = new (1);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        root.Margin!.Thickness = new (1);
+        TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
-        var result = View.GetViewsAtLocation (root, new Point (2, 2));
-        Assert.Equal (1, result.Count);
+        List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
+        Assert.Single (result);
         Assert.Equal (root, result [0]);
 
         result = View.GetViewsAtLocation (root, new Point (0, 0));
@@ -118,11 +118,11 @@ public class GetViewsAtLocationTests
         Assert.Equal (root.Margin, result [1]);
 
         result = View.GetViewsAtLocation (root, new Point (1, 1));
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (root, result [0]);
 
         result = View.GetViewsAtLocation (root, new Point (8, 8));
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
 
@@ -130,8 +130,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_And_Border_WhenPointInside_With_Border ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Border.Thickness = new (1);
+        TestView root = new (0, 0, 10, 10);
+        root.Border!.Thickness = new (1);
         var result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -141,12 +141,12 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_WhenPointOutsideSubview_With_Border ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Border.Thickness = new (1);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        root.Border!.Thickness = new (1);
+        TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
         var result = View.GetViewsAtLocation (root, new Point (2, 2));
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (root, result [0]);
 
         result = View.GetViewsAtLocation (root, new Point (0, 0));
@@ -155,19 +155,19 @@ public class GetViewsAtLocationTests
         Assert.Equal (root.Border, result [1]);
 
         result = View.GetViewsAtLocation (root, new Point (1, 1));
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (root, result [0]);
 
         result = View.GetViewsAtLocation (root, new Point (8, 8));
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
 
     [Fact]
     public void ReturnsRoot_And_Border_WhenPointInsideRootBorder ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Border.Thickness = new (1);
+        TestView root = new (0, 0, 10, 10);
+        root.Border!.Thickness = new (1);
         var result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -177,8 +177,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_And_Padding_WhenPointInsideRootPadding ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        root.Padding.Thickness = new (1);
+        TestView root = new (0, 0, 10, 10);
+        root.Padding!.Thickness = new (1);
         var result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -188,8 +188,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRootAndSubview_WhenPointInsideSubview ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
 
         var result = View.GetViewsAtLocation (root, new Point (3, 3));
@@ -201,8 +201,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRootAndSubviewAndMargin_WhenPointInsideSubviewMargin ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         sub.Margin!.Thickness = new (1);
         root.Add (sub);
 
@@ -216,8 +216,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRootAndSubviewAndBorder_WhenPointInsideSubviewBorder ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         sub.Border!.Thickness = new (1);
         root.Add (sub);
 
@@ -231,8 +231,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRootAndSubviewAndSubviewAndBorder_WhenPointInsideSubviewBorder ()
     {
-        var root = new TestView (2, 2, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (2, 2, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         sub.Border!.Thickness = new (1);
         root.Add (sub);
 
@@ -246,8 +246,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRootAndSubviewAndBorder_WhenPointInsideSubviewPadding ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         sub.Padding!.Thickness = new (1);
         root.Add (sub);
 
@@ -261,8 +261,8 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRootAndSubviewAndMarginAndShadowView_WhenPointInsideSubviewMargin ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         sub.ShadowStyle = ShadowStyle.Opaque;
         root.Add (sub);
 
@@ -274,14 +274,14 @@ public class GetViewsAtLocationTests
         Assert.Equal (sub, result [1]);
         Assert.Equal (sub.Margin, result [2]);
         Assert.Equal (sub.Margin!.SubViews.ElementAt (0), result [3]);
-        Assert.Equal (sub.Margin.SubViews.ElementAt (1), result [4]);
+        Assert.Equal (sub.Margin!.SubViews.ElementAt (1), result [4]);
     }
 
     [Fact]
     public void ReturnsRootAndSubviewAndBorderAndButton_WhenPointInsideSubviewBorder ()
     {
-        var root = new TestView (0, 0, 10, 10);
-        var sub = new TestView (2, 2, 5, 5);
+        TestView root = new (0, 0, 10, 10);
+        TestView sub = new (2, 2, 5, 5);
         sub.Border!.Thickness = new (1);
 
         Button closeButton = new Button ()
@@ -295,7 +295,7 @@ public class GetViewsAtLocationTests
             Y= 0,
             ShadowStyle = ShadowStyle.None
         };
-        sub.Border.Add (closeButton);
+        sub.Border!.Add (closeButton);
         root.Add (sub);
 
         root.Layout ();
@@ -311,7 +311,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsDeepestSubview_WhenNested ()
     {
-        var root = new TestView (0, 0, 20, 20);
+        TestView root = new (0, 0, 20, 20);
         var sub1 = new TestView (2, 2, 16, 16);
         var sub2 = new TestView (3, 3, 10, 10);
         var sub3 = new TestView (1, 1, 5, 5);
@@ -331,7 +331,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsTopmostSubview_WhenOverlapping ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var sub1 = new TestView (2, 2, 6, 6);
         var sub2 = new TestView (4, 4, 6, 6);
         root.Add (sub1);
@@ -347,7 +347,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsTopmostSubview_WhenNotOverlapping ()
     {
-        var root = new TestView (0, 0, 10, 10);// under 5,5,
+        TestView root = new (0, 0, 10, 10);// under 5,5,
         var sub1 = new TestView (10, 10, 6, 6); // not under location 5,5
         var sub2 = new TestView (4, 4, 6, 6); // under 5,5,
         root.Add (sub1);
@@ -362,7 +362,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void SkipsInvisibleSubviews ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var sub1 = new TestView (2, 2, 6, 6, visible: false);
         var sub2 = new TestView (4, 4, 6, 6);
         root.Add (sub1);
@@ -377,7 +377,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_WhenPointOnEdge ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
@@ -386,7 +386,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsRoot_WhenPointOnBottomRightCorner ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var result = View.GetViewsAtLocation (root, new Point (9, 9));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
@@ -395,7 +395,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsEmpty_WhenAllSubviewsInvisible ()
     {
-        var root = new TestView (0, 0, 10, 10);
+        TestView root = new (0, 0, 10, 10);
         var sub1 = new TestView (2, 2, 6, 6, visible: false);
         root.Add (sub1);
 

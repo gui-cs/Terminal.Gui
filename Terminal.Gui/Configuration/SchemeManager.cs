@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -15,8 +16,12 @@ namespace Terminal.Gui;
 /// </summary>
 public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _schemesLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
     internal static void ResetToHardCodedDefaults ()
     {
         SetSchemes (GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase));
@@ -27,7 +32,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    public static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
+    public static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes ()!; }
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
@@ -38,6 +43,8 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     public static Dictionary<string, Scheme?>? Schemes
     {
         get => GetSchemes ();
+        [RequiresUnreferencedCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
+        [RequiresDynamicCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
         private set => SetSchemes (value);
     }
 
@@ -55,6 +62,8 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     }
 
     /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     private static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
         lock (_schemesLock)
@@ -172,7 +181,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             if (!ConfigurationManager.IsInitialized ())
             {
-                Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
+                Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase)!;
 
                 return hardCoded;
             }

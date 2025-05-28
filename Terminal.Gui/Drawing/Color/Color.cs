@@ -107,7 +107,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap [colorName]; }
+    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap! [colorName]; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See
@@ -138,7 +138,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         get =>
 
             // Transform _colorToNameMap into a Dictionary<ColorNames,string>
-            ColorExtensions.ColorToName16Map.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
+            ColorExtensions.ColorToName16Map!.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
         set
         {
             // Transform Dictionary<ColorNames,string> into _colorToNameMap
@@ -231,7 +231,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     [SkipLocalsInit]
     internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
     {
-        return ColorExtensions.ColorToName16Map.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
+        return ColorExtensions.ColorToName16Map!.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
     }
 
     /// <summary>Converts the given color value to exact named color represented by <see cref="ColorName16"/>.</summary>
@@ -240,7 +240,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <returns>True if conversion succeeded; otherwise false.</returns>
     internal static bool TryGetExactNamedColor16 (Color inputColor, out ColorName16 colorName16)
     {
-        return ColorExtensions.ColorToName16Map.TryGetValue (inputColor, out colorName16);
+        return ColorExtensions.ColorToName16Map!.TryGetValue (inputColor, out colorName16);
     }
 
     [SkipLocalsInit]
@@ -282,27 +282,25 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </code>
     /// </example>
 
-    public Color GetHighlightColor ()
+    public Color GetHighlightColor (double lightenAmount = 0.2)
     {
         HSL? hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
-        const double BRIGHTEN_AMOUNT = 0.25;
-        const double DARKEN_AMOUNT = 0.25;
 
         double lNorm = hsl.L / 255.0;
         double newL;
 
         if (lNorm < 0.5)
         {
-            newL = Math.Min (1.0, lNorm + BRIGHTEN_AMOUNT);
+            newL = Math.Min (1.0, lNorm + lightenAmount);
         }
         else
         {
-            newL = Math.Max (0.0, lNorm - DARKEN_AMOUNT);
+            newL = Math.Max (0.0, lNorm - lightenAmount);
         }
 
         if (Math.Abs (newL - lNorm) < 0.1)
         {
-            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * BRIGHTEN_AMOUNT) : Math.Max (0.0, lNorm - 2 * DARKEN_AMOUNT);
+            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * lightenAmount) : Math.Max (0.0, lNorm - 2 * lightenAmount);
         }
 
         HSL newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));

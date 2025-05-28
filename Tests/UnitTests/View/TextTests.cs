@@ -688,8 +688,8 @@ w ";
         lbl.Layout ();
 
         Assert.Equal (new (0, 0, 2, 1), lbl.Frame);
-        Assert.Equal (new (0, 0, 2, 1), lbl._needsDrawRect);
-        Assert.Equal (new (0, 0, 80, 25), lbl.SuperView._needsDrawRect);
+        Assert.Equal (new (0, 0, 2, 1), lbl.NeedsDrawRect);
+        Assert.Equal (new (0, 0, 80, 25), lbl.SuperView.NeedsDrawRect);
         Assert.True (lbl.SuperView.NeedsLayout);
         Application.RunIteration (ref rs);
 

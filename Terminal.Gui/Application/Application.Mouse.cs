@@ -6,12 +6,15 @@ namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
 {
-    internal static Point? _lastMousePosition;
+    /// <summary>
+    /// INTERNAL API: Holds the last mouse position.
+    /// </summary>
+    internal static Point? LastMousePosition { get; set; }
 
     /// <summary>
     ///     Gets the most recent position of the mouse.
     /// </summary>
-    public static Point? GetLastMousePosition () { return _lastMousePosition; }
+    public static Point? GetLastMousePosition () { return LastMousePosition; }
 
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -136,7 +139,7 @@ public static partial class Application // Mouse handling
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
     internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
-        _lastMousePosition = mouseEvent.ScreenPosition;
+        LastMousePosition = mouseEvent.ScreenPosition;
 
         if (IsMouseDisabled)
         {
@@ -147,7 +150,7 @@ public static partial class Application // Mouse handling
         //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (mouseEvent.ScreenPosition);
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettings.TransparentMouse);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse.LastOrDefault ();
 

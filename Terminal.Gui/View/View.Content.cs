@@ -6,8 +6,8 @@ public partial class View
     #region Content Area
 
     // nullable holder of developer specified Content Size. If null then the developer did not
-    // explicitly set it and contentsize will be calculated dynamically.
-    internal Size? _contentSize;
+    // explicitly set it and the content size will be calculated dynamically.
+    private Size? _contentSize;
 
     /// <summary>
     ///     Sets the size of the View's content.

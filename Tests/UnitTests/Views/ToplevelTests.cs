@@ -568,7 +568,7 @@ public class ToplevelTests
 
         void ViewLayoutStarted (object sender, LayoutEventArgs e)
         {
-            Assert.Equal (new (0, 0, 20, 10), view._needsDrawRect);
+            Assert.Equal (new (0, 0, 20, 10), view.NeedsDrawRect);
             view.SubViewLayout -= ViewLayoutStarted;
         }
 
@@ -580,12 +580,12 @@ public class ToplevelTests
 
         view.Frame = new (1, 3, 10, 5);
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new (0, 0, 10, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 5), view.NeedsDrawRect);
 
         view.Frame = new (1, 3, 10, 5);
         top.Layout ();
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new (0, 0, 10, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 5), view.NeedsDrawRect);
         top.Dispose ();
     }
 

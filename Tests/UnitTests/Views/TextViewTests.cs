@@ -8276,7 +8276,7 @@ Line 2.",
         DriverAssert.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
         Assert.True (_textView.NewKeyDownEvent (Key.H.WithShift));
-        Assert.NotEqual (Rectangle.Empty, _textView._needsDrawRect);
+        Assert.NotEqual (Rectangle.Empty, _textView.NeedsDrawRect);
         Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (

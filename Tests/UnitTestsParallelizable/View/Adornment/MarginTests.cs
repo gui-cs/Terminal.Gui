@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class MarginTests (ITestOutputHelper output)
+public class MarginTests
 {
     [Fact]
     public void Is_Visually_Transparent ()

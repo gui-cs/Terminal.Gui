@@ -707,7 +707,7 @@ public partial class View // Drawing APIs
     //      TODO: If Empty, it means no need to redraw
     //      TODO: If not Empty, it means the region that needs to be redrawn
     // The viewport-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rectangle _needsDrawRect = Rectangle.Empty;
+    internal Rectangle NeedsDrawRect { get; set; } = Rectangle.Empty;
 
     /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
     /// <remarks>
@@ -722,7 +722,7 @@ public partial class View // Drawing APIs
     public bool NeedsDraw
     {
         // TODO: Figure out if we can decouple NeedsDraw from NeedsLayout.
-        get => Visible && (_needsDrawRect != Rectangle.Empty || NeedsLayout);
+        get => Visible && (NeedsDrawRect != Rectangle.Empty || NeedsLayout);
         set
         {
             if (value)
@@ -748,7 +748,7 @@ public partial class View // Drawing APIs
     {
         Rectangle viewport = Viewport;
 
-        if (!Visible || (_needsDrawRect != Rectangle.Empty && viewport.IsEmpty))
+        if (!Visible || (NeedsDrawRect != Rectangle.Empty && viewport.IsEmpty))
         {
             // This handles the case where the view has not been initialized yet
             return;
@@ -775,9 +775,9 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (_needsDrawRect.IsEmpty)
+        if (NeedsDrawRect.IsEmpty)
         {
-            _needsDrawRect = viewPortRelativeRegion;
+            NeedsDrawRect = viewPortRelativeRegion;
         }
         else
         {
@@ -785,7 +785,7 @@ public partial class View // Drawing APIs
             int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
             int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
             int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
-            _needsDrawRect = new (x, y, w, h);
+            NeedsDrawRect = new (x, y, w, h);
         }
 
         // Do not set on Margin - it will be drawn in a separate pass.
@@ -844,7 +844,7 @@ public partial class View // Drawing APIs
     /// <summary>Clears <see cref="NeedsDraw"/> and <see cref="SubViewNeedsDraw"/>.</summary>
     protected void ClearNeedsDraw ()
     {
-        _needsDrawRect = Rectangle.Empty;
+        NeedsDrawRect = Rectangle.Empty;
         SubViewNeedsDraw = false;
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty)

@@ -116,7 +116,7 @@ public partial class View // Mouse APIs
 
     /// <summary>
     ///     Gets the <see cref="Scheme"/> to use when the view is highlighted. The highlight colorscheme
-    ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetHighlightColor()"/>.
+    ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetHighlightColor"/>.
     /// </summary>
     /// <remarks>The highlight scheme.</remarks>
     public Scheme GetHighlightScheme ()

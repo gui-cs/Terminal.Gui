@@ -12,7 +12,7 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (5, 5), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (5, 5), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
     }
 
@@ -23,7 +23,7 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (20, 20), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (20, 20), ViewportSettings.TransparentMouse);
         Assert.Empty (result);
     }
 
@@ -40,7 +40,7 @@ public class GetViewsUnderLocationForRootTests
             X = 2, Y = 2, Width = 5, Height = 5
         };
         top.Add (sub);
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (3, 3), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (3, 3), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (sub, result);
         Assert.Equal (sub, result.Last ());
@@ -60,11 +60,11 @@ public class GetViewsUnderLocationForRootTests
             ViewportSettings = ViewportSettings.TransparentMouse
         };
         top.Add (sub);
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (3, 3), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (3, 3), ViewportSettings.TransparentMouse);
         Assert.Single (result);
         Assert.Contains (top, result);
 
-        result = View.GetViewsUnderLocationForRoot (top, new (3, 3), true);
+        result = View.GetViewsUnderLocation (top, new (3, 3), ViewportSettings.None);
         Assert.Equal (2, result.Count);
         Assert.Contains (top, result);
         Assert.Contains (sub, result);
@@ -77,9 +77,9 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        top.Margin.Thickness = new (1);
-        top.Margin.ViewportSettings = ViewportSettings.None;
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (0, 0), false);
+        top.Margin!.Thickness = new (1);
+        top.Margin!.ViewportSettings = ViewportSettings.None;
+        List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Margin, result);
     }
@@ -91,9 +91,9 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        top.Margin.Thickness = new (1);
-        top.Margin.ViewportSettings = ViewportSettings.TransparentMouse;
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (0, 0), false);
+        top.Margin!.Thickness = new (1);
+        top.Margin!.ViewportSettings = ViewportSettings.TransparentMouse;
+        List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettings.TransparentMouse);
         Assert.DoesNotContain (top, result);
         Assert.DoesNotContain (top.Margin, result);
     }
@@ -105,9 +105,9 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        top.Margin.Thickness = new (1);
-        top.Margin.ViewportSettings = ViewportSettings.None;
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (0, 0), false);
+        top.Margin!.Thickness = new (1);
+        top.Margin!.ViewportSettings = ViewportSettings.None;
+        List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Margin, result);
     }
@@ -119,8 +119,8 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        top.Border.Thickness = new (1);
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (0, 0), false);
+        top.Border!.Thickness = new (1);
+        List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Border, result);
     }
@@ -132,10 +132,10 @@ public class GetViewsUnderLocationForRootTests
         {
             Frame = new (0, 0, 10, 10)
         };
-        top.Border.Thickness = new (1);
-        top.Padding.Thickness = new (1);
+        top.Border!.Thickness = new (1);
+        top.Padding!.Thickness = new (1);
         top.Layout ();
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (1, 1), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (1, 1), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Padding, result);
     }
@@ -148,10 +148,10 @@ public class GetViewsUnderLocationForRootTests
             Frame = new (0, 0, 10, 10),
             ViewportSettings = ViewportSettings.TransparentMouse
         };
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (5, 5), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (5, 5), ViewportSettings.TransparentMouse);
         Assert.Empty (result);
 
-        result = View.GetViewsUnderLocationForRoot (top, new (5, 5), true);
+        result = View.GetViewsUnderLocation (top, new (5, 5), ViewportSettings.None);
         Assert.NotEmpty (result);
     }
 
@@ -174,7 +174,7 @@ public class GetViewsUnderLocationForRootTests
         };
         sub1.Add (sub2);
         top.Add (sub1);
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (3, 3), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (3, 3), ViewportSettings.TransparentMouse);
         Assert.Contains (sub2, result);
         Assert.Equal (sub2, result.Last ());
     }
@@ -192,18 +192,18 @@ public class GetViewsUnderLocationForRootTests
             Frame = new (0, 0, 5, 5)
         };
         subView.Margin!.Thickness = new (1);
-        subView.Margin.ViewportSettings = ViewportSettings.None;
+        subView.Margin!.ViewportSettings = ViewportSettings.None;
         top.Add (subView);
 
         Assert.True (subView.Contains (new Point (4, 4)));
-        List<View?> result = View.GetViewsUnderLocationForRoot (top, new (4, 4), false);
+        List<View?> result = View.GetViewsUnderLocation (top, new (4, 4), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (subView.Margin, result);
         Assert.Contains (subView, result);
 
-        subView.Margin.ViewportSettings = ViewportSettings.TransparentMouse;
+        subView.Margin!.ViewportSettings = ViewportSettings.TransparentMouse;
 
-        result = View.GetViewsUnderLocationForRoot (top, new (4, 4), false);
+        result = View.GetViewsUnderLocation (top, new (4, 4), ViewportSettings.TransparentMouse);
         Assert.Contains (top, result);
         Assert.DoesNotContain (subView.Margin, result);
         Assert.DoesNotContain (subView, result);
@@ -257,7 +257,7 @@ public class GetViewsUnderLocationForRootTests
         adornment.ViewportSettings = ViewportSettings.None;
 
         // Act: Point inside adornmentSubView (which is inside the adornment)
-        var result = View.GetViewsUnderLocationForRoot (top, new (0, 0), false);
+        var result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettings.TransparentMouse);
 
         // Assert: Should contain top, subView, adornment, and adornmentSubView
         Assert.Contains (top, result);
@@ -320,7 +320,7 @@ public class GetViewsUnderLocationForRootTests
         adornment.ViewportSettings = ViewportSettings.TransparentMouse;
 
         // Act: Point inside adornmentSubView (which is inside the adornment)
-        var result = View.GetViewsUnderLocationForRoot (top, new (0, 0), false);
+        var result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettings.TransparentMouse);
 
         // Assert: Should contain top, subView, adornment, and adornmentSubView
         Assert.Contains (top, result);
