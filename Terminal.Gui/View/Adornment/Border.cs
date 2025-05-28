@@ -256,7 +256,7 @@ public class Border : Adornment
 
             var cs = new Scheme (GetScheme ())
             {
-                Normal = new (GetScheme ().Normal.Foreground.GetHighlightColor (), 
+                Normal = new (GetScheme ().Normal.Foreground.GetBrighterColor (), 
                               GetScheme ().Normal.Background,
                               GetScheme ().Normal.Style)
             };

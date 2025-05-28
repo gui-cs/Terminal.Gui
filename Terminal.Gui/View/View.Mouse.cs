@@ -116,7 +116,7 @@ public partial class View // Mouse APIs
 
     /// <summary>
     ///     Gets the <see cref="Scheme"/> to use when the view is highlighted. The highlight colorscheme
-    ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetHighlightColor"/>.
+    ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetBrighterColor"/>.
     /// </summary>
     /// <remarks>The highlight scheme.</remarks>
     public Scheme GetHighlightScheme ()
@@ -126,19 +126,19 @@ public partial class View // Mouse APIs
         return cs with
         {
             Normal = new (
-                          GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (),
+                          GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor (),
                           GetAttributeForRole (VisualRole.Normal).Background,
                           GetAttributeForRole (VisualRole.Normal).Style),
             HotNormal = new (
-                             GetAttributeForRole (VisualRole.HotNormal).Foreground.GetHighlightColor (),
+                             GetAttributeForRole (VisualRole.HotNormal).Foreground.GetBrighterColor (),
                              GetAttributeForRole (VisualRole.HotNormal).Background,
                              GetAttributeForRole (VisualRole.HotNormal).Style),
             Focus = new (
-                         GetAttributeForRole (VisualRole.Focus).Foreground.GetHighlightColor (),
+                         GetAttributeForRole (VisualRole.Focus).Foreground.GetBrighterColor (),
                          GetAttributeForRole (VisualRole.Focus).Background,
                          GetAttributeForRole (VisualRole.Focus).Style),
             HotFocus = new (
-                            GetAttributeForRole (VisualRole.HotFocus).Foreground.GetHighlightColor (),
+                            GetAttributeForRole (VisualRole.HotFocus).Foreground.GetBrighterColor (),
                             GetAttributeForRole (VisualRole.HotFocus).Background,
                             GetAttributeForRole (VisualRole.HotFocus).Style)
         };
@@ -757,8 +757,8 @@ public partial class View // Mouse APIs
                     {
                         // Highlight the foreground focus color
                         Focus = new (
-                                     GetScheme ().Focus.Foreground.GetHighlightColor (),
-                                     GetScheme ().Focus.Background.GetHighlightColor (),
+                                     GetScheme ().Focus.Foreground.GetBrighterColor (),
+                                     GetScheme ().Focus.Background.GetBrighterColor (),
                                      GetScheme ().Focus.Style)
                     };
                     SetScheme (cs);

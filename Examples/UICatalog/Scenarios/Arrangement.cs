@@ -177,12 +177,17 @@ public class Arrangement : Scenario
             Y = 17,
             Id = "datePicker",
             Title = "Not _Sizeable",
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel),
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
+
+        datePicker.SetScheme (new Scheme (
+                                          new Attribute (
+                                                         SchemeManager.GetScheme (Schemes.Toplevel).Normal.Foreground.GetBrighterColor (),
+                                                         SchemeManager.GetScheme (Schemes.Toplevel).Normal.Background.GetBrighterColor (),
+                                                         SchemeManager.GetScheme (Schemes.Toplevel).Normal.Style)));
 
         TransparentView transparentView = new ()
         {
@@ -260,8 +265,6 @@ public class Arrangement : Scenario
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Resizable
-
-            //            SuperViewRendersLineCanvas = true
         };
 
         return tiled;

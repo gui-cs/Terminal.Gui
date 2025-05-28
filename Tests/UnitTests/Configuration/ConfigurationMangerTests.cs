@@ -586,7 +586,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Load (ConfigLocations.LibraryResources);
 
             // Spot check
-            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+            Assert.Equal (Key.Esc, Settings! ["Application.QuitKey"].PropertyValue as Key);
             Assert.Equal (10000, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             Assert.NotEmpty (ThemeManager.Themes!);

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using ColorHelper;
+using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
 
@@ -146,7 +147,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
             return;
 
-            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new Color (kvp.Value); }
+            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new (kvp.Value); }
 
             static ColorName16 GetColorToNameMapValue (KeyValuePair<ColorName16, string> kvp)
             {
@@ -172,7 +173,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     will return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     Get returns the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> of the closest 24-bit color value. Set
+    ///     sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
     public ColorName16 GetClosestNamedColor16 () { return GetClosestNamedColor16 (this); }
@@ -247,116 +249,124 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
 
     /// <summary>
-    /// Returns a color with the same hue and saturation as this color, but with a significantly different lightness,
-    /// making it suitable for use as a highlight or contrast color in UI elements.
+    ///     Returns a color with the same hue and saturation as this color, but with a significantly different lightness,
+    ///     making it suitable for use as a highlight or contrast color in UI elements.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This method brightens the color if it is dark, or darkens it if it is light, ensuring the result is visually distinct
-    /// from the original. The algorithm works in HSL color space and adjusts the lightness channel:
-    /// <list type="bullet">
-    ///   <item>
-    ///     <description>If the color is dark (lightness &lt; 0.5), the lightness is increased (brightened).</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>If the color is light (lightness &gt;= 0.5), the lightness is decreased (darkened).</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>If the adjustment resulted in a color too close to the original, a larger adjustment is made.</description>
-    ///   </item>
-    /// </list>
-    /// This ensures the returned color is always visually distinct and suitable for highlighting or selection states.
-    /// </para>
-    /// <para>
-    /// The returned color will always have the same hue and saturation as the original, but a different lightness.
-    /// </para>
+    ///     <para>
+    ///         This method brightens the color if it is dark, or darkens it if it is light, ensuring the result is visually
+    ///         distinct
+    ///         from the original. The algorithm works in HSL color space and adjusts the lightness channel:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If the color is dark (lightness &lt; 0.5), the lightness is increased (brightened).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>If the color is light (lightness &gt;= 0.5), the lightness is decreased (darkened).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the adjustment resulted in a color too close to the original, a larger adjustment is
+    ///                     made.
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///         This ensures the returned color is always visually distinct and suitable for highlighting or selection states.
+    ///     </para>
+    ///     <para>
+    ///         The returned color will always have the same hue and saturation as the original, but a different lightness.
+    ///     </para>
     /// </remarks>
+    /// <param name="brightenAmount">The percent amount to brighten the color by. The default is <c>20%</c>.</param>
     /// <returns>
-    /// A <see cref="Color"/> instance with the same hue and saturation as this color, but with a contrasting lightness.
+    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a contrasting lightness.
     /// </returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// var baseColor = new Color(100, 100, 100);
     /// var highlight = baseColor.GetHighlightColor();
     /// // highlight will be a lighter or darker version of baseColor, depending on its original lightness.
     /// </code>
     /// </example>
-
-    public Color GetHighlightColor (double lightenAmount = 0.2)
+    public Color GetBrighterColor (double brightenAmount = 0.2)
     {
-        HSL? hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
+        HSL? hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
         double lNorm = hsl.L / 255.0;
         double newL;
 
         if (lNorm < 0.5)
         {
-            newL = Math.Min (1.0, lNorm + lightenAmount);
+            newL = Math.Min (1.0, lNorm + brightenAmount);
         }
         else
         {
-            newL = Math.Max (0.0, lNorm - lightenAmount);
+            newL = Math.Max (0.0, lNorm - brightenAmount);
         }
 
         if (Math.Abs (newL - lNorm) < 0.1)
         {
-            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * lightenAmount) : Math.Max (0.0, lNorm - 2 * lightenAmount);
+            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * brightenAmount) : Math.Max (0.0, lNorm - 2 * brightenAmount);
         }
 
-        HSL newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
-        RGB? rgb = ColorHelper.ColorConverter.HslToRgb (newHsl);
-        return new Color (rgb.R, rgb.G, rgb.B);
+        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        RGB? rgb = ColorConverter.HslToRgb (newHsl);
+
+        return new (rgb.R, rgb.G, rgb.B);
     }
 
-
     /// <summary>
-    /// Returns a color with the same hue and saturation as this color, but with a significantly lower lightness,
-    /// making it suitable for use as a shadow or background contrast color in UI elements.
+    ///     Returns a color with the same hue and saturation as this color, but with a significantly lower lightness,
+    ///     making it suitable for use as a shadow or background contrast color in UI elements.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This method darkens the color by reducing its lightness in HSL color space:
-    /// <list type="bullet">
-    ///   <item>
-    ///     <description>If the color is already very dark, returns <see cref="ColorName16.DarkGray"/>.</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>Otherwise, reduces the lightness by a fixed amount (default 30%).</description>
-    ///   </item>
-    ///   <item>
-    ///     <description>If the adjustment resulted in a color too close to the original, a larger adjustment is made.</description>
-    ///   </item>
-    /// </list>
-    /// This ensures the returned color is always visually distinct and suitable for shadowing or de-emphasis.
-    /// </para>
+    ///     <para>
+    ///         This method darkens the color by reducing its lightness in HSL color space:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If the color is already very dark, returns <see cref="ColorName16.DarkGray"/>.</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Otherwise, reduces the lightness by a fixed amount (default 30%).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the adjustment resulted in a color too close to the original, a larger adjustment is
+    ///                     made.
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///         This ensures the returned color is always visually distinct and suitable for shadowing or de-emphasis.
+    ///     </para>
     /// </remarks>
+    /// <param name="dimAmount">The percent amount to dim the color by. The default is <c>20%</c>.</param>
     /// <returns>
-    /// A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
+    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
     /// </returns>
-    public Color GetDimColor (double darkenAmount = 0.2)
+    public Color GetDimColor (double dimAmount = 0.2)
     {
-        HSL hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
+        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
         double lNorm = hsl.L / 255.0;
-        double newL = Math.Max (0.0, lNorm - darkenAmount);
+        double newL = Math.Max (0.0, lNorm - dimAmount);
 
         // If the color is already very dark, return a standard dark gray for visibility
         if (lNorm <= 0.1)
         {
-            return new Color (ColorName16.DarkGray);
+            return new (ColorName16.DarkGray);
         }
 
         // If the new lightness is too close to the original, force a bigger change
         if (Math.Abs (newL - lNorm) < 0.1)
         {
-            newL = Math.Max (0.0, lNorm - 2 * darkenAmount);
+            newL = Math.Max (0.0, lNorm - 2 * dimAmount);
         }
 
-        HSL newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
-        RGB rgb = ColorHelper.ColorConverter.HslToRgb (newHsl);
-        return new Color (rgb.R, rgb.G, rgb.B);
-    }
+        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        RGB rgb = ColorConverter.HslToRgb (newHsl);
 
+        return new (rgb.R, rgb.G, rgb.B);
+    }
 
     #region Legacy Color Names
 

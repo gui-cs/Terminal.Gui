@@ -123,7 +123,7 @@ public class RegionScenario : Scenario
                                                                     app.LineCanvas,
                                                                     LineStyle.Dashed,
                                                                     new (
-                                                                         tools.CurrentAttribute!.Value.Foreground.GetHighlightColor (),
+                                                                         tools.CurrentAttribute!.Value.Foreground.GetBrighterColor (),
                                                                          tools.CurrentAttribute!.Value.Background));
                                   }
                               };

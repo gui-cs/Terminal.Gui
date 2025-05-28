@@ -170,7 +170,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         Scheme CreateBase ()
         {
             var highlight = new Color ("LightGray");
-            highlight = highlight.GetHighlightColor ();
+            highlight = highlight.GetBrighterColor ();
 
             return new ()
             {
@@ -398,7 +398,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Active =>
                                    GetAttributeForRoleCore (VisualRole.Focus, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetHighlightColor (),
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetBrighterColor (),
                                        Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
                                        Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold
                                    },
@@ -406,7 +406,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Highlight =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor (),
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetBrighterColor (),
                                        Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
                                        Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Italic
                                    },
@@ -414,7 +414,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Editable =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetHighlightColor (),
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetBrighterColor (),
                                        Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetDimColor ()
                                    },
 

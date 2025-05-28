@@ -111,7 +111,7 @@ public class TrueColors : Scenario
                                           {
                                               Normal = new (
                                                             normal.Foreground,
-                                                            normal.Background.GetHighlightColor ()
+                                                            normal.Background.GetBrighterColor ()
                                                            )
                                           });
                                       }

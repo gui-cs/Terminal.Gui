@@ -31,7 +31,7 @@ public class TextField : View, IDesignable
 
         // TODO: Determine if this is a good choice. Previously this was hard coded to 
         // TODO: DarkGray which was NOT a good choice.
-        CaptionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor();
+        CaptionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
         Height = Dim.Auto (DimAutoStyle.Text, 1);
