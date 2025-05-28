@@ -18,6 +18,8 @@ public class AdornmentsEditor : EditorBase
         ExpanderButton!.Orientation = Orientation.Horizontal;
 
         Initialized += AdornmentsEditor_Initialized;
+
+        SchemeName = "Dialog";
     }
 
     public MarginEditor? MarginEditor { get; set; }

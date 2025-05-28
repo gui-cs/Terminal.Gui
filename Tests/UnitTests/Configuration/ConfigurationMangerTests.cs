@@ -81,6 +81,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         finally
         {
             Disable (true);
+            Application.ResetState (true);
         }
     }
 
@@ -163,6 +164,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Applied -= ConfigurationManagerApplied;
 
         Disable (resetToHardCodedDefaults: true);
+        Application.ResetState (true);
     }
 
     [Fact]
@@ -188,6 +190,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         // clean up
         Updated -= ConfigurationManagerUpdated;
         Disable (true);
+        Application.ResetState (true);
 
         return;
 
@@ -225,6 +228,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         finally
         {
             Disable (true);
+            Application.ResetState (true);
         }
     }
 
@@ -256,6 +260,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         {
             // clean up
             Disable (true);
+            Application.ResetState (true);
         }
     }
 
@@ -285,6 +290,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Updated -= ConfigurationManagerUpdated;
 
             Disable (true);
+            Application.ResetState (true);
         }
 
         return;
@@ -342,6 +348,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         finally
         {
             Disable (true);
+            Application.ResetState (true);
         }
     }
 
@@ -369,6 +376,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         ResetToHardCodedDefaults ();
         Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
         Disable ();
+        Application.ResetState (true);
     }
 
     [Fact]

@@ -48,6 +48,8 @@ public abstract class EditorBase : View
 
         AddCommand (Command.Accept, () => true);
 
+        SchemeName = "Dialog";
+
     }
 
     private readonly ExpanderButton? _expanderButton;

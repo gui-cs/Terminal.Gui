@@ -34,7 +34,7 @@ public class Arrangement : Scenario
 
         app.Add (adornmentsEditor);
 
-        adornmentsEditor.ExpanderButton.Orientation = Orientation.Horizontal;
+        adornmentsEditor!.ExpanderButton!.Orientation = Orientation.Horizontal;
 
         //  adornmentsEditor.ExpanderButton!.Collapsed = true;
 
