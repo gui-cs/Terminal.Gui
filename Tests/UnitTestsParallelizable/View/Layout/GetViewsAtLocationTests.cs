@@ -74,6 +74,21 @@ public class GetViewsAtLocationTests
         Assert.Equal (sub, result [1]);
     }
 
+    [Fact]
+    public void ReturnsRoot_And_Subview_Border_WhenPointInsideRootMargin ()
+    {
+        var root = new TestView (0, 0, 10, 10);
+        root.Margin.Thickness = new (1);
+        var sub = new TestView (2, 2, 5, 5);
+        sub.BorderStyle = LineStyle.Dotted;
+        root.Add (sub);
+        var result = View.GetViewsAtLocation (root, new Point (3, 3));
+        Assert.Equal (3, result.Count);
+        Assert.Equal (root, result [0]);
+        Assert.Equal (sub, result [1]);
+        Assert.Equal (sub.Border, result [2]);
+    }
+
 
     [Fact]
     public void ReturnsRoot_And_Margin_WhenPointInside_With_Margin ()

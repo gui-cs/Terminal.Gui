@@ -1,7 +1,4 @@
 ﻿#nullable enable
-using Microsoft.VisualBasic;
-using System.Diagnostics;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -11,55 +8,16 @@ internal class ShadowView : View
 {
     private ShadowStyle _shadowStyle;
 
-    /// <inheritdoc />
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute newAttribute)
-    {
-        //if (role == VisualRole.Normal)
-        //{
-        //    if (SuperView is not Adornment adornment)
-        //    {
-        //        return false;
-        //    }
-
-        //    var attr = Attribute.Default;
-
-        //    if (adornment.Parent?.SuperView is { })
-        //    {
-        //        attr = adornment.Parent.SuperView.GetAttributeForRole (VisualRole.Normal);
-        //    }
-        //    else
-        //    {
-        //        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (FrameToScreen ().Location);
-        //        View? underView = currentViewsUnderMouse!.LastOrDefault (view => !IsInHierarchy (adornment!.Parent!.SuperView, view, true));
-        //        attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
-        //    }
-
-        //    newAttribute =
-        //                new Attribute (
-        //                               ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
-        //                               ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor (),
-        //                               attr.Style);
-
-        //    // If either fg or bg are DarkGray, GetDarkerColor gave up. Use Style = Faint
-        //    if (newAttribute.Foreground == Color.DarkGray)
-        //    {
-        //        newAttribute = attr;// new Attribute (attr.Foreground, currentAttribute.Background);
-        //    }
-
-        //    //return true;
-        //}
-
-        return true;//base.OnSettingAttributeForRole (in role, in currentAttribute, ref newAttribute);
-    }
-
-    /// <inheritdoc />
-    protected override bool OnDrawingText ()
     {
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
+    protected override bool OnDrawingText () { return true; }
+
+    /// <inheritdoc/>
     protected override bool OnClearingViewport ()
     {
         // Prevent clearing (so we can have transparency)
@@ -144,6 +102,7 @@ internal class ShadowView : View
             {
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
+
                 if (c < Driver?.Contents!.GetLength (1) && r < Driver?.Contents?.GetLength (0))
                 {
                     Driver.AddRune (Driver.Contents [r, c].Rune);
@@ -170,13 +129,14 @@ internal class ShadowView : View
     {
         Rectangle screen = ViewportToScreen (Viewport);
 
-        // Fill the rest of the rectangle
+        // Fill in the rest of the rectangle
         for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
         {
             for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
             {
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
+
                 if (Driver?.Contents is { } && screen.X < Driver.Contents.GetLength (1) && r < Driver.Contents.GetLength (0))
                 {
                     Driver.AddRune (Driver.Contents [r, c].Rune);
@@ -187,25 +147,35 @@ internal class ShadowView : View
 
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment adornment)
+        if (SuperView is not Adornment adornment
+            || location.X < 0
+            || location.X >= Application.Screen.Width
+            || location.Y < 0
+            || location.Y >= Application.Screen.Height)
         {
             return Attribute.Default;
         }
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location);
-        View? underView = currentViewsUnderMouse!.LastOrDefault (/*view => !IsInHierarchy (adornment!.Parent!.SuperView, view, true)*/);
-        Attribute attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
+        Attribute attr = Driver!.Contents! [location.Y, location.X].Attribute!.Value;
 
-        Attribute newAttribute =
+        var newAttribute =
             new Attribute (
                            ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDimColor (),
-                           ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimColor (),
+                           ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimColor (0.05),
                            attr.Style);
 
-        // If either fg or bg are DarkGray, GetDarkerColor gave up. Use Style = Faint
-        if (newAttribute.Foreground == Color.DarkGray)
+        // If the BG is DarkGray, GetDimColor gave up. Instead of using the attribute in the Driver under the shadow,
+        // use the Normal attribute from the View under the shadow.
+        if (newAttribute.Background== Color.DarkGray)
         {
-            newAttribute = attr;// new Attribute (attr.Foreground, currentAttribute.Background);
+            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location);
+            View? underView = currentViewsUnderMouse!.LastOrDefault ();
+            attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
+
+            newAttribute = new (
+                                ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Background.GetDimColor (),
+                                ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimColor (0.05),
+                                attr.Style);
         }
 
         return newAttribute;

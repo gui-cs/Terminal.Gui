@@ -335,13 +335,12 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <returns>
     /// A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
     /// </returns>
-    public Color GetDimColor ()
+    public Color GetDimColor (double darkenAmount = 0.2)
     {
         HSL hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
-        const double DARKEN_AMOUNT = 0.2;
 
         double lNorm = hsl.L / 255.0;
-        double newL = Math.Max (0.0, lNorm - DARKEN_AMOUNT);
+        double newL = Math.Max (0.0, lNorm - darkenAmount);
 
         // If the color is already very dark, return a standard dark gray for visibility
         if (lNorm <= 0.1)
@@ -352,7 +351,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         // If the new lightness is too close to the original, force a bigger change
         if (Math.Abs (newL - lNorm) < 0.1)
         {
-            newL = Math.Max (0.0, lNorm - 2 * DARKEN_AMOUNT);
+            newL = Math.Max (0.0, lNorm - 2 * darkenAmount);
         }
 
         HSL newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));

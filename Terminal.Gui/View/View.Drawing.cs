@@ -233,7 +233,7 @@ public partial class View // Drawing APIs
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-           Margin?.Draw ();
+           //Margin?.Draw ();
         }
     }
 

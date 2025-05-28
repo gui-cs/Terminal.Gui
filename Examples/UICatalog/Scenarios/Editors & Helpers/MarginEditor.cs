@@ -15,11 +15,18 @@ public class MarginEditor : AdornmentEditor
 
     private RadioGroup? _rgShadow;
 
+    private FlagSelector? _flagSelectorTransparent;
+
     private void MarginEditor_AdornmentChanged (object? sender, EventArgs e)
     {
         if (AdornmentToEdit is { })
         {
             _rgShadow!.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+        }
+
+        if (AdornmentToEdit is { })
+        {
+            _flagSelectorTransparent!.Value = (uint)((Margin)AdornmentToEdit).ViewportSettings;
         }
     }
 
@@ -28,7 +35,7 @@ public class MarginEditor : AdornmentEditor
         _rgShadow = new RadioGroup
         {
             X = 0,
-            Y = Pos.AnchorEnd (),
+            Y = Pos.Bottom (SubViews.ElementAt(SubViews.Count-1)),
 
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
@@ -47,5 +54,37 @@ public class MarginEditor : AdornmentEditor
                                         };
 
         Add (_rgShadow);
+
+        var flags = new Dictionary<uint, string> ()
+        {
+            { (uint)Terminal.Gui.ViewportSettings.Transparent, "Transparent" },
+            { (uint)Terminal.Gui.ViewportSettings.TransparentMouse, "TransparentMouse" }
+        };
+
+        _flagSelectorTransparent = new FlagSelector ()
+        {
+            X = 0,
+            Y = Pos.Bottom (_rgShadow),
+
+            SuperViewRendersLineCanvas = true,
+            Title = "_ViewportSettings",
+            BorderStyle = LineStyle.Single,
+        };
+        _flagSelectorTransparent.SetFlags(flags.AsReadOnly ());
+
+
+        Add (_flagSelectorTransparent);
+
+        if (AdornmentToEdit is { })
+        {
+            _flagSelectorTransparent.Value = (uint)((Margin)AdornmentToEdit).ViewportSettings;
+        }
+
+        _flagSelectorTransparent.ValueChanged += (_, args) =>
+                                                 {
+                                                     ((Margin)AdornmentToEdit!).ViewportSettings = (Terminal.Gui.ViewportSettings)args.CurrentValue!;
+                                                 };
+
+
     }
 }

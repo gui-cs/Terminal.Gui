@@ -207,7 +207,7 @@ internal abstract class ColorBar : View, IColorBar
             else
             {
                 SetAttribute (new (color, color, Enabled ? TextStyle.None : TextStyle.Faint));
-                AddRune (x + xOffset, yOffset, new ('█'));
+                AddRune (x + xOffset, yOffset, new (' '));
             }
         }
     }

@@ -254,7 +254,7 @@ public class Adornment : View, IDesignable
             return result;
         }
 
-        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToFrame (location) ?? location;
+        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (location) ?? location;
 
         if (adornment.Contains (superViewRelativeLocation))
         {

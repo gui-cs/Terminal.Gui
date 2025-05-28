@@ -46,9 +46,6 @@ public class Margin : Adornment
 
         // Margins are transparent to mouse by default
         ViewportSettings |= ViewportSettings.TransparentMouse;
-
-        Text = "margin";
-
     }
 
     // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views
@@ -150,6 +147,12 @@ public class Margin : Adornment
         }
 
         return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnDrawingText ()
+    {
+        return ViewportSettings.HasFlag(ViewportSettings.Transparent);
     }
 
     #region Shadow
