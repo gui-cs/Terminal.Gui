@@ -25,7 +25,7 @@ public class LineCanvasExperiment : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Base"]
+            SchemeName = "Base"
            ,
             SuperViewRendersLineCanvas = true
         };
@@ -58,7 +58,7 @@ public class LineCanvasExperiment : Scenario
             Width = Dim.Percent (30),
             Height = Dim.Percent (70),
 
-            //ColorScheme = Colors.ColorSchemes ["Error"],
+            //Scheme = Colors.Schemes ["Error"],
             SuperViewRendersLineCanvas = true
         };
 
@@ -72,7 +72,7 @@ public class LineCanvasExperiment : Scenario
             Height = Dim.Fill (),
             SuperViewRendersLineCanvas = true
 
-            //ColorScheme = Colors.ColorSchemes ["Menu"],
+            //Scheme = Colors.Schemes ["Menu"],
         };
 
         win2.Add (subViewOfWin2);
@@ -102,7 +102,7 @@ public class LineCanvasExperiment : Scenario
         //    Width = view4.Width,
         //    Height = 5,
 
-        //    //ColorScheme = Colors.ColorSchemes ["TopLevel"],
+        //    //Scheme = Colors.Schemes ["TopLevel"],
         //    SuperViewRendersLineCanvas = true,
         //    BorderStyle = LineStyle.Double
         //};
@@ -128,10 +128,10 @@ public class LineCanvasExperiment : Scenario
         //    Width = 25,
         //    Height = 10,
 
-        //    //ColorScheme = Colors.ColorSchemes ["Error"],
+        //    //Scheme = Colors.Schemes ["Error"],
         //    SuperViewRendersLineCanvas = true
         //};
-        //marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Error"];
+        //marginWindow.Margin.Scheme = Colors.Schemes ["Error"];
         //marginWindow.Margin.Thickness = new (1);
         //marginWindow.Border.Thickness = new (1, 2, 1, 1);
 

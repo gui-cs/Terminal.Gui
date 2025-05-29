@@ -32,6 +32,7 @@ public class ApplicationNavigation
         return _focused;
     }
 
+    // BUGBUG: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the SubView hierarchy of <paramref name="start"/>.
     /// </summary>

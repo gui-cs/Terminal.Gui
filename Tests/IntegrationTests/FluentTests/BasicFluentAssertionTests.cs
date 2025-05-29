@@ -38,7 +38,7 @@ public class BasicFluentAssertionTests
         Assert.False (top!.Running);
 
         Application.Top?.Dispose ();
-        Application.Shutdown();
+        Application.Shutdown ();
 
         context.WriteOutLogs (_out);
         context.Stop ();
@@ -93,6 +93,17 @@ public class BasicFluentAssertionTests
 
                                      // Click in main area inside border
                                      .RightClick (1, 1)
+                                     .Then (
+                                            () =>
+                                            {
+                                                // Test depends on menu having a border
+                                                IPopover? popover = Application.Popover!.GetActivePopover ();
+                                                Assert.NotNull (popover);
+                                                var popoverMenu = popover as PopoverMenu;
+                                                popoverMenu!.Root!.BorderStyle = LineStyle.Single;
+
+                                            })
+                                     .WaitIteration ()
                                      .ScreenShot ("After open menu", _out)
                                      .LeftClick (2, 2)
                                      .Stop ()

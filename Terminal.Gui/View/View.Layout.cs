@@ -62,7 +62,7 @@ public partial class View // Layout APIs
                 _width = _frame!.Value.Width;
                 _height = _frame!.Value.Height;
 
-                // Implicit layout is ok here because we are setting the Frame directly.
+                // Explicit layout is ok here because we are setting the Frame directly.
                 Layout ();
             }
         }
@@ -103,6 +103,7 @@ public partial class View // Layout APIs
         {
             RaiseViewportChangedEvent (oldViewport);
         }
+
         return true;
     }
 
@@ -758,6 +759,7 @@ public partial class View // Layout APIs
             Padding.SetNeedsLayout ();
         }
 
+        // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
         // Use a stack to avoid recursion
         Stack<View> stack = new (SubViews);
 
@@ -1078,7 +1080,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            nx = 0;//targetX;
+            nx = 0; //targetX;
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
@@ -1147,9 +1149,188 @@ public partial class View // Layout APIs
             ny = 0;
         }
 
-            //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
-            return superView!;
+        return superView!;
+    }
+
+    /// <summary>
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
+    ///     deepest
+    ///     View is at the end of the list (the top most View is at element 0).
+    /// </summary>
+    /// <param name="screenLocation">Screen-relative location.</param>
+    /// <param name="excludeViewportSettingsFlags">
+    ///     If set, excludes Views that have the <see cref="ViewportSettings.Transparent"/> or <see cref="ViewportSettings.TransparentMouse"/>
+    ///     flags set in their ViewportSettings.
+    /// </param>
+    public static List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettings excludeViewportSettingsFlags)
+    {
+        // PopoverHost - If visible, start with it instead of Top
+        if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
+        {
+            // BUGBUG: We do not traverse all visible toplevels if there's an active popover. This may be a bug.
+            List<View?> result = [];
+
+            result.AddRange (GetViewsUnderLocation (visiblePopover, screenLocation, excludeViewportSettingsFlags));
+
+            if (result.Count > 1)
+            {
+                return result;
+            }
+        }
+
+        var checkedTop = false;
+
+        // Traverse all visible toplevels, topmost first (reverse stack order)
+        if (Application.TopLevels.Count > 0)
+        {
+            foreach (Toplevel toplevel in Application.TopLevels)
+            {
+                if (toplevel.Visible && toplevel.Contains (screenLocation))
+                {
+                    List<View?> result = GetViewsUnderLocation (toplevel, screenLocation, excludeViewportSettingsFlags);
+
+                    // Only return if the result is not empty
+                    if (result.Count > 0)
+                    {
+                        return result;
+                    }
+                }
+
+                if (toplevel == Application.Top)
+                {
+                    checkedTop = true;
+                }
+            }
+        }
+
+        // Fallback: If TopLevels is empty or Top is not in TopLevels, check Top directly (for test compatibility)
+        if (!checkedTop && Application.Top is { Visible: true } top)
+        {
+            // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
+            List<View?> result = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);
+
+            if (result.Count > 0)
+            {
+                return result;
+            }
+        }
+
+        return [];
+    }
+
+    /// <summary>
+    ///     INTERNAL: Helper for GetViewsUnderLocation that starts from a given root view.
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
+    ///     deepest
+    ///     View is at the end of the list (the topmost View is at element 0).
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="screenLocation">Screen-relative location.</param>
+    /// <param name="excludeViewportSettingsFlags">
+    ///     If set, excludes Views that have the <see cref="ViewportSettings.Transparent"/> or <see cref="ViewportSettings.TransparentMouse"/>
+    ///     flags set in their ViewportSettings.
+    /// </param>
+    internal static List<View?> GetViewsUnderLocation (View root, in Point screenLocation, ViewportSettings excludeViewportSettingsFlags)
+    {
+        List<View?> viewsUnderLocation = GetViewsAtLocation (root, screenLocation);
+
+        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettings.Transparent) && !excludeViewportSettingsFlags.HasFlag (ViewportSettings.TransparentMouse))
+        {
+            // Only filter views if we are excluding transparent views.
+            return viewsUnderLocation;
+        }
+
+        // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
+        // because the point was in their adornment, and if the adornment is transparent, they should be removed.
+        viewsUnderLocation.RemoveAll (
+                                      v =>
+                                      {
+                                          if (v is null or Adornment)
+                                          {
+                                              return false;
+                                          }
+
+                                          bool? ret = null;
+
+                                          if (viewsUnderLocation.Contains (v.Margin)
+                                              && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              ret = true;
+                                          }
+
+                                          if (viewsUnderLocation.Contains (v.Border)
+                                              && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              ret = true;
+                                          }
+
+                                          if (viewsUnderLocation.Contains (v.Padding)
+                                              && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              ret = true;
+                                          }
+
+                                          return ret is true;
+                                      });
+
+        // Now remove all views that have ViewportSettings.TransparentMouse set
+        viewsUnderLocation.RemoveAll (v => v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags));
+
+        return viewsUnderLocation;
+    }
+    /// <summary>
+    ///     INTERNAL: Gets ALL Views (Subviews and Adornments) in the of <see cref="SuperView"/> hierarchcy that are at
+    ///     <paramref name="location"/>,
+    ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="Visible"/> set to
+    ///     <see langword="false"/> will not be included.
+    ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
+    /// </summary>
+    /// <param name="superView">The root view from which the search for subviews begins.</param>
+    /// <param name="location">The screen-relative location where the search for views is focused.</param>
+    /// <returns>A list of views that are located under the specified point.</returns>
+    internal static List<View?> GetViewsAtLocation (View? superView, in Point location)
+    {
+        if (superView is null || !superView.Visible)
+        {
+            return [];
+        }
+
+        List<View?> result = [];
+        Stack<View> viewsToProcess = new ();
+
+        // Start with the superview if it contains the location
+        if (superView.FrameToScreen ().Contains (location))
+        {
+            viewsToProcess.Push (superView);
+        }
+
+        while (viewsToProcess.Count > 0)
+        {
+            View currentView = viewsToProcess.Pop ();
+
+            // Add the current view to the result
+            result.Add (currentView);
+
+            // Add adornments for the current view
+            result.AddRange (Adornment.GetViewsAtLocation (currentView.Margin, location));
+            result.AddRange (Adornment.GetViewsAtLocation (currentView.Border, location));
+            result.AddRange (Adornment.GetViewsAtLocation (currentView.Padding, location));
+
+            // Add subviews to the stack in reverse order
+            // This maintains the original depth-first traversal order
+            for (int i = currentView.InternalSubViews.Count - 1; i >= 0; i--)
+            {
+                View subview = currentView.InternalSubViews [i];
+                if (subview.Visible && subview.FrameToScreen ().Contains (location))
+                {
+                    viewsToProcess.Push (subview);
+                }
+            }
+        }
+
+        return result;
     }
 
     #endregion Utilities

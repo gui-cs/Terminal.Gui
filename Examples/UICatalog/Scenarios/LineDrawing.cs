@@ -120,7 +120,7 @@ public class LineDrawing : Scenario
 
         win.Add (canvas);
         win.Add (tools);
-        tools.CurrentColor = canvas.GetNormalColor ();
+        tools.CurrentColor = canvas.GetAttributeForRole (VisualRole.Normal);
         canvas.CurrentAttribute = tools.CurrentColor;
 
         win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
@@ -235,14 +235,14 @@ public class ToolsView : Window
 
         _colors.ValueChanged += (s, e) => ColorChanged?.Invoke (this, e);
 
-        _stylePicker = new()
+        _stylePicker = new ()
         {
             X = 0, Y = Pos.Bottom (_colors), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
         };
         _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
         _stylePicker.SelectedItem = 1;
 
-        _addLayerBtn = new() { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
+        _addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
         _addLayerBtn.Accepting += (s, a) => AddLayer?.Invoke ();
         Add (_colors, _stylePicker, _addLayerBtn);
@@ -276,7 +276,7 @@ public class DrawingArea : View
             {
                 if (c.Value is { })
                 {
-                    SetCurrentAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
+                    SetCurrentAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
@@ -286,7 +286,7 @@ public class DrawingArea : View
 
         // TODO: This is a hack to work around overlapped views not drawing correctly.
         // without this the toolbox disappears
-        SuperView?.SetNeedsLayout();
+        SuperView?.SetNeedsLayout ();
 
         return true;
     }
@@ -356,13 +356,13 @@ public class AttributeView : View
         }
     }
 
-    private static readonly HashSet<(int, int)> ForegroundPoints = new()
+    private static readonly HashSet<(int, int)> ForegroundPoints = new ()
     {
         (0, 0), (1, 0), (2, 0),
         (0, 1), (1, 1), (2, 1)
     };
 
-    private static readonly HashSet<(int, int)> BackgroundPoints = new()
+    private static readonly HashSet<(int, int)> BackgroundPoints = new ()
     {
         (3, 1),
         (1, 2), (2, 2), (3, 2)
@@ -380,8 +380,8 @@ public class AttributeView : View
         Color fg = Value.Foreground;
         Color bg = Value.Background;
 
-        bool isTransparentFg = fg == GetNormalColor ().Background;
-        bool isTransparentBg = bg == GetNormalColor ().Background;
+        bool isTransparentFg = fg == GetAttributeForRole (VisualRole.Normal).Background;
+        bool isTransparentBg = bg == GetAttributeForRole (VisualRole.Normal).Background;
 
         SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
 
@@ -457,7 +457,7 @@ public class AttributeView : View
     {
         if (LineDrawing.PromptForColor ("Background", Value.Background, out Color newColor))
         {
-            Value = new (Value.Foreground, newColor);
+            Value = new (Value.Foreground, newColor, Value.Style);
             SetNeedsDraw ();
         }
     }

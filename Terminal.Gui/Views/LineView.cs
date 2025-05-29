@@ -57,7 +57,7 @@ public class LineView : View
     protected override bool OnDrawingContent ()
     {
         Move (0, 0);
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         int hLineWidth = Math.Max (1, Glyphs.HLine.GetColumns ());
 

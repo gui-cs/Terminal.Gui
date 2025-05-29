@@ -8,21 +8,20 @@ namespace Terminal.Gui.ConfigurationTests;
 public class GlyphTests
 {
     [Fact]
-    public void Overrides_Defaults ()
+    public void Apply_Applies_Over_Defaults ()
     {
         // arrange
-        Locations = ConfigLocations.Default;
-        Load (true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 
-        var glyph = (Rune)Themes ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
+        var glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
         Assert.Equal ((Rune)'⟦', glyph);
 
         ThrowOnJsonErrors = true;
 
         // act
-        var json = """
+        RuntimeConfig = """
                    {
                        "Themes": [
                            {
@@ -35,15 +34,15 @@ public class GlyphTests
                    }
                    """;
 
-        Settings!.Update (json, "Overrides_Defaults", ConfigLocations.Runtime);
-        Apply();
+        Load (ConfigLocations.Runtime);
+        Apply ();
 
         // assert
-        glyph = glyph = (Rune)Themes ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
+        glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
         Assert.Equal ((Rune)'[', glyph);
-        Assert.Equal((Rune)'[', Glyphs.LeftBracket);
+        Assert.Equal ((Rune)'[', Glyphs.LeftBracket);
 
         // clean up
-        Reset ();
+        Disable (resetToHardCodedDefaults: true);
     }
 }

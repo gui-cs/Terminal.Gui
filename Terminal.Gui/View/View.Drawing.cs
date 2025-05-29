@@ -28,7 +28,7 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
-        // Draw the margins (those whith Shadows) last to ensure they are drawn on top of the content.
+        // Draw the margins (those with Shadows) last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
     }
 
@@ -75,26 +75,23 @@ public partial class View // Drawing APIs
             // If no context ...
             context ??= new DrawContext ();
 
-            // TODO: Simplify/optimize SetAttribute system.
-            SetNormalAttribute ();
+            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
 
             // ------------------------------------
             // Draw the subviews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
-                SetNormalAttribute ();
                 DoDrawSubViews (context);
             }
 
             // ------------------------------------
             // Draw the text
-            SetNormalAttribute ();
+            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
 
             // ------------------------------------
             // Draw the content
-            SetNormalAttribute ();
             DoDrawContent (context);
 
             // ------------------------------------
@@ -234,10 +231,9 @@ public partial class View // Drawing APIs
             Padding?.Draw ();
         }
 
-
-        if (Margin is { } && Margin.Thickness != Thickness.Empty && Margin.ShadowStyle == ShadowStyle.None)
+        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-            Margin?.Draw ();
+           //Margin?.Draw ();
         }
     }
 
@@ -251,7 +247,7 @@ public partial class View // Drawing APIs
         // Get screen-relative coords
         Rectangle toClear = FrameToScreen ();
 
-        Attribute prev = SetAttribute (GetNormalColor ());
+        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Driver.FillRect (toClear);
         SetAttribute (prev);
         SetNeedsDraw ();
@@ -347,12 +343,10 @@ public partial class View // Drawing APIs
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        Attribute prev = SetAttribute (GetNormalColor ());
         Driver.FillRect (toClear);
 
         // context.AddDrawnRectangle (toClear);
 
-        SetAttribute (prev);
         SetNeedsDraw ();
     }
 
@@ -430,8 +424,8 @@ public partial class View // Drawing APIs
 
         TextFormatter?.Draw (
                              drawRect,
-                             HasFocus ? GetFocusColor () : GetNormalColor (),
-                             HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
+                             HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                             HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
                              Rectangle.Empty
                             );
 
@@ -628,7 +622,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    SetAttribute (p.Value.Value.Attribute ?? GetNormalColor ());
+                    SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
@@ -662,11 +656,11 @@ public partial class View // Drawing APIs
                 ExcludeFromClip (context!.GetDrawnRegion ());
 
                 // Exclude the Border and Padding from the clip
-                ExcludeFromClip (Border?.Thickness.AsRegion (FrameToScreen ()));
-                ExcludeFromClip (Padding?.Thickness.AsRegion (FrameToScreen ()));
+                ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
+                ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
 
                 // QUESTION: This makes it so that no nesting of transparent views is possible, but is more correct?
-                //context = new DrawContext ();
+                context = new DrawContext ();
             }
             else
             {
@@ -681,7 +675,6 @@ public partial class View // Drawing APIs
                 // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
                 ExcludeFromClip (borderFrame);
 
-                // BUGBUG: There looks like a bug in Region where this Union call is not adding the rectangle right
                 // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
                 // This enables the SuperView to know what was drawn by this view.
                 context?.AddDrawnRectangle (borderFrame);
@@ -714,7 +707,7 @@ public partial class View // Drawing APIs
     //      TODO: If Empty, it means no need to redraw
     //      TODO: If not Empty, it means the region that needs to be redrawn
     // The viewport-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rectangle _needsDrawRect = Rectangle.Empty;
+    internal Rectangle NeedsDrawRect { get; set; } = Rectangle.Empty;
 
     /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
     /// <remarks>
@@ -729,7 +722,7 @@ public partial class View // Drawing APIs
     public bool NeedsDraw
     {
         // TODO: Figure out if we can decouple NeedsDraw from NeedsLayout.
-        get => Visible && (_needsDrawRect != Rectangle.Empty || NeedsLayout);
+        get => Visible && (NeedsDrawRect != Rectangle.Empty || NeedsLayout);
         set
         {
             if (value)
@@ -755,7 +748,7 @@ public partial class View // Drawing APIs
     {
         Rectangle viewport = Viewport;
 
-        if (!Visible || (_needsDrawRect != Rectangle.Empty && viewport.IsEmpty))
+        if (!Visible || (NeedsDrawRect != Rectangle.Empty && viewport.IsEmpty))
         {
             // This handles the case where the view has not been initialized yet
             return;
@@ -782,9 +775,9 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (_needsDrawRect.IsEmpty)
+        if (NeedsDrawRect.IsEmpty)
         {
-            _needsDrawRect = viewPortRelativeRegion;
+            NeedsDrawRect = viewPortRelativeRegion;
         }
         else
         {
@@ -792,7 +785,7 @@ public partial class View // Drawing APIs
             int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
             int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
             int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
-            _needsDrawRect = new (x, y, w, h);
+            NeedsDrawRect = new (x, y, w, h);
         }
 
         // Do not set on Margin - it will be drawn in a separate pass.
@@ -851,7 +844,7 @@ public partial class View // Drawing APIs
     /// <summary>Clears <see cref="NeedsDraw"/> and <see cref="SubViewNeedsDraw"/>.</summary>
     protected void ClearNeedsDraw ()
     {
-        _needsDrawRect = Rectangle.Empty;
+        NeedsDrawRect = Rectangle.Empty;
         SubViewNeedsDraw = false;
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty)

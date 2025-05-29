@@ -38,7 +38,7 @@ public class Bars : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            SchemeName = "Toplevel",
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border.Thickness = new (0, 1, 0, 0);

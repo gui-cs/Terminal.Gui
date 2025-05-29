@@ -63,7 +63,7 @@ public class GlobalTestSetup : IDisposable
         Assert.False (Application._forceFakeConsole);
         Assert.Equal (-1, Application.MainThreadId);
         Assert.Empty (Application.TopLevels);
-        Assert.Empty (Application._cachedViewsUnderMouse);
+        Assert.Empty (Application.CachedViewsUnderMouse);
 
         // Mouse
         // Do not reset _lastMousePosition

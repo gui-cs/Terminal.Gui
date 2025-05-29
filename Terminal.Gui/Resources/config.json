@@ -39,67 +39,28 @@
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
 
   // --------------- Themes -----------------
-  "Theme": "Default",
   "Themes": [
+    // We do not override any hard-coded properties for Default here; 
+    // Default is by definition the same as hard-coded.
+    //{
+    //  "Default": {
+    //  }
+    //},
     {
-      "Default": {
-        "Dialog.DefaultButtonAlignment": "End",
-        "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
-        "Dialog.DefaultBorderStyle": "Heavy",
-        "Dialog.DefaultShadow": "Transparent",
-        "FrameView.DefaultBorderStyle": "Single",
-        "Window.DefaultBorderStyle": "Single",
-        "MessageBox.DefaultButtonAlignment": "Center",
-        "MessageBox.DefaultBorderStyle": "Heavy",
-        "Button.DefaultShadow": "Opaque",
-        "Menuv2.DefaultBorderStyle": "Single",
-        "MenuBarv2.DefaultBorderStyle": "None",
-        "StatusBar.DefaultSeparatorLineStyle": "Single",
-        "ColorSchemes": [
+      "TurboPascal 5": {
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "BrightGreen",
-                "Background": "#505050" // DarkerGray
-              },
-              "Focus": {
                 "Foreground": "White",
-                "Background": "#696969" // DimGray
-              },
-              "HotNormal": {
-                "Foreground": "Yellow",
-                "Background": "#505050" // DarkerGray
-              },
-              "HotFocus": {
-                "Foreground": "Yellow",
-                "Background": "#696969" // DimGray
-              },
-              "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "#505050" // DarkerGray
+                "Background": "Blue"
               }
             }
           },
           {
             "Base": {
               "Normal": {
-                "Foreground": "White",
-                "Background": "Blue"
-              },
-              "Focus": {
-                "Foreground": "DarkBlue",
-                "Background": "LightGray"
-              },
-              "HotNormal": {
-                "Foreground": "BrightCyan",
-                "Background": "Blue"
-              },
-              "HotFocus": {
-                "Foreground": "BrightBlue",
-                "Background": "LightGray"
-              },
-              "Disabled": {
-                "Foreground": "DarkGray",
+                "Foreground": "Yellow",
                 "Background": "Blue"
               }
             }
@@ -109,215 +70,106 @@
               "Normal": {
                 "Foreground": "Black",
                 "Background": "LightGray"
-              },
-              "Focus": {
-                "Foreground": "DarkGray",
-                "Background": "LightGray"
-              },
-              "HotNormal": {
-                "Foreground": "Blue",
-                "Background": "LightGray"
-              },
-              "HotFocus": {
-                "Foreground": "BrightBlue",
-                "Background": "LightGray"
-              },
-              "Disabled": {
-                "Foreground": "Gray",
-                "Background": "DarkGray"
               }
             }
           },
           {
             "Menu": {
               "Normal": {
-                "Foreground": "White",
-                "Background": "DarkBlue"
+                "Foreground": "Black",
+                "Background": "Cyan",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "DarkBlue",
-                "Background": "White"
+                "Foreground": "Black",
+                "Background": "LightGray",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "Yellow",
-                "Background": "DarkBlue"
+                "Foreground": "BrightRed",
+                "Background": "Cyan",
+                "Style": "None"
               },
               "HotFocus": {
-                "Foreground": "Blue",
-                "Background": "White"
+                "Foreground": "BrightRed",
+                "Background": "LightGray",
+                "Style": "None"
               },
               "Disabled": {
-                "Foreground": "Gray",
-                "Background": "DarkGray"
+                "Foreground": "DarkGray",
+                "Background": "Cyan",
+                "Style": "None"
               }
             }
           },
           {
             "Error": {
               "Normal": {
-                "Foreground": "Red",
-                "Background": "Pink"
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "BrightRed"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "Pink"
-              },
-              "HotFocus": {
-                "Foreground": "Pink",
-                "Background": "BrightRed"
-              },
-              "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "White"
+                "Foreground": "BrightRed",
+                "Background": "LightGray",
+                "Style": "None"
               }
             }
           }
         ],
-        "Glyphs.Apple": "\uD83C\uDF4E",
-        "Glyphs.AppleBMP": "❦",
-        "Glyphs.BlackCircle": "●",
-        "Glyphs.BlocksMeterSegment": "▌",
-        "Glyphs.BottomSideLineLtHv": "╽",
-        "Glyphs.BottomTee": "┴",
-        "Glyphs.BottomTeeDbl": "╩",
-        "Glyphs.BottomTeeDblH": "╧",
-        "Glyphs.BottomTeeDblV": "╨",
-        "Glyphs.BottomTeeHvDblH": "┻",
-        "Glyphs.BottomTeeHvH": "┷",
-        "Glyphs.BottomTeeHvV": "┸",
-        "Glyphs.CheckStateChecked": "☑",
-        "Glyphs.CheckStateNone": "☒",
+        "Glyphs.CheckStateChecked": "☒",
+        "Glyphs.CheckStateNone": "□",
         "Glyphs.CheckStateUnChecked": "☐",
-        "Glyphs.Close": "✘",
-        "Glyphs.Collapse": "-",
-        "Glyphs.ContinuousMeterSegment": "█",
-        "Glyphs.Cross": "┼",
-        "Glyphs.CrossDbl": "╬",
-        "Glyphs.CrossDblH": "╪",
-        "Glyphs.CrossDblV": "╫",
-        "Glyphs.CrossHv": "╋",
-        "Glyphs.CrossHvH": "┿",
-        "Glyphs.CrossHvV": "╂",
-        "Glyphs.Diamond": "◊",
-        "Glyphs.Dot": "∙",
-        "Glyphs.DottedSquare": "⬚",
-        "Glyphs.DownArrow": "▼",
-        "Glyphs.Expand": "+",
-        "Glyphs.File": "☰",
-        "Glyphs.Folder": "꤉",
-        "Glyphs.HalfBottomLine": "╷",
-        "Glyphs.HalfBottomLineLt": "╻",
-        "Glyphs.HalfLeftLine": "╴",
-        "Glyphs.HalfLeftLineHv": "╸",
-        "Glyphs.HalfRightLine": "╶",
-        "Glyphs.HalfRightLineHv": "╺",
-        "Glyphs.HalfTopLine": "╵",
-        "Glyphs.HalfTopLineHv": "╹",
-        "Glyphs.HLine": "─",
-        "Glyphs.HLineDa2": "╌",
-        "Glyphs.HLineDa3": "┄",
-        "Glyphs.HLineDa4": "┈",
-        "Glyphs.HLineDbl": "═",
-        "Glyphs.HLineHv": "━",
-        "Glyphs.HLineHvDa2": "╍",
-        "Glyphs.HLineHvDa3": "┅",
-        "Glyphs.HLineHvDa4": "┉",
-        "Glyphs.HorizontalEllipsis": "…",
-        "Glyphs.IdenticalTo": "≡",
-        "Glyphs.LeftArrow": "◄",
-        "Glyphs.LeftBracket": "⟦",
-        "Glyphs.LeftDefaultIndicator": "►",
-        "Glyphs.LeftSideLineHvLt": "╾",
-        "Glyphs.LeftTee": "├",
-        "Glyphs.LeftTeeDbl": "╠",
-        "Glyphs.LeftTeeDblH": "╞",
-        "Glyphs.LeftTeeDblV": "╟",
-        "Glyphs.LeftTeeHvDblH": "┣",
-        "Glyphs.LeftTeeHvH": "┝",
-        "Glyphs.LeftTeeHvV": "┠",
-        "Glyphs.LLCorner": "└",
-        "Glyphs.LLCornerDbl": "╚",
-        "Glyphs.LLCornerDblSingle": "╙",
-        "Glyphs.LLCornerHv": "┗",
-        "Glyphs.LLCornerHvLt": "┖",
-        "Glyphs.LLCornerLtHv": "┕",
-        "Glyphs.LLCornerR": "╰",
-        "Glyphs.LLCornerSingleDbl": "╘",
-        "Glyphs.LRCorner": "┘",
-        "Glyphs.LRCornerDbl": "╝",
-        "Glyphs.LRCornerDblSingle": "╜",
-        "Glyphs.LRCornerHv": "┛",
-        "Glyphs.LRCornerHvLt": "┚",
-        "Glyphs.LRCornerLtHv": "┙",
-        "Glyphs.LRCornerR": "╯",
-        "Glyphs.LRCornerSingleDbl": "╛",
-        "Glyphs.Maximize": "✽",
-        "Glyphs.Minimize": "❏",
-        "Glyphs.Move": "◊",
-        "Glyphs.RightArrow": "►",
-        "Glyphs.RightBracket": "⟧",
-        "Glyphs.RightDefaultIndicator": "◄",
-        "Glyphs.RightSideLineLtHv": "╼",
-        "Glyphs.RightTee": "┤",
-        "Glyphs.RightTeeDbl": "╣",
-        "Glyphs.RightTeeDblH": "╡",
-        "Glyphs.RightTeeDblV": "╢",
-        "Glyphs.RightTeeHvDblH": "┫",
-        "Glyphs.RightTeeHvH": "┥",
-        "Glyphs.RightTeeHvV": "┨",
-        "Glyphs.Selected": "◉",
-        "Glyphs.ShadowHorizontal": "▀",
-        "Glyphs.ShadowHorizontalEnd": "▘",
-        "Glyphs.ShadowHorizontalStart": "▝",
-        "Glyphs.ShadowVertical": "▌",
-        "Glyphs.ShadowVerticalStart": "▖",
-        "Glyphs.SizeBottomLeft": "↙",
-        "Glyphs.SizeBottomRight": "↘",
-        "Glyphs.SizeHorizontal": "↔",
-        "Glyphs.SizeTopLeft": "↖",
-        "Glyphs.SizeTopRight": "↗",
-        "Glyphs.SizeVertical": "↕",
-        "Glyphs.Stipple": "░",
-        "Glyphs.TopSideLineHvLt": "╿",
-        "Glyphs.TopTee": "┬",
-        "Glyphs.TopTeeDbl": "╦",
-        "Glyphs.TopTeeDblH": "╤",
-        "Glyphs.TopTeeDblV": "╥",
-        "Glyphs.TopTeeHvDblH": "┳",
-        "Glyphs.TopTeeHvH": "┯",
-        "Glyphs.TopTeeHvV": "┰",
-        "Glyphs.ULCorner": "┌",
-        "Glyphs.ULCornerDbl": "╔",
-        "Glyphs.ULCornerDblSingle": "╓",
-        "Glyphs.ULCornerHv": "┏",
-        "Glyphs.ULCornerHvLt": "┎",
-        "Glyphs.ULCornerLtHv": "┍",
-        "Glyphs.ULCornerR": "╭",
-        "Glyphs.ULCornerSingleDbl": "╒",
-        "Glyphs.UnSelected": "○",
-        "Glyphs.UpArrow": "▲",
-        "Glyphs.URCorner": "┐",
-        "Glyphs.URCornerDbl": "╗",
-        "Glyphs.URCornerDblSingle": "╖",
-        "Glyphs.URCornerHv": "┓",
-        "Glyphs.URCornerHvLt": "┑",
-        "Glyphs.URCornerLtHv": "┒",
-        "Glyphs.URCornerR": "╮",
-        "Glyphs.URCornerSingleDbl": "╕",
-        "Glyphs.VerticalFourDots": "⁞",
-        "Glyphs.VLine": "│",
-        "Glyphs.VLineDa2": "╎",
-        "Glyphs.VLineDa3": "┆",
-        "Glyphs.VLineDa4": "┊",
-        "Glyphs.VLineDbl": "║",
-        "Glyphs.VLineHv": "┃",
-        "Glyphs.VLineHvDa2": "╏",
-        "Glyphs.VLineHvDa3": "┇",
-        "Glyphs.VLineHvDa4": "┋"
+        "Glyphs.LeftBracket": "[",
+        "Glyphs.RightBracket": "]"
+      }
+    },
+    {
+      "Anders": {
+        "Schemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "WhiteSmoke",
+                "Background": "DimGray"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "DarkBlue"
+              }
+            },
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "BrightBlue",
+                "Background": "LightGray"
+              },
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Blue",
+                "Style": "Bold"
+              },
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "Red",
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
+              },
+            }
+          }
+        ],
+        "Glyphs.CheckStateChecked": "☒",
+        "Glyphs.CheckStateNone": "□",
+        "Glyphs.CheckStateUnChecked": "☐",
+        "Glyphs.LeftBracket": "[",
+        "Glyphs.RightBracket": "]"
       }
     },
     {
@@ -331,124 +183,273 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "Gray",
-                "Background": "Black"
+                "Foreground": "LightGray",
+                "Background": "Black",
+                "Style": "None"
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "BrightGreen"
+                "Background": "Charcoal",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "BrightGreen",
-                "Background": "Black"
-              },
-              "HotFocus": {
-                "Foreground": "Cyan",
-                "Background": "Black"
+                "Foreground": "Silver",
+                "Background": "Black",
+                "Style": "Underline"
               },
               "Disabled": {
-                "Foreground": "Black",
-                "Background": "Gray"
+                "Foreground": "DarkGray",
+                "Background": "Black",
+                "Style": "Faint"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Charcoal",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "Onyx",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Onyx",
+                "Style": "Underline"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "OuterSpace",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "LightYellow",
+                "Background": "Black",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "Italic"
               }
             }
           },
           {
             "Base": {
               "Normal": {
-                "Foreground": "Gray",
-                "Background": "Black"
+                "Foreground": "LightGray",
+                "Background": "Black",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "White",
+                "Background": "Charcoal",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "BrightYellow",
-                "Background": "Black"
-              },
-              "HotFocus": {
-                "Foreground": "Cyan",
-                "Background": "Black"
+                "Foreground": "Silver",
+                "Background": "Black",
+                "Style": "Underline"
               },
               "Disabled": {
-                "Foreground": "Black",
-                "Background": "Gray"
+                "Foreground": "DarkGray",
+                "Background": "Black",
+                "Style": "Faint"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Charcoal",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "Onyx"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Onyx",
+                "Style": "Underline"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "OuterSpace",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "Italic"
               }
             }
           },
           {
             "Dialog": {
               "Normal": {
-                "Foreground": "Gray",
-                "Background": "Black"
+                "Foreground": "LightGray",
+                "Background": "Charcoal",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "BrightCyan",
-                "Background": "Black"
+                "Foreground": "White",
+                "Background": "SlateGray",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black"
+                "Foreground": "Silver",
+                "Background": "Charcoal",
+                "Style": "Underline"
+              },
+              "Disabled": {
+                "Foreground": "DarkGray",
+                "Background": "Charcoal",
+                "Style": "Faint"
               },
               "HotFocus": {
                 "Foreground": "White",
-                "Background": "Black"
+                "Background": "SlateGray",
+                "Style": "Underline"
               },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "Gray"
+              "Active": {
+                "Foreground": "White",
+                "Background": "OuterSpace",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "OuterSpace",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "Onyx",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Gray",
+                "Background": "Charcoal",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "Charcoal",
+                "Style": "Italic"
               }
             }
           },
           {
             "Menu": {
               "Normal": {
-                "Foreground": "LightGray",
-                "Background": "#505050" // DarkerGray
+                "Foreground": "White",
+                "Background": "Onyx",
+                "Style": "Bold"
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "Black"
+                "Background": "Charcoal",
+                "Style": "Bold"
               },
               "HotNormal": {
-                "Foreground": "White",
-                "Background": "#505050" // DarkerGray
+                "Foreground": "Silver",
+                "Background": "Onyx",
+                "Style": "Underline,Bold"
+              },
+              "Disabled": {
+                "Foreground": "DarkGray",
+                "Background": "Charcoal",
+                "Style": "Faint"
               },
               "HotFocus": {
                 "Foreground": "White",
-                "Background": "Black"
+                "Background": "Charcoal",
+                "Style": "Underline,Bold"
               },
-              "Disabled": {
+              "Active": {
+                "Foreground": "White",
+                "Background": "OuterSpace",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "OuterSpace",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "SlateGray",
+                "Style": "None"
+              },
+              "Editable": {
                 "Foreground": "Gray",
-                "Background": "Black"
+                "Background": "Onyx",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "Onyx",
+                "Style": "Italic"
               }
             }
           },
           {
             "Error": {
               "Normal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "IndianRed",
+                "Background": "Black",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "DarkGray",
-                "Background": "BrightYellow"
+                "Foreground": "White",
+                "Background": "IndianRed",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
-              },
-              "HotFocus": {
-                "Foreground": "Red",
-                "Background": "BrightYellow"
+                "Foreground": "LightCoral",
+                "Background": "Black",
+                "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "Gray"
+                "Background": "Black",
+                "Style": "Faint"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "IndianRed",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "LightCoral",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "LightCoral",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "IndianRed",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "Italic"
               }
             }
           }
@@ -466,124 +467,274 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "DarkGray",
-                "Background": "White"
+                "Foreground": "DimGray",
+                "Background": "WhiteSmoke",
+                "Style": "None"
               },
               "Focus": {
                 "Foreground": "Black",
-                "Background": "White"
+                "Background": "Gainsboro",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "BrightGreen",
-                "Background": "White"
-              },
-              "HotFocus": {
-                "Foreground": "Cyan",
-                "Background": "White"
+                "Foreground": "Gray",
+                "Background": "WhiteSmoke",
+                "Style": "Underline"
               },
               "Disabled": {
+                "Foreground": "LightGray",
+                "Background": "WhiteSmoke",
+                "Style": "Faint"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "Gainsboro",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "LightGray",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Goldenrod",
+                "Background": "WhiteSmoke",
+                "Style": "None"
+              },
+              "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "White"
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
               }
             }
           },
           {
             "Base": {
               "Normal": {
-                "Foreground": "#505050", // DarkerGray
-                "Background": "White"
+                "Foreground": "Gray",
+                "Background": "WhiteSmoke",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "BrightRed",
-                "Background": "Gray"
+                "Foreground": "Black",
+                "Background": "Gainsboro",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "Red",
-                "Background": "White"
-              },
-              "HotFocus": {
-                "Foreground": "Cyan",
-                "Background": "DarkGray"
+                "Foreground": "Silver",
+                "Background": "WhiteSmoke",
+                "Style": "Underline"
               },
               "Disabled": {
+                "Foreground": "LightGray",
+                "Background": "WhiteSmoke",
+                "Style": "Faint"
+              },
+              "HotFocus": {
                 "Foreground": "Black",
-                "Background": "Gray"
+                "Background": "Gainsboro",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "LightGray",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Goldenrod",
+                "Background": "WhiteSmoke",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
               }
             }
           },
           {
             "Dialog": {
               "Normal": {
-                "Foreground": "Black",
-                "Background": "Gray"
+                "Foreground": "DimGray",
+                "Background": "WhiteSmoke",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "Blue",
-                "Background": "Gray"
+                "Foreground": "Black",
+                "Background": "Gainsboro",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "Black",
-                "Background": "Gray"
-              },
-              "HotFocus": {
-                "Foreground": "BrightBlue",
-                "Background": "Gray"
+                "Foreground": "Gray",
+                "Background": "WhiteSmoke",
+                "Style": "Underline"
               },
               "Disabled": {
+                "Foreground": "LightGray",
+                "Background": "WhiteSmoke",
+                "Style": "Faint"
+              },
+              "HotFocus": {
                 "Foreground": "Black",
-                "Background": "Gray"
+                "Background": "Gainsboro",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "LightGray",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Black",
+                "Background": "LemonChiffon",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
               }
             }
           },
           {
             "Menu": {
               "Normal": {
-                "Foreground": "DarkGray",
-                "Background": "LightGray"
+                "Foreground": "DimGray",
+                "Background": "White",
+                "Style": "Bold"
               },
               "Focus": {
-                "Foreground": "DarkGray",
-                "Background": "White"
+                "Foreground": "Black",
+                "Background": "Gainsboro",
+                "Style": "Bold"
               },
               "HotNormal": {
-                "Foreground": "BrightRed",
-                "Background": "LightGray"
-              },
-              "HotFocus": {
-                "Foreground": "BrightRed",
-                "Background": "White"
+                "Foreground": "Gray",
+                "Background": "White",
+                "Style": "Underline,Bold"
               },
               "Disabled": {
+                "Foreground": "LightGray",
+                "Background": "WhiteSmoke",
+                "Style": "Faint"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "Gainsboro",
+                "Style": "Underline,Bold"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "WhiteSmoke",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "WhiteSmoke",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "LightGray",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "DimGray",
+                "Background": "White",
+                "Style": "None"
+              },
+              "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "White"
+                "Background": "White",
+                "Style": "Italic"
               }
             }
           },
           {
             "Error": {
               "Normal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "FireBrick",
+                "Background": "WhiteSmoke",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "DarkGray",
-                "Background": "BrightYellow"
+                "Foreground": "WhiteSmoke",
+                "Background": "FireBrick",
+                "Style": "None"
               },
               "HotNormal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
-              },
-              "HotFocus": {
-                "Foreground": "Red",
-                "Background": "BrightYellow"
+                "Foreground": "LightCoral",
+                "Background": "WhiteSmoke",
+                "Style": "Underline"
               },
               "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "Gray"
+                "Foreground": "LightGray",
+                "Background": "WhiteSmoke",
+                "Style": "Faint"
+              },
+              "HotFocus": {
+                "Foreground": "WhiteSmoke",
+                "Background": "FireBrick",
+                "Style": "Underline"
+              },
+              "Active": {
+                "Foreground": "WhiteSmoke",
+                "Background": "LightCoral",
+                "Style": "Bold"
+              },
+              "HotActive": {
+                "Foreground": "WhiteSmoke",
+                "Background": "LightCoral",
+                "Style": "Underline,Bold"
+              },
+              "Highlight": {
+                "Foreground": "WhiteSmoke",
+                "Background": "FireBrick",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "Goldenrod",
+                "Background": "WhiteSmoke",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "Gray",
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
               }
             }
           }
@@ -591,59 +742,49 @@
       }
     },
     {
-      "Black & White": {
+      "Green Phosphor": {
         "Dialog.DefaultShadow": "None",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
-        "MessageBox.DefaultButtonAlignment": "Center",
-        "MessageBox.DefaultBorderStyle": "Heavy",
+        "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "ColorSchemes": [
+        "Menuv2.DefaultBorderStyle": "Single",
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "White",
-                "Background": "Black"
-              },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "White"
-              },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "White"
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black"
-              },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "Black"
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "None"
               }
             }
           },
           {
             "Base": {
               "Normal": {
-                "Foreground": "White",
-                "Background": "Black"
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "None"
               },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "White"
+              "Active": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "Bold"
               },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "White"
+              "Highlight": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "Italic"
               },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black"
+              "Editable": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "None"
               },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "Black"
+              "ReadOnly": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -651,23 +792,28 @@
             "Dialog": {
               "Normal": {
                 "Foreground": "Black",
-                "Background": "White"
+                "Background": "GreenPhosphor",
+                "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black"
-              },
-              "HotFocus": {
+              "Active": {
                 "Foreground": "Black",
-                "Background": "White"
+                "Background": "GreenPhosphor",
+                "Style": "Bold"
               },
-              "Disabled": {
-                "Foreground": "White",
-                "Background": "White"
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "GreenPhosphor",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -675,47 +821,57 @@
             "Menu": {
               "Normal": {
                 "Foreground": "Black",
-                "Background": "White"
+                "Background": "GreenPhosphor",
+                "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black"
-              },
-              "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black"
-              },
-              "HotFocus": {
+              "Active": {
                 "Foreground": "Black",
-                "Background": "White"
+                "Background": "GreenPhosphor",
+                "Style": "Bold"
               },
-              "Disabled": {
-                "Foreground": "White",
-                "Background": "White"
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "GreenPhosphor",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
           {
             "Error": {
               "Normal": {
-                "Foreground": "White",
-                "Background": "Black"
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "Italic"
               },
-              "Focus": {
-                "Foreground": "Black",
-                "Background": "White"
+              "Active": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "Bold,Italic"
               },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "White"
+              "Highlight": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Black",
+                "Style": "Italic"
               },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black"
+              "Editable": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Italic"
               },
-              "Disabled": {
-                "Foreground": "Black",
-                "Background": "Black"
+              "ReadOnly": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint,Italic"
               }
             }
           }
@@ -723,134 +879,136 @@
       }
     },
     {
-      "Gray Scale": {
-        "Dialog.DefaultButtonAlignment": "End",
-        "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
-        "Dialog.DefaultBorderStyle": "Heavy",
-        "Dialog.DefaultShadow": "Transparent",
+      "Amber Phosphor": {
+        "Dialog.DefaultShadow": "None",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
-        "MessageBox.DefaultButtonAlignment": "Center",
-        "MessageBox.DefaultBorderStyle": "Heavy",
-        "Button.DefaultShadow": "Opaque",
-        "ColorSchemes": [
+        "MessageBox.DefaultBorderStyle": "Single",
+        "Button.DefaultShadow": "None",
+        "Menuv2.DefaultBorderStyle": "Single",
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "#A9A9A9", // DarkGray
-                "Background": "#505050" // DarkerGray
-              },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "#696969" // DimGray
-              },
-              "HotNormal": {
-                "Foreground": "#808080", // Gray
-                "Background": "#505050" // DarkerGray
-              },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "#808080" // Gray
-              },
-              "Disabled": {
-                "Foreground": "#505050", // DarkerGray
-                "Background": "Black"
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "None"
               }
             }
           },
           {
             "Base": {
               "Normal": {
-                "Foreground": "#A9A9A9", // DarkGray
-                "Background": "Black"
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "None"
               },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "#505050" // DarkerGray
+              "Active": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "Bold"
               },
-              "HotNormal": {
-                "Foreground": "#808080", // Gray
-                "Background": "Black"
+              "Highlight": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "Italic"
               },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "#505050" // DarkerGray
+              "Editable": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "None"
               },
-              "Disabled": {
-                "Foreground": "#696969", // DimGray
-                "Background": "Black"
+              "ReadOnly": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
           {
             "Dialog": {
               "Normal": {
-                "Foreground": "#505050", // DarkerGray
-                "Background": "White"
-              },
-              "Focus": {
                 "Foreground": "Black",
-                "Background": "#D3D3D3" // LightGray
+                "Background": "AmberPhosphor",
+                "Style": "Bold"
               },
-              "HotNormal": {
-                "Foreground": "#808080", // Gray
-                "Background": "White"
-              },
-              "HotFocus": {
+              "Active": {
                 "Foreground": "Black",
-                "Background": "#D3D3D3" // LightGray
+                "Background": "AmberPhosphor",
+                "Style": "Bold"
               },
-              "Disabled": {
-                "Foreground": "#696969", // DimGray
-                "Background": "White"
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
+                "Style": "None"
+              },
+              "Editable": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
           {
             "Menu": {
               "Normal": {
-                "Foreground": "#D3D3D3", // LightGray
-                "Background": "#505050" // DarkerGray
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
+                "Style": "Bold"
               },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "#808080" // Gray
+              "Active": {
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
+                "Style": "Bold"
               },
-              "HotNormal": {
-                "Foreground": "#808080", // Gray
-                "Background": "#505050" // DarkerGray
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
+                "Style": "None"
               },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "#808080" // Gray
+              "Editable": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "None"
               },
-              "Disabled": {
-                "Foreground": "#505050", // DarkerGray
-                "Background": "#505050" // DarkerGray
+              "ReadOnly": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
           {
             "Error": {
               "Normal": {
-                "Foreground": "Black",
-                "Background": "White"
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "Italic"
               },
-              "Focus": {
-                "Foreground": "White",
-                "Background": "Black"
+              "Active": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "Bold,Italic"
               },
-              "HotNormal": {
-                "Foreground": "Black",
-                "Background": "#D3D3D3" // LightGray
+              "Highlight": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Black",
+                "Style": "Italic"
               },
-              "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black"
+              "Editable": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Italic"
               },
-              "Disabled": {
-                "Foreground": "#696969", // DimGray
-                "Background": "White"
+              "ReadOnly": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Faint,Italic"
               }
             }
           }
@@ -858,15 +1016,373 @@
       }
     },
     {
-      "Minimal": {
+      "8-Bit": {
         "Dialog.DefaultShadow": "None",
-        "FrameView.DefaultBorderStyle": "None",
-        "Window.DefaultBorderStyle": "None",
-        "MessageBox.DefaultBorderStyle": "None",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
         "Menuv2.DefaultBorderStyle": "None",
         "Glyphs.LeftBracket": "[",
-        "Glyphs.RightBracket": "]"
+        "Glyphs.RightBracket": "]",
+        "Glyphs.CheckStateChecked": "X",
+        "Glyphs.CheckStateUnChecked": "O",
+        "Glyphs.CheckStateNone": " ",
+        "Glyphs.Selected": "*",
+        "Glyphs.UnSelected": " ",
+        "Glyphs.RightArrow": ">",
+        "Glyphs.LeftArrow": "<",
+        "Glyphs.DownArrow": "v",
+        "Glyphs.UpArrow": "^",
+        "Glyphs.LeftDefaultIndicator": ">",
+        "Glyphs.RightDefaultIndicator": "<",
+        "Glyphs.BlocksMeterSegment": "#",
+        "Glyphs.ContinuousMeterSegment": " ",
+        "Glyphs.Stipple": ".",
+        "Glyphs.Diamond": "+",
+        "Glyphs.Close": "X",
+        "Glyphs.Minimize": "_",
+        "Glyphs.Maximize": "^",
+        "Glyphs.Dot": ".",
+        "Glyphs.DottedSquare": "#",
+        "Glyphs.BlackCircle": "O",
+        "Glyphs.Expand": "+",
+        "Glyphs.Collapse": "-",
+        "Glyphs.IdenticalTo": "=",
+        "Glyphs.Move": "+",
+        "Glyphs.SizeHorizontal": "-",
+        "Glyphs.SizeVertical": "|",
+        "Glyphs.SizeTopLeft": "/",
+        "Glyphs.SizeTopRight": "\\",
+        "Glyphs.SizeBottomRight": "/",
+        "Glyphs.SizeBottomLeft": "\\",
+        "Glyphs.Apple": "@",
+        "Glyphs.AppleBMP": "@",
+        "Glyphs.HLine": "-",
+        "Glyphs.VLine": "|",
+        "Glyphs.HLineDbl": "=",
+        "Glyphs.VLineDbl": "|",
+        "Glyphs.HLineHvDa2": "-",
+        "Glyphs.VLineHvDa2": "|",
+        "Glyphs.HLineHvDa3": "-",
+        "Glyphs.VLineHvDa3": "|",
+        "Glyphs.HLineHvDa4": "-",
+        "Glyphs.VLineHvDa4": "|",
+        "Glyphs.HLineDa2": "-",
+        "Glyphs.VLineDa2": "|",
+        "Glyphs.HLineDa3": "-",
+        "Glyphs.VLineDa3": "|",
+        "Glyphs.HLineDa4": "-",
+        "Glyphs.VLineDa4": "|",
+        "Glyphs.HLineHv": "=",
+        "Glyphs.VLineHv": "|",
+        "Glyphs.HalfLeftLine": "-",
+        "Glyphs.HalfTopLine": "|",
+        "Glyphs.HalfRightLine": "-",
+        "Glyphs.HalfBottomLine": "|",
+        "Glyphs.HalfLeftLineHv": "-",
+        "Glyphs.HalfTopLineHv": "|",
+        "Glyphs.HalfRightLineHv": "-",
+        "Glyphs.HalfBottomLineLt": "|",
+        "Glyphs.RightSideLineLtHv": "-",
+        "Glyphs.BottomSideLineLtHv": "|",
+        "Glyphs.LeftSideLineHvLt": "-",
+        "Glyphs.TopSideLineHvLt": "|",
+        "Glyphs.ULCorner": "+",
+        "Glyphs.ULCornerDbl": "+",
+        "Glyphs.ULCornerR": "+",
+        "Glyphs.ULCornerHv": "+",
+        "Glyphs.ULCornerHvLt": "+",
+        "Glyphs.ULCornerLtHv": "+",
+        "Glyphs.ULCornerDblSingle": "+",
+        "Glyphs.ULCornerSingleDbl": "+",
+        "Glyphs.LLCorner": "+",
+        "Glyphs.LLCornerHv": "+",
+        "Glyphs.LLCornerHvLt": "+",
+        "Glyphs.LLCornerLtHv": "+",
+        "Glyphs.LLCornerDbl": "+",
+        "Glyphs.LLCornerSingleDbl": "+",
+        "Glyphs.LLCornerDblSingle": "+",
+        "Glyphs.LLCornerR": "+",
+        "Glyphs.URCorner": "+",
+        "Glyphs.URCornerDbl": "+",
+        "Glyphs.URCornerR": "+",
+        "Glyphs.URCornerHv": "+",
+        "Glyphs.URCornerHvLt": "+",
+        "Glyphs.URCornerLtHv": "+",
+        "Glyphs.URCornerDblSingle": "+",
+        "Glyphs.URCornerSingleDbl": "+",
+        "Glyphs.LRCorner": "+",
+        "Glyphs.LRCornerDbl": "+",
+        "Glyphs.LRCornerR": "+",
+        "Glyphs.LRCornerHv": "+",
+        "Glyphs.LRCornerDblSingle": "+",
+        "Glyphs.LRCornerSingleDbl": "+",
+        "Glyphs.LRCornerLtHv": "+",
+        "Glyphs.LRCornerHvLt": "+",
+        "Glyphs.LeftTee": "+",
+        "Glyphs.LeftTeeDblH": "+",
+        "Glyphs.LeftTeeDblV": "+",
+        "Glyphs.LeftTeeDbl": "+",
+        "Glyphs.LeftTeeHvH": "+",
+        "Glyphs.LeftTeeHvV": "+",
+        "Glyphs.LeftTeeHvDblH": "+",
+        "Glyphs.RightTee": "+",
+        "Glyphs.RightTeeDblH": "+",
+        "Glyphs.RightTeeDblV": "+",
+        "Glyphs.RightTeeDbl": "+",
+        "Glyphs.RightTeeHvH": "+",
+        "Glyphs.RightTeeHvV": "+",
+        "Glyphs.RightTeeHvDblH": "+",
+        "Glyphs.TopTee": "+",
+        "Glyphs.TopTeeDblH": "+",
+        "Glyphs.TopTeeDblV": "+",
+        "Glyphs.TopTeeDbl": "+",
+        "Glyphs.TopTeeHvH": "+",
+        "Glyphs.TopTeeHvV": "+",
+        "Glyphs.TopTeeHvDblH": "+",
+        "Glyphs.BottomTee": "+",
+        "Glyphs.BottomTeeDblH": "+",
+        "Glyphs.BottomTeeDblV": "+",
+        "Glyphs.BottomTeeDbl": "+",
+        "Glyphs.BottomTeeHvH": "+",
+        "Glyphs.BottomTeeHvV": "+",
+        "Glyphs.BottomTeeHvDblH": "+",
+        "Glyphs.Cross": "+",
+        "Glyphs.CrossDblH": "+",
+        "Glyphs.CrossDblV": "+",
+        "Glyphs.CrossDbl": "+",
+        "Glyphs.CrossHvH": "+",
+        "Glyphs.CrossHvV": "+",
+        "Glyphs.CrossHv": "+",
+        "Glyphs.ShadowVerticalStart": "|",
+        "Glyphs.ShadowVertical": "|",
+        "Glyphs.ShadowHorizontalStart": "-",
+        "Glyphs.ShadowHorizontal": "-",
+        "Glyphs.ShadowHorizontalEnd": "-",
+        "Schemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Editable": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "ReadOnly": {
+                "Foreground": "White",
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Editable": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "ReadOnly": {
+                "Foreground": "White",
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "White",
+                "Background": "White"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Editable": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "ReadOnly": {
+                "Foreground": "Black",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "White",
+                "Background": "White"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Editable": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "ReadOnly": {
+                "Foreground": "Black",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Editable": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "ReadOnly": {
+                "Foreground": "White",
+                "Background": "Black"
+              }
+            }
+          }
+        ]
+
       }
     }
   ]

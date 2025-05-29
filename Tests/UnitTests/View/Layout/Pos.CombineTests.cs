@@ -72,7 +72,7 @@ public class PosCombineTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
-        var foundView = View.GetViewsUnderMouse (new Point(9, 4)).LastOrDefault ();
+        var foundView = View.GetViewsUnderLocation (new Point(9, 4), ViewportSettings.None).LastOrDefault ();
         Assert.Equal (foundView, view2);
         Application.Top.Dispose ();
         Application.ResetState (ignoreDisposed: true);

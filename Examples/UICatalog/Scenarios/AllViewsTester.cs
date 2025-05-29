@@ -21,10 +21,7 @@ public class AllViewsTester : Scenario
     private ArrangementEditor? _arrangementEditor;
     private LayoutEditor? _layoutEditor;
     private ViewportSettingsEditor? _viewportSettingsEditor;
-    private FrameView? _settingsPane;
-    private RadioGroup? _orientation;
-    private string _demoText = "This, that, and the other thing.";
-    private TextView? _demoTextView;
+    private ViewPropertiesEditor? _propertiesEditor;
 
     private FrameView? _hostPane;
     private View? _curView;
@@ -38,12 +35,12 @@ public class AllViewsTester : Scenario
         var app = new Window
         {
             Title = GetQuitKeyAndName (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
         };
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
         app.Border!.LineStyle = LineStyle.Heavy;
         app.Border.Thickness = new (0);
+
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -148,9 +145,9 @@ public class AllViewsTester : Scenario
         };
         _viewportSettingsEditor.Border!.Thickness = new (1, 1, 1, 1);
 
-        _settingsPane = new ()
+        _propertiesEditor = new ()
         {
-            Title = "Misc Settings [_6]",
+            Title = "View Properties [_6]",
             X = Pos.Right (_adornmentsEditor) - 1,
             Y = Pos.Bottom (_viewportSettingsEditor) - Pos.Func (() => _viewportSettingsEditor.Frame.Height == 1 ? 0 : 1),
             Width = Dim.Width (_layoutEditor),
@@ -158,49 +155,7 @@ public class AllViewsTester : Scenario
             CanFocus = true,
             SuperViewRendersLineCanvas = true
         };
-        _settingsPane.Border!.Thickness = new (1, 1, 1, 0);
-
-        Label label = new () { X = 0, Y = 0, Text = "_Orientation:" };
-
-        _orientation = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            RadioLabels = new [] { "Horizontal", "Vertical" },
-            Orientation = Orientation.Horizontal
-        };
-
-        _orientation.SelectedItemChanged += (s, selected) =>
-                                            {
-                                                if (_curView is IOrientation orientatedView)
-                                                {
-                                                    orientatedView.Orientation = (Orientation)_orientation.SelectedItem;
-                                                }
-                                            };
-        _settingsPane.Add (label, _orientation);
-
-        label = new () { X = 0, Y = Pos.Bottom (_orientation), Text = "_Text:" };
-
-        _demoTextView = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = Dim.Fill (),
-            Height = Dim.Auto (minimumContentDim: 2),
-            Text = _demoText
-        };
-
-        _demoTextView.ContentsChanged += (s, e) =>
-                                         {
-                                             _demoText = _demoTextView.Text;
-
-                                             if (_curView is { })
-                                             {
-                                                 _curView.Text = _demoText;
-                                             }
-                                         };
-
-        _settingsPane.Add (label, _demoTextView);
+        _propertiesEditor.Border!.Thickness = new (1, 1, 1, 0);
 
         _eventLog = new ()
         {
@@ -235,22 +190,22 @@ public class AllViewsTester : Scenario
         {
             Id = "_hostPane",
             X = Pos.Right (_adornmentsEditor),
-            Y = Pos.Bottom (_settingsPane),
+            Y = Pos.Bottom (_propertiesEditor),
             Width = Dim.Width (_layoutEditor) - 2,
             Height = Dim.Fill (),
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            ColorScheme = Colors.ColorSchemes ["Base"],
+            //SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.ColorScheme = app.ColorScheme;
+        _hostPane.Border!.SetScheme (app.GetScheme ());
         _hostPane.Padding!.Thickness = new (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.ColorScheme = app.ColorScheme;
+        _hostPane.Padding.SetScheme (app.GetScheme ());
 
-        app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _settingsPane, _eventLog, _hostPane);
+        app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
 
         app.Initialized += App_Initialized;
 
@@ -296,7 +251,7 @@ public class AllViewsTester : Scenario
         // Ensure the type does not contain any generic parameters
         if (type.ContainsGenericParameters)
         {
-            Logging.Warning($"Cannot create an instance of {type} because it contains generic parameters.");
+            Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
             //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
             return;
         }
@@ -307,23 +262,15 @@ public class AllViewsTester : Scenario
 
         if (view is IDesignable designable)
         {
-            designable.EnableForDesign (ref _demoText);
+            string settingsEditorDemoText = _propertiesEditor!.DemoText;
+            designable.EnableForDesign (ref settingsEditorDemoText);
         }
         else
         {
-            view.Text = _demoText;
+            view.Text = _propertiesEditor!.DemoText;
             view.Title = "_Test Title";
         }
 
-        if (view is IOrientation orientatedView)
-        {
-            _orientation!.SelectedItem = (int)orientatedView.Orientation;
-            _orientation.Enabled = true;
-        }
-        else
-        {
-            _orientation!.Enabled = false;
-        }
 
         view.Initialized += CurrentView_Initialized;
         view.SubViewsLaidOut += CurrentView_LayoutComplete;
@@ -335,6 +282,7 @@ public class AllViewsTester : Scenario
         _layoutEditor!.ViewToEdit = _curView;
         _viewportSettingsEditor!.ViewToEdit = _curView;
         _arrangementEditor!.ViewToEdit = _curView;
+        _propertiesEditor!.ViewToEdit = _curView;
         _curView.SetNeedsLayout ();
     }
 
@@ -349,6 +297,7 @@ public class AllViewsTester : Scenario
             _layoutEditor!.ViewToEdit = null;
             _viewportSettingsEditor!.ViewToEdit = null;
             _arrangementEditor!.ViewToEdit = null;
+            _propertiesEditor!.ViewToEdit = null;
 
             _curView.Dispose ();
             _curView = null;
@@ -379,7 +328,7 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width == Dim.Absolute(0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0) || view.Width is null)
         {
             view.Width = Dim.Fill ();
         }

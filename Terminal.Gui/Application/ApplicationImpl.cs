@@ -219,8 +219,7 @@ public class ApplicationImpl : IApplication
 
         bool wasInitialized = Application.Initialized;
         Application.ResetState ();
-        LogJsonErrors ();
-        PrintJsonErrors ();
+        ConfigurationManager.PrintJsonErrors ();
 
         if (wasInitialized)
         {

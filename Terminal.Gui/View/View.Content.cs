@@ -6,8 +6,8 @@ public partial class View
     #region Content Area
 
     // nullable holder of developer specified Content Size. If null then the developer did not
-    // explicitly set it and contentsize will be calculated dynamically.
-    internal Size? _contentSize;
+    // explicitly set it and the content size will be calculated dynamically.
+    private Size? _contentSize;
 
     /// <summary>
     ///     Sets the size of the View's content.
@@ -78,6 +78,84 @@ public partial class View
     ///     return the size of the <see cref="Viewport"/> and <see cref="ContentSizeTracksViewport"/> will be <see langword="true"/>.
     /// </returns>
     public Size GetContentSize () { return _contentSize ?? Viewport.Size; }
+
+    /// <summary>
+    ///     Gets the number of rows required for all the View's SubViews.
+    /// </summary>
+    /// <returns></returns>
+    public int GetWidthRequiredForSubViews ()
+    {
+        int max = GetContentSize ().Width;
+
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return max;
+        }
+
+        if (max == 0)
+        {
+            max = Viewport.Width;
+        }
+
+        // Iterate through all subviews to calculate the maximum height
+        foreach (View subView in InternalSubViews)
+        {
+            if (subView.Width is { })
+            {
+                //if (subView.Height is DimAbsolute)
+                //{
+                //    max = Math.Max (max, subView.Height.GetAnchor (0));
+                //}
+                //else
+                {
+                    max = Math.Max (max, subView.X.GetAnchor (0) + subView.Width.Calculate (0, max, subView, Dimension.Width));
+                }
+            }
+        }
+
+        // Return the calculated maximum content size
+        return max;
+    }
+
+    /// <summary>
+    ///     Gets the number of rows required for all the View's SubViews.
+    /// </summary>
+    /// <returns></returns>
+    public int GetHeightRequiredForSubViews ()
+    {
+        int max = GetContentSize ().Height;
+
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return max;
+        }
+
+        if (max == 0)
+        {
+            max = Viewport.Height;
+        }
+
+        // Iterate through all subviews to calculate the maximum height
+        foreach (View subView in InternalSubViews)
+        {
+            if (subView.Height is { })
+            {
+                //if (subView.Height is DimAbsolute)
+                //{
+                //    max = Math.Max (max, subView.Height.GetAnchor (0));
+                //}
+                //else
+                {
+                    max = Math.Max (max, subView.Y.GetAnchor (0) + subView.Height.Calculate (0, max, subView, Dimension.Height));
+                }
+            }
+        }
+
+        // Return the calculated maximum content size
+        return max;
+    }
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s

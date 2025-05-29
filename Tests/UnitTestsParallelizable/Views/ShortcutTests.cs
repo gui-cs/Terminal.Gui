@@ -439,18 +439,4 @@ public class ShortcutTests
         Assert.False (shortcut.CanFocus);
         Assert.True (shortcut.CommandView.CanFocus);
     }
-
-    [Fact]
-    public void ColorScheme_SetsAndGetsCorrectly ()
-    {
-        var colorScheme = new ColorScheme ();
-
-        var shortcut = new Shortcut
-        {
-            ColorScheme = colorScheme
-        };
-
-        Assert.Same (colorScheme, shortcut.ColorScheme);
-    }
-
 }

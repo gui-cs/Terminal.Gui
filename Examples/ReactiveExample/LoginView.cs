@@ -96,8 +96,8 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
                 ViewModel
                     .WhenAnyValue (x => x.IsValid)
-                    .Select (valid => valid ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"])
-                    .BindTo (validation, x => x.ColorScheme)
+                    .Select (valid => valid ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme ("Error"))
+                    .BindTo (validation, x => x.GetScheme ())
                     .DisposeWith (_disposable);
             })
             .AddControlAfter<Button> ((previous, login) =>

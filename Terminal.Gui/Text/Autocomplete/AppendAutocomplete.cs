@@ -13,9 +13,9 @@ public class AppendAutocomplete : AutocompleteBase
     public AppendAutocomplete (TextField textField)
     {
         this.textField = textField;
-        SelectionKey = KeyCode.Tab;
+        base.SelectionKey = KeyCode.Tab;
 
-        ColorScheme = new ColorScheme
+        Scheme = new Scheme
         {
             Normal = new Attribute (Color.DarkGray, Color.Black),
             Focus = new Attribute (Color.DarkGray, Color.Black),
@@ -26,10 +26,10 @@ public class AppendAutocomplete : AutocompleteBase
     }
 
     /// <summary>
-    ///     The color used for rendering the appended text. Note that only <see cref="ColorScheme.Normal"/> is used and
+    ///     The color used for rendering the appended text. Note that only <see cref="Scheme.Normal"/> is used and
     ///     then only <see cref="Attribute.Foreground"/> (Background comes from <see cref="HostControl"/>).
     /// </summary>
-    public override ColorScheme ColorScheme { get; set; }
+    public override Scheme Scheme { get; set; }
 
     /// <inheritdoc/>
     public override View HostControl
@@ -108,8 +108,9 @@ public class AppendAutocomplete : AutocompleteBase
         // draw it like it's selected, even though it's not
         textField.SetAttribute (
                                new Attribute (
-                                              ColorScheme.Normal.Foreground,
-                                              textField.ColorScheme.Focus.Background
+                                              Scheme.Normal.Foreground,
+                                              textField.GetAttributeForRole(VisualRole.Focus).Background,
+                                              Scheme.Normal.Style
                                              )
                               );
         textField.Move (textField.Text.Length, 0);

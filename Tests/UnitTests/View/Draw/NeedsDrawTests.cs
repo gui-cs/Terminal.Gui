@@ -14,7 +14,7 @@ public class NeedsDrawTests ()
 
         var label = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["Menu"], X = 0, Y = 0, Text = "This should be the first line."
+            SchemeName = "Menu", X = 0, Y = 0, Text = "This should be the first line."
         };
 
         var view = new View
@@ -39,13 +39,13 @@ public class NeedsDrawTests ()
 
         RunState runState = Application.Begin (top);
 
-        top.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 80, 25), top._needsDrawRect); };
+        top.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 80, 25), top.NeedsDrawRect); };
 
-        frame.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 40, 8), frame._needsDrawRect); };
+        frame.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 40, 8), frame.NeedsDrawRect); };
 
-        label.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 38, 1), label._needsDrawRect); };
+        label.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 38, 1), label.NeedsDrawRect); };
 
-        view.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 13, 1), view._needsDrawRect); };
+        view.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 13, 1), view.NeedsDrawRect); };
 
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
         Assert.Equal (new (20, 8, 40, 8), frame.Frame);

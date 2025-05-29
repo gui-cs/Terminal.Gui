@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace Terminal.Gui;
 
 /// <summary>
-///     Defines non-color text style flags for an <see cref="Attribute"/>.
+///     Defines non-color style flags for an <see cref="Attribute"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -9,7 +11,7 @@ namespace Terminal.Gui;
 ///         Styles that are poorly supported, non-visual, or redundant with other APIs are omitted.
 ///     </para>
 ///     <para>
-///         Multiple styles can be combined using bitwise operations. Use <see cref="Attribute.TextStyle"/>
+///         Multiple styles can be combined using bitwise operations. Use <see cref="Attribute.Style"/>
 ///         to get or set these styles on an <see cref="Attribute"/>.
 ///     </para>
 ///     <para>
@@ -20,6 +22,7 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 [Flags]
+[JsonConverter (typeof (JsonStringEnumConverter<TextStyle>))]
 public enum TextStyle : byte
 {
     /// <summary>

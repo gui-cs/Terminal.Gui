@@ -71,6 +71,16 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
+            if (Application.MouseGrabView == this)
+            {
+                Application.UngrabMouse ();
+            }
+
+            if (Application.WantContinuousButtonPressedView == this)
+            {
+                Application.WantContinuousButtonPressedView = null;
+            }
+
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
             {
                 View subview = InternalSubViews [i];
@@ -103,11 +113,23 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
+    private IConsoleDriver? _driver = null;
     /// <summary>
-    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
+    ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    public static IConsoleDriver? Driver => Application.Driver;
+    internal IConsoleDriver? Driver
+    {
+        get
+        {
+            if (_driver is { })
+            {
+                return _driver;
+            }
+            return Application.Driver;
+        }
+        set => _driver = value;
+    }
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>

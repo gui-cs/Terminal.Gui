@@ -145,20 +145,11 @@ public class Wizard : Dialog
 
             if (base.Modal)
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"];
+                SchemeName = "Dialog";
                 BorderStyle = LineStyle.Rounded;
             }
             else
             {
-                if (SuperView is { })
-                {
-                    ColorScheme = SuperView.ColorScheme;
-                }
-                else
-                {
-                    ColorScheme = Colors.ColorSchemes ["Base"];
-                }
-
                 CanFocus = true;
                 BorderStyle = LineStyle.None;
             }

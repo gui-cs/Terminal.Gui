@@ -128,16 +128,16 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                         _numericUpDown.Value = (T)Convert.ChangeType (_value.Text, typeof (T));
                     }
 
-                    _value.ColorScheme = SuperView!.ColorScheme;
+                    _value.SetScheme (SuperView!.GetScheme ());
 
                 }
                 catch (System.FormatException)
                 {
-                    _value.ColorScheme = Colors.ColorSchemes ["Error"];
+                    _value.SchemeName = "Error";
                 }
                 catch (InvalidCastException)
                 {
-                    _value.ColorScheme = Colors.ColorSchemes ["Error"];
+                    _value.SchemeName = "Error";
                 }
                 finally
                 {
@@ -176,16 +176,16 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                     _ = string.Format (_format.Text, _value);
                     _numericUpDown.Format = _format.Text;
 
-                    _format.ColorScheme = SuperView!.ColorScheme;
+                    _format.SetScheme (SuperView!.GetScheme ());
 
                 }
                 catch (System.FormatException)
                 {
-                    _format.ColorScheme = Colors.ColorSchemes ["Error"];
+                    _format.SchemeName = "Error";
                 }
                 catch (InvalidCastException)
                 {
-                    _format.ColorScheme = Colors.ColorSchemes ["Error"];
+                    _format.SchemeName = "Error";
                 }
                 finally
                 {
@@ -231,16 +231,16 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                         _numericUpDown.Increment = (T)Convert.ChangeType (_increment.Text, typeof (T));
                     }
 
-                    _increment.ColorScheme = SuperView!.ColorScheme;
+                    _increment.SetScheme (SuperView!.GetScheme ());
 
                 }
                 catch (System.FormatException)
                 {
-                    _increment.ColorScheme = Colors.ColorSchemes ["Error"];
+                    _increment.SchemeName = "Error";
                 }
                 catch (InvalidCastException)
                 {
-                    _increment.ColorScheme = Colors.ColorSchemes ["Error"];
+                    _increment.SchemeName = "Error";
                 }
                 finally
                 {

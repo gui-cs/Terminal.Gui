@@ -259,11 +259,10 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         var menuBar = new MenuBar ();
         Assert.Equal (KeyCode.F9, menuBar.Key);
         var menu = new Menu { Host = menuBar, X = 0, Y = 0, BarItems = new () };
-        Assert.Null (menu.ColorScheme);
+        Assert.False (menu.HasScheme);
         Assert.False (menu.IsInitialized);
         menu.BeginInit ();
         menu.EndInit ();
-        Assert.Equal (Colors.ColorSchemes ["Menu"], menu.ColorScheme);
         Assert.True (menu.CanFocus);
         Assert.False (menu.WantContinuousButtonPressed);
         Assert.Equal (LineStyle.Single, menuBar.MenusBorderStyle);
@@ -274,7 +273,6 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
         Assert.True (menuBar.WantMousePositionReports);
         Assert.False (menuBar.IsMenuOpen);
 
@@ -284,7 +282,6 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
         Assert.True (menuBar.WantMousePositionReports);
         Assert.False (menuBar.IsMenuOpen);
 
@@ -318,7 +315,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown]
     public void Disabled_MenuBar_Is_Never_Opened ()
     {
         Toplevel top = new ();
@@ -344,7 +341,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
     }
 
     [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown]
     public void Disabled_MenuItem_Is_Never_Selected ()
     {
         var menu = new MenuBar
@@ -371,13 +368,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Attribute [] attributes =
         {
             // 0
-            menu.ColorScheme.Normal,
+            menu.GetAttributeForRole(VisualRole.Normal),
 
             // 1
-            menu.ColorScheme.Focus,
+            menu.GetAttributeForRole(VisualRole.Focus),
 
             // 2
-            menu.ColorScheme.Disabled
+            menu.GetAttributeForRole(VisualRole.Disabled)
         };
 
         DriverAssert.AssertDriverAttributesAre (
@@ -415,7 +412,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                         new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked, View = top.SubViews.ElementAt (1) }
                                        )
                     );
-        top.SubViews.ElementAt (1).Layout();
+        top.SubViews.ElementAt (1).Layout ();
         top.SubViews.ElementAt (1).Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -701,7 +698,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Assert.Equal (new (0, 0, 40, 15), View.GetClip ()!.GetBounds());
+        Assert.Equal (new (0, 0, 40, 15), View.GetClip ()!.GetBounds ());
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         List<string> items = new ()
@@ -1948,7 +1945,7 @@ wo
         Application.Iteration += (s, a) =>
                                  {
                                      Toplevel top = Application.Top;
-                                     Application.LayoutAndDraw();
+                                     Application.LayoutAndDraw ();
 
                                      DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
@@ -3239,484 +3236,6 @@ Edit
         top.Dispose ();
     }
 
-    [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown]
-    public void UseSubMenusSingleFrame_False_Disabled_Border ()
-    {
-        var menu = new MenuBar
-        {
-            MenusBorderStyle = LineStyle.None,
-            Menus =
-            [
-                new (
-                     "Numbers",
-                     new MenuItem []
-                     {
-                         new ("One", "", null),
-                         new MenuBarItem (
-                                          "Two",
-                                          new MenuItem []
-                                          {
-                                              new (
-                                                   "Sub-Menu 1",
-                                                   "",
-                                                   null
-                                                  ),
-                                              new (
-                                                   "Sub-Menu 2",
-                                                   "",
-                                                   null
-                                                  )
-                                          }
-                                         ),
-                         new ("Three", "", null)
-                     }
-                    )
-            ]
-        };
-
-        menu.UseKeysUpDownAsKeysLeftRight = true;
-        menu.BeginInit ();
-        menu.EndInit ();
-
-        menu.OpenMenu ();
-        menu.ColorScheme = menu._openMenu.ColorScheme = new (Attribute.Default);
-        Assert.True (menu.IsMenuOpen);
-
-        menu.Draw ();
-        menu._openMenu.Draw ();
-
-        var expected = @"
- Numbers
- One    
- Two   ►
- Three  ";
-
-        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-
-        Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
-        menu.Draw ();
-        menu._openMenu.Draw ();
-        menu.OpenCurrentMenu.Draw ();
-
-        expected = @"
- Numbers           
- One               
- Two   ► Sub-Menu 1
- Three   Sub-Menu 2";
-
-        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-    }
-
-    [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown]
-    public void UseSubMenusSingleFrame_True_By_Keyboard ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "Numbers",
-                     new MenuItem []
-                     {
-                         new ("One", "", null),
-                         new MenuBarItem (
-                                          "Two",
-                                          new MenuItem []
-                                          {
-                                              new (
-                                                   "Sub-Menu 1",
-                                                   "",
-                                                   null
-                                                  ),
-                                              new (
-                                                   "Sub-Menu 2",
-                                                   "",
-                                                   null
-                                                  )
-                                          }
-                                         ),
-                         new ("Three", "", null)
-                     }
-                    )
-            ]
-        };
-
-        var top = new Toplevel ();
-        top.Add (menu);
-        Application.Begin (top);
-
-        Assert.Equal (Point.Empty, new (menu.Frame.X, menu.Frame.Y));
-        Assert.False (menu.UseSubMenusSingleFrame);
-        menu.UseSubMenusSingleFrame = true;
-        Assert.True (menu.UseSubMenusSingleFrame);
-
-        top.Draw ();
-
-        var expected = @"
- Numbers
-";
-
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 1), pos);
-
-        Assert.True (menu.NewKeyDownEvent (menu.Key));
-        top.Draw ();
-
-        expected = @"
- Numbers  
-┌────────┐
-│ One    │
-│ Two   ►│
-│ Three  │
-└────────┘
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 10, 6), pos);
-
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.Enter));
-        top.Draw ();
-
-        expected = @"
- Numbers       
-┌─────────────┐
-│◄    Two     │
-├─────────────┤
-│ Sub-Menu 1  │
-│ Sub-Menu 2  │
-└─────────────┘
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 15, 7), pos);
-
-        Assert.True (Application.Top.SubViews.ElementAt (2).NewKeyDownEvent (Key.Enter));
-        top.Draw ();
-
-        expected = @"
- Numbers  
-┌────────┐
-│ One    │
-│ Two   ►│
-│ Three  │
-└────────┘
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 10, 6), pos);
-
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.Esc));
-        top.Draw ();
-
-        expected = @"
- Numbers
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 1), pos);
-        top.Dispose ();
-    }
-
-    [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown]
-    public void UseSubMenusSingleFrame_True_By_Mouse ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "Numbers",
-                     new MenuItem []
-                     {
-                         new ("One", "", null),
-                         new MenuBarItem (
-                                          "Two",
-                                          new MenuItem []
-                                          {
-                                              new (
-                                                   "Sub-Menu 1",
-                                                   "",
-                                                   null
-                                                  ),
-                                              new (
-                                                   "Sub-Menu 2",
-                                                   "",
-                                                   null
-                                                  )
-                                          }
-                                         ),
-                         new ("Three", "", null)
-                     }
-                    )
-            ]
-        };
-
-        var top = new Toplevel ();
-        top.Add (menu);
-        Application.Begin (top);
-
-        Assert.Equal (Point.Empty, new (menu.Frame.X, menu.Frame.Y));
-        Assert.False (menu.UseSubMenusSingleFrame);
-        menu.UseSubMenusSingleFrame = true;
-        Assert.True (menu.UseSubMenusSingleFrame);
-
-        top.Draw ();
-
-        var expected = @"
- Numbers
-";
-
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 1), pos);
-
-        Assert.True (menu.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.Button1Pressed, View = menu }));
-        top.Draw ();
-
-        expected = @"
- Numbers  
-┌────────┐
-│ One    │
-│ Two   ►│
-│ Three  │
-└────────┘
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 10, 6), pos);
-
-        Assert.False (menu.NewMouseEvent (new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (1) }));
-        top.Draw ();
-
-        expected = @"
- Numbers       
-┌─────────────┐
-│◄    Two     │
-├─────────────┤
-│ Sub-Menu 1  │
-│ Sub-Menu 2  │
-└─────────────┘
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 15, 7), pos);
-
-        menu.NewMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (2) });
-        top.Draw ();
-
-        expected = @"
- Numbers  
-┌────────┐
-│ One    │
-│ Two   ►│
-│ Three  │
-└────────┘
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 10, 6), pos);
-
-        Assert.False (menu.NewMouseEvent (new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }));
-        top.Draw ();
-
-        expected = @"
- Numbers
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 1), pos);
-        top.Dispose ();
-    }
-
-    [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown]
-    public void UseSubMenusSingleFrame_True_Disabled_Border ()
-    {
-        var menu = new MenuBar
-        {
-            MenusBorderStyle = LineStyle.None,
-            Menus =
-            [
-                new (
-                     "Numbers",
-                     new MenuItem []
-                     {
-                         new ("One", "", null),
-                         new MenuBarItem (
-                                          "Two",
-                                          new MenuItem []
-                                          {
-                                              new (
-                                                   "Sub-Menu 1",
-                                                   "",
-                                                   null
-                                                  ),
-                                              new (
-                                                   "Sub-Menu 2",
-                                                   "",
-                                                   null
-                                                  )
-                                          }
-                                         ),
-                         new ("Three", "", null)
-                     }
-                    )
-            ]
-        };
-
-        menu.UseSubMenusSingleFrame = true;
-        menu.BeginInit ();
-        menu.EndInit ();
-
-        menu.OpenMenu ();
-        Assert.True (menu.IsMenuOpen);
-
-        menu.Draw ();
-        menu.ColorScheme = menu._openMenu.ColorScheme = new (Attribute.Default);
-        menu._openMenu.Draw ();
-
-        var expected = @"
- Numbers
- One    
- Two   ►
- Three  ";
-
-        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-
-        Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
-        Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        menu.Draw ();
-        menu._openMenu.Draw ();
-        menu.OpenCurrentMenu.Draw ();
-
-        expected = @"
- Numbers     
-◄    Two     
-─────────────
- Sub-Menu 1  
- Sub-Menu 2  ";
-
-        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-    }
-
-    [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown]
-    public void UseSubMenusSingleFrame_True_Without_Border ()
-    {
-        var menu = new MenuBar
-        {
-            UseSubMenusSingleFrame = true,
-            MenusBorderStyle = LineStyle.None,
-            Menus =
-            [
-                new (
-                     "Numbers",
-                     new MenuItem []
-                     {
-                         new ("One", "", null),
-                         new MenuBarItem (
-                                          "Two",
-                                          new MenuItem []
-                                          {
-                                              new (
-                                                   "Sub-Menu 1",
-                                                   "",
-                                                   null
-                                                  ),
-                                              new (
-                                                   "Sub-Menu 2",
-                                                   "",
-                                                   null
-                                                  )
-                                          }
-                                         ),
-                         new ("Three", "", null)
-                     }
-                    )
-            ]
-        };
-
-        var top = new Toplevel ();
-        top.Add (menu);
-        Application.Begin (top);
-
-        Assert.Equal (Point.Empty, new (menu.Frame.X, menu.Frame.Y));
-        Assert.True (menu.UseSubMenusSingleFrame);
-        Assert.Equal (LineStyle.None, menu.MenusBorderStyle);
-
-        top.Draw ();
-
-        var expected = @"
- Numbers
-";
-
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 1), pos);
-
-        Assert.True (
-                     menu.NewMouseEvent (
-                                         new () { Position = new (1, 0), Flags = MouseFlags.Button1Pressed, View = menu }
-                                        )
-                    );
-        top.Draw ();
-
-        expected = @"
- Numbers
- One    
- Two   ►
- Three  
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 4), pos);
-
-        menu.NewMouseEvent (
-                            new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (1) }
-                           );
-        top.Draw ();
-
-        expected = @"
- Numbers     
-◄    Two     
-─────────────
- Sub-Menu 1  
- Sub-Menu 2  
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 13, 5), pos);
-
-        menu.NewMouseEvent (
-                            new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (2) }
-                           );
-        top.Draw ();
-
-        expected = @"
- Numbers
- One    
- Two   ►
- Three  
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 4), pos);
-
-        menu.NewMouseEvent (
-                            new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }
-                           );
-        top.Draw ();
-
-        expected = @"
- Numbers
-";
-
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 0, 8, 1), pos);
-        top.Dispose ();
-    }
 
     [Fact]
     [AutoInitShutdown]

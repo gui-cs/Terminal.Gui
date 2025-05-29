@@ -28,26 +28,26 @@ public static class MessageBox
     ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center; // Default is set in config.json
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center;
 
     /// <summary>
     ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumWidth { get; set; } = 0;
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 0;
     /// <summary>
     ///     The index of the selected button, or -1 if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox. This is useful for web
@@ -411,7 +411,7 @@ public static class MessageBox
             d.Height = height;
         }
 
-        d.ColorScheme = useErrorColors ? Colors.ColorSchemes ["Error"] : Colors.ColorSchemes ["Dialog"];
+        d.SchemeName = useErrorColors ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
         d.HotKeySpecifier = new Rune ('\xFFFF');
         d.Text = message;
