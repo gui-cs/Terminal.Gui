@@ -9,10 +9,11 @@ public static class Program
 
     private static void Main (string [] args)
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Services = ConfigureServices ();
         Application.Init ();
         Application.Run (Services.GetRequiredService<LoginView> ());
-        Application.Top?.Dispose();
+        Application.Top?.Dispose ();
         Application.Shutdown ();
     }
 

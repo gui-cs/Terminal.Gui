@@ -1,7 +1,8 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "--debug-log-level Debug"
     },
     "UICatalog --driver NetDriver": {
       "commandName": "Project",
@@ -60,9 +61,17 @@
       "commandName": "Project",
       "commandLineArgs": "\"All Views Tester\" -b -t 5000"
     },
-    "Charmap": {
+    "UICatalog --disable-cm": {
       "commandName": "Project",
-      "commandLineArgs": "Bars -b"
+      "commandLineArgs": "--disable-cm\r\n"
+    },
+    "UICatalog --disable-cm --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--disable-cm --driver v2win"
+    },
+    "Themes": {
+      "commandName": "Project",
+      "commandLineArgs": "Themes"
     }
   }
 }

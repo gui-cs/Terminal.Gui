@@ -21,8 +21,8 @@ public class TileViewTests (ITestOutputHelper output)
         top.Layout ();
 
         tileView.Tiles.ElementAt (1).ContentView!.Add (new Label { Text = "Hello" });
-        tileView.ColorScheme = new ();
-        top.ColorScheme = new ();
+        tileView.SetScheme (new ());
+        top.SetScheme (new ());
 
         top.Layout ();
         tileView.Layout ();
@@ -1509,11 +1509,11 @@ public class TileViewTests (ITestOutputHelper output)
     {
         var tv = new TileView
         {
-            Width = 10, Height = 5, ColorScheme = new (), LineStyle = LineStyle.Single
+            Width = 10, Height = 5, LineStyle = LineStyle.Single
         };
 
         tv.TrySplitTile (1, 2, out TileView tv2);
-        tv2.ColorScheme = new ();
+       // tv2.Scheme = new ();
         tv2.LineStyle = LineStyle.Single;
         tv2.Orientation = Orientation.Horizontal;
 
@@ -1554,14 +1554,13 @@ public class TileViewTests (ITestOutputHelper output)
     {
         var tv = new TileView
         {
-            Width = 10, Height = 5, ColorScheme = new (), LineStyle = LineStyle.Single
+            Width = 10, Height = 5, LineStyle = LineStyle.Single
         };
 
         var tv2 = new TileView
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = new (),
             LineStyle = LineStyle.Single,
             Orientation = Orientation.Horizontal
         };
@@ -2217,7 +2216,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         var tv = new TileView (5)
         {
-            Width = 25, Height = 4, ColorScheme = new (), LineStyle = LineStyle.Single
+            Width = 25, Height = 4, LineStyle = LineStyle.Single
         };
 
         if (!border)
@@ -2269,8 +2268,6 @@ public class TileViewTests (ITestOutputHelper output)
         Assert.True (container.TrySplitTile (0, 2, out TileView newContainer));
 
         newContainer.Orientation = Orientation.Horizontal;
-        newContainer.ColorScheme = new ();
-        container.ColorScheme = new ();
 
         container.LayoutSubViews ();
 
@@ -2325,8 +2322,6 @@ public class TileViewTests (ITestOutputHelper output)
                                  );
         }
 
-        newContainer.ColorScheme = new ();
-        container.ColorScheme = new ();
         Application.Top.Add (container);
         Application.Begin (Application.Top);
 
@@ -2382,7 +2377,6 @@ public class TileViewTests (ITestOutputHelper output)
 
         Application.Top = new ();
         Application.Top.Add (container);
-        container.ColorScheme = new ();
 
         Application.Begin (Application.Top);
 

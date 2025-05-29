@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/> and
-///         inherits it's color scheme from the <see cref="View.SuperView"/>.
+///         inherits it's scheme from the <see cref="View.SuperView"/>.
 ///     </para>
 ///     <para>
 ///         
@@ -37,6 +37,6 @@ public class FrameView : View
     ///     This property can be set in a Theme to change the default <see cref="LineStyle"/> for all
     ///     <see cref="FrameView"/>s.
     /// </remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
 }

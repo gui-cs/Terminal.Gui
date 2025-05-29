@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
-///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.ColorSchemes ["Dialog"]</c> color scheme and has a
+///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.Schemes ["Dialog"]</c> scheme and has a
 ///     1 cell padding around the edges.
 /// </summary>
 /// <remarks>
@@ -16,42 +16,42 @@ public class Dialog : Window
 {
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End; // Default is set in config.json
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
 
     /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
 
     /// <summary>
     ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumWidth { get; set; } = 80;
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 80;
 
 
     /// <summary>
     /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None; // Default is set in config.json
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
 
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
 
     private readonly List<Button> _buttons = new ();
 
@@ -75,27 +75,30 @@ public class Dialog : Window
         Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
         Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        ColorScheme = Colors.ColorSchemes ["Dialog"];
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
     }
 
-    // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.
+    // BUGBUG: We override GetNormal/FocusColor because "Dialog" Scheme is goofy.
     // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
     // BUGBUG: Calls these methods.
     // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
-    /// <inheritdoc />
-    public override Attribute GetNormalColor ()
-    {
-        return ColorScheme!.Normal;
-    }
 
     /// <inheritdoc />
-    public override Attribute GetFocusColor ()
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        return ColorScheme!.Normal;
+        if (role == VisualRole.Normal || role == VisualRole.Focus)
+        {
+            currentAttribute = GetScheme ().Normal;
+
+            return true;
+        }
+
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
     private bool _canceled;

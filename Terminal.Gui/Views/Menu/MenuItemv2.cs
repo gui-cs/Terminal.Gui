@@ -104,7 +104,7 @@ public class MenuItemv2 : Shortcut
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
-        Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
+        // Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
         bool? ret = null;
 
         bool quit = false;
@@ -114,7 +114,7 @@ public class MenuItemv2 : Shortcut
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {
                 // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-                Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
+                // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
                 quit = true;
                 //ret = true;
             }
@@ -130,27 +130,27 @@ public class MenuItemv2 : Shortcut
         {
             if (TargetView is { })
             {
-                Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
+                // Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
                 ret = TargetView.InvokeCommand (Command, commandContext);
             }
             else
             {
                 // Is this an Application-bound command?
-                Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
+                // Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
                 ret = Application.InvokeCommandsBoundToKey (Key);
             }
         }
 
         if (ret is not true)
         {
-            Logging.Debug ($"{Title} - calling base.DispatchCommand...");
+            // Logging.Debug ($"{Title} - calling base.DispatchCommand...");
             // Base will Raise Selected, then Accepting, then invoke the Action, if any
             ret = base.DispatchCommand (commandContext);
         }
 
         if (ret is true)
         {
-            Logging.Debug ($"{Title} - Calling RaiseAccepted");
+            // Logging.Debug ($"{Title} - Calling RaiseAccepted");
             RaiseAccepted (commandContext);
         }
 
@@ -160,7 +160,7 @@ public class MenuItemv2 : Shortcut
     ///// <inheritdoc />
     //protected override bool OnAccepting (CommandEventArgs e)
     //{
-    //    Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
+    //    // Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
     //    bool? ret = base.OnAccepting (e);
 
     //    if (ret is true || e.Cancel)

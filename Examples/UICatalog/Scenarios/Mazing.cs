@@ -67,14 +67,14 @@ public class Mazing : Scenario
                                    top.AddStr ("e");
 
                                    top.Move (_m.Player.X, _m.Player.Y);
-                                   top.SetAttribute (new (Color.Cyan, top.GetNormalColor ().Background));
+                                   top.SetAttribute (new (Color.Cyan, top.GetAttributeForRole (VisualRole.Normal).Background));
                                    top.AddStr (_dead ? "x" : "@");
 
                                    // Draw goblins
                                    foreach (Point goblin in _goblins!)
                                    {
                                        top.Move (goblin.X, goblin.Y);
-                                       top.SetAttribute (new (Color.Red, top.GetNormalColor ().Background));
+                                       top.SetAttribute (new (Color.Red, top.GetAttributeForRole (VisualRole.Normal).Background));
                                        top.AddStr ("G");
                                    }
 
@@ -82,12 +82,12 @@ public class Mazing : Scenario
                                    foreach (Point potion in _potions!)
                                    {
                                        top.Move (potion.X, potion.Y);
-                                       top.SetAttribute (new (Color.Yellow, top.GetNormalColor ().Background));
+                                       top.SetAttribute (new (Color.Yellow, top.GetAttributeForRole (VisualRole.Normal).Background));
                                        top.AddStr ("p");
                                    }
 
                                    // Draw UI
-                                   top.SetAttribute (top.GetNormalColor ());
+                                   top.SetAttribute (top.GetAttributeForRole (VisualRole.Normal));
 
                                    var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
                                    top.Move (_m.MazeWidth + 1, 0);
@@ -102,7 +102,7 @@ public class Mazing : Scenario
                                        top.AddRune ('█');
                                    }
 
-                                   top.SetAttribute (top.GetNormalColor ());
+                                   top.SetAttribute (top.GetAttributeForRole (VisualRole.Normal));
 
                                    if (!string.IsNullOrWhiteSpace (_message))
                                    {

@@ -115,7 +115,7 @@ private void SendMessage (LoginAction loginAction, string message = "")
             break;
         case LoginAction.Validation:
             ValidationMessage = CanLogin ? VALID_LOGIN_MESSAGE : INVALID_LOGIN_MESSAGE;
-            ValidationColorScheme = CanLogin ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"];
+            ValidationScheme = CanLogin ? Colors.Schemes ["Base"] : Colors.Schemes ["Error"];
             break;
     }
     WeakReferenceMessenger.Default.Send (new Message<LoginAction> { Value = loginAction });
@@ -144,7 +144,7 @@ public void Receive (Message<LoginAction> message)
         case LoginAction.Validation:
             {
                 validationLabel.Text = ViewModel.ValidationMessage;
-                validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
+                validationLabel.Scheme = ViewModel.ValidationScheme;
                 break;
             }
     }

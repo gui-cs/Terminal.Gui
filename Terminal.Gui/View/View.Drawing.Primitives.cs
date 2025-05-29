@@ -103,26 +103,26 @@ public partial class View
     }
 
     /// <summary>
-    ///     Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused"
+    ///     Utility function to draw strings that contains a hotkey using a <see cref="Scheme"/> and the "focused"
     ///     state.
     /// </summary>
     /// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
     /// <param name="focused">
-    ///     If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise
+    ///     If set to <see langword="true"/> this uses the focused colors from the scheme, otherwise
     ///     the regular ones.
     /// </param>
     public void DrawHotString (string text, bool focused)
     {
         if (focused)
         {
-            DrawHotString (text, GetHotFocusColor (), GetFocusColor ());
+            DrawHotString (text, GetAttributeForRole (VisualRole.HotFocus), GetAttributeForRole (VisualRole.Focus));
         }
         else
         {
             DrawHotString (
                            text,
-                           Enabled ? GetHotNormalColor () : ColorScheme!.Disabled,
-                           Enabled ? GetNormalColor () : ColorScheme!.Disabled
+                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ()!.Disabled,
+                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ()!.Disabled
                           );
         }
     }
@@ -139,7 +139,7 @@ public partial class View
 
         Region prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
-        Attribute prev = SetAttribute (new (color ?? GetNormalColor ().Background));
+        Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
         SetAttribute (prev);
         SetClip (prevClip);

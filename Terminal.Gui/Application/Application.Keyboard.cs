@@ -118,7 +118,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <summary>
-    ///     Invokes an Application-bound commmand.
+    ///     Invokes an Application-bound command.
     /// </summary>
     /// <param name="command">The Command to invoke</param>
     /// <param name="key">The Application-bound Key that was pressed.</param>
@@ -185,6 +185,9 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
+
+        // TODO: Add Popover support
+
         foreach (Toplevel topLevel in TopLevels.ToList ())
         {
             if (topLevel.NewKeyUpEvent (key))
@@ -203,7 +206,10 @@ public static partial class Application // Keyboard handling
 
     #region Application-scoped KeyBindings
 
-    static Application () { AddKeyBindings (); }
+    static Application ()
+    {
+        AddKeyBindings ();
+    }
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
     public static KeyBindings KeyBindings { get; internal set; } = new (null);
@@ -277,13 +283,7 @@ public static partial class Application // Keyboard handling
                         return false;
                     });
 
-        // Resources/config.json overrides
-        QuitKey = Key.Esc;
-        NextTabKey = Key.Tab;
-        PrevTabKey = Key.Tab.WithShift;
-        NextTabGroupKey = Key.F6;
-        PrevTabGroupKey = Key.F6.WithShift;
-        ArrangeKey = Key.F5.WithCtrl;
+        //SetKeysToHardCodedDefaults ();
 
         // Need to clear after setting the above to ensure actually clear
         // because set_QuitKey etc.. may call Add

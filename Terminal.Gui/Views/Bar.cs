@@ -198,7 +198,7 @@ public class Bar : View, IOrientation, IDesignable
                 {
                     View barItem = SubViews.ElementAt (index);
 
-                    //barItem.ColorScheme = ColorScheme;
+                    //barItem.Scheme = Scheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
 
@@ -232,7 +232,7 @@ public class Bar : View, IOrientation, IDesignable
                         View barItem = SubViews.ElementAt (index);
 
 
-                       // barItem.ColorScheme = ColorScheme;
+                       // barItem.Scheme = Scheme;
 
                         if (!barItem.Visible)
                         {

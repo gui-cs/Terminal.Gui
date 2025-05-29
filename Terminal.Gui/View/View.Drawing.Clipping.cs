@@ -29,9 +29,9 @@ public partial class View
     /// <param name="region"></param>
     public static void SetClip (Region? region)
     {
-        if (Driver is { } && region is { })
+        if (Application.Driver is { } && region is { })
         {
-            Driver.Clip = region;
+            Application.Driver.Clip = region;
         }
     }
 
@@ -54,9 +54,9 @@ public partial class View
     {
         Region? previous = GetClip ();
 
-        if (Driver is { })
+        if (Application.Driver is { })
         {
-            Driver.Clip = new (Application.Screen);
+            Application.Driver.Clip = new (Application.Screen);
         }
 
         return previous;
@@ -71,7 +71,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="rectangle"></param>
-    public static void ExcludeFromClip (Rectangle rectangle) { Driver?.Clip?.Exclude (rectangle); }
+    public static void ExcludeFromClip (Rectangle rectangle) { Application.Driver?.Clip?.Exclude (rectangle); }
 
     /// <summary>
     ///     Removes the specified rectangle from the Clip.
@@ -82,7 +82,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="region"></param>
-    public static void ExcludeFromClip (Region? region) { Driver?.Clip?.Exclude (region); }
+    public static void ExcludeFromClip (Region? region) { Application.Driver?.Clip?.Exclude (region); }
 
     /// <summary>
     ///     Changes the Clip to the intersection of the current Clip and the <see cref="Frame"/> of this View.

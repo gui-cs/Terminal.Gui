@@ -99,7 +99,7 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
         };
-        _eventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        _eventListView.SchemeName = "TopLevel";
         _appWindow.Add (_eventListView);
 
         _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");

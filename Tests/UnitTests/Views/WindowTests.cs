@@ -45,7 +45,7 @@ public class WindowTests (ITestOutputHelper output)
 
         var sb = new StatusBar ();
 
-        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
+        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View", BorderStyle = LineStyle.Single };
         var win = new Window ();
         win.Add (menu, sb, fv);
         Toplevel top = new ();
@@ -132,7 +132,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
-        Assert.NotNull (defaultWindow.ColorScheme);
+        Assert.NotNull (defaultWindow.GetScheme ());
         Assert.Equal (0, defaultWindow.X);
         Assert.Equal (0, defaultWindow.Y);
         Assert.Equal (Dim.Fill (), defaultWindow.Width);
@@ -155,7 +155,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
         Assert.Null (windowWithFrameRectEmpty.Focused);
-        Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
+        Assert.NotNull (windowWithFrameRectEmpty.GetScheme ());
         Assert.Equal (0, windowWithFrameRectEmpty.X);
         Assert.Equal (0, windowWithFrameRectEmpty.Y);
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
@@ -179,7 +179,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);
         Assert.Equal (new (1, 2, 3, 4), windowWithFrame1234.Frame);
         Assert.Null (windowWithFrame1234.Focused);
-        Assert.NotNull (windowWithFrame1234.ColorScheme);
+        Assert.NotNull (windowWithFrame1234.GetScheme ());
         Assert.Equal (1, windowWithFrame1234.X);
         Assert.Equal (2, windowWithFrame1234.Y);
         Assert.Equal (3, windowWithFrame1234.Width);

@@ -688,8 +688,8 @@ w ";
         lbl.Layout ();
 
         Assert.Equal (new (0, 0, 2, 1), lbl.Frame);
-        Assert.Equal (new (0, 0, 2, 1), lbl._needsDrawRect);
-        Assert.Equal (new (0, 0, 80, 25), lbl.SuperView._needsDrawRect);
+        Assert.Equal (new (0, 0, 2, 1), lbl.NeedsDrawRect);
+        Assert.Equal (new (0, 0, 80, 25), lbl.SuperView.NeedsDrawRect);
         Assert.True (lbl.SuperView.NeedsLayout);
         Application.RunIteration (ref rs);
 
@@ -778,7 +778,7 @@ w ";
             lblJust.Height = Dim.Auto ();
         }
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
         var top = new Toplevel ();
         top.Add (frame);
@@ -907,7 +907,7 @@ w ";
             lblJust.Height = Dim.Auto ();
         }
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
         var top = new Toplevel ();
@@ -1019,7 +1019,7 @@ w ";
         // Autosize is off, so we have to explicitly set TextFormatter.Size
         verticalView.TextFormatter.ConstrainToSize = new (1, 20);
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window" };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window", BorderStyle = LineStyle.Single };
         frame.Add (horizontalView, verticalView);
         top.Add (frame);
         top.BeginInit ();

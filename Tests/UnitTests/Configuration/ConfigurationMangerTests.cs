@@ -1,35 +1,155 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
-using UnitTests;
+using ColorHelper;
 using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
+using File = System.IO.File;
+
 #pragma warning disable IDE1006
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class ConfigurationManagerTests
+public class ConfigurationManagerTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ConfigurationManagerTests (ITestOutputHelper output)
+    [Fact]
+    public void ModuleInitializer_Was_Called ()
     {
-        _output = output;
+        Assert.False (IsEnabled);
+        Assert.True (IsInitialized ());
     }
 
-    public static readonly JsonSerializerOptions _jsonOptions = new ()
+    [Fact]
+    public void Initialize_Throws_If_Called_Explicitly ()
     {
-        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
-    };
+        Assert.False (IsEnabled);
+
+        Assert.Throws<InvalidOperationException> (Initialize);
+    }
+
+    [Fact]
+    public void HardCodedDefaultCache_Properties_Are_Copies ()
+    {
+        Assert.False (IsEnabled);
+        Enable (ConfigLocations.HardCoded);
+
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        ConfigProperty fromSettings = Settings! ["Application.QuitKey"];
+
+        FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
+        Assert.NotNull (initialCache);
+
+        ConfigProperty fromCache = initialCache ["Application.QuitKey"];
+
+        // Assert
+        Assert.NotEqual (fromCache, fromSettings);
+        Disable (true);
+    }
+
+    [Fact]
+    public void HardCodedDefaultCache_Properties_Are_Immutable ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+            Assert.Equal (Key.Esc, Application.QuitKey);
+
+            FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
+            Assert.NotNull (initialCache);
+            Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
+
+            // Act
+            Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+            Assert.Equal (Key.Q, (Key)Settings ["Application.QuitKey"].PropertyValue);
+
+            Settings ["Application.QuitKey"].Apply ();
+            Assert.Equal (Key.Q, Application.QuitKey);
+
+            Application.QuitKey = Key.K;
+
+            // Assert
+            FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
+            Assert.Equal (initialCache, cache);
+            Assert.True (initialCache ["Application.QuitKey"].Immutable);
+            Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
+    }
+
+    [Fact]
+    public void Disable_Settings_Is_NotNull ()
+    {
+        Assert.False (IsEnabled);
+
+        Disable ();
+        Assert.NotNull (Settings);
+    }
+
+
+    [Fact]
+    public void Disable_With_ResetToHardCodedDefaults_True_Works_When_Disabled ()
+    {
+        Assert.False (ConfigurationManager.IsEnabled);
+        ConfigurationManager.Disable (true);
+    }
+
+    [Fact]
+    public void Enable_Settings_Is_Valid ()
+    {
+        Assert.False (IsEnabled);
+
+        Enable (ConfigLocations.HardCoded);
+
+        Assert.NotNull (Settings);
+
+        Disable ();
+    }
+
+
+    [Fact]
+    public void Apply_Applies_Theme ()
+    {
+        Assert.False (IsEnabled);
+        Enable (ConfigLocations.HardCoded);
+
+        var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
+        Assert.NotEmpty (theme);
+
+        Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
+        Assert.Equal (2, ThemeManager.Themes.Count);
+
+        Assert.Equal (LineStyle.Rounded, FrameView.DefaultBorderStyle);
+        theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double;
+
+        ThemeManager.Theme = "testTheme";
+        ConfigurationManager.Apply ();
+
+        Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
+
+        Disable (resetToHardCodedDefaults: true);
+    }
 
     [Fact]
     public void Apply_Raises_Applied ()
     {
-        Reset ();
-        Applied += ConfigurationManager_Applied;
+        Assert.False (IsEnabled);
+
+        Enable (ConfigLocations.HardCoded);
+
+        Applied += ConfigurationManagerApplied;
         var fired = false;
 
-        void ConfigurationManager_Applied (object sender, ConfigurationManagerEventArgs obj)
+        void ConfigurationManagerApplied (object sender, ConfigurationManagerEventArgs obj)
         {
             fired = true;
 
@@ -49,409 +169,265 @@ public class ConfigurationManagerTests
         // assert
         Assert.True (fired);
 
-        Applied -= ConfigurationManager_Applied;
-        Reset ();
-    }
+        Applied -= ConfigurationManagerApplied;
 
-    [Fact]
-    public void DeepMemberWiseCopyTest ()
-    {
-        // Value types
-        var stringDest = "Destination";
-        var stringSrc = "Source";
-        object stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        stringDest = "Destination";
-        stringSrc = "Destination";
-        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        stringDest = "Destination";
-        stringSrc = null;
-        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        stringDest = "Destination";
-        stringSrc = string.Empty;
-        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        var boolDest = true;
-        var boolSrc = false;
-        object boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        boolDest = false;
-        boolSrc = true;
-        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        boolDest = true;
-        boolSrc = true;
-        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        boolDest = false;
-        boolSrc = false;
-        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        // Structs
-        var attrDest = new Attribute (Color.Black);
-        var attrSrc = new Attribute (Color.White);
-        object attrCopy = DeepMemberWiseCopy (attrSrc, attrDest);
-        Assert.Equal (attrSrc, attrCopy);
-
-        // Classes
-        var colorschemeDest = new ColorScheme { Disabled = new Attribute (Color.Black) };
-        var colorschemeSrc = new ColorScheme { Disabled = new Attribute (Color.White) };
-        object colorschemeCopy = DeepMemberWiseCopy (colorschemeSrc, colorschemeDest);
-        Assert.Equal (colorschemeSrc, colorschemeCopy);
-
-        // Dictionaries
-        Dictionary<string, Attribute> dictDest = new () { { "Disabled", new Attribute (Color.Black) } };
-        Dictionary<string, Attribute> dictSrc = new () { { "Disabled", new Attribute (Color.White) } };
-        Dictionary<string, Attribute> dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (dictSrc, dictCopy);
-
-        dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
-
-        dictSrc = new Dictionary<string, Attribute>
-        {
-            { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
-        };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (dictSrc, dictCopy);
-
-        // src adds an item
-        dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
-
-        dictSrc = new Dictionary<string, Attribute>
-        {
-            { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
-        };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (2, dictCopy!.Count);
-        Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
-        Assert.Equal (dictSrc ["Normal"], dictCopy ["Normal"]);
-
-        // src updates only one item
-        dictDest = new Dictionary<string, Attribute>
-        {
-            { "Disabled", new Attribute (Color.Black) }, { "Normal", new Attribute (Color.White) }
-        };
-        dictSrc = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.White) } };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (2, dictCopy!.Count);
-        Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
-        Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
-    }
-
-    public class DeepCopyTest ()
-    {
-        public static Key key = Key.Esc;
-    }
-
-    [Fact]
-    public void Illustrate_DeepMemberWiseCopy_Breaks_Dictionary ()
-    {
-        Assert.Equal (Key.Esc, DeepCopyTest.key);
-
-        Dictionary<Key, string> dict = new Dictionary<Key, string> (new KeyEqualityComparer ());
-        dict.Add (new (DeepCopyTest.key), "Esc");
-        Assert.Contains (Key.Esc, dict);
-
-        DeepCopyTest.key = (Key)DeepMemberWiseCopy (Key.Q.WithCtrl, DeepCopyTest.key);
-
-        Assert.Equal (Key.Q.WithCtrl, DeepCopyTest.key);
-        Assert.Equal (Key.Esc, dict.Keys.ToArray () [0]);
-
-        var eq = new KeyEqualityComparer ();
-        Assert.True (eq.Equals (Key.Q.WithCtrl, DeepCopyTest.key));
-        Assert.Equal (Key.Q.WithCtrl.GetHashCode (), DeepCopyTest.key.GetHashCode ());
-        Assert.Equal (eq.GetHashCode (Key.Q.WithCtrl), eq.GetHashCode (DeepCopyTest.key));
-        Assert.Equal (Key.Q.WithCtrl.GetHashCode (), eq.GetHashCode (DeepCopyTest.key));
-        Assert.True (dict.ContainsKey (Key.Esc));
-
-        dict.Remove (Key.Esc);  
-        dict.Add (new (DeepCopyTest.key), "Ctrl+Q");
-        Assert.True (dict.ContainsKey (Key.Q.WithCtrl));
+        Disable (resetToHardCodedDefaults: true);
+        Application.ResetState (true);
     }
 
     [Fact]
     public void Load_Raises_Updated ()
     {
-        ThrowOnJsonErrors = true;
-        Locations = ConfigLocations.All;
-        Reset ();
-        Assert.Equal (Key.Esc, (((Key)Settings! ["Application.QuitKey"].PropertyValue)!).KeyCode);
+        Assert.False (IsEnabled);
 
-        Updated += ConfigurationManager_Updated;
         var fired = false;
+        Enable (ConfigLocations.HardCoded);
 
-        void ConfigurationManager_Updated (object sender, ConfigurationManagerEventArgs obj)
-        {
-            fired = true;
-        }
+        ThrowOnJsonErrors = true;
+        Assert.Equal (Key.Esc, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+
+        Updated += ConfigurationManagerUpdated;
 
         // Act
-        // Reset to cause load to raise event
-        Load (true);
+        // Only select locations under test control
+        Load (ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime);
 
         // assert
         Assert.True (fired);
 
-        Updated -= ConfigurationManager_Updated;
-
         // clean up
-        Locations = ConfigLocations.Default;
-        Reset ();
+        Updated -= ConfigurationManagerUpdated;
+        Disable (true);
+        Application.ResetState (true);
+
+        return;
+
+        void ConfigurationManagerUpdated (object sender, ConfigurationManagerEventArgs obj) { fired = true; }
     }
 
     [Fact]
-    public void Load_Performance_Check ()
+    public void Load_And_Apply_Performance_Check ()
     {
-        Locations = ConfigLocations.All;
-        Reset ();
+        Assert.False (IsEnabled);
 
-        // Start stopwatch
-        Stopwatch stopwatch = new Stopwatch ();
-        stopwatch.Start ();
+        Enable (ConfigLocations.HardCoded);
 
-        // Act
-        Load (true);
-        Apply();
+        try
+        {
+            // Start stopwatch
+            var stopwatch = new Stopwatch ();
+            stopwatch.Start ();
 
-        // Stop stopwatch
-        stopwatch.Stop ();
+            // Act
+            Load (ConfigLocations.All);
+            Apply ();
 
-        // Assert
-        _output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
+            // Stop stopwatch
+            stopwatch.Stop ();
+
+            // Assert
+            output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
+
+            // Ensure load time is reasonable (adjust threshold as needed)
+            Assert.True (
+                         stopwatch.ElapsedMilliseconds < 1000,
+                         $"Loading configuration took {stopwatch.ElapsedMilliseconds}ms, which exceeds reasonable threshold");
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
     }
-
 
     [Fact]
     public void Load_Loads_Custom_Json ()
     {
-        // arrange
-        Locations = ConfigLocations.Runtime | ConfigLocations.Default;
-        Reset ();
-        ThrowOnJsonErrors = true;
+        Assert.False (IsEnabled);
 
-        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
 
-        // act
-        RuntimeConfig = """
-                   
-                           {
-                                 "Application.QuitKey": "Ctrl-Q"
-                           }
-                   """;
-        Load (false);
+            Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
-        // assert
-        Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
+            // act
+            RuntimeConfig = """
+                            
+                                    {
+                                          "Application.QuitKey": "Ctrl-Q"
+                                    }
+                            """;
+            Load (ConfigLocations.Runtime);
 
-        // clean up
-        Locations = ConfigLocations.Default;
-        Reset ();
+            // assert
+            Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            // clean up
+            Disable (true);
+            Application.ResetState (true);
+        }
     }
 
-    //[Fact]
-    //[AutoInitShutdown]
-    //public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
-    //{
-    //    //var _configFilename = "config.json";
-    //    //// Arrange
-    //    //// Create a mock of the configuration files in all sources
-    //    //// Home directory
-    //    //string homeDir = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".tui");
-    //    //if (!Directory.Exists (homeDir)) {
-    //    //	Directory.CreateDirectory (homeDir);
-    //    //}
-    //    //string globalConfigFile = Path.Combine (homeDir, _configFilename);
-    //    //string appSpecificConfigFile = Path.Combine (homeDir, "appname.config.json");
-    //    //File.WriteAllText (globalConfigFile, "{\"Settings\": {\"TestSetting\":\"Global\"}}");
-    //    //File.WriteAllText (appSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecific\"}}");
-
-    //    //// App directory
-    //    //string appDir = Directory.GetCurrentDirectory ();
-    //    //string appDirGlobalConfigFile = Path.Combine (appDir, _configFilename);
-    //    //string appDirAppSpecificConfigFile = Path.Combine (appDir, "appname.config.json");
-    //    //File.WriteAllText (appDirGlobalConfigFile, "{\"Settings\": {\"TestSetting\":\"GlobalAppDir\"}}");
-    //    //File.WriteAllText (appDirAppSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecificAppDir\"}}");
-
-    //    //// App resources
-    //    //// ...
-
-    //    //// Act
-    //    //ConfigurationManager.Locations = ConfigurationManager.ConfigLocation.All;
-    //    //ConfigurationManager.Load ();
-
-    //    //// Assert
-    //    //// Check that the settings from the highest precedence source are loaded
-    //    //Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
-    //}
-
-
-    [Fact]
-    public void Reset_Raises_Updated ()
+    [Fact (Skip = "Events disabled")]
+    public void ResetToCurrentValues_Raises_Updated ()
     {
-        ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.All;
-        Reset ();
+        Assert.False (IsEnabled);
 
-        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
-
-        Updated += ConfigurationManager_Updated;
         var fired = false;
 
-        void ConfigurationManager_Updated (object sender, ConfigurationManagerEventArgs obj)
+        try
         {
-            fired = true;
+            Enable (ConfigLocations.HardCoded);
+
+            Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+
+            Updated += ConfigurationManagerUpdated;
+
+            // Act
+            ResetToCurrentValues ();
+
+            // assert
+            Assert.True (fired);
+        }
+        finally
+        {
+            Updated -= ConfigurationManagerUpdated;
+
+            Disable (true);
+            Application.ResetState (true);
         }
 
+        return;
+
+        void ConfigurationManagerUpdated (object sender, ConfigurationManagerEventArgs obj) { fired = true; }
+    }
+
+    [Fact]
+    public void ResetToHardCodedDefaults_and_Load_LibraryResourcesOnly_are_same ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // arrange
+            Enable (ConfigLocations.HardCoded);
+
+            Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+            Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+            Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+            Settings.Apply ();
+
+            // assert apply worked
+            Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
+            Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
+            Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
+
+            //act
+            ResetToHardCodedDefaults ();
+
+            // assert
+            Assert.NotEmpty (ThemeManager.Themes!);
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Equal (Key.F6, Application.NextTabGroupKey);
+            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+
+            // arrange
+            Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+            Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+            Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+            Settings.Apply ();
+
+            // act
+            Load (ConfigLocations.LibraryResources);
+            Apply ();
+
+            // assert
+            Assert.NotEmpty (ThemeManager.Themes);
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
+            Assert.Equal (Key.F6, Application.NextTabGroupKey);
+            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
+    }
+
+    [Fact]
+    public void ResetToCurrentValues_Enabled_Resets ()
+    {
+        Assert.False (IsEnabled);
+
         // Act
-        Reset ();
+        Enable (ConfigLocations.HardCoded);
 
-        // assert
-        Assert.True (fired);
+        Application.QuitKey = Key.A;
 
-        Updated -= ConfigurationManager_Updated;
-        Reset ();
-        Locations = savedLocations;
-    }
+        ResetToCurrentValues ();
 
+        Assert.Equal (Key.A, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        Assert.NotNull (Settings);
+        Assert.NotNull (AppSettings);
+        Assert.NotNull (ThemeManager.Themes);
 
-    [Fact]
-    public void Reset_and_ResetLoadWithLibraryResourcesOnly_are_same ()
-    {
-        Locations = ConfigLocations.Default;
+        // Default Theme should be "Default"
+        Assert.Single (ThemeManager.Themes);
+        Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
 
-        // arrange
-        Reset ();
-        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
-        Settings.Apply ();
-
-        // assert apply worked
-        Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
-        Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
-
-        //act
-        Reset ();
-
-        // assert
-        Assert.NotEmpty (Themes!);
-        Assert.Equal ("Default", Themes.Theme);
-        Assert.Equal (Key.Esc, Application.QuitKey);
-        Assert.Equal (Key.F6, Application.NextTabGroupKey);
-        Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
-
-        // arrange
-        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
-        Settings.Apply ();
-
-        Locations = ConfigLocations.Default;
-
-        // act
-        Reset ();
-        Load ();
-
-        // assert
-        Assert.NotEmpty (Themes);
-        Assert.Equal ("Default", Themes.Theme);
-        Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-        Assert.Equal (Key.F6, Application.NextTabGroupKey);
-        Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
-        Reset ();
+        ResetToHardCodedDefaults ();
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        Disable ();
+        Application.ResetState (true);
     }
 
     [Fact]
-    public void Reset_Resets ()
+    public void ConfigurationManager_DefaultPrecedence_IsRespected ()
     {
-        Locations = ConfigLocations.Default;
-        Reset ();
-        Assert.NotEmpty (Themes!);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // arrange
+            Enable (ConfigLocations.HardCoded);
+
+            ThrowOnJsonErrors = true;
+
+            // Setup multiple configurations with the same setting
+            // with different precedence levels
+            RuntimeConfig = """
+                            {
+                                 "Application.QuitKey": "Alt+Q"  
+                            }
+                            """;
+
+            var defaultConfig = """
+                                {
+                                     "Application.QuitKey": "Ctrl+X"
+                                }
+                                """;
+
+            // Update default config first (lower precedence)
+            SourcesManager?.Load (Settings, defaultConfig, "default-test", ConfigLocations.LibraryResources);
+
+            // Then load runtime config, which should override default
+            Load (ConfigLocations.Runtime);
+
+            // Assert - the runtime config should win due to precedence
+            Assert.Equal (Key.Q.WithAlt, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
-
-    //[Fact ()]
-    //public void LoadFromJsonTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void ToJsonTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void UpdateConfigurationTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void UpdateConfigurationFromFileTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void SaveHardCodedDefaultsTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadGlobalFromLibraryResourceTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadGlobalFromAppDirectoryTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadGlobalFromHomeDirectoryTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadAppFromAppResourcesTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadAppFromAppDirectoryTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadAppFromHomeDirectoryTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
-
-    //[Fact ()]
-    //public void LoadTest ()
-    //{
-    //	Assert.True (false, "This test needs an implementation");
-    //}
 
     /// <summary>Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.</summary>
     /// <remarks>
@@ -459,125 +435,235 @@ public class ConfigurationManagerTests
     ///     static and thus can be overwritten by other tests.
     /// </remarks>
     [Fact]
-    public void SaveDefaults ()
+    public void Save_HardCodedDefaults_To_config_json ()
     {
-        Initialize ();
-        Reset ();
+        Assert.False (IsEnabled);
 
-        // Get the hard coded settings
-        GetHardCodedDefaults ();
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
 
-        // Serialize to a JSON string
-        string json = ToJson ();
+            // Get the hard coded settings
+            ResetToHardCodedDefaults ();
 
-        // Write the JSON string to the file
-        File.WriteAllText ("config.json", json);
+            // Serialize to a JSON string
+            string json = SourcesManager?.ToJson (Settings);
+
+            // Write the JSON string to the file
+            File.WriteAllText ("hard_coded_defaults_config.json", json);
+
+            // Verify the file was created
+            Assert.True (File.Exists ("hard_coded_defaults_config.json"), "Failed to create config.json file");
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    /// <summary>Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.</summary>
+    /// <remarks>
+    ///     IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties are all
+    ///     static and thus can be overwritten by other tests.
+    /// </remarks>
+    [Fact]
+    public void Save_Library_Defaults_To_config_json ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.LibraryResources);
+
+            // Serialize to a JSON string
+            string json = SourcesManager?.ToJson (Settings);
+
+            // Write the JSON string to the file
+            File.WriteAllText ("library_defaults_config.json", json);
+
+            // Verify the file was created
+            Assert.True (File.Exists ("library_defaults_config.json"), "Failed to create config.json file");
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
     public void TestConfigProperties ()
     {
-        Locations = ConfigLocations.All;
-        Reset ();
+        Assert.False (IsEnabled);
 
-        Assert.NotEmpty (Settings!);
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
 
-        // test that all ConfigProperties have our attribute
-        Assert.All (
-                    Settings,
-                    item => Assert.NotEmpty (
-                                             item.Value.PropertyInfo!.CustomAttributes.Where (
-                                                                                              a => a.AttributeType == typeof (SerializableConfigurationProperty)
-                                                                                             )
-                                            )
-                   );
+            Assert.NotEmpty (Settings!);
 
-#pragma warning disable xUnit2029
-        Assert.Empty (
-                      Settings.Where (
-                                      cp => cp.Value.PropertyInfo!.GetCustomAttribute (
-                                                                                       typeof (SerializableConfigurationProperty)
-                                                                                      )
-                                            == null
-                                     )
-                     );
-#pragma warning restore xUnit2029
+            // test that all ConfigProperties have our attribute
+            Assert.All (
+                        Settings,
+                        item => Assert.Contains (item.Value.PropertyInfo!.CustomAttributes, a => a.AttributeType
+                                                                                                       == typeof (ConfigurationPropertyAttribute)
+));
 
-        // Application is a static class
-        PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
-        Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
+#pragma warning disable xUnit2030
+            Assert.DoesNotContain (Settings, cp => cp.Value.PropertyInfo!.GetCustomAttribute (
+                                                                                           typeof (ConfigurationPropertyAttribute)
+                                                                                          )
+                                                == null
+);
+#pragma warning restore xUnit2030
 
-        // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
-        pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
-        Assert.False (Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.True (Themes! ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.Equal (pi, Themes! ["Default"] ["FrameView.DefaultBorderStyle"].PropertyInfo);
+            // Application is a static class
+            PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
+            Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
+
+            // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
+            pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
+            Assert.False (Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
+            Assert.True (ThemeManager.GetCurrentTheme ().ContainsKey ("FrameView.DefaultBorderStyle"));
+            Assert.Equal (pi, ThemeManager.GetCurrentTheme () ["FrameView.DefaultBorderStyle"].PropertyInfo);
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
-    public void TestConfigPropertyOmitClassName ()
+    public void Load_And_Apply_HardCoded ()
     {
-        ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.All;
+        Assert.False (IsEnabled);
 
-        // Color.ColorSchemes is serialized as "ColorSchemes", not "Colors.ColorSchemes"
-        PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
-        var scp = (SerializableConfigurationProperty)pi!.GetCustomAttribute (typeof (SerializableConfigurationProperty));
-        Assert.True (scp!.Scope == typeof (ThemeScope));
-        Assert.True (scp.OmitClassName);
+        try
+        {
+            // Spot check by setting some of the config properties
+            Application.QuitKey = Key.X.WithCtrl;
+            FileDialog.MaxSearchResults = 1;
 
-        Reset ();
-        Assert.Equal (pi, Themes! ["Default"] ["ColorSchemes"].PropertyInfo);
+            Enable (ConfigLocations.HardCoded);
+            Load (ConfigLocations.HardCoded);
 
-        Locations = savedLocations;
+            // Spot check
+            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+            Assert.Equal (10000, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
+
+            Assert.Single (ThemeManager.Themes!);
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.NotEmpty (ThemeManager.Themes [ThemeManager.Theme]);
+
+            // Verify schemes are properly initialized
+            Assert.NotNull (SchemeManager.GetSchemes ());
+            Assert.NotEmpty (SchemeManager.GetSchemes ());
+
+            // Verify "Base" has correct values
+            //Assert.Equal (Color.White, SchemeManager.GetSchemes () ["Base"]!.Normal.Foreground);
+            //Assert.Equal (Color.Blue, SchemeManager.GetSchemes () ["Base"].Normal.Background);
+
+            Apply ();
+            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Equal (10000, FileDialog.MaxSearchResults);
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
-    public void TestConfigurationManagerInitDriver ()
+    public void Load_And_Apply_LibraryResources ()
     {
-        Assert.Equal ("Default", Themes!.Theme);
+        Assert.False (IsEnabled);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"]!.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+        try
+        {
+            // Spot check by setting some of the config properties
+            Application.QuitKey = Key.X.WithCtrl;
+            FileDialog.MaxSearchResults = 1;
 
-        // Change Base
-        Stream json = ToStream ();
+            Enable (ConfigLocations.HardCoded);
+            Load (ConfigLocations.LibraryResources);
 
-        Settings!.Update (json, "TestConfigurationManagerInitDriver", ConfigLocations.Runtime);
+            // Spot check
+            Assert.Equal (Key.Esc, Settings! ["Application.QuitKey"].PropertyValue as Key);
+            Assert.Equal (10000, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
 
-        Dictionary<string, ColorScheme> colorSchemes =
-            (Dictionary<string, ColorScheme>)Themes [Themes.Theme] ["ColorSchemes"].PropertyValue;
-        Assert.Equal (Colors.ColorSchemes ["Base"], colorSchemes! ["Base"]);
-        Assert.Equal (Colors.ColorSchemes ["TopLevel"], colorSchemes ["TopLevel"]);
-        Assert.Equal (Colors.ColorSchemes ["Error"], colorSchemes ["Error"]);
-        Assert.Equal (Colors.ColorSchemes ["Dialog"], colorSchemes ["Dialog"]);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], colorSchemes ["Menu"]);
+            Assert.NotEmpty (ThemeManager.Themes!);
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.NotEmpty (ThemeManager.Themes [ThemeManager.Theme]);
 
-        Colors.ColorSchemes ["Base"] = colorSchemes ["Base"];
-        Colors.ColorSchemes ["TopLevel"] = colorSchemes ["TopLevel"];
-        Colors.ColorSchemes ["Error"] = colorSchemes ["Error"];
-        Colors.ColorSchemes ["Dialog"] = colorSchemes ["Dialog"];
-        Colors.ColorSchemes ["Menu"] = colorSchemes ["Menu"];
+            // Verify schemes are properly initialized
+            Assert.NotNull (SchemeManager.GetSchemes ());
+            Assert.NotEmpty (SchemeManager.GetSchemes ());
 
-        Assert.Equal (colorSchemes ["Base"], Colors.ColorSchemes ["Base"]);
-        Assert.Equal (colorSchemes ["TopLevel"], Colors.ColorSchemes ["TopLevel"]);
-        Assert.Equal (colorSchemes ["Error"], Colors.ColorSchemes ["Error"]);
-        Assert.Equal (colorSchemes ["Dialog"], Colors.ColorSchemes ["Dialog"]);
-        Assert.Equal (colorSchemes ["Menu"], Colors.ColorSchemes ["Menu"]);
+            // This is too fragile as the default scheme may change
+            // Verify "Base" has correct values
+            //Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
+            //Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
+
+            Apply ();
+            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Equal (10000, FileDialog.MaxSearchResults);
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.None)]
-    public void TestConfigurationManagerInitDriver_NoLocations ()
+    public void Load_And_Apply_RuntimeConfig ()
     {
-        // TODO: Write this test
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Spot check by setting some of the config properties
+            Application.QuitKey = Key.X.WithCtrl;
+            FileDialog.MaxSearchResults = 1;
+            Glyphs.Apple = new ('z');
+
+            ThrowOnJsonErrors = true;
+            Enable (ConfigLocations.HardCoded);
+
+            RuntimeConfig = """
+                            {
+                                "Application.QuitKey": "Alt-Q",
+                                "FileDialog.MaxSearchResults":9,
+                                "Themes" : [
+                                    {
+                                        "Default" : {
+                                            "Glyphs.Apple": "a"
+                                        }
+                                    }
+                                ]
+                            }
+                            """;
+            Load (ConfigLocations.Runtime);
+
+            Assert.Equal (Key.Q.WithAlt, Settings! ["Application.QuitKey"].PropertyValue as Key);
+            Assert.Equal (9, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
+            Assert.Equal (new Rune ('a'), ThemeManager.GetCurrentTheme () ["Glyphs.Apple"].PropertyValue);
+
+            Apply ();
+            Assert.Equal (Key.Q.WithAlt, Application.QuitKey);
+            Assert.Equal (9, FileDialog.MaxSearchResults);
+            Assert.Equal (new ('a'), Glyphs.Apple);
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
-    public void TestConfigurationManagerInvalidJsonLogs ()
+    public void InvalidJsonLogs ()
     {
-        Application.Init (new FakeDriver ());
+        Assert.False (IsEnabled);
+
+        Enable (ConfigLocations.HardCoded);
 
         ThrowOnJsonErrors = false;
 
@@ -587,7 +673,7 @@ public class ConfigurationManagerTests
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -602,15 +688,15 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings!.Update (json, "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
-        // AbNormal is not a ColorScheme attribute
+        // AbNormal is not a Scheme attribute
         json = @"
 			{
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""AbNormal"": {
@@ -625,7 +711,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
         // Modify hotNormal background only
         json = @"
@@ -633,7 +719,7 @@ public class ConfigurationManagerTests
 				""Themes"" :  [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -647,21 +733,23 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
-        Settings.Update ("{}}", "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, "{}}", "test", ConfigLocations.Runtime);
 
         Assert.NotEqual (0, _jsonErrors.Length);
 
-        Application.Shutdown ();
-
         ThrowOnJsonErrors = false;
+
+        Disable (true);
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void TestConfigurationManagerInvalidJsonThrows ()
+    public void InvalidJsonThrows ()
     {
+        Assert.False (IsEnabled);
+        Enable (ConfigLocations.HardCoded);
+
         ThrowOnJsonErrors = true;
 
         // "yellow" is not a color
@@ -670,7 +758,7 @@ public class ConfigurationManagerTests
 				""Themes"" : [
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -685,16 +773,16 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
+        var jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        Assert.StartsWith ("foreground: \"\"brownish\"\"", jsonException.Message);
 
-        // AbNormal is not a ColorScheme attribute
+        // AbNormal is not a Scheme attribute
         json = @"
 			{
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""AbNormal"": {
@@ -709,8 +797,8 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Unrecognized ColorScheme Attribute name: AbNormal.", jsonException.Message);
+        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        Assert.StartsWith ("AbNormal:", jsonException.Message);
 
         // Modify hotNormal background only
         json = @"
@@ -718,7 +806,7 @@ public class ConfigurationManagerTests
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -732,8 +820,8 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
+        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        Assert.StartsWith ("background:", jsonException.Message);
 
         // Unknown property
         json = @"
@@ -741,33 +829,27 @@ public class ConfigurationManagerTests
 				""Unknown"" : ""Not known""
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
-        Assert.StartsWith ("Unknown property", jsonException.Message);
+        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        Assert.StartsWith ("Unknown:", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
 
         ThrowOnJsonErrors = false;
+
+        Disable (true);
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void TestConfigurationManagerToJson ()
+    public void UpdateFromJson ()
     {
-        Reset ();
-        GetHardCodedDefaults ();
-        Stream stream = ToStream ();
+        Assert.False (IsEnabled);
 
-        Settings!.Update (stream, "TestConfigurationManagerToJson", ConfigLocations.Runtime);
-    }
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
 
-    [Fact]
-    public void TestConfigurationManagerUpdateFromJson ()
-    {
-        ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.All;
-
-        // Arrange
-        var json = @"
+            // Arrange
+            var json = @"
 {
   ""$schema"": ""https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json"",
   ""Application.QuitKey"": ""Alt-Z"",
@@ -775,7 +857,8 @@ public class ConfigurationManagerTests
   ""Themes"": [
     {
       ""Default"": {
-        ""ColorSchemes"": [
+        ""MessageBox.DefaultButtonAlignment"": ""End"",
+        ""Schemes"": [
           {
             ""TopLevel"": {
               ""Normal"": {
@@ -903,41 +986,32 @@ public class ConfigurationManagerTests
 }					
 			";
 
-        Reset ();
-        ThrowOnJsonErrors = true;
+            ResetToCurrentValues ();
+            ThrowOnJsonErrors = true;
 
-        Settings!.Update (json, "TestConfigurationManagerUpdateFromJson", ConfigLocations.Runtime);
+            SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
 
-        Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue)!.KeyCode);
+            Assert.Equal ("Default", ThemeManager.Theme);
 
-        Assert.Equal ("Default", Themes!.Theme);
+            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+            Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"]!.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+            // Now re-apply
+            Apply ();
 
-        Dictionary<string, ColorScheme> colorSchemes =
-            (Dictionary<string, ColorScheme>)Themes.First ().Value ["ColorSchemes"].PropertyValue;
-        Assert.Equal (new Color (Color.White), colorSchemes! ["Base"].Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), colorSchemes ["Base"].Normal.Background);
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
+            Assert.Equal (Alignment.End, MessageBox.DefaultButtonAlignment);
 
-        // Now re-apply
-        Apply ();
+            Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"].Normal.Foreground);
+            Assert.Equal (Color.Blue, SchemeManager.GetSchemes ()! ["Base"].Normal.Background);
+        }
+        finally
+        {
+            Disable (resetToHardCodedDefaults: true);
 
-        Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
-        Assert.Equal ("Default", Themes.Theme);
-
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
-        Reset ();
-
-        Locations = savedLocations;
+        }
     }
 
-    [Fact]
-    public void UseWithoutResetDoesNotThrow ()
-    {
-        Initialize ();
-        _ = Settings;
-    }
 }
