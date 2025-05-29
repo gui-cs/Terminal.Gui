@@ -727,7 +727,7 @@ public class BorderTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single};
 
         top.Add (frame);
         RunState rs = Application.Begin (top);
@@ -755,7 +755,7 @@ public class BorderTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
+        var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
         RunState rs = Application.Begin (top);

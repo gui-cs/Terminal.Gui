@@ -188,7 +188,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
-        var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         view.DrawingContent += (s, e) =>
                                {
@@ -253,7 +253,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
-        var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         view.DrawingContent += (s, e) =>
                                {

@@ -1049,7 +1049,7 @@ e
         label.Width = Dim.Fill () - text.Length;
         label.Height = 0;
 
-        var win = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var win = new View { CanFocus = true, BorderStyle = LineStyle.Single, Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         win.BeginInit ();
         win.EndInit ();

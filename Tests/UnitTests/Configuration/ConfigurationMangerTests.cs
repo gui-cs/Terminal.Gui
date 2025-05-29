@@ -128,8 +128,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
         Assert.Equal (2, ThemeManager.Themes.Count);
 
-        Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
-        theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
+        Assert.Equal (LineStyle.Rounded, FrameView.DefaultBorderStyle);
+        theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double;
 
         ThemeManager.Theme = "testTheme";
         ConfigurationManager.Apply ();

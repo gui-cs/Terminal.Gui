@@ -119,7 +119,7 @@ public class ThicknessTests (ITestOutputHelper output)
     public void DrawTests_Ruler ()
     {
         // Add a frame so we can see the ruler
-        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single};
 
         var top = new Toplevel ();
         top.Add (f);

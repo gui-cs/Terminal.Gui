@@ -45,7 +45,7 @@ public class WindowTests (ITestOutputHelper output)
 
         var sb = new StatusBar ();
 
-        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
+        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View", BorderStyle = LineStyle.Single };
         var win = new Window ();
         win.Add (menu, sb, fv);
         Toplevel top = new ();

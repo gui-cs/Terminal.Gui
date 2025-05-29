@@ -192,7 +192,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
         Assert.Equal (2, ThemeManager.Themes.Count);
 
-        Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
+        Assert.Equal (LineStyle.Rounded, FrameView.DefaultBorderStyle);
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
 
         ThemeManager.Theme = "testTheme";
