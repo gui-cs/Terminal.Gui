@@ -186,26 +186,6 @@ public class SchemeTests
     }
 
     [Fact]
-    public void SetAttributeForRole_Event_CanCancelAttributeChange ()
-    {
-        var view = new View { SchemeName = "Base" };
-
-        view.SettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Focus)
-            {
-                args.Cancel = true;
-            }
-        };
-
-        var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);
-        Assert.NotEqual (view.GetScheme ().Focus, view.GetCurrentAttribute ());
-        Assert.Equal (previousAttribute, view.GetCurrentAttribute ());
-
-        view.Dispose ();
-    }
-
-    [Fact]
     public void GetHardCodedSchemes_ReturnsExpectedSchemes ()
     {
         var schemes = Scheme.GetHardCodedSchemes ();

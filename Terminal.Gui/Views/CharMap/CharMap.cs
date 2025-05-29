@@ -100,15 +100,16 @@ public class CharMap : View, IDesignable
 
         // The scrollbars are in the Padding. VisualRole.Focus/Active are used to draw the
         // CharMap headers. Override Padding to force it to draw to match.
-        // Note: We could use either SettingAttributeForRole or GettingAttributeForRole for this.
-        // Using SettingAttributeForRole is preferable since it gets called last before 
-        // SetAttribute.
-        Padding!.SettingAttributeForRole += PaddingOnSettingAttributeForRole;
+        Padding!.GettingAttributeForRole += PaddingOnGettingAttributeForRole;
     }
 
-    private void PaddingOnSettingAttributeForRole (object? sender, VisualRoleEventArgs e)
+    private void PaddingOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
     {
-        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        if (e.Role != VisualRole.Focus && e.Role != VisualRole.Active)
+        {
+            e.NewValue = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        }
+
         e.Cancel = true;
     }
 

@@ -100,11 +100,6 @@ public partial class View
     ///         Calls <see cref="GetAttributeForRole"/> to get the Attribute associated with the specified role, which will
     ///         raise <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>.
     ///     </para>
-    ///     <para>
-    ///         Then, raises <see cref="OnSettingAttributeForRole"/>/<see cref="SettingAttributeForRole"/> and checks for
-    ///         cancellation
-    ///         before setting the Attribute via <see cref="SetAttribute"/>.
-    ///     </para>
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The previously set Attribute.</returns>
@@ -112,40 +107,8 @@ public partial class View
     {
         Attribute schemeAttribute = GetAttributeForRole (role);
         Attribute currentAttribute = GetCurrentAttribute ();
-
-        if (OnSettingAttributeForRole (in role, in currentAttribute, ref schemeAttribute))
-        {
-            return currentAttribute;
-        }
-
-        var args = new VisualRoleEventArgs (role, in currentAttribute, ref schemeAttribute);
-        SettingAttributeForRole?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return currentAttribute;
-        }
-
         return SetAttribute (schemeAttribute);
     }
-
-    /// <summary>
-    ///     Raised when the Attribute associated with the specified <see cref="VisualRole"/> for the View being set.
-    ///     This is raised by <see cref="SetAttributeForRole"/>.
-    /// </summary>
-    /// <returns>
-    ///     <see langword="true"/> to cancel the setting of the attribute.
-    /// </returns>
-    protected virtual bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute newAttribute) { return false; }
-
-    /// <summary>
-    ///     Raised when the Attribute associated with the specified <see cref="VisualRole"/> for the View being set.
-    ///     This is raised by <see cref="SetAttributeForRole"/>.
-    /// </summary>
-    /// <para>
-    ///     Set `Cancel` to <see langword="true"/> to cancel the setting of the attribute.
-    /// </para>
-    public event EventHandler<VisualRoleEventArgs>? SettingAttributeForRole;
 
     #endregion Set
 }
