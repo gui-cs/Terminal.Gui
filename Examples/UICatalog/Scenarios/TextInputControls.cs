@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Terminal.Gui;
-using Terminal.Gui.TextValidateProviders;
 
 namespace UICatalog.Scenarios;
 
@@ -119,11 +118,18 @@ public class TextInputControls : Scenario
                                         labelMirroringTextView.Text = textView.Text;
                                     };
 
+        CheckBox chxReadOnly = new ()
+        {
+            X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
+        };
+        chxReadOnly.CheckedStateChanging += (sender, args) => textView.ReadOnly = args.NewValue == CheckState.Checked;
+        win.Add (chxReadOnly);
+
         // By default TextView is a multi-line control. It can be forced to 
         // single-line mode.
         var chxMultiline = new CheckBox
         {
-            X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
+            X = Pos.Right (chxReadOnly) + 2, Y = Pos.Bottom (textView), CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
         };
         win.Add (chxMultiline);
 
