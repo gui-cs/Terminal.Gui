@@ -269,9 +269,11 @@ internal class TextModel
 
                     if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)))
                     {
+                        List<Cell> line = GetLine (nRow);
+
                         if (lastValidCol > -1)
                         {
-                            nCol = lastValidCol;
+                            nCol = lastValidCol + Math.Max (lastValidCol, line.Count);
                         }
 
                         return;
