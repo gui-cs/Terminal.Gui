@@ -4905,23 +4905,29 @@ This is the second line.
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.ReadOnly);
         Assert.True (tv.CanFocus);
+        Assert.False (tv.IsSelecting);
 
         var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
 
         tv.CanFocus = false;
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.False (tv.IsSelecting);
         tv.CanFocus = true;
         Assert.False (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new (1, 0), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal (2, tv.CurrentRow);
         Assert.Equal (23, tv.CurrentColumn);
         Assert.Equal (tv.CurrentColumn, tv.GetCurrentLine ().Count);
         Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.NotNull (tv.Autocomplete);
         Assert.Empty (g.AllSuggestions);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         tv.Draw ();
 
@@ -4931,6 +4937,7 @@ This is the second line.
                      );
         Assert.Equal (new (24, 2), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         tv.Draw ();
 
@@ -4940,6 +4947,7 @@ This is the second line.
                      );
         Assert.Equal (new (23, 2), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         tv.Draw ();
 
@@ -4949,6 +4957,7 @@ This is the second line.
                      );
         Assert.Equal (new (24, 2), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
@@ -4969,6 +4978,7 @@ This is the second line.
         Assert.Equal ("line", g.AllSuggestions [4]);
         Assert.Equal ("second", g.AllSuggestions [5]);
         Assert.Equal ("third", g.AllSuggestions [^1]);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         tv.Draw ();
 
@@ -4979,6 +4989,7 @@ This is the second line.
         Assert.Equal (new (24, 2), tv.CursorPosition);
         Assert.Single (tv.Autocomplete.Suggestions);
         Assert.Equal ("first", tv.Autocomplete.Suggestions [0].Replacement);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
@@ -4992,68 +5003,85 @@ This is the second line.
         tv.Autocomplete.ClearSuggestions ();
         Assert.Empty (g.AllSuggestions);
         Assert.Empty (tv.Autocomplete.Suggestions);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new (24, 1), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (new (Key.PageUp)));
         Assert.Equal (23, tv.GetCurrentLine ().Count);
         Assert.Equal (new (23, 0), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new (23, 1), tv.CursorPosition); // gets the previous length
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal (28, tv.GetCurrentLine ().Count);
         Assert.Equal (new (23, 2), tv.CursorPosition); // gets the previous length
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.PageUp.WithShift));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new (23, 1), tv.CursorPosition); // gets the previous length
         Assert.Equal (24 + Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($".{Environment.NewLine}This is the third line.", tv.SelectedText);
+        Assert.True (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.PageDown.WithShift));
         Assert.Equal (28, tv.GetCurrentLine ().Count);
         Assert.Equal (new (23, 2), tv.CursorPosition); // gets the previous length
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.True (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Home.WithCtrl));
         Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.N.WithCtrl));
         Assert.Equal (new (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.P.WithCtrl));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (new (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorDown.WithShift));
         Assert.Equal (new (0, 1), tv.CursorPosition);
         Assert.Equal (23 + Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($"This is the first line.{Environment.NewLine}", tv.SelectedText);
+        Assert.True (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorUp.WithShift));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.True (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.F.WithCtrl));
         Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.B.WithCtrl));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -5103,6 +5131,7 @@ This is the second line.
                       tv.Text
                      );
         Assert.Equal (new (21, 0), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
@@ -5110,6 +5139,7 @@ This is the second line.
                       tv.Text
                      );
         Assert.Equal (new (20, 0), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
@@ -5117,6 +5147,7 @@ This is the second line.
                       tv.Text
                      );
         Assert.Equal (new (19, 0), tv.CursorPosition);
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Home));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -5421,7 +5452,6 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
-        Assert.False (tv.IsSelecting);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
         Assert.Equal (new (18, 1), tv.CursorPosition);
@@ -5493,6 +5523,7 @@ This is the second line.
         Assert.False (tv.Used);
         Assert.True (tv.AllowsTab);
         Assert.Equal (new (18, 2), tv.CursorPosition);
+        Assert.True (tv.IsSelecting);
         tv.AllowsTab = false;
         Assert.False (tv.NewKeyDownEvent (Key.Tab));
 
@@ -5511,6 +5542,7 @@ This is the second line.
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
                       tv.Text
                      );
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.AllowsTab);
         tv.AllowsTab = false;
         Assert.False (tv.NewKeyDownEvent (Key.Tab.WithShift));
@@ -5519,6 +5551,7 @@ This is the second line.
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
                       tv.Text
                      );
+        Assert.False (tv.IsSelecting);
         Assert.False (tv.AllowsTab);
         tv.AllowsTab = true;
         Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
@@ -5527,6 +5560,7 @@ This is the second line.
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
                       tv.Text
                      );
+        Assert.False (tv.IsSelecting);
         Assert.True (tv.AllowsTab);
         Assert.False (tv.NewKeyDownEvent (Key.F6));
         Assert.False (tv.NewKeyDownEvent (Application.NextTabGroupKey));
@@ -5535,6 +5569,7 @@ This is the second line.
 
         Assert.True (tv.NewKeyDownEvent (PopoverMenu.DefaultKey));
         Assert.True (tv.ContextMenu != null && tv.ContextMenu.Visible);
+        Assert.False (tv.IsSelecting);
         top.Dispose ();
     }
 
@@ -7105,7 +7140,7 @@ line.
         Assert.True (tv.NewMouseEvent (new () { Position = new (0, 3), Flags = MouseFlags.Button1Pressed }));
         tv.Draw ();
         Assert.Equal (new (0, 3), tv.CursorPosition);
-        Assert.Equal (new (13, 0), cp);
+        Assert.Equal (new (12, 0), cp);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

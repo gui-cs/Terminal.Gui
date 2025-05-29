@@ -1015,7 +1015,6 @@ public class TextField : View, IDesignable
 
         RenderCaption ();
 
-        DrawAutocomplete ();
         _isDrawing = false;
 
         return true;
@@ -1686,6 +1685,8 @@ public class TextField : View, IDesignable
         }
 
         GenerateSuggestions ();
+
+        DrawAutocomplete ();
     }
 
     private void DrawAutocomplete ()
