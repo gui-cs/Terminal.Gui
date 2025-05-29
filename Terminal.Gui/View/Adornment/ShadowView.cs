@@ -9,12 +9,6 @@ internal class ShadowView : View
     private ShadowStyle _shadowStyle;
 
     /// <inheritdoc/>
-    protected override bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute newAttribute)
-    {
-        return true;
-    }
-
-    /// <inheritdoc/>
     protected override bool OnDrawingText () { return true; }
 
     /// <inheritdoc/>
