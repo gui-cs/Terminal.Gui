@@ -63,7 +63,7 @@ The @Terminal.Gui.Application MainLoop will iterate over all Views in the view h
 12) DrawComplete is raised.
 13) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
 
-Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable_work_pattern.md). For example, the base @Terminal.Gui.View always clears the viewport. To override this, a subclass can override @Terminal.Gui.View.OnClearingViewport to simply return `true`. Or, a user of `View` can subscribe to the @Terminal.Gui.View.ClearingViewport event and set the `Cancel` argument to `true`.
+Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable-work-pattern.md). For example, the base @Terminal.Gui.View always clears the viewport. To override this, a subclass can override @Terminal.Gui.View.OnClearingViewport to simply return `true`. Or, a user of `View` can subscribe to the @Terminal.Gui.View.ClearingViewport event and set the `Cancel` argument to `true`.
 
 Then, after the above steps have completed, the Mainloop will iterate through all views in the view hierarchy again, this time calling Draw on any @Terminal.Gui.View.Margin objects, using the cached Clip region mentioned above. This enables Margin to be transparent.
 

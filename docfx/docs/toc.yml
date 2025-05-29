@@ -9,7 +9,7 @@
 - name: Arrangement
   href: arrangement.md
 - name: Cancellable Work Pattern
-  href: cancellable_work_pattern.md
+  href: cancellable-work-pattern.md
 - name: Configuration
   href: config.md
 - name: Command Deep Dive
