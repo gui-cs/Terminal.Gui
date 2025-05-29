@@ -1155,17 +1155,16 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Gets the Views that are under <paramref name="location"/>, including Adornments. The list is ordered by depth. The
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
     ///     deepest
     ///     View is at the end of the list (the top most View is at element 0).
     /// </summary>
-    /// <param name="location">Screen-relative location.</param>
+    /// <param name="screenLocation">Screen-relative location.</param>
     /// <param name="excludeViewportSettingsFlags">
     ///     If set, excludes Views that have the <see cref="ViewportSettings.Transparent"/> or <see cref="ViewportSettings.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
-    /// <returns></returns>
-    public static List<View?> GetViewsUnderLocation (in Point location, ViewportSettings excludeViewportSettingsFlags)
+    public static List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettings excludeViewportSettingsFlags)
     {
         // PopoverHost - If visible, start with it instead of Top
         if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
@@ -1173,7 +1172,7 @@ public partial class View // Layout APIs
             // BUGBUG: We do not traverse all visible toplevels if there's an active popover. This may be a bug.
             List<View?> result = [];
 
-            result.AddRange (GetViewsUnderLocation (visiblePopover, location, excludeViewportSettingsFlags));
+            result.AddRange (GetViewsUnderLocation (visiblePopover, screenLocation, excludeViewportSettingsFlags));
 
             if (result.Count > 1)
             {
@@ -1188,9 +1187,9 @@ public partial class View // Layout APIs
         {
             foreach (Toplevel toplevel in Application.TopLevels)
             {
-                if (toplevel.Visible && toplevel.Contains (location))
+                if (toplevel.Visible && toplevel.Contains (screenLocation))
                 {
-                    List<View?> result = GetViewsUnderLocation (toplevel, location, excludeViewportSettingsFlags);
+                    List<View?> result = GetViewsUnderLocation (toplevel, screenLocation, excludeViewportSettingsFlags);
 
                     // Only return if the result is not empty
                     if (result.Count > 0)
@@ -1210,7 +1209,7 @@ public partial class View // Layout APIs
         if (!checkedTop && Application.Top is { Visible: true } top)
         {
             // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
-            List<View?> result = GetViewsUnderLocation (top, location, excludeViewportSettingsFlags);
+            List<View?> result = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);
 
             if (result.Count > 0)
             {
@@ -1223,20 +1222,19 @@ public partial class View // Layout APIs
 
     /// <summary>
     ///     INTERNAL: Helper for GetViewsUnderLocation that starts from a given root view.
-    ///     Gets the Views that are under <paramref name="location"/>, including Adornments. The list is ordered by depth. The
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
     ///     deepest
     ///     View is at the end of the list (the topmost View is at element 0).
     /// </summary>
     /// <param name="root"></param>
-    /// <param name="location">Screen-relative location.</param>
+    /// <param name="screenLocation">Screen-relative location.</param>
     /// <param name="excludeViewportSettingsFlags">
     ///     If set, excludes Views that have the <see cref="ViewportSettings.Transparent"/> or <see cref="ViewportSettings.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
-    /// <returns></returns>
-    internal static List<View?> GetViewsUnderLocation (View root, in Point location, ViewportSettings excludeViewportSettingsFlags)
+    internal static List<View?> GetViewsUnderLocation (View root, in Point screenLocation, ViewportSettings excludeViewportSettingsFlags)
     {
-        List<View?> viewsUnderLocation = GetViewsAtLocation (root, location);
+        List<View?> viewsUnderLocation = GetViewsAtLocation (root, screenLocation);
 
         if (!excludeViewportSettingsFlags.HasFlag (ViewportSettings.Transparent) && !excludeViewportSettingsFlags.HasFlag (ViewportSettings.TransparentMouse))
         {

@@ -238,14 +238,14 @@ public class Adornment : View, IDesignable
     }
 
     /// <summary>
-    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="location"/>,
+    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="screenLocation"/>,
     ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="View.Visible"/> set to <see langword="false"/> will not be included.
     ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
     /// </summary>
     /// <param name="adornment">The root Adornment from which the search for subviews begins.</param>
-    /// <param name="location">The screen-relative location where the search for views is focused.</param>
+    /// <param name="screenLocation">The screen-relative location where the search for views is focused.</param>
     /// <returns>A list of views that are located under the specified point.</returns>
-    internal static List<View?> GetViewsAtLocation (Adornment? adornment, in Point location)
+    internal static List<View?> GetViewsAtLocation (Adornment? adornment, in Point screenLocation)
     {
         List<View?> result = [];
 
@@ -254,11 +254,11 @@ public class Adornment : View, IDesignable
             return result;
         }
 
-        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (location) ?? location;
+        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (screenLocation) ?? screenLocation;
 
         if (adornment.Contains (superViewRelativeLocation))
         {
-            List<View?> adornmentResult = GetViewsAtLocation (adornment as View, location);
+            List<View?> adornmentResult = GetViewsAtLocation (adornment as View, screenLocation);
             if (adornmentResult.Count > 0)
             {
                 result.AddRange (adornmentResult);

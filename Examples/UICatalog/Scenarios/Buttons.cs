@@ -138,7 +138,7 @@ public class Buttons : Scenario
         var removeButton = new Button
         {
             X = 2, Y = Pos.Bottom (button) + 1,
-            SchemeName = "Error",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error),
             Text = "Remove this button"
         };
         main.Add (removeButton);
