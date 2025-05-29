@@ -124,16 +124,20 @@ public static class ConfigurationManager
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
 #pragma warning disable IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
+    private static readonly object _hardCodedConfigPropertyCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
     {
-        if (_hardCodedConfigPropertyCache is null)
+        lock (_hardCodedConfigPropertyCacheLock)
         {
-            throw new InvalidOperationException ("_hardCodedConfigPropertyCache has not been set.");
-        }
+            if (_hardCodedConfigPropertyCache is null)
+            {
+                throw new InvalidOperationException ("_hardCodedConfigPropertyCache has not been set.");
+            }
 
-        return _hardCodedConfigPropertyCache;
+            return _hardCodedConfigPropertyCache;
+        }
     }
 
     /// <summary>
@@ -146,7 +150,7 @@ public static class ConfigurationManager
     private static ImmutableSortedDictionary<string, ConfigProperty>? _uninitializedConfigPropertiesCache;
 
 #pragma warning disable IDE1006 // Naming Styles
-    private static readonly object _allConfigPropertiesCacheLock = new ();
+    private static readonly object __uninitializedConfigPropertiesCacheCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
@@ -177,7 +181,7 @@ public static class ConfigurationManager
         ConfigProperty.Initialize ();
 
         // Cache all configuration properties
-        lock (_allConfigPropertiesCacheLock)
+        lock (__uninitializedConfigPropertiesCacheCacheLock)
         {
             // _allConfigProperties: for ordered, iterable access (LINQ-friendly)
             // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
@@ -187,14 +191,17 @@ public static class ConfigurationManager
         }
 
         // Create a COPY of the _allConfigPropertiesCache to ensure that the original is not modified.
-        _hardCodedConfigPropertyCache = ConfigProperty.GetAllConfigProperties ().ToFrozenDictionary ();
-
-        foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
+        lock (_hardCodedConfigPropertyCacheLock)
         {
-            // Set the PropertyValue to the hard coded value
-            hardCodedProperty.Value.Immutable = false;
-            hardCodedProperty.Value.UpdateToCurrentValue ();
-            hardCodedProperty.Value.Immutable = true;
+            _hardCodedConfigPropertyCache = ConfigProperty.GetAllConfigProperties ().ToFrozenDictionary ();
+
+            foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
+            {
+                // Set the PropertyValue to the hard coded value
+                hardCodedProperty.Value.Immutable = false;
+                hardCodedProperty.Value.UpdateToCurrentValue ();
+                hardCodedProperty.Value.Immutable = true;
+            }
         }
 
         lock (_initializedLock)

@@ -31,30 +31,30 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     internal int PlatformColor { get; init; }
 
     /// <summary>
-    /// Gets the foreground <see cref="Color"/> used to render text.
+    ///     Gets the foreground <see cref="Color"/> used to render text.
     /// </summary>
     [JsonConverter (typeof (ColorJsonConverter))]
     public Color Foreground { get; init; }
 
     /// <summary>
-    /// Gets the background <see cref="Color"/> used behind text.
+    ///     Gets the background <see cref="Color"/> used behind text.
     /// </summary>
     [JsonConverter (typeof (ColorJsonConverter))]
     public Color Background { get; init; }
 
     // TODO: Add constructors which permit including a Style.
     /// <summary>
-    /// Gets the <see cref="TextStyle"/> (e.g., bold, underline, italic) applied to text.
+    ///     Gets the <see cref="TextStyle"/> (e.g., bold, underline, italic) applied to text.
     /// </summary>
     public TextStyle Style { get; init; } = TextStyle.None;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Attribute"/> struct with default values.
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct with default values.
     /// </summary>
     public Attribute () { this = Default with { PlatformColor = -1 }; }
 
     /// <summary>
-    /// Initializes a new <see cref="Attribute"/> from an existing instance, preserving explicit state.
+    ///     Initializes a new <see cref="Attribute"/> from an existing instance, preserving explicit state.
     /// </summary>
     public Attribute (in Attribute attr) { this = attr with { PlatformColor = -1 }; }
 
@@ -62,7 +62,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <param name="platformColor">platform-dependent color value.</param>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    internal Attribute (int platformColor, Color foreground, Color background)
+    internal Attribute (in int platformColor, in Color foreground, in Color background)
     {
         Foreground = foreground;
         Background = background;
@@ -71,7 +71,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     }
 
     /// <summary>
-    /// Initializes an instance using two named colors.
+    ///     Initializes an instance using two named colors.
     /// </summary>
     public Attribute (in Color foreground, in Color background)
     {
@@ -84,7 +84,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     }
 
     /// <summary>
-    /// Initializes a new instance with foreground, background, and <see cref="TextStyle"/>.
+    ///     Initializes a new instance with foreground, background, and <see cref="TextStyle"/>.
     /// </summary>
     public Attribute (in Color foreground, in Color background, in TextStyle style)
     {
@@ -97,53 +97,97 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Attribute"/> struct from string representations of colors and style.
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct from string representations of colors and style.
     /// </summary>
     /// <param name="foreground">Foreground color as a string (name, hex, or rgb).</param>
     /// <param name="background">Background color as a string (name, hex, or rgb).</param>
     /// <param name="style">Optional style as a string (e.g., "Bold,Underline").</param>
     /// <exception cref="ArgumentException">Thrown if color parsing fails.</exception>
-    public Attribute (string foreground, string background, string? style = null)
+    public Attribute (in string foreground, in string background, in string? style = null)
     {
         Foreground = Color.Parse (foreground);
         Background = Color.Parse (background);
-        Style = style is { } && Enum.TryParse<TextStyle> (style, true, out var parsedStyle)
+
+        Style = style is { } && Enum.TryParse (style, true, out TextStyle parsedStyle)
                     ? parsedStyle
                     : TextStyle.None;
         PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct from string representations of colors and style.
+    /// </summary>
+    /// <param name="foreground">Foreground color as a string (name, hex, or rgb).</param>
+    /// <param name="background">Background color as a string (name, hex, or rgb).</param>
+    /// <param name="style">Optional style as a string (e.g., "Bold,Underline").</param>
+    /// <exception cref="ArgumentException">Thrown if color parsing fails.</exception>
+    public Attribute (in string foreground, in string background, in TextStyle style)
+    {
+        Foreground = Color.Parse (foreground);
+        Background = Color.Parse (background);
+
+        Style = style;
+        PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
+    }
 
     /// <summary>
     ///     INTERNAL: Initializes a new instance with a <see cref="ColorName16"/> value. Both <see cref="Foreground"/> and
     ///     <see cref="Background"/> will be set to the specified color.
     /// </summary>
-    /// <param name="colorName">Value.</param>
-    internal Attribute (in ColorName16 colorName) : this (in colorName, in colorName) { }
+    /// <param name="color16Name">Value.</param>
+    internal Attribute (in ColorName16 color16Name) : this (in color16Name, in color16Name) { }
 
     /// <summary>
-    /// Initializes a new instance with foreground and background colors.
+    ///     Initializes a new instance with foreground and background colors.
     /// </summary>
-    public Attribute (in ColorName16 foregroundName, in ColorName16 backgroundName)
-        : this (new Color (in foregroundName), new Color (in backgroundName))
+    public Attribute (in ColorName16 foreground16Name, in ColorName16 background16Name)
+        : this (new Color (in foreground16Name), new Color (in background16Name))
     { }
 
     /// <summary>
-    /// Initializes a new instance with foreground and background colors.
+    ///     Initializes a new instance with foreground and background colors.
     /// </summary>
-    public Attribute (in ColorName16 foregroundName, in Color background) : this (new Color (in foregroundName), in background) { }
+    public Attribute (in ColorName16 foreground16Name, in Color background) : this (new Color (in foreground16Name), in background) { }
 
     /// <summary>
-    /// Initializes a new instance with foreground and background colors.
+    ///     Initializes a new instance with foreground and background colors.
     /// </summary>
-    public Attribute (in Color foreground, in ColorName16 backgroundName) : this (in foreground, new Color (in backgroundName)) { }
-
-    // TODO: Add constructor support for StandardColor
+    public Attribute (in Color foreground, in ColorName16 background16Name) : this (in foreground, new Color (in background16Name)) { }
 
     /// <summary>
-    /// Initializes an instance using a single color for both foreground and background.
+    ///     INTERNAL: Initializes a new instance with a <see cref="StandardColors"/> value. Both <see cref="Foreground"/> and
+    ///     <see cref="Background"/> will be set to the specified color.
+    /// </summary>
+    /// <param name="standardColor">Value.</param>
+    internal Attribute (in StandardColor standardColor) : this (in standardColor, in standardColor) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in StandardColor foreground, in StandardColor background)
+        : this (new Color (in foreground), new Color (in background))
+    { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in StandardColor foreground, in Color background) : this (new Color (in foreground), in background) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in Color foreground, in StandardColor background) : this (in foreground, new Color (in background)) { }
+
+    /// <summary>
+    ///     Initializes an instance using a single color for both foreground and background.
     /// </summary>
     public Attribute (in Color color) : this (color, color) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors and a <see cref="TextStyle"/>.
+    /// </summary>
+    public Attribute (in StandardColor foreground, in StandardColor background, in TextStyle style) : this (new (in foreground), new Color (in background), style) { }
+
 
     /// <inheritdoc/>
     public bool Equals (Attribute other)
@@ -152,17 +196,10 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
                && Foreground.Equals (other.Foreground)
                && Background.Equals (other.Background)
                && Style == other.Style;
-
-        // ❌ do not include IsExplicitlySet
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode ()
-    {
-        return HashCode.Combine (PlatformColor, Foreground, Background, Style);
-
-        // ❌ do not include IsExplicitlySet
-    }
+    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, Style); }
 
     /// <inheritdoc/>
     public override string ToString ()

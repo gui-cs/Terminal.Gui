@@ -16,6 +16,7 @@ namespace Terminal.Gui;
 /// </remarks>
 public abstract class PopoverBaseImpl : View, IPopover
 {
+
     /// <summary>
     ///     Creates a new PopoverBaseImpl.
     /// </summary>
@@ -74,4 +75,8 @@ public abstract class PopoverBaseImpl : View, IPopover
 
         return ret;
     }
+
+    /// <inheritdoc />
+    public Toplevel? Toplevel { get; set; }
+
 }

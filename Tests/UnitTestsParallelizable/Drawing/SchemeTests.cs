@@ -32,12 +32,22 @@ public class SchemeTests
         Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemes ();
         Assert.NotNull (schemes);
         Assert.Equal (5, schemes.Count);
-        Assert.True (schemes.ContainsKey ("TopLevel"));
         Assert.True (schemes.ContainsKey ("Base"));
         Assert.True (schemes.ContainsKey ("Dialog"));
-        Assert.True (schemes.ContainsKey ("Menu"));
         Assert.True (schemes.ContainsKey ("Error"));
+        Assert.True (schemes.ContainsKey ("Menu"));
+        Assert.True (schemes.ContainsKey ("TopLevel"));
     }
+
+    [Fact]
+    public void Built_Ins_Are_Implicit ()
+    {
+        Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemes ();
+
+        Assert.True (schemes ["Base"]!.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
+        Assert.False (schemes ["Base"]!.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
+    }
+
 
     [Fact]
     public void With_Same_Attributes_AreEqual ()

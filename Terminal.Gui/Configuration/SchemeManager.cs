@@ -20,19 +20,12 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     private static readonly object _schemesLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
-    internal static void ResetToHardCodedDefaults ()
-    {
-        SetSchemes (GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase));
-    }
-
     /// <summary>
-    ///     Gets the hard-coded schemes defined by <see cref="View"/>. These are not loaded from the configuration files,
+    ///     INTERNAL: Gets the hard-coded schemes defined by <see cref="View"/>. These are not loaded from the configuration files,
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    public static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes ()!; }
+    internal static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes ()!; }
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
@@ -181,13 +174,10 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             if (!ConfigurationManager.IsInitialized ())
             {
-                Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase)!;
-
-                return hardCoded;
+                throw new InvalidOperationException ("CM Must be Initialized");
             }
 
-            Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-            if (schemes is null)
+            if (ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue is not Dictionary<string, Scheme?> schemes)
             {
                 // Most likely because "Schemes": was left out of the config
                 throw new InvalidOperationException ("Current Theme does not have a Scheme.");
@@ -205,12 +195,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     {
         lock (_schemesLock)
         {
-            if (GetSchemes () is { })
-            {
-                return GetSchemes ()!.Keys.ToImmutableList ();
-            }
+            return GetSchemes ()!.Keys.ToImmutableList ();
         }
-
-        throw new InvalidOperationException ("Schemes is not set.");
     }
 }

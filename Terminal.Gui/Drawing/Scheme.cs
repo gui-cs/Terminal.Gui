@@ -160,29 +160,18 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                                       StringComparer.InvariantCultureIgnoreCase,
                                                       [
                                                           new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Base)!, CreateBase ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Toplevel)!, CreateToplevel ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Error)!, CreateError ()),
                                                           new (SchemeManager.SchemesToSchemeName (Schemes.Dialog)!, CreateDialog ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Menu)!, CreateMenu ())
+                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Error)!, CreateError ()),
+                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Menu)!, CreateMenu ()),
+                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Toplevel)!, CreateToplevel ()),
                                                       ]
                                                      );
 
         Scheme CreateBase ()
         {
-            var highlight = new Color ("LightGray");
-            highlight = highlight.GetBrighterColor ();
-
             return new ()
             {
-                Normal = new ("LightGray", "RaisinBlack")
-            };
-        }
-
-        Scheme CreateToplevel ()
-        {
-            return new ()
-            {
-                Normal = new ("SlateGray", "OuterSpace")
+                Normal = new (StandardColor.LightBlue, StandardColor.RaisinBlack)
             };
         }
 
@@ -190,7 +179,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("IndianRed", "RaisinBlack")
+                Normal = new (StandardColor.IndianRed, StandardColor.RaisinBlack)
             };
         }
 
@@ -198,7 +187,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("WhiteSmoke", "OuterSpace")
+                Normal = new (StandardColor.LightSkyBlue, StandardColor.OuterSpace)
             };
         }
 
@@ -206,9 +195,18 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return new ()
             {
-                Normal = new ("Charcoal", "WhiteSmoke", "Bold")
+                Normal = new (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold)
             };
         }
+
+        Scheme CreateToplevel ()
+        {
+            return new ()
+            {
+                Normal = new (StandardColor.CadetBlue, StandardColor.Charcoal)
+            };
+        }
+
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
@@ -222,86 +220,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
         Normal = scheme.Normal;
 
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out Attribute? hotNormal))
-        {
-            _hotNormal = hotNormal;
-        }
-        else
-        {
-            _hotNormal = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Focus, out Attribute? focus))
-        {
-            _focus = focus;
-        }
-        else
-        {
-            _focus = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotFocus, out Attribute? hotFocus))
-        {
-            _hotFocus = hotFocus;
-        }
-        else
-        {
-            _hotFocus = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out Attribute? active))
-        {
-            _active = active;
-        }
-        else
-        {
-            _active = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotActive, out Attribute? hotActive))
-        {
-            _hotActive = hotActive;
-        }
-        else
-        {
-            _hotActive = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out Attribute? highlight))
-        {
-            _highlight = highlight;
-        }
-        else
-        {
-            _highlight = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out Attribute? editable))
-        {
-            _editable = editable;
-        }
-        else
-        {
-            _editable = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out Attribute? readOnly))
-        {
-            _readOnly = readOnly;
-        }
-        else
-        {
-            _readOnly = null;
-        }
-
-        if (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out Attribute? disabled))
-        {
-            _disabled = disabled;
-        }
-        else
-        {
-            _disabled = null;
-        }
+        _hotNormal = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out Attribute? hotNormal) ? hotNormal : null;
+        _focus = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Focus, out Attribute? focus) ? focus : null;
+        _hotFocus = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotFocus, out Attribute? hotFocus) ? hotFocus : null;
+        _active = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Active, out Attribute? active) ? active : null;
+        _hotActive = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotActive, out Attribute? hotActive) ? hotActive : null;
+        _highlight = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Highlight, out Attribute? highlight) ? highlight : null;
+        _editable = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out Attribute? editable) ? editable : null;
+        _readOnly = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out Attribute? readOnly) ? readOnly : null;
+        _disabled = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out Attribute? disabled) ? disabled : null;
     }
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="attribute"/>.</summary>
@@ -365,22 +292,8 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return Normal; // fallback
         }
 
-        Attribute? attr = role switch
-                          {
-                              VisualRole.Normal => Normal,
-                              VisualRole.HotNormal => _hotNormal,
-                              VisualRole.Focus => _focus,
-                              VisualRole.HotFocus => _hotFocus,
-                              VisualRole.Active => _active,
-                              VisualRole.HotActive => _hotActive,
-                              VisualRole.Highlight => _highlight,
-                              VisualRole.Editable => _editable,
-                              VisualRole.ReadOnly => _readOnly,
-                              VisualRole.Disabled => _disabled,
-                              _ => null
-                          };
-
-        if (attr is { } || role == VisualRole.Normal)
+        Attribute? attr = Normal;
+        if (role == VisualRole.Normal || TryGetExplicitlySetAttributeForRole (role, out attr))
         {
             return attr!.Value;
         }
@@ -414,20 +327,20 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Editable =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetBrighterColor (),
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetDimColor ()
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor ()
                                    },
 
                                VisualRole.ReadOnly =>
                                    GetAttributeForRoleCore (VisualRole.Editable, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Faint
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Editable, stack).Foreground.GetDimColor (0.05),
                                    },
 
                                VisualRole.Disabled =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Faint
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.5),
                                    },
 
                                VisualRole.HotNormal =>
@@ -472,6 +385,28 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         return Normal;
     }
 
+    // Helper method for property _get implementation
+    private Attribute GetAttributeForRoleProperty (Attribute? explicitValue, VisualRole role)
+    {
+        if (explicitValue is { })
+        {
+            return explicitValue.Value;
+        }
+
+        return GetAttributeForRoleCore (role, []);
+    }
+
+    // Helper method for property _set implementation
+    private Attribute? SetAttributeForRoleProperty (Attribute value, VisualRole role)
+    {
+        // If value is the same as the algorithm value, use null
+        if (GetAttributeForRoleCore (role, []) == value)
+        {
+            return null;
+        }
+        return value;
+    }
+
     private readonly Attribute? _normal;
 
     /// <summary>
@@ -490,57 +425,39 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
     /// <summary>
     ///     The visual role for <see cref="Normal"/> elements with a <see cref="View.HotKey"/> indicator.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute HotNormal
     {
-        get
-        {
-            if (_hotNormal is { })
-            {
-                return _hotNormal.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.HotNormal, []);
-        }
-        init => _hotNormal = value;
+        get => GetAttributeForRoleProperty (_hotNormal, VisualRole.HotNormal);
+        init => _hotNormal = SetAttributeForRoleProperty (value, VisualRole.HotNormal);
     }
 
     private readonly Attribute? _focus;
 
     /// <summary>
     ///     The visual role when the element is focused.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute Focus
     {
-        get
-        {
-            if (_focus is { })
-            {
-                return _focus.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.Focus, []);
-        }
-        init => _focus = value;
+        get => GetAttributeForRoleProperty (_focus, VisualRole.Focus);
+        init => _focus = SetAttributeForRoleProperty (value, VisualRole.Focus);
     }
 
     private readonly Attribute? _hotFocus;
 
     /// <summary>
     ///     The visual role for <see cref="Focus"/> elements with a <see cref="View.HotKey"/> indicator.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute HotFocus
     {
-        get
-        {
-            if (_hotFocus is { })
-            {
-                return _hotFocus.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.HotFocus, []);
-        }
-        init => _hotFocus = value;
+        get => GetAttributeForRoleProperty (_hotFocus, VisualRole.HotFocus);
+        init => _hotFocus = SetAttributeForRoleProperty (value, VisualRole.HotFocus);
     }
 
     private readonly Attribute? _active;
@@ -549,114 +466,78 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     ///     The visual role for elements that are active or selected (e.g., selected item in a <see cref="ListView"/>). Also
     ///     used
     ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/> and  <see cref="TabView"/>.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute Active
     {
-        get
-        {
-            if (_active is { })
-            {
-                return _active.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.Active, []);
-        }
-        init => _active = value;
+        get => GetAttributeForRoleProperty (_active, VisualRole.Active);
+        init => _active = SetAttributeForRoleProperty (value, VisualRole.Active);
     }
 
     private readonly Attribute? _hotActive;
 
     /// <summary>
     ///     The visual role for <see cref="Active"/> elements with a <see cref="View.HotKey"/> indicator.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute HotActive
     {
-        get
-        {
-            if (_hotActive is { })
-            {
-                return _hotActive.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.HotActive, []);
-        }
-        init => _hotActive = value;
+        get => GetAttributeForRoleProperty (_hotActive, VisualRole.HotActive);
+        init => _hotActive = SetAttributeForRoleProperty (value, VisualRole.HotActive);
     }
 
     private readonly Attribute? _highlight;
 
     /// <summary>
     ///     The visual role for elements that are highlighted (e.g., when the mouse is hovering over a <see cref="Button"/>).
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute Highlight
     {
-        get
-        {
-            if (_highlight is { })
-            {
-                return _highlight.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.Highlight, []);
-        }
-        init => _highlight = value;
+        get => GetAttributeForRoleProperty (_highlight, VisualRole.Highlight);
+        init => _highlight = SetAttributeForRoleProperty (value, VisualRole.Highlight);
     }
 
     private readonly Attribute? _editable;
 
     /// <summary>
     ///     The visual role for elements that are editable (e.g., <see cref="TextField"/> and <see cref="TextView"/>).
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute Editable
     {
-        get
-        {
-            if (_editable is { })
-            {
-                return _editable.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.Editable, []);
-        }
-        init => _editable = value;
+        get => GetAttributeForRoleProperty (_editable, VisualRole.Editable);
+        init => _editable = SetAttributeForRoleProperty (value, VisualRole.Editable);
     }
 
     private readonly Attribute? _readOnly;
 
     /// <summary>
     ///     The visual role for elements that are normally editable but currently read-only.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute ReadOnly
     {
-        get
-        {
-            if (_readOnly is { })
-            {
-                return _readOnly.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.ReadOnly, []);
-        }
-        init => _readOnly = value;
+        get => GetAttributeForRoleProperty (_readOnly, VisualRole.ReadOnly);
+        init => _readOnly = SetAttributeForRoleProperty (value, VisualRole.ReadOnly);
     }
 
     private readonly Attribute? _disabled;
 
     /// <summary>
     ///     The visual role for elements that are disabled and not interactable.
+    ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
+    ///     algorithm used.
     /// </summary>
     public Attribute Disabled
     {
-        get
-        {
-            if (_disabled is { })
-            {
-                return _disabled.Value;
-            }
-
-            return GetAttributeForRoleCore (VisualRole.Disabled, []);
-        }
-        init => _disabled = value;
+        get => GetAttributeForRoleProperty (_disabled, VisualRole.Disabled);
+        init => _disabled = SetAttributeForRoleProperty (value, VisualRole.Disabled);
     }
 
     /// <inheritdoc/>

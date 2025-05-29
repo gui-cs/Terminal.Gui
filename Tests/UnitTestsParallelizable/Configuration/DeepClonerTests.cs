@@ -182,16 +182,16 @@ public class DeepClonerTests
     {
         Scheme? source = new ()
         {
-            Normal = new (new ("LightGray"), new ("RaisinBlack"), TextStyle.None), // Material Theme: Panel Background
-            Focus = new (new ("White"), new ("DarkGray"), TextStyle.None), // Slightly lighter background for focus
-            HotNormal = new (new ("Silver"), new ("RaisinBlack"), TextStyle.Underline), // Lighter text for hotkeys
-            Disabled = new (new ("DarkGray"), new ("RaisinBlack"), TextStyle.Faint), // Dimmed text for disabled
-            HotFocus = new (new ("White"), new ("DarkGray"), TextStyle.Underline), // Underlined white text on focus
-            Active = new (new ("White"), new ("Charcoal"), TextStyle.Bold), // White text on active
-            HotActive = new (new ("White"), new ("Charcoal"), TextStyle.Underline | TextStyle.Bold), // Underlined white text on active
-            Highlight = new (new ("White"), new ("Onyx"), TextStyle.None), // Highlight with slightly lighter background
-            Editable = new (new ("LightYellow"), new ("RaisinBlack"), TextStyle.None), // Yellowish text for editable fields
-            ReadOnly = new (new ("Gray"), new ("RaisinBlack"), TextStyle.Italic) // Gray italic text for read-only
+            Normal = new ("LightGray", "RaisinBlack", TextStyle.None), 
+            Focus = new ("White", "DarkGray", TextStyle.None), 
+            HotNormal = new ("Silver", "RaisinBlack", TextStyle.Underline), 
+            Disabled = new ("DarkGray", "RaisinBlack", TextStyle.Faint), 
+            HotFocus = new ("White", "Green", TextStyle.Underline), 
+            Active = new ("White", "Charcoal", TextStyle.Bold), 
+            HotActive = new ("White", "Charcoal", TextStyle.Underline | TextStyle.Bold),
+            Highlight = new ("White", "Onyx", TextStyle.None), 
+            Editable = new ("LightYellow", "RaisinBlack", TextStyle.None),
+            ReadOnly = new ("Gray", "RaisinBlack", TextStyle.Italic) 
         };
         Scheme? result = DeepCloner.DeepClone (source);
         Assert.True (source.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
@@ -591,11 +591,11 @@ public class DeepClonerTests
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         // Create a Themes list with two themes
-        List<Dictionary<string, ThemeScope>> themesList = new ()
-        {
-            new() { { "Default", defaultThemeScope } },
-            new() { { "Dark", darkThemeScope } }
-        };
+        List<Dictionary<string, ThemeScope>> themesList =
+        [
+            new () { { "Default", defaultThemeScope } },
+            new () { { "Dark", darkThemeScope } }
+        ];
 
         // Create a SettingsScope and set the Themes property
         var settingsScope = new SettingsScope ();

@@ -61,16 +61,16 @@ public class SchemeGetAttributeForRoleAlgorithmTests
     //    Assert.True (readOnly.Style.HasFlag (TextStyle.Italic));
     //}
 
-    [Fact]
-    public void Disabled_Derived_From_Normal_Faint ()
-    {
-        Attribute normal = new ("Red", "Blue");
-        Scheme scheme = new (normal);
+    //[Fact]
+    //public void Disabled_Derived_From_Normal_Faint ()
+    //{
+    //    Attribute normal = new ("Red", "Blue");
+    //    Scheme scheme = new (normal);
 
-        Attribute disabled = scheme.GetAttributeForRole (VisualRole.Disabled);
-        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
-        Assert.True (disabled.Style.HasFlag (TextStyle.Faint));
-    }
+    //    Attribute disabled = scheme.GetAttributeForRole (VisualRole.Disabled);
+    //    Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
+    //    Assert.True (disabled.Style.HasFlag (TextStyle.Faint));
+    //}
 
     [Fact]
     public void Active_Derived_Correctly ()

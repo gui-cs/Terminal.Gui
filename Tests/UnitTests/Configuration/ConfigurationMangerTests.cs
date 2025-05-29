@@ -94,6 +94,14 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.NotNull (Settings);
     }
 
+
+    [Fact]
+    public void Disable_With_ResetToHardCodedDefaults_True_Works_When_Disabled ()
+    {
+        Assert.False (ConfigurationManager.IsEnabled);
+        ConfigurationManager.Disable (true);
+    }
+
     [Fact]
     public void Enable_Settings_Is_Valid ()
     {
@@ -1005,4 +1013,5 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         }
     }
+
 }
