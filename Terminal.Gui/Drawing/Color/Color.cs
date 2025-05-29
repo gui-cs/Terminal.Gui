@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using ColorHelper;
+using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
 
@@ -107,7 +108,12 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap [colorName]; }
+    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap! [colorName]; }
+
+
+    /// <summary>Initializes a new instance of the <see cref="Color"/> color from a value in the <see cref="StandardColor"/> enum.</summary>
+    /// <param name="colorName">The 16-color value.</param>
+    public Color (in StandardColor colorName) : this ((int)colorName) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See
@@ -132,13 +138,13 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     // TODO: ColorName and AnsiColorCode are only needed when a driver is in Force16Color mode and we
     // TODO: should be able to remove these from any non-Driver-specific usages.
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static Dictionary<ColorName16, string> Colors16
     {
         get =>
 
             // Transform _colorToNameMap into a Dictionary<ColorNames,string>
-            ColorExtensions.ColorToName16Map.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
+            ColorExtensions.ColorToName16Map!.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
         set
         {
             // Transform Dictionary<ColorNames,string> into _colorToNameMap
@@ -146,7 +152,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
             return;
 
-            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new Color (kvp.Value); }
+            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new (kvp.Value); }
 
             static ColorName16 GetColorToNameMapValue (KeyValuePair<ColorName16, string> kvp)
             {
@@ -172,7 +178,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     will return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     Get returns the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> of the closest 24-bit color value. Set
+    ///     sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
     public ColorName16 GetClosestNamedColor16 () { return GetClosestNamedColor16 (this); }
@@ -231,7 +238,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     [SkipLocalsInit]
     internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
     {
-        return ColorExtensions.ColorToName16Map.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
+        return ColorExtensions.ColorToName16Map!.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
     }
 
     /// <summary>Converts the given color value to exact named color represented by <see cref="ColorName16"/>.</summary>
@@ -240,55 +247,135 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <returns>True if conversion succeeded; otherwise false.</returns>
     internal static bool TryGetExactNamedColor16 (Color inputColor, out ColorName16 colorName16)
     {
-        return ColorExtensions.ColorToName16Map.TryGetValue (inputColor, out colorName16);
+        return ColorExtensions.ColorToName16Map!.TryGetValue (inputColor, out colorName16);
     }
 
     [SkipLocalsInit]
     private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
 
     /// <summary>
-    /// Gets a color that is the same hue as the current color, but with a different lightness.
+    ///     Returns a color with the same hue and saturation as this color, but with a significantly different lightness,
+    ///     making it suitable for use as a highlight or contrast color in UI elements.
     /// </summary>
-    /// <returns></returns>
-    public Color GetHighlightColor ()
+    /// <remarks>
+    ///     <para>
+    ///         This method brightens the color if it is dark, or darkens it if it is light, ensuring the result is visually
+    ///         distinct
+    ///         from the original. The algorithm works in HSL color space and adjusts the lightness channel:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If the color is dark (lightness &lt; 0.5), the lightness is increased (brightened).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>If the color is light (lightness &gt;= 0.5), the lightness is decreased (darkened).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the adjustment resulted in a color too close to the original, a larger adjustment is
+    ///                     made.
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///         This ensures the returned color is always visually distinct and suitable for highlighting or selection states.
+    ///     </para>
+    ///     <para>
+    ///         The returned color will always have the same hue and saturation as the original, but a different lightness.
+    ///     </para>
+    /// </remarks>
+    /// <param name="brightenAmount">The percent amount to brighten the color by. The default is <c>20%</c>.</param>
+    /// <returns>
+    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a contrasting lightness.
+    /// </returns>
+    /// <example>
+    ///     <code>
+    /// var baseColor = new Color(100, 100, 100);
+    /// var highlight = baseColor.GetHighlightColor();
+    /// // highlight will be a lighter or darker version of baseColor, depending on its original lightness.
+    /// </code>
+    /// </example>
+    public Color GetBrighterColor (double brightenAmount = 0.2)
     {
-        // TODO: This is a temporary implementation; just enough to show how it could work. 
-        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
+        HSL? hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
-        var amount = .7;
-        if (hsl.L <= 5)
+        double lNorm = hsl.L / 255.0;
+        double newL;
+
+        if (lNorm < 0.5)
         {
-            return DarkGray;
+            newL = Math.Min (1.0, lNorm + brightenAmount);
         }
-        hsl.L = (byte)(hsl.L * amount);
+        else
+        {
+            newL = Math.Max (0.0, lNorm - brightenAmount);
+        }
 
-        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        if (Math.Abs (newL - lNorm) < 0.1)
+        {
+            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * brightenAmount) : Math.Max (0.0, lNorm - 2 * brightenAmount);
+        }
+
+        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        RGB? rgb = ColorConverter.HslToRgb (newHsl);
+
         return new (rgb.R, rgb.G, rgb.B);
-
     }
 
     /// <summary>
-    /// Gets a color that is the same hue as the current color, but with a different lightness.
+    ///     Returns a color with the same hue and saturation as this color, but with a significantly lower lightness,
+    ///     making it suitable for use as a shadow or background contrast color in UI elements.
     /// </summary>
-    /// <returns></returns>
-    public Color GetDarkerColor ()
+    /// <remarks>
+    ///     <para>
+    ///         This method darkens the color by reducing its lightness in HSL color space:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If the color is already very dark, returns <see cref="ColorName16.DarkGray"/>.</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Otherwise, reduces the lightness by a fixed amount (default 30%).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the adjustment resulted in a color too close to the original, a larger adjustment is
+    ///                     made.
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///         This ensures the returned color is always visually distinct and suitable for shadowing or de-emphasis.
+    ///     </para>
+    /// </remarks>
+    /// <param name="dimAmount">The percent amount to dim the color by. The default is <c>20%</c>.</param>
+    /// <returns>
+    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
+    /// </returns>
+    public Color GetDimColor (double dimAmount = 0.2)
     {
-        // TODO: This is a temporary implementation; just enough to show how it could work. 
-        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
+        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
-        var amount = .3;
-        if (hsl.L <= 5)
+        double lNorm = hsl.L / 255.0;
+        double newL = Math.Max (0.0, lNorm - dimAmount);
+
+        // If the color is already very dark, return a standard dark gray for visibility
+        if (lNorm <= 0.1)
         {
-            return DarkGray;
+            return new (ColorName16.DarkGray);
         }
-        hsl.L = (byte)(hsl.L * amount);
 
-        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        // If the new lightness is too close to the original, force a bigger change
+        if (Math.Abs (newL - lNorm) < 0.1)
+        {
+            newL = Math.Max (0.0, lNorm - 2 * dimAmount);
+        }
+
+        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        RGB rgb = ColorConverter.HslToRgb (newHsl);
+
         return new (rgb.R, rgb.G, rgb.B);
-
     }
 
     #region Legacy Color Names
+
+    // ReSharper disable InconsistentNaming
 
     /// <summary>The black color.</summary>
     public const ColorName16 Black = ColorName16.Black;

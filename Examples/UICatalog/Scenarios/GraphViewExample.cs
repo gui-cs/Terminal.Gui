@@ -137,7 +137,7 @@ public class GraphViewExample : Scenario
         };
         app.Add (menu);
 
-        _graphView = new()
+        _graphView = new ()
         {
             X = 0,
             Y = 1,
@@ -161,7 +161,7 @@ public class GraphViewExample : Scenario
         };
 
         frameRight.Add (
-                        _about = new() { Width = Dim.Fill (), Height = Dim.Fill (), ReadOnly = true }
+                        _about = new () { Width = Dim.Fill (), Height = Dim.Fill (), ReadOnly = true }
                        );
 
         app.Add (frameRight);
@@ -239,9 +239,9 @@ public class GraphViewExample : Scenario
 
         _about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-        Color fore = _graphView.ColorScheme.Normal.Foreground == Color.Black
+        Color fore = _graphView.GetAttributeForRole (VisualRole.Normal).Foreground == Color.Black
                          ? Color.White
-                         : _graphView.ColorScheme.Normal.Foreground;
+                         : _graphView.GetAttributeForRole (VisualRole.Normal).Foreground;
         var black = new Attribute (fore, Color.Black);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);
         var magenta = new Attribute (Color.BrightMagenta, Color.Black);
@@ -398,7 +398,7 @@ public class GraphViewExample : Scenario
 
         var barSeries = new BarSeries
         {
-            Bars = new()
+            Bars = new ()
             {
                 new ("Switzerland", softStiple, 83.4f),
                 new (
@@ -533,7 +533,7 @@ public class GraphViewExample : Scenario
 
         _about.Text = "This graph shows random points";
 
-        var black = new Attribute (_graphView.ColorScheme.Normal.Foreground, Color.Black);
+        var black = new Attribute (_graphView.GetAttributeForRole (VisualRole.Normal).Foreground, Color.Black, _graphView.GetAttributeForRole (VisualRole.Normal).Style);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);
         var magenta = new Attribute (Color.BrightMagenta, Color.Black);
         var red = new Attribute (Color.BrightRed, Color.Black);
@@ -621,7 +621,7 @@ public class GraphViewExample : Scenario
         _graphView.Series.Add (
                                new ScatterSeries
                                {
-                                   Points = new()
+                                   Points = new ()
                                    {
                                        new (1, 1.007f),
                                        new (2, 4.002f),
@@ -825,7 +825,7 @@ public class GraphViewExample : Scenario
         var malesSeries = new BarSeries
         {
             Orientation = Orientation.Horizontal,
-            Bars = new()
+            Bars = new ()
             {
                 new ("0-4", stiple, -2009363),
                 new ("5-9", stiple, -2108550),
@@ -856,7 +856,7 @@ public class GraphViewExample : Scenario
         var femalesSeries = new BarSeries
         {
             Orientation = Orientation.Horizontal,
-            Bars = new()
+            Bars = new ()
             {
                 new ("0-4", stiple, 1915127),
                 new ("5-9", stiple, 2011016),

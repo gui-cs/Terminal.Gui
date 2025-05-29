@@ -33,7 +33,8 @@ public class MenuBarv2 : Menuv2, IDesignable
                     Command.HotKey,
                     () =>
                     {
-                        Logging.Debug ($"{Title} - Command.HotKey");
+                        // Logging.Debug ($"{Title} - Command.HotKey");
+
                         if (RaiseHandlingHotKey () is true)
                         {
                             return true;
@@ -65,7 +66,8 @@ public class MenuBarv2 : Menuv2, IDesignable
                     Command.Quit,
                     ctx =>
                     {
-                        Logging.Debug ($"{Title} - Command.Quit");
+                        // Logging.Debug ($"{Title} - Command.Quit");
+
                         if (HideActiveItem ())
                         {
                             return true;
@@ -90,7 +92,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         BorderStyle = DefaultBorderStyle;
 
-        Applied += OnConfigurationManagerApplied;
+        ConfigurationManager.Applied += OnConfigurationManagerApplied;
         SuperViewChanged += OnSuperViewChanged;
 
         return;
@@ -108,7 +110,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
 
@@ -125,7 +127,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <summary>
     ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
 
     private Key _key = DefaultKey;
@@ -168,7 +170,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
@@ -180,10 +182,11 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewRemoved (View view)
     {
         base.OnSubViewRemoved (view);
+
         if (view is MenuBarItemv2 mbi)
         {
             mbi.Accepted -= OnMenuBarItemAccepted;
@@ -199,17 +202,12 @@ public class MenuBarv2 : Menuv2, IDesignable
             {
                 Active = true;
             }
-            else
-            {
-
-
-            }
         }
     }
 
     private void OnMenuBarItemAccepted (object? sender, CommandEventArgs e)
     {
-        Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
 
         RaiseAccepted (e.Context);
     }
@@ -218,14 +216,14 @@ public class MenuBarv2 : Menuv2, IDesignable
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>The default key for activating menu bars.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F9;
 
     /// <summary>
     ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public bool IsOpen () { return SubViews.OfType<MenuBarItemv2>().Count (sv => sv is { PopoverMenuOpen: true }) > 0; }
+    public bool IsOpen () { return SubViews.OfType<MenuBarItemv2> ().Count (sv => sv is { PopoverMenuOpen: true }) > 0; }
 
     private bool _active;
 
@@ -246,7 +244,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             }
 
             _active = value;
-            Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            // Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             if (!_active)
             {
@@ -255,8 +253,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             }
 
             CanFocus = value;
-            Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
-
+            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
         }
     }
 
@@ -265,7 +262,8 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         // If the MenuBar does not have focus and the mouse enters: Enable CanFocus
         // But do NOT show a Popover unless the user clicks or presses a hotkey
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+
         if (!HasFocus)
         {
             Active = true;
@@ -277,7 +275,8 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnMouseLeave ()
     {
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+
         if (!IsOpen ())
         {
             Active = false;
@@ -289,7 +288,8 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+
         if (!newHasFocus)
         {
             Active = false;
@@ -299,7 +299,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
+        // Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
 
         if (IsOpen () && selected is MenuBarItemv2 { PopoverMenuOpen: false } selectedMenuBarItem)
         {
@@ -328,7 +328,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
+        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // TODO: Ensure sourceMenuBar is actually one of our bar items
         if (Visible && Enabled && args.Context?.Source is MenuBarItemv2 { PopoverMenuOpen: false } sourceMenuBarItem)
@@ -340,7 +340,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 // We are not Active; change that
                 Active = true;
 
-                ShowItem(sourceMenuBarItem);
+                ShowItem (sourceMenuBarItem);
 
                 if (!sourceMenuBarItem.HasFocus)
                 {
@@ -359,10 +359,10 @@ public class MenuBarv2 : Menuv2, IDesignable
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnAccepted (CommandEventArgs args)
     {
-        Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
+        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
         base.OnAccepted (args);
 
         if (SubViews.OfType<MenuBarItemv2> ().Contains (args.Context?.Source))
@@ -379,11 +379,12 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowItem (MenuBarItemv2? menuBarItem)
     {
-        Logging.Debug ($"{Title} - {menuBarItem?.Id}");
+        // Logging.Debug ($"{Title} - {menuBarItem?.Id}");
 
         if (!Active || !Visible)
         {
-            Logging.Debug ($"{Title} - {menuBarItem?.Id} - Not Active, not showing.");
+            // Logging.Debug ($"{Title} - {menuBarItem?.Id} - Not Active, not showing.");
+
             return;
         }
 
@@ -398,13 +399,13 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
-            Logging.Debug ($"{Title} - Calling Application.Popover?.Hide ({popoverMenu.Title})");
+            // Logging.Debug ($"{Title} - Calling Application.Popover?.Hide ({popoverMenu.Title})");
             Application.Popover?.Hide (popoverMenu);
         }
 
         if (menuBarItem is null)
         {
-            Logging.Debug ($"{Title} - menuBarItem is null.");
+            // Logging.Debug ($"{Title} - menuBarItem is null.");
 
             return;
         }
@@ -417,16 +418,18 @@ public class MenuBarv2 : Menuv2, IDesignable
             menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
         }
 
-        Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
+        // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
         menuBarItem.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
 
         menuBarItem.Accepting += OnMenuItemAccepted;
+
+        menuBarItem.PopoverMenu!.Root.SchemeName = SchemeName;
 
         return;
 
         void OnMenuItemAccepted (object? sender, EventArgs args)
         {
-            Logging.Debug ($"{Title} - OnMenuItemAccepted");
+            // Logging.Debug ($"{Title} - OnMenuItemAccepted");
             menuBarItem.PopoverMenu!.VisibleChanged -= OnMenuItemAccepted;
 
             if (Active && menuBarItem.PopoverMenu is { Visible: false })
@@ -452,11 +455,11 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <returns><see langword="true"/> if the popover was hidden</returns>
     public bool HideItem (MenuBarItemv2? activeItem)
     {
-        Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+        // Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
         if (activeItem is null || !activeItem.PopoverMenu!.Visible)
         {
-            Logging.Debug ($"{Title} No active item.");
+            // Logging.Debug ($"{Title} No active item.");
 
             return false;
         }
@@ -478,10 +481,12 @@ public class MenuBarv2 : Menuv2, IDesignable
     public IEnumerable<MenuItemv2> GetMenuItemsWithTitle (string title)
     {
         List<MenuItemv2> menuItems = new ();
+
         if (string.IsNullOrEmpty (title))
         {
             return menuItems;
         }
+
         foreach (MenuBarItemv2 mbi in SubViews.OfType<MenuBarItemv2> ())
         {
             if (mbi.PopoverMenu is { })
@@ -489,6 +494,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
             }
         }
+
         return menuItems.Where (mi => mi.Title == title);
     }
 
@@ -498,7 +504,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
 
-        Id = "DemonuBar";
+        Id = "DemoBar";
 
         var bordersCb = new CheckBox
         {
@@ -513,7 +519,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         var enableOverwriteCb = new CheckBox
         {
-            Title = "Enable _Overwrite",
+            Title = "Enable _Overwrite"
         };
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
@@ -522,100 +528,105 @@ public class MenuBarv2 : Menuv2, IDesignable
             SelectedItem = 0
         };
 
-        var menuBgColorCp = new ColorPicker ()
+        var menuBgColorCp = new ColorPicker
         {
             Width = 30
         };
 
         menuBgColorCp.ColorChanged += (sender, args) =>
                                       {
-                                          ColorScheme = ColorScheme! with
-                                          {
-                                              Normal = new (ColorScheme.Normal.Foreground, args.CurrentValue)
-                                          };
+                                          // BUGBUG: This is weird.
+                                          SetScheme (
+                                                     GetScheme () with
+                                                     {
+                                                         Normal = new (
+                                                                       GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                       args.CurrentValue,
+                                                                       GetAttributeForRole (VisualRole.Normal).Style)
+                                                     });
                                       };
 
         Add (
-                        new MenuBarItemv2 (
-                                           "_File",
-                                           [
-                                               new MenuItemv2 (context as View, Command.New),
-                                               new MenuItemv2 (context as View, Command.Open),
-                                               new MenuItemv2 (context as View, Command.Save),
-                                               new MenuItemv2 (context as View, Command.SaveAs),
-                                               new Line (),
-                                               new MenuItemv2
-                                               {
-                                                   Title = "_File Options",
-                                                   SubMenu = new (
-                                                                  [
-                                                                      new ()
-                                                                      {
-                                                                          Id = "AutoSave",
-                                                                          Text = "(no Command)",
-                                                                          Key = Key.F10,
-                                                                          CommandView = autoSaveCb
-                                                                      },
-                                                                      new ()
-                                                                      {
-                                                                          Text = "Overwrite",
-                                                                          Id = "Overwrite",
-                                                                          Key = Key.W.WithCtrl,
-                                                                          CommandView = enableOverwriteCb,
-                                                                          Command = Command.EnableOverwrite,
-                                                                          TargetView = context as View
-                                                                      },
-                                                                      new ()
-                                                                      {
-                                                                          Title = "_File Settings...",
-                                                                          HelpText = "More file settings",
-                                                                          Action = () => MessageBox.Query (
-                                                                                    "File Settings",
-                                                                                    "This is the File Settings Dialog\n",
-                                                                                    "_Ok",
-                                                                                    "_Cancel")
-                                                                      }
-                                                                  ]
-                                                                 )
-                                               },
-                                               new Line (),
-                                               new MenuItemv2
-                                               {
-                                                   Title = "_Preferences",
-                                                   SubMenu = new (
-                                                                  [
-                                                                      new MenuItemv2 ()
-                                                                      {
-                                                                          CommandView = bordersCb,
-                                                                          HelpText = "Toggle Menu Borders",
-                                                                          Action = ToggleMenuBorders
-                                                                      },
-                                                                      new MenuItemv2 ()
-                                                                      {
-                                                                          HelpText = "3 Mutually Exclusive Options",
-                                                                          CommandView = mutuallyExclusiveOptionsSelector,
-                                                                          Key = Key.F7
-                                                                      },
-                                                                      new Line (),
-                                                                      new MenuItemv2 ()
-                                                                      {
-                                                                          HelpText = "MenuBar BG Color",
-                                                                          CommandView = menuBgColorCp,
-                                                                          Key = Key.F8,
-                                                                      }
-                                                                  ]
-                                                                 )
-                                               },
-                                               new Line (),
-                                               new MenuItemv2 ()
-                                               {
-                                                   TargetView = context as View,
-                                                   Key = Application.QuitKey,
-                                                   Command = Command.Quit
-                                               }
-                                           ]
-                                          )
-                       );
+             new MenuBarItemv2 (
+                                "_File",
+                                [
+                                    new MenuItemv2 (context as View, Command.New),
+                                    new MenuItemv2 (context as View, Command.Open),
+                                    new MenuItemv2 (context as View, Command.Save),
+                                    new MenuItemv2 (context as View, Command.SaveAs),
+                                    new Line (),
+                                    new MenuItemv2
+                                    {
+                                        Title = "_File Options",
+                                        SubMenu = new (
+                                                       [
+                                                           new ()
+                                                           {
+                                                               Id = "AutoSave",
+                                                               Text = "(no Command)",
+                                                               Key = Key.F10,
+                                                               CommandView = autoSaveCb
+                                                           },
+                                                           new ()
+                                                           {
+                                                               Text = "Overwrite",
+                                                               Id = "Overwrite",
+                                                               Key = Key.W.WithCtrl,
+                                                               CommandView = enableOverwriteCb,
+                                                               Command = Command.EnableOverwrite,
+                                                               TargetView = context as View
+                                                           },
+                                                           new ()
+                                                           {
+                                                               Title = "_File Settings...",
+                                                               HelpText = "More file settings",
+                                                               Action = () => MessageBox.Query (
+                                                                                                "File Settings",
+                                                                                                "This is the File Settings Dialog\n",
+                                                                                                "_Ok",
+                                                                                                "_Cancel")
+                                                           }
+                                                       ]
+                                                      )
+                                    },
+                                    new Line (),
+                                    new MenuItemv2
+                                    {
+                                        Title = "_Preferences",
+                                        SubMenu = new (
+                                                       [
+                                                           new MenuItemv2
+                                                           {
+                                                               CommandView = bordersCb,
+                                                               HelpText = "Toggle Menu Borders",
+                                                               Action = ToggleMenuBorders
+                                                           },
+                                                           new MenuItemv2
+                                                           {
+                                                               HelpText = "3 Mutually Exclusive Options",
+                                                               CommandView = mutuallyExclusiveOptionsSelector,
+                                                               Key = Key.F7
+                                                           },
+                                                           new Line (),
+                                                           new MenuItemv2
+                                                           {
+                                                               HelpText = "MenuBar BG Color",
+                                                               CommandView = menuBgColorCp,
+                                                               Key = Key.F8
+                                                           }
+                                                       ]
+                                                      )
+                                    },
+                                    new Line (),
+                                    new MenuItemv2
+                                    {
+                                        TargetView = context as View,
+                                        Key = Application.QuitKey,
+                                        Command = Command.Quit
+                                    }
+                                ]
+                               )
+            );
 
         Add (
              new MenuBarItemv2 (
@@ -627,11 +638,11 @@ public class MenuBarv2 : Menuv2, IDesignable
                                     new Line (),
                                     new MenuItemv2 (context as View, Command.SelectAll),
                                     new Line (),
-                                    new MenuItemv2 ()
+                                    new MenuItemv2
                                     {
                                         Title = "_Details",
                                         SubMenu = new (ConfigureDetailsSubMenu ())
-                                    },
+                                    }
                                 ]
                                )
             );
@@ -690,7 +701,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             var nestedSubMenu = new MenuItemv2
             {
                 Title = "_Moar Details",
-                SubMenu = new (ConfigureMoreDetailsSubMenu ()),
+                SubMenu = new (ConfigureMoreDetailsSubMenu ())
             };
 
             var editMode = new MenuItemv2
@@ -700,7 +711,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 Command = Command.Edit,
                 CommandView = new CheckBox
                 {
-                    Title = "E_dit Mode",
+                    Title = "E_dit Mode"
                 }
             };
 
@@ -727,17 +738,17 @@ public class MenuBarv2 : Menuv2, IDesignable
                 return [deeperDetail, new Line (), belowLineDetail];
             }
         }
-
     }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         base.Dispose (disposing);
+
         if (disposing)
         {
             SuperViewChanged += OnSuperViewChanged;
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
 }

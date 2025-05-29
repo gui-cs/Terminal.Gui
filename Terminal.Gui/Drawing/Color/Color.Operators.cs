@@ -57,7 +57,7 @@ public readonly partial record struct Color
     ///     <see cref="ColorExtensions.ColorName16ToColorMap"/>.
     /// </summary>
     [Pure]
-    public static implicit operator Color (ColorName16 colorName) { return ColorExtensions.ColorName16ToColorMap [colorName]; }
+    public static implicit operator Color (ColorName16 colorName) { return ColorExtensions.ColorName16ToColorMap! [colorName]; }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Vector4"/> to <see cref="Color"/>, where (<see cref="Vector4.X"/>,

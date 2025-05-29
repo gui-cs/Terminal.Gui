@@ -14,13 +14,13 @@ public static partial class Application // Navigation stuff
     private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrides
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key NextTabGroupKey
     {
         get => _nextTabGroupKey;
         set
         {
-            if (_nextTabGroupKey != value)
+            //if (_nextTabGroupKey != value)
             {
                 KeyBindings.Replace (_nextTabGroupKey, value);
                 _nextTabGroupKey = value;
@@ -29,13 +29,13 @@ public static partial class Application // Navigation stuff
     }
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key NextTabKey
     {
         get => _nextTabKey;
         set
         {
-            if (_nextTabKey != value)
+            //if (_nextTabKey != value)
             {
                 KeyBindings.Replace (_nextTabKey, value);
                 _nextTabKey = value;
@@ -58,13 +58,13 @@ public static partial class Application // Navigation stuff
     /// </remarks>
     public static event EventHandler<Key>? KeyUp;
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key PrevTabGroupKey
     {
         get => _prevTabGroupKey;
         set
         {
-            if (_prevTabGroupKey != value)
+            //if (_prevTabGroupKey != value)
             {
                 KeyBindings.Replace (_prevTabGroupKey, value);
                 _prevTabGroupKey = value;
@@ -73,13 +73,13 @@ public static partial class Application // Navigation stuff
     }
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key PrevTabKey
     {
         get => _prevTabKey;
         set
-        {   
-            if (_prevTabKey != value)
+        {
+            //if (_prevTabKey != value)
             {
                 KeyBindings.Replace (_prevTabKey, value);
                 _prevTabKey = value;

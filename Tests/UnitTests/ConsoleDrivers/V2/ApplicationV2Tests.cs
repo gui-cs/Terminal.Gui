@@ -183,10 +183,10 @@ public class ApplicationV2Tests
                            if (Application.Top != null)
                            {
                                Application.RequestStop ();
-                               return true;
+                               return false;
                            }
 
-                           return true;
+                           return false;
                        }
                        );
         Assert.Null (Application.Top);
@@ -195,7 +195,8 @@ public class ApplicationV2Tests
 
         v2.Run (new Window ());
 
-        Assert.True (v2.RemoveTimeout (timeoutToken));
+        // We returned false above, so we should not have to remove the timeout
+        Assert.False(v2.RemoveTimeout (timeoutToken));
 
         Assert.NotNull (Application.Top);
         Application.Top?.Dispose ();
@@ -226,10 +227,10 @@ public class ApplicationV2Tests
                                               if (Application.Top != null)
                                               {
                                                   Application.RequestStop ();
-                                                  return true;
+                                                  return false;
                                               }
 
-                                              return true;
+                                              return false;
                                           }
                                          );
 
@@ -237,8 +238,8 @@ public class ApplicationV2Tests
 
         // Blocks until the timeout call is hit
         v2.Run (top);
-
-        Assert.True (v2.RemoveTimeout (timeoutToken));
+        // We returned false above, so we should not have to remove the timeout
+        Assert.False (v2.RemoveTimeout (timeoutToken));
 
         Assert.False (top!.Running);
 
@@ -287,10 +288,10 @@ public class ApplicationV2Tests
                                               if (Application.Top != null)
                                               {
                                                   Application.RequestStop ();
-                                                  return true;
+                                                  return false;
                                               }
 
-                                              return true;
+                                              return false;
                                           }
                                          );
 
@@ -303,7 +304,8 @@ public class ApplicationV2Tests
         Assert.Equal (1, closedCount);
         Assert.Equal (1, unloadedCount);
 
-        Assert.True (v2.RemoveTimeout (timeoutToken));
+        // We returned false above, so we should not have to remove the timeout
+        Assert.False (v2.RemoveTimeout (timeoutToken));
 
         Application.Top?.Dispose ();
         v2.Shutdown ();
@@ -335,10 +337,10 @@ public class ApplicationV2Tests
                                               if (Application.Top != null)
                                               {
                                                   Application.RaiseKeyDownEvent (Application.QuitKey);
-                                                  return true;
+                                                  return false;
                                               }
 
-                                              return true;
+                                              return false;
                                           }
                                          );
 
@@ -347,7 +349,8 @@ public class ApplicationV2Tests
         // Blocks until the timeout call is hit
         v2.Run (top);
 
-        Assert.True (v2.RemoveTimeout (timeoutToken));
+        // We returned false above, so we should not have to remove the timeout
+        Assert.False (v2.RemoveTimeout (timeoutToken));
 
         Assert.False (top!.Running);
 
@@ -542,7 +545,7 @@ public class ApplicationV2Tests
                                                   return false;
                                               }
 
-                                              return true;
+                                              return false;
                                           });
 
         Assert.Null (Application.Top);

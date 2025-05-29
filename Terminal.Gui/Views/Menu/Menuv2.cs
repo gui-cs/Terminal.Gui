@@ -21,7 +21,7 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
         if (Border is { })
         {
@@ -30,7 +30,7 @@ public class Menuv2 : Bar
 
         BorderStyle = DefaultBorderStyle;
 
-        Applied += OnConfigurationManagerApplied;
+        ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 
     private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
@@ -42,10 +42,10 @@ public class Menuv2 : Bar
     }
 
     /// <summary>
-    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.Single"/>.
+    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
 
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
@@ -86,7 +86,7 @@ public class Menuv2 : Bar
 
                     void MenuItemOnAccepted (object? sender, CommandEventArgs e)
                     {
-                        Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
+                        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
                         RaiseAccepted (e.Context);
                     }
                 }
@@ -105,23 +105,23 @@ public class Menuv2 : Bar
     {
         // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
 
-        Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
+        // Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
 
         // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
         // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
         if (SuperView is { })
         {
-            Logging.Debug ($"{Title} - SuperView is null");
+            // Logging.Debug ($"{Title} - SuperView is null");
             //return false;
         }
 
-        Logging.Debug ($"{Title} - {args.Context}");
+        // Logging.Debug ($"{Title} - {args.Context}");
 
         if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
         {
             // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
             // And causes just the menu to quit.
-            Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+            // Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
             return true;
         }
 
@@ -129,7 +129,7 @@ public class Menuv2 : Bar
         // Command.Accept to the SuperMenuItem if it exists.
         if (SuperView is null && SuperMenuItem is { })
         {
-            Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
+            // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
             return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
         return false;
@@ -199,7 +199,7 @@ public class Menuv2 : Bar
 
     internal void RaiseSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        Logging.Debug ($"{Title} ({selected?.Title})");
+        // Logging.Debug ($"{Title} ({selected?.Title})");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);
@@ -225,7 +225,7 @@ public class Menuv2 : Bar
 
         if (disposing)
         {
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
 }

@@ -356,7 +356,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         for (var i = 0; i < _radioLabels.Count; i++)
         {
@@ -373,7 +373,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             }
 
             string rl = _radioLabels [i];
-            SetAttribute (GetNormalColor ());
+            SetAttribute (GetAttributeForRole (VisualRole.Normal));
             Driver?.AddStr ($"{(i == _selected ? Glyphs.Selected : Glyphs.UnSelected)} ");
             TextFormatter.FindHotKey (rl, HotKeySpecifier, out int hotPos, out Key hotKey);
 
@@ -387,15 +387,15 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                     if (j == hotPos && i == Cursor)
                     {
-                        SetAttribute (HasFocus ? GetHotFocusColor () : GetHotNormalColor ());
+                        SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal));
                     }
                     else if (j == hotPos && i != Cursor)
                     {
-                        SetAttribute (GetHotNormalColor ());
+                        SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
                     }
                     else if (HasFocus && i == Cursor)
                     {
-                        SetAttribute (GetFocusColor ());
+                        SetAttribute (GetAttributeForRole (VisualRole.Focus));
                     }
 
                     if (rune == HotKeySpecifier && j + 1 < rlRunes.Length)
@@ -405,16 +405,16 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                         if (i == Cursor)
                         {
-                            SetAttribute (HasFocus ? GetHotFocusColor () : GetHotNormalColor ());
+                            SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal));
                         }
                         else if (i != Cursor)
                         {
-                            SetAttribute (GetHotNormalColor ());
+                            SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
                         }
                     }
 
                     Application.Driver?.AddRune (rune);
-                    SetAttribute (GetNormalColor ());
+                    SetAttribute (GetAttributeForRole (VisualRole.Normal));
                 }
             }
             else

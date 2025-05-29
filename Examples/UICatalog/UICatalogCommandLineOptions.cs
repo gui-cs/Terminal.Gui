@@ -5,6 +5,8 @@ public struct UICatalogCommandLineOptions
 {
     public string Driver { get; set; }
 
+    public bool DontEnableConfigurationManagement { get; set; }
+
     public string Scenario { get; set; }
 
     public uint BenchmarkTimeout { get; set; }

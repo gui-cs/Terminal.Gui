@@ -78,22 +78,23 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Foreground,
+                                                                         editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
                                                                          out var newColor
                                                                         ))
                                         {
                                             return;
                                         }
 
-                                        var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
+                                        var cs = new Scheme (editor.ViewToEdit.GetScheme ())
                                         {
-                                            HotNormal = new Attribute (
+                                            Active = new Attribute (
                                                                        newColor,
-                                                                       editor.ViewToEdit.ColorScheme.HotNormal
-                                                                             .Background
+                                                                       editor.ViewToEdit.GetAttributeForRole (VisualRole.Active)
+                                                                             .Background,
+                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Style
                                                                       )
                                         };
-                                        editor.ViewToEdit.ColorScheme = cs;
+                                        editor.ViewToEdit.SetScheme (cs);
                                     };
 
         var bgColorPickerBtn = new Button
@@ -108,22 +109,23 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Background
+                                                                         editor.ViewToEdit!.GetAttributeForRole (VisualRole.Active)
+                                                                               .Background
                                                                         , out var newColor))
 
                                         {
                                             return;
                                         }
 
-                                        var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
+                                        var cs = new Scheme (editor.ViewToEdit.GetScheme ())
                                         {
-                                            HotNormal = new Attribute (
-                                                                       editor.ViewToEdit.ColorScheme.HotNormal
-                                                                             .Foreground,
-                                                                       newColor
-                                                                      )
+                                            Active = new Attribute (
+                                                                    editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                    newColor,
+                                                                    editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Style
+                                                                   )
                                         };
-                                        editor.ViewToEdit.ColorScheme = cs;
+                                        editor.ViewToEdit.SetScheme (cs);
                                     };
 
         #endregion
@@ -210,7 +212,7 @@ public class ProgressBarStyles : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (continuousPB),
-            Text = "BidirectionalMarquee", 
+            Text = "BidirectionalMarquee",
             CheckedState = CheckState.Checked
         };
         container.Add (ckbBidirectional);

@@ -595,7 +595,7 @@ public abstract class ConsoleDriver : IConsoleDriver
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
-                _currentAttribute = new (value.Foreground, value.Background);
+                _currentAttribute = new (value.Foreground, value.Background, value.Style);
 
                 return;
             }
@@ -629,7 +629,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     {
         // Encode the colors into the int value.
         return new (
-                    -1, // only used by cursesdriver!
+                    0xFF, // only used by cursesdriver!
                     foreground,
                     background
                    );

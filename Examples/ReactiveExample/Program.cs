@@ -8,6 +8,7 @@ public static class Program
 {
     private static void Main (string [] args)
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         RxApp.MainThreadScheduler = TerminalScheduler.Default;
         RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;

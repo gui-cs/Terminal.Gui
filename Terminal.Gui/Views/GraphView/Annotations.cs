@@ -92,11 +92,11 @@ public class TextAnnotation : IAnnotation
 
         if (Text.Length < availableWidth)
         {
-            View.Driver.AddStr (Text);
+            graph.Driver?.AddStr (Text);
         }
         else
         {
-            View.Driver.AddStr (Text.Substring (0, availableWidth));
+            graph.Driver?.AddStr (Text.Substring (0, availableWidth));
         }
     }
 }
@@ -144,7 +144,8 @@ public class LegendAnnotation : View, IAnnotation
     {
         if (!IsInitialized)
         {
-            ColorScheme = new ColorScheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default};
+            // BUGBUG: We should be getting a visual role here?
+            SetScheme (new Scheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default});
             graph.Add (this);
         }
 
@@ -217,7 +218,7 @@ public class PathAnnotation : IAnnotation
     /// <param name="graph"></param>
     public void Render (GraphView graph)
     {
-        graph.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
+        graph.SetAttribute (LineColor ?? graph.GetAttributeForRole(VisualRole.Normal));
 
         foreach (LineF line in PointsToLines ())
         {

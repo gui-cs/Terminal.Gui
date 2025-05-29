@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -21,13 +22,13 @@ public class Scrolling : Scenario
         var label = new Label { X = 0, Y = 0 };
         app.Add (label);
 
-        var demoView = new DemoView
+        var demoView = new AllViewsView
         {
             Id = "demoView",
             X = 2,
             Y = Pos.Bottom (label) + 1,
-            Width = 60,
-            Height = 20
+            Width = Dim.Fill (4),
+            Height = Dim.Fill (4)
         };
 
         label.Text =
@@ -91,35 +92,17 @@ public class Scrolling : Scenario
                                                             hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked;
                                                         };
 
-        var count = 0;
-
-        var mousePos = new Label
-        {
-            X = Pos.Right (demoView) + 1,
-            Y = Pos.AnchorEnd (1),
-
-            Width = 50,
-            Text = "Mouse: "
-        };
-        app.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.Position}) - {a.Flags} {count++}"; };
-
         // Add a progress bar to cause constant redraws
-        var progress = new ProgressBar { X = Pos.Right (demoView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
+        var progress = new ProgressBar
+        {
+            X = Pos.Center (), Y = Pos.AnchorEnd (), Width = Dim.Fill ()
+        };
 
         app.Add (progress);
 
         var pulsing = true;
 
-        bool TimerFn ()
-        {
-            progress.Pulse ();
-
-            return pulsing;
-        }
-
-        Application.AddTimeout (TimeSpan.FromMilliseconds (300), TimerFn);
-
+        app.Initialized += AppOnInitialized;
         app.Unloaded += AppUnloaded;
 
         Application.Run (app);
@@ -129,144 +112,17 @@ public class Scrolling : Scenario
 
         return;
 
+        void AppOnInitialized (object sender, EventArgs e)
+        {
+            bool TimerFn ()
+            {
+                progress.Pulse ();
+
+                return pulsing;
+            }
+
+            Application.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
+        }
         void AppUnloaded (object sender, EventArgs args) { pulsing = false; }
-    }
-}
-
-public class DemoView : View
-{
-    public DemoView ()
-    {
-        base.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        CanFocus = true;
-        BorderStyle = LineStyle.Heavy;
-        Arrangement = ViewArrangement.Resizable;
-        Initialized += OnInitialized;
-        HorizontalScrollBar.AutoShow = true;
-        VerticalScrollBar.AutoShow = true;
-    }
-
-    private void OnInitialized (object sender, EventArgs e)
-    {
-        SetContentSize (new (80, 25));
-
-        var rulerView = new View
-        {
-            Height = Dim.Fill (),
-            Width = Dim.Fill ()
-        };
-        rulerView.Border!.Thickness = new (1);
-        rulerView.Border.LineStyle = LineStyle.None;
-        rulerView.Border.Diagnostics = ViewDiagnosticFlags.Ruler;
-        rulerView.Border.ColorScheme = Colors.ColorSchemes ["Error"];
-
-        Add (rulerView);
-
-        var centeredLabel = new Label ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            TextAlignment = Alignment.Center,
-            VerticalTextAlignment = Alignment.Center,
-            Text = $"This label is centred.\nContentSize is {GetContentSize ()}"
-        };
-        Add (centeredLabel);
-
-        var pressMeButton = new Button
-        {
-            X = 1,
-            Y = 1,
-            Text = "Press me!"
-        };
-        pressMeButton.Accepting += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
-        Add (pressMeButton);
-
-        var aLongButton = new Button
-        {
-            X = Pos.Right (pressMeButton),
-            Y = Pos.Bottom (pressMeButton),
-
-            Text = "A very long button. Should be wide enough to demo clipping!"
-        };
-        aLongButton.Accepting += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
-        Add (aLongButton);
-
-        Add (
-             new TextField
-             {
-                 X = Pos.Left (pressMeButton),
-                 Y = Pos.Bottom (aLongButton) + 1,
-                 Width = 50,
-                 ColorScheme = Colors.ColorSchemes ["Dialog"],
-                 Text = "This is a test of..."
-             }
-            );
-
-        Add (
-             new TextField
-             {
-                 X = Pos.Left (pressMeButton),
-                 Y = Pos.Bottom (aLongButton) + 3,
-                 Width = 50,
-                 ColorScheme = Colors.ColorSchemes ["Dialog"],
-                 Text = "... the emergency broadcast system."
-             }
-            );
-
-        Add (
-             new TextField
-             {
-                 X = Pos.Left (pressMeButton),
-                 Y = 40,
-                 Width = 50,
-                 ColorScheme = Colors.ColorSchemes ["Error"],
-                 Text = "Last line - Beyond content area @ Y = 40"
-             }
-            );
-
-        // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button
-        {
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-            Text = "Bottom Right"
-        };
-
-        anchorButton.Accepting += (s, e) =>
-                                  {
-                                      // This demonstrates how to have a dynamically sized button
-                                      // Each time the button is clicked the button's text gets longer
-                                      anchorButton.Text += "!";
-                                  };
-        Add (anchorButton);
-    }
-
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
-    {
-        if (mouseEvent.Flags == MouseFlags.WheeledDown)
-        {
-            ScrollVertical (1);
-            return mouseEvent.Handled = true;
-        }
-
-        if (mouseEvent.Flags == MouseFlags.WheeledUp)
-        {
-            ScrollVertical (-1);
-            return mouseEvent.Handled = true;
-        }
-
-        if (mouseEvent.Flags == MouseFlags.WheeledRight)
-        {
-            ScrollHorizontal (1);
-            return mouseEvent.Handled = true;
-        }
-
-        if (mouseEvent.Flags == MouseFlags.WheeledLeft)
-        {
-            ScrollHorizontal (-1);
-            return mouseEvent.Handled = true;
-        }
-
-        return false;
     }
 }

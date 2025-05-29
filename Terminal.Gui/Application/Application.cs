@@ -212,7 +212,7 @@ public static partial class Application
         // Do not clear _lastMousePosition; Popover's require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
-        _cachedViewsUnderMouse.Clear ();
+        CachedViewsUnderMouse.Clear ();
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
         GrabbedMouse = null;

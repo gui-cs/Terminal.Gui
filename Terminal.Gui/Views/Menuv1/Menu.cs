@@ -145,7 +145,7 @@ internal sealed class Menu : View
         if (_barItems is { IsTopLevel: true })
         {
             // This is a standalone MenuItem on a MenuBar
-            ColorScheme = _host.ColorScheme;
+            SetScheme (_host.GetScheme ());
             CanFocus = true;
         }
         else
@@ -162,7 +162,7 @@ internal sealed class Menu : View
                 }
             }
 
-            ColorScheme = _host.ColorScheme;
+            SetScheme (_host.GetScheme ());
             CanFocus = true;
             WantMousePositionReports = _host.WantMousePositionReports;
         }
@@ -418,19 +418,19 @@ internal sealed class Menu : View
         return true;
     }
 
-    internal Attribute DetermineColorSchemeFor (MenuItem? item, int index)
+    internal Attribute DetermineSchemeFor (MenuItem? item, int index)
     {
         if (item is null)
         {
-            return GetNormalColor ();
+            return GetAttributeForRole (VisualRole.Normal);
         }
 
         if (index == _currentChild)
         {
-            return GetFocusColor ();
+            return GetAttributeForRole (VisualRole.Focus);
         }
 
-        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
+        return !item.IsEnabled () ? GetAttributeForRole (VisualRole.Disabled) : GetAttributeForRole (VisualRole.Normal);
     }
 
     internal required MenuBar Host
@@ -456,14 +456,14 @@ internal sealed class Menu : View
         int maxW = (items.Max (z => z?.Width) ?? 0) + borderOffset;
         int maxH = items.Length + borderOffset;
 
-        if (parent is { } && x + maxW > Driver.Cols)
+        if (parent is { } && x + maxW > Application.Screen.Width)
         {
             minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
         }
 
-        if (y + maxH > Driver.Rows)
+        if (y + maxH > Application.Screen.Height)
         {
-            minY = Math.Max (Driver.Rows - maxH, 0);
+            minY = Math.Max (Application.Screen.Height - maxH, 0);
         }
 
         return new (minX, minY, maxW, maxH);
@@ -837,7 +837,7 @@ internal sealed class Menu : View
         // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
         Region? savedClip = SetClipToScreen ();
 
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         for (int i = Viewport.Y; i < _barItems!.Children.Length; i++)
         {
@@ -856,8 +856,8 @@ internal sealed class Menu : View
             SetAttribute (
 
                           // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                          item is null ? GetNormalColor () :
-                          i == _currentChild ? GetFocusColor () : GetNormalColor ()
+                          item is null ? GetAttributeForRole (VisualRole.Normal) :
+                          i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal)
                          );
 
             if (item is null && BorderStyle != LineStyle.None)
@@ -871,7 +871,7 @@ internal sealed class Menu : View
                 Move (0, i);
             }
 
-            SetAttribute (DetermineColorSchemeFor (item, i));
+            SetAttribute (DetermineSchemeFor (item, i));
 
             for (int p = Viewport.X; p < Frame.Width - 2; p++)
             {
@@ -955,7 +955,7 @@ internal sealed class Menu : View
 
                 if (!item.IsEnabled ())
                 {
-                    DrawHotString (textToDraw, ColorScheme!.Disabled, ColorScheme.Disabled);
+                    DrawHotString (textToDraw, GetAttributeForRole (VisualRole.Disabled), GetAttributeForRole (VisualRole.Disabled));
                 }
                 else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
                 {
@@ -969,8 +969,8 @@ internal sealed class Menu : View
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
-                             i == _currentChild ? GetFocusColor () : GetNormalColor (),
-                             i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
+                             i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                             i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
@@ -978,8 +978,8 @@ internal sealed class Menu : View
                 {
                     DrawHotString (
                                    textToDraw,
-                                   i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
-                                   i == _currentChild ? GetFocusColor () : GetNormalColor ()
+                                   i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                   i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal)
                                   );
                 }
 

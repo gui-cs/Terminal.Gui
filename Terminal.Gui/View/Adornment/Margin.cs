@@ -5,10 +5,14 @@ namespace Terminal.Gui;
 /// <summary>The Margin for a <see cref="View"/>. Accessed via <see cref="View.Margin"/></summary>
 /// <remarks>
 ///     <para>
-///         The Margin is transparent by default. This can be overriden by explicitly setting <see cref="ColorScheme"/>.
+///         The Margin is transparent by default. This can be overriden by explicitly setting <see cref="Scheme"/>.
 ///     </para>
 ///     <para>
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
+///     </para>
+///     <para>
+///         Margins have <see cref="ViewportSettings.TransparentMouse"/> enabled by default and are thus
+///         transparent to the mouse. This can be overridden by explicitly setting <see cref="ViewportSettings"/>.
 ///     </para>
 ///     <para>See the <see cref="Adornment"/> class.</para>
 /// </remarks>
@@ -36,6 +40,12 @@ public class Margin : Adornment
 
         // Margin should not be focusable
         CanFocus = false;
+
+        // Margins are transparent by default
+        ViewportSettings |= ViewportSettings.Transparent;
+
+        // Margins are transparent to mouse by default
+        ViewportSettings |= ViewportSettings.TransparentMouse;
     }
 
     // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views
@@ -48,7 +58,7 @@ public class Margin : Adornment
 
     internal void CacheClip ()
     {
-        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyle.None)
+        if (Thickness != Thickness.Empty /*&& ShadowStyle != ShadowStyle.None*/)
         {
             // PERFORMANCE: How expensive are these clones?
             _cachedClip = GetClip ()?.Clone ();
@@ -60,11 +70,11 @@ public class Margin : Adornment
     ///     INTERNAL API - Draws the margins for the specified views. This is called by the <see cref="Application"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
-    /// <param name="margins"></param>
+    /// <param name="views"></param>
     /// <returns><see langword="true"/></returns>
-    internal static bool DrawMargins (IEnumerable<View> margins)
+    internal static bool DrawMargins (IEnumerable<View> views)
     {
-        Stack<View> stack = new (margins);
+        Stack<View> stack = new (views);
 
         while (stack.Count > 0)
         {
@@ -104,87 +114,13 @@ public class Margin : Adornment
         ShadowStyle = base.ShadowStyle;
     }
 
-    // TODO: We may actualy need this. Not clear what broke, if anything by commenting it out. See https://github.com/gui-cs/Terminal.Gui/issues/4016
-    /////// <summary>
-    ///////     The color scheme for the Margin. If set to <see langword="null"/> (the default), the margin will be transparent.
-    /////// </summary>
-    //public override ColorScheme? ColorScheme
+    ///// <inheritdoc />
+    //protected override bool OnGettingScheme (out Scheme? scheme)
     //{
-    //    get
-    //    {
-    //        //if (base.ColorScheme is { })
-    //        {
-    //            return base.ColorScheme;
-    //        }
+    //    scheme = Parent?.SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
 
-    //        //return (Parent?.SuperView?.ColorScheme ?? Colors.ColorSchemes ["TopLevel"])!;
-    //    }
-    //    set
-    //    {
-    //        base.ColorScheme = value;
-    //        Parent?.SetNeedsDraw ();
-    //    }
+    //    return true;
     //}
-
-    /// <inheritdoc />
-    public override Attribute GetNormalColor ()
-    {
-        if (_colorScheme is { })
-        {
-            return _colorScheme.Normal;
-        }
-        if (Parent is { })
-        {
-            return Parent.GetNormalColor ();
-        }
-
-        return base.GetNormalColor ();
-    }
-
-    /// <inheritdoc />
-    public override Attribute GetHotNormalColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetHotNormalColor ();
-        }
-        return base.GetHotNormalColor ();
-    }
-
-    /// <inheritdoc />
-    public override Attribute GetFocusColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetFocusColor ();
-        }
-        return base.GetFocusColor ();
-    }
-
-    /// <inheritdoc />
-    public override Attribute GetHotFocusColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetHotFocusColor ();
-        }
-
-        return base.GetHotFocusColor ();
-    }
-
-    /// <inheritdoc />
-    protected override bool OnSettingNormalAttribute ()
-    {
-        if (Parent is { })
-        {
-            SetAttribute (Parent.GetNormalColor ());
-
-            return true;
-        }
-
-        return false;
-
-    }
 
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()
@@ -196,11 +132,11 @@ public class Margin : Adornment
 
         Rectangle screen = ViewportToScreen (Viewport);
 
-        // This just draws/clears the thickness, not the insides.
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || base.ColorScheme is { })
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
         {
+            // This just draws/clears the thickness, not the insides.
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
-            SetAttribute (GetNormalColor ());
+            //SetAttribute (GetAttributeForRole (VisualRole.Normal));
             Thickness.Draw (screen, Diagnostics, ToString ());
         }
 
@@ -211,6 +147,12 @@ public class Margin : Adornment
         }
 
         return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnDrawingText ()
+    {
+        return ViewportSettings.HasFlag(ViewportSettings.Transparent);
     }
 
     #region Shadow

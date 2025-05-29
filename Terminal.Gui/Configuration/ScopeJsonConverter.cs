@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
@@ -11,22 +10,25 @@ namespace Terminal.Gui;
 ///     Converts <see cref="Scope{T}"/> instances to/from JSON. Does all the heavy lifting of reading/writing config
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
-/// <typeparam name="scopeT"></typeparam>
-internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
+/// <typeparam name="TScopeT"></typeparam>
+[RequiresUnreferencedCode ("AOT")]
+internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TScopeT> : JsonConverter<TScopeT>
+    where TScopeT : Scope<TScopeT>
 {
     [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
 #pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override TScopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 #pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException (
-                                     $"Expected a JSON object (\"{{ \"propName\" : ... }}\"), but got \"{reader.TokenType}\"."
+                                     $$"""Expected a JSON object ("{ "propName" : ... }"), but got "{{reader.TokenType}}"."""
                                     );
         }
 
-        var scope = (scopeT)Activator.CreateInstance (typeof (scopeT))!;
+        var scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
+        var propertyName = string.Empty;
 
         while (reader.Read ())
         {
@@ -37,19 +39,28 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                throw new JsonException ($"Expected a JSON property name, but got \"{reader.TokenType}\".");
+                throw new JsonException ($"After {propertyName}: Expected a JSON property name, but got \"{reader.TokenType}\"");
             }
 
-            string? propertyName = reader.GetString ();
+            propertyName = reader.GetString ();
             reader.Read ();
 
-            if (propertyName is { } && scope!.TryGetValue (propertyName, out ConfigProperty? configProp))
-            {
-                // This property name was found in the Scope's ScopeProperties dictionary
-                // Figure out if it needs a JsonConverter and if so, create one
-                Type? propertyType = configProp?.PropertyInfo?.PropertyType!;
+            // Get the hardcoded property from the TscopeT (e.g. ThemeScope.GetHardCodedProperty)
+            ConfigProperty? configProperty = scope.GetHardCodedProperty (propertyName!);
 
-                if (configProp?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
+            if (propertyName is { } && configProperty is { })
+            {
+                // This property name was found in the cached hard-coded scope dict.
+
+                // Add it, with no value
+                configProperty.HasValue = false;
+                configProperty.PropertyValue = null;
+                scope.TryAdd (propertyName, configProperty);
+
+                // Figure out if it needs a JsonConverter and if so, create one
+                Type? propertyType = configProperty?.PropertyInfo?.PropertyType!;
+
+                if (configProperty?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
                     JsonConverterAttribute jca)
                 {
                     object? converter = Activator.CreateInstance (jca.ConverterType!)!;
@@ -58,69 +69,61 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     {
                         var factory = (JsonConverterFactory)converter;
 
-                        if (propertyType is { } && factory.CanConvert (propertyType))
+                        if (factory.CanConvert (propertyType))
                         {
                             converter = factory.CreateConverter (propertyType, options);
                         }
                     }
 
-                    var readHelper = Activator.CreateInstance (
-                                                               (Type?)typeof (ReadHelper<>).MakeGenericType (
-                                                                    typeof (scopeT),
-                                                                    propertyType!
-                                                                   )!,
-                                                               converter
-                                                              ) as ReadHelper;
-
                     try
                     {
+                        var type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
+                        var readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
+
                         scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
                     }
                     catch (NotSupportedException e)
                     {
                         throw new JsonException (
-                                                 $"Error reading property \"{propertyName}\" of type \"{propertyType?.Name}\".",
+                                                 $"{propertyName}: Error reading property of type \"{propertyType?.Name}\".",
                                                  e
                                                 );
+                    }
+                    catch (TargetInvocationException)
+                    {
+                        // QUESTION: Should we try/catch here?
+                        scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
                     }
                 }
                 else
                 {
-                    try
-                    {
-                        scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, SerializerContext);
-                    }
-                    catch (Exception)
-                    {
-                       // Logging.Trace ($"scopeT Read: {ex}");
-                    }
+                    // QUESTION: Should we try/catch here?
+                    scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
                 }
-                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
 
+                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
             }
             else
             {
                 // It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
-                // like ScopeSettings.$schema...
+                // like ScopeSettings.$schema.
+                // If so, don't add it to the dictionary but apply it to the underlying property on 
+                // the scopeT. 
+                // BUGBUG: This is a really bad design. The only time it's used is for $schema though.
                 PropertyInfo? property = scope!.GetType ()
                                                .GetProperties ()
                                                .Where (
                                                        p =>
                                                        {
-                                                           var jia =
-                                                               p.GetCustomAttribute (typeof (JsonIncludeAttribute)) as
-                                                                   JsonIncludeAttribute;
-
-                                                           if (jia is { })
+                                                           if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
                                                            {
-                                                               var jpna =
+                                                               var jsonPropertyNameAttribute =
                                                                    p.GetCustomAttribute (
                                                                                          typeof (JsonPropertyNameAttribute)
                                                                                         ) as
                                                                        JsonPropertyNameAttribute;
 
-                                                               if (jpna?.Name == propertyName)
+                                                               if (jsonPropertyNameAttribute?.Name == propertyName)
                                                                {
                                                                    // Bit of a hack, modifying propertyName in an enumerator...
                                                                    propertyName = p.Name;
@@ -138,21 +141,28 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
                 if (property is { })
                 {
+                    // Set the value of propertyName on the scopeT.
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, SerializerContext));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }
                 else
                 {
                     // Unknown property
-                    throw new JsonException ($"Unknown property name \"{propertyName}\".");
+                    // TODO: To support forward compatibility, we should just ignore unknown properties?
+                    // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
+                    throw new JsonException ($"{propertyName}: Unknown property name.");
                 }
             }
         }
 
-        throw new JsonException ("ScopeJsonConverter");
+        throw new JsonException ($"{propertyName}: Json error in ScopeJsonConverter");
     }
 
-    public override void Write (Utf8JsonWriter writer, scopeT scope, JsonSerializerOptions options)
+    [UnconditionalSuppressMessage (
+                                      "AOT",
+                                      "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                      Justification = "<Pending>")]
+    public override void Write (Utf8JsonWriter writer, TScopeT scope, JsonSerializerOptions options)
     {
         writer.WriteStartObject ();
 
@@ -167,7 +177,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
             object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
-            JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
+            JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
@@ -175,13 +185,13 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                                        cp =>
                                                                            cp.Value.PropertyInfo?.GetCustomAttribute (
                                                                                     typeof (
-                                                                                        SerializableConfigurationProperty)
+                                                                                        ConfigurationPropertyAttribute)
                                                                                    )
                                                                                is
-                                                                               SerializableConfigurationProperty scp
-                                                                           && scp?.Scope == typeof (scopeT)
+                                                                               ConfigurationPropertyAttribute scp
+                                                                           && scp?.Scope == typeof (TScopeT)
                                                                       )
-                                                           where p.Value.PropertyValue != null
+                                                           where p.Value.HasValue
                                                            select p)
         {
             writer.WritePropertyName (p.Key);
@@ -207,13 +217,20 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 {
                     converter.GetType ()
                              .GetMethod ("Write")
-                             ?.Invoke (converter, new [] { writer, p.Value.PropertyValue, options });
+                             ?.Invoke (converter, [writer, p.Value.PropertyValue, options]);
                 }
             }
             else
             {
                 object? prop = p.Value.PropertyValue;
-                JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
+                if (prop == null)
+                {
+                    writer.WriteNullValue ();
+                }
+                else
+                {
+                    JsonSerializer.Serialize (writer, prop, prop.GetType (), ConfigurationManager.SerializerContext);
+                }
             }
         }
 
@@ -226,18 +243,16 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         public abstract object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
     }
 
-    internal class ReadHelper<converterT> : ReadHelper
+    [method: RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
+    internal class ReadHelper<TConverter> (object converter) : ReadHelper
     {
-        private readonly ReadDelegate _readDelegate;
-
-        [RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
-        public ReadHelper (object converter) { _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read"); }
+        private readonly ReadDelegate _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read");
 
         public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
         {
             return _readDelegate.Invoke (ref reader, type, options);
         }
 
-        private delegate converterT ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
+        private delegate TConverter ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
     }
 }

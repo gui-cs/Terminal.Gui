@@ -11,12 +11,12 @@ public class FrameViewTests (ITestOutputHelper output)
         var fv = new FrameView ();
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);
-        Assert.Equal (LineStyle.Single, fv.BorderStyle);
+        Assert.Equal (LineStyle.Rounded, fv.BorderStyle);
 
         fv = new() { Title = "Test" };
         Assert.Equal ("Test", fv.Title);
         Assert.Equal (string.Empty, fv.Text);
-        Assert.Equal (LineStyle.Single, fv.BorderStyle);
+        Assert.Equal (LineStyle.Rounded, fv.BorderStyle);
 
         fv = new()
         {
@@ -30,7 +30,7 @@ public class FrameViewTests (ITestOutputHelper output)
         Assert.Equal (string.Empty, fv.Text);
         fv.BeginInit ();
         fv.EndInit ();
-        Assert.Equal (LineStyle.Single, fv.BorderStyle);
+        Assert.Equal (LineStyle.Rounded, fv.BorderStyle);
         Assert.Equal (new (1, 2, 10, 20), fv.Frame);
     }
 
@@ -39,7 +39,7 @@ public class FrameViewTests (ITestOutputHelper output)
     public void Draw_Defaults ()
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
-        var fv = new FrameView ();
+        var fv = new FrameView () { BorderStyle = LineStyle.Single };
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);
         var top = new Toplevel ();

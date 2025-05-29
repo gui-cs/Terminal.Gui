@@ -14,7 +14,7 @@ public class ColumnStyle
     public Func<object, Alignment> AlignmentGetter;
 
     /// <summary>
-    ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
+    ///     Defines a delegate for returning a custom scheme per cell based on cell values. Return null for the
     ///     default
     /// </summary>
     public CellColorGetterDelegate ColorGetter;

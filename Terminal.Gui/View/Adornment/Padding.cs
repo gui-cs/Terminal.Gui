@@ -18,19 +18,6 @@ public class Padding : Adornment
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
     }
 
-    /// <summary>
-    ///     The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
-    ///     scheme. color scheme.
-    /// </summary>
-    public override ColorScheme? ColorScheme
-    {
-        get => base.ColorScheme ?? Parent?.ColorScheme;
-        set
-        {
-            base.ColorScheme = value;
-            Parent?.SetNeedsDraw ();
-        }
-    }
 
     /// <summary>Called when a mouse event occurs within the Padding.</summary>
     /// <remarks>

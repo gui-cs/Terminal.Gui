@@ -28,9 +28,9 @@ public class StatusBar : Bar, IDesignable
             Border.LineStyle = DefaultSeparatorLineStyle;
         }
 
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
-        Applied += OnConfigurationManagerApplied;
+        ConfigurationManager.Applied += OnConfigurationManagerApplied;
         SuperViewChanged += OnSuperViewChanged;
     }
 
@@ -42,7 +42,7 @@ public class StatusBar : Bar, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
     private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
@@ -56,8 +56,8 @@ public class StatusBar : Bar, IDesignable
     /// <summary>
     ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultSeparatorLineStyle { get; set; } = LineStyle.Dashed;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultSeparatorLineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc />
     protected override void OnSubViewLayout (LayoutEventArgs args)
@@ -169,6 +169,6 @@ public class StatusBar : Bar, IDesignable
         base.Dispose (disposing);
 
         SuperViewChanged -= OnSuperViewChanged;
-        Applied -= OnConfigurationManagerApplied;
+        ConfigurationManager.Applied -= OnConfigurationManagerApplied;
     }
 }

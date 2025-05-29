@@ -472,6 +472,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (CommandView.Margin is { })
         {
             CommandView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            CommandView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -480,26 +482,28 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStyle = HighlightStyle.None;
-        CommandView.GettingNormalColor += CommandViewOnGettingNormalColor;
-        CommandView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
-
+        CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
-    private void CommandViewOnGettingNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
     {
-        if (HasFocus)
+        switch (e.Role)
         {
-            e.Cancel = true;
-            e.NewValue = GetFocusColor ();
-        }
-    }
+            case VisualRole.Normal:
+                if (HasFocus)
+                {
+                    e.Cancel = true;
+                    e.NewValue = GetAttributeForRole (VisualRole.Focus);
+                }
+                break;
 
-    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
-    {
-        if (HasFocus && e is { })
-        {
-            e.Cancel = true;
-            e.NewValue = GetHotFocusColor ();
+            case VisualRole.HotNormal:
+                if (HasFocus)
+                {
+                    e.Cancel = true;
+                    e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
+                }
+                break;
         }
     }
 
@@ -530,6 +534,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (HelpView.Margin is { })
         {
             HelpView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            HelpView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -543,8 +549,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.TextFormatter.WordWrap = false;
         HelpView.HighlightStyle = HighlightStyle.None;
 
-        HelpView.GettingNormalColor += CommandViewOnGettingNormalColor;
-        HelpView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
+        HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     /// <summary>
@@ -634,7 +639,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public ShortcutKeyView KeyView { get; } = new ();
+    public View KeyView { get; } = new ();
 
     private int _minimumKeyTextSize;
 
@@ -662,6 +667,8 @@ public class Shortcut : View, IOrientation, IDesignable
         if (KeyView.Margin is { })
         {
             KeyView.Margin.Thickness = GetMarginThickness ();
+            // strip off ViewportSettings.TransparentMouse
+            KeyView.Margin.ViewportSettings &= ~ViewportSettings.TransparentMouse;
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -674,7 +681,21 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        HelpView.HighlightStyle = HighlightStyle.None;
+        KeyView.HighlightStyle = HighlightStyle.None;
+
+        KeyView.GettingAttributeForRole += (sender, args) =>
+                                           {
+                                               if (args.Role == VisualRole.Normal)
+                                               {
+                                                   args.NewValue = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
+                                                   args.Cancel = true;
+                                               }
+                                           };
+        KeyView.ClearingViewport += (sender, args) =>
+                                          {
+                                              // Do not clear; otherwise spaces will be printed with underlines
+                                              args.Cancel = true;
+                                          };
     }
 
     private void UpdateKeyBindings (Key oldKey)
@@ -726,26 +747,27 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    public override Attribute GetNormalColor ()
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (HasFocus)
+        if (!HasFocus)
         {
-            return base.GetFocusColor ();
+            return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
 
-        return base.GetNormalColor ();
-    }
-
-    /// <inheritdoc />
-    public override Attribute GetHotNormalColor ()
-    {
-        if (HasFocus)
-
+        if (role == VisualRole.Normal)
         {
-            return base.GetHotFocusColor ();
+            currentAttribute = GetAttributeForRole (VisualRole.Focus);
+
+            return true;
+        }
+        if (role == VisualRole.HotNormal)
+        {
+            currentAttribute = GetAttributeForRole (VisualRole.HotFocus);
+
+            return true;
         }
 
-        return base.GetHotNormalColor ();
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
     #endregion Focus
@@ -784,23 +806,5 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         base.Dispose (disposing);
-    }
-}
-
-/// <summary>
-///     A helper class used by <see cref="Shortcut"/> to display the key. Reverses the Normal and HotNormal colors.
-/// </summary>
-public class ShortcutKeyView : View
-{
-    /// <inheritdoc />
-    public override Attribute GetNormalColor ()
-    {
-        if (SuperView is { HasFocus: true })
-
-        {
-            return base.GetHotFocusColor ();
-        }
-
-        return base.GetHotNormalColor ();
     }
 }

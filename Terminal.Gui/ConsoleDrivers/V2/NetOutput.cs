@@ -138,9 +138,9 @@ public class NetOutput : IConsoleOutput
                             attr.Background.B
                         );
 
-                        EscSeqUtils.CSI_AppendTextStyleChange (output, _redrawTextStyle, attr.TextStyle);
+                        EscSeqUtils.CSI_AppendTextStyleChange (output, _redrawTextStyle, attr.Style);
 
-                        _redrawTextStyle = attr.TextStyle;
+                        _redrawTextStyle = attr.Style;
                     }
 
                     outputWidth++;

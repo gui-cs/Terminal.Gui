@@ -7,6 +7,7 @@
 // TODO: Support shrinking the stream (e.g. del/backspace should work).
 // 
 
+using System;
 using System.Buffers;
 
 namespace Terminal.Gui;
@@ -21,7 +22,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>Users can switch from one side to the other by using the tab key.</para>
 ///     <para>
-///         To enable editing, set <see cref="AllowEdits"/> to true. When <see cref="AllowEdits"/> is true the user can
+///         To enable editing, set <see cref="ReadOnly"/> to true. When <see cref="ReadOnly"/> is true the user can
 ///         make changes to the hexadecimal values of the <see cref="Stream"/>. Any changes are tracked in the
 ///         <see cref="Edits"/> property (a <see cref="SortedDictionary{TKey, TValue}"/>) indicating the position where the
 ///         changes were made and the new values. A convenience method, <see cref="ApplyEdits"/> will apply the edits to
@@ -70,6 +71,7 @@ public class HexView : View, IDesignable
         AddCommand (Command.LeftStart, () => MoveLeftStart ());
         AddCommand (Command.RightEnd, () => MoveEndOfLine ());
         AddCommand (Command.StartOfPage, () => MoveUp (BytesPerLine * ((int)(Address - Viewport.Y) / BytesPerLine)));
+
         AddCommand (
                     Command.EndOfPage,
                     () => MoveDown (BytesPerLine * (Viewport.Height - 1 - (int)(Address - Viewport.Y) / BytesPerLine))
@@ -112,7 +114,11 @@ public class HexView : View, IDesignable
     private void HexViewSubViewsLaidOut (object? sender, LayoutEventArgs e)
     {
         SetBytesPerLine ();
-        SetContentSize (new (GetLeftSideStartColumn () + BytesPerLine / NUM_BYTES_PER_HEX_COLUMN * HEX_COLUMN_WIDTH + BytesPerLine - 1, (int)((GetEditedSize ()) / BytesPerLine) + 1));
+
+        SetContentSize (
+                        new (
+                             GetLeftSideStartColumn () + BytesPerLine / NUM_BYTES_PER_HEX_COLUMN * HEX_COLUMN_WIDTH + BytesPerLine - 1,
+                             (int)(GetEditedSize () / BytesPerLine) + 1));
     }
 
     /// <summary>Initializes a <see cref="HexView"/> class.</summary>
@@ -120,10 +126,9 @@ public class HexView : View, IDesignable
 
     /// <summary>
     ///     Gets or sets whether this <see cref="HexView"/> allows editing of the <see cref="Stream"/> of the underlying
-    ///     <see cref="Stream"/>.
+    ///     <see cref="Stream"/>. The default is <see langword="false"/>.
     /// </summary>
-    /// <value><c>true</c> to allow edits; otherwise, <c>false</c>.</value>
-    public bool AllowEdits { get; set; } = true;
+    public bool ReadOnly { get; set; } = false;
 
     /// <summary>Gets the current edit position.</summary>
     /// <param name="address"></param>
@@ -134,8 +139,8 @@ public class HexView : View, IDesignable
             return Point.Empty;
         }
 
-        var line = address / BytesPerLine;
-        var item = address % BytesPerLine;
+        long line = address / BytesPerLine;
+        long item = address % BytesPerLine;
 
         return new ((int)item, (int)line);
     }
@@ -145,6 +150,7 @@ public class HexView : View, IDesignable
     public Point GetCursor (long address)
     {
         Point position = GetPosition (address);
+
         if (_leftSideHasFocus)
         {
             int block = position.X / NUM_BYTES_PER_HEX_COLUMN;
@@ -156,9 +162,11 @@ public class HexView : View, IDesignable
         {
             position.X += BytesPerLine / NUM_BYTES_PER_HEX_COLUMN * HEX_COLUMN_WIDTH - 1;
         }
+
         position.X += GetLeftSideStartColumn ();
 
         position.Offset (-Viewport.X, -Viewport.Y);
+
         return position;
     }
 
@@ -199,6 +207,7 @@ public class HexView : View, IDesignable
 
             return position;
         }
+
         return null;
     }
 
@@ -222,7 +231,6 @@ public class HexView : View, IDesignable
 
         return Math.Max (_source!.Length, maxEditAddress + 1);
     }
-
 
     /// <summary>
     ///     Applies and edits made to the <see cref="Stream"/> and resets the contents of the
@@ -417,6 +425,7 @@ public class HexView : View, IDesignable
             {
                 _firstNibble = true;
             }
+
             SetNeedsDraw ();
         }
 
@@ -431,11 +440,6 @@ public class HexView : View, IDesignable
             return true;
         }
 
-        Attribute currentAttribute = Attribute.Default;
-        Attribute current = GetFocusColor ();
-        SetAttribute (current);
-        Move (-Viewport.X, 0);
-
         long addressOfFirstLine = Viewport.Y * BytesPerLine;
 
         int nBlocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
@@ -443,13 +447,18 @@ public class HexView : View, IDesignable
         Source.Position = addressOfFirstLine;
         long bytesRead = Source!.Read (data, 0, data.Length);
 
-        Attribute selectedAttribute = GetHotNormalColor ();
-        Attribute editedAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
-        Attribute editingAttribute = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
-        Attribute addressAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
+        Attribute selectedAttribute = GetAttributeForRole (VisualRole.Active);
+
+        Attribute editedAttribute = GetAttributeForRole (VisualRole.Editable);
+        editedAttribute = editedAttribute with { Style = editedAttribute.Style | TextStyle.Italic | TextStyle.Underline };
+        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
+        Attribute addressAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+
         for (var line = 0; line < Viewport.Height; line++)
         {
-            Move (-Viewport.X, line);
+            int max  = -Viewport.X;
+
+            Move (max, line);
             long addressOfLine = addressOfFirstLine + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN;
 
             if (addressOfLine <= GetEditedSize ())
@@ -458,12 +467,14 @@ public class HexView : View, IDesignable
             }
             else
             {
-                SetAttribute (new Attribute (GetNormalColor ().Background.GetHighlightColor (), addressAttribute.Background));
+                SetAttributeForRole (VisualRole.Disabled);
             }
+
             var address = $"{addressOfLine:x8}";
             AddStr ($"{address.Substring (8 - AddressWidth)}");
 
-            SetAttribute (GetNormalColor ());
+            SetAttribute (editingAttribute);
+
             if (AddressWidth > 0)
             {
                 AddStr (" ");
@@ -479,15 +490,15 @@ public class HexView : View, IDesignable
                     if (offset + addressOfFirstLine == Address)
                     {
                         // Selected
-                        SetAttribute (_leftSideHasFocus ? editingAttribute : (edited ? editedAttribute : selectedAttribute));
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : GetAttributeForRole (VisualRole.Focus));
                     }
                     else
                     {
-                        SetAttribute (edited ? editedAttribute : GetNormalColor ());
+                        SetAttribute (edited ? editedAttribute : editingAttribute);
                     }
 
                     AddStr (offset >= bytesRead && !edited ? "  " : $"{value:x2}");
-                    SetAttribute (GetNormalColor ());
+                    SetAttribute (editingAttribute);
                     AddRune (_spaceCharRune);
                 }
 
@@ -516,7 +527,7 @@ public class HexView : View, IDesignable
                         //    break;
                         case > 127:
                             {
-                                var utf8 = GetData (data, offset, 4, out bool _);
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
                                 OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
 
@@ -537,11 +548,11 @@ public class HexView : View, IDesignable
                 if (offset + Source.Position == Address)
                 {
                     // Selected
-                    SetAttribute (_leftSideHasFocus ? editingAttribute : (edited ? editedAttribute : selectedAttribute));
+                    SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : selectedAttribute);
                 }
                 else
                 {
-                    SetAttribute (edited ? editedAttribute : GetNormalColor ());
+                    SetAttribute (edited ? editedAttribute : editingAttribute);
                 }
 
                 AddRune (c);
@@ -551,6 +562,13 @@ public class HexView : View, IDesignable
                     byteIndex++;
                     AddRune (_periodCharRune);
                 }
+            }
+
+            SetAttribute (editingAttribute);
+            // Fill rest of line
+            for (int x = max; x < Viewport.Width; x++)
+            {
+                AddRune (new Rune (' '));
             }
         }
 
@@ -594,7 +612,7 @@ public class HexView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
-        if (!AllowEdits || _source is null)
+        if (ReadOnly || _source is null)
         {
             return false;
         }
@@ -719,6 +737,7 @@ public class HexView : View, IDesignable
         edited = false;
 
         long pos = Viewport.Y + offset;
+
         for (long i = pos; i < pos + count; i++)
         {
             if (_edits.TryGetValue (i, out byte v))
@@ -780,6 +799,7 @@ public class HexView : View, IDesignable
     {
         // This lets address go past the end of the stream one, enabling adding to the stream.
         Address = GetEditedSize ();
+
         return true;
     }
 
@@ -787,12 +807,14 @@ public class HexView : View, IDesignable
     {
         // This lets address go past the end of the stream one, enabling adding to the stream.
         Address = Math.Min (Address / BytesPerLine * BytesPerLine + BytesPerLine - 1, GetEditedSize ());
+
         return true;
     }
 
     private bool MoveHome ()
     {
         Address = 0;
+
         return true;
     }
 
@@ -843,7 +865,6 @@ public class HexView : View, IDesignable
         return true;
     }
 
-
     private bool MoveLeftStart ()
     {
         Address = Address / BytesPerLine * BytesPerLine;
@@ -858,7 +879,7 @@ public class HexView : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
     {
         if (behavior is { } && behavior != TabStop)
