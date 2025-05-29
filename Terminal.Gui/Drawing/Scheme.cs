@@ -298,6 +298,8 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return attr!.Value;
         }
 
+        // TODO: Provide an API that lets devs override this algo?
+
         // Derivation algorithm as documented
         Attribute result = role switch
                            {

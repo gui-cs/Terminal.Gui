@@ -11,19 +11,24 @@ A Scheme defines how Views look based on their semantic purpose. The following s
 | Scheme Name | Description |
 |:-----|:--------|
 | **Base** | The base scheme used for most Views. |
-| **TopLevel** | The application Toplevel scheme; used for the Toplevel View. |
 | **Dialog** | The dialog scheme; used for Dialog, MessageBox, and other views dialog-like views. |
-| **Menu** | The menu scheme; used for Terminal.Gui.Menu, MenuBar, and StatusBar. |
 | **Error** | The scheme for showing errors, such as in `ErrorQuery`. |
+| **Menu** | The menu scheme; used for Terminal.Gui.Menu, MenuBar, and StatusBar. |
+| **TopLevel** | The application Toplevel scheme; used for the Toplevel View. |
 
 @Terminal.Gui.SchemeManager manages the set of available schemes and provides a set of convenience methods for getting the current scheme and for overriding the default values for these schemes.
 
 ```csharp
-var scheme = SchemeManager.GetCurrentSchemes () ["TopLevel"];
+Scheme dialogScheme = SchemeManager.GetScheme (Schemes.Dialog);
 ```
 
 [ConfigurationManager](config.md) can be used to override the default values for these schemes and add additional schemes. 
 
+### Scheme Inheritance
+
+ A `Scheme` enables consistent, semantic theming of UI elements by associating each visual state with a specific style. Each property (e.g., `Normal`  or `Focus`) is an @Terminal.Gui.Attribute. 
+
+ Only `Normal` is required. If other properties are not explicitly set, its value is derived from other roles (typically `Normal`) using well-defined inheritance rules. See the source code for the `Scheme` class for more details. 
 
 ### Flexible Scheme Management in `Terminal.Gui.View`
 
@@ -72,10 +77,7 @@ A `View`'s appearance is primarily determined by its `Scheme`, which maps semant
 
     *   **`SetAttributeForRole(VisualRole role)`**:
         *   This method is used to tell the `ConsoleDriver` which `Attribute` to use for subsequent drawing operations (like `AddRune` or `AddStr`).
-        *   It first determines the appropriate `Attribute` for the `role` from the current `Scheme` (similar to `GetAttributeForRole`).
-        *   It then raises the `SettingAttributeForRole` event (and calls `OnSettingAttributeForRole`).
-        *   Subscribers can modify the `schemeAttribute` (via `args.NewValue`) or cancel the operation (`args.Cancel = true`).
-        *   If not canceled, it calls `Driver.SetAttribute(schemeAttribute)`.
+        *   It first determines the appropriate `Attribute` for the `role` from the current `Scheme` by calling `GetAttributeForRole`.
 
     *   **`SetAttribute(Attribute attribute)`**:
         *   This is a more direct way to set the driver's current attribute, bypassing the scheme and role system. It's generally preferred to use `SetAttributeForRole` to maintain consistency with the `Scheme`.

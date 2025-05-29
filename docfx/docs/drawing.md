@@ -97,6 +97,7 @@ The @Terminal.Gui.Attribute class represents the formatting attributes of a `Cel
 Use @Terminal.Gui.View.SetAttribute to indicate which Attribute subsequent @Terminal.Gui.View.AddRune and @Terminal.Gui.View.AddStr calls will use:
 
 ```cs
+// This is for illustration only. Developers typically use SetAttributeForRole instead.
 SetAttribute (new Attribute (Color.Red, Color.Black, Style.Underline));
 AddStr ("Red on Black Underlined.");
 ```
@@ -119,6 +120,10 @@ AddStr ("Red on Black Underlined.");
 Color is supported on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
 
 The `Color` class represents a color. It provides automatic mapping between the legacy 4-bit (16-color) system and 24-bit colors. It contains properties for the red, green, and blue components of the color. The `StandardColor` enum provides a set of predefined colors.
+
+```cs
+Attribute attribute = new Attribute(StandardColor.Goldenrod, StandardColor.Wheat Style.None);
+```
 
 ## VisualRole
 

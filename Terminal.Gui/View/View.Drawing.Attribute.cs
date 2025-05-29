@@ -19,16 +19,18 @@ public partial class View
     ///         which can cancel the default behavior, and optionally change the attribute in the event args.
     ///     </para>
     ///     <para>
-    ///         If the View is disabled (<see cref="Enabled"/> is <see langword="false"/>), <see cref="VisualRole.Disabled"/>
-    ///         will be used instead of <paramref name="role"/>. Cancel the event to override this behavior.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     If the View is disabled (<see cref="Enabled"/> is <see langword="false"/>), <see cref="VisualRole.Disabled"/>
+    ///     If <see cref="Enabled"/> is <see langword="false"/>, <see cref="VisualRole.Disabled"/>
     ///     will be used instead of <paramref name="role"></paramref>.
     ///     To override this behavior use  <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
     ///     to cancel the method, and return a different attribute.
-    /// </remarks>
+    ///     </para>
+    ///     <para>
+    ///     If <see cref="HighlightStyle"/> is not <see cref="HighlightStyle.None"/> and <see cref="MouseHovering"/> is <see langword="true"/>,
+    ///     the <see cref="VisualRole.Highlight"/> will be used instead of <paramref name="role"/>.
+    ///     To override this behavior use  <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
+    ///     to cancel the method, and return a different attribute.
+    ///     </para>
+    /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
