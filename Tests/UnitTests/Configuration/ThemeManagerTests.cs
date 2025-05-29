@@ -272,7 +272,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
         output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");
 
-        string json = SourcesManager?.ToJson (Settings)!;
+        string json = ConfigurationManager.SourcesManager?.ToJson (Settings)!;
 
         // In memory size should be less than the size of the json
         output.WriteLine ($"JSON size: {json.Length / 1024} Kb");
