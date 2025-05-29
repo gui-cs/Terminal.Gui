@@ -150,10 +150,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 }
             }
 
-            if (TopLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
-            {
-                throw new ArgumentException ("There are duplicates Toplevel IDs");
-            }
+            //if (TopLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
+            //{
+            //    throw new ArgumentException ("There are duplicates Toplevel IDs");
+            //}
         }
 
         if (Top is null)
@@ -588,25 +588,23 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // End the RunState.Toplevel
         // First, take it off the Toplevel Stack
-        if (TopLevels.Count > 0)
+        if (TopLevels.TryPop (out Toplevel? topOfStack))
         {
-            if (TopLevels.Peek () != runState.Toplevel)
+            if (topOfStack != runState.Toplevel)
             {
                 // If the top of the stack is not the RunState.Toplevel then
                 // this call to End is not balanced with the call to Begin that started the RunState
                 throw new ArgumentException ("End must be balanced with calls to Begin");
             }
-
-            TopLevels.Pop ();
         }
 
         // Notify that it is closing
         runState.Toplevel?.OnClosed (runState.Toplevel);
 
-        if (TopLevels.Count > 0)
+        if (TopLevels.TryPeek (out Toplevel? newTop))
         {
-            Top = TopLevels.Peek ();
-            Top.SetNeedsDraw ();
+            Top = newTop;
+            Top?.SetNeedsDraw ();
         }
 
         if (runState.Toplevel is { HasFocus: true })

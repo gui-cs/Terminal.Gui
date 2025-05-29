@@ -578,15 +578,15 @@ public class DeepClonerTests
         Assert.Single ((Dictionary<string, int>)source ["Counts"].PropertyValue!);
     }
 
-    [Fact]
+    [Fact /*(Skip = "This test randomly fails due to a concurrent change to something. Needs to be moved to non-parallel tests.")*/]
     public void ThemeScopeList_WithThemes_ClonesSuccessfully ()
     {
         // Arrange: Create a ThemeScope and verify a property exists
-        var defaultThemeScope = new ThemeScope ();
+        ThemeScope defaultThemeScope = new ThemeScope ();
         defaultThemeScope.LoadHardCodedDefaults ();
         Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
-        var darkThemeScope = new ThemeScope ();
+        ThemeScope darkThemeScope = new ThemeScope ();
         darkThemeScope.LoadHardCodedDefaults ();
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
@@ -598,7 +598,7 @@ public class DeepClonerTests
         ];
 
         // Create a SettingsScope and set the Themes property
-        var settingsScope = new SettingsScope ();
+        SettingsScope settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
         Assert.True (settingsScope.ContainsKey ("Themes"));
         settingsScope ["Themes"].PropertyValue = themesList;
@@ -609,7 +609,7 @@ public class DeepClonerTests
         // Assert
         Assert.NotNull (result);
         Assert.IsType<SettingsScope> (result);
-        var resultScope = (SettingsScope)result;
+        SettingsScope resultScope = (SettingsScope)result;
         Assert.True (resultScope.ContainsKey ("Themes"));
 
         Assert.NotNull (resultScope ["Themes"].PropertyValue);

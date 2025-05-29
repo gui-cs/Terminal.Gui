@@ -150,7 +150,7 @@ public static class ConfigurationManager
     private static ImmutableSortedDictionary<string, ConfigProperty>? _uninitializedConfigPropertiesCache;
 
 #pragma warning disable IDE1006 // Naming Styles
-    private static readonly object __uninitializedConfigPropertiesCacheCacheLock = new ();
+    private static readonly object _uninitializedConfigPropertiesCacheCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
@@ -181,7 +181,7 @@ public static class ConfigurationManager
         ConfigProperty.Initialize ();
 
         // Cache all configuration properties
-        lock (__uninitializedConfigPropertiesCacheCacheLock)
+        lock (_uninitializedConfigPropertiesCacheCacheLock)
         {
             // _allConfigProperties: for ordered, iterable access (LINQ-friendly)
             // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
@@ -777,15 +777,17 @@ public static class ConfigurationManager
             return _uninitializedConfigPropertiesCache;
         }
 
-        // Filter properties by scope using the cached ScopeType property instead of reflection
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
+        lock (_uninitializedConfigPropertiesCacheCacheLock)
+        {
+            // Filter properties by scope using the cached ScopeType property instead of reflection
+            IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
 
-        Debug.Assert (filtered is { });
+            Debug.Assert (filtered is { });
 
-        IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope = filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
-        Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
-
-        return configPropertiesByScope;
+            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope = filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
+            Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
+            return configPropertiesByScope;
+        }
     }
 
     /// <summary>
