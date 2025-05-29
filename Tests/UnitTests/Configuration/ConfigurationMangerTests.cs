@@ -414,7 +414,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                                 """;
 
             // Update default config first (lower precedence)
-            SourcesManager?.Load (Settings, defaultConfig, "default-test", ConfigLocations.LibraryResources);
+            ConfigurationManager.SourcesManager?.Load (Settings, defaultConfig, "default-test", ConfigLocations.LibraryResources);
 
             // Then load runtime config, which should override default
             Load (ConfigLocations.Runtime);
@@ -447,7 +447,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ResetToHardCodedDefaults ();
 
             // Serialize to a JSON string
-            string json = SourcesManager?.ToJson (Settings);
+            string json = ConfigurationManager.SourcesManager?.ToJson (Settings);
 
             // Write the JSON string to the file
             File.WriteAllText ("hard_coded_defaults_config.json", json);
@@ -476,7 +476,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Enable (ConfigLocations.LibraryResources);
 
             // Serialize to a JSON string
-            string json = SourcesManager?.ToJson (Settings);
+            string json = ConfigurationManager.SourcesManager?.ToJson (Settings);
 
             // Write the JSON string to the file
             File.WriteAllText ("library_defaults_config.json", json);
@@ -688,7 +688,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				}
 			}";
 
-        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
+        ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
         // AbNormal is not a Scheme attribute
         json = @"
@@ -711,7 +711,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				}
 			}";
 
-        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
+        ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
         // Modify hotNormal background only
         json = @"
@@ -733,9 +733,9 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				}
 			}";
 
-        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
+        ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
-        SourcesManager?.Load (Settings, "{}}", "test", ConfigLocations.Runtime);
+        ConfigurationManager.SourcesManager?.Load (Settings, "{}}", "test", ConfigLocations.Runtime);
 
         Assert.NotEqual (0, _jsonErrors.Length);
 
@@ -773,7 +773,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				]
 			}";
 
-        var jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        var jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("foreground: \"\"brownish\"\"", jsonException.Message);
 
         // AbNormal is not a Scheme attribute
@@ -797,7 +797,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("AbNormal:", jsonException.Message);
 
         // Modify hotNormal background only
@@ -820,7 +820,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("background:", jsonException.Message);
 
         // Unknown property
@@ -829,7 +829,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 				""Unknown"" : ""Not known""
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("Unknown:", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
@@ -989,7 +989,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ResetToCurrentValues ();
             ThrowOnJsonErrors = true;
 
-            SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
+            ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
 
             Assert.Equal ("Default", ThemeManager.Theme);
 

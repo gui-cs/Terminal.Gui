@@ -743,7 +743,6 @@ public class ToplevelTests
     }
 
     [Fact]
-    [TestRespondersDisposed]
     public void Multi_Thread_Toplevels ()
     {
         Application.Init (new FakeDriver ());

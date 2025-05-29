@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Terminal.Gui.ConsoleDrivers;
 using InputRecord = Terminal.Gui.WindowsConsole.InputRecord;
 using ButtonState = Terminal.Gui.WindowsConsole.ButtonState;
 using EventFlags = Terminal.Gui.WindowsConsole.EventFlags;
