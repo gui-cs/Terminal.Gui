@@ -20,8 +20,21 @@ public static partial class Application // Mouse handling
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
 
+    private static View? _wantContinuousButtonPressedView;
+
     /// <summary>Gets <see cref="View"/> that has registered to get continuous mouse button pressed events.</summary>
-    public static View? WantContinuousButtonPressedView { get; internal set; }
+    public static View? WantContinuousButtonPressedView
+    {
+        get => _wantContinuousButtonPressedView;
+        internal set
+        {
+            if (Initialized)
+            {
+                // WantContinuousButtonPressedView is a static; only set if the application is initialized.
+                _wantContinuousButtonPressedView = value;
+            }
+        }
+    }
 
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
@@ -54,7 +67,12 @@ public static partial class Application // Mouse handling
         }
 
         RaiseGrabbedMouseEvent (view);
-        MouseGrabView = view;
+
+        if (Initialized)
+        {
+            // MouseGrabView is a static; only set if the application is initialized.
+            MouseGrabView = view;
+        }
     }
 
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
@@ -139,7 +157,11 @@ public static partial class Application // Mouse handling
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
     internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
-        LastMousePosition = mouseEvent.ScreenPosition;
+        if (Initialized)
+        {
+            // LastMousePosition is a static; only set if the application is initialized.
+            LastMousePosition = mouseEvent.ScreenPosition;
+        }
 
         if (IsMouseDisabled)
         {
@@ -209,7 +231,7 @@ public static partial class Application // Mouse handling
 
         // if the mouse is outside the Application.Top or Application.Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (Application.Top, deepestViewUnderMouse, true) && !View.IsInHierarchy(Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+        if (!View.IsInHierarchy (Application.Top, deepestViewUnderMouse, true) && !View.IsInHierarchy (Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }

@@ -133,6 +133,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
     public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
+        Application.Init (new FakeDriver ());
         var superView = new View
         {
             Height = 10, Width = 10

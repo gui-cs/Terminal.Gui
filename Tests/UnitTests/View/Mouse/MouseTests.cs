@@ -166,6 +166,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
+        Application.Init (new FakeDriver ());
         var me = new MouseEventArgs ();
 
         var view = new View
@@ -211,6 +212,7 @@ public class MouseTests : TestsAllViews
         MouseFlags clicked
     )
     {
+        Application.Init (new FakeDriver ());
         var me = new MouseEventArgs ();
 
         var view = new View
@@ -253,6 +255,7 @@ public class MouseTests : TestsAllViews
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
+        Application.Init (new FakeDriver ());
         var me = new MouseEventArgs ();
 
         var view = new View
