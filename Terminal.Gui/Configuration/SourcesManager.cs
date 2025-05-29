@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Terminal.Gui.Configuration;
+namespace Terminal.Gui;
 
 /// <summary>
 ///    Manages the <see cref="ConfigurationManager"/> Sources and provides the API for loading them. Source is a location where a configuration can be stored. Sources are defined in <see cref="ConfigLocations"/>.

@@ -2,8 +2,6 @@
 // FakeConsole.cs: A fake .NET Windows Console API implementation for unit tests.
 //
 
-using Terminal.Gui.ConsoleDrivers;
-
 namespace Terminal.Gui;
 
 #pragma warning disable RCS1138 // Add summary to documentation comment.
