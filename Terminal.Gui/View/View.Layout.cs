@@ -1238,48 +1238,50 @@ public partial class View // Layout APIs
     {
         List<View?> viewsUnderLocation = GetViewsAtLocation (root, location);
 
-        if (excludeViewportSettingsFlags.HasFlag (ViewportSettings.Transparent) || excludeViewportSettingsFlags.HasFlag (ViewportSettings.TransparentMouse))
+        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettings.Transparent) && !excludeViewportSettingsFlags.HasFlag (ViewportSettings.TransparentMouse))
         {
-            // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
-            // because the point was in their adornment, and if the adornment is transparent, they should be removed.
-            viewsUnderLocation.RemoveAll (
-                                          v =>
-                                          {
-                                              if (v is null or Adornment)
-                                              {
-                                                  return false;
-                                              }
-
-                                              bool? ret = null;
-
-                                              if (viewsUnderLocation.Contains (v.Margin)
-                                                  && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
-                                              {
-                                                  ret = true;
-                                              }
-
-                                              if (viewsUnderLocation.Contains (v.Border)
-                                                  && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
-                                              {
-                                                  ret = true;
-                                              }
-
-                                              if (viewsUnderLocation.Contains (v.Padding)
-                                                  && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
-                                              {
-                                                  ret = true;
-                                              }
-
-                                              return ret is true;
-                                          });
-
-            // Now remove all views that have ViewportSettings.TransparentMouse set
-            viewsUnderLocation.RemoveAll (v => v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags));
+            // Only filter views if we are excluding transparent views.
+            return viewsUnderLocation;
         }
+
+        // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
+        // because the point was in their adornment, and if the adornment is transparent, they should be removed.
+        viewsUnderLocation.RemoveAll (
+                                      v =>
+                                      {
+                                          if (v is null or Adornment)
+                                          {
+                                              return false;
+                                          }
+
+                                          bool? ret = null;
+
+                                          if (viewsUnderLocation.Contains (v.Margin)
+                                              && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              ret = true;
+                                          }
+
+                                          if (viewsUnderLocation.Contains (v.Border)
+                                              && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              ret = true;
+                                          }
+
+                                          if (viewsUnderLocation.Contains (v.Padding)
+                                              && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              ret = true;
+                                          }
+
+                                          return ret is true;
+                                      });
+
+        // Now remove all views that have ViewportSettings.TransparentMouse set
+        viewsUnderLocation.RemoveAll (v => v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags));
 
         return viewsUnderLocation;
     }
-
     /// <summary>
     ///     INTERNAL: Gets ALL Views (Subviews and Adornments) in the of <see cref="SuperView"/> hierarchcy that are at
     ///     <paramref name="location"/>,
@@ -1297,30 +1299,36 @@ public partial class View // Layout APIs
             return [];
         }
 
-        if (!superView.FrameToScreen ().Contains (location))
+        List<View?> result = [];
+        Stack<View> viewsToProcess = new ();
+
+        // Start with the superview if it contains the location
+        if (superView.FrameToScreen ().Contains (location))
         {
-            return [];
+            viewsToProcess.Push (superView);
         }
 
-        List<View?> result = [superView];
-
-        result.AddRange (Adornment.GetViewsAtLocation (superView.Margin, location));
-        result.AddRange (Adornment.GetViewsAtLocation (superView.Border, location));
-        result.AddRange (Adornment.GetViewsAtLocation (superView.Padding, location));
-
-        // Add subviews
-        foreach (View subview in superView.InternalSubViews)
+        while (viewsToProcess.Count > 0)
         {
-            if (!subview.Visible)
-            {
-                continue;
-            }
+            View currentView = viewsToProcess.Pop ();
 
-            List<View?> subResult = GetViewsAtLocation (subview, location);
+            // Add the current view to the result
+            result.Add (currentView);
 
-            if (subResult.Count > 0)
+            // Add adornments for the current view
+            result.AddRange (Adornment.GetViewsAtLocation (currentView.Margin, location));
+            result.AddRange (Adornment.GetViewsAtLocation (currentView.Border, location));
+            result.AddRange (Adornment.GetViewsAtLocation (currentView.Padding, location));
+
+            // Add subviews to the stack in reverse order
+            // This maintains the original depth-first traversal order
+            for (int i = currentView.InternalSubViews.Count - 1; i >= 0; i--)
             {
-                result.AddRange (subResult);
+                View subview = currentView.InternalSubViews [i];
+                if (subview.Visible && subview.FrameToScreen ().Contains (location))
+                {
+                    viewsToProcess.Push (subview);
+                }
             }
         }
 
