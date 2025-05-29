@@ -118,7 +118,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <summary>
-    ///     Invokes an Application-bound commmand.
+    ///     Invokes an Application-bound command.
     /// </summary>
     /// <param name="command">The Command to invoke</param>
     /// <param name="key">The Application-bound Key that was pressed.</param>
@@ -206,7 +206,6 @@ public static partial class Application // Keyboard handling
     static Application ()
     {
         AddKeyBindings ();
-        SetKeysToHardCodedDefaults ();
     }
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
@@ -307,21 +306,6 @@ public static partial class Application // Keyboard handling
         {
             KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         }
-    }
-
-    private static void SetKeysToHardCodedDefaults ()
-    {
-        // Resources/config.json overrides
-        // BUGBUG: We reset these here becaues they may have been changed. But 
-        // BUGBUG: These may not actually be the correct default values.
-        // BUGBUG: AND there are other settings that might be similarly overridden.
-        // BUGBUG: Need a better way to do this.
-        QuitKey = Key.Esc;
-        NextTabKey = Key.Tab;
-        PrevTabKey = Key.Tab.WithShift;
-        NextTabGroupKey = Key.F6;
-        PrevTabGroupKey = Key.F6.WithShift;
-        ArrangeKey = Key.F5.WithCtrl;
     }
 
     #endregion Application-scoped KeyBindings
