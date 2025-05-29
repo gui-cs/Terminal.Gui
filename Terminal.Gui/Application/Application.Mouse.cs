@@ -263,7 +263,6 @@ public static partial class Application // Mouse handling
 
         RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
 
-
         if (Initialized)
         {
             WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
