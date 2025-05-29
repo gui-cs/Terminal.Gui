@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using UnitTests;
+﻿#nullable enable
+using System.Collections.Concurrent;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -12,7 +12,7 @@ public class SettingsScopeTests
         // arrange
         Enable (ConfigLocations.HardCoded);
 
-        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue!);
 
         ThrowOnJsonErrors = true;
 
@@ -27,7 +27,7 @@ public class SettingsScopeTests
         Load (ConfigLocations.Runtime);
 
         // assert
-        Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue!);
 
         // clean up
         Disable (resetToHardCodedDefaults: true);
@@ -43,11 +43,11 @@ public class SettingsScopeTests
         ThrowOnJsonErrors = true;
 
         ConfigProperty themesConfigProperty = Settings! ["Themes"];
-        ConcurrentDictionary<string, ThemeScope> dict = themesConfigProperty.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
+        ConcurrentDictionary<string, ThemeScope> dict = (themesConfigProperty.PropertyValue as ConcurrentDictionary<string, ThemeScope>)!;
 
         Assert.NotNull (dict);
         Assert.Single (dict);
-        Assert.NotEmpty ((ConcurrentDictionary<string, ThemeScope>)themesConfigProperty.PropertyValue);
+        Assert.NotEmpty (((ConcurrentDictionary<string, ThemeScope>)themesConfigProperty.PropertyValue!)!);
 
         ThemeScope scope = dict [ThemeManager.DEFAULT_THEME_NAME];
         Assert.NotNull (scope);
@@ -111,16 +111,16 @@ public class SettingsScopeTests
         Load (ConfigLocations.LibraryResources);
 
         // arrange
-        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Esc, (Key)Settings!["Application.QuitKey"].PropertyValue!);
 
         Assert.Equal (
                       Key.F6,
-                      (Key)Settings ["Application.NextTabGroupKey"].PropertyValue
+                      (Key)Settings["Application.NextTabGroupKey"].PropertyValue!
                      );
 
         Assert.Equal (
                       Key.F6.WithShift,
-                      (Key)Settings ["Application.PrevTabGroupKey"].PropertyValue
+                      (Key)Settings["Application.PrevTabGroupKey"].PropertyValue!
                      );
 
         // act
@@ -154,9 +154,9 @@ public class SettingsScopeTests
         updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Settings.UpdateFrom (updatedSettings);
-        Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
-        Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue).KeyCode);
-        Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue).KeyCode);
+        Assert.Equal (KeyCode.End, ((Key)Settings["Application.QuitKey"].PropertyValue!).KeyCode);
+        Assert.Equal (KeyCode.F, ((Key)updatedSettings["Application.NextTabGroupKey"].PropertyValue!).KeyCode);
+        Assert.Equal (KeyCode.B, ((Key)updatedSettings["Application.PrevTabGroupKey"].PropertyValue!).KeyCode);
         Disable (resetToHardCodedDefaults: true);
     }
 
@@ -216,6 +216,136 @@ public class SettingsScopeTests
         // Assert
         Assert.Equal (Key.Esc, Application.QuitKey);
 
+        Disable (resetToHardCodedDefaults: true);
+    }
+    
+    private class ConfigPropertyMock
+    {
+        public object? PropertyValue { get; init; }
+        public bool Immutable { get; init; }
+    }
+
+    private class SettingsScopeMock : Dictionary<string, ConfigPropertyMock>
+    {
+        public string? Theme { get; set; }
+    }
+
+
+    [Fact]
+    public void SettingsScopeMockWithKey_CreatesDeepCopy ()
+    {
+        SettingsScopeMock? source = new ()
+        {
+            Theme = "Dark",
+            ["KeyBinding"] = new () { PropertyValue = new Key (KeyCode.A) { Handled = true } },
+            ["Counts"] = new () { PropertyValue = new Dictionary<string, int> { { "X", 1 } } }
+        };
+        SettingsScopeMock? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.NotSame (source, result);
+        Assert.Equal (source.Theme, result!.Theme);
+        Assert.NotSame (source ["KeyBinding"], result ["KeyBinding"]);
+        Assert.NotSame (source ["Counts"], result ["Counts"]);
+
+        ConfigPropertyMock clonedKeyProp = result ["KeyBinding"];
+        var clonedKey = (Key)clonedKeyProp.PropertyValue!;
+        Assert.NotSame (source ["KeyBinding"].PropertyValue, clonedKey);
+        Assert.Equal (((Key)source ["KeyBinding"].PropertyValue!).KeyCode, clonedKey.KeyCode);
+        Assert.Equal (((Key)source ["KeyBinding"].PropertyValue!).Handled, clonedKey.Handled);
+
+        Assert.Equal ((Dictionary<string, int>)source ["Counts"].PropertyValue!, (Dictionary<string, int>)result ["Counts"].PropertyValue!);
+
+        // Modify result, ensure source unchanged
+        result.Theme = "Light";
+        clonedKey.Handled = false;
+        ((Dictionary<string, int>)result ["Counts"].PropertyValue!).Add ("Y", 2);
+        Assert.Equal ("Dark", source.Theme);
+        Assert.True (((Key)source ["KeyBinding"].PropertyValue!).Handled);
+        Assert.Single ((Dictionary<string, int>)source ["Counts"].PropertyValue!);
+        Disable (resetToHardCodedDefaults: true);
+    }
+
+    [Fact /*(Skip = "This test randomly fails due to a concurrent change to something. Needs to be moved to non-parallel tests.")*/]
+    public void ThemeScopeList_WithThemes_ClonesSuccessfully ()
+    {
+        // Arrange: Create a ThemeScope and verify a property exists
+        ThemeScope defaultThemeScope = new ThemeScope ();
+        defaultThemeScope.LoadHardCodedDefaults ();
+        Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
+
+        ThemeScope darkThemeScope = new ThemeScope ();
+        darkThemeScope.LoadHardCodedDefaults ();
+        Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
+
+        // Create a Themes list with two themes
+        List<Dictionary<string, ThemeScope>> themesList =
+        [
+            new () { { "Default", defaultThemeScope } },
+            new () { { "Dark", darkThemeScope } }
+        ];
+
+        // Create a SettingsScope and set the Themes property
+        SettingsScope settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
+        Assert.True (settingsScope.ContainsKey ("Themes"));
+        settingsScope ["Themes"].PropertyValue = themesList;
+
+        // Act
+        SettingsScope? result = DeepCloner.DeepClone (settingsScope);
+
+        // Assert
+        Assert.NotNull (result);
+        Assert.IsType<SettingsScope> (result);
+        SettingsScope resultScope = (SettingsScope)result;
+        Assert.True (resultScope.ContainsKey ("Themes"));
+
+        Assert.NotNull (resultScope ["Themes"].PropertyValue);
+
+        List<Dictionary<string, ThemeScope>> clonedThemes = (List<Dictionary<string, ThemeScope>>)resultScope ["Themes"].PropertyValue!;
+        Assert.Equal (2, clonedThemes.Count);
+        Disable (resetToHardCodedDefaults: true);
+    }
+
+    [Fact]
+    public void Empty_SettingsScope_ClonesSuccessfully ()
+    {
+        // Arrange: Create a SettingsScope 
+        var settingsScope = new SettingsScope ();
+        Assert.True (settingsScope.ContainsKey ("Themes"));
+
+        // Act
+        SettingsScope? result = DeepCloner.DeepClone (settingsScope);
+
+        // Assert
+        Assert.NotNull (result);
+        Assert.IsType<SettingsScope> (result);
+
+        Assert.True (result.ContainsKey ("Themes"));
+        Disable (resetToHardCodedDefaults: true);
+    }
+
+    [Fact]
+    public void SettingsScope_With_Themes_Set_ClonesSuccessfully ()
+    {
+        // Arrange: Create a SettingsScope 
+        var settingsScope = new SettingsScope ();
+        Assert.True (settingsScope.ContainsKey ("Themes"));
+
+        settingsScope ["Themes"].PropertyValue = new List<Dictionary<string, ThemeScope>>
+        {
+            new() { { "Default", new () } },
+            new() { { "Dark", new () } }
+        };
+
+        // Act
+        SettingsScope? result = DeepCloner.DeepClone (settingsScope);
+
+        // Assert
+        Assert.NotNull (result);
+        Assert.IsType<SettingsScope> (result);
+        Assert.True (result.ContainsKey ("Themes"));
+        Assert.NotNull (result ["Themes"].PropertyValue);
         Disable (resetToHardCodedDefaults: true);
     }
 }

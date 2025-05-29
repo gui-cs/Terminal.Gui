@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 

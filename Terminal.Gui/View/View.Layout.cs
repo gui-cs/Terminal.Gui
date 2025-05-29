@@ -800,14 +800,6 @@ public partial class View // Layout APIs
             SuperView?.SetNeedsLayout ();
         }
 
-        if (SuperView is null)
-        {
-            foreach (Toplevel tl in Application.TopLevels)
-            {
-                // tl.SetNeedsDraw ();
-            }
-        }
-
         if (this is not Adornment adornment)
         {
             return;
