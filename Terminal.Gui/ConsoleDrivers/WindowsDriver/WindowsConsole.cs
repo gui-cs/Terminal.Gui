@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 

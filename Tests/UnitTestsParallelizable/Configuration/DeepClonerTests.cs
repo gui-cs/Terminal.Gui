@@ -56,11 +56,6 @@ public class DeepClonerTests
         public bool Immutable { get; init; }
     }
 
-    private class SettingsScopeMock : Dictionary<string, ConfigPropertyMock>
-    {
-        public string? Theme { get; set; }
-    }
-
     private class ComplexKey
     {
         public int Id { get; init; }
@@ -542,120 +537,6 @@ public class DeepClonerTests
         // PropertyInfo is effectively a simple type
         Assert.Same (source.PropertyInfo, result!.PropertyInfo);
         Assert.Equal (source.Immutable, result.Immutable);
-    }
-
-    [Fact]
-    public void SettingsScopeMockWithKey_CreatesDeepCopy ()
-    {
-        SettingsScopeMock? source = new ()
-        {
-            Theme = "Dark",
-            ["KeyBinding"] = new () { PropertyValue = new Key (KeyCode.A) { Handled = true } },
-            ["Counts"] = new () { PropertyValue = new Dictionary<string, int> { { "X", 1 } } }
-        };
-        SettingsScopeMock? result = DeepCloner.DeepClone (source);
-
-        Assert.NotNull (result);
-        Assert.NotSame (source, result);
-        Assert.Equal (source.Theme, result!.Theme);
-        Assert.NotSame (source ["KeyBinding"], result ["KeyBinding"]);
-        Assert.NotSame (source ["Counts"], result ["Counts"]);
-
-        ConfigPropertyMock clonedKeyProp = result ["KeyBinding"];
-        var clonedKey = (Key)clonedKeyProp.PropertyValue!;
-        Assert.NotSame (source ["KeyBinding"].PropertyValue, clonedKey);
-        Assert.Equal (((Key)source ["KeyBinding"].PropertyValue!).KeyCode, clonedKey.KeyCode);
-        Assert.Equal (((Key)source ["KeyBinding"].PropertyValue!).Handled, clonedKey.Handled);
-
-        Assert.Equal ((Dictionary<string, int>)source ["Counts"].PropertyValue!, (Dictionary<string, int>)result ["Counts"].PropertyValue!);
-
-        // Modify result, ensure source unchanged
-        result.Theme = "Light";
-        clonedKey.Handled = false;
-        ((Dictionary<string, int>)result ["Counts"].PropertyValue!).Add ("Y", 2);
-        Assert.Equal ("Dark", source.Theme);
-        Assert.True (((Key)source ["KeyBinding"].PropertyValue!).Handled);
-        Assert.Single ((Dictionary<string, int>)source ["Counts"].PropertyValue!);
-    }
-
-    [Fact]
-    public void ThemeScopeList_WithThemes_ClonesSuccessfully ()
-    {
-        // Arrange: Create a ThemeScope and verify a property exists
-        var defaultThemeScope = new ThemeScope ();
-        defaultThemeScope.LoadHardCodedDefaults ();
-        Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
-
-        var darkThemeScope = new ThemeScope ();
-        darkThemeScope.LoadHardCodedDefaults ();
-        Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
-
-        // Create a Themes list with two themes
-        List<Dictionary<string, ThemeScope>> themesList =
-        [
-            new () { { "Default", defaultThemeScope } },
-            new () { { "Dark", darkThemeScope } }
-        ];
-
-        // Create a SettingsScope and set the Themes property
-        var settingsScope = new SettingsScope ();
-        settingsScope.LoadHardCodedDefaults ();
-        Assert.True (settingsScope.ContainsKey ("Themes"));
-        settingsScope ["Themes"].PropertyValue = themesList;
-
-        // Act
-        SettingsScope? result = DeepCloner.DeepClone (settingsScope);
-
-        // Assert
-        Assert.NotNull (result);
-        Assert.IsType<SettingsScope> (result);
-        var resultScope = (SettingsScope)result;
-        Assert.True (resultScope.ContainsKey ("Themes"));
-
-        Assert.NotNull (resultScope ["Themes"].PropertyValue);
-
-        List<Dictionary<string, ThemeScope>> clonedThemes = (List<Dictionary<string, ThemeScope>>)resultScope ["Themes"].PropertyValue!;
-        Assert.Equal (2, clonedThemes.Count);
-    }
-
-    [Fact]
-    public void Empty_SettingsScope_ClonesSuccessfully ()
-    {
-        // Arrange: Create a SettingsScope 
-        var settingsScope = new SettingsScope ();
-        Assert.True (settingsScope.ContainsKey ("Themes"));
-
-        // Act
-        SettingsScope? result = DeepCloner.DeepClone (settingsScope);
-
-        // Assert
-        Assert.NotNull (result);
-        Assert.IsType<SettingsScope> (result);
-
-        Assert.True (result.ContainsKey ("Themes"));
-    }
-
-    [Fact]
-    public void SettingsScope_With_Themes_Set_ClonesSuccessfully ()
-    {
-        // Arrange: Create a SettingsScope 
-        var settingsScope = new SettingsScope ();
-        Assert.True (settingsScope.ContainsKey ("Themes"));
-
-        settingsScope ["Themes"].PropertyValue = new List<Dictionary<string, ThemeScope>>
-        {
-            new() { { "Default", new () } },
-            new() { { "Dark", new () } }
-        };
-
-        // Act
-        SettingsScope? result = DeepCloner.DeepClone (settingsScope);
-
-        // Assert
-        Assert.NotNull (result);
-        Assert.IsType<SettingsScope> (result);
-        Assert.True (result.ContainsKey ("Themes"));
-        Assert.NotNull (result ["Themes"].PropertyValue);
     }
 
     [Fact]

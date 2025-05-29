@@ -101,6 +101,10 @@ public static class ThemeManager
     /// <returns></returns>
     public static string GetCurrentThemeName () { return Theme!; }
 
+    // TODO: Add a lock around Theme and Themes
+    // TODO: For now, this test can't run in parallel with other tests that access Theme or Themes.
+    // TODO: ThemeScopeList_WithThemes_ClonesSuccessfully
+
     /// <summary>
     ///     Gets the Themes dictionary. <see cref="GetThemes"/> is preferred.
     ///     The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Themes"]</c>.

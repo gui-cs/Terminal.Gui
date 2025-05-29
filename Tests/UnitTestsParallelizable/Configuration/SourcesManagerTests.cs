@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Text.Json;
-using Terminal.Gui.Configuration;
 
 public class SourcesManagerTests
 {

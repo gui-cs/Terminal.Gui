@@ -19,8 +19,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -76,7 +74,7 @@ internal class WindowsDriver : ConsoleDriver
 
     public static WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
     {
-        if (keyEvent.wVirtualKeyCode != (VK)ConsoleKey.Packet)
+        if (keyEvent.wVirtualKeyCode != (ConsoleKeyMapping.VK)ConsoleKey.Packet)
         {
             return keyEvent;
         }
@@ -106,8 +104,8 @@ internal class WindowsDriver : ConsoleDriver
                                            mod.HasFlag (ConsoleModifiers.Shift),
                                            mod.HasFlag (ConsoleModifiers.Alt),
                                            mod.HasFlag (ConsoleModifiers.Control));
-        cKeyInfo = DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
-        uint scanCode = GetScanCodeFromConsoleKeyInfo (cKeyInfo);
+        cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
+        uint scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (cKeyInfo);
 
         return new WindowsConsole.KeyEventRecord
         {
@@ -115,7 +113,7 @@ internal class WindowsDriver : ConsoleDriver
             bKeyDown = keyEvent.bKeyDown,
             dwControlKeyState = keyEvent.dwControlKeyState,
             wRepeatCount = keyEvent.wRepeatCount,
-            wVirtualKeyCode = (VK)cKeyInfo.Key,
+            wVirtualKeyCode = (ConsoleKeyMapping.VK)cKeyInfo.Key,
             wVirtualScanCode = (ushort)scanCode
         };
     }
@@ -139,7 +137,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
             keyEvent.UnicodeChar = '\0';
-            keyEvent.wVirtualKeyCode = VK.SHIFT;
+            keyEvent.wVirtualKeyCode = ConsoleKeyMapping.VK.SHIFT;
         }
 
         if (alt)
@@ -147,7 +145,7 @@ internal class WindowsDriver : ConsoleDriver
             controlKey |= WindowsConsole.ControlKeyState.LeftAltPressed;
             controlKey |= WindowsConsole.ControlKeyState.RightAltPressed;
             keyEvent.UnicodeChar = '\0';
-            keyEvent.wVirtualKeyCode = VK.MENU;
+            keyEvent.wVirtualKeyCode = ConsoleKeyMapping.VK.MENU;
         }
 
         if (control)
@@ -155,7 +153,7 @@ internal class WindowsDriver : ConsoleDriver
             controlKey |= WindowsConsole.ControlKeyState.LeftControlPressed;
             controlKey |= WindowsConsole.ControlKeyState.RightControlPressed;
             keyEvent.UnicodeChar = '\0';
-            keyEvent.wVirtualKeyCode = VK.CONTROL;
+            keyEvent.wVirtualKeyCode = ConsoleKeyMapping.VK.CONTROL;
         }
 
         keyEvent.dwControlKeyState = controlKey;
@@ -174,7 +172,7 @@ internal class WindowsDriver : ConsoleDriver
         //} else {
         //	keyEvent.wVirtualKeyCode = '\0';
         //}
-        keyEvent.wVirtualKeyCode = (VK)key;
+        keyEvent.wVirtualKeyCode = (ConsoleKeyMapping.VK)key;
 
         input.KeyEvent = keyEvent;
 
@@ -492,7 +490,7 @@ internal class WindowsDriver : ConsoleDriver
         switch (inputEvent.EventType)
         {
             case WindowsConsole.EventType.Key:
-                if (inputEvent.KeyEvent.wVirtualKeyCode == (VK)ConsoleKey.Packet)
+                if (inputEvent.KeyEvent.wVirtualKeyCode == (ConsoleKeyMapping.VK)ConsoleKey.Packet)
                 {
                     // Used to pass Unicode characters as if they were keystrokes.
                     // The VK_PACKET key is the low word of a 32-bit
@@ -681,7 +679,7 @@ internal class WindowsDriver : ConsoleDriver
             case ConsoleKey.OemMinus:
                 // These virtual key codes are mapped differently depending on the keyboard layout in use.
                 // We use the Win32 API to map them to the correct character.
-                uint mapResult = MapVKtoChar ((VK)keyInfo.Key);
+                uint mapResult = ConsoleKeyMapping.MapVKtoChar ((ConsoleKeyMapping.VK)keyInfo.Key);
 
                 if (mapResult == 0)
                 {
@@ -738,7 +736,7 @@ internal class WindowsDriver : ConsoleDriver
 
                     // Return the mappedChar with modifiers. Because mappedChar is un-shifted, if Shift was down
                     // we should keep it
-                    return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
+                    return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
                 }
 
                 // KeyChar is printable
@@ -751,12 +749,12 @@ internal class WindowsDriver : ConsoleDriver
                 if (keyInfo.Modifiers != ConsoleModifiers.Shift)
                 {
                     // If Shift wasn't down we don't need to do anything but return the mappedChar
-                    return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
+                    return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
                 }
 
                 // Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "�")
                 // and passing on Shift would be redundant.
-                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
         // A..Z are special cased:
@@ -772,13 +770,13 @@ internal class WindowsDriver : ConsoleDriver
                 // AltGr support - AltGr is equivalent to Ctrl+Alt
                 if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
                 {
-                    return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+                    return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
                 }
             }
 
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
             }
 
             if ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ keyInfoEx.CapsLock)
@@ -810,47 +808,47 @@ internal class WindowsDriver : ConsoleDriver
         if (Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
             // If the key is JUST a modifier, return it as just that key
-            if (keyInfo.Key == (ConsoleKey)VK.SHIFT)
+            if (keyInfo.Key == (ConsoleKey)ConsoleKeyMapping.VK.SHIFT)
             { // Shift 16
                 return KeyCode.ShiftMask;
             }
 
-            if (keyInfo.Key == (ConsoleKey)VK.CONTROL)
+            if (keyInfo.Key == (ConsoleKey)ConsoleKeyMapping.VK.CONTROL)
             { // Ctrl 17
                 return KeyCode.CtrlMask;
             }
 
-            if (keyInfo.Key == (ConsoleKey)VK.MENU)
+            if (keyInfo.Key == (ConsoleKey)ConsoleKeyMapping.VK.MENU)
             { // Alt 18
                 return KeyCode.AltMask;
             }
 
             if (keyInfo.KeyChar == 0)
             {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
             }
 
             // Backspace (ASCII 127)
             if (keyInfo.KeyChar == '\u007f')
             {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
             }
 
             if (keyInfo.Key != ConsoleKey.None)
             {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
             }
 
-            return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
         // Handle control keys (e.g. CursorUp)
         if (Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
         {
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
 
-        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+        return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
     }
 
     private MouseFlags ProcessButtonClick (WindowsConsole.MouseEventRecord mouseEvent)

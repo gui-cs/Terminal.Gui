@@ -4,7 +4,6 @@
 //
 
 using System.Runtime.InteropServices;
-using Terminal.Gui.ConsoleDrivers;
 using Unix.Terminal;
 
 namespace Terminal.Gui;
