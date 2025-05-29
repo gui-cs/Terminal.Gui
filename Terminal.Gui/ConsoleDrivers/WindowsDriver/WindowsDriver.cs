@@ -804,6 +804,7 @@ internal class WindowsDriver : ConsoleDriver
         }
 
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
+        // Also handle the key ASCII value 127 (BACK)
         if (Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
             // If the key is JUST a modifier, return it as just that key
@@ -825,6 +826,12 @@ internal class WindowsDriver : ConsoleDriver
             if (keyInfo.KeyChar == 0)
             {
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+            }
+
+            // Backspace (ASCII 127)
+            if (keyInfo.KeyChar == '\u007f')
+            {
+                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
             }
 
             if (keyInfo.Key != ConsoleKey.None)
