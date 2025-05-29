@@ -58,7 +58,6 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Input\Keyboard\" />
 		<Folder Include="Input\Mouse\" />
 	</ItemGroup>
 	<PropertyGroup Label="FineCodeCoverage">

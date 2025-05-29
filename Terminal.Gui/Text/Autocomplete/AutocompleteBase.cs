@@ -34,7 +34,7 @@ public abstract class AutocompleteBase : IAutocomplete
     public virtual int SelectedIdx { get; set; }
 
     /// <inheritdoc/>
-    public abstract ColorScheme ColorScheme { get; set; }
+    public abstract Scheme Scheme { get; set; }
 
     /// <inheritdoc/>
     public virtual Key SelectionKey { get; set; } = Key.Enter;

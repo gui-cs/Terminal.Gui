@@ -15,7 +15,7 @@ public class HexEditor : Scenario
 {
     private string? _fileName;
     private HexView? _hexView;
-    private MenuItemv2? _miAllowEdits;
+    private MenuItemv2? _miReadOnly;
     private bool _saved = true;
     private Shortcut? _scAddress;
     private Shortcut? _scInfo;
@@ -26,9 +26,9 @@ public class HexEditor : Scenario
     {
         Application.Init ();
 
-        var app = new Toplevel
+        var app = new Window ()
         {
-            ColorScheme = Colors.ColorSchemes ["Base"]
+            BorderStyle = LineStyle.None
         };
 
         _fileName = "demo.bin";
@@ -78,10 +78,10 @@ public class HexEditor : Scenario
                      "_Options",
                      new MenuItemv2 []
                      {
-                         _miAllowEdits = new (
-                                              "_AllowEdits",
+                         _miReadOnly = new (
+                                              "_Read Only",
                                               "",
-                                              ToggleAllowEdits
+                                              ToggleReadOnly
                                              )
                          {
 
@@ -93,10 +93,10 @@ public class HexEditor : Scenario
 
         CheckBox cb = new CheckBox ()
         {
-            Title = _miAllowEdits.Title,
-            CheckedState = _hexView.AllowEdits ? CheckState.Checked : CheckState.None,
+            Title = _miReadOnly.Title,
+            CheckedState = _hexView.ReadOnly ? CheckState.Checked : CheckState.None,
         };
-        _miAllowEdits.CommandView = cb;
+        _miReadOnly.CommandView = cb;
         app.Add (menu);
 
         var addressWidthUpDown = new NumericUpDown
@@ -292,13 +292,13 @@ public class HexEditor : Scenario
         }
     }
 
-    private void ToggleAllowEdits ()
+    private void ToggleReadOnly ()
     {
-        if (_miAllowEdits?.CommandView is not CheckBox cb)
+        if (_miReadOnly?.CommandView is not CheckBox cb)
         {
             return;
         }
 
-        _hexView!.AllowEdits = cb.CheckedState == CheckState.Checked;
+        _hexView!.ReadOnly = cb.CheckedState == CheckState.Checked;
     }
 }

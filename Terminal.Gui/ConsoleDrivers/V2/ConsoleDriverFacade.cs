@@ -344,7 +344,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         // TODO: what even is this? why Attribute constructor wants to call Driver method which must return an instance of Attribute? ?!?!?!
         return new (
-                    -1, // only used by cursesdriver!
+                    0xFF, // only used by cursesdriver!
                     foreground,
                     background
                    );

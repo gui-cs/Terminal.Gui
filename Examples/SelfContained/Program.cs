@@ -12,6 +12,7 @@ public static class Program
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IConsoleDriver)")]
     private static void Main (string [] args)
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
 
         #region The code in this region is not intended for use in a self-contained single-file. It's just here to make sure there is no functionality break with localization in Terminal.Gui using single-file

@@ -594,7 +594,7 @@ public class DynamicMenuBar : Scenario
 
             var lblMenuBar = new Label
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
                 TextAlignment = Alignment.Center,
                 X = Pos.Right (btnPrevious) + 1,
                 Y = Pos.Top (btnPrevious),
@@ -632,7 +632,7 @@ public class DynamicMenuBar : Scenario
 
             _lstMenus = new ()
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
                 X = Pos.Right (btnPrevious) + 1,
                 Y = Pos.Top (btnPrevious) + 2,
                 Width = lblMenuBar.Width,

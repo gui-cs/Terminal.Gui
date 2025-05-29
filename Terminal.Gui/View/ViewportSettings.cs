@@ -153,6 +153,8 @@ public enum ViewportSettings
     /// </summary>
     Transparent = 0b_0001_0000_0000,
 
+    // BUGBUG: The API docs here are wrong: If a TransparentMouse View has subviews, those subviews WILL get mouse events. 
+    // BUGBUG: That's an important feature that enables Popovers to work.
     /// <summary>
     ///     If set the View will be transparent to mouse events: Any mouse event that occurs over the View (and it's SubViews) will be passed to the
     ///     Views below it.

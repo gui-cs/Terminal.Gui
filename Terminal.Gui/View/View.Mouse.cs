@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel;
-using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui;
 
@@ -47,8 +46,11 @@ public partial class View // Mouse APIs
 
     #region MouseEnterLeave
 
-    private bool _hovering;
-    private ColorScheme? _savedNonHoverColorScheme;
+    /// <summary>
+    ///     Gets whether the mouse is currently hovering over the View's <see cref="Viewport"/>. Is <see langword="true"/> after
+    ///     <see cref="MouseEnter"/> has been raised, and before <see cref="MouseLeave"/> is raised.
+    /// </summary>
+    public bool MouseHovering { get; internal set; }
 
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's
@@ -79,30 +81,15 @@ public partial class View // Mouse APIs
 
         MouseEnter?.Invoke (this, eventArgs);
 
-        _hovering = !eventArgs.Cancel;
-
         if (eventArgs.Cancel)
         {
             return true;
         }
 
-        // Post-conditions
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover))
+        MouseHovering = true;
+
+        if (HighlightStyle != HighlightStyle.None)
         {
-            HighlightStyle copy = HighlightStyle;
-            var hover = HighlightStyle.Hover;
-            CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
-
-            if (RaiseHighlight (args) || args.Cancel)
-            {
-                return args.Cancel;
-            }
-
-            ColorScheme? cs = _colorScheme;
-
-            _savedNonHoverColorScheme = cs;
-
-            _colorScheme = GetHighlightColorScheme ();
             SetNeedsDraw ();
         }
 
@@ -110,20 +97,32 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Gets the <see cref="ColorScheme"/> to use when the view is highlighted. The highlight colorscheme
-    ///     is based on the current <see cref="ColorScheme"/>, using <see cref="Color.GetHighlightColor()"/>.
+    ///     Gets the <see cref="Scheme"/> to use when the view is highlighted. The highlight colorscheme
+    ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetBrighterColor"/>.
     /// </summary>
-    /// <remarks>The highlight color scheme.</remarks>
-    public ColorScheme? GetHighlightColorScheme ()
+    /// <remarks>The highlight scheme.</remarks>
+    public Scheme GetHighlightScheme ()
     {
-        ColorScheme? cs = _colorScheme ?? SuperView?.ColorScheme ?? new ColorScheme ();
+        Scheme cs = GetScheme ();
 
         return cs with
         {
-            Normal = new (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background),
-            HotNormal = new (GetHotNormalColor ().Foreground.GetHighlightColor (), GetHotNormalColor ().Background),
-            Focus = new (GetFocusColor ().Foreground.GetHighlightColor (), GetFocusColor ().Background),
-            HotFocus = new (GetHotFocusColor ().Foreground.GetHighlightColor (), GetHotFocusColor ().Background)
+            Normal = new (
+                          GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor (),
+                          GetAttributeForRole (VisualRole.Normal).Background,
+                          GetAttributeForRole (VisualRole.Normal).Style),
+            HotNormal = new (
+                             GetAttributeForRole (VisualRole.HotNormal).Foreground.GetBrighterColor (),
+                             GetAttributeForRole (VisualRole.HotNormal).Background,
+                             GetAttributeForRole (VisualRole.HotNormal).Style),
+            Focus = new (
+                         GetAttributeForRole (VisualRole.Focus).Foreground.GetBrighterColor (),
+                         GetAttributeForRole (VisualRole.Focus).Background,
+                         GetAttributeForRole (VisualRole.Focus).Style),
+            HotFocus = new (
+                            GetAttributeForRole (VisualRole.HotFocus).Foreground.GetBrighterColor (),
+                            GetAttributeForRole (VisualRole.HotFocus).Background,
+                            GetAttributeForRole (VisualRole.HotFocus).Style)
         };
     }
 
@@ -205,22 +204,11 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-        // Post-conditions
-        _hovering = false;
+        MouseHovering = false;
 
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover))
+        if (HighlightStyle != HighlightStyle.None)
         {
-            HighlightStyle copy = HighlightStyle;
-            var hover = HighlightStyle.None;
-            RaiseHighlight (new (ref copy, ref hover));
-
-            // if (_savedNonHoverColorScheme is { })
-            {
-                _colorScheme = _savedNonHoverColorScheme;
-                _savedNonHoverColorScheme = null;
-                SetNeedsDraw ();
-
-            }
+            SetNeedsDraw ();
         }
     }
 
@@ -576,7 +564,6 @@ public partial class View // Mouse APIs
             // If mouse is still in bounds, generate a click
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
-
                 return RaiseMouseClickEvent (mouseEvent);
             }
 
@@ -641,8 +628,6 @@ public partial class View // Mouse APIs
 
     #region Highlight Handling
 
-    // Used for Pressed highlighting
-    private ColorScheme? _savedHighlightColorScheme;
 
     /// <summary>
     ///     Gets or sets whether the <see cref="View"/> will be highlighted visually by mouse interaction.
@@ -663,13 +648,6 @@ public partial class View // Mouse APIs
         }
 
         Highlight?.Invoke (this, args);
-
-        //if (args.Cancel)
-        //{
-        //    return true;
-        //}
-
-        //args.Cancel = InvokeCommandsBoundToMouse (args) == true;
 
         return args.Cancel;
     }
@@ -728,155 +706,10 @@ public partial class View // Mouse APIs
 
         // For 3D Pressed Style - Note we don't care about canceling the event here
         Margin?.RaiseHighlight (args);
-        args.Cancel = false; // Just in case
-
-        if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
-        {
-            if (_savedHighlightColorScheme is null && _colorScheme is { })
-            {
-                _savedHighlightColorScheme = _colorScheme;
-
-                if (ColorScheme is null)
-                {
-                    return false;
-                }
-
-                if (CanFocus)
-                {
-                    var cs = new ColorScheme (ColorScheme)
-                    {
-                        // Highlight the foreground focus color
-                        Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ())
-                    };
-                    _colorScheme = cs;
-                }
-                else
-                {
-                    var cs = new ColorScheme (ColorScheme)
-                    {
-                        // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
-                    };
-                    _colorScheme = cs;
-                }
-            }
-
-            // Return false since we don't want to eat the event
-            return false;
-        }
-
-        if (args.NewValue == HighlightStyle.None)
-        {
-            // Unhighlight
-            _colorScheme = _savedHighlightColorScheme;
-            _savedHighlightColorScheme = null;
-            SetNeedsDraw ();
-        }
-
-        return false;
+        return args.Cancel;
     }
 
     #endregion Highlight Handling
-
-    /// <summary>
-    ///     INTERNAL: Gets the Views that are under the mouse at <paramref name="location"/>, including Adornments.
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="ignoreTransparent">If <see langword="true"/> any transparent views will be ignored.</param>
-    /// <returns></returns>
-    internal static List<View?> GetViewsUnderMouse (in Point location, bool ignoreTransparent = false)
-    {
-        List<View?> viewsUnderMouse = new ();
-
-        View? start = Application.Top;
-
-        // PopoverHost - If visible, start with it instead of Top
-        if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover && !ignoreTransparent)
-        {
-            start = visiblePopover;
-
-            // Put Top on stack next
-            viewsUnderMouse.Add (Application.Top);
-        }
-
-        Point currentLocation = location;
-
-        while (start is { Visible: true } && start.Contains (currentLocation))
-        {
-            if (!start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-            {
-                viewsUnderMouse.Add (start);
-            }
-
-            Adornment? found = null;
-
-            if (start is not Adornment)
-            {
-                if (start.Margin is { } && start.Margin.Contains (currentLocation))
-                {
-                    found = start.Margin;
-                }
-                else if (start.Border is { } && start.Border.Contains (currentLocation))
-                {
-                    found = start.Border;
-                }
-                else if (start.Padding is { } && start.Padding.Contains (currentLocation))
-                {
-                    found = start.Padding;
-                }
-            }
-
-            Point viewportOffset = start.GetViewportOffsetFromFrame ();
-
-            if (found is { })
-            {
-                start = found;
-                viewsUnderMouse.Add (start);
-                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
-            }
-
-            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
-
-            View? subview = null;
-
-            for (int i = start.InternalSubViews.Count - 1; i >= 0; i--)
-            {
-                if (start.InternalSubViews [i].Visible
-                    && start.InternalSubViews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
-                    && (!ignoreTransparent || !start.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
-                {
-                    subview = start.InternalSubViews [i];
-                    currentLocation.X = startOffsetX + start.Viewport.X;
-                    currentLocation.Y = startOffsetY + start.Viewport.Y;
-
-                    // start is the deepest subview under the mouse; stop searching the subviews
-                    break;
-                }
-            }
-
-            if (subview is null)
-            {
-                // In the case start is transparent, recursively add all it's subviews etc...
-                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
-                {
-                    viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
-
-                    // De-dupe viewsUnderMouse
-                    HashSet<View?> hashSet = [.. viewsUnderMouse];
-                    viewsUnderMouse = [.. hashSet];
-                }
-
-                // No subview was found that's under the mouse, so we're done
-                return viewsUnderMouse;
-            }
-
-            // We found a subview of start that's under the mouse, continue...
-            start = subview;
-        }
-
-        return viewsUnderMouse;
-    }
 
     private void DisposeMouse () { }
 }

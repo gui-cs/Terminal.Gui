@@ -36,7 +36,7 @@ public class Adornments : Scenario
             Title = "The _Window",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable,
 
-            Width = Dim.Fill (Dim.Func (() => editor.Frame.Width )),
+            Width = Dim.Fill (Dim.Func (() => editor.Frame.Width)),
             Height = Dim.Fill ()
         };
         app.Add (window);
@@ -47,13 +47,15 @@ public class Adornments : Scenario
 
         color.ColorChanged += (s, e) =>
                               {
-                                  color.SuperView.ColorScheme = new (color.SuperView.ColorScheme)
-                                  {
-                                      Normal = new (
-                                                    color.SuperView.ColorScheme.Normal.Foreground,
-                                                    e.CurrentValue
-                                                   )
-                                  };
+                                  color.SuperView!.SetScheme (
+                                                             new (color.SuperView.GetScheme ())
+                                                             {
+                                                                 Normal = new (
+                                                                               color.SuperView.GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                               e.CurrentValue,
+                                                                               color.SuperView.GetAttributeForRole (VisualRole.Normal).Style
+                                                                              )
+                                                             });
                               };
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
@@ -80,7 +82,7 @@ public class Adornments : Scenario
             Width = 40,
             Height = Dim.Percent (20),
             Text = "Label\nY=AnchorEnd(),Height=Dim.Percent(10)",
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            SchemeName = "Dialog"
         };
 
         window.Margin.Data = "Margin";
@@ -94,7 +96,7 @@ public class Adornments : Scenario
         window.Padding.Data = "Padding";
         window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new (3);
-        window.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+        window.Padding.SchemeName = "Error";
         window.Padding.CanFocus = true;
 
         var longLabel = new Label

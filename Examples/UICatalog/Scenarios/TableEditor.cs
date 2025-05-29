@@ -318,7 +318,7 @@ public class TableEditor : Scenario
         new (0xE0000, 0xE007F, "Tags")
     };
 
-    private ColorScheme _alternatingColorScheme;
+    private Scheme _alternatingScheme;
     private DataTable _currentTable;
     private MenuItem _miAlternatingColors;
     private MenuItem _miAlwaysShowHeaders;
@@ -336,8 +336,8 @@ public class TableEditor : Scenario
     private MenuItem _miShowHeaders;
     private MenuItem _miShowHorizontalScrollIndicators;
     private MenuItem _miSmoothScrolling;
-    private ColorScheme _redColorScheme;
-    private ColorScheme _redColorSchemeAlt;
+    private Scheme _redScheme;
+    private Scheme _redSchemeAlt;
     private TableView _tableView;
 
     /// <summary>
@@ -664,27 +664,27 @@ public class TableEditor : Scenario
 
         //SetupScrollBar ();
 
-        _redColorScheme = new ()
+        _redScheme = new ()
         {
-            Disabled = appWindow.ColorScheme.Disabled,
-            HotFocus = appWindow.ColorScheme.HotFocus,
-            Focus = appWindow.ColorScheme.Focus,
-            Normal = new (Color.Red, appWindow.ColorScheme.Normal.Background)
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole(VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
+            Normal = new (Color.Red, appWindow.GetAttributeForRole(VisualRole.Normal).Background)
         };
 
-        _alternatingColorScheme = new ()
+        _alternatingScheme = new ()
         {
-            Disabled = appWindow.ColorScheme.Disabled,
-            HotFocus = appWindow.ColorScheme.HotFocus,
-            Focus = appWindow.ColorScheme.Focus,
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole(VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
             Normal = new (Color.White, Color.BrightBlue)
         };
 
-        _redColorSchemeAlt = new ()
+        _redSchemeAlt = new ()
         {
-            Disabled = appWindow.ColorScheme.Disabled,
-            HotFocus = appWindow.ColorScheme.HotFocus,
-            Focus = appWindow.ColorScheme.Focus,
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole(VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
             Normal = new (Color.Red, Color.BrightBlue)
         };
 
@@ -1099,8 +1099,8 @@ public class TableEditor : Scenario
                                    d <= 0.0000001
                                        ? a.RowIndex % 2 == 0
                                          && _miAlternatingColors.Checked == true
-                                             ? _redColorSchemeAlt
-                                             : _redColorScheme
+                                             ? _redSchemeAlt
+                                             : _redScheme
                                        :
 
                                        // use normal scheme for positive values
@@ -1334,7 +1334,7 @@ public class TableEditor : Scenario
 
         if (_miAlternatingColors.Checked == true)
         {
-            _tableView.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingColorScheme : null; };
+            _tableView.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
         }
         else
         {

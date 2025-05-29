@@ -3,15 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui;
 
-internal class AutocompleteFilepathContext : AutocompleteContext
+internal class AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
+    : AutocompleteContext (Cell.ToCellList (currentLine), cursorPosition)
 {
-    public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
-        : base (Cell.ToCellList (currentLine), cursorPosition)
-    {
-        State = state;
-    }
-
-    public FileDialogState State { get; set; }
+    public FileDialogState State { get; set; } = state;
 }
 
 internal class FilepathSuggestionGenerator : ISuggestionGenerator

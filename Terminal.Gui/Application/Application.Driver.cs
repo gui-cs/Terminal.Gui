@@ -14,7 +14,7 @@ public static partial class Application // Driver abstractions
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
     ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors { get; set; }
 
     // BUGBUG: ForceDriver should be nullable.
@@ -26,7 +26,7 @@ public static partial class Application // Driver abstractions
     ///     Note, <see cref="Application.Init(IConsoleDriver, string)"/> will override this configuration setting if called
     ///     with either `driver` or `driverName` specified.
     /// </remarks>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver { get; set; } = string.Empty;
 
     /// <summary>

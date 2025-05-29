@@ -74,11 +74,11 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     }
 
     /// <inheritdoc/>
-    public override string ToString () { return $"[{Rune}, {Attribute}]"; }
+    public override string ToString () { return $"['{Rune}':{Attribute}]"; }
 
     /// <summary>Converts the string into a <see cref="List{Cell}"/>.</summary>
     /// <param name="str">The string to convert.</param>
-    /// <param name="attribute">The <see cref="Gui.ColorScheme"/> to use.</param>
+    /// <param name="attribute">The <see cref="Gui.Scheme"/> to use.</param>
     /// <returns></returns>
     public static List<Cell> ToCellList (string str, Attribute? attribute = null)
     {
@@ -96,7 +96,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     ///     Splits a string into a List that will contain a <see cref="List{Cell}"/> for each line.
     /// </summary>
     /// <param name="content">The string content.</param>
-    /// <param name="attribute">The color scheme.</param>
+    /// <param name="attribute">The scheme.</param>
     /// <returns>A <see cref="List{Cell}"/> for each line.</returns>
     public static List<List<Cell>> StringToLinesOfCells (string content, Attribute? attribute = null)
     {

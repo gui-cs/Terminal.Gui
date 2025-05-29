@@ -291,7 +291,7 @@ public class Snake : Scenario
         {
             _appleRune = Glyphs.Apple;
 
-            if (!Driver.IsRuneSupported (_appleRune))
+            if (!Application.Driver!.IsRuneSupported (_appleRune))
             {
                 _appleRune = Glyphs.AppleBMP;
             }
@@ -299,14 +299,7 @@ public class Snake : Scenario
             State = state;
             CanFocus = true;
 
-            base.ColorScheme = new ()
-            {
-                Normal = white,
-                Focus = white,
-                HotNormal = white,
-                HotFocus = white,
-                Disabled = white
-            };
+            base.SetScheme (new (white));
 
             KeyBindings.Add (Key.CursorLeft, Command.Left);
             KeyBindings.Add (Key.CursorRight, Command.Right);

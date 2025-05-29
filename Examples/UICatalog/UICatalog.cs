@@ -14,7 +14,6 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Terminal.Gui;
-using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -77,6 +76,13 @@ public class UICatalog
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
 
+        // Configuration Management
+        Option<bool> disableConfigManagement = new (
+                                                    "--disable-cm",
+                                                    "Indicates Configuration Management should not be enabled. Only `ConfigLocations.HardCoded` settings will be loaded.");
+        disableConfigManagement.AddAlias ("-dcm");
+        disableConfigManagement.AddAlias ("--dcm");
+
         Option<bool> benchmarkFlag = new ("--benchmark", "Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked.");
         benchmarkFlag.AddAlias ("-b");
         benchmarkFlag.AddAlias ("--b");
@@ -109,13 +115,13 @@ public class UICatalog
                                                                   getDefaultValue: () => "none"
                                                                  ).FromAmong (
                                                                               UICatalogTop.CachedScenarios.Select (s => s.GetName ())
-                                                                                               .Append ("none")
-                                                                                               .ToArray ()
+                                                                                          .Append ("none")
+                                                                                          .ToArray ()
                                                                              );
 
         var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
         {
-            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption
+            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption, disableConfigManagement
         };
 
         rootCommand.SetHandler (
@@ -125,6 +131,7 @@ public class UICatalog
                                     {
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
                                         Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
+                                        DontEnableConfigurationManagement = context.ParseResult.GetValueForOption (disableConfigManagement),
                                         Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
                                         BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
@@ -217,16 +224,7 @@ public class UICatalog
 
         Application.Init (driverName: _forceDriver);
 
-        if (string.IsNullOrWhiteSpace (UICatalogTop.CachedTheme))
-        {
-            UICatalogTop.CachedTheme = Themes?.Theme;
-        }
-        else
-        {
-            Themes!.Theme = UICatalogTop.CachedTheme;
-        }
-
-        UICatalogTop top = Application.Run<UICatalogTop> ();
+        var top = Application.Run<UICatalogTop> ();
         top.Dispose ();
         Application.Shutdown ();
         VerifyObjectsWereDisposed ();
@@ -308,14 +306,13 @@ public class UICatalog
             return;
         }
 
-        Load ();
-        Apply ();
+        Logging.Debug ($"{e.FullPath} {e.ChangeType} - Loading and Applying");
+        ConfigurationManager.Load (ConfigLocations.All);
+        ConfigurationManager.Apply ();
     }
 
     private static void UICatalogMain (UICatalogCommandLineOptions options)
     {
-        StartConfigFileWatcher ();
-
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;
@@ -324,12 +321,17 @@ public class UICatalog
         // run it and exit when done.
         if (options.Scenario != "none")
         {
+            if (!Options.DontEnableConfigurationManagement)
+            {
+                ConfigurationManager.Enable (ConfigLocations.All);
+            }
+
             int item = UICatalogTop.CachedScenarios!.IndexOf (
-                                                                   UICatalogTop.CachedScenarios!.FirstOrDefault (
-                                                                        s =>
-                                                                            s.GetName ()
-                                                                             .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
-                                                                       )!);
+                                                              UICatalogTop.CachedScenarios!.FirstOrDefault (
+                                                                   s =>
+                                                                       s.GetName ()
+                                                                        .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
+                                                                  )!);
             UICatalogTop.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogTop.CachedScenarios [item].GetType ())!;
 
             BenchmarkResults? results = RunScenario (UICatalogTop.CachedSelectedScenario, options.Benchmark);
@@ -358,14 +360,18 @@ public class UICatalog
             return;
         }
 
-
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
 #endif
 
+        if (!Options.DontEnableConfigurationManagement)
+        {
+            ConfigurationManager.Enable (ConfigLocations.All);
+            StartConfigFileWatcher ();
+        }
+
         while (RunUICatalogTopLevel () is { } scenario)
         {
-
 #if DEBUG_IDISPOSABLE
             VerifyObjectsWereDisposed ();
 

@@ -34,14 +34,14 @@ public class TextEffectsScenario : Scenario
                               }
                           };
 
-        w.ColorScheme = new ()
+        w.SetScheme (new ()
         {
             Normal = new (ColorName16.White, ColorName16.Black),
             Focus = new (ColorName16.Black, ColorName16.White),
             HotNormal = new (ColorName16.White, ColorName16.Black),
             HotFocus = new (ColorName16.White, ColorName16.Black),
             Disabled = new (ColorName16.Gray, ColorName16.Black)
-        };
+        });
 
         var gradientsView = new GradientsView
         {
@@ -159,7 +159,7 @@ internal class GradientsView : View
 
         int width = text.Length;
         int x = xOffset + (GRADIENT_WIDTH - width) / 2; // Center the text within the gradient area width
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Move (x, yOffset + 1);
         AddStr (text);
     }

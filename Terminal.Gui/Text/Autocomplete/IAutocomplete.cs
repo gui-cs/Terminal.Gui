@@ -18,7 +18,7 @@ public interface IAutocomplete
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
     ///     will cause an error
     /// </summary>
-    ColorScheme ColorScheme { get; set; }
+    Scheme Scheme { get; set; }
 
     /// <summary>The context used by the autocomplete menu.</summary>
     AutocompleteContext Context { get; set; }

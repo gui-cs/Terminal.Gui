@@ -1858,6 +1858,8 @@ public static class EscSeqUtils
         builder.Append ($"{CSI}48;2;{r};{g};{b}m");
     }
 
+
+
     #endregion
 
     #region Text Styles

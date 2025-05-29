@@ -10,7 +10,7 @@ public class TableStyle
     public bool AlwaysShowHeaders { get; set; } = false;
 
     /// <summary>
-    ///     Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering vertical
+    ///     Gets or sets a flag indicating whether to force <see cref="Scheme.Normal"/> use when rendering vertical
     ///     cell lines (even when <see cref="TableView.FullRowSelect"/> is on).
     /// </summary>
     public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;

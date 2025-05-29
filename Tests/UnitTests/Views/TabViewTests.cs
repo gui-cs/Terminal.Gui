@@ -1492,7 +1492,7 @@ public class TabViewTests (ITestOutputHelper output)
         var tv = new TabView () { Id = "tv " };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.ColorScheme = new ();
+        //tv.Scheme = new ();
 
         tv.AddTab (
                    tab1 = new () { Id = "tab1", DisplayText = "Tab1", View = new TextField { Id = "tab1.TextField", Width = 2, Text = "hi" } },

@@ -13,7 +13,7 @@ public class LineCanvas : IDisposable
         // TODO: Refactor ConfigurationManager to not use an event handler for this.
         // Instead, have it call a method on any class appropriately attributed
         // to update the cached values. See Issue #2871
-        Applied += ConfigurationManager_Applied;
+        ConfigurationManager.Applied += ConfigurationManager_Applied;
     }
 
     private readonly List<StraightLine> _lines = [];
@@ -963,7 +963,7 @@ public class LineCanvas : IDisposable
     /// <inheritdoc/>
     public void Dispose ()
     {
-        Applied -= ConfigurationManager_Applied;
+        ConfigurationManager.Applied -= ConfigurationManager_Applied;
         GC.SuppressFinalize (this);
     }
 }

@@ -34,7 +34,7 @@ public class OutputBuffer : IOutputBuffer
             if (Application.Driver is { })
             {
                 // TODO: Update this when attributes can include TextStyle in the constructor
-                _currentAttribute = new (value.Foreground, value.Background) { TextStyle = value.TextStyle };
+                _currentAttribute = new (value.Foreground, value.Background, value.Style);
 
                 return;
             }

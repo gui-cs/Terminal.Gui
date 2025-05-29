@@ -156,7 +156,7 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation:ConfigLocations.Default)]
+    [AutoInitShutdown]
     public void TestTreeTableSource_CombinedWithCheckboxes ()
     {
         Toplevel top = new ();
@@ -222,7 +222,7 @@ public class TreeTableSourceTests : IDisposable
 │ │Name             │Description       │
 ├─┼─────────────────┼──────────────────┤
 │☐│├-Lost Highway   │Exciting night roa│
-│☑││ ├─Ford Trans-Am│Talking thunderbir│
+│☒││ ├─Ford Trans-Am│Talking thunderbir│
 │☐││ └─DeLorean     │Time travelling ca│
 │☐│└+Route 66       │Great race course │
 ";
@@ -240,8 +240,7 @@ public class TreeTableSourceTests : IDisposable
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
     {
         var tableView = new TableView ();
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
 
         tableView.Style.ShowHorizontalHeaderUnderline = true;

@@ -53,7 +53,7 @@ public class ApplicationMouseEnterLeaveTests
             ScreenPosition = mousePosition
         };
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         try
         {
@@ -82,8 +82,8 @@ public class ApplicationMouseEnterLeaveTests
         List<View> currentViewsUnderMouse = new ();
         var mouseEvent = new MouseEventArgs ();
 
-        Application._cachedViewsUnderMouse.Clear ();
-        Application._cachedViewsUnderMouse.Add (view);
+        Application.CachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Add (view);
 
         try
         {
@@ -117,7 +117,7 @@ public class ApplicationMouseEnterLeaveTests
         Application.Top.Add (view1);
         Application.Top.Add (view2);
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         try
         {
@@ -126,7 +126,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (0, view1.OnMouseEnterCalled);
@@ -139,7 +139,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -152,7 +152,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -165,7 +165,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -178,7 +178,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -205,7 +205,7 @@ public class ApplicationMouseEnterLeaveTests
         List<View> currentViewsUnderMouse = new ();
         var mouseEvent = new MouseEventArgs ();
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         try
         {
@@ -244,7 +244,7 @@ public class ApplicationMouseEnterLeaveTests
         Application.Top.Add (view1);
         Application.Top.Add (view2);
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         try
         {
@@ -253,7 +253,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (0, view1.OnMouseEnterCalled);
@@ -266,7 +266,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -279,7 +279,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -292,7 +292,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -305,7 +305,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -318,7 +318,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -360,7 +360,7 @@ public class ApplicationMouseEnterLeaveTests
         view1.Add (subView);
         Application.Top.Add (view1);
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         try
         {
@@ -372,7 +372,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (0, view1.OnMouseEnterCalled);
@@ -385,7 +385,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -398,7 +398,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -411,7 +411,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (1, view1.OnMouseEnterCalled);
@@ -424,7 +424,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (2, view1.OnMouseEnterCalled);
@@ -437,7 +437,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (2, view1.OnMouseEnterCalled);
@@ -450,7 +450,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (2, view1.OnMouseEnterCalled);
@@ -463,7 +463,7 @@ public class ApplicationMouseEnterLeaveTests
 
             Application.RaiseMouseEnterLeaveEvents (
                                                     mousePosition,
-                                                    View.GetViewsUnderMouse (mousePosition));
+                                                    View.GetViewsUnderLocation (mousePosition, ViewportSettings.TransparentMouse));
 
             // Assert
             Assert.Equal (3, view1.OnMouseEnterCalled);

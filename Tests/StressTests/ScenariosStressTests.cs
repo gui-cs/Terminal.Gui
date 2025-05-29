@@ -34,9 +34,7 @@ public class ScenariosStressTests : TestsAllViews
         Assert.Null (_timeoutLock);
         _timeoutLock = new ();
 
-        // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Disable();
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -88,10 +86,6 @@ public class ScenariosStressTests : TestsAllViews
         _output.WriteLine ($"  called View.Draw {drawCompleteCount} times.");
         _output.WriteLine ($"  added {addedCount} views.");
         _output.WriteLine ($"  called View.LayoutComplete {laidOutCount} times.");
-
-        // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
 
         return;
 

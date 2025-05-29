@@ -177,7 +177,7 @@ public class TreeViewFileSystem : Scenario
         };
         top.Add (menu);
 
-        _treeViewFiles = new() { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
+        _treeViewFiles = new () { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
         _treeViewFiles.VerticalScrollBar.AutoShow = false;
@@ -247,15 +247,15 @@ public class TreeViewFileSystem : Scenario
                                          {
                                              if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden))
                                              {
-                                                 return new()
+                                                 return new ()
                                                  {
                                                      Focus = new (
                                                                   Color.BrightRed,
-                                                                  _treeViewFiles.ColorScheme.Focus.Background
+                                                                  _treeViewFiles.GetAttributeForRole (VisualRole.Focus).Background
                                                                  ),
                                                      Normal = new (
                                                                    Color.BrightYellow,
-                                                                   _treeViewFiles.ColorScheme.Normal.Background
+                                                                   _treeViewFiles.GetAttributeForRole (VisualRole.Normal).Background
                                                                   )
                                                  };
 
@@ -264,15 +264,15 @@ public class TreeViewFileSystem : Scenario
 
                                              if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden))
                                              {
-                                                 return new()
+                                                 return new ()
                                                  {
                                                      Focus = new (
                                                                   Color.BrightRed,
-                                                                  _treeViewFiles.ColorScheme.Focus.Background
+                                                                  _treeViewFiles.GetAttributeForRole (VisualRole.Focus).Background
                                                                  ),
                                                      Normal = new (
                                                                    Color.BrightYellow,
-                                                                   _treeViewFiles.ColorScheme.Normal.Background
+                                                                   _treeViewFiles.GetAttributeForRole (VisualRole.Normal).Background
                                                                   )
                                                  };
 
@@ -447,7 +447,8 @@ public class TreeViewFileSystem : Scenario
 
                     cell.Attribute = new Attribute (
                                                     Color.BrightYellow,
-                                                    cell.Attribute!.Value.Background
+                                                    cell.Attribute!.Value.Background,
+                                                    cell.Attribute!.Value.Style
                                                    );
                 }
             }

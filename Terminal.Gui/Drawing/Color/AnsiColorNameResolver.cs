@@ -10,12 +10,12 @@ namespace Terminal.Gui;
 /// </summary>
 public class AnsiColorNameResolver : IColorNameResolver
 {
-    private static readonly ImmutableArray<string> AnsiColorNames = ImmutableArray.Create(Enum.GetNames<ColorName16>());
+    private static readonly ImmutableArray<string> _ansiColorNames = ImmutableArray.Create (Enum.GetNames<ColorName16> ());
 
     /// <inheritdoc/>
     public IEnumerable<string> GetColorNames ()
     {
-        return AnsiColorNames;
+        return _ansiColorNames;
     }
 
     /// <inheritdoc/>

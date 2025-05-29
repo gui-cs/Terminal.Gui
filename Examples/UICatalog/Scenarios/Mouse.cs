@@ -205,7 +205,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = 50,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
@@ -236,7 +236,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);
@@ -278,7 +278,7 @@ public class Mouse : Scenario
             CanFocus = true;
             Id = "mouseEventDemoView";
 
-            Padding.Thickness = new Thickness (1, 1, 1, 1);
+            Padding!.Thickness = new Thickness (1, 1, 1, 1);
 
             Initialized += OnInitialized;
 
@@ -287,22 +287,22 @@ public class Mouse : Scenario
                 TextAlignment = Alignment.Center;
                 VerticalTextAlignment = Alignment.Center;
 
-                Padding.ColorScheme = new ColorScheme (new Attribute (Color.Black));
+                Padding!.SetScheme (new Scheme (new Attribute (Color.Black)));
 
                 Padding.MouseEnter += PaddingOnMouseEnter;
                 Padding.MouseLeave += PaddingOnMouseLeave;
 
                 void PaddingOnMouseEnter (object o, CancelEventArgs e)
                 {
-                    Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+                    Padding.SchemeName = "Error";
                 }
 
                 void PaddingOnMouseLeave (object o, EventArgs e)
                 {
-                    Padding.ColorScheme = Colors.ColorSchemes ["Dialog"];
+                    Padding.SchemeName = "Dialog";
                 }
 
-                Border.Thickness = new Thickness (1);
+                Border!.Thickness = new Thickness (1);
                 Border.LineStyle = LineStyle.Rounded;
             }
 

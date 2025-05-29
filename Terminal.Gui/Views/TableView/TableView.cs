@@ -6,12 +6,12 @@ namespace Terminal.Gui;
 /// <summary>Delegate for providing color to <see cref="TableView"/> cells based on the value being rendered</summary>
 /// <param name="args">Contains information about the cell for which color is needed</param>
 /// <returns></returns>
-public delegate ColorScheme CellColorGetterDelegate (CellColorGetterArgs args);
+public delegate Scheme CellColorGetterDelegate (CellColorGetterArgs args);
 
 /// <summary>Delegate for providing color for a whole row of a <see cref="TableView"/></summary>
 /// <param name="args"></param>
 /// <returns></returns>
-public delegate ColorScheme RowColorGetterDelegate (RowColorGetterArgs args);
+public delegate Scheme RowColorGetterDelegate (RowColorGetterArgs args);
 
 /// <summary>
 ///     View for tabular data based on a <see cref="ITableSource"/>.
@@ -239,11 +239,11 @@ public class TableView : View, IDesignable
                     }
                    );
 
-        AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)));
+        AddCommand (Command.Accept, () => OnCellActivated (new (Table, SelectedColumn, SelectedRow)));
 
         AddCommand (
                     Command.Select, // was Command.ToggleChecked
-                    (ctx) =>
+                    ctx =>
                     {
                         if (ToggleCurrentCellSelection () is true)
                         {
@@ -389,13 +389,13 @@ public class TableView : View, IDesignable
             if (oldValue != selectedColumn)
             {
                 OnSelectedCellChanged (
-                                       new SelectedCellChangedEventArgs (
-                                                                         Table,
-                                                                         oldValue,
-                                                                         SelectedColumn,
-                                                                         SelectedRow,
-                                                                         SelectedRow
-                                                                        )
+                                       new (
+                                            Table,
+                                            oldValue,
+                                            SelectedColumn,
+                                            SelectedRow,
+                                            SelectedRow
+                                           )
                                       );
             }
         }
@@ -414,13 +414,13 @@ public class TableView : View, IDesignable
             if (oldValue != selectedRow)
             {
                 OnSelectedCellChanged (
-                                       new SelectedCellChangedEventArgs (
-                                                                         Table,
-                                                                         SelectedColumn,
-                                                                         SelectedColumn,
-                                                                         oldValue,
-                                                                         selectedRow
-                                                                        )
+                                       new (
+                                            Table,
+                                            SelectedColumn,
+                                            SelectedColumn,
+                                            oldValue,
+                                            selectedRow
+                                           )
                                       );
             }
         }
@@ -505,16 +505,16 @@ public class TableView : View, IDesignable
     }
 
     /// <summary>
-    /// Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
-    /// changed as a result of moving the selection. Used by key handling logic to determine whether e.g.
-    /// the cursor right resulted in a change or should be forwarded on to toggle logic handling.
+    ///     Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
+    ///     changed as a result of moving the selection. Used by key handling logic to determine whether e.g.
+    ///     the cursor right resulted in a change or should be forwarded on to toggle logic handling.
     /// </summary>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
     /// <returns></returns>
     private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY)
     {
-        var oldSelection = GetSelectionSnapshot ();
+        TableViewSelectionSnapshot oldSelection = GetSelectionSnapshot ();
         SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, false);
         Update ();
 
@@ -531,12 +531,13 @@ public class TableView : View, IDesignable
 
     private bool SelectionIsSame (TableViewSelectionSnapshot oldSelection)
     {
-        var newSelection = GetSelectionSnapshot ();
+        TableViewSelectionSnapshot newSelection = GetSelectionSnapshot ();
 
         return oldSelection.SelectedColumn == newSelection.SelectedColumn
                && oldSelection.SelectedRow == newSelection.SelectedRow
                && oldSelection.multiSelection.SequenceEqual (newSelection.multiSelection);
     }
+
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] multiSelection);
 
     /// <summary>
@@ -715,18 +716,18 @@ public class TableView : View, IDesignable
             }
 
             // ensure region's origin exists
-            region.Origin = new Point (
-                                       Math.Max (Math.Min (region.Origin.X, Table.Columns - 1), 0),
-                                       Math.Max (Math.Min (region.Origin.Y, Table.Rows - 1), 0)
-                                      );
+            region.Origin = new (
+                                 Math.Max (Math.Min (region.Origin.X, Table.Columns - 1), 0),
+                                 Math.Max (Math.Min (region.Origin.Y, Table.Rows - 1), 0)
+                                );
 
             // ensure regions do not go over edge of table bounds
             region.Rectangle = Rectangle.FromLTRB (
-                                         region.Rectangle.Left,
-                                         region.Rectangle.Top,
-                                         Math.Max (Math.Min (region.Rectangle.Right, Table.Columns), 0),
-                                         Math.Max (Math.Min (region.Rectangle.Bottom, Table.Rows), 0)
-                                        );
+                                                   region.Rectangle.Left,
+                                                   region.Rectangle.Top,
+                                                   Math.Max (Math.Min (region.Rectangle.Right, Table.Columns), 0),
+                                                   Math.Max (Math.Min (region.Rectangle.Bottom, Table.Rows), 0)
+                                                  );
 
             MultiSelectedRegions.Push (region);
         }
@@ -764,7 +765,7 @@ public class TableView : View, IDesignable
                 {
                     if (IsSelected (x, y))
                     {
-                        toReturn.Add (new Point (x, y));
+                        toReturn.Add (new (x, y));
                     }
                 }
             }
@@ -778,13 +779,13 @@ public class TableView : View, IDesignable
             // all cells in active row are selected
             for (var x = 0; x < Table.Columns; x++)
             {
-                toReturn.Add (new Point (x, SelectedRow));
+                toReturn.Add (new (x, SelectedRow));
             }
         }
         else
         {
             // Not full row select and no multi selections
-            toReturn.Add (new Point (SelectedColumn, SelectedRow));
+            toReturn.Add (new (SelectedColumn, SelectedRow));
         }
 
         return toReturn;
@@ -844,6 +845,7 @@ public class TableView : View, IDesignable
             case MouseFlags.WheeledDown:
                 RowOffset++;
                 EnsureValidScrollOffsets ();
+
                 //SetNeedsDraw ();
 
                 return true;
@@ -851,6 +853,7 @@ public class TableView : View, IDesignable
             case MouseFlags.WheeledUp:
                 RowOffset--;
                 EnsureValidScrollOffsets ();
+
                 //SetNeedsDraw ();
 
                 return true;
@@ -858,6 +861,7 @@ public class TableView : View, IDesignable
             case MouseFlags.WheeledRight:
                 ColumnOffset++;
                 EnsureValidScrollOffsets ();
+
                 //SetNeedsDraw ();
 
                 return true;
@@ -865,6 +869,7 @@ public class TableView : View, IDesignable
             case MouseFlags.WheeledLeft:
                 ColumnOffset--;
                 EnsureValidScrollOffsets ();
+
                 //SetNeedsDraw ();
 
                 return true;
@@ -917,7 +922,7 @@ public class TableView : View, IDesignable
 
             if (hit is { })
             {
-                return OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
+                return OnCellActivated (new (Table, hit.Value.X, hit.Value.Y));
             }
         }
 
@@ -935,10 +940,10 @@ public class TableView : View, IDesignable
         // What columns to render at what X offset in viewport
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
 
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
-        Driver?.AddStr (new string (' ', Viewport.Width));
+        Driver?.AddStr (new (' ', Viewport.Width));
 
         var line = 0;
 
@@ -1066,7 +1071,7 @@ public class TableView : View, IDesignable
         {
             Move (screenPoint.Value.X, screenPoint.Value.Y);
 
-            return null;//screenPoint;
+            return null; //screenPoint;
         }
 
         return null;
@@ -1191,10 +1196,10 @@ public class TableView : View, IDesignable
 
         // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right behaves properly
         MultiSelectedRegions.Push (
-                                   new TableSelection (
-                                                       new (SelectedColumn, SelectedRow),
-                                                       new (0, 0, Table.Columns, table.Rows)
-                                                      )
+                                   new (
+                                        new (SelectedColumn, SelectedRow),
+                                        new (0, 0, Table.Columns, table.Rows)
+                                       )
                                   );
         Update ();
     }
@@ -1272,6 +1277,7 @@ public class TableView : View, IDesignable
     protected virtual bool OnCellActivated (CellActivatedEventArgs args)
     {
         CellActivated?.Invoke (this, args);
+
         return CellActivated is { };
     }
 
@@ -1284,15 +1290,16 @@ public class TableView : View, IDesignable
 
     /// <summary>
     ///     Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to with
-    ///     <see cref="IConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and you
+    ///     <see cref="IConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and
+    ///     you
     ///     must render the full <paramref name="render"/> or the view will not look right.  For simpler provision of color use
     ///     <see cref="ColumnStyle.ColorGetter"/> For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>
     /// </summary>
-    /// <param name="cellColor"></param>
+    /// <param name="cellAttribute"></param>
     /// <param name="render"></param>
     /// <param name="isPrimaryCell"></param>
-    protected virtual void RenderCell (Attribute cellColor, string render, bool isPrimaryCell)
+    protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell)
     {
         // If the cell is the selected col/row then draw the first rune in inverted colors
         // this allows the user to track which cell is the active one during a multi cell
@@ -1302,19 +1309,19 @@ public class TableView : View, IDesignable
             if (render.Length > 0)
             {
                 // invert the color of the current cell for the first character
-                SetAttribute (new Attribute (cellColor.Background, cellColor.Foreground));
+                SetAttribute (new (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
                 Driver?.AddRune ((Rune)render [0]);
 
                 if (render.Length > 1)
                 {
-                    SetAttribute (cellColor);
+                    SetAttribute (cellAttribute);
                     Driver?.AddStr (render.Substring (1));
                 }
             }
         }
         else
         {
-            SetAttribute (cellColor);
+            SetAttribute (cellAttribute);
             Driver?.AddStr (render);
         }
     }
@@ -1509,7 +1516,7 @@ public class TableView : View, IDesignable
             bool isVeryLast = lastColumn == col;
 
             // there is space
-            toReturn.Add (new ColumnToRender (col, startingIdxForCurrentHeader, colWidth, isVeryLast));
+            toReturn.Add (new (col, startingIdxForCurrentHeader, colWidth, isVeryLast));
             first = false;
         }
 
@@ -1531,9 +1538,10 @@ public class TableView : View, IDesignable
         {
             return;
         }
+
         Move (0, row);
-        SetAttribute (GetNormalColor ());
-        Driver.AddStr (new string (' ', width));
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
+        Driver.AddStr (new (' ', width));
     }
 
     private void ClearMultiSelectedRegions (bool keepToggledSelections)
@@ -1577,7 +1585,7 @@ public class TableView : View, IDesignable
         int right = Math.Max (Math.Max (pt1X, pt2X), 0);
 
         // Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
-        return new TableSelection (new (pt1X, pt1Y), new (left, top, right - left + 1, bot - top + 1))
+        return new (new (pt1X, pt1Y), new (left, top, right - left + 1, bot - top + 1))
         {
             IsToggled = toggle
         };
@@ -1906,30 +1914,27 @@ public class TableView : View, IDesignable
     {
         bool focused = HasFocus;
 
-        ColorScheme rowScheme = Style.RowColorGetter?.Invoke (
-                                                              new RowColorGetterArgs (Table, rowToRender)
-                                                             )
-                                ?? ColorScheme;
+        Scheme rowScheme = Style.RowColorGetter?.Invoke (
+                                                         new (Table, rowToRender)
+                                                        )
+                           ?? GetScheme ();
 
         //start by clearing the entire line
         Move (0, row);
 
-        Attribute? color;
+        Attribute? attribute;
 
         if (FullRowSelect && IsSelected (0, rowToRender))
         {
-            color = focused ? rowScheme?.Focus : rowScheme?.HotNormal;
+            attribute = focused ? rowScheme?.Focus : rowScheme?.Active;
         }
         else
         {
-            color = Enabled ? rowScheme?.Normal : rowScheme?.Disabled;
+            attribute = Enabled ? rowScheme?.Normal : rowScheme?.Active;
         }
 
-        if (color is { })
-        {
-            SetAttribute (color.Value);
-        }
-        Driver?.AddStr (new string (' ', Viewport.Width));
+        SetAttribute (attribute.Value);
+        Driver?.AddStr (new (' ', Viewport.Width));
 
         // Render cells for each visible header for the current row
         for (var i = 0; i < columnsToRender.Length; i++)
@@ -1941,7 +1946,7 @@ public class TableView : View, IDesignable
             // move to start of cell (in line with header positions)
             Move (current.X, row);
 
-            // Set color scheme based on whether the current cell is the selected one
+            // Set scheme based on whether the current cell is the selected one
             bool isSelectedCell = IsSelected (current.Column, rowToRender);
 
             object val = Table [rowToRender, current.Column];
@@ -1950,23 +1955,23 @@ public class TableView : View, IDesignable
             string representation = GetRepresentation (val, colStyle);
 
             // to get the colour scheme
-            CellColorGetterDelegate colorSchemeGetter = colStyle?.ColorGetter;
+            CellColorGetterDelegate schemeGetter = colStyle?.ColorGetter;
 
-            ColorScheme scheme;
+            Scheme scheme;
 
-            if (colorSchemeGetter is { })
+            if (schemeGetter is { })
             {
                 // user has a delegate for defining row color per cell, call it
-                scheme = colorSchemeGetter (
-                                            new CellColorGetterArgs (
-                                                                     Table,
-                                                                     rowToRender,
-                                                                     current.Column,
-                                                                     val,
-                                                                     representation,
-                                                                     rowScheme
-                                                                    )
-                                           );
+                scheme = schemeGetter (
+                                       new (
+                                            Table,
+                                            rowToRender,
+                                            current.Column,
+                                            val,
+                                            representation,
+                                            rowScheme
+                                           )
+                                      );
 
                 // if users custom color getter returned null, use the row scheme
                 if (scheme is null)
@@ -1984,7 +1989,7 @@ public class TableView : View, IDesignable
 
             if (isSelectedCell)
             {
-                cellColor = focused ? scheme?.Focus : scheme?.HotNormal;
+                cellColor = focused ? scheme?.Focus : scheme?.Active;
             }
             else
             {
@@ -2001,22 +2006,22 @@ public class TableView : View, IDesignable
                 RenderCell (cellColor.Value, render, isPrimaryCell);
             }
 
-            // Reset color scheme to normal for drawing separators if we drew text with custom scheme
+            // Reset scheme to normal for drawing separators if we drew text with custom scheme
             if (scheme != rowScheme)
             {
                 if (isSelectedCell)
                 {
-                    color = focused ? rowScheme.Focus : rowScheme.HotNormal;
+                    attribute = focused ? rowScheme.Focus : rowScheme.Active;
                 }
                 else
                 {
-                    color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+                    attribute = Enabled ? rowScheme.Normal : rowScheme.Disabled;
                 }
 
-                SetAttribute (color.Value);
+                SetAttribute (attribute.Value);
             }
 
-            // If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
+            // If not in full row select mode always, reset scheme to normal and render the vertical line (or space) at the end of the cell
             if (!FullRowSelect)
             {
                 if (rowScheme is { })
@@ -2172,7 +2177,7 @@ public class TableView : View, IDesignable
     {
         if (string.IsNullOrEmpty (representation))
         {
-            return new string (' ', availableHorizontalSpace);
+            return new (' ', availableHorizontalSpace);
         }
 
         // if value is not wide enough
@@ -2202,10 +2207,10 @@ public class TableView : View, IDesignable
         }
 
         // value is too wide
-        return new string (
-                           representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0)
-                                         .ToArray ()
-                          );
+        return new (
+                    representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0)
+                                  .ToArray ()
+                   );
     }
 
     private bool TryGetNearestVisibleColumn (
@@ -2344,8 +2349,9 @@ public class TableView : View, IDesignable
 
     bool IDesignable.EnableForDesign ()
     {
-        var dt = BuildDemoDataTable (5, 5);
+        DataTable dt = BuildDemoDataTable (5, 5);
         Table = new DataTableSource (dt);
+
         return true;
     }
 

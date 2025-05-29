@@ -8,18 +8,18 @@ namespace Terminal.Gui;
 /// </summary>
 public static class ColorStrings
 {
-    private static readonly AnsiColorNameResolver Ansi = new();
-    private static readonly W3cColorNameResolver W3c = new();
-    private static readonly MultiStandardColorNameResolver Multi = new();
+    private static readonly AnsiColorNameResolver _ansi = new();
+    private static readonly StandardColorsNameResolver _standard = new();
+    private static readonly MultiStandardColorNameResolver _multi = new();
 
     /// <summary>
-    ///     Gets the W3C standard string for <paramref name="color"/>.
+    ///     Gets the W3C+  standard string for <paramref name="color"/>.
     /// </summary>
     /// <param name="color">The color.</param>
     /// <returns><see langword="null"/> if there is no standard color name for the specified color.</returns>
-    public static string? GetW3CColorName (Color color)
+    public static string? GetStandardColorName (Color color)
     {
-        if (W3c.TryNameColor (color, out string? name))
+        if (_standard.TryNameColor (color, out string? name))
         {
             return name;
         }
@@ -31,9 +31,10 @@ public static class ColorStrings
     /// </summary>
     /// <param name="color">The color.</param>
     /// <returns><see langword="null"/> if there is no standard color name for the specified color.</returns>
+    // ReSharper disable once InconsistentNaming
     public static string? GetANSIColor16Name (Color color)
     {
-        if (Ansi.TryNameColor (color, out string? name))
+        if (_ansi.TryNameColor (color, out string? name))
         {
             return name;
         }
@@ -47,7 +48,7 @@ public static class ColorStrings
     /// <returns>Standard color name for the specified color; otherwise <see langword="null"/>.</returns>
     public static string? GetColorName (Color color)
     {
-        if (Multi.TryNameColor (color, out string? name))
+        if (_multi.TryNameColor (color, out string? name))
         {
             return name;
         }
@@ -55,23 +56,23 @@ public static class ColorStrings
     }
 
     /// <summary>
-    ///     Returns the list of W3C standard color names.
+    ///     Returns the list of W3C+ standard color names.
     /// </summary>
     /// <returns></returns>
-    public static IEnumerable<string> GetW3CColorNames ()
+    public static IEnumerable<string> GetStandardColorNames ()
     {
-        return W3c.GetColorNames ();
+        return _standard.GetColorNames ();
     }
 
     /// <summary>
-    ///     Parses <paramref name="name"/> and returns <paramref name="color"/> if name is a W3C standard named color.
+    ///     Parses <paramref name="name"/> and returns <paramref name="color"/> if name is a W3C+ standard named color.
     /// </summary>
     /// <param name="name">The name to parse.</param>
     /// <param name="color">If successful, the color.</param>
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
-    public static bool TryParseW3CColorName (ReadOnlySpan<char> name, out Color color)
+    public static bool TryParseStandardColorName (ReadOnlySpan<char> name, out Color color)
     {
-        if (W3c.TryParseColor (name, out color))
+        if (_standard.TryParseColor (name, out color))
         {
             return true;
         }
@@ -87,7 +88,7 @@ public static class ColorStrings
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
     public static bool TryParseColor16 (ReadOnlySpan<char> name, out Color color)
     {
-        if (Ansi.TryParseColor (name, out color))
+        if (_ansi.TryParseColor (name, out color))
         {
             return true;
         }
@@ -103,7 +104,7 @@ public static class ColorStrings
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
     public static bool TryParseNamedColor (ReadOnlySpan<char> name, out Color color)
     {
-        if (Multi.TryParseColor (name, out color))
+        if (_multi.TryParseColor (name, out color))
         {
             return true;
         }

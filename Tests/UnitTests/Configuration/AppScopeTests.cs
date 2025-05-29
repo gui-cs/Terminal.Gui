@@ -1,87 +1,126 @@
-﻿using System.Text.Json;
+﻿#nullable enable
+using System.Text.Json;
 using UnitTests;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class AppScopeTests
+public class AppSettingsScopeTests
 {
-    public static readonly JsonSerializerOptions _jsonOptions = new ()
+    [Fact]
+    public void Empty_By_Default_Disabled ()
     {
-        Converters =
-        {
-            //new AttributeJsonConverter (),
-            //new ColorJsonConverter ()
-        }
-    };
+        Assert.False (IsEnabled);
+
+        Assert.NotNull (Settings! ["AppSettings"].PropertyValue);
+
+        AppSettingsScope? appSettings = (Settings! ["AppSettings"].PropertyValue as AppSettingsScope);
+        Assert.Equal (10, appSettings!.Count); // 10 test properties
+
+        Assert.Equal ("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue);
+    }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    public void Empty_By_Default_Enabled ()
+    {
+        Enable (ConfigLocations.HardCoded);
+
+        Assert.NotNull (Settings! ["AppSettings"].PropertyValue);
+
+        AppSettingsScope? appSettings = (Settings! ["AppSettings"].PropertyValue as AppSettingsScope);
+        Assert.Equal (10, appSettings!.Count); // 10 test properties
+        Assert.Equal ("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue);
+
+        Disable (resetToHardCodedDefaults: true);
+    }
+
+    [Fact]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Reset ();
-        Assert.Null (AppSettingsTestClass.TestProperty);
-        Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
+        Enable (ConfigLocations.HardCoded);
 
-        AppSettingsTestClass.TestProperty = true;
-        Reset ();
-        Assert.True (AppSettingsTestClass.TestProperty);
-        Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        Assert.Null (AppSettingsTestClass.NullableValueProperty);
+        Assert.NotEmpty (AppSettings!);
+        Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
-        AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue = false;
-        Assert.False (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        AppSettingsTestClass.NullableValueProperty = true;
+        ResetToCurrentValues ();
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
+        Assert.NotEmpty (AppSettings);
+        Assert.True (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
+
+        AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue = false;
+        Assert.False (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
 
         // ConfigurationManager.Settings should NOT apply theme settings
-        Settings.Apply ();
-        Assert.True (AppSettingsTestClass.TestProperty);
+        Settings!.Apply ();
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-        Assert.True (AppSettingsTestClass.TestProperty);
+        ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.AppSettings should NOT apply theme settings
         AppSettings.Apply ();
-        Assert.False (AppSettingsTestClass.TestProperty);
+        Assert.False (AppSettingsTestClass.NullableValueProperty);
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
     public void TestNullable ()
     {
-        AppSettingsTestClass.TestProperty = null;
-        Assert.Null (AppSettingsTestClass.TestProperty);
+        Enable (ConfigLocations.HardCoded);
 
-        Initialize ();
-        GetHardCodedDefaults ();
-        Apply ();
-        Assert.Null (AppSettingsTestClass.TestProperty);
+        AppSettingsTestClass.NullableValueProperty = null;
+        Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
-        AppSettingsTestClass.TestProperty = true;
-        Initialize ();
-        GetHardCodedDefaults ();
-        Assert.NotNull (AppSettingsTestClass.TestProperty);
+        ResetToCurrentValues ();
+        Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
+
         Apply ();
-        Assert.NotNull (AppSettingsTestClass.TestProperty);
+        Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
+        Assert.Null (AppSettingsTestClass.NullableValueProperty);
+
+        AppSettingsTestClass.NullableValueProperty = true;
+        ResetToCurrentValues ();
+        Assert.True ((bool)AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue!);
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
+        Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
+        Apply ();
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
+        Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
+
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
-        Reset ();
+        Enable (ConfigLocations.HardCoded);
 
-        AppScope initial = AppSettings;
+        AppSettingsScope initial = AppSettings!;
 
-        string serialized = JsonSerializer.Serialize (AppSettings, _jsonOptions);
-        var deserialized = JsonSerializer.Deserialize<AppScope> (serialized, _jsonOptions);
+        string serialized = JsonSerializer.Serialize (AppSettings, SerializerContext.Options);
+        var deserialized = JsonSerializer.Deserialize<AppSettingsScope> (serialized, SerializerContext.Options);
 
         Assert.NotEqual (initial, deserialized);
-        Assert.Equal (deserialized.Count, initial.Count);
+        Assert.Equal (deserialized!.Count, initial.Count);
+
+        Disable (resetToHardCodedDefaults: true);
     }
 
     public class AppSettingsTestClass
     {
-        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
-        public static bool? TestProperty { get; set; }
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+        public static bool ValueProperty { get; set; }
+
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+        public static bool? NullableValueProperty { get; set; }
+
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+        public static string ReferenceProperty { get; set; } = "test";
+
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+        public static string? NullableReferenceProperty { get; set; }
     }
 }

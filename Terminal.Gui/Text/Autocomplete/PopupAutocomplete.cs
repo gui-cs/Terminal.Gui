@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 public abstract partial class PopupAutocomplete : AutocompleteBase
 {
     private bool _closed;
-    private ColorScheme _colorScheme;
+    private Scheme _scheme;
     private View _hostControl;
     private View _top;  // The _hostControl's SuperView
     private View _popup;
@@ -22,18 +22,18 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
     ///     will cause an error
     /// </summary>
-    public override ColorScheme ColorScheme
+    public override Scheme Scheme
     {
         get
         {
-            if (_colorScheme is null)
+            if (_scheme is null)
             {
-                _colorScheme = Colors.ColorSchemes ["Menu"];
+                _scheme = SchemeManager.GetScheme (Schemes.Menu);
             }
 
-            return _colorScheme;
+            return _scheme;
         }
-        set => _colorScheme = value;
+        set => _scheme = value;
     }
 
     /// <summary>The host control to handle.</summary>
@@ -51,7 +51,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
             if (_hostControl is null)
             {
-                RemovePopupFromTop();
+                RemovePopupFromTop ();
                 _top.Removed -= _top_Removed;
                 _top = null;
 
@@ -390,11 +390,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (i == SelectedIdx - ScrollOffset)
             {
-                _popup.SetAttribute (ColorScheme.Focus);
+                _popup.SetAttribute (Scheme.Focus);
             }
             else
             {
-                _popup.SetAttribute (ColorScheme.Normal);
+                _popup.SetAttribute (Scheme.Normal);
             }
 
             _popup.Move (0, i);

@@ -6,19 +6,22 @@ namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
 {
-    internal static Point? _lastMousePosition;
+    /// <summary>
+    /// INTERNAL API: Holds the last mouse position.
+    /// </summary>
+    internal static Point? LastMousePosition { get; set; }
 
     /// <summary>
     ///     Gets the most recent position of the mouse.
     /// </summary>
-    public static Point? GetLastMousePosition () { return _lastMousePosition; }
+    public static Point? GetLastMousePosition () { return LastMousePosition; }
 
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
 
-    /// <summary>The current <see cref="View"/> object that wants continuous mouse button pressed events.</summary>
-    public static View? WantContinuousButtonPressedView { get; private set; }
+    /// <summary>Gets <see cref="View"/> that has registered to get continuous mouse button pressed events.</summary>
+    public static View? WantContinuousButtonPressedView { get; internal set; }
 
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
@@ -51,7 +54,12 @@ public static partial class Application // Mouse handling
         }
 
         RaiseGrabbedMouseEvent (view);
-        MouseGrabView = view;
+
+        if (Initialized)
+        {
+            // MouseGrabView is a static; only set if the application is initialized.
+            MouseGrabView = view;
+        }
     }
 
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
@@ -136,7 +144,11 @@ public static partial class Application // Mouse handling
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
     internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
-        _lastMousePosition = mouseEvent.ScreenPosition;
+        if (Initialized)
+        {
+            // LastMousePosition is a static; only set if the application is initialized.
+            LastMousePosition = mouseEvent.ScreenPosition;
+        }
 
         if (IsMouseDisabled)
         {
@@ -147,7 +159,7 @@ public static partial class Application // Mouse handling
         //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.ScreenPosition);
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettings.TransparentMouse);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse.LastOrDefault ();
 
@@ -191,15 +203,25 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        WantContinuousButtonPressedView = deepestViewUnderMouse switch
+        if (Initialized)
         {
-            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-            _ => null
-        };
+            WantContinuousButtonPressedView = deepestViewUnderMouse switch
+                                              {
+                                                  { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+                                                  _ => null
+                                              };
+        }
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
         if (deepestViewUnderMouse is null)
+        {
+            return;
+        }
+
+        // if the mouse is outside the Application.Top or Application.Popover hierarchy, we don't want to
+        // send the mouse event to the deepest view under the mouse.
+        if (!View.IsInHierarchy (Application.Top, deepestViewUnderMouse, true) && !View.IsInHierarchy (Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }
@@ -234,8 +256,6 @@ public static partial class Application // Mouse handling
         else
         {
             // The mouse was outside any View's Viewport.
-            //Debug.Fail ("this should not happen.");
-
             // Debug.Fail ("This should never happen. If it does please file an Issue!!");
 
             return;
@@ -243,7 +263,10 @@ public static partial class Application // Mouse handling
 
         RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
 
-        WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
+        if (Initialized)
+        {
+            WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
+        }
 
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
         {
@@ -335,17 +358,20 @@ public static partial class Application // Mouse handling
         return false;
     }
 
-    internal static readonly List<View?> _cachedViewsUnderMouse = new ();
+    /// <summary>
+    ///     INTERNAL: Holds the non-<see cref="ViewportSettings.TransparentMouse"/> views that are currently under the mouse.
+    /// </summary>
+    internal static List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.
     /// </summary>
     /// <param name="screenPosition">The position of the mouse.</param>
-    /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderMouse().</param>
+    /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderLocation().</param>
     internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
         // Tell any views that are no longer under the mouse that the mouse has left
-        List<View?> viewsToLeave = _cachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
+        List<View?> viewsToLeave = CachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
 
         foreach (View? view in viewsToLeave)
         {
@@ -355,7 +381,7 @@ public static partial class Application // Mouse handling
             }
 
             view.NewMouseLeaveEvent ();
-            _cachedViewsUnderMouse.Remove (view);
+            CachedViewsUnderMouse.Remove (view);
         }
 
         // Tell any views that are now under the mouse that the mouse has entered and add them to the list
@@ -366,12 +392,12 @@ public static partial class Application // Mouse handling
                 continue;
             }
 
-            if (_cachedViewsUnderMouse.Contains (view))
+            if (CachedViewsUnderMouse.Contains (view))
             {
                 continue;
             }
 
-            _cachedViewsUnderMouse.Add (view);
+            CachedViewsUnderMouse.Add (view);
             var raise = false;
 
             if (view is Adornment { Parent: { } } adornmentView)

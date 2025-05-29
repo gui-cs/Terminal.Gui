@@ -723,8 +723,7 @@ public class ListView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        Attribute current = ColorScheme?.Focus ?? Attribute.Default;
-        SetAttribute (current);
+        Attribute current = Attribute.Default;
         Move (0, 0);
         Rectangle f = Viewport;
         int item = Viewport.Y;
@@ -736,13 +735,13 @@ public class ListView : View, IDesignable
         {
             bool isSelected = item == _selected;
 
-            Attribute newcolor = focused ? isSelected ? ColorScheme.Focus : GetNormalColor () :
-                                 isSelected ? ColorScheme.HotNormal : GetNormalColor ();
+            Attribute newAttribute = focused ? isSelected ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal) :
+                                 isSelected ? GetAttributeForRole (VisualRole.Active) : GetAttributeForRole (VisualRole.Normal);
 
-            if (newcolor != current)
+            if (newAttribute != current)
             {
-                SetAttribute (newcolor);
-                current = newcolor;
+                SetAttribute (newAttribute);
+                current = newAttribute;
             }
 
             Move (0, row);
@@ -856,23 +855,8 @@ public class ListView : View, IDesignable
         return false;
     }
 
-    /// <summary>This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.</summary>
+    /// <summary>This event is raised when the user Double-Clicks on an item or presses ENTER to open the selected item.</summary>
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
-
-    ///// <inheritdoc/>
-    //public override Point? PositionCursor ()
-    //{
-    //    int x = 0;
-    //    int y = _selected - Viewport.Y;
-    //    if (!_allowsMarking)
-    //    {
-    //        x = Viewport.Width - 1;
-    //    }
-
-    //    Move (x, y);
-
-    //    return null; // Don't show the cursor
-    //}
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs> RowRender;

@@ -7,41 +7,36 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Configuration Editor", "Edits Terminal.Gui Config Files.")]
+[ScenarioMetadata ("Configuration Editor", "Editor of Terminal.Gui Config Files")]
 [ScenarioCategory ("TabView")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
+[ScenarioCategory ("Configuration")]
 public class ConfigurationEditor : Scenario
 {
-    private static ColorScheme _editorColorScheme = new ()
-    {
-        Normal = new Attribute (Color.Red, Color.White),
-        Focus = new Attribute (Color.Red, Color.Black),
-        HotFocus = new Attribute (Color.BrightRed, Color.Black),
-        HotNormal = new Attribute (Color.Magenta, Color.White)
-    };
+    //private static Scheme _editorScheme = SchemeManager.GetScheme (Schemes.Base);
 
-    private static Action? _editorColorSchemeChanged;
+    //private static Action? _editorSchemeChanged;
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
 
-    [SerializableConfigurationProperty (Scope = typeof (AppScope))]
-    public static ColorScheme EditorColorScheme
-    {
-        get => _editorColorScheme;
-        set
-        {
-            _editorColorScheme = value;
-            _editorColorSchemeChanged?.Invoke ();
-        }
-    }
+    //[ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+    //public static Scheme EditorScheme
+    //{
+    //    get => _editorScheme;
+    //    set
+    //    {
+    //        _editorScheme = value;
+    //        _editorSchemeChanged?.Invoke ();
+    //    }
+    //}
 
     public override void Main ()
     {
         Application.Init ();
 
-        Toplevel top = new ();
+        Window? win = new ();
 
         _lenShortcut = new Shortcut ()
         {
@@ -77,34 +72,49 @@ public class ConfigurationEditor : Scenario
             Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height))
         };
 
-        top.Add (_tabView, statusBar);
+        win.Add (_tabView, statusBar);
 
-        top.Loaded += (s, a) =>
+        win.Loaded += (s, a) =>
                       {
                           Open ();
-                          _editorColorSchemeChanged?.Invoke ();
+                          //_editorSchemeChanged?.Invoke ();
                       };
 
-        void OnEditorColorSchemeChanged ()
-        {
-            if (Application.Top is { })
-            {
-                return;
-            }
 
-            foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
-            {
-                t.ColorScheme = EditorColorScheme;
-            }
-        }
 
-        _editorColorSchemeChanged += OnEditorColorSchemeChanged;
+        //_editorSchemeChanged += OnEditorSchemeChanged;
 
-        Application.Run (top);
-        _editorColorSchemeChanged -= OnEditorColorSchemeChanged;
-        top.Dispose ();
+        ConfigurationManager.Applied += ConfigurationManagerOnApplied;
+
+        Application.Run (win);
+        //_editorSchemeChanged -= OnEditorSchemeChanged;
+        win.Dispose ();
+        win = null;
 
         Application.Shutdown ();
+
+        return;
+
+        //void OnEditorSchemeChanged ()
+        //{
+        //    if (Application.Top is { })
+        //    {
+        //        return;
+        //    }
+
+        //    foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
+        //    {
+        //        t.SetScheme (EditorScheme);
+        //    }
+        //}
+
+        void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
+        {
+            if (win is { })
+            {
+                win.SetNeedsDraw ();
+            }
+        }
     }
     public void Save ()
     {
@@ -116,7 +126,7 @@ public class ConfigurationEditor : Scenario
 
     private void Open ()
     {
-        foreach (var config in ConfigurationManager.Settings!.Sources)
+        foreach (var config in ConfigurationManager.SourcesManager!.Sources)
         {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
             var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
@@ -128,6 +138,12 @@ public class ConfigurationEditor : Scenario
                 Height = Dim.Fill (),
                 FileInfo = fileInfo,
             };
+
+            if (config.Value == "HardCoded")
+            {
+                editor.Title = "HardCoded";
+
+            }
 
             Tab tab = new Tab ()
             {
@@ -244,15 +260,20 @@ public class ConfigurationEditor : Scenario
                 return;
             }
 
-            if (FileInfo!.FullName.Contains ("RuntimeConfig"))
+            if (FileInfo!.FullName.Contains ("HardCoded"))
+            {
+                Text = ConfigurationManager.GetHardCodedConfig ()!;
+                ReadOnly = true;
+                Enabled = true;
+            }
+            else if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {
                 Text = ConfigurationManager.RuntimeConfig!;
-
             }
             else if (!FileInfo.Exists)
             {
                 // Create empty config file
-                Text = ConfigurationManager.GetEmptyJson ();
+                Text = ConfigurationManager.GetEmptyConfig ();
             }
             else
             {

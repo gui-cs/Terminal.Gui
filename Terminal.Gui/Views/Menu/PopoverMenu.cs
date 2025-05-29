@@ -70,7 +70,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         bool? Quit (ICommandContext? ctx)
         {
-            Logging.Debug ($"{Title} Command.Quit - {ctx?.Source?.Title}");
+            // Logging.Debug ($"{Title} Command.Quit - {ctx?.Source?.Title}");
 
             if (!Visible)
             {
@@ -82,7 +82,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             // This is important for MenuBarItems to ensure the MenuBar loses focus when
             // the user presses QuitKey to cause the menu to close.
             // Note, we override OnAccepting, which will set Visible to false
-            Logging.Debug ($"{Title} Command.Quit - Calling RaiseAccepting {ctx?.Source?.Title}");
+            // Logging.Debug ($"{Title} Command.Quit - Calling RaiseAccepting {ctx?.Source?.Title}");
             bool? ret = RaiseAccepting (ctx);
 
             if (Visible && ret is not true)
@@ -145,7 +145,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>The default key for activating popover menus.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
     /// <summary>
@@ -166,7 +166,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         if (Visible)
         {
-            Logging.Debug ($"{Title} - Already Visible");
+            // Logging.Debug ($"{Title} - Already Visible");
 
             return;
         }
@@ -210,7 +210,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <inheritdoc/>
     protected override void OnVisibleChanged ()
     {
-        Logging.Debug ($"{Title} - Visible: {Visible}");
+        // Logging.Debug ($"{Title} - Visible: {Visible}");
         base.OnVisibleChanged ();
 
         if (Visible)
@@ -291,7 +291,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             menuItem.Key = key;
 
-            Logging.Debug ($"{Title} - HotKey: {menuItem.Key}->{menuItem.Command}");
+            // Logging.Debug ($"{Title} - HotKey: {menuItem.Key}->{menuItem.Command}");
         }
     }
 
@@ -305,7 +305,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             if (key != Application.QuitKey && menuItem.Key == key)
             {
-                Logging.Debug ($"{Title} - key: {key}");
+                // Logging.Debug ($"{Title} - key: {key}");
 
                 return menuItem.NewKeyDownEvent (key);
             }
@@ -377,7 +377,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         var menu = menuItem?.SuperView as Menuv2;
 
-        Logging.Debug ($"{Title} - menuItem: {menuItem?.Title}, menu: {menu?.Title}");
+        // Logging.Debug ($"{Title} - menuItem: {menuItem?.Title}, menu: {menu?.Title}");
 
         menu?.Layout ();
 
@@ -430,7 +430,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         if (menu is { SuperView: null, Visible: false })
         {
-            Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
+            // Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
             // TODO: Find the menu item below the mouse, if any, and select it
 
@@ -455,7 +455,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         if (menu is { Visible: true })
         {
-            Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
+            // Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
             // If there's a visible submenu, remove / hide it
             if (menu.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
@@ -478,11 +478,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
         var senderView = sender as View;
-        Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command} - Sender: {senderView?.GetType ().Name}");
+        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command} - Sender: {senderView?.GetType ().Name}");
 
         if (e.Context?.Command != Command.HotKey)
         {
-            Logging.Debug ($"{Title} - Setting Visible = false");
+            // Logging.Debug ($"{Title} - Setting Visible = false");
             Visible = false;
         }
 
@@ -490,7 +490,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {
-                Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+                // Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
                 e.Handled = true;
             }
         }
@@ -498,7 +498,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
-        Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
 
         if (e.Context?.Source is MenuItemv2 { SubMenu: null })
         {
@@ -515,7 +515,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
+        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
 
         // If we're not visible, ignore any keys that are not hotkeys
         CommandContext<KeyBinding>? keyCommandContext = args.Context as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
@@ -524,13 +524,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != keyCommandContext.Value.Binding.Key))
             {
-                Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - ignore any keys that are not hotkeys");
+                // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - ignore any keys that are not hotkeys");
 
                 return false;
             }
         }
 
-        Logging.Debug ($"{Title} - calling base.OnAccepting: {args.Context?.Command}");
+        // Logging.Debug ($"{Title} - calling base.OnAccepting: {args.Context?.Command}");
         bool? ret = base.OnAccepting (args);
 
         if (ret is true || args.Handled)
@@ -541,7 +541,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Only raise Accepted if the command came from one of our MenuItems
         //if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
         {
-            Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
+            // Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
             RaiseAccepted (args.Context);
         }
 
@@ -557,7 +557,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <returns></returns>
     protected void RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Debug ($"{Title} - RaiseAccepted: {ctx}");
+        // Logging.Debug ($"{Title} - RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
@@ -586,7 +586,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
-        Logging.Debug ($"{Title} - e.Title: {e?.Title}");
+        // Logging.Debug ($"{Title} - e.Title: {e?.Title}");
         ShowSubMenu (e);
     }
 

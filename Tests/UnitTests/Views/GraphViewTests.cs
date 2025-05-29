@@ -61,7 +61,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.ColorScheme = new ColorScheme ();
+        //gv.Scheme = new Scheme ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
         gv.Series.Add (new ScatterSeries { Points = new List<PointF> { new (1, 1) } });
         gv.CellSize = new PointF (0, 5);
@@ -83,7 +83,7 @@ public class GraphViewTests
         gv.BeginInit ();
         gv.EndInit ();
 
-        gv.ColorScheme = new ColorScheme ();
+        //gv.Scheme = new Scheme ();
         gv.MarginBottom = 1;
         gv.MarginLeft = 1;
         gv.Viewport = new Rectangle (0, 0, 10, 5);
@@ -450,7 +450,7 @@ public class SeriesTests
         gv.BeginInit ();
         gv.EndInit ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
-        gv.ColorScheme = new ColorScheme ();
+        //gv.Scheme = new Scheme ();
 
         var fullGraphBounds = RectangleF.Empty;
         var graphScreenBounds = Rectangle.Empty;
@@ -502,7 +502,7 @@ public class SeriesTests
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
-        gv.ColorScheme = new ColorScheme ();
+        //gv.Scheme = new Scheme ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
 
         // the larger the cell size the more condensed (smaller) the graph space is
@@ -640,7 +640,7 @@ public class MultiBarSeriesTests
         GraphViewTests.InitFakeDriver ();
 
         var gv = new GraphView ();
-        gv.ColorScheme = new ColorScheme ();
+        //gv.Scheme = new Scheme ();
 
         // y axis goes from 0.1 to 1 across 10 console rows
         // x axis goes from 0 to 20 across 20 console columns
@@ -882,7 +882,7 @@ public class BarSeriesTests
         // y axis goes from 0.1 to 1 across 10 console rows
         // x axis goes from 0 to 10 across 20 console columns
         gv.Viewport = new Rectangle (0, 0, 20, 10);
-        gv.ColorScheme = new ColorScheme ();
+       //gv.Scheme = new Scheme ();
         gv.CellSize = new PointF (0.5f, 0.1f);
 
         gv.Series.Add (series = new FakeBarSeries ());
@@ -923,7 +923,7 @@ public class AxisTests
 
         var gv = new GraphView ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
-        gv.ColorScheme = new ColorScheme ();
+       // gv.Scheme = new Scheme ();
 
         // graph can't be completely empty or it won't draw
         gv.Series.Add (new ScatterSeries ());
@@ -1542,7 +1542,7 @@ public class PathAnnotationTests
             Application.Begin (top);
 
             // render view
-            view.ColorScheme = new ColorScheme ();
+            //view.Scheme = new Scheme ();
             Assert.Equal (1, view.Height);
             mount.SetNeedsDraw ();
             mount.Draw ();
@@ -1570,7 +1570,7 @@ public class PathAnnotationTests
     public void XAxisLabels_With_MarginLeft ()
     {
         GraphViewTests.InitFakeDriver ();
-        var gv = new GraphView { ColorScheme = new ColorScheme (), Viewport = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
@@ -1609,7 +1609,7 @@ public class PathAnnotationTests
     public void YAxisLabels_With_MarginBottom ()
     {
         GraphViewTests.InitFakeDriver ();
-        var gv = new GraphView { ColorScheme = new ColorScheme (), Viewport = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
