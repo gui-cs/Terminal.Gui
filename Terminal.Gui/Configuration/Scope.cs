@@ -98,11 +98,8 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
         foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in ConfigurationManager.GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
         {
             ConfigProperty copy = ConfigProperty.CreateCopy (hardCodedKeyValuePair.Value);
-
-            if (!TryAdd (hardCodedKeyValuePair.Key, copy))
-            {
-                this [hardCodedKeyValuePair.Key].PropertyValue = copy.PropertyValue;
-            }
+            TryAdd (hardCodedKeyValuePair.Key, copy);
+            this [hardCodedKeyValuePair.Key].PropertyValue = hardCodedKeyValuePair.Value.PropertyValue;
         }
     }
 
