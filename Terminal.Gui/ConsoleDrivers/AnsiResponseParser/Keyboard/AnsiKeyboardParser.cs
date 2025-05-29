@@ -10,6 +10,7 @@ public class AnsiKeyboardParser
     {
         new Ss3Pattern (),
         new CsiKeyPattern (),
+        new CsiCursorPattern(),
         new EscAsAltPattern { IsLastMinute = true }
     };
 
