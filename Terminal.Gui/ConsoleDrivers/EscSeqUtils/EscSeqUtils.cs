@@ -1123,6 +1123,17 @@ public static class EscSeqUtils
                                              (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
                                              true);
                 }
+                else if (consoleKeyInfo is { Key: 0, KeyChar: '\b' })
+                {
+                    key = ConsoleKey.Backspace;
+
+                    newConsoleKeyInfo = new (
+                                             consoleKeyInfo.KeyChar,
+                                             key,
+                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                             true);
+                }
                 else if (consoleKeyInfo.Key == 0)
                 {
                     key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
