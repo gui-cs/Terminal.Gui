@@ -160,7 +160,7 @@ internal class ShadowView : View
 
         // If the BG is DarkGray, GetDimColor gave up. Instead of using the attribute in the Driver under the shadow,
         // use the Normal attribute from the View under the shadow.
-        if (newAttribute.Background== Color.DarkGray)
+        if (newAttribute.Background == Color.DarkGray)
         {
             List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettings.Transparent);
             View? underView = currentViewsUnderMouse!.LastOrDefault ();
@@ -168,7 +168,7 @@ internal class ShadowView : View
 
             newAttribute = new (
                                 ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Background.GetDimColor (),
-                                ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimColor (0.05),
+                                ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimColor (0.25),
                                 attr.Style);
         }
 

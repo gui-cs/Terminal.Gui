@@ -12,7 +12,7 @@ public class ThemeScopeTests
         Enable (ConfigLocations.HardCoded);
 
         Load (ConfigLocations.All);
-        Assert.True (ThemeManager.Themes.ContainsKey ("Default"));
+        Assert.True (ThemeManager.Themes!.ContainsKey ("Default"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Dark"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Light"));
         Disable (true);
@@ -22,19 +22,26 @@ public class ThemeScopeTests
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         Enable (ConfigLocations.HardCoded);
-        Assert.NotEmpty (ThemeManager.Themes);
-        Alignment savedValue = Dialog.DefaultButtonAlignment;
-        Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
+        Assert.NotEmpty (ThemeManager.Themes!);
 
-        ThemeManager.GetCurrentTheme () ["Dialog.DefaultButtonAlignment"].PropertyValue = newValue;
+        Alignment savedButtonAlignment = Dialog.DefaultButtonAlignment;
+        Alignment newButtonAlignment = Alignment.Center != savedButtonAlignment ? Alignment.Center : Alignment.Start;
+        ThemeManager.GetCurrentTheme () ["Dialog.DefaultButtonAlignment"].PropertyValue = newButtonAlignment;
+
+        LineStyle savedBorderStyle = Dialog.DefaultBorderStyle;
+        LineStyle newBorderStyle = LineStyle.HeavyDotted;
+        ThemeManager.GetCurrentTheme () ["Dialog.DefaultBorderStyle"].PropertyValue = newBorderStyle;
 
         ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
-        Assert.Equal (newValue, Dialog.DefaultButtonAlignment);
+        Assert.Equal (newButtonAlignment, Dialog.DefaultButtonAlignment);
+        Assert.Equal (newBorderStyle, Dialog.DefaultBorderStyle);
 
         // Replace with the savedValue to avoid failures on other unit tests that rely on the default value
-        ThemeManager.GetCurrentTheme () ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
+        ThemeManager.GetCurrentTheme () ["Dialog.DefaultButtonAlignment"].PropertyValue = savedButtonAlignment;
+        ThemeManager.GetCurrentTheme () ["Dialog.DefaultBorderStyle"].PropertyValue = savedBorderStyle;
         ThemeManager.GetCurrentTheme ().Apply ();
-        Assert.Equal (savedValue, Dialog.DefaultButtonAlignment);
+        Assert.Equal (savedButtonAlignment, Dialog.DefaultButtonAlignment);
+        Assert.Equal (savedBorderStyle, Dialog.DefaultBorderStyle);
         Disable (true);
     }
 

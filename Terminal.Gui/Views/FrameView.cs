@@ -38,5 +38,5 @@ public class FrameView : View
     ///     <see cref="FrameView"/>s.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
 }
