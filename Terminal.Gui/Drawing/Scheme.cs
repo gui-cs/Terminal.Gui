@@ -328,7 +328,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
                                        Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor ()
+                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.5)
                                    },
 
                                VisualRole.ReadOnly =>
@@ -340,7 +340,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Disabled =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.5),
+                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.05),
                                    },
 
                                VisualRole.HotNormal =>
