@@ -217,21 +217,21 @@ public class TextValidateField : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnKeyDownNotHandled (Key a)
+    protected override bool OnKeyDownNotHandled (Key key)
     {
         if (_provider is null)
         {
             return false;
         }
 
-        if (a.AsRune == default (Rune))
+        if (key.AsRune == default (Rune) || key == Application.QuitKey)
         {
             return false;
         }
 
-        Rune key = a.AsRune;
+        Rune rune = key.AsRune;
 
-        bool inserted = _provider.InsertAt ((char)key.Value, _cursorPosition);
+        bool inserted = _provider.InsertAt ((char)rune.Value, _cursorPosition);
 
         if (inserted)
         {
@@ -271,7 +271,7 @@ public class TextValidateField : View
     /// <returns></returns>
     private bool BackspaceKeyHandler ()
     {
-        if (_provider.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
+        if (_provider!.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
         {
             return false;
         }
