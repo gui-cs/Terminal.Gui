@@ -1715,6 +1715,7 @@ public class TextView : View, IDesignable
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
+            SetNeedsDraw ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
         {
@@ -1735,6 +1736,7 @@ public class TextView : View, IDesignable
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
+            SetNeedsDraw ();
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
@@ -1747,6 +1749,8 @@ public class TextView : View, IDesignable
             //ShowContextMenu ();
         }
 
+        OnUnwrappedCursorPosition ();
+
         return true;
     }
 
@@ -1757,7 +1761,7 @@ public class TextView : View, IDesignable
         List<Cell> line = GetCurrentLine ();
         CurrentColumn = line.Count;
         TrackColumn ();
-        PositionCursor ();
+        DoNeededAction ();
     }
 
     /// <summary>Will scroll the <see cref="TextView"/> to the first line and position the cursor there.</summary>
@@ -1768,8 +1772,7 @@ public class TextView : View, IDesignable
         CurrentColumn = 0;
         _leftColumn = 0;
         TrackColumn ();
-        PositionCursor ();
-        SetNeedsDraw ();
+        DoNeededAction ();
     }
 
     /// <summary>
@@ -2661,6 +2664,11 @@ public class TextView : View, IDesignable
 
     private void DoNeededAction ()
     {
+        if (!NeedsDraw && (IsSelecting || _wrapNeeded || !Used))
+        {
+            SetNeedsDraw ();
+        }
+
         if (NeedsDraw)
         {
             Adjust ();
@@ -2668,6 +2676,7 @@ public class TextView : View, IDesignable
         else
         {
             PositionCursor ();
+            OnUnwrappedCursorPosition ();
         }
     }
 
@@ -3385,8 +3394,24 @@ public class TextView : View, IDesignable
         }
         else if (newPos.HasValue)
         {
-            int restCount = currentLine.Count - CurrentColumn;
-            currentLine.RemoveRange (CurrentColumn, restCount);
+            int restCount;
+
+            if (newPos.Value.row == CurrentRow)
+            {
+                restCount = currentLine.Count - CurrentColumn;
+                currentLine.RemoveRange (CurrentColumn, restCount);
+            }
+            else
+            {
+                while (CurrentRow != newPos.Value.row)
+                {
+                    restCount = currentLine.Count;
+                    currentLine.RemoveRange (0, restCount);
+
+                    CurrentRow--;
+                    currentLine = GetCurrentLine ();
+                }
+            }
 
             if (_wordWrap)
             {
@@ -3540,8 +3565,7 @@ public class TextView : View, IDesignable
     private void MoveEndOfLine ()
     {
         List<Cell> currentLine = GetCurrentLine ();
-        CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
-        Adjust ();
+        CurrentColumn = currentLine.Count;
         DoNeededAction ();
     }
 
@@ -3572,7 +3596,6 @@ public class TextView : View, IDesignable
             }
         }
 
-        Adjust ();
         DoNeededAction ();
 
         return true;
@@ -3654,10 +3677,6 @@ public class TextView : View, IDesignable
                     _topRow++;
                     SetNeedsDraw ();
                 }
-                else
-                {
-                    return false;
-                }
             }
             else
             {
@@ -3665,7 +3684,6 @@ public class TextView : View, IDesignable
             }
         }
 
-        Adjust ();
         DoNeededAction ();
 
         return true;
@@ -3680,7 +3698,6 @@ public class TextView : View, IDesignable
 
         CurrentColumn = 0;
         _leftColumn = 0;
-        Adjust ();
         DoNeededAction ();
     }
 
@@ -3743,7 +3760,6 @@ public class TextView : View, IDesignable
             CurrentRow = newPos.Value.row;
         }
 
-        Adjust ();
         DoNeededAction ();
     }
 
@@ -3757,7 +3773,6 @@ public class TextView : View, IDesignable
             CurrentRow = newPos.Value.row;
         }
 
-        Adjust ();
         DoNeededAction ();
     }
 
@@ -4031,6 +4046,7 @@ public class TextView : View, IDesignable
     private void ProcessKillWordForward ()
     {
         ResetColumnTrack ();
+        StopSelecting ();
         KillWordForward ();
     }
 
@@ -4578,6 +4594,11 @@ public class TextView : View, IDesignable
 
     private void StopSelecting ()
     {
+        if (IsSelecting)
+        {
+            SetNeedsDraw ();
+        }
+
         _shiftSelecting = false;
         IsSelecting = false;
         _isButtonShift = false;

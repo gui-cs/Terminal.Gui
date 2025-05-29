@@ -776,6 +776,10 @@ internal class CursesDriver : ConsoleDriver
                 wch -= 60;
                 k = KeyCode.ShiftMask | KeyCode.AltMask | MapCursesKey (wch);
             }
+            else if (wch == 520) // Ctrl+Delete
+            {
+                k = KeyCode.CtrlMask | KeyCode.Delete;
+            }
 
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
@@ -876,6 +880,12 @@ internal class CursesDriver : ConsoleDriver
 
             OnKeyDown (key);
             OnKeyUp (key);
+        }
+        else if (wch == 8) // Ctrl+Backspace
+        {
+            k = KeyCode.Backspace | KeyCode.CtrlMask;
+            OnKeyDown (new Key (k));
+            OnKeyUp (new Key (k));
         }
         else if (wch == Curses.KeyTab)
         {
