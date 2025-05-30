@@ -1,5 +1,5 @@
 ﻿
-namespace Terminal.Gui.Text;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can

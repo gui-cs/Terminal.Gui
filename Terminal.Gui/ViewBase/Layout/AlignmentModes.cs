@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui.Drawing;
+namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     Determines alignment modes for <see cref="Alignment"/>.

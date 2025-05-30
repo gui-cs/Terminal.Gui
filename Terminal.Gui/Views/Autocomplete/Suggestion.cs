@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Text;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>A replacement suggestion made by <see cref="IAutocomplete"/></summary>
 public class Suggestion

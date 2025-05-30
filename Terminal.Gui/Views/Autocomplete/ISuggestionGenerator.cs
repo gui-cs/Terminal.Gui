@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Text;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Generates autocomplete <see cref="Suggestion"/> based on a given cursor location within a string</summary>
 public interface ISuggestionGenerator

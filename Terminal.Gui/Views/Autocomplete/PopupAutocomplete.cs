@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Terminal.Gui.Text;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Text;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ISuggestionGenerator"/> which suggests from a collection of words those that match the

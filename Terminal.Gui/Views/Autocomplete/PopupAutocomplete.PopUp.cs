@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Terminal.Gui.Text;
+namespace Terminal.Gui.Views;
 
 public abstract partial class PopupAutocomplete
 {
