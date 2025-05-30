@@ -47,7 +47,7 @@ using System.Runtime.InteropServices;
 namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-public partial class Curses
+internal partial class Curses
 {
     // We encode ESC + char (what Alt-char generates) as 0x2000 + char
     public const int KeyAlt = 0x2000;
@@ -424,7 +424,7 @@ public partial class Curses
     //};
 
     [StructLayout (LayoutKind.Sequential)]
-    public struct MouseEvent
+    internal struct MouseEvent
     {
         public short ID;
         public int X, Y, Z;

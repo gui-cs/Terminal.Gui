@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Core;
 
 /// <summary>Extension of <see cref="Stack{T}"/> helper to work with specific <see cref="IEqualityComparer{T}"/></summary>
 public static class StackExtensions

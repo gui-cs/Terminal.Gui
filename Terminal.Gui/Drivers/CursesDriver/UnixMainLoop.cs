@@ -18,7 +18,7 @@ internal class UnixMainLoop : IMainLoopDriver
 {
     /// <summary>Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.</summary>
     [Flags]
-    public enum Condition : short
+    internal enum Condition : short
     {
         /// <summary>There is data to read</summary>
         PollIn = 1,

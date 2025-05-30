@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public partial class Curses
+internal partial class Curses
 {
     public const int A_NORMAL = 0x0;
     public const int A_STANDOUT = 0x10000;
@@ -58,7 +58,7 @@ public partial class Curses
     public const int TIOCGWINSZ = 0x5413;
     public const int TIOCGWINSZ_MAC = 0x40087468;
     [Flags]
-    public enum Event : long
+    internal enum Event : long
     {
         Button1Pressed = 0x2,
         Button1Released = 0x1,

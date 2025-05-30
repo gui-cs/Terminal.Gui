@@ -28,9 +28,9 @@
 
 namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public partial class Curses
+internal partial class Curses
 {
-    public class Window
+    internal class Window
     {
         public readonly nint Handle;
 
