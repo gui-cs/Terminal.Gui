@@ -2,7 +2,7 @@
   href: docs/
 
 - name: API
-  href: api/
+  href: api/Terminal.Gui.Core.html
 
 - name: Source
   href: https://github.com/gui-cs/Terminal.Gui

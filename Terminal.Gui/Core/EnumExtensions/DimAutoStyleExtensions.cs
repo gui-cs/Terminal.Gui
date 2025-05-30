@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Terminal.Gui.EnumExtensions;
+namespace Terminal.Gui.Core;
 
 /// <summary>Extension methods for the <see cref="DimAutoStyle"/> <see langword="enum"/> type.</summary>
 [GeneratedCode ("Terminal.Gui.Analyzers.Internal", "1.0")]
