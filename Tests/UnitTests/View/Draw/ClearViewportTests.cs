@@ -31,7 +31,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     {
         // Arrange
         Mock<TestableView> view = new () { CallBase = true };
-        view.Object.ViewportSettings = ViewportSettings.Transparent;
+        view.Object.ViewportSettings = ViewportSettingsFlags.Transparent;
 
         // Act
         view.Object.DoClearViewport ();
@@ -158,7 +158,7 @@ public class ClearViewportTests (ITestOutputHelper output)
             X = 1, Y = 1,
             Width = 3, Height = 3,
             BorderStyle = LineStyle.Single,
-            ViewportSettings = ViewportSettings.ClearContentOnly
+            ViewportSettings = ViewportSettingsFlags.ClearContentOnly
         };
         superView.Add (view);
         superView.BeginInit ();

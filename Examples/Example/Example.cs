@@ -1,15 +1,14 @@
-﻿// This is a simple example application.  For the full range of functionality
+﻿// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
+
+// This is a simple example application.  For the full range of functionality
 // see the UICatalog project
 
-// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
-
-
-// Override the default configuration for the application to use the Light theme
-
 using Terminal.Gui.Configuration;
-using Terminal.Gui.Core;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+// Override the default configuration for the application to use the Light theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
 ConfigurationManager.Enable(ConfigLocations.All);
 

@@ -252,7 +252,7 @@ public class ClipTests (ITestOutputHelper _output)
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ViewportSettings = ViewportSettings.ClipContentOnly
+            ViewportSettings = ViewportSettingsFlags.ClipContentOnly
         };
         view.SetContentSize (new Size (10, 10));
         view.Border!.Thickness = new (1);

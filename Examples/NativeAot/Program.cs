@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Terminal.Gui.Configuration;
-using Terminal.Gui.Core;
 using Terminal.Gui.Views;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
 
 namespace NativeAot;
 

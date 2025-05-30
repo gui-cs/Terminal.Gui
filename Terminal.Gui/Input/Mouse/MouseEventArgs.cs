@@ -7,7 +7,7 @@ namespace Terminal.Gui.Input;
 ///     Specifies the event arguments for <see cref="MouseEventArgs"/>. This is a higher-level construct than
 ///     the wrapped <see cref="MouseEventArgs"/> class and is used for the events defined on
 ///     <see cref="View"/> and subclasses
-///     of View (e.g. <see cref="Core.View.MouseEnter"/> and <see cref="View.MouseClick"/>).
+///     of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 /// </summary>
 public class MouseEventArgs : HandledEventArgs
 {

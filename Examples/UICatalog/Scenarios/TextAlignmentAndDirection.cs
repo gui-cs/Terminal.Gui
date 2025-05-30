@@ -14,7 +14,7 @@ public class TextAlignmentAndDirection : Scenario
     {
         public AlignmentAndDirectionView ()
         {
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent;
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent;
             BorderStyle = LineStyle.Dotted;
         }
     }
@@ -91,7 +91,7 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection1",
             TextAlignment = Alignment.Start,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
 
         var txtLabelHC = new View
@@ -103,7 +103,7 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection2",
             TextAlignment = Alignment.Center,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
 
         var txtLabelHR = new View
@@ -115,7 +115,7 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection1",
             TextAlignment = Alignment.End,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
 
         var txtLabelHJ = new View
@@ -127,7 +127,7 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection2",
             TextAlignment = Alignment.Fill,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
 
         singleLineLabels.Add (txtLabelHL);
@@ -208,7 +208,7 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Start,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
         txtLabelVT.TextFormatter.WordWrap = false;
 
@@ -222,7 +222,7 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Center,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
         txtLabelVM.TextFormatter.WordWrap = false;
 
@@ -236,7 +236,7 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
         txtLabelVB.TextFormatter.WordWrap = false;
 
@@ -250,7 +250,7 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Fill,
             Text = txt,
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         };
         txtLabelVJ.TextFormatter.WordWrap = false;
 

@@ -6,7 +6,7 @@ namespace Terminal.Gui.Input;
 public enum MouseFlags
 {
     /// <summary>
-    ///    No mouse event. This is the default value for <see cref="Terminal.Gui.MouseEventArgs.Flags"/> when no mouse event is being reported.
+    ///    No mouse event. This is the default value for <see cref="MouseEventArgs.Flags"/> when no mouse event is being reported.
     /// </summary>
     None = 0,
 

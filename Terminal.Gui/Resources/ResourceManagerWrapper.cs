@@ -4,7 +4,7 @@ using System.Collections;
 using System.Globalization;
 using System.Resources;
 
-namespace Terminal.Gui.Core;
+namespace Terminal.Gui.App;
 
 internal class ResourceManagerWrapper (ResourceManager resourceManager)
 {

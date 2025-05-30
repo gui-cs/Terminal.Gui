@@ -56,8 +56,8 @@ public class MarginEditor : AdornmentEditor
 
         var flags = new Dictionary<uint, string> ()
         {
-            { (uint)Terminal.Gui.Core.ViewportSettings.Transparent, "Transparent" },
-            { (uint)Terminal.Gui.Core.ViewportSettings.TransparentMouse, "TransparentMouse" }
+            { (uint)Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent, "Transparent" },
+            { (uint)Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse, "TransparentMouse" }
         };
 
         _flagSelectorTransparent = new FlagSelector ()
@@ -81,7 +81,7 @@ public class MarginEditor : AdornmentEditor
 
         _flagSelectorTransparent.ValueChanged += (_, args) =>
                                                  {
-                                                     ((Margin)AdornmentToEdit!).ViewportSettings = (Terminal.Gui.Core.ViewportSettings)args.CurrentValue!;
+                                                     ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.CurrentValue!;
                                                  };
 
 

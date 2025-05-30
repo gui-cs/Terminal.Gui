@@ -154,14 +154,23 @@ public class MenuBarItemv2 : MenuItemv2
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void RaisePopoverMenuOpenChanged ()
     {
         OnPopoverMenuOpenChanged();
         PopoverMenuOpenChanged?.Invoke (this, new EventArgs<bool> (PopoverMenuOpen));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     protected virtual void OnPopoverMenuOpenChanged () {}
 
+    /// <summary>
+    /// 
+    /// </summary>
     public event EventHandler<EventArgs<bool>>? PopoverMenuOpenChanged;
 
     /// <inheritdoc />

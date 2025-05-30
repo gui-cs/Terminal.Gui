@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
-///     Aligns items within a container based on the specified <see cref="Gui.Alignment"/>. Both horizontal and vertical
+///     Aligns items within a container based on the specified <see cref="Alignment"/>. Both horizontal and vertical
 ///     alignments are supported.
 /// </summary>
 public class Aligner : INotifyPropertyChanged

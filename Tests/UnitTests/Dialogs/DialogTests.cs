@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 using Xunit.Abstractions;
-using static Terminal.Gui.Core.Application;
+using static Terminal.Gui.App.Application;
 
 namespace Terminal.Gui.DialogTests;
 

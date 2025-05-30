@@ -266,7 +266,7 @@ public class Slider<T> : View, IOrientation
     }
     #endregion
 
-    /// <summary>Legends Orientation. <see cref="Core.Orientation"></see></summary>
+    /// <summary>Legends Orientation. <see cref="ViewBase.Orientation"></see></summary>
     public Orientation LegendsOrientation
     {
         get => _config._legendsOrientation;

@@ -9,14 +9,14 @@ public class MarginTests
     public void Is_Visually_Transparent ()
     {
         var view = new View { Height = 3, Width = 3 };
-        Assert.True(view.Margin!.ViewportSettings.HasFlag(ViewportSettings.Transparent), "Margin should be transparent by default.");
+        Assert.True(view.Margin!.ViewportSettings.HasFlag(ViewportSettingsFlags.Transparent), "Margin should be transparent by default.");
     }
 
     [Fact]
     public void Is_Transparent_To_Mouse ()
     {
         var view = new View { Height = 3, Width = 3 };
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse), "Margin should be transparent to mouse by default.");
+        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse by default.");
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class MarginTests
         view.Margin.Text = "Test";
 
         // Strip off ViewportSettings.Transparent
-        view.Margin!.ViewportSettings &= ~ViewportSettings.Transparent;
+        view.Margin!.ViewportSettings &= ~ViewportSettingsFlags.Transparent;
 
         // 
 
@@ -50,8 +50,8 @@ public class MarginTests
     {
         var view = new View { Height = 3, Width = 3, ShadowStyle = ShadowStyle.Transparent };
         Assert.Equal (ShadowStyle.Transparent, view.Margin!.ShadowStyle);
-        Assert.True (view.Margin.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse), "Margin should be transparent to mouse when ShadowStyle is Transparent.");
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettings.Transparent), "Margin should be transparent when ShadowStyle is Transparent..");
+        Assert.True (view.Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse when ShadowStyle is Transparent.");
+        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent when ShadowStyle is Transparent..");
     }
 
     [Fact]
@@ -59,8 +59,8 @@ public class MarginTests
     {
         var view = new View { Height = 3, Width = 3, ShadowStyle = ShadowStyle.Opaque };
         Assert.Equal (ShadowStyle.Opaque, view.Margin!.ShadowStyle);
-        Assert.True (view.Margin.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse), "Margin should be transparent to mouse when ShadowStyle is Opaque.");
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettings.Transparent), "Margin should be transparent when ShadowStyle is Opaque..");
+        Assert.True (view.Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse when ShadowStyle is Opaque.");
+        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent when ShadowStyle is Opaque..");
     }
 
 }

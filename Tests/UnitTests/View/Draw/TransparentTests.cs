@@ -33,7 +33,7 @@ public class TransparentTests (ITestOutputHelper output)
             Height = 3,
             Id = "sub",
             Text = "Sub",
-            ViewportSettings = ViewportSettings.Transparent,
+            ViewportSettings = ViewportSettingsFlags.Transparent,
             BorderStyle = LineStyle.Single
         };
 
@@ -76,7 +76,7 @@ public class TransparentTests (ITestOutputHelper output)
             Width = 15,
             Height = 3,
             Id = "sub",
-            ViewportSettings = ViewportSettings.Transparent,
+            ViewportSettings = ViewportSettingsFlags.Transparent,
             BorderStyle = LineStyle.Single
         };
 

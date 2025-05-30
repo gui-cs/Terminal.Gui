@@ -4,8 +4,8 @@
 //
 
 using System.Runtime.InteropServices;
-using IMainLoopDriver = Terminal.Gui.Core.IMainLoopDriver;
-using MainLoop = Terminal.Gui.Core.MainLoop;
+using IMainLoopDriver = Terminal.Gui.App.IMainLoopDriver;
+using MainLoop = Terminal.Gui.App.MainLoop;
 
 namespace Terminal.Gui.Drivers;
 

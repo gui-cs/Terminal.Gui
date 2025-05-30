@@ -6,7 +6,7 @@ public class ListColumnStyle
 {
     /// <summary>
     ///     Gets or sets an Orientation enum indicating whether to populate data down each column rather than across each
-    ///     row. Defaults to <see cref="Core.Orientation.Horizontal"/>.
+    ///     row. Defaults to <see cref="Orientation.Horizontal"/>.
     /// </summary>
     public Orientation Orientation { get; set; } = Orientation.Horizontal;
 

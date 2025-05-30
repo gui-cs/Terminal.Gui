@@ -1,5 +1,5 @@
 ﻿
-using Terminal.Gui.Core;
+using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
 namespace CommunityToolkitExample;

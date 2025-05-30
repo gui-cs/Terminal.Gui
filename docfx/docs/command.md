@@ -18,7 +18,7 @@ The `Command` system in Terminal.Gui defines a set of standard actions via the `
 The `Command` system bridges user input and view behavior, enabling:
 - **Consistency**: Standard commands ensure predictable interactions (e.g., `Enter` triggers `Accept` in buttons, menus, checkboxes).
 - **Extensibility**: Custom handlers and events allow behavior customization.
-- **Decoupling**: Events reduce reliance on subclassing, though current propagation mechanisms may require subview-superview coordination.
+- **Decoupling**: Events reduce reliance on sub-classing, though current propagation mechanisms may require subview-superview coordination.
 
 ### Note on `Cancel` Property
 The `CommandEventArgs` class uses a `Cancel` property to indicate that a command event (e.g., `Accepting`) should stop processing. This is misleading, as it implies action negation rather than completion. A filed issue proposes replacing `Cancel` with `Handled` to align with input events (e.g., `Key.Handled`). This document uses `Cancel` to reflect the current implementation, with the appendix summarizing the proposed change.

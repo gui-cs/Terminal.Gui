@@ -21,7 +21,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         };
         Application.Top.Margin.Thickness = new Thickness (viewMargin);
         // Turn of TransparentMouse for the test
-        Application.Top.Margin.ViewportSettings = ViewportSettings.None;
+        Application.Top.Margin.ViewportSettings = ViewportSettingsFlags.None;
 
         var subView = new View ()
         {
@@ -32,12 +32,12 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         };
         subView.Margin.Thickness = new Thickness (subViewMargin);
         // Turn of TransparentMouse for the test
-        subView.Margin.ViewportSettings = ViewportSettings.None;
+        subView.Margin.ViewportSettings = ViewportSettingsFlags.None;
 
         Application.Top.Margin.Add (subView);
         Application.Top.Layout ();
 
-        var foundView = View.GetViewsUnderLocation (new Point(0, 0), ViewportSettings.None).LastOrDefault ();
+        var foundView = View.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ();
 
         bool found = foundView == subView || foundView == subView.Margin;
         Assert.Equal (expectedFound, found);
@@ -66,7 +66,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         Application.Top.Padding.Add (subView);
         Application.Top.Layout ();
 
-        Assert.Equal (Application.Top.Padding, View.GetViewsUnderLocation (new Point(0, 0), ViewportSettings.None).LastOrDefault ());
+        Assert.Equal (Application.Top.Padding, View.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ());
         Application.Top?.Dispose ();
         Application.ResetState (ignoreDisposed: true);
     }

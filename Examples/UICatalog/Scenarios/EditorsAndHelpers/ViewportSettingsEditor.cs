@@ -31,35 +31,35 @@ public sealed class ViewportSettingsEditor : EditorBase
             _contentSizeWidth!.Value = ViewToEdit.GetContentSize ().Width;
             _contentSizeHeight!.Value = ViewToEdit.GetContentSize ().Height;
 
-            _cbAllowNegativeX!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.AllowNegativeX)
+            _cbAllowNegativeX!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX)
                                                   ? CheckState.Checked
                                                   : CheckState.UnChecked;
 
-            _cbAllowNegativeY!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.AllowNegativeY)
+            _cbAllowNegativeY!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY)
                                                   ? CheckState.Checked
                                                   : CheckState.UnChecked;
 
-            _cbAllowXGreaterThanContentWidth!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.AllowXGreaterThanContentWidth)
+            _cbAllowXGreaterThanContentWidth!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXGreaterThanContentWidth)
                                                                  ? CheckState.Checked
                                                                  : CheckState.UnChecked;
 
-            _cbAllowYGreaterThanContentHeight!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.AllowYGreaterThanContentHeight)
+            _cbAllowYGreaterThanContentHeight!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYGreaterThanContentHeight)
                                                                   ? CheckState.Checked
                                                                   : CheckState.UnChecked;
 
-            _cbClearContentOnly!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.ClearContentOnly)
+            _cbClearContentOnly!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly)
                                                     ? CheckState.Checked
                                                     : CheckState.UnChecked;
 
-            _cbClipContentOnly!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.ClipContentOnly)
+            _cbClipContentOnly!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly)
                                                    ? CheckState.Checked
                                                    : CheckState.UnChecked;
 
-            _cbTransparent!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.Transparent)
+            _cbTransparent!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
                                                ? CheckState.Checked
                                                : CheckState.UnChecked;
 
-            _cbTransparentMouse!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (Terminal.Gui.Core.ViewportSettings.TransparentMouse)
+            _cbTransparentMouse!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)
                                                ? CheckState.Checked
                                                : CheckState.UnChecked;
 
@@ -119,11 +119,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.AllowNegativeX;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeX;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.AllowNegativeX;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeX;
             }
         }
 
@@ -131,11 +131,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.AllowXGreaterThanContentWidth;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowXGreaterThanContentWidth;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.AllowXGreaterThanContentWidth;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowXGreaterThanContentWidth;
             }
         }
 
@@ -157,11 +157,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.AllowNegativeY;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeY;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.AllowNegativeY;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeY;
             }
         }
 
@@ -169,11 +169,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.AllowYGreaterThanContentHeight;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.AllowYGreaterThanContentHeight;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
             }
         }
 
@@ -247,11 +247,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.ClearContentOnly;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClearContentOnly;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.ClearContentOnly;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.ClearContentOnly;
             }
         }
 
@@ -268,11 +268,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.ClipContentOnly;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClipContentOnly;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.ClipContentOnly;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.ClipContentOnly;
             }
         }
 
@@ -289,11 +289,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.Transparent;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.Transparent;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent;
             }
         }
 
@@ -310,11 +310,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (e.NewValue == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.TransparentMouse;
+                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.TransparentMouse;
+                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
             }
         }
 

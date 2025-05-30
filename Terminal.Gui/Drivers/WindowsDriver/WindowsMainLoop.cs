@@ -3,9 +3,9 @@
 #define HACK_CHECK_WINCHANGED
 
 using System.Collections.Concurrent;
-using IMainLoopDriver = Terminal.Gui.Core.IMainLoopDriver;
-using MainLoop = Terminal.Gui.Core.MainLoop;
-using SizeChangedEventArgs = Terminal.Gui.Core.SizeChangedEventArgs;
+using IMainLoopDriver = Terminal.Gui.App.IMainLoopDriver;
+using MainLoop = Terminal.Gui.App.MainLoop;
+using SizeChangedEventArgs = Terminal.Gui.ViewBase.SizeChangedEventArgs;
 
 namespace Terminal.Gui.Drivers;
 

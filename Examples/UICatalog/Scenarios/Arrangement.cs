@@ -191,7 +191,7 @@ public class Arrangement : Scenario
         TransparentView transparentView = new ()
         {
             Title = "Transparent",
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.Transparent,
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent,
             X = 30,
             Y = 5,
             Width = 35,
@@ -208,7 +208,7 @@ public class Arrangement : Scenario
         testFrame.Add (new TransparentView ()
         {
             Title = "Transparent|TransparentMouse",
-            ViewportSettings = Terminal.Gui.Core.ViewportSettings.TransparentMouse | Terminal.Gui.Core.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse | Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         });
 
         adornmentsEditor.AutoSelectSuperView = testFrame;
@@ -335,7 +335,7 @@ public class Arrangement : Scenario
             Width = 30;
             Height = 10;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.Core.ViewportSettings.Transparent | Terminal.Gui.Core.ViewportSettings.TransparentMouse;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent | Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
 
             Padding!.Thickness = new Thickness (1);
 
