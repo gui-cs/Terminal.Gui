@@ -1,30 +1,61 @@
+# Views
+
 *Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
 
-* [Button](~/api/Terminal.Gui.Views.Button.yml) - A View that provides an item that invokes an System.Action when activated by the user.
-* [CheckBox](~/api/Terminal.Gui.Views.CheckBox.yml) - Shows an on/off toggle that the user can set.
-* [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml) - Enables to user to pick a color.
-* [ComboBox](~/api/Terminal.Gui.Views.ComboBox.yml) - Provides a drop-down list of items the user can select from.
-* [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) - A pop-up Window that contains one or more Buttons.
-  * [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) - A Dialog providing an interactive pop-up Window for users to select files or directories.
-  * [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml) - A Dialog providing an interactive pop-up Window for users to save files.
-* [FrameView](~/api/Terminal.Gui.Views.FrameView.yml) - A container View that draws a frame around its contents. Similar to a GroupBox in Windows.
-* [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) - A View for rendering graphs (bar, scatter etc).
-* [Hex viewer/editor](~/api/Terminal.Gui.Views.HexView.yml) - A hex viewer and editor that operates over a file stream. 
-* [Label](~/api/Terminal.Gui.Views.Label.yml) - Displays a string at a given position and supports multiple lines.
-* [ListView](~/api/Terminal.Gui.Views.ListView.yml) - Displays a scrollable list of data where each item can be activated to perform an action.
-* [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml) - Provides a menu bar with drop-down and cascading menus.
-* [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml) - Displays a modal (pup-up) message to the user, with a title, a message and a series of options that the user can choose from. 
-* [ProgressBar](~/api/Terminal.Gui.Views.ProgressBar.yml) - Displays a progress Bar indicating progress of an activity.
-* [RadioGroup](~/api/Terminal.Gui.Views.RadioGroup.yml) - Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time
-* [ScrollBarView](~/api/Terminal.Gui.Views.ScrollBar.yml) - A scrollbar, either horizontal or vertical.
-* [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) - A View that snaps to the bottom of a Toplevel displaying set of status items. Includes support for global app keyboard shortcuts.
-* [TableView](~/api/Terminal.Gui.Views.TableView.yml) - A View for tabular data based on a System.Data.DataTable. 
-* [TimeField](~/api/Terminal.Gui.Views.TimeField.yml) & [DateField](~/api/Terminal.Gui.Views.TimeField.yml) - Enables structured editing of dates and times.
-* [TextField](~/api/Terminal.Gui.Views.TextField.yml) - Provides a single-line text entry.
-* [TextValidateField](~/api/Terminal.Gui.Views.TextValidateField.yml) - Text field that validates input through a ITextValidateProvider.
-* [TextView](~/api/Terminal.Gui.Views.TextView.yml)- A multi-line text editing View supporting word-wrap, auto-complete, context menus, undo/redo, and clipboard operations, 
-* [TopLevel](~/api/Terminal.Gui.Views.Toplevel.yml) - The base class for modal/pop-up Windows.
-* [TreeView](~/api/Terminal.Gui.Views.TreeView.yml) - A hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined ITreeBuilder.
-* [View](~/api/Terminal.Gui.ViewBase.View.yml) - The base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
-* [Window](~/api/Terminal.Gui.Views.Window.yml) - A Toplevel view that draws a border around its Frame with a title at the top.
-* [Wizard](~/api/Terminal.Gui.Views.Wizard.yml) - Provides navigation and a user interface to collect related data across multiple steps.
+| View | Description |
+|------|-------------|
+| [Bar](~/api/Terminal.Gui.Views.Bar.yml) | Provides a horizontally or vertically oriented container for [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s to be used as a menu, toolbar, or status bar. |
+| [Button](~/api/Terminal.Gui.Views.Button.yml) | A button View that can be pressed with the mouse or keyboard. |
+| [CharMap](~/api/Terminal.Gui.Views.CharMap.yml) | A scrollable map of the Unicode codepoints. |
+| [CheckBox](~/api/Terminal.Gui.Views.CheckBox.yml) | Shows a checkbox that can be cycled between two or three states. |
+| [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml) | True color picker using HSL |
+| [ColorPicker16](~/api/Terminal.Gui.Views.ColorPicker16.yml) | The OG 16-color color picker. |
+| [ComboBox](~/api/Terminal.Gui.Views.ComboBox.yml) | Provides a drop-down list of items the user can select from. |
+| [DateField](~/api/Terminal.Gui.Views.DateField.yml) | Simple Date editing [View](~/api/Terminal.Gui.ViewBase.View.yml) |
+| [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml) | The [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml) [View](~/api/Terminal.Gui.ViewBase.View.yml) Date Picker. |
+| [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) | The [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) [View](~/api/Terminal.Gui.ViewBase.View.yml) is a [Window](~/api/Terminal.Gui.Views.Window.yml) that by default is centered and contains one or more [Button](~/api/Terminal.Gui.Views.Button.yml)s. It defaults to the `Colors.Schemes ["Dialog"]` scheme and has a 1 cell padding around the edges. |
+| [FileDialog](~/api/Terminal.Gui.Views.FileDialog.yml) | Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root drives etc). |
+| [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml) | Provides a user interface for displaying and selecting flags. Flags can be set from a dictionary or directly from an enum type. |
+| [FlagSelector\<T\>](~/api/Terminal.Gui.Views.FlagSelector-1.yml) | Provides a user interface for displaying and selecting flags. Flags can be set from a dictionary or directly from an enum type. |
+| [FrameView](~/api/Terminal.Gui.Views.FrameView.yml) | A non-overlapped container for other views with a border and optional title. |
+| [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) | View for rendering graphs (bar, scatter, etc.). |
+| [HexView](~/api/Terminal.Gui.Views.HexView.yml) | Hex viewer and editor [View](~/api/Terminal.Gui.ViewBase.View.yml) over a [IO.Stream](~/api/System.IO.Stream.yml) |
+| [Label](~/api/Terminal.Gui.Views.Label.yml) | The Label [View](~/api/Terminal.Gui.ViewBase.View.yml) displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When Label receives a [Command.HotKey](~/api/Terminal.Gui.Input.Command.HotKey.yml) command it will pass it to the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). |
+| [LegendAnnotation](~/api/Terminal.Gui.Views.LegendAnnotation.yml) | A box containing symbol definitions e.g. meanings for colors in a graph. The 'Key' to the graph |
+| [Line](~/api/Terminal.Gui.Views.Line.yml) | Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by [View.BorderStyle](~/api/Terminal.Gui.ViewBase.View.BorderStyle.yml). |
+| [LineView](~/api/Terminal.Gui.Views.LineView.yml) | A straight line control either horizontal or vertical |
+| [ListView](~/api/Terminal.Gui.Views.ListView.yml) | ListView [View](~/api/Terminal.Gui.ViewBase.View.yml) renders a scrollable list of data where each item can be activated to perform an action. |
+| [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml) | Provides a menu bar that spans the top of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar.  |
+| [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml) | A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as items in a [MenuBarv2](~/api/Terminal.Gui.Views.MenuBarv2.yml). MenuBarItems hold a [MenuBarItemv2.PopoverMenu](~/api/Terminal.Gui.Views.MenuBarItemv2.PopoverMenu.yml) instead of a [MenuBarItemv2.SubMenu](~/api/Terminal.Gui.Views.MenuBarItemv2.SubMenu.yml). |
+| [MenuBarv2](~/api/Terminal.Gui.Views.MenuBarv2.yml) | A horizontal list of [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml)s. Each [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml) can have a [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml) that is shown when the [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml) is selected. |
+| [MenuItemv2](~/api/Terminal.Gui.Views.MenuItemv2.yml) | A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as a menu item in a [Menuv2](~/api/Terminal.Gui.Views.Menuv2.yml). Has title, an A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as a menu item in a [Menuv2](~/api/Terminal.Gui.Views.Menuv2.yml). Has title, an associated help text, and an action to execute on activation. |
+| [Menuv2](~/api/Terminal.Gui.Views.Menuv2.yml) | A [Bar](~/api/Terminal.Gui.Views.Bar.yml)-derived object to be used as a vertically-oriented menu. Each subview is a [MenuItemv2](~/api/Terminal.Gui.Views.MenuItemv2.yml). |
+| [NumericUpDown](~/api/Terminal.Gui.Views.NumericUpDown.yml) | Enables the user to increase or decrease an int by clicking on the up or down buttons. |
+| [NumericUpDown\<T\>](~/api/Terminal.Gui.Views.NumericUpDown-1.yml) | Enables the user to increase or decrease a value with the mouse or keyboard. |
+| [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) | The [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml)provides an interactive dialog box for users to select files or directories. |
+| [OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml) | Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time. |
+| [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml) | Provides a cascading menu that pops over all other content. Can be used as a context menu or a drop-down all other content. Can be used as a context menu or a drop-down menu as part of [MenuBarv2](~/api/Terminal.Gui.Views.MenuBarv2.yml) as part of [MenuBarv2](~/api/Terminal.Gui.Views.MenuBarv2.yml). |
+| [ProgressBar](~/api/Terminal.Gui.Views.ProgressBar.yml) | A Progress Bar view that can indicate progress of an activity visually. |
+| [RadioGroup](~/api/Terminal.Gui.Views.RadioGroup.yml) | Displays a list of mutually-exclusive items. Each items can have its own hotkey. |
+| [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml) | The [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml) provides an interactive dialog box for users to pick a file to save. |
+| [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml) | Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.View.Viewport.yml). |
+| [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) | The ScrollSlider can be dragged with the mouse, constrained by the size of the Viewport of it's superview. The ScrollSlider can be oriented either vertically or horizontally. |
+| [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml) | Displays a command, help text, and a key binding. When the key specified by [Shortcut.Key](~/api/Terminal.Gui.Views.Shortcut.Key.yml) is pressed, the command will be invoked. Useful for displaying a command in [Bar](~/api/Terminal.Gui.Views.Bar.yml) such as a menu, toolbar, or status bar. |
+| [Slider](~/api/Terminal.Gui.Views.Slider.yml) | Slider control. |
+| [Slider\<T\>](~/api/Terminal.Gui.Views.Slider-1.yml) | Provides a slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse. |
+| [SpinnerView](~/api/Terminal.Gui.Views.SpinnerView.yml) | A [View](~/api/Terminal.Gui.ViewBase.View.yml) which displays (by default) a spinning line character. |
+| [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) | A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar. |
+| [Tab](~/api/Terminal.Gui.Views.Tab.yml) | A single tab in a [TabView](~/api/Terminal.Gui.Views.TabView.yml). |
+| [TableView](~/api/Terminal.Gui.Views.TableView.yml) | View for tabular data based on a [ITableSource](~/api/Terminal.Gui.Views.ITableSource.yml). See TableView Deep Dive for more information. |
+| [TabView](~/api/Terminal.Gui.Views.TabView.yml) | Control that hosts multiple sub views, presenting a single one at once. |
+| [TextField](~/api/Terminal.Gui.Views.TextField.yml) | Single-line text entry [View](~/api/Terminal.Gui.ViewBase.View.yml) |
+| [TextValidateField](~/api/Terminal.Gui.Views.TextValidateField.yml) | Text field that validates input through a [ITextValidateProvider](~/api/Terminal.Gui.Views.ITextValidateProvider.yml) |
+| [TextView](~/api/Terminal.Gui.Views.TextView.yml) | Multi-line text editing [View](~/api/Terminal.Gui.ViewBase.View.yml). |
+| [TileView](~/api/Terminal.Gui.Views.TileView.yml) | A [View](~/api/Terminal.Gui.ViewBase.View.yml) consisting of a moveable bar that divides the display area into resizeable [TileView.Tiles](~/api/Terminal.Gui.Views.TileView.Tiles.yml). |
+| [TimeField](~/api/Terminal.Gui.Views.TimeField.yml) | Time editing [View](~/api/Terminal.Gui.ViewBase.View.yml) |
+| [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) | Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)). |
+| [TreeView](~/api/Terminal.Gui.Views.TreeView.yml) | Convenience implementation of generic [TreeView%601](~/api/Terminal.Gui.Views.TreeView%601.yml) for any tree were all nodes implement [ITreeNode](~/api/Terminal.Gui.Views.ITreeNode.yml). See TreeView Deep Dive for more information. |
+| [TreeView\<T\>](~/api/Terminal.Gui.Views.TreeView-1.yml) | Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined [ITreeBuilder%601](~/api/Terminal.Gui.Views.ITreeBuilder%601.yml). See TreeView Deep Dive for more information. |
+| [Window](~/api/Terminal.Gui.Views.Window.yml) | An overlapped container for other views with a border and optional title. |
+| [Wizard](~/api/Terminal.Gui.Views.Wizard.yml) | Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step ( [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml)) can host arbitrary [View](~/api/Terminal.Gui.ViewBase.View.yml)s, much like a [Dialog](~/api/Terminal.Gui.Views.Dialog.yml). Each step also has a pane for help text. Along the bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard. |
+| [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml) | Represents a basic step that is displayed in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). The [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml) view is divided horizontally in two. On the left is the content view where [View](~/api/Terminal.Gui.ViewBase.View.yml)s can be added, On the right is the help for the step. Set [WizardStep.HelpText](~/api/Terminal.Gui.Views.WizardStep.HelpText.yml) to set the help text. If the help text is empty the help pane will not be shown. If there are no Views added to the WizardStep the [WizardStep.HelpText](~/api/Terminal.Gui.Views.WizardStep.HelpText.yml) (if not empty) will fill the wizard step. |

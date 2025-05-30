@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.Views;
 
-/// <summary>The <see cref="ColorPicker16"/> <see cref="View"/> Color picker.</summary>
+/// <summary>The OG 16-color color picker.</summary>
 public class ColorPicker16 : View
 {
     /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
