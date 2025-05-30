@@ -1,7 +1,11 @@
 ﻿// These classes use a keybinding system based on the design implemented in Scintilla.Net which is an
 // MIT licensed open source project https://github.com/jacobslusser/ScintillaNET/blob/master/src/ScintillaNET/Command.cs
 
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Views;
+
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Actions which can be performed by a <see cref="View"/>.

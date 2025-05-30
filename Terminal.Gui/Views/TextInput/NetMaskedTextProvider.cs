@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using Terminal.Gui.Core;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     .Net MaskedTextProvider Provider for TextValidateField.

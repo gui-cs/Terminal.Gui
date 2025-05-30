@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Translates colors in an image into a Palette of up to <see cref="MaxColors"/> colors (typically 256).

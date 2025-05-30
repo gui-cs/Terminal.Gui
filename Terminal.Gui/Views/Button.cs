@@ -1,4 +1,10 @@
-namespace Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A button View that can be pressed with the mouse or keyboard.

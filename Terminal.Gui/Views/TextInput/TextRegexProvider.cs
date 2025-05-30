@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System.Text.RegularExpressions;
+using Terminal.Gui.Core;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Regex Provider for TextValidateField.</summary>
 public class TextRegexProvider : ITextValidateProvider

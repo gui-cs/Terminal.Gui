@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Represents an option in a <see cref="Slider{T}"/> .</summary>
 /// <typeparam name="T">Data type of the option.</typeparam>

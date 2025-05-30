@@ -1,6 +1,10 @@
 #nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBarv2"/>.

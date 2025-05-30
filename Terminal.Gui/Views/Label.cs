@@ -1,4 +1,7 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The Label <see cref="View"/> displays text that describes the View next in the <see cref="View.SubViews"/>. When

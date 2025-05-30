@@ -1,1 +1,12 @@
-﻿global using CM = Terminal.Gui.ConfigurationManager;
+﻿global using CM = Terminal.Gui.Configuration.ConfigurationManager;
+global using Attribute = Terminal.Gui.Drawing.Attribute;
+global using Color = Terminal.Gui.Drawing.Color;
+global using Terminal.Gui.Core;
+global using Terminal.Gui.Drivers;
+global using Terminal.Gui.Input;
+global using Terminal.Gui.Configuration;
+global using Terminal.Gui.Views;
+global using Terminal.Gui.Drawing;
+global using Terminal.Gui.Text;
+global using Terminal.Gui.Resources;
+global using Terminal.Gui.FileServices;

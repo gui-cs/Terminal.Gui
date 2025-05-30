@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using Terminal.Gui;
+using Terminal.Gui.Core;
 
 namespace ReactiveExample;
 

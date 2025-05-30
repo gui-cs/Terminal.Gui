@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>Mouse flags reported in <see cref="MouseEventArgs"/>.</summary>
 /// <remarks>They just happen to map to the ncurses ones.</remarks>

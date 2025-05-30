@@ -1,4 +1,7 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column

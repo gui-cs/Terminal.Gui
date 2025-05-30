@@ -2,11 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Drawing;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 // ReSharper disable StringLiteralTypo
-/// <summary>Implements a JSON converter for <see cref="Scheme"/>.</summary>
+/// <summary>Implements a JSON converter for <see cref="Drawing.Scheme"/>.</summary>
 [RequiresUnreferencedCode ("AOT")]
 internal class SchemeJsonConverter : JsonConverter<Scheme>
 {

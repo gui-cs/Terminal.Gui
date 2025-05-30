@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Determines the position of items when arranged in a container.

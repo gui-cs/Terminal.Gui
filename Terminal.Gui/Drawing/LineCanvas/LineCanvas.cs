@@ -1,8 +1,11 @@
 #nullable enable
-using System.Buffers;
-using System.Runtime.InteropServices;
 
-namespace Terminal.Gui;
+using System.Runtime.InteropServices;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Facilitates box drawing and line intersection detection and rendering. Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable

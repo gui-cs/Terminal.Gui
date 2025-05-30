@@ -1,4 +1,8 @@
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>
 /// <typeparam name="T"></typeparam>

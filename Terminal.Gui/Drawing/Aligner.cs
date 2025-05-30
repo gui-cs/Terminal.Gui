@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Aligns items within a container based on the specified <see cref="Gui.Alignment"/>. Both horizontal and vertical

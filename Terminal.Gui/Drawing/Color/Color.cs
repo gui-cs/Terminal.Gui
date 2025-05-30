@@ -6,9 +6,10 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using ColorHelper;
+using Terminal.Gui.Configuration;
 using ColorConverter = ColorHelper.ColorConverter;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a 24-bit color encoded in ARGB32 format.

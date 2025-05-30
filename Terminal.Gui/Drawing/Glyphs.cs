@@ -1,5 +1,9 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Text;
+using Terminal.Gui.Views;
+
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...</summary>
 /// <remarks>

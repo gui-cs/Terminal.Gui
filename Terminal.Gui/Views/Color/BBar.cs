@@ -2,7 +2,7 @@
 
 using ColorHelper;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 internal class BBar : ColorBar
 {

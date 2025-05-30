@@ -7,8 +7,11 @@
 //
 
 using System.Globalization;
+using Terminal.Gui.Core;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Simple Date editing <see cref="View"/></summary>
 /// <remarks>The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.</remarks>

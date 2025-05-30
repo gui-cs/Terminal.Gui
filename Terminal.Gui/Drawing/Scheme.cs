@@ -2,8 +2,11 @@
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Views;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a theme definition that maps each <see cref="VisualRole"/> (such as <see cref="VisualRole.Focus"/>,

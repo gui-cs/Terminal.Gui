@@ -1,6 +1,8 @@
 #nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="MenuBarItem"/> is a menu item on  <see cref="MenuBar"/>. MenuBarItems do not support

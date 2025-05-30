@@ -78,7 +78,7 @@ public sealed class Transparent : Scenario
             TextFormatter.Alignment = Alignment.Center;
             TextFormatter.VerticalAlignment = Alignment.Center;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
+            ViewportSettings |= Terminal.Gui.Core.ViewportSettings.Transparent | Terminal.Gui.Core.ViewportSettings.TransparentMouse;
             BorderStyle = LineStyle.RoundedDotted;
             //SchemeName = "Base";
 
@@ -139,7 +139,7 @@ public sealed class Transparent : Scenario
             //Padding.SchemeName = "Error";
 
             Margin!.Thickness = new (1);
-           // Margin.ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+           // Margin.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.Transparent;
         }
 
         /// <inheritdoc />

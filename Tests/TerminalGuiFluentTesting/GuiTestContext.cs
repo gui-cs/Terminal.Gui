@@ -2,6 +2,10 @@
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+using Terminal.Gui.Views;
 
 namespace TerminalGuiFluentTesting;
 

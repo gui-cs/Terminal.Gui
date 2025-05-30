@@ -2,7 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Numerics;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 public readonly partial record struct Color
 {

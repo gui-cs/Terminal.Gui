@@ -1,7 +1,10 @@
 #nullable enable
 using System.Diagnostics;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting a single item from a list of options.

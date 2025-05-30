@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UnitTests;
 

@@ -1,5 +1,9 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting flags.

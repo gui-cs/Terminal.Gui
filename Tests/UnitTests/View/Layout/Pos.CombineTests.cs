@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
 using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
-using static Terminal.Gui.Pos;
+using static Terminal.Gui.Core.Dim;
+using static Terminal.Gui.Core.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 

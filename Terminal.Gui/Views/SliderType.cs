@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="Slider{T}"/>  Types</summary>
 public enum SliderType

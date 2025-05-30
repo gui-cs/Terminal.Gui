@@ -1,9 +1,10 @@
 ﻿#nullable enable
 
 using ColorHelper;
+using Terminal.Gui.Drawing;
 using ColorConverter = ColorHelper.ColorConverter;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 internal class ColorModelStrategy
 {

@@ -9,8 +9,12 @@
 
 using System;
 using System.Buffers;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Hex viewer and editor <see cref="View"/> over a <see cref="Stream"/></summary>
 /// <remarks>

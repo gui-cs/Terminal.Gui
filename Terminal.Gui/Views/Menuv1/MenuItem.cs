@@ -1,6 +1,10 @@
 #nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="MenuItem"/> has title, an associated help text, and an action to execute on activation. MenuItems

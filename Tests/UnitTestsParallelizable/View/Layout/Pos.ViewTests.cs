@@ -1,4 +1,4 @@
-﻿using static Terminal.Gui.Pos;
+﻿using static Terminal.Gui.Core.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 

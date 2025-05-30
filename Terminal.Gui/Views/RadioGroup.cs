@@ -1,5 +1,10 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Displays a list of mutually-exclusive items. Each items can have its own hotkey.</summary>
 public class RadioGroup : View, IDesignable, IOrientation

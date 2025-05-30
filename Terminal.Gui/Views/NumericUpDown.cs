@@ -1,7 +1,11 @@
 #nullable enable
 using System.ComponentModel;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Enables the user to increase or decrease a value with the mouse or keyboard.

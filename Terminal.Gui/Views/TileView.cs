@@ -1,5 +1,10 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="View"/> consisting of a moveable bar that divides the display area into resizeable

@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>
 ///     Abstract implementation of <see cref="IAutocomplete"/> allows for tailoring how autocomplete is

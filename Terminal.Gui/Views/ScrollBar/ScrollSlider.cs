@@ -1,8 +1,12 @@
 ﻿#nullable enable
 
 using System.ComponentModel;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The ScrollSlider can be dragged with the mouse, constrained by the size of the Viewport of it's superview. The

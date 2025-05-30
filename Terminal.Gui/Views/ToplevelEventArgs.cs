@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Args for events that relate to a specific <see cref="Toplevel"/>.</summary>
 public class ToplevelEventArgs : EventArgs

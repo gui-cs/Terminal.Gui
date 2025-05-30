@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="ITreeBuilder{T}"/> implementation for <see cref="ITreeNode"/> objects</summary>
 public class TreeNodeBuilder : TreeBuilder<ITreeNode>

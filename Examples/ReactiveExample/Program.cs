@@ -1,6 +1,8 @@
 ﻿using System.Reactive.Concurrency;
 using ReactiveUI;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
 
 namespace ReactiveExample;
 

@@ -1,8 +1,13 @@
 #nullable enable
 using System.Buffers;
 using System.Diagnostics;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+using Terminal.Gui.Views;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>
 ///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal and vertical alignment, text direction,

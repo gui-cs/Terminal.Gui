@@ -1,8 +1,12 @@
 ﻿#nullable enable
 
 using System.ComponentModel;
+using Terminal.Gui.Core;
+using Terminal.Gui.Text;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Indicates the size of scrollable content and controls the position of the visible content, either vertically or

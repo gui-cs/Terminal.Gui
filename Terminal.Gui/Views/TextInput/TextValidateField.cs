@@ -1,6 +1,11 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Text field that validates input through a  <see cref="ITextValidateProvider"/></summary>
 public class TextValidateField : View

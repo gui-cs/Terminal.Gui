@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by their row number.</summary>
 public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase

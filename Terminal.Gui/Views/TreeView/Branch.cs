@@ -1,6 +1,10 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 internal class Branch<T> where T : class
 {

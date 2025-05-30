@@ -156,11 +156,11 @@ public class ListViewWithSelection : Scenario
     {
         if (stateEventArgs.NewValue == CheckState.Checked)
         {
-            _listView.ViewportSettings |= Terminal.Gui.ViewportSettings.AllowYGreaterThanContentHeight;
+            _listView.ViewportSettings |= Terminal.Gui.Core.ViewportSettings.AllowYGreaterThanContentHeight;
         }
         else
         {
-            _listView.ViewportSettings &= ~Terminal.Gui.ViewportSettings.AllowYGreaterThanContentHeight;
+            _listView.ViewportSettings &= ~Terminal.Gui.Core.ViewportSettings.AllowYGreaterThanContentHeight;
         }
         _appWindow.SetNeedsDraw ();
     }

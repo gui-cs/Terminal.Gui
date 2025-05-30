@@ -1,11 +1,13 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Defines rendering options that affect how the view is displayed.</summary>
 public class ListColumnStyle
 {
     /// <summary>
     ///     Gets or sets an Orientation enum indicating whether to populate data down each column rather than across each
-    ///     row. Defaults to <see cref="Orientation.Horizontal"/>.
+    ///     row. Defaults to <see cref="Core.Orientation.Horizontal"/>.
     /// </summary>
     public Orientation Orientation { get; set; } = Orientation.Horizontal;
 

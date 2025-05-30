@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="EventArgs"/> for <see cref="Slider{T}"/> events.</summary>
 public class SliderEventArgs<T> : EventArgs

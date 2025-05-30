@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Describes the location of the configuration settings. The constants can be combined (bitwise) to specify multiple

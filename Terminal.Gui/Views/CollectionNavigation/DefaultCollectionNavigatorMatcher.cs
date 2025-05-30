@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Default implementation of <see cref="ICollectionNavigatorMatcher"/>, performs

@@ -1,5 +1,7 @@
 #nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Drawing;
+
+namespace Terminal.Gui.Views;
 
 internal class HistoryText
 {

@@ -4,10 +4,11 @@ using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Terminal.Gui.Core;
 
 namespace Terminal.Gui.EnumExtensions;
 
-/// <summary>Extension methods for the <see cref="Terminal.Gui.Dimension"/> <see langword="enum"/> type.</summary>
+/// <summary>Extension methods for the <see cref="Dimension"/> <see langword="enum"/> type.</summary>
 [GeneratedCode ("Terminal.Gui.Analyzers.Internal", "1.0")]
 [CompilerGenerated]
 [DebuggerNonUserCode]
@@ -15,7 +16,7 @@ namespace Terminal.Gui.EnumExtensions;
 public static class DimensionExtensions
 {
     /// <summary>
-    ///     Directly converts this <see cref="Terminal.Gui.Dimension"/> value to an <see langword="int"/> value with the same
+    ///     Directly converts this <see cref="Dimension"/> value to an <see langword="int"/> value with the same
     ///     binary representation.
     /// </summary>
     /// <remarks>NO VALIDATION IS PERFORMED!</remarks>
@@ -23,7 +24,7 @@ public static class DimensionExtensions
     public static int AsInt32 (this Dimension e) => Unsafe.As<Dimension, int> (ref e);
 
     /// <summary>
-    ///     Directly converts this <see cref="Terminal.Gui.Dimension"/> value to a <see langword="uint"/> value with the same
+    ///     Directly converts this <see cref="Dimension"/> value to a <see langword="uint"/> value with the same
     ///     binary representation.
     /// </summary>
     /// <remarks>NO VALIDATION IS PERFORMED!</remarks>
@@ -32,7 +33,7 @@ public static class DimensionExtensions
 
     /// <summary>
     ///     Determines if the specified <see langword="int"/> value is explicitly defined as a named value of the
-    ///     <see cref="Terminal.Gui.Dimension"/> <see langword="enum"/> type.
+    ///     <see cref="Dimension"/> <see langword="enum"/> type.
     /// </summary>
     /// <remarks>
     ///     Only explicitly named values return true, as with IsDefined. Combined valid flag values of flags enums which are

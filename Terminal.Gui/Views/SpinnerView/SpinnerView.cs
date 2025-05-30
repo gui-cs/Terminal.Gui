@@ -1,11 +1,13 @@
 ﻿#nullable enable
+using Terminal.Gui.Core;
+
 //------------------------------------------------------------------------------
 // Windows Terminal supports Unicode and Emoji characters, but by default
 // conhost shells (e.g., PowerShell and cmd.exe) do not. See
 // <https://spectreconsole.net/best-practices>.
 //------------------------------------------------------------------------------
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>A <see cref="View"/> which displays (by default) a spinning line character.</summary>
 /// <remarks>

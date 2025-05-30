@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Drawing;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and

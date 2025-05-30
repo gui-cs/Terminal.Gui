@@ -1,5 +1,9 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>The <see cref="ColorPicker16"/> <see cref="View"/> Color picker.</summary>
 public class ColorPicker16 : View

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Terminal.Gui;
+using Terminal.Gui.Input;
 
 namespace ReactiveExample;
 

@@ -1,7 +1,12 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Displays a command, help text, and a key binding. When the key specified by <see cref="Key"/> is pressed, the
@@ -25,7 +30,7 @@ namespace Terminal.Gui;
 ///     <para>
 ///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
 ///         binding on the
-///         right side. Set <see cref="AlignmentModes"/> to <see cref="AlignmentModes.EndToStart"/> to reverse the order.
+///         right side. Set <see cref="AlignmentModes"/> to <see cref="Drawing.AlignmentModes.EndToStart"/> to reverse the order.
 ///     </para>
 ///     <para>
 ///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting

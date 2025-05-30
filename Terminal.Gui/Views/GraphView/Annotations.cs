@@ -1,4 +1,8 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <para>Describes an overlay element that is rendered either before or after a series.</para>

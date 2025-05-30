@@ -1,5 +1,5 @@
 #nullable enable
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A helper class for accessing the ucdapi.org API.

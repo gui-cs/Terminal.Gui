@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
+using Terminal.Gui.Views;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 /// <summary>TreeView builder for creating file system based trees.</summary>
 public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IFileSystemInfo>

@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 internal class FileDialogCollectionNavigator (FileDialog fileDialog, TableView tableView) : CollectionNavigatorBase
 {

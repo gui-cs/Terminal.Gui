@@ -1,5 +1,10 @@
 #nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up)

@@ -2,8 +2,9 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using Terminal.Gui.Core;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define

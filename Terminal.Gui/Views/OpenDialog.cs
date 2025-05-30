@@ -12,7 +12,7 @@
 using System.Collections.ObjectModel;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Determine which <see cref="System.IO"/> type to open.</summary>
 public enum OpenMode

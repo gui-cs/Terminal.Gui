@@ -9,7 +9,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
-using Color = Terminal.Gui.Color;
+using Color = Terminal.Gui.Drawing.Color;
 
 namespace UICatalog.Scenarios;
 

@@ -1,5 +1,9 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>View for rendering graphs (bar, scatter, etc...).</summary>
 public class GraphView : View, IDesignable

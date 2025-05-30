@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text.Unicode;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Represents all of the Uniicode ranges.from System.Text.Unicode.UnicodeRange plus

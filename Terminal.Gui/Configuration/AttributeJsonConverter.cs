@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Drawing;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
 [RequiresUnreferencedCode ("AOT")]

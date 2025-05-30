@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+
+namespace Terminal.Gui.Drawing;
 #nullable enable
 
 // TODO: Add events that notify when StraightLine changes to enable dynamic layout

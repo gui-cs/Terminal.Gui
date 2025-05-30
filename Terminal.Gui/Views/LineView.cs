@@ -1,4 +1,8 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>A straight line control either horizontal or vertical</summary>
 public class LineView : View

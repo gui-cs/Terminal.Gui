@@ -68,3 +68,4 @@ BenchmarkDotNet.Artifacts/
 *.log.*
 
 log.*
+/Terminal.Gui/Drivers/V2/WindowsInputProcessor.cs

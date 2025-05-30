@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ICollectionNavigator"/> sub-interface for <see cref="ListView"/> and <see cref="TreeView"/>. See also

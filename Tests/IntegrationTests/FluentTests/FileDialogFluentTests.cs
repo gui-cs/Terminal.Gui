@@ -2,6 +2,8 @@
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using Terminal.Gui;
+using Terminal.Gui.Input;
+using Terminal.Gui.Views;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;

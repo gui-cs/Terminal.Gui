@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using Tui = Terminal.Gui;
+using Terminal.Gui.Text;
+using Tui = Terminal.Gui.Text;
 
 namespace Terminal.Gui.Benchmarks.Text.RuneExtensions;
 
 /// <summary>
-/// Benchmarks for <see cref="Tui.RuneExtensions.DecodeSurrogatePair"/> performance fine-tuning.
+/// Benchmarks for <see cref="DecodeSurrogatePair"/> performance fine-tuning.
 /// </summary>
 [MemoryDiagnoser]
 [BenchmarkCategory (nameof (Tui.RuneExtensions))]

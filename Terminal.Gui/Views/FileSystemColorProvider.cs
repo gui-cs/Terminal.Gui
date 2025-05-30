@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Provides a way to get the color of a file or directory.</summary>
 public class FileSystemColorProvider

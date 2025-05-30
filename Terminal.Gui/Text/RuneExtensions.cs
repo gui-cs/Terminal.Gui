@@ -3,7 +3,7 @@
 using System.Globalization;
 using Wcwidth;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>Extends <see cref="System.Text.Rune"/> to support TUI text manipulation.</summary>
 public static class RuneExtensions

@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
+using Terminal.Gui.Views;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 internal class FileDialogState
 {

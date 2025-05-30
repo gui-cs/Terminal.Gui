@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Terminal.Gui;
+using Terminal.Gui.Drivers;
 
 namespace TerminalGuiFluentTesting;
 

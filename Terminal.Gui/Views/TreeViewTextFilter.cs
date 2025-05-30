@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ITreeViewFilter{T}"/> implementation which searches the <see cref="TreeView{T}.AspectGetter"/> of

@@ -1,7 +1,10 @@
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.FileServices;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 internal class AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
     : AutocompleteContext (Cell.ToCellList (currentLine), cursorPosition)

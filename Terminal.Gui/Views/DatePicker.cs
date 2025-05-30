@@ -6,8 +6,10 @@
 
 using System.Data;
 using System.Globalization;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>The <see cref="DatePicker"/> <see cref="View"/> Date Picker.</summary>
 public class DatePicker : View

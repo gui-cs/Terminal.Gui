@@ -4,6 +4,9 @@
 // A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
 
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Views;
 
 // Override the default configuration for the application to use the Light theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";

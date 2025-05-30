@@ -6,8 +6,12 @@
 // Licensed under the MIT license
 
 using System.Globalization;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Time editing <see cref="View"/></summary>
 /// <remarks>The <see cref="TimeField"/> <see cref="View"/> provides time editing functionality with mouse support.</remarks>

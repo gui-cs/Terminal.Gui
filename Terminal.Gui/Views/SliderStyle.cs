@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Drawing;
+
+namespace Terminal.Gui.Views;
 
 /// <summary><see cref="Slider{T}"/> Style</summary>
 public class SliderStyle

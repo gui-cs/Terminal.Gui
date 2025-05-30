@@ -1,6 +1,11 @@
 ﻿using System.Transactions;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Slider control.</summary>
 public class Slider : Slider<object>
@@ -266,7 +271,7 @@ public class Slider<T> : View, IOrientation
     }
     #endregion
 
-    /// <summary>Legends Orientation. <see cref="Gui.Orientation"></see></summary>
+    /// <summary>Legends Orientation. <see cref="Core.Orientation"></see></summary>
     public Orientation LegendsOrientation
     {
         get => _config._legendsOrientation;

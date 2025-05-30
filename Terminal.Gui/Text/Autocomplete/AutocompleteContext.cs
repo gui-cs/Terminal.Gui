@@ -1,4 +1,7 @@
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+
+namespace Terminal.Gui.Text;
 
 /// <summary>
 ///     Describes the current state of a <see cref="View"/> which is proposing autocomplete. Suggestions are based on

@@ -1,4 +1,10 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+using Terminal.Gui.Views;
+
+namespace Terminal.Gui.Text;
 
 /// <summary>
 ///     Autocomplete for a <see cref="TextField"/> which shows suggestions within the box. Displayed suggestions can

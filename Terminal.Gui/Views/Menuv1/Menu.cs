@@ -1,6 +1,11 @@
 #nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 

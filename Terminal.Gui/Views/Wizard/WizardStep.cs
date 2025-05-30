@@ -1,5 +1,8 @@
-﻿#nullable enable 
-namespace Terminal.Gui;
+﻿#nullable enable
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is

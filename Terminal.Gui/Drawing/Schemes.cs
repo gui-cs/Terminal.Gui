@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 // ReSharper disable InconsistentNaming
 /// <summary>

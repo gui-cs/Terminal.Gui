@@ -1,11 +1,13 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Provides a collection of <see cref="Key"/>s bound to <see cref="Command"/>s.
 /// </summary>
-/// <seealso cref="Application.KeyBindings"/>
-/// <seealso cref="View.KeyBindings"/>
+/// <seealso cref="KeyBindings"/>
+/// <seealso cref="KeyBindings"/>
 /// <seealso cref="Command"/>
 public class KeyBindings : InputBindings<Key, KeyBinding>
 {

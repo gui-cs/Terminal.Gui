@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="Slider{T}"/> Legend Style</summary>
 public class SliderAttributes

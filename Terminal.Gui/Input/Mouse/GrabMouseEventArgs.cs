@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Core;
+
+namespace Terminal.Gui.Input;
 
 /// <summary>Args GrabMouse related events.</summary>
 public class GrabMouseEventArgs : EventArgs

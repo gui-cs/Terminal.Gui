@@ -1,5 +1,8 @@
 #nullable enable
-namespace Terminal.Gui;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Text;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Represents the underlying data model for managing and manipulating multi-line text in a <see cref="TextView"/>.

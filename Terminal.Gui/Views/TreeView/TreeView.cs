@@ -3,8 +3,12 @@
 // and code to be used in this library under the MIT license.
 
 using System.Collections.ObjectModel;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface for all non-generic members of <see cref="TreeView{T}"/>.

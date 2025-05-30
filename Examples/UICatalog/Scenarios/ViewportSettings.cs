@@ -28,8 +28,8 @@ public class ViewportSettings : Scenario
             Arrangement = ViewArrangement.Resizable;
 
             SetContentSize (new (60, 40));
-            ViewportSettings |= Terminal.Gui.ViewportSettings.ClearContentOnly;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.ClipContentOnly;
+            ViewportSettings |= Terminal.Gui.Core.ViewportSettings.ClearContentOnly;
+            ViewportSettings |= Terminal.Gui.Core.ViewportSettings.ClipContentOnly;
             VerticalScrollBar.Visible = true;
 
             // Things this view knows how to do

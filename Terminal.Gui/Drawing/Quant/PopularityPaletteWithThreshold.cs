@@ -1,5 +1,5 @@
 ﻿using Terminal.Gui;
-using Color = Terminal.Gui.Color;
+using Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Simple fast palette building algorithm which uses the frequency that a color is seen

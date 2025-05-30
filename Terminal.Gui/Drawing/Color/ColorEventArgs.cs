@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Event arguments for the <see cref="Color"/> events.</summary>
 public class ColorEventArgs : EventArgs<Color>

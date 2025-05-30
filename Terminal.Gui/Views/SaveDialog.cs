@@ -12,7 +12,7 @@
 using System.IO.Abstractions;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>The <see cref="SaveDialog"/> provides an interactive dialog box for users to pick a file to save.</summary>
 /// <remarks>

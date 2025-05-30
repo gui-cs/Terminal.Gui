@@ -2,8 +2,9 @@
 // Nerd fonts can be installed by following the instructions on the Nerd Fonts repository: https://github.com/ryanoasis/nerd-fonts
 
 using System.IO.Abstractions;
+using Terminal.Gui.Configuration;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 internal class NerdFonts
 {

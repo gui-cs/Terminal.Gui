@@ -16,7 +16,7 @@ public class MarginTests (ITestOutputHelper output)
         view.Margin.Thickness = new (1);
 
         Application.Top = new Toplevel ();
-        Application.TopLevels.Push (Gui.Application.Top);
+        Application.TopLevels.Push (Application.Top);
 
         Application.Top.SetScheme (new()
         {
@@ -52,7 +52,7 @@ public class MarginTests (ITestOutputHelper output)
         view.Margin.ViewportSettings = ViewportSettings.None;
 
         Application.Top = new Toplevel ();
-        Application.TopLevels.Push (Gui.Application.Top);
+        Application.TopLevels.Push (Application.Top);
 
         Application.Top.SetScheme (new ()
         {

@@ -1,4 +1,9 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Configuration;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Views;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains

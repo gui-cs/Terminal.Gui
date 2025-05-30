@@ -1,4 +1,4 @@
-﻿global using Attribute = Terminal.Gui.Attribute;
+﻿global using Attribute = Terminal.Gui.Drawing.Attribute;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
@@ -14,7 +14,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Terminal.Gui;
-using Command = Terminal.Gui.Command;
+using Command = Terminal.Gui.Input.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 #nullable enable

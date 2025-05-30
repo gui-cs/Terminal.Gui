@@ -1,6 +1,10 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+using Terminal.Gui.Core;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Input;
+
+namespace Terminal.Gui.Views;
 
 /// <inheritdoc/>
 internal abstract class CollectionNavigatorBase : ICollectionNavigator
