@@ -26,7 +26,7 @@ Scheme dialogScheme = SchemeManager.GetScheme (Schemes.Dialog);
 
 ### Scheme Inheritance
 
- A `Scheme` enables consistent, semantic theming of UI elements by associating each visual state with a specific style. Each property (e.g., `Normal`  or `Focus`) is an @Terminal.Gui.Attribute. 
+ A `Scheme` enables consistent, semantic theming of UI elements by associating each visual state with a specific style. Each property (e.g., `Normal`  or `Focus`) is an @Terminal.Gui.Drawing.Attribute. 
 
  Only `Normal` is required. If other properties are not explicitly set, its value is derived from other roles (typically `Normal`) using well-defined inheritance rules. See the source code for the `Scheme` class for more details. 
 

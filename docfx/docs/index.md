@@ -8,12 +8,12 @@
 
 * **[Cross Platform](drivers.md)** - Windows, Mac, and Linux. Terminal drivers for Curses, Windows, and the .NET Console mean apps will work well on both color and monochrome terminals. Apps also work over SSH.
 * **[Templates](getting-started.md)** - The `dotnet new` command can be used to create a new Terminal.Gui app.
-* **[Extensible UI](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views. Dozens of [Built-in Views](views.md) are provided.
+* **[Extensible UI](~/api/Terminal.Gui.ViewBase.View.yml)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views. Dozens of [Built-in Views](views.md) are provided.
 * **[Keyboard](keyboard.md) and [Mouse](mouse.md) Input** - The library handles all the details of input processing and provides a simple event-based API for applications to consume.
 * **[Powerful Layout Engine](layout.md)** - The layout engine makes it easy to lay out controls relative to each other and enables dynamic terminal UIs. 
-* **[Machine, User, and App-Level Configuration](config.md)** - Persistent configuration settings, including overriding default look & feel with Themes, keyboard bindings, and more via the [ConfigurationManager](~/api/Terminal.Gui.ConfigurationManager.yml) class.
-* **[Clipboard support](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.Clipboard.html)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
-* **Multi-tasking** - The [Mainloop](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, and timers. Most classes are safe for threading.
+* **[Machine, User, and App-Level Configuration](config.md)** - Persistent configuration settings, including overriding default look & feel with Themes, keyboard bindings, and more via the [ConfigurationManager](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml) class.
+* **[Clipboard support](~/api/Terminal.Gui.App.Clipboard.yml)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
+* **Multi-tasking** - The [Mainloop](~/api/Terminal.Gui.App.MainLoop.yml) supports processing events, idle handlers, and timers. Most classes are safe for threading.
 * **[Reactive Extensions](https://github.com/dotnet/reactive)** - Use reactive extensions and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/ReactiveExample) of a sample app.
 
 See [What's New in V2 For more](newinv2.md).
@@ -57,9 +57,9 @@ This example shows a prompt and returns an integer value depending on which valu
 
 More interesting user interfaces can be created by composing some of the various `View` classes that are included. 
 
-In the example above, @Terminal.Gui.Application.Init(Terminal.Gui.IConsoleDriver,System.String) sets up the environment, initializes the color schemes, and clears the screen to start the application.
+In the example above, @Terminal.Gui.App.Application.Init* sets up the environment, initializes the color schemes, and clears the screen to start the application.
 
-The [Application](~/api/Terminal.Gui.Application.yml) class additionally creates an instance of the [Toplevel](~/api/Terminal.Gui.Toplevel.yml) View available in the `Application.Top` property, and can be used like this:
+The [Application](~/api/Terminal.Gui.App.Application.yml) class additionally creates an instance of the [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) View available in the `Application.Top` property, and can be used like this:
 
 ```csharp
 using Terminal.Gui;
@@ -117,11 +117,11 @@ Application.Shutdown ();
 ## Views
 
 All visible elements in a Terminal.Gui application are implemented as
-[Views](~/api/Terminal.Gui.View.yml). Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.
+[Views](~/api/Terminal.Gui.ViewBase.View.yml). Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.
 
 See the full list of [Views provided by the Terminal.Gui library here](views.md).
 
-Every view can contain an arbitrary number of child views, called `SubViews`. Call @Terminal.Gui.View.Add(View) to add a couple of buttons to a UI:
+Every view can contain an arbitrary number of child views, called `SubViews`. Call @Terminal.Gui.ViewBase.View.Add* to add a couple of buttons to a UI:
 
 ```csharp
 void SetupMyView (View myView)
@@ -161,11 +161,11 @@ There is no return value from running modally, so the modal view must have a mec
 
 ## Windows
 
-[Window](~/api/Terminal.Gui.Window.yml) is a view used in `Overlapped` layouts, providing a frame and a title - and can be moved and sized with the keyboard or mouse.
+[Window](~/api/Terminal.Gui.Views.Window.yml) is a view used in `Overlapped` layouts, providing a frame and a title - and can be moved and sized with the keyboard or mouse.
 
 ## Dialogs
 
-[Dialogs](~/api/Terminal.Gui.Dialog.yml) are Modal [Windows](~/api/Terminal.Gui.Window.yml) that are centered in the middle of the screen and are intended to be used modally - that is, they run, and they are expected to return a result before resuming execution of the application.
+[Dialogs](~/api/Terminal.Gui.Views.Dialog.yml) are Modal [Windows](~/api/Terminal.Gui.Views.Window.yml) that are centered in the middle of the screen and are intended to be used modally - that is, they run, and they are expected to return a result before resuming execution of the application.
 
 Dialogs expose an API for adding buttons and managing the layout such that buttons are at the bottom of the dialog (e.g. [`AddButton`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.Dialog.yml#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_)).
 
@@ -189,7 +189,7 @@ Which will show something like this:
 
 ## Wizards
 
-[Wizards](~/api/Terminal.Gui.Wizard.yml) are Dialogs that let users step through a series of steps to complete a task. 
+[Wizards](~/api/Terminal.Gui.Views.Wizard.yml) are Dialogs that let users step through a series of steps to complete a task. 
 
 ```
 ╔╡Gandolf - The last step╞════════════════════════════════════╗

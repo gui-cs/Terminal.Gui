@@ -80,13 +80,13 @@ For this to work properly, there must be logic that removes the focus-cache used
 
 ## Application Level Navigation
 
-At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.Application.Navigation property.
+At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.App.Application.Navigation property.
 
-@Terminal.Gui.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
+@Terminal.Gui.App.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
 
-The @Terminal.Gui.ApplicationNavigation.FocusedChanged and @Terminal.Gui.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful apps that want to override what view can be focused across an entire app. 
+The @Terminal.Gui.App.ApplicationNavigation.FocusedChanged and @Terminal.Gui.App.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful apps that want to override what view can be focused across an entire app. 
 
-The @Terminal.Gui.ApplicationNavigation.AdvanceFocus(Terminal.Gui.NavigationDirection,System.Nullable{Terminal.Gui.TabBehavior}) method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
+The @Terminal.Gui.App.ApplicationNavigation.AdvanceFocus* method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
 
 The implementation is simple:
 
@@ -100,9 +100,9 @@ This method replaces about a dozen functions in v1 (scattered across `Applicatio
 
 ## View Level Navigation
 
-@Terminal.Gui.View.AdvanceFocus(Terminal.Gui.NavigationDirection,System.Nullable{Terminal.Gui.TabBehavior}) is the primary method for developers to cause a view to gain or lose focus.
+@Terminal.Gui.ViewBase.View.AdvanceFocus* is the primary method for developers to cause a view to gain or lose focus.
 
-Various events are raised when a View's focus is changing. For example, @Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged.
+Various events are raised when a View's focus is changing. For example, @Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged.
 
 ## What makes a View focusable?
 
@@ -168,7 +168,7 @@ In v2, the automatic setting of `TabStop` in `Add` is retained because it is not
 
 ## Knowing When a View's Focus is Changing
 
-@Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged are raised when a View's focus is changing.
+@Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged are raised when a View's focus is changing.
 
 ## Built-In Views Interactivity
 
@@ -183,7 +183,7 @@ In v2, the automatic setting of `TabStop` in `Add` is retained because it is not
 | **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption      | SetFocusedOption<br>OnAccept | Focus                     | SetFocus<br>SetFocusedOption |                              | SetFocus<br>SetFocusedOption |                | Yes           |
 | **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow         | OpenSelectedItem<br>OnAccept | OnAccept                  | SetMark<br>OnSelectedChanged | OpenSelectedItem<br>OnAccept |                              |                | No            |
 
-## Accesibilty Tenets
+## Accessibility Tenets
 
 See https://devblogs.microsoft.com/dotnet/the-journey-to-accessible-apps-keyboard-accessible/
 

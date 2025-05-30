@@ -9,11 +9,10 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 ## Terminal.Gui API Documentation
 
 * [Conceptual Docs & Deep Dives](docs/index.md)
-* [API Reference](~/api/Terminal.Gui.yml)
+* [API Reference](~/api/Terminal.Gui.App.yml)
 
 ## UI Catalog
 
 UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
 
-* [UI Catalog API Reference](~/api/UICatalog/UICatalog.yml)
 * [UI Catalog Source](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog)
