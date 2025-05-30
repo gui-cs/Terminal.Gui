@@ -3,8 +3,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.Configuration;
 

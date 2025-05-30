@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Terminal.Gui;
 using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;

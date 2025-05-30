@@ -1,8 +1,4 @@
 using System.Diagnostics;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Text;
 

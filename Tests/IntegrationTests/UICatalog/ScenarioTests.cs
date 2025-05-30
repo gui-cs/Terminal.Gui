@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Terminal.Gui;
 using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;

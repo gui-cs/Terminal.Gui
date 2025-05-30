@@ -1,7 +1,5 @@
 ﻿#nullable enable
 using System.Text.RegularExpressions;
-using Terminal.Gui.Core;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Views;
 

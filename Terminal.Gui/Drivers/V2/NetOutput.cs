@@ -1,7 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Drivers;
 

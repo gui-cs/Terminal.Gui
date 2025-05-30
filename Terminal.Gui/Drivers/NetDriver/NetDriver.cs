@@ -7,9 +7,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Terminal.Gui.Core;
-using Terminal.Gui.Input;
-using Terminal.Gui.Text;
 using static Terminal.Gui.Drivers.NetEvents;
 
 namespace Terminal.Gui.Drivers;

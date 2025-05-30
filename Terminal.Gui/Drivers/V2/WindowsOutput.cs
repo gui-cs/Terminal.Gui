@@ -3,9 +3,6 @@ using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Text;
 using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;

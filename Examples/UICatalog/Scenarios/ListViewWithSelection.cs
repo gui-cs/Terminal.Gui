@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
 using JetBrains.Annotations;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

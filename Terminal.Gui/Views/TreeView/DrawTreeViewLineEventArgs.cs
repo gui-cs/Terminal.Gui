@@ -2,7 +2,6 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Views;
 

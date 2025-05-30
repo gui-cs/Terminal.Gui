@@ -1,8 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Drivers;
 

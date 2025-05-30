@@ -19,9 +19,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Terminal.Gui.Core;
-using Terminal.Gui.Input;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Drivers;
 

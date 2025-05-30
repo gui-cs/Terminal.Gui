@@ -3,9 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Configuration;
 

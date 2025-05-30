@@ -4,8 +4,6 @@
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Terminal.Gui.Core;
-using Terminal.Gui.Text;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 

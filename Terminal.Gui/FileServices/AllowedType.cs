@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Resources;
-
+﻿
 namespace Terminal.Gui.FileServices;
 
 /// <summary>Interface for <see cref="FileDialog"/> restrictions on which file type(s) the user is allowed to select/enter.</summary>

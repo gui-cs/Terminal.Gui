@@ -1,4 +1,3 @@
-using Terminal.Gui;
 
 /// <summary>
 ///     Represents the status of a line during text editing operations in a <see cref="TextView"/>.

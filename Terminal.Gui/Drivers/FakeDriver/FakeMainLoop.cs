@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Core;
-
+﻿
 namespace Terminal.Gui.Drivers;
 
 internal class FakeMainLoop : IMainLoopDriver

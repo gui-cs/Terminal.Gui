@@ -2,9 +2,6 @@
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text.Json.Serialization;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Core;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Drawing;
 

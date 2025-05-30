@@ -1,13 +1,5 @@
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.FileServices;
-using Terminal.Gui.Input;
-using Terminal.Gui.Resources;
-using Terminal.Gui.Text;
 
 #nullable enable
 

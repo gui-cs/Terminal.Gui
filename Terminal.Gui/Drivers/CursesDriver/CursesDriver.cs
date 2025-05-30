@@ -4,10 +4,6 @@
 //
 
 using System.Runtime.InteropServices;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Input;
-using Terminal.Gui.Text;
 using Unix.Terminal;
 
 namespace Terminal.Gui.Drivers;

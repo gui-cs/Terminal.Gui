@@ -1,6 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.Drawing;
 

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using Terminal.Gui.Core;
 
 //------------------------------------------------------------------------------
 // Windows Terminal supports Unicode and Emoji characters, but by default

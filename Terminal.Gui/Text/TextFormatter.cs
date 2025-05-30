@@ -1,11 +1,6 @@
 #nullable enable
 using System.Buffers;
 using System.Diagnostics;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Input;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Text;
 

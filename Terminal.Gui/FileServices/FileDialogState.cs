@@ -1,5 +1,4 @@
 ﻿using System.IO.Abstractions;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.FileServices;
 

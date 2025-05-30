@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.IO.Abstractions;
-using Terminal.Gui.Resources;
 
 namespace Terminal.Gui.FileServices;
 

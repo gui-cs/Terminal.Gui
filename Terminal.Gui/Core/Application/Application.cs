@@ -3,11 +3,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Resources;
-using Terminal.Gui.Text;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Core;
 

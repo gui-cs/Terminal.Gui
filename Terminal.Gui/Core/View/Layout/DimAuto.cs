@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Core;
 

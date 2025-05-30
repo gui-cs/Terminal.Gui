@@ -4,7 +4,6 @@ using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using Terminal.Gui.Core;
 
 namespace Terminal.Gui.EnumExtensions;
 

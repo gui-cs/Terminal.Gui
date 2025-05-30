@@ -1,8 +1,5 @@
 #nullable enable
 using System.Globalization;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Drivers;
 

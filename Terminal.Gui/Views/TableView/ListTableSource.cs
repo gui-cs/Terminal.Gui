@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Data;
-using Terminal.Gui.Core;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Views;
 

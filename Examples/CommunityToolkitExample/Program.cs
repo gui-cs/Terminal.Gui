@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Terminal.Gui;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Core;
 

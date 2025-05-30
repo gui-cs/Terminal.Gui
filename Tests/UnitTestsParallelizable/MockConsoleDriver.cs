@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Text;
 
-using Terminal.Gui;
 
 internal class MockConsoleDriver : IConsoleDriver
 {

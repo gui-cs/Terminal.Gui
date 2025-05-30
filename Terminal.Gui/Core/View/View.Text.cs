@@ -1,7 +1,5 @@
 #nullable enable
 
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Core;
 

@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Terminal.Gui;
 using Terminal.Gui.Core;
 
 namespace CommunityToolkitExample;

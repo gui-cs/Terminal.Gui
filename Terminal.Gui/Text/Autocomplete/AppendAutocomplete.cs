@@ -1,9 +1,4 @@
-﻿using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Input;
-using Terminal.Gui.Views;
-
+﻿
 namespace Terminal.Gui.Text;
 
 /// <summary>

@@ -1,6 +1,4 @@
 using System.IO.Abstractions;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Views;
 

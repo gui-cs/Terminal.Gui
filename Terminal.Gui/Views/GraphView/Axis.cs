@@ -1,7 +1,4 @@
-﻿using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-
+﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>Renders a continuous line with grid line ticks and labels</summary>

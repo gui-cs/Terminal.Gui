@@ -10,7 +10,6 @@
 //   * DirListView: Add mouse support
 
 using System.IO.Abstractions;
-using Terminal.Gui.Resources;
 
 namespace Terminal.Gui.Views;
 

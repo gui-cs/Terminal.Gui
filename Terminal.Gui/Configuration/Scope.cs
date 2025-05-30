@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Terminal.Gui.Core;
 
 namespace Terminal.Gui.Configuration;
 

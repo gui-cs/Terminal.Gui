@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Core;
-
+﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>All <see cref="Slider{T}"/> configuration are grouped in this class.</summary>

@@ -1,8 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using Terminal.Gui.Input;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Drivers;
 

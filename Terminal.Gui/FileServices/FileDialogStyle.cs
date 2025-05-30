@@ -1,9 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Resources;
-using Terminal.Gui.Views;
 using static System.Environment;
 
 namespace Terminal.Gui.FileServices;

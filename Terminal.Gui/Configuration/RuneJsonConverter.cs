@@ -2,7 +2,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Configuration;
 

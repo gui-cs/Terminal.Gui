@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Metrics;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

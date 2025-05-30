@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Core;
-
+﻿
 namespace Terminal.Gui.Drawing;
 
 /// <summary>Extension methods for <see cref="StraightLine"/> (including collections).</summary>

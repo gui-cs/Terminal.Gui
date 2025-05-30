@@ -1,8 +1,5 @@
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.FileServices;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Views;
 

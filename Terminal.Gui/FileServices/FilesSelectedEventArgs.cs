@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Views;
-
+﻿
 namespace Terminal.Gui.FileServices;
 
 /// <summary>Event args for the <see cref="FileDialog.FilesSelected"/> event</summary>

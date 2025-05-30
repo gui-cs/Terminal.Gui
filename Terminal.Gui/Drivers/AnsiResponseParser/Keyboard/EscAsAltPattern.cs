@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Text.RegularExpressions;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Drivers;
 

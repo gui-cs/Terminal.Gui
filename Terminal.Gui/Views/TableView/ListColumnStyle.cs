@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Core;
-
+﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>Defines rendering options that affect how the view is displayed.</summary>

@@ -2,7 +2,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
-using Terminal.Gui;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Core;
 using Terminal.Gui.Views;

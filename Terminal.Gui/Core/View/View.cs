@@ -1,12 +1,7 @@
 ﻿#nullable enable
-global using Attribute = Terminal.Gui.Drawing.Attribute;
-global using Color = Terminal.Gui.Drawing.Color;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Core;
 

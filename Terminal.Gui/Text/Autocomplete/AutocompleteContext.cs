@@ -1,5 +1,3 @@
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Text;
 

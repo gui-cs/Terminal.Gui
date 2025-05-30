@@ -1,6 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Views;
 #nullable enable

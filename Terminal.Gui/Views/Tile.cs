@@ -1,7 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Views;
 

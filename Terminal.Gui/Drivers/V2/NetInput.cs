@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Terminal.Gui.Core;
 
 namespace Terminal.Gui.Drivers;
 

@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using Terminal.Gui.Core;
 
 // These classes use a key binding system based on the design implemented in Scintilla.Net which is an
 // MIT licensed open source project https://github.com/jacobslusser/ScintillaNET/blob/master/src/ScintillaNET/Command.cs

@@ -1,8 +1,4 @@
-﻿using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Resources;
-
+﻿
 namespace Terminal.Gui.Views;
 
 public partial class ColorPicker

@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
-using Terminal.Gui.Configuration;
 
 namespace Terminal.Gui;
 

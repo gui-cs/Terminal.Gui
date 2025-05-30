@@ -43,8 +43,6 @@
 //
 
 using System.Runtime.InteropServices;
-using Terminal.Gui;
-using Terminal.Gui.Core;
 
 namespace Unix.Terminal;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

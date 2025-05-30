@@ -1,9 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Core;
 

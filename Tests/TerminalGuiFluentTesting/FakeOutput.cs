@@ -1,6 +1,4 @@
 ﻿using System.Drawing;
-using Terminal.Gui;
-using Terminal.Gui.Drivers;
 
 namespace TerminalGuiFluentTesting;
 

@@ -1,9 +1,6 @@
 #nullable enable
 
 using System.Runtime.InteropServices;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.Drawing;
 

@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using ColorHelper;
-using Terminal.Gui.Configuration;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui.Drawing;

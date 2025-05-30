@@ -1,8 +1,5 @@
 ﻿#nullable enable
 using System.Diagnostics;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Drivers;
 

@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Input;
-
+﻿
 namespace Terminal.Gui.Drivers;
 
 /// <summary>

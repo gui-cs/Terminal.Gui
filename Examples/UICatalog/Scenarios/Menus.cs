@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Terminal.Gui;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace UICatalog.Scenarios;

@@ -6,8 +6,6 @@
 
 using System.Data;
 using System.Globalization;
-using Terminal.Gui.Core;
-using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Views;
 

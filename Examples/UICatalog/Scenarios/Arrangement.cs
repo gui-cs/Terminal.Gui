@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Terminal.Gui;
 using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;

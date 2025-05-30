@@ -1,5 +1,4 @@
-﻿using Terminal.Gui;
-
+﻿
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Run<T> Example", "Illustrates using Application.Run<T> to run a custom class")]

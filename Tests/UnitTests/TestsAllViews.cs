@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Drawing;
 using System.Reflection;
-using Terminal.Gui;
 
 namespace UnitTests;
 

@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Concurrent;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Core;
 

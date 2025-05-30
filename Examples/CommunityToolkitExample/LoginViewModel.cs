@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Terminal.Gui;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 

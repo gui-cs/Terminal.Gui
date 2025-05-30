@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Concurrency;
 using ReactiveUI;
-using Terminal.Gui;
+using ReactiveUI.SourceGenerators;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Core;
 

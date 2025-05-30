@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Terminal.Gui.Core;
 
 namespace Terminal.Gui.Drivers;
 

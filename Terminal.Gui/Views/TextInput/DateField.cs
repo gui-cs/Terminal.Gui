@@ -7,9 +7,6 @@
 //
 
 using System.Globalization;
-using Terminal.Gui.Core;
-using Terminal.Gui.Input;
-using Terminal.Gui.Text;
 
 namespace Terminal.Gui.Views;
 

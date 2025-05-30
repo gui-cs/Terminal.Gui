@@ -1,7 +1,4 @@
 using System.IO.Abstractions;
-using Terminal.Gui.Core;
-using Terminal.Gui.Resources;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.FileServices;
 

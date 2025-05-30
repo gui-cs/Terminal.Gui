@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using Terminal.Gui.Input;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Core;
 

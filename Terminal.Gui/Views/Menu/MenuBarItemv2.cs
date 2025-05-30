@@ -1,8 +1,5 @@
 #nullable enable
 
-using Terminal.Gui.Core;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Views;
 
