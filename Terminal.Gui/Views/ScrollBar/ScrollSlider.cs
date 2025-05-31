@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Represenst the proportion of the visible content to the Viewport in a <see cref="ScrollBar"/>.
+///     Represents the proportion of the visible content to the Viewport in a <see cref="ScrollBar"/>.
 ///     Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be
 ///     oriented either vertically or horizontally.
 /// </summary>

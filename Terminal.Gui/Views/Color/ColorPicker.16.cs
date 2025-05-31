@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.Views;
 
-/// <summary>The OG 16-color color picker.</summary>
+/// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
 public class ColorPicker16 : View
 {
     /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
