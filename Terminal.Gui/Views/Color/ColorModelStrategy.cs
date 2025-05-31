@@ -3,7 +3,7 @@
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 internal class ColorModelStrategy
 {

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Describes a request to render a given <see cref="SixelData"/> at a given <see cref="ScreenPosition"/>.

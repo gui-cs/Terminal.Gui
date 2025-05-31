@@ -9,7 +9,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Provides settings and configuration management for Terminal.Gui applications. See the Configuration Deep Dive for

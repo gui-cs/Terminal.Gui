@@ -26,7 +26,7 @@ public class TransparentMouseTests
         Application.Top = top;
 
         var underlying = new MouseTrackingView { Id = "underlying", X = 0, Y = 0, Width = 10, Height = 10 };
-        var overlay = new MouseTrackingView { Id = "overlay", X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettings.TransparentMouse };
+        var overlay = new MouseTrackingView { Id = "overlay", X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
 
         top.Add (underlying);
         top.Add (overlay);
@@ -59,7 +59,7 @@ public class TransparentMouseTests
         Application.Top = top;
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10 };
-        var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettings.None };
+        var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.None };
 
         top.Add (underlying);
         top.Add (overlay);
@@ -92,8 +92,8 @@ public class TransparentMouseTests
         var top = new Toplevel ();
         Application.Top = top;
 
-        var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettings.TransparentMouse };
-        var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettings.TransparentMouse };
+        var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
+        var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
 
         top.Add (underlying);
         top.Add (overlay);

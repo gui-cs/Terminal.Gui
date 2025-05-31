@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>Renders a continuous line with grid line ticks and labels</summary>
 public abstract class Axis

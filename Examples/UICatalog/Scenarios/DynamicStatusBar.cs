@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

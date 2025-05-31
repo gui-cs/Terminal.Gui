@@ -8,18 +8,15 @@
 - What is the order in which UI elements are traversed when using keyboard navigation?
 - What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, `MouseClick`)?
 
+## See Also
+
+* [Keyboard Deep Dive](keyboard.md)
+* [Mouse Deep Dive](mouse.md)
+* [Lexicon & Taxonomy](lexicon.md)
+
 ## Lexicon & Taxonomy
 
-- **Navigation** refers to the user experience for moving focus between views in the application view-hierarchy. 
-- **Focus** - Refers to the state where a particular UI element (`View`), such as a button, input field, or any interactive component, is actively selected and ready to receive user input. When an element has focus, it typically responds to keyboard events and other interactions.
-- **Focus Chain** - The ordered sequence of UI elements that can receive focus, starting from the currently focused element and extending to its parent (SuperView) elements up to the root of the focus tree (`Application.Top`). This chain determines the path that focus traversal follows within the application. Only one focus chain in an application can have focus (`top.HasFocus == true`), and there is one, and only one, View in a focus chain that is the most-focused; the one receiving keyboard input. 
-- **Cursor** - A visual indicator to the user where keyboard input will have an impact. There is one Cursor per terminal session. See [Cursor](cursor.md) for a deep-dive.
-- **Focus Ordering** - The order focusable Views are navigated. Focus Ordering is typically used in UI frameworks to enable screen readers and improve the Accessibility of an application. In v1, `TabIndex`/`TabIndexes` enabled Focus Ordering. 
-- **Tab** - Describes the `Tab` key found on all keyboards, a break in text that is wider than a space, or a UI element that is a stop-point for keyboard navigation. The use of the word "Tab" for this comes from the typewriter, and is reinforced by the existence of a `Tab` key on all keyboards.
-- **TabStop** - A `View` that is an ultimate stop-point for keyboard navigation. In this usage, ultimate means the `View` has no focusable subviews. The `Application.NextTabStopKey` and `Application.PrevTabStopKey` are `Key.Tab` and `Key.Tab.WithShift` respectively. These keys navigate only between peer-views. 
-- **TabGroup** - A `View` that is a container for other focusable views. The `Application.NextTabGroupKey` and `Application.PrevTabGroupKey` are `Key.PageDown.WithCtrl` and `Key.PageUp.WithCtrl` respectively. These keys enable the user to use the keyboard to navigate up and down the view-hierarchy. 
-- **Enter** / **Gain** - Means a View that previously was not focused is now becoming focused. "The View is entering focus" is the same as "The View is gaining focus". These terms are legacy terms from v1.
-- **Leave** / **Lose** - Means a View that previously was focused is now becoming un-focused. "The View is leaving focus" is the same as "The View is losing focus". These terms are legacy terms from v1.
+[!INCLUDE [Navigation Lexicon](~/includes/navigation-lexicon.md)]
 
 ## Tenets for Terminal.Gui UI Navigation (Unless you know better ones...)
 
@@ -80,13 +77,13 @@ For this to work properly, there must be logic that removes the focus-cache used
 
 ## Application Level Navigation
 
-At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.Application.Navigation property.
+At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.App.Application.Navigation property.
 
-@Terminal.Gui.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
+@Terminal.Gui.App.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
 
-The @Terminal.Gui.ApplicationNavigation.FocusedChanged and @Terminal.Gui.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful apps that want to override what view can be focused across an entire app. 
+The @Terminal.Gui.App.ApplicationNavigation.FocusedChanged and @Terminal.Gui.App.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful apps that want to override what view can be focused across an entire app. 
 
-The @Terminal.Gui.ApplicationNavigation.AdvanceFocus(Terminal.Gui.NavigationDirection,System.Nullable{Terminal.Gui.TabBehavior}) method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
+The @Terminal.Gui.App.ApplicationNavigation.AdvanceFocus* method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
 
 The implementation is simple:
 
@@ -100,9 +97,9 @@ This method replaces about a dozen functions in v1 (scattered across `Applicatio
 
 ## View Level Navigation
 
-@Terminal.Gui.View.AdvanceFocus(Terminal.Gui.NavigationDirection,System.Nullable{Terminal.Gui.TabBehavior}) is the primary method for developers to cause a view to gain or lose focus.
+@Terminal.Gui.ViewBase.View.AdvanceFocus* is the primary method for developers to cause a view to gain or lose focus.
 
-Various events are raised when a View's focus is changing. For example, @Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged.
+Various events are raised when a View's focus is changing. For example, @Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged.
 
 ## What makes a View focusable?
 
@@ -168,7 +165,7 @@ In v2, the automatic setting of `TabStop` in `Add` is retained because it is not
 
 ## Knowing When a View's Focus is Changing
 
-@Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged are raised when a View's focus is changing.
+@Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged are raised when a View's focus is changing.
 
 ## Built-In Views Interactivity
 
@@ -183,7 +180,7 @@ In v2, the automatic setting of `TabStop` in `Add` is retained because it is not
 | **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption      | SetFocusedOption<br>OnAccept | Focus                     | SetFocus<br>SetFocusedOption |                              | SetFocus<br>SetFocusedOption |                | Yes           |
 | **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow         | OpenSelectedItem<br>OnAccept | OnAccept                  | SetMark<br>OnSelectedChanged | OpenSelectedItem<br>OnAccept |                              |                | No            |
 
-## Accesibilty Tenets
+## Accessibility Tenets
 
 See https://devblogs.microsoft.com/dotnet/the-journey-to-accessible-apps-keyboard-accessible/
 

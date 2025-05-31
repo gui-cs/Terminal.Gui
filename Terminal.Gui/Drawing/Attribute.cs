@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents the visual styling for a UI element, including foreground and background color and text style.

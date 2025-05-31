@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Terminal.Gui;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
 
 namespace CommunityToolkitExample;
 

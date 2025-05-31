@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Describes the thickness of a frame around a rectangle. Four <see cref="int"/> values describe the

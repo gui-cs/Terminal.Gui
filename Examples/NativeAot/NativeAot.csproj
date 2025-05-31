@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PackageReference Include="Terminal.Gui" />
+	  <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
     <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 

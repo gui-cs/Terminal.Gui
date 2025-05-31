@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

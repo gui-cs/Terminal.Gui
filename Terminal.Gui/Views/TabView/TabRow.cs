@@ -1,5 +1,6 @@
 #nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 internal class TabRow : View
 {

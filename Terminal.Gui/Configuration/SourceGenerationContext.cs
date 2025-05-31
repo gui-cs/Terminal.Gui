@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Allow AOT and self-contained single file applications with the <see cref="System.Text.Json.Serialization"/>.

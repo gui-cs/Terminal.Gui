@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A single <see cref="ContentView"/> presented in a <see cref="TileView"/>. To create new instances use
@@ -43,7 +43,7 @@ public class Tile
     ///     The text that should be displayed above the <see cref="ContentView"/>. This will appear over the splitter line
     ///     or border (above the view client area).
     /// </summary>
-    /// <remarks>Title are not rendered for root level tiles <see cref="Gui.LineStyle"/> is <see cref="LineStyle.None"/>.</remarks>
+    /// <remarks>Title are not rendered for root level tiles <see cref="LineStyle"/> is <see cref="LineStyle.None"/>.</remarks>
     public string Title
     {
         get => _title;

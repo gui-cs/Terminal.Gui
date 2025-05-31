@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -14,9 +13,9 @@ namespace UICatalog.Scenarios;
 ///         (F4) or mouse.
 ///     </para>
 ///     <para>
-///         If <see cref="Orientation"/> is set to <see cref="Terminal.Gui.Orientation.Vertical"/>, the button will appear
+///         If <see cref="Orientation"/> is set to <see cref="Orientation.Vertical"/>, the button will appear
 ///         at the top/right.
-///         If <see cref="Orientation"/> is set to <see cref="Terminal.Gui.Orientation.Horizontal"/>, the button will
+///         If <see cref="Orientation"/> is set to <see cref="Orientation.Horizontal"/>, the button will
 ///         appear at the
 ///         bottom/left.
 ///     </para>

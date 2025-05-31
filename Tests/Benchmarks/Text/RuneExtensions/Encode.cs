@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using Tui = Terminal.Gui;
+using Tui = Terminal.Gui.Text;
 
 namespace Terminal.Gui.Benchmarks.Text.RuneExtensions;
 

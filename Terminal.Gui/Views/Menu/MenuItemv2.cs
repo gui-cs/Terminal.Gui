@@ -1,9 +1,8 @@
 #nullable enable
 
 using System.ComponentModel;
-using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.FileServices;
 
 /// <summary>Event args for the <see cref="FileDialog.FilesSelected"/> event</summary>
 public class FilesSelectedEventArgs : EventArgs

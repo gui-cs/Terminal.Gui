@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Specifies how a <see cref="MenuItem"/> shows selection state.</summary>
 [Flags]

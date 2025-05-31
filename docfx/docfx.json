@@ -41,7 +41,8 @@
           "schemas/**.json"
         ],
         "exclude": [
-          "_site/**"
+          "_site/**",
+          "includes/**"
         ]
       }
     ],

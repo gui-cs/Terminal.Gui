@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

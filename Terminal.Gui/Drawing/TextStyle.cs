@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Defines non-color style flags for an <see cref="Attribute"/>.

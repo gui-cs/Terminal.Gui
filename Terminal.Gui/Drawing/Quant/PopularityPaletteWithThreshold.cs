@@ -1,6 +1,4 @@
-﻿using Terminal.Gui;
-using Color = Terminal.Gui.Color;
-
+﻿
 /// <summary>
 ///     Simple fast palette building algorithm which uses the frequency that a color is seen
 ///     to determine whether it will appear in the final palette. Includes a threshold where

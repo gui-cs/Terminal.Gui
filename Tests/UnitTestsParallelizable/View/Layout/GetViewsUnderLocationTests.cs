@@ -20,7 +20,7 @@ public class GetViewsUnderLocationTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettings.None);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.None);
 
         // Assert
         Assert.Empty (viewsUnderMouse);
@@ -42,7 +42,7 @@ public class GetViewsUnderLocationTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettings.None);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.None);
 
         // Assert
         Assert.Empty (viewsUnderMouse);

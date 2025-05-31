@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a theme definition that maps each <see cref="VisualRole"/> (such as <see cref="VisualRole.Focus"/>,

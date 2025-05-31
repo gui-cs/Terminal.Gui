@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <inheritdoc cref="CollectionNavigatorBase"/>
 /// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>

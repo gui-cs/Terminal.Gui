@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 #pragma warning disable CS0618 // Type or member is obsolete
 
 /// <summary>Defines arguments for the <see cref="MenuBar.MenuOpened"/> event</summary>

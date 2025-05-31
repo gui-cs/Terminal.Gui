@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>A single tab in a <see cref="TabView"/>.</summary>
 public class Tab : View

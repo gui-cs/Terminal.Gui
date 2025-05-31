@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 /// Contains style settings for <see cref="ColorPicker"/> e.g. which <see cref="ColorModel"/>

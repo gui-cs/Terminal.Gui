@@ -7,19 +7,17 @@
 // TODO: Support shrinking the stream (e.g. del/backspace should work).
 // 
 
-using System;
 using System.Buffers;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
-/// <summary>Hex viewer and editor <see cref="View"/> over a <see cref="Stream"/></summary>
+/// <summary>
+///     Provides a hex editor with the left side
+///     showing the hex values of the bytes in a `Stream` and the right side showing the contents
+///     (filtered
+///     to printable Unicode glyphs).
+/// </summary>
 /// <remarks>
-///     <para>
-///         <see cref="HexView"/> provides a hex editor on top of a seekable <see cref="Stream"/> with the left side
-///         showing the hex values of the bytes in the <see cref="Stream"/> and the right side showing the contents
-///         (filtered
-///         to non-control sequence ASCII characters).
-///     </para>
 ///     <para>Users can switch from one side to the other by using the tab key.</para>
 ///     <para>
 ///         To enable editing, set <see cref="ReadOnly"/> to true. When <see cref="ReadOnly"/> is true the user can
@@ -456,7 +454,7 @@ public class HexView : View, IDesignable
 
         for (var line = 0; line < Viewport.Height; line++)
         {
-            int max  = -Viewport.X;
+            int max = -Viewport.X;
 
             Move (max, line);
             long addressOfLine = addressOfFirstLine + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN;
@@ -526,18 +524,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
+                        {
+                            byte [] utf8 = GetData (data, offset, 4, out bool _);
+
+                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                            while (status == OperationStatus.NeedMoreData)
                             {
-                                byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                                while (status == OperationStatus.NeedMoreData)
-                                {
-                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                                }
-
-                                break;
+                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
                             }
+
+                            break;
+                        }
                         default:
                             Rune.DecodeFromUtf8 (new (ref b), out c, out _);
 
@@ -565,6 +563,7 @@ public class HexView : View, IDesignable
             }
 
             SetAttribute (editingAttribute);
+
             // Fill rest of line
             for (int x = max; x < Viewport.Width; x++)
             {

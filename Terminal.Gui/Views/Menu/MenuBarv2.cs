@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A horizontal list of <see cref="MenuBarItemv2"/>s. Each <see cref="MenuBarItemv2"/> can have a

@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
-using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 /// <summary>Default file operation handlers using modal dialogs.</summary>
 public class DefaultFileOperations : IFileOperations

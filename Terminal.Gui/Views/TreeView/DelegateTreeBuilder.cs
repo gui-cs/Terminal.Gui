@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Implementation of <see cref="ITreeBuilder{T}"/> that uses user defined functions</summary>
 public class DelegateTreeBuilder<T> : TreeBuilder<T>

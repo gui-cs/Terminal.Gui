@@ -27,7 +27,7 @@
 
 #pragma warning disable CA1034 // Nested types should not be visible
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>SpinnerStyles used in a <see cref="SpinnerView"/>.</summary>
 public abstract class SpinnerStyle

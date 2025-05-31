@@ -16,11 +16,11 @@ This class provides the following capabilities:
 * Idle processing handlers
 * Invoking UI code from a background thread
 
-The `MainLoop` property in the the [`Application`](~/api/Terminal.Gui.Application.yml)
+The `MainLoop` property in the the [`Application`](~/api/Terminal.Gui.App.Application.yml)
 provides access to these functions.
 
 When `Application.Run (Toplevel)` is called, the application will prepare the current
-[`Toplevel`](~/api/Terminal.Gui.Toplevel.yml) instance by redrawing the screen appropriately and then starting the main loop.
+[`Toplevel`](~/api/Terminal.Gui.Views.Toplevel.yml) instance by redrawing the screen appropriately and then starting the main loop.
 
 Configure the Mainloop before calling Application.Run, or  configure the MainLoop in response to events during the execution.
 

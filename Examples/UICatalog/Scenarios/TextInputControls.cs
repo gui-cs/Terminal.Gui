@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

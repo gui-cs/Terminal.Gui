@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
-using Terminal.Gui.Resources;
 using static System.Environment;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 /// <summary>Stores style settings for <see cref="FileDialog"/>.</summary>
 public class FileDialogStyle

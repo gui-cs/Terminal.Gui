@@ -3,7 +3,10 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
 
 namespace SelfContained;
 

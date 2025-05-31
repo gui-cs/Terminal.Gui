@@ -2,7 +2,7 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Indicates the size of scrollable content and controls the position of the visible content, either vertically or

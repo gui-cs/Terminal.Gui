@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
 [RequiresUnreferencedCode ("AOT")]

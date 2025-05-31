@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using ColorHelper;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Terminal.Gui;
-using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios;
 

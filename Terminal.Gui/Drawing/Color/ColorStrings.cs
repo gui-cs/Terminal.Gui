@@ -1,7 +1,7 @@
 #nullable enable
 using System.Globalization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Provides a mapping between <see cref="Color"/> and the W3C standard color name strings.

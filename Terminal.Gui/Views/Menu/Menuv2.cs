@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a <see cref="MenuItemv2"/>.

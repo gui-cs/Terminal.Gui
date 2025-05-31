@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Args for events that relate <see cref="VisualRole"/>.</summary>
 public class VisualRoleEventArgs : CancelEventArgs<Attribute>

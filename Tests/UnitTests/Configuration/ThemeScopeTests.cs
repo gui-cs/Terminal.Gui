@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
-using static Terminal.Gui.ConfigurationManager;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 

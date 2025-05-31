@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>TextValidateField Providers Interface. All TextValidateField are created with a ITextValidateProvider.</summary>
 public interface ITextValidateProvider

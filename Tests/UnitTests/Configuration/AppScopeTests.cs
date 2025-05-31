@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Text.Json;
 using UnitTests;
-using static Terminal.Gui.ConfigurationManager;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 

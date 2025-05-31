@@ -3,7 +3,7 @@
 
 using System.IO.Abstractions;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 internal class NerdFonts
 {

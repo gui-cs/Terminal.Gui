@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
