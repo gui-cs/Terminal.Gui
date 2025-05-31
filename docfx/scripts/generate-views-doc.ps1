@@ -1,7 +1,8 @@
 # Script to generate views.md from API documentation
 param(
     [string]$ApiPath = "api",
-    [string]$OutputPath = "docs/views.md"
+    [string]$OutputPath = "docs/views.md",
+    [switch]$Debug
 )
 
 # Ensure we're in the correct directory (docfx root)
@@ -13,7 +14,12 @@ Write-Host "Working directory: $(Get-Location)"
 Write-Host "Looking for view files in: $ApiPath"
 
 # Get all .yml files in the API directory that are Views
-$viewFiles = Get-ChildItem -Path $ApiPath -Filter "Terminal.Gui.Views.*.yml"
+if ($Debug) {
+    Write-Host "DEBUG MODE: Only processing Button view" -ForegroundColor Cyan
+    $viewFiles = Get-ChildItem -Path $ApiPath -Filter "Terminal.Gui.Views.Button.yml"
+} else {
+    $viewFiles = Get-ChildItem -Path $ApiPath -Filter "Terminal.Gui.Views.*.yml"
+}
 Write-Host "Found $($viewFiles.Count) view files"
 
 # Start building the markdown content
@@ -22,8 +28,8 @@ $content = @"
 
 *Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
 
-| View | Description |
-|------|-------------|
+| View | Description | Example |
+|------|-------------|---------|
 "@
 
 # Process each view file
@@ -82,8 +88,39 @@ foreach ($file in $viewFiles) {
         $description = $description -replace '\[Terminal\.Gui\.Input\.([^\]]+)\]', '[$1]'
         $description = $description -replace '\[System\.([^\]]+)\]', '[$1]'
         
+        # Get the view output
+        $viewOutput = ""
+        try {
+            $viewName = $file.BaseName -replace "^Terminal\.Gui\.Views\.", ""
+            $tempFile = [System.IO.Path]::GetTempFileName()
+            Write-Host "Running: dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile" -ForegroundColor Cyan
+            
+            dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile
+#            Write-Host "Command result: $result" -ForegroundColor Yellow
+#            Write-Host "Exit code: $?" -ForegroundColor Yellow
+            
+            if (Test-Path $tempFile) {
+                $output = Get-Content $tempFile -Raw
+                Write-Host "Tempfile: $tempFile"
+                Write-Host "File size: $((Get-Item $tempFile).Length) bytes" -ForegroundColor Magenta
+                #Remove-Item $tempFile
+                if ($output -and $output.Trim()) {
+                    $viewOutput = '```' + "`n$($output.Trim())`n" + '```'
+                }
+            } else {
+                Write-Host "Temp file was not created!" -ForegroundColor Red
+            }
+            
+            if (-not $viewOutput) {
+                Write-Host "  No output generated for $($file.Name)" -ForegroundColor Yellow
+            }
+        }
+        catch {
+            Write-Host "  Error running OutputView for $($file.Name): $_" -ForegroundColor Red
+        }
+        
         Write-Host "Found view: $name"
-        $views += "| [$name](~/api/$($file.BaseName).yml) | $description |"
+        $views += "| [$name](~/api/$($file.BaseName).yml) | $description | $viewOutput |"
     }
     catch {
         Write-Host "  Error processing $($file.Name): $_" -ForegroundColor Red
@@ -91,6 +128,7 @@ foreach ($file in $viewFiles) {
         Write-Host (Get-Content $file.FullName -Raw)
     }
 }
+
 
 Write-Host "Sorting views..."
 # Sort the views alphabetically

@@ -185,7 +185,7 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     {
         if (IsEmpty)
         {
-            throw new JsonException ($@"Empty!");
+            //throw new JsonException ($@"Empty!");
         }
     }
 }
