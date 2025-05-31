@@ -2,14 +2,15 @@
 
 Terminal.Gui provides a rich system for how [View](View.md) users can scroll content with the keyboard and/or mouse.
 
+## See Also
+
+- [View Deep Dive](View.md)
+- [Layout](layout.md)
+- [Arrangement](arrangement.md)
+
 ## Lexicon & Taxonomy
 
-See [View Deep Dive](View.md) for broader definitions.
-
-* *Scroll* (Verb) - The act of causing content to move either horizontally or vertically within the @Terminal.Gui.ViewBase.View.Viewport. Also referred to as "Content Scrolling".
-* *ScrollSlider* - A visual indicator that shows the proportion of the scrollable content to the size of the @Terminal.Gui.ViewBase.View.Viewport and allows the user to use the mouse to scroll. 
-* *[ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml)* -  Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. At each end, a @Terminal.Gui.Views.Button is provided, one to scroll up or left and one to scroll down or right. Between the
- buttons is a @Terminal.Gui.Views.ScrollSlider that can be dragged to control the position of the visible content. The ScrollSlider is sized to show the proportion of the scrollable content to the size of the @Terminal.Gui.ViewBase.View.Viewport.
+[!INCLUDE [Scrolling Lexicon](./../includes/scrolling-lexicon.md)]
 
 ## Overview
 
@@ -30,7 +31,7 @@ While @Terminal.Gui.Views.ScrollBar can be used in a standalone manner to provid
 
 ## Examples
 
-These Scenarios illustrate Terminal.Gui scrolling:
+These `UI Catalog` Scenarios illustrate Terminal.Gui scrolling:
 
 * *Scrolling* - Demonstrates the @Terminal.Gui.Views.ScrollBar objects built into-View.
 * *ScrollBar Demo* - Demonstrates using @Terminal.Gui.Views.ScrollBar view in a standalone manner.

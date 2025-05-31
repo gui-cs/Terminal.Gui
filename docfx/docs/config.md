@@ -4,29 +4,7 @@ Terminal.Gui provides persistent configuration settings via the [`ConfigurationM
 
 ## Configuration Lexicon and Taxonomy
 
-| Term | Meaning |
-|:-----|:--------|
-| **AppSettings** | Application-specific settings stored in the application's resources. |
-| **Apply** | Apply the configuration to the application; copies settings from configuration properties to corresponding `static` `[ConfigProperty]` properties. |
-| **Attribute** | Defines concrete visual styling for a visual element (Foreground color, Background color, TextStyle). |
-| **BackgroundColor** | A property of `Attribute` describing the background text color. |
-| **Color** | Base terminal color (supports TrueColor and named values like White, Black, Cyan, etc.). |
-| **ConfigProperty** | A property decorated with `[ConfigProperty]` that can be configured via the configuration system. |
-| **Configuration** | A collection of settings defining application behavior and appearance. |
-| **ConfigurationManager** | System that loads and manages application runtime settings from external sources. |
-| **ForegroundColor** | A property of `Attribute` describing the foreground text color. |
-| **Load** | Load configuration from given location(s), updating with new values. Loading doesn't apply settings automatically. |
-| **Location** | Storage location for configuration (e.g., user's home directory, application directory). |
-| **Reset** | Reset configuration to current values or hard-coded defaults. Does not load configuration. |
-| **Scope** | Defines the context where configuration applies (Settings, Theme, or AppSettings). |
-| **Scheme** | Maps `VisualRole` to `Attribute`, defining visual element appearance (color and style) based on semantic purpose. |
-| **Settings** | Runtime options including both system settings and application-specific settings. |
-| **Sources** | Set of locations where configuration can be stored (@Terminal.Gui.Configuration.ConfigLocations enum). |
-| **Style** | Property of `Attribute` for font-like hints (bold, italic, underline). |
-| **Theme** | Named instance containing specific appearance settings. |
-| **ThemeInheritance** | Mechanism where themes can inherit and override settings from other themes. |
-| **Themes** | Collection of named Theme definitions bundling visual and layout settings. |
-| **VisualRole** | Semantic role/purpose of a visual element (Normal, Focus, HotFocus, Active, Disabled, ReadOnly). |
+[!INCLUDE [Config Lexicon](~/includes/config-lexicon.md)]
 
 # Fundamentals
 

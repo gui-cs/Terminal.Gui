@@ -13,7 +13,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a hex editor with the left side
-///     showing the hex values of the bytes in a <see cref="Stream"/> and the right side showing the contents
+///     showing the hex values of the bytes in a `Stream` and the right side showing the contents
 ///     (filtered
 ///     to printable Unicode glyphs).
 /// </summary>

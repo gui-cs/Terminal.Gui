@@ -38,46 +38,6 @@ classDiagram
     note for Rectangle "Defines location and size"
 ```
 
-## View Composition Layers
-
-```mermaid
-flowchart TD
-    ContentArea[Content Area (0,0)]
-    C1[Content at (0,0)]
-    C2[Content at (5,5)]
-    C3[Content at (10,10)]
-    
-    Frame[Frame]
-    Margin[Margin]
-    Border[Border]
-    Padding[Padding]
-    Viewport[Viewport (5,5)]
-    V1[Visible Content]
-
-    ContentArea --> C1
-    ContentArea --> C2
-    ContentArea --> C3
-    
-    Frame --> Margin
-    Margin --> Border
-    Border --> Padding
-    Padding --> Viewport
-    Viewport --> V1
-    
-    Viewport -.-> ContentArea
-
-    style Frame fill:#f0f0f0,stroke:#666,stroke-width:1px
-    style Margin fill:#e8e8e8,stroke:#666,stroke-width:1px
-    style Border fill:#e0e0e0,stroke:#666,stroke-width:1px
-    style Padding fill:#d8d8d8,stroke:#666,stroke-width:1px
-    style Viewport fill:#d0d0d0,stroke:#666,stroke-width:1px
-    style ContentArea fill:#c8c8c8,stroke:#666,stroke-width:1px
-    style C1 fill:#c8c8c8,stroke:none
-    style C2 fill:#c8c8c8,stroke:none
-    style C3 fill:#c8c8c8,stroke:none
-    style V1 fill:#d0d0d0,stroke:none
-```
-
 The diagram above shows the structure of a View's composition:
 
 1. **Frame**: The outermost rectangle defining the View's location and size

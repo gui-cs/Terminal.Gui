@@ -4,6 +4,8 @@
 
 * [Cancellable Work Pattern](cancellable-work-pattern.md)
 * [Command Deep Dive](command.md)
+* [Mouse Deep Dive](mouse.md)
+* [Lexicon & Taxonomy](lexicon.md)
 
 ## Tenets for Terminal.Gui Keyboard Handling (Unless you know better ones...)
 

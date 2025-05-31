@@ -24,6 +24,8 @@
   href: drivers.md
 - name: Events Deep Dive
   href: events.md
+- name: Lexicon & Taxonomy
+  href: lexicon.md
 - name: Keyboard
   href: keyboard.md
 - name: Layout Engine

@@ -2,15 +2,9 @@
 
 Terminal.Gui provides a set of APIs for formatting text, line drawing, and character-based graphing. 
 
-| Term | Meaning |
-|:-----|:--------|
-| **Attribute** | Defines concrete visual styling for a visual element (Foreground color, Background color, TextStyle). |
-| **Color** | Base terminal color (supports TrueColor and named values like White, Black, Cyan, etc.). |
-| **Scheme** | Maps `VisualRole` to `Attribute`, defining visual element appearance (color and style) based on semantic purpose. |
-| **Style** | Property of `Attribute` for font-like hints (bold, italic, underline). |
-| **VisualRole** | Semantic role/purpose of a visual element (Normal, Focus, HotFocus, Active, Disabled, ReadOnly). |
-| **Rune** | Unicode character. |
-| **Glyph** | A graphical representation of a character. |
+## Drawing Taxonomy & Lexicon
+
+[!INCLUDE [Drawing Lexicon](~/includes/drawing-lexicon.md)]
 
 # View Drawing API
 
@@ -118,7 +112,7 @@ Represents the semantic visual role of a visual element rendered by a View (e.g.
 
 ## Schemes
 
-[!code-markdown[Scheme Overview](scheme.md#Scheme-Overview)]
+[!INCLUDE [Scheme Overview](~/includes/scheme-overview.md)]
 
 See [Scheme Deep Dive](scheme.md) for more details.
 
