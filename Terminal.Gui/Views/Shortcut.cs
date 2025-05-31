@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
 ///         binding on the
-///         right side. Set <see cref="AlignmentModes"/> to <see cref="Drawing.AlignmentModes.EndToStart"/> to reverse the order.
+///         right side. Set <see cref="AlignmentModes"/> to <see cref="ViewBase.AlignmentModes.EndToStart"/> to reverse the order.
 ///     </para>
 ///     <para>
 ///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting
