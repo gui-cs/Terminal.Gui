@@ -55,7 +55,7 @@ Shows a checkbox that can be cycled between two or three states.
 
 ### [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml)
 
-True color picker using HSL
+Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Drawing.IColorNameResolver.yml).
 
 ```
 H:                         ▲355
@@ -83,7 +83,7 @@ Provides a drop-down list of items the user can select from.
 
 ### [DateField](~/api/Terminal.Gui.Views.DateField.yml)
 
-Simple Date editing [View](~/api/Terminal.Gui.ViewBase.View.yml)
+Provides date editing functionality with mouse support.
 
 ```
 01/01/0001
@@ -91,11 +91,11 @@ Simple Date editing [View](~/api/Terminal.Gui.ViewBase.View.yml)
 
 ### [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml)
 
-The [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml) [View](~/api/Terminal.Gui.ViewBase.View.yml) Date Picker.
+Lets the user pick a date from a visual calendar.
 
 ```
 ┌┤Demo Title├────────────────┐
-│Date:  05/30/2025           │
+│Date:  05/31/2025           │
 │┌───┬───┬───┬───┬───┬───┬──┐│
 ││Sun│Mon│Tue│Wed│Thu│Fri│Sa││
 │├───┼───┼───┼───┼───┼───┼──┤│
@@ -112,7 +112,7 @@ The [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml) [View](~/api/Terminal.
 
 ### [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-The [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) [View](~/api/Terminal.Gui.ViewBase.View.yml) is a [Window](~/api/Terminal.Gui.Views.Window.yml) that by default is centered and contains one or more [Button](~/api/Terminal.Gui.Views.Button.yml)s. It defaults to the `Colors.Schemes ["Dialog"]` scheme and has a 1 cell padding around the edges.
+A [Toplevel.Modal](~/api/Terminal.Gui.Views.Toplevel.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
 
 ```
 ┏┥Demo Title┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -137,7 +137,7 @@ The [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) [View](~/api/Terminal.Gui.View
 
 ### [FileDialog](~/api/Terminal.Gui.Views.FileDialog.yml)
 
-Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root drives etc).
+The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml)
 
 ```
 ┏┥Open┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -160,7 +160,7 @@ Modal dialog for selecting files/directories. Has auto-complete and expandable n
 
 ### [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml)
 
-Provides a user interface for displaying and selecting flags. Flags can be set from a dictionary or directly from an enum type.
+Provides a user interface for displaying and selecting non-mutually-exclusive flags. Flags can be set from a dictionary or directly from an enum type.
 
 ```
 ☒ No Style
@@ -172,7 +172,7 @@ Provides a user interface for displaying and selecting flags. Flags can be set f
 
 ### [FlagSelector\<T\>](~/api/Terminal.Gui.Views.FlagSelector-1.yml)
 
-Provides a user interface for displaying and selecting flags. Flags can be set from a dictionary or directly from an enum type.
+Provides a user interface for displaying and selecting non-mutually-exclusive flags. Flags can be set from a dictionary or directly from an enum type.
 
 
 
@@ -205,7 +205,7 @@ A non-overlapped container for other views with a border and optional title.
 
 ### [GraphView](~/api/Terminal.Gui.Views.GraphView.yml)
 
-View for rendering graphs (bar, scatter, etc.).
+Displays graphs (bar, scatter, etc.) with flexible labels, scaling, and scrolling
 
 ```
 │        .
@@ -232,7 +232,7 @@ Y                      -0.20┤
 
 ### [HexView](~/api/Terminal.Gui.Views.HexView.yml)
 
-Hex viewer and editor [View](~/api/Terminal.Gui.ViewBase.View.yml) over a [IO.Stream](~/api/System.IO.Stream.yml)
+Provides a hex editor with the left side showing the hex values of the bytes in a [IO.Stream](~/api/System.IO.Stream.yml) and the right side showing the contents (filtered to printable Unicode glyphs).
 
 ```
 00000000 48 65 78 56 ┊ 69 65 77 20  HexView
@@ -259,7 +259,7 @@ Hex viewer and editor [View](~/api/Terminal.Gui.ViewBase.View.yml) over a [IO.St
 
 ### [Label](~/api/Terminal.Gui.Views.Label.yml)
 
-The Label [View](~/api/Terminal.Gui.ViewBase.View.yml) displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When Label receives a [Command.HotKey](~/api/Terminal.Gui.Input.Command.HotKey.yml) command it will pass it to the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml).
+Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When Label receives a [Command.HotKey](~/api/Terminal.Gui.Input.Command.HotKey.yml) command it will pass it to the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml).
 
 ```
 Label
@@ -267,7 +267,7 @@ Label
 
 ### [LegendAnnotation](~/api/Terminal.Gui.Views.LegendAnnotation.yml)
 
-A box containing symbol definitions e.g. meanings for colors in a graph. The 'Key' to the graph
+Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol definitions in a graph, e.g. colors and their meanings
 
 ```
 ┌┤Demo Title├────────────────────────────────────┐
@@ -310,7 +310,7 @@ A straight line control either horizontal or vertical
 
 ### [ListView](~/api/Terminal.Gui.Views.ListView.yml)
 
-ListView [View](~/api/Terminal.Gui.ViewBase.View.yml) renders a scrollable list of data where each item can be activated to perform an action.
+Provides a scrollable list of data where each item can be activated to perform an action.
 
 ```
 List Item 1
@@ -379,7 +379,7 @@ Enables the user to increase or decrease a value with the mouse or keyboard in t
 
 ### [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml)
 
-The [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml)provides an interactive dialog box for users to select files or directories.
+Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for selecting files or directories for opening
 
 ```
 ┏┥Open┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -407,7 +407,8 @@ Provides a user interface for displaying and selecting a single item from a list
 ```
 ○ Option 1
 ○ Option 2
-○ Option 3
+○ Third Option
+○ Option Quattro
 ```
 
 ### [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml)
@@ -436,7 +437,7 @@ Displays a list of mutually-exclusive items. Each items can have its own hotkey.
 
 ### [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml)
 
-The [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml) provides an interactive dialog box for users to pick a file to save.
+Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for selecting files or directories for saving
 
 ```
 ┏┥Save┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -486,7 +487,7 @@ Indicates the size of scrollable content and controls the position of the visibl
 
 ### [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml)
 
-The ScrollSlider can be dragged with the mouse, constrained by the size of the Viewport of it's superview. The ScrollSlider can be oriented either vertically or horizontally.
+Represenst the proportion of the visible content to the Viewport in a [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml). Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be oriented either vertically or horizontally.
 
 ```
 ██████████████████████████████████████████████████
@@ -506,7 +507,7 @@ Shortcut  Shortcut help  F1
 
 ### [Slider](~/api/Terminal.Gui.Views.Slider.yml)
 
-Slider control.
+Provides a slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 ```
 ●
@@ -515,13 +516,13 @@ Demo Text
 
 ### [Slider\<T\>](~/api/Terminal.Gui.Views.Slider-1.yml)
 
-Provides a slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
+Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 
 
 ### [SpinnerView](~/api/Terminal.Gui.Views.SpinnerView.yml)
 
-A [View](~/api/Terminal.Gui.ViewBase.View.yml) which displays (by default) a spinning line character.
+Displays a spinning glyph or combinations of glyphs to indicate progress or activity
 
 ```
 ●∙∙
@@ -564,7 +565,7 @@ A single tab in a [TabView](~/api/Terminal.Gui.Views.TabView.yml).
 
 ### [TableView](~/api/Terminal.Gui.Views.TableView.yml)
 
-View for tabular data based on a [ITableSource](~/api/Terminal.Gui.Views.ITableSource.yml). See TableView Deep Dive for more information.
+Displays and enables infinite scrolling through tabular data based on a [ITableSource](~/api/Terminal.Gui.Views.ITableSource.yml). See the TableView Deep Dive for more.
 
 ```
 ┌──────────────────┬──────────────────────┬──────┐
@@ -603,7 +604,7 @@ Control that hosts multiple sub views, presenting a single one at once.
 
 ### [TextField](~/api/Terminal.Gui.Views.TextField.yml)
 
-Single-line text entry [View](~/api/Terminal.Gui.ViewBase.View.yml)
+Single-line text editor.
 
 ```
 This is a test.
@@ -611,15 +612,17 @@ This is a test.
 
 ### [TextValidateField](~/api/Terminal.Gui.Views.TextValidateField.yml)
 
-Text field that validates input through a [ITextValidateProvider](~/api/Terminal.Gui.Views.ITextValidateProvider.yml)
+Masked text editor that validates input through a [ITextValidateProvider](~/api/Terminal.Gui.Views.ITextValidateProvider.yml)
 
 ```
-Error: ITextValidateProvider not set!
+┌┤^([0-9]?[0-9]?[0-9]|1000)$├────────────────────┐
+│999                                             │
+└────────────────────────────────────────────────┘
 ```
 
 ### [TextView](~/api/Terminal.Gui.Views.TextView.yml)
 
-Multi-line text editing [View](~/api/Terminal.Gui.ViewBase.View.yml).
+Fully featured multi-line text editor
 
 ```
 TextView provides a fully featured multi-line text
@@ -655,7 +658,7 @@ A [View](~/api/Terminal.Gui.ViewBase.View.yml) consisting of a moveable bar that
 
 ### [TimeField](~/api/Terminal.Gui.Views.TimeField.yml)
 
-Time editing [View](~/api/Terminal.Gui.ViewBase.View.yml)
+Provides time editing functionality with mouse support
 
 ```
 02:48:05
