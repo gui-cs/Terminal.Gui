@@ -1535,6 +1535,11 @@ public class TextView : View, IDesignable
             {
                 _isButtonReleased = false;
 
+                if (SelectedLength == 0)
+                {
+                    StopSelecting ();
+                }
+
                 return true;
             }
 

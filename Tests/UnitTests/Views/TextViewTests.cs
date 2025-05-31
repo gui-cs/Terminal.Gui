@@ -9143,5 +9143,36 @@ ror       ";
         }
     }
 
+    [Fact]
+    [TextViewTestsAutoInitShutdown]
+    public void IsSelecting_False_If_SelectedLength_Is_Zero_On_Mouse_Click ()
+    {
+        _textView.Text = "This is the first line.";
+        var top = new Toplevel ();
+        top.Add (_textView);
+        Application.Begin (top);
+
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (22, 0), Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (22, _textView.CursorPosition.X);
+        Assert.Equal (0, _textView.CursorPosition.Y);
+        Assert.Equal (0, _textView.SelectedLength);
+        Assert.True (_textView.IsSelecting);
+
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (22, 0), Flags = MouseFlags.Button1Released });
+        Assert.Equal (22, _textView.CursorPosition.X);
+        Assert.Equal (0, _textView.CursorPosition.Y);
+        Assert.Equal (0, _textView.SelectedLength);
+        Assert.True (_textView.IsSelecting);
+
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (22, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.Equal (22, _textView.CursorPosition.X);
+        Assert.Equal (0, _textView.CursorPosition.Y);
+        Assert.Equal (0, _textView.SelectedLength);
+        Assert.False (_textView.IsSelecting);
+
+        top.Dispose ();
+        Application.Shutdown ();
+    }
+
     private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }
 }
