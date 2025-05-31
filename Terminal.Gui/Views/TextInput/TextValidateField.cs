@@ -3,8 +3,8 @@
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Text field that validates input through a  <see cref="ITextValidateProvider"/></summary>
-public class TextValidateField : View
+/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
+public class TextValidateField : View, IDesignable
 {
     private const int DEFAULT_LENGTH = 10;
     private int _cursorPosition;
@@ -364,6 +364,20 @@ public class TextValidateField : View
     {
         _cursorPosition = _provider!.CursorStart ();
         SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        TextRegexProvider provider = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+
+        BorderStyle = LineStyle.Single;
+        Title = provider.Pattern;
+        Provider = provider;
+
+        Text = "999";
 
         return true;
     }

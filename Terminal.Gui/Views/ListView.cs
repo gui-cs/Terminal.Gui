@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an
+///     Provides a scrollable list of data where each item can be activated to perform an
 ///     action.
 /// </summary>
 /// <remarks>

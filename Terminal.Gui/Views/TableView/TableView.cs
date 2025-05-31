@@ -14,8 +14,8 @@ public delegate Scheme CellColorGetterDelegate (CellColorGetterArgs args);
 public delegate Scheme RowColorGetterDelegate (RowColorGetterArgs args);
 
 /// <summary>
-///     View for tabular data based on a <see cref="ITableSource"/>.
-///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
+///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
+///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
 /// </summary>
 public class TableView : View, IDesignable
 {

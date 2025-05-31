@@ -8,7 +8,7 @@
 
 namespace Terminal.Gui.Views;
 
-/// <summary>A <see cref="View"/> which displays (by default) a spinning line character.</summary>
+/// <summary>Displays a spinning glyph or combinations of glyphs to indicate progress or activity</summary>
 /// <remarks>
 ///     By default, animation only occurs when you call <see cref="SpinnerView.AdvanceAnimation(bool)"/>. Use
 ///     <see cref="AutoSpin"/> to make the automate calls to <see cref="SpinnerView.AdvanceAnimation(bool)"/>.

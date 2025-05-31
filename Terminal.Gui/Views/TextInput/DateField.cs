@@ -10,8 +10,7 @@ using System.Globalization;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Simple Date editing <see cref="View"/></summary>
-/// <remarks>The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.</remarks>
+/// <summary>Provides date editing functionality with mouse support.</summary>
 public class DateField : TextField
 {
     private const string RightToLeftMark = "\u200f";

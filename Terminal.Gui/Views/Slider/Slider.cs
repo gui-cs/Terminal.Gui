@@ -2,7 +2,11 @@
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Slider control.</summary>
+/// <summary>
+///     Provides a slider control letting the user navigate from a set of typed options in a linear manner using the
+///     keyboard or mouse.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class Slider : Slider<object>
 {
     /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
@@ -17,7 +21,7 @@ public class Slider : Slider<object>
 }
 
 /// <summary>
-///     Provides a slider control letting the user navigate from a set of typed options in a linear manner using the
+///     Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
