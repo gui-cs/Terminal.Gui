@@ -503,7 +503,7 @@ public class MenuBarTests ()
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown]
     public void Disabled_MenuBar_Is_Not_Activated ()
     {
         // Arrange
@@ -534,7 +534,7 @@ public class MenuBarTests ()
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown]
     public void MenuBarItem_Disabled_MenuBarItem_HotKey_No_Activate_Or_Open ()
     {
         // Arrange
@@ -566,7 +566,7 @@ public class MenuBarTests ()
 
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown]
     public void MenuBarItem_Disabled_Popover_Is_Activated ()
     {
         // Arrange

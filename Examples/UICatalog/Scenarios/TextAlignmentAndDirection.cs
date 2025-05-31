@@ -13,7 +13,7 @@ public class TextAlignmentAndDirection : Scenario
 
     internal class AlignmentAndDirectionView : View
     {
-        public AlignmentAndDirectionView()
+        public AlignmentAndDirectionView ()
         {
             ViewportSettings = Terminal.Gui.ViewportSettings.Transparent;
             BorderStyle = LineStyle.Dotted;
@@ -31,8 +31,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
 
-        var color1 = new ColorScheme { Normal = new (Color.Black, Color.Gray) };
-        var color2 = new ColorScheme { Normal = new (Color.Black, Color.DarkGray) };
+        SchemeManager.AddScheme ("TextAlignmentAndDirection1", new Scheme { Normal = new (Color.Black, Color.Gray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection2", new Scheme { Normal = new (Color.Black, Color.DarkGray) });
 
         List<View> singleLineLabels = new (); // single line
         List<View> multiLineLabels = new (); // multi line
@@ -46,7 +46,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Dialog"],
+            SchemeName = "Dialog",
             Text = "Start",
         };
 
@@ -57,7 +57,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Dialog"],
+            SchemeName = "Dialog",
             Text = "Center"
         };
 
@@ -68,7 +68,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Dialog"],
+            SchemeName = "Dialog",
             Text = "End"
         };
 
@@ -79,7 +79,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Dialog"],
+            SchemeName = "Dialog",
             Text = "Fill"
         };
 
@@ -89,7 +89,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Y (labelHL),
             Width = Dim.Fill (9),
             Height = 1,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextAlignment = Alignment.Start,
             Text = txt,
             ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
@@ -101,7 +101,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Y (labelHC),
             Width = Dim.Fill (9),
             Height = 1,
-            ColorScheme = color2,
+            SchemeName = "TextAlignmentAndDirection2",
             TextAlignment = Alignment.Center,
             Text = txt,
             ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
@@ -113,7 +113,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Y (labelHR),
             Width = Dim.Fill (9),
             Height = 1,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextAlignment = Alignment.End,
             Text = txt,
             ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
@@ -125,7 +125,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Y (labelHJ),
             Width = Dim.Fill (9),
             Height = 1,
-            ColorScheme = color2,
+            SchemeName = "TextAlignmentAndDirection2",
             TextAlignment = Alignment.Fill,
             Text = txt,
             ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
@@ -153,7 +153,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = 0,
             Width = 2,
             Height = 6,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = "Start"
@@ -166,7 +166,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = 0,
             Width = 2,
             Height = 6,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = "Center"
@@ -179,7 +179,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = 0,
             Width = 2,
             Height = 6,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = "End"
@@ -192,7 +192,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = 0,
             Width = 2,
             Height = 6,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = "Fill"
@@ -205,7 +205,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Bottom (labelVT) + 1,
             Width = 2,
             Height = Dim.Fill (),
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Start,
             Text = txt,
@@ -219,7 +219,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Bottom (labelVM) + 1,
             Width = 2,
             Height = Dim.Fill (),
-            ColorScheme = color2,
+            SchemeName = "TextAlignmentAndDirection2",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Center,
             Text = txt,
@@ -233,7 +233,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Bottom (labelVB) + 1,
             Width = 2,
             Height = Dim.Fill (),
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = txt,
@@ -247,7 +247,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Bottom (labelVJ) + 1,
             Width = 2,
             Height = Dim.Fill (),
-            ColorScheme = color2,
+            SchemeName = "TextAlignmentAndDirection2",
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Fill,
             Text = txt,
@@ -278,7 +278,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = Dim.Fill (31),
             Height = Dim.Fill (4)
 
-            //ColorScheme = color2
+            //SchemeName = "TextAlignmentAndDirection2"
         };
 
         var txtLabelTL = new AlignmentAndDirectionView
@@ -289,7 +289,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.Start,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelTL.TextFormatter.MultiLine = true;
@@ -302,7 +302,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.Start,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelTC.TextFormatter.MultiLine = true;
@@ -315,7 +315,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.Start,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelTR.TextFormatter.MultiLine = true;
@@ -328,7 +328,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.Center,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelML.TextFormatter.MultiLine = true;
@@ -341,7 +341,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.Center,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelMC.TextFormatter.MultiLine = true;
@@ -354,7 +354,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.Center,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelMR.TextFormatter.MultiLine = true;
@@ -367,7 +367,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.End,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelBL.TextFormatter.MultiLine = true;
@@ -380,7 +380,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.End,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelBC.TextFormatter.MultiLine = true;
@@ -388,12 +388,12 @@ public class TextAlignmentAndDirection : Scenario
         var txtLabelBR = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelMR),
-            Y = Pos.Bottom(txtLabelMR),
+            Y = Pos.Bottom (txtLabelMR),
             Width = Dim.Percent (100, DimPercentMode.Position),
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.End,
-            ColorScheme = color1,
+            SchemeName = "TextAlignmentAndDirection1",
             Text = txt,
         };
         txtLabelBR.TextFormatter.MultiLine = true;
@@ -577,6 +577,12 @@ public class TextAlignmentAndDirection : Scenario
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
+
+        // Be a good citizen and remove the schemes we added
+        SchemeManager.RemoveScheme ("TextAlignmentAndDirection1");
+        SchemeManager.RemoveScheme ("TextAlignmentAndDirection2");
+
+        return;
 
         void ToggleJustify (bool oldValue, bool wasJustOptions = false)
         {

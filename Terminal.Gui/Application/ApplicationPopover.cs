@@ -35,6 +35,13 @@ public sealed class ApplicationPopover : IDisposable
     {
         if (popover is { } && !_popovers.Contains (popover))
         {
+
+            // When created, set IPopover.Toplevel to the current Application.Top
+            if (popover.Toplevel is null)
+            {
+                popover.Toplevel = Application.Top;
+            }
+
             _popovers.Add (popover);
         }
 
@@ -104,6 +111,7 @@ public sealed class ApplicationPopover : IDisposable
         if (popover is View newPopover)
         {
             Register (popover);
+
             if (!newPopover.IsInitialized)
             {
                 newPopover.BeginInit ();
@@ -147,6 +155,7 @@ public sealed class ApplicationPopover : IDisposable
         if (activePopover is { Visible: true })
         {
             Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
+
             if (activePopover.NewKeyDownEvent (key))
             {
                 return true;
@@ -159,7 +168,9 @@ public sealed class ApplicationPopover : IDisposable
 
         foreach (IPopover popover in _popovers)
         {
-            if (popover == activePopover || popover is not View popoverView)
+            if (popover == activePopover
+                || popover is not View popoverView
+                || (popover.Toplevel is { } && popover.Toplevel != Application.Top))
             {
                 continue;
             }

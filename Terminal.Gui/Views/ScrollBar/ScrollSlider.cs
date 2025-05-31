@@ -267,10 +267,19 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     public event EventHandler<EventArgs<int>>? Scrolled;
 
-    /// <inheritdoc/>
-    public override Attribute GetNormalColor () { return base.GetHotNormalColor (); }
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (role == VisualRole.Normal)
+        {
+            currentAttribute = GetAttributeForRole (VisualRole.HotNormal);
 
-    ///// <inheritdoc/>
+            return true;
+        }
+
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+    }
+
     private int _lastLocation = -1;
 
     /// <summary>

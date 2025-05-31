@@ -21,7 +21,7 @@ See [What's New in V2 For more](newinv2.md).
 ## Conceptual Documentation
 
 * [Arrangement API](arrangement.md)
-* [Cancellable Work Pattern](cancellable_work_pattern.md)
+* [Cancellable Work Pattern](cancellable-work-pattern.md)
 * [Configuration and Theme Manager](config.md)
 * [Command Deep Dive](command.md)
 * [Cursor Deep Dive](cursor.md)
@@ -46,6 +46,7 @@ The simplest application looks like this:
 
 ```csharp
 using Terminal.Gui;
+ConfigurationManager.Enable(ConfigLocations.All);
 Application.Init ();
 var n = MessageBox.Query (50, 5, "Question", "Do you like TUI apps?", "Yes", "No");
 Application.Shutdown ();
@@ -62,6 +63,7 @@ The [Application](~/api/Terminal.Gui.Application.yml) class additionally creates
 
 ```csharp
 using Terminal.Gui;
+ConfigurationManager.Enable(ConfigLocations.All);
 Application.Init ();
 
 var label = new Label () {
@@ -83,6 +85,7 @@ This example includes a menu bar at the top of the screen and a button that show
 ```csharp
 using Terminal.Gui;
 
+ConfigurationManager.Enable(ConfigLocations.All);
 Application.Init ();
 var menu = new MenuBar (new MenuBarItem [] {
     new MenuBarItem ("_File", new MenuItem [] {

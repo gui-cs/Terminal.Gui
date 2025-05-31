@@ -13,7 +13,6 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
-        Locations = ConfigLocations.Default;
 
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
@@ -318,11 +317,14 @@ public class ApplicationTests
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
-            Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
-            Assert.Equal (Key.Tab, Application.NextTabKey);
-            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
-            Assert.Equal (Key.F6, Application.NextTabGroupKey);
-            Assert.Equal (Key.Esc, Application.QuitKey);
+
+            // Commented out because if CM changed the defaults, those changes should
+            // persist across Inits.
+            //Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
+            //Assert.Equal (Key.Tab, Application.NextTabKey);
+            //Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+            //Assert.Equal (Key.F6, Application.NextTabGroupKey);
+            //Assert.Equal (Key.Esc, Application.QuitKey);
 
             // Internal properties
             Assert.False (Application.Initialized);
@@ -331,7 +333,7 @@ public class ApplicationTests
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application.TopLevels);
-            Assert.Empty (Application._cachedViewsUnderMouse);
+            Assert.Empty (Application.CachedViewsUnderMouse);
 
             // Mouse
             // Do not reset _lastMousePosition
@@ -365,7 +367,7 @@ public class ApplicationTests
         Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -377,12 +379,12 @@ public class ApplicationTests
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.D, Command.Cancel);
 
-        Application._cachedViewsUnderMouse.Clear ();
+        Application.CachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
         // Mouse
-        Application._lastMousePosition = new Point (1, 1);
+        Application.LastMousePosition = new Point (1, 1);
 
         Application.Navigation = new ();
 
@@ -537,45 +539,26 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Init_KeyBindings_Set_To_Defaults ()
+    public void Init_KeyBindings_Are_Not_Reset ()
     {
-        // arrange
-        Locations = ConfigLocations.All;
-        ThrowOnJsonErrors = true;
+        Debug.Assert(!IsEnabled);
 
-        Application.QuitKey = Key.Q;
+        try
+        {
+            // arrange
+            ThrowOnJsonErrors = true;
 
-        Application.Init (new FakeDriver ());
+            Application.QuitKey = Key.Q;
+            Assert.Equal (Key.Q, Application.QuitKey);
 
-        Assert.Equal (Key.Esc, Application.QuitKey);
+            Application.Init (new FakeDriver ());
 
-        Application.Shutdown ();
-    }
-
-    [Fact]
-    public void Init_KeyBindings_Set_To_Custom ()
-    {
-        // arrange
-        Locations = ConfigLocations.Runtime;
-        ThrowOnJsonErrors = true;
-
-        RuntimeConfig = """
-                         {
-                               "Application.QuitKey": "Ctrl-Q"
-                         }
-                 """;
-
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        // Act
-        Application.Init (new FakeDriver ());
-
-        Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
-
-        Assert.True (Application.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
-
-        Application.Shutdown ();
-        Locations = ConfigLocations.Default;
+            Assert.Equal (Key.Q, Application.QuitKey);
+        }
+        finally
+        {
+            Application.ResetState (false);
+        }
     }
 
     [Fact]

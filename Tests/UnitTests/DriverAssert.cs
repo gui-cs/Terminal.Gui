@@ -43,7 +43,7 @@ internal partial class DriverAssert
         expectedLook = expectedLook.Trim ();
         driver ??= Application.Driver;
 
-        Cell [,] contents = driver.Contents;
+        Cell [,] contents = driver!.Contents;
 
         var line = 0;
 
@@ -51,7 +51,7 @@ internal partial class DriverAssert
         {
             for (var c = 0; c < lineString.Length; c++)
             {
-                Attribute? val = contents [line, c].Attribute;
+                Attribute? val = contents! [line, c].Attribute;
 
                 List<Attribute> match = expectedAttributes.Where (e => e == val).ToList ();
 
@@ -60,9 +60,9 @@ internal partial class DriverAssert
                     case 0:
                         output.WriteLine (
                                           $"{Application.ToString (driver)}\n"
-                                          + $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
-                                          + $" Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
-                                          + $"  But Was: <not found>"
+                                          + $"Expected Attribute {val} (PlatformColor = {val!.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
+                                          + $" Expected: {string.Join (",", expectedAttributes.Select (attr => attr))}\n"
+                                          + $" But Was: <not found>"
                                          );
                         Assert.Empty (match);
 
@@ -79,9 +79,55 @@ internal partial class DriverAssert
                 if (colorUsed != userExpected)
                 {
                     output.WriteLine ($"{Application.ToString (driver)}");
-                    output.WriteLine ($"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.");
+                    output.WriteLine ($"Unexpected Attribute at Contents[{line},{c}] = {contents [line, c]}.");
                     output.WriteLine ($" Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})");
-                    output.WriteLine ($"  But Was:   {colorUsed} ({val})");
+                    output.WriteLine ($"  But Was: {colorUsed} ({val})");
+
+                    // Print `contents` as the expected and actual attribute indexes in a grid where each cell is of the form "e:a" (e = expected, a = actual)
+                    // e.g:
+                    // 0:1 0:0 1:1
+                    // 0:0 1:1 0:0
+                    // 0:0 1:1 0:0
+
+                    //// Use StringBuilder since output only has .WriteLine
+                    //var sb = new StringBuilder ();
+                    //// for each line in `contents`
+                    //for (var r = 0; r < driver.Rows; r++)
+                    //{
+                    //    // for each column in `contents`
+                    //    for (var cc = 0; cc < driver.Cols; cc++)
+                    //    {
+                    //        // get the attribute at the current location
+                    //        Attribute? val2 = contents [r, cc].Attribute;
+                    //        // if the attribute is not null
+                    //        if (val2.HasValue)
+                    //        {
+                    //            // get the index of the attribute in `expectedAttributes`
+                    //            int index = Array.IndexOf (expectedAttributes, val2.Value);
+                    //            // if the index is -1, it means the attribute was not found in `expectedAttributes`
+
+                    //            // get the index of the actual attribute in `expectedAttributes`
+
+
+                    //            if (index == -1)
+                    //            {
+                    //                sb.Append ("x:x ");
+                    //            }
+                    //            else
+                    //            {
+                    //                sb.Append ($"{index}:{val2.Value} ");
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            sb.Append ("x:x ");
+                    //        }
+                    //    }
+                    //    sb.AppendLine ();
+                    //}
+
+                    //output.WriteLine ($"Contents:\n{sb}");
+
                     Assert.Equal (userExpected, colorUsed);
 
                     return;

@@ -12,7 +12,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     [InlineData (1, 0, true)]
     [InlineData (1, 1, true)]
     [InlineData (2, 1, true)]
-    public void Adornment_WithSubView_GetViewsUnderMouse_Finds (int viewMargin, int subViewMargin, bool expectedFound)
+    public void Adornment_WithSubView_Finds (int viewMargin, int subViewMargin, bool expectedFound)
     {
         Application.Top = new Toplevel()
         {
@@ -20,6 +20,8 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Height = 10
         };
         Application.Top.Margin.Thickness = new Thickness (viewMargin);
+        // Turn of TransparentMouse for the test
+        Application.Top.Margin.ViewportSettings = ViewportSettings.None;
 
         var subView = new View ()
         {
@@ -29,10 +31,13 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Height = 5
         };
         subView.Margin.Thickness = new Thickness (subViewMargin);
+        // Turn of TransparentMouse for the test
+        subView.Margin.ViewportSettings = ViewportSettings.None;
+
         Application.Top.Margin.Add (subView);
         Application.Top.Layout ();
 
-        var foundView = View.GetViewsUnderMouse (new Point(0, 0)).LastOrDefault ();
+        var foundView = View.GetViewsUnderLocation (new Point(0, 0), ViewportSettings.None).LastOrDefault ();
 
         bool found = foundView == subView || foundView == subView.Margin;
         Assert.Equal (expectedFound, found);
@@ -41,7 +46,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Adornment_WithNonVisibleSubView_GetViewsUnderMouse_Finds_Adornment ()
+    public void Adornment_WithNonVisibleSubView_Finds_Adornment ()
     {
         Application.Top = new Toplevel ()
         {
@@ -61,7 +66,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         Application.Top.Padding.Add (subView);
         Application.Top.Layout ();
 
-        Assert.Equal (Application.Top.Padding, View.GetViewsUnderMouse (new Point(0, 0)).LastOrDefault ());
+        Assert.Equal (Application.Top.Padding, View.GetViewsUnderLocation (new Point(0, 0), ViewportSettings.None).LastOrDefault ());
         Application.Top?.Dispose ();
         Application.ResetState (ignoreDisposed: true);
     }

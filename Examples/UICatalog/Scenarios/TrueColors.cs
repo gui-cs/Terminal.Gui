@@ -105,19 +105,19 @@ public class TrueColors : Scenario
 
                                       if (e.Flags == MouseFlags.Button1Clicked)
                                       {
-                                          Attribute normal = e.View.GetNormalColor ();
+                                          Attribute normal = e.View.GetAttributeForRole (VisualRole.Normal);
 
-                                          lblLighter.ColorScheme = new (e.View.ColorScheme)
+                                          lblLighter.SetScheme (new (e.View.GetScheme ())
                                           {
                                               Normal = new (
                                                             normal.Foreground,
-                                                            normal.Background.GetHighlightColor ()
+                                                            normal.Background.GetBrighterColor ()
                                                            )
-                                          };
+                                          });
                                       }
                                       else
                                       {
-                                          Attribute normal = e.View.GetNormalColor ();
+                                          Attribute normal = e.View.GetAttributeForRole (VisualRole.Normal);
                                           lblRed.Text = normal.Foreground.R.ToString ();
                                           lblGreen.Text = normal.Foreground.G.ToString ();
                                           lblBlue.Text = normal.Foreground.B.ToString ();
@@ -140,16 +140,15 @@ public class TrueColors : Scenario
                 var l = new Label
                 {
                     X = dx++,
-                    Y = y,
-                    ColorScheme = new()
-                    {
-                        Normal = new (
-                                      colorFunc (Math.Clamp (i, 0, 255)),
-                                      colorFunc (Math.Clamp (i, 0, 255))
-                                     )
-                    },
-                    Text = " "
+                    Y = y
                 };
+                l.SetScheme (new ()
+                {
+                    Normal = new (
+                                  colorFunc (Math.Clamp (i, 0, 255)),
+                                  colorFunc (Math.Clamp (i, 0, 255))
+                                 )
+                });
                 app.Add (l);
             }
 

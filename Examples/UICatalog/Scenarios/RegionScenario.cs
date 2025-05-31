@@ -37,7 +37,7 @@ public class RegionScenario : Scenario
 
         var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
-        tools.CurrentAttribute = app.ColorScheme!.HotNormal;
+        tools.CurrentAttribute = app.GetAttributeForRole (VisualRole.HotNormal);
 
         tools.SetStyle += b =>
                           {
@@ -123,7 +123,7 @@ public class RegionScenario : Scenario
                                                                     app.LineCanvas,
                                                                     LineStyle.Dashed,
                                                                     new (
-                                                                         tools.CurrentAttribute!.Value.Foreground.GetHighlightColor (),
+                                                                         tools.CurrentAttribute!.Value.Foreground.GetBrighterColor (),
                                                                          tools.CurrentAttribute!.Value.Background));
                                   }
                               };
@@ -204,7 +204,7 @@ public class ToolsView : Window
         _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
-        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
+        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem!); };
         _stylePicker.SelectedItem = (int)RegionDrawStyles.FillOnly;
 
         _regionOpSelector = new ()
@@ -245,7 +245,7 @@ public class RegionOpSelector : View
             Y = 0,
             RadioLabels = Enum.GetNames<RegionOp> ().Select (n => n = "_" + n).ToArray ()
         };
-        _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem); };
+        _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem!); };
         Add (_radioGroup);
     }
 
@@ -301,8 +301,8 @@ public class AttributeView : View
         Color fg = Value?.Foreground ?? Color.Black;
         Color bg = Value?.Background ?? Color.Black;
 
-        bool isTransparentFg = fg == GetNormalColor ().Background;
-        bool isTransparentBg = bg == GetNormalColor ().Background;
+        bool isTransparentFg = fg == GetAttributeForRole (VisualRole.Normal).Background;
+        bool isTransparentBg = bg == GetAttributeForRole (VisualRole.Normal).Background;
 
         SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
 

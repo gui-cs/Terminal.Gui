@@ -2,6 +2,9 @@
 
 public class ApplicationPopoverTests
 {
+
+
+
     [Fact]
     public void Application_Init_Initializes_PopoverManager ()
     {
@@ -140,6 +143,56 @@ public class ApplicationPopoverTests
 
         popover.Dispose ();
         Assert.Equal (1, popover.DisposedCount);
+    }
+
+    [Fact]
+    public void Register_SetsTopLevel ()
+    {
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel ();
+        PopoverTestClass popover = new ();
+
+        // Act
+        Application.Popover?.Register (popover);
+
+        // Assert
+        Assert.Equal (Application.Top, popover.Toplevel);
+
+        Application.ResetState (true);
+    }
+
+    [Fact]
+    public void Keyboard_Events_Go_Only_To_Popover_Associated_With_Toplevel ()
+    {
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel () { Id = "initialTop" };
+        PopoverTestClass popover = new ();
+        int keyDownEvents = 0;
+        popover.KeyDown += (s, e) =>
+                           {
+                               keyDownEvents++;
+                               e.Handled = true;
+                           }; // Ensure it handles the key
+
+        Application.Popover?.Register (popover);
+
+        // Act
+        Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
+
+        Application.Top = new Toplevel () { Id = "secondaryTop" };
+        Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
+
+        // Test
+        Assert.Equal (1, keyDownEvents);
+
+
+        popover.Dispose ();
+        Assert.Equal (1, popover.DisposedCount);
+        Application.ResetState (true);
     }
 
     public class PopoverTestClass : PopoverBaseImpl

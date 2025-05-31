@@ -2,7 +2,7 @@
 
 ## See Also
 
-* [Cancellable Work Pattern](cancellable_work_pattern.md)
+* [Cancellable Work Pattern](cancellable-work-pattern.md)
 * [Command Deep Dive](command.md)
 
 ## Tenets for Terminal.Gui Keyboard Handling (Unless you know better ones...)

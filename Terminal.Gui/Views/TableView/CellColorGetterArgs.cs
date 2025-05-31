@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Arguments for a <see cref="CellColorGetterDelegate"/>.  Describes a cell for which a rendering
-///     <see cref="ColorScheme"/> is being sought
+///     <see cref="Scheme"/> is being sought
 /// </summary>
 public class CellColorGetterArgs
 {
@@ -12,7 +12,7 @@ public class CellColorGetterArgs
         int colIdx,
         object cellValue,
         string representation,
-        ColorScheme rowScheme
+        Scheme rowScheme
     )
     {
         Table = table;
@@ -35,8 +35,8 @@ public class CellColorGetterArgs
     /// <summary>The index of the row in <see cref="Table"/> for which color is needed</summary>
     public int RowIndex { get; }
 
-    /// <summary>the color scheme that is going to be used to render the cell if no cell specific color scheme is returned</summary>
-    public ColorScheme RowScheme { get; }
+    /// <summary>the scheme that is going to be used to render the cell if no cell specific scheme is returned</summary>
+    public Scheme RowScheme { get; }
 
     /// <summary>The data table hosted by the <see cref="TableView"/> control.</summary>
     public ITableSource Table { get; }

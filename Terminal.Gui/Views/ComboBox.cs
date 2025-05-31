@@ -110,16 +110,11 @@ public class ComboBox : View, IDesignable
         KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
     }
 
-    /// <inheritdoc/>
-    public new ColorScheme ColorScheme
+    /// <inheritdoc />
+    protected override bool OnSettingScheme (in Scheme scheme)
     {
-        get => base.ColorScheme;
-        set
-        {
-            _listview.ColorScheme = value;
-            base.ColorScheme = value;
-            SetNeedsDraw ();
-        }
+        _listview.SetScheme(scheme);
+        return base.OnSettingScheme (in scheme);
     }
 
     /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>
@@ -136,18 +131,15 @@ public class ComboBox : View, IDesignable
     public bool ReadOnly
     {
         get => _search.ReadOnly;
-        set
-        {
-            _search.ReadOnly = value;
+        set => _search.ReadOnly = value;
 
-            if (_search.ReadOnly)
-            {
-                if (_search.ColorScheme is { })
-                {
-                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
-                }
-            }
-        }
+        //if (_search.ReadOnly)
+        //{
+        //    if (_search.Scheme is { })
+        //    {
+        //        _search.Scheme = new Scheme (_search.Scheme) { Normal = _search.Scheme.Focus };
+        //    }
+        //}
     }
 
     /// <summary>Current search text</summary>
@@ -302,10 +294,7 @@ public class ComboBox : View, IDesignable
             return true;
         }
 
-        if (ColorScheme != null)
-        {
-            SetAttribute (ColorScheme.Focus);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Focus : VisualRole.Disabled);
         AddRune (Viewport.Right - 1, 0, Glyphs.DownArrow);
 
         return true;
@@ -890,7 +879,7 @@ public class ComboBox : View, IDesignable
 
         protected override bool OnDrawingContent ()
         {
-            Attribute current = ColorScheme?.Focus ?? Attribute.Default;
+            Attribute current = GetAttributeForRole (VisualRole.Focus);
             SetAttribute (current);
             Move (0, 0);
             Rectangle f = Frame;
@@ -908,15 +897,15 @@ public class ComboBox : View, IDesignable
 
                 if (isHighlighted || (isSelected && !_hideDropdownListOnClick))
                 {
-                    newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
+                    newcolor = focused ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else if (isSelected && _hideDropdownListOnClick)
                 {
-                    newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+                    newcolor = focused ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else
                 {
-                    newcolor = focused ? GetNormalColor () : GetNormalColor ();
+                    newcolor = GetAttributeForRole (VisualRole.Normal);
                 }
 
                 if (newcolor != current)

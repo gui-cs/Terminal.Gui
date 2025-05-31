@@ -28,6 +28,8 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * *New!* @Terminal.Gui.PosAlign - Aligns a set of views horizontally or vertically (left, right, center, etc...).
 * *New!* @Terminal.Gui.View.Arrangement enables tiled and overlapped view arrangement and moving/resizing Views with the keyboard and mouse. See [Arrangement](arrangement.md).
 * *Improved!* Keyboard [Navigation](navigation.md) has been revamped to be more reliability and ensure TUI apps built with Terminal.Gui are accessible. 
+* *New!* Sizable/Movable views - Any view can now be set to have resizeable borders and/or be dragged around.
+* *Improved!* Consistent tabbing behavior - Tab navigation now behaves as expected, cleanly and consistently.
 
 ## New and Improved Built-in Views
 
@@ -41,11 +43,29 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * *[MenuBar](~/api/Terminal.Gui.MenuBar.yml)* - COMING SOON! New implementation based on `Bar`
 * *[ContextMenu](~/api/Terminal.Gui.ContextMenu.yml)* - COMING SOON! New implementation based on `Bar`
 * *[FileDialog](~/api/Terminal.Gui.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView`. 
+* *[TableView](tableview.md)* - No longer just DataTable, now supports any collections, checkboxes and even expandable trees
 * *@"Terminal.Gui.ColorPicker"* - Fully supports TrueColor with the ability to choose a color using HSV, RGB, or HSL as well as W3C standard color names.
+
+## Beauty
+
+Terminal.Gui has never been prettier
+
+* *ShowBorders* - Get that 3D 'pop' for your buttons
+* *Gradient* - Render beautiful true color borders, titles etc with the new Gradient API
+
 
 ## Configuration Manager
 
 Terminal.Gui now supports a configuration manager enabling library and app settings to be persisted and loaded from the file system. See [Configuration Manager](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#configuration-manager) for details.
+
+## Logging & Metrics
+
+Terminal.Gui now features multi level logging of engine internals and system performance metrics (redraws, invoke durations etc).  Never again wonder why your frame rate is low, or a given terminal/distro does not behave as expected.
+See [Logging](logging.md) for details.
+
+## Sixel Image Support
+
+Recently added to Windows Terminal and long supported in mainstream linux terminals, this graphics protcol allows images and even animations to be rendered directly into the console.
 
 ## Updated Keyboard API
 
@@ -63,3 +83,6 @@ The API for mouse input is now internally consistent and easiser to use.
 * More granular APIs are provided to ease handling specific mouse actions. See [Mouse API](mouse.md).
 * Views can use the `View.Highlight` event to have the view be visibly highlighted on various mouse events.
 * Views can set `View.WantContinousButtonPresses = true` to ahve their `Command.Accept` command be invoked repeatedly as the user holds a mouse button down on the view.
+
+## AOT support
+*AOT/single file app support* now works out of the box.

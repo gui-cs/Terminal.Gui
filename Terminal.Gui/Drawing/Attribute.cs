@@ -1,20 +1,23 @@
-#nullable enable
+﻿#nullable enable
 using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-
-// TODO: Add support for other attributes (bold, underline, etc.) once the platform drivers support them.
-// TODO: See https://github.com/gui-cs/Terminal.Gui/issues/457
-
-
-/// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
+/// <summary>
+///     Represents the visual styling for a UI element, including foreground and background color and text style.
+/// </summary>
 /// <remarks>
-///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
-///     text styling). They encode both the foreground and the background color and are used in the
-///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
+///     <para>
+///         <see cref="Attribute"/> is a lightweight, immutable struct used to define how visual elements are rendered
+///         in a terminal UI. It wraps color and style information in a platform-independent way and is used
+///         extensively in <see cref="Scheme"/>, <see cref="VisualRole"/>, and theming infrastructure.
+///     </para>
 /// </remarks>
+/// <seealso cref="Color"/>
+/// <seealso cref="TextStyle"/>
+/// <seealso cref="VisualRole"/>
+/// <seealso cref="Scheme"/>
 [JsonConverter (typeof (AttributeJsonConverter))]
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
@@ -22,96 +25,186 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonIgnore]
     public static Attribute Default => new (Color.White, Color.Black);
 
-    /// <summary>The <see cref="IConsoleDriver"/>-specific color value.</summary>
+    // TODO: Once CursesDriver is dead, remove this property
+    /// <summary>INTERNAL: The <see cref="IConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
     internal int PlatformColor { get; init; }
 
-    /// <summary>The foreground color.</summary>
+    /// <summary>
+    ///     Gets the foreground <see cref="Color"/> used to render text.
+    /// </summary>
     [JsonConverter (typeof (ColorJsonConverter))]
-    public Color Foreground { get; }
+    public Color Foreground { get; init; }
 
-    /// <summary>The background color.</summary>
+    /// <summary>
+    ///     Gets the background <see cref="Color"/> used behind text.
+    /// </summary>
     [JsonConverter (typeof (ColorJsonConverter))]
-    public Color Background { get; }
+    public Color Background { get; init; }
 
-    // TODO: Add constructors which permit including a TextStyle.
-    /// <summary>The text style (bold, italic, underlined, etc.).</summary>
-    public TextStyle TextStyle { get; init; } = TextStyle.None;
+    // TODO: Add constructors which permit including a Style.
+    /// <summary>
+    ///     Gets the <see cref="TextStyle"/> (e.g., bold, underline, italic) applied to text.
+    /// </summary>
+    public TextStyle Style { get; init; } = TextStyle.None;
 
-    /// <summary>Initializes a new instance with default values.</summary>
-    public Attribute ()
-    {
-        this = Default with { PlatformColor = -1 };
-    }
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct with default values.
+    /// </summary>
+    public Attribute () { this = Default with { PlatformColor = -1 }; }
 
-    /// <summary>Initializes a new instance from an existing instance.</summary>
-    public Attribute (in Attribute attr)
-    {
-        this = attr with { PlatformColor = -1 };
-    }
+    /// <summary>
+    ///     Initializes a new <see cref="Attribute"/> from an existing instance, preserving explicit state.
+    /// </summary>
+    public Attribute (in Attribute attr) { this = attr with { PlatformColor = -1 }; }
 
-    /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
+    /// <summary>INTERNAL: Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="platformColor">platform-dependent color value.</param>
     /// <param name="foreground">Foreground</param>
     /// <param name="background">Background</param>
-    internal Attribute (int platformColor, Color foreground, Color background)
+    internal Attribute (in int platformColor, in Color foreground, in Color background)
     {
         Foreground = foreground;
         Background = background;
         PlatformColor = platformColor;
+        Style = TextStyle.None;
     }
 
-    /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
-    /// <param name="foreground">Foreground</param>
-    /// <param name="background">Background</param>
+    /// <summary>
+    ///     Initializes an instance using two named colors.
+    /// </summary>
     public Attribute (in Color foreground, in Color background)
     {
         Foreground = foreground;
         Background = background;
 
         // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
-        PlatformColor = Application.Driver?.MakeColor(in foreground, in background).PlatformColor ?? -1;
+        PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
+        Style = TextStyle.None;
     }
 
     /// <summary>
-    ///     Initializes a new instance with a <see cref="ColorName16"/> value. Both <see cref="Foreground"/> and
-    ///     <see cref="Background"/> will be set to the specified color.
+    ///     Initializes a new instance with foreground, background, and <see cref="TextStyle"/>.
     /// </summary>
-    /// <param name="colorName">Value.</param>
-    internal Attribute (in ColorName16 colorName) : this (in colorName, in colorName) { }
+    public Attribute (in Color foreground, in Color background, in TextStyle style)
+    {
+        Foreground = foreground;
+        Background = background;
+        Style = style;
 
-    /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
-    /// <param name="foregroundName">Foreground</param>
-    /// <param name="backgroundName">Background</param>
-    public Attribute (in ColorName16 foregroundName, in ColorName16 backgroundName)
-        : this (new Color (in foregroundName), new Color (in backgroundName))
-    { }
-
-    /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
-    /// <param name="foregroundName">Foreground</param>
-    /// <param name="background">Background</param>
-    public Attribute (in ColorName16 foregroundName, in Color background) : this (new Color (in foregroundName), in background) { }
-
-    /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
-    /// <param name="foreground">Foreground</param>
-    /// <param name="backgroundName">Background</param>
-    public Attribute (in Color foreground, in ColorName16 backgroundName) : this (in foreground, new Color (in backgroundName)) { }
+        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
+        PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
+    }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and
-    ///     background.
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct from string representations of colors and style.
     /// </summary>
-    /// <param name="color">The color.</param>
+    /// <param name="foreground">Foreground color as a string (name, hex, or rgb).</param>
+    /// <param name="background">Background color as a string (name, hex, or rgb).</param>
+    /// <param name="style">Optional style as a string (e.g., "Bold,Underline").</param>
+    /// <exception cref="ArgumentException">Thrown if color parsing fails.</exception>
+    public Attribute (in string foreground, in string background, in string? style = null)
+    {
+        Foreground = Color.Parse (foreground);
+        Background = Color.Parse (background);
+
+        Style = style is { } && Enum.TryParse (style, true, out TextStyle parsedStyle)
+                    ? parsedStyle
+                    : TextStyle.None;
+        PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Attribute"/> struct from string representations of colors and style.
+    /// </summary>
+    /// <param name="foreground">Foreground color as a string (name, hex, or rgb).</param>
+    /// <param name="background">Background color as a string (name, hex, or rgb).</param>
+    /// <param name="style">Optional style as a string (e.g., "Bold,Underline").</param>
+    /// <exception cref="ArgumentException">Thrown if color parsing fails.</exception>
+    public Attribute (in string foreground, in string background, in TextStyle style)
+    {
+        Foreground = Color.Parse (foreground);
+        Background = Color.Parse (background);
+
+        Style = style;
+        PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Initializes a new instance with a <see cref="ColorName16"/> value. Both <see cref="Foreground"/> and
+    ///     <see cref="Background"/> will be set to the specified color.
+    /// </summary>
+    /// <param name="color16Name">Value.</param>
+    internal Attribute (in ColorName16 color16Name) : this (in color16Name, in color16Name) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in ColorName16 foreground16Name, in ColorName16 background16Name)
+        : this (new Color (in foreground16Name), new Color (in background16Name))
+    { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in ColorName16 foreground16Name, in Color background) : this (new Color (in foreground16Name), in background) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in Color foreground, in ColorName16 background16Name) : this (in foreground, new Color (in background16Name)) { }
+
+    /// <summary>
+    ///     INTERNAL: Initializes a new instance with a <see cref="StandardColors"/> value. Both <see cref="Foreground"/> and
+    ///     <see cref="Background"/> will be set to the specified color.
+    /// </summary>
+    /// <param name="standardColor">Value.</param>
+    internal Attribute (in StandardColor standardColor) : this (in standardColor, in standardColor) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in StandardColor foreground, in StandardColor background)
+        : this (new Color (in foreground), new Color (in background))
+    { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in StandardColor foreground, in Color background) : this (new Color (in foreground), in background) { }
+
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors.
+    /// </summary>
+    public Attribute (in Color foreground, in StandardColor background) : this (in foreground, new Color (in background)) { }
+
+    /// <summary>
+    ///     Initializes an instance using a single color for both foreground and background.
+    /// </summary>
     public Attribute (in Color color) : this (color, color) { }
 
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
+    /// <summary>
+    ///     Initializes a new instance with foreground and background colors and a <see cref="TextStyle"/>.
+    /// </summary>
+    public Attribute (in StandardColor foreground, in StandardColor background, in TextStyle style) : this (new (in foreground), new Color (in background), style) { }
 
-    // TODO: Add TextStyle to Attribute.ToString(), modify unit tests to account
+
+    /// <inheritdoc/>
+    public bool Equals (Attribute other)
+    {
+        return PlatformColor == other.PlatformColor
+               && Foreground.Equals (other.Foreground)
+               && Background.Equals (other.Background)
+               && Style == other.Style;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, Style); }
+
     /// <inheritdoc/>
     public override string ToString ()
     {
         // Note: Unit tests are dependent on this format
-        return $"[{Foreground},{Background}]";
+        return $"[{Foreground},{Background},{Style}]";
     }
 }

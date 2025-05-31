@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
+// TODO: Change to internal to prevent app usage
 /// <summary>
 ///     The root object for a Theme. A Theme is a set of settings that are applied to the running
 ///     <see cref="Application"/> as a group.
@@ -13,7 +14,7 @@ namespace Terminal.Gui;
 /// <example>
 ///     <code>
 /// 	"Default": {
-/// 		"ColorSchemes": [
+/// 		"Schemes": [
 /// 		{
 /// 		"TopLevel": {
 /// 		"Normal": {
@@ -44,4 +45,7 @@ namespace Terminal.Gui;
 /// </example>
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 public class ThemeScope : Scope<ThemeScope>
-{ }
+{
+}
+
+

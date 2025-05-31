@@ -1,6 +1,5 @@
 #nullable enable
 using System.Globalization;
-using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui;
 
@@ -1123,6 +1122,17 @@ public static class EscSeqUtils
                                              (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
                                              true);
                 }
+                else if (consoleKeyInfo is { Key: 0, KeyChar: '\b' })
+                {
+                    key = ConsoleKey.Backspace;
+
+                    newConsoleKeyInfo = new (
+                                             consoleKeyInfo.KeyChar,
+                                             key,
+                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                             true);
+                }
                 else if (consoleKeyInfo.Key == 0)
                 {
                     key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
@@ -1148,7 +1158,7 @@ public static class EscSeqUtils
 
                 break;
             default:
-                uint ck = MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
+                uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
 
                 if (isConsoleKey)
                 {
@@ -1404,12 +1414,12 @@ public static class EscSeqUtils
                 if (keyInfo.Modifiers != ConsoleModifiers.Shift)
                 {
                     // If Shift wasn't down we don't need to do anything but return the keyInfo.KeyChar
-                    return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+                    return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
                 }
 
                 // Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç")
                 // and passing on Shift would be redundant.
-                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
@@ -1420,14 +1430,14 @@ public static class EscSeqUtils
                 return KeyCode.Tab;
             }
 
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
         }
 
         // Handle control keys (e.g. CursorUp)
         if (keyInfo.Key != ConsoleKey.None
             && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
         {
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
 
         if ((ConsoleKey)keyInfo.KeyChar is >= ConsoleKey.A and <= ConsoleKey.Z)
@@ -1458,7 +1468,7 @@ public static class EscSeqUtils
                 || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
                 // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
-                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
             }
 
             if (keyInfo.Modifiers == ConsoleModifiers.Shift)
@@ -1473,7 +1483,7 @@ public static class EscSeqUtils
             return (KeyCode)keyInfo.Key;
         }
 
-        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+        return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
     }
 
     private static async Task ProcessButtonClickedAsync ()
@@ -1846,6 +1856,8 @@ public static class EscSeqUtils
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}48;2;{r};{g};{b}m");
     }
+
+
 
     #endregion
 

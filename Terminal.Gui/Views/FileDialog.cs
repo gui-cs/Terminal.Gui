@@ -74,7 +74,7 @@ public class FileDialog : Dialog, IDesignable
         _fileSystem = fileSystem;
         Style = new (fileSystem);
 
-        _btnOk = new()
+        _btnOk = new ()
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
             Y = Pos.AnchorEnd (),
@@ -91,7 +91,7 @@ public class FileDialog : Dialog, IDesignable
                                 Accept (true);
                             };
 
-        _btnCancel = new()
+        _btnCancel = new ()
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
             Y = Pos.AnchorEnd (),
@@ -113,7 +113,7 @@ public class FileDialog : Dialog, IDesignable
                                     }
                                 };
 
-        _btnUp = new() { X = 0, Y = 1, NoPadding = true };
+        _btnUp = new () { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
         _btnUp.Accepting += (s, e) =>
                             {
@@ -121,7 +121,7 @@ public class FileDialog : Dialog, IDesignable
                                 e.Handled = true;
                             };
 
-        _btnBack = new() { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
+        _btnBack = new () { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
         _btnBack.Accepting += (s, e) =>
                               {
@@ -129,15 +129,15 @@ public class FileDialog : Dialog, IDesignable
                                   e.Handled = true;
                               };
 
-        _btnForward = new() { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
+        _btnForward = new () { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
         _btnForward.Accepting += (s, e) =>
                                  {
-                                     _history.Forward();
+                                     _history.Forward ();
                                      e.Handled = true;
                                  };
 
-        _tbPath = new() { Width = Dim.Fill (), CaptionColor = new (Color.Black) };
+        _tbPath = new () { Width = Dim.Fill (), CaptionColor = new (Color.Black) };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -151,7 +151,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        _splitContainer = new()
+        _splitContainer = new ()
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
@@ -167,7 +167,7 @@ public class FileDialog : Dialog, IDesignable
 
         // this.splitContainer.Border.BorderStyle = BorderStyle.None;
 
-        _tableView = new()
+        _tableView = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -195,7 +195,7 @@ public class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-        _treeView = new() { Width = Dim.Fill (), Height = Dim.Fill () };
+        _treeView = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
         _treeView.TreeBuilder = fileDialogTreeBuilder;
@@ -207,7 +207,7 @@ public class FileDialog : Dialog, IDesignable
         _splitContainer.Tiles.ElementAt (0).ContentView.Add (_treeView);
         _splitContainer.Tiles.ElementAt (1).ContentView.Add (_tableView);
 
-        _btnToggleSplitterCollapse = new()
+        _btnToggleSplitterCollapse = new ()
         {
             X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
             Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false)
@@ -225,7 +225,7 @@ public class FileDialog : Dialog, IDesignable
                                                     SetNeedsLayout ();
                                                 };
 
-        _tbFind = new()
+        _tbFind = new ()
         {
             X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
             CaptionColor = new (Color.Black),
@@ -234,8 +234,8 @@ public class FileDialog : Dialog, IDesignable
             HotKey = Key.F.WithAlt
         };
 
-        _spinnerView = new()
-            { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput), Y = Pos.AnchorEnd (1), Visible = false };
+        _spinnerView = new ()
+        { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput), Y = Pos.AnchorEnd (1), Visible = false };
 
         _tbFind.TextChanged += (s, o) => RestartSearch ();
 
@@ -327,7 +327,7 @@ public class FileDialog : Dialog, IDesignable
 
     /// <summary>The maximum number of results that will be collected when searching before stopping.</summary>
     /// <remarks>This prevents performance issues e.g. when searching root of file system for a common letter (e.g. 'e').</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static int MaxSearchResults { get; set; } = 10000;
 
     /// <summary>
@@ -419,7 +419,7 @@ public class FileDialog : Dialog, IDesignable
 
             Move (0, Viewport.Height / 2);
 
-            SetAttribute (new (Color.Red, ColorScheme.Normal.Background));
+            SetAttribute (new (Color.Red, GetAttributeForRole (VisualRole.Normal).Background));
             Driver.AddStr (new (' ', feedbackPadLeft));
             Driver.AddStr (_feedback);
             Driver.AddStr (new (' ', feedbackPadRight));
@@ -451,9 +451,9 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Caption = Style.PathCaption;
         _tbFind.Caption = Style.SearchCaption;
 
-        _tbPath.Autocomplete.ColorScheme = new (_tbPath.ColorScheme)
+        _tbPath.Autocomplete.Scheme = new (_tbPath.GetScheme ())
         {
-            Normal = new (Color.Black, _tbPath.ColorScheme.Normal.Background)
+            Normal = new (Color.Black, _tbPath.GetAttributeForRole (VisualRole.Normal).Background)
         };
 
         _treeRoots = Style.TreeRootGetter ();
@@ -481,7 +481,7 @@ public class FileDialog : Dialog, IDesignable
                                                                         .ToArray ()
                                    );
 
-            _allowedTypeMenuBar = new()
+            _allowedTypeMenuBar = new ()
             {
                 Width = width,
                 Y = 1,
@@ -811,20 +811,20 @@ public class FileDialog : Dialog, IDesignable
 
     private void ClearFeedback () { _feedback = null; }
 
-    private ColorScheme ColorGetter (CellColorGetterArgs args)
+    private Scheme ColorGetter (CellColorGetterArgs args)
     {
         FileSystemInfoStats stats = RowToStats (args.RowIndex);
 
         if (!Style.UseColors)
         {
-            return _tableView.ColorScheme;
+            return _tableView.GetScheme ();
         }
 
         Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);
         var black = new Color (Color.Black);
 
         // TODO: Add some kind of cache for this
-        return new()
+        return new ()
         {
             Normal = new (color, black),
             HotNormal = new (color, black),

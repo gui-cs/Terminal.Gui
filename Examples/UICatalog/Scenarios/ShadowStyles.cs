@@ -18,12 +18,14 @@ public class ShadowStyles : Scenario
 
         Window app = new ()
         {
+            Id = "app",
             Title = GetQuitKeyAndName ()
         };
 
 
         var editor = new AdornmentsEditor ()
         {
+            Id = "editor",
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true,
         };
@@ -31,8 +33,10 @@ public class ShadowStyles : Scenario
 
         app.Add (editor);
 
-        Window win = new ()
+        Window shadowWindow = new ()
         {
+
+            Id = "shadowWindow",
             X = Pos.Right (editor),
             Y = 0,
             Width = Dim.Percent (30),
@@ -51,20 +55,37 @@ public class ShadowStyles : Scenario
 
         var buttonInWin = new Button
         {
+            Id = "buttonInWin",
             X = Pos.Center (),
             Y = Pos.Center (), Text = "Button in Window",
             ShadowStyle = ShadowStyle.Opaque
         };
-        win.Add (buttonInWin);
-        app.Add (win);
+        shadowWindow.Add (buttonInWin);
+        app.Add (shadowWindow);
 
         var button = new Button
         {
+            Id = "button",
             X = Pos.Right (editor) + 10,
             Y = Pos.Center (), Text = "Button",
             ShadowStyle = ShadowStyle.Opaque
         };
-        app.Add (button);
+
+        ColorPicker colorPicker = new ()
+        {
+            Title = "ColorPicker to illustrate highlight (currently broken)",
+            BorderStyle = LineStyle.Dotted,
+            Id = "colorPicker16",
+            X = Pos.Center (),
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Percent(80),
+        };
+        colorPicker.ColorChanged += (sender, args) =>
+                                    {
+                                        var normal = app.GetScheme ().Normal;
+                                        app.SetScheme (app.GetScheme() with {Normal = new Attribute(normal.Foreground, args.CurrentValue)});
+                                    };
+        app.Add (button, colorPicker);
 
         editor.AutoSelectViewToEdit = true;
         editor.AutoSelectSuperView = app;

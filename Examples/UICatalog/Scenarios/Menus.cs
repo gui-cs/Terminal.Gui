@@ -33,7 +33,7 @@ public class Menus : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);

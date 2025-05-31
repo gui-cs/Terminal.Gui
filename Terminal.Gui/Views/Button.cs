@@ -31,13 +31,13 @@ public class Button : View, IDesignable
     /// <summary>
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.Pressed | HighlightStyle.Hover;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>

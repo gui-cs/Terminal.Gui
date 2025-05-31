@@ -1,4 +1,6 @@
 #nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -31,13 +33,18 @@ public class OptionSelector : View, IOrientation, IDesignable
     private int? _selectedItem;
 
     /// <summary>
-    /// Gets or sets the index of the selected item.
+    /// Gets or sets the index of the selected item. Will be <see langword="null"/> if no item is selected.
     /// </summary>
     public int? SelectedItem
     {
         get => _selectedItem;
         set
         {
+            if (value < 0 || value >= SubViews.OfType<CheckBox> ().Count ())
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @$"SelectedItem must be between 0 and {SubViews.OfType<CheckBox> ().Count ()-1}");
+
+            }
             if (_selectedItem == value)
             {
                 return;
@@ -172,58 +179,57 @@ public class OptionSelector : View, IOrientation, IDesignable
             Title = nameWithHotKey,
             Id = name,
             Data = index,
-            HighlightStyle = HighlightStyle.Hover,
+            //HighlightStyle = HighlightStyle.Hover,
             RadioStyle = true
         };
 
-        checkbox.GettingNormalColor += (_, e) =>
+        checkbox.GettingAttributeForRole += (_, e) =>
         {
-            if (SuperView is { HasFocus: true })
+            if (SuperView is { HasFocus: false })
             {
-                e.Cancel = true;
+                return;
+            }
 
-                if (!HasFocus)
-                {
-                    e.NewValue = GetFocusColor ();
-                }
-                else
-                {
-                    // If _colorScheme was set, it's because of Hover
-                    if (checkbox._colorScheme is { })
+            switch (e.Role)
+            {
+                case VisualRole.Normal:
+                    e.Cancel = true;
+
+                    if (!HasFocus)
                     {
-                        e.NewValue = checkbox._colorScheme.Normal;
+                        e.NewValue = GetAttributeForRole (VisualRole.Focus);
                     }
                     else
                     {
-                        e.NewValue = GetNormalColor ();
+                        // If _scheme was set, it's because of Hover
+                        if (checkbox.HasScheme)
+                        {
+                            e.NewValue = checkbox.GetAttributeForRole(VisualRole.Normal);
+                        }
+                        else
+                        {
+                            e.NewValue = GetAttributeForRole (VisualRole.Normal);
+                        }
                     }
-                }
-            }
-        };
 
-        checkbox.GettingHotNormalColor += (_, e) =>
-        {
-            if (SuperView is { HasFocus: true })
-            {
-                e.Cancel = true;
-                if (!HasFocus)
-                {
-                    e.NewValue = GetHotFocusColor ();
-                }
-                else
-                {
-                    // If _colorScheme was set, it's because of Hover
-                    if (checkbox._colorScheme is { })
+                    break;
+
+                case VisualRole.HotNormal:
+                    e.Cancel = true;
+
+                    if (!HasFocus)
                     {
-                        e.NewValue = checkbox._colorScheme.Normal;
+                        e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
                     }
                     else
                     {
-                        e.NewValue = GetNormalColor ();
+                        e.NewValue = GetAttributeForRole (VisualRole.HotNormal);
                     }
-                }
+
+                    break;
             }
         };
+
         checkbox.Selecting += (sender, args) =>
         {
             if (RaiseSelecting (args.Context) is true)

@@ -236,8 +236,8 @@ internal partial class WindowsOutput : IConsoleOutput
                     prev = attr;
                     EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
                     EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
-                    EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.TextStyle);
-                    _redrawTextStyle = attr.TextStyle;
+                    EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
+                    _redrawTextStyle = attr.Style;
                 }
 
                 if (info.Char != '\x1b')

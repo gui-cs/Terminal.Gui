@@ -81,11 +81,12 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
 
     public MouseEventArgs ToDriverMouse (MouseEventRecord e)
     {
-        var mouseFlags = MouseFlags.ReportMousePosition;
+        var mouseFlags = MouseFlags.None;
 
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button1Pressed, MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
+
 
         // Deal with button 3 separately because it is considered same as 'rightmost button'
         if (e.ButtonState.HasFlag (ButtonState.Button3Pressed) || e.ButtonState.HasFlag (ButtonState.RightmostButtonPressed))
@@ -98,6 +99,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             if (_lastWasPressed [2])
             {
                 mouseFlags |= MouseFlags.Button3Released;
+
                 _lastWasPressed [2] = false;
             }
         }
@@ -118,13 +120,43 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             }
         }
 
+        if (e.EventFlags != EventFlags.NoEvent)
+        {
+            switch (e.EventFlags)
+            {
+                case EventFlags.MouseMoved:
+                    mouseFlags |= MouseFlags.ReportMousePosition;
+
+                    break;
+            }
+        }
+
+        if (e.ControlKeyState != ControlKeyState.NoControlKeyPressed)
+        {
+            switch (e.ControlKeyState)
+            {
+                case ControlKeyState.RightAltPressed:
+                case ControlKeyState.LeftAltPressed:
+                    mouseFlags |= MouseFlags.ButtonAlt;
+
+                    break;
+                case ControlKeyState.RightControlPressed:
+                case ControlKeyState.LeftControlPressed:
+                    mouseFlags |= MouseFlags.ButtonCtrl;
+
+                    break;
+                case ControlKeyState.ShiftPressed:
+                    mouseFlags |= MouseFlags.ButtonShift;
+
+                    break;
+            }
+        }
+
         var result = new MouseEventArgs
         {
             Position = new (e.MousePosition.X, e.MousePosition.Y),
             Flags = mouseFlags
         };
-
-        // TODO: Return keys too
 
         return result;
     }
@@ -148,6 +180,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             if (_lastWasPressed [buttonIndex])
             {
                 current |= releasedFlag;
+
                 _lastWasPressed [buttonIndex] = false;
             }
         }

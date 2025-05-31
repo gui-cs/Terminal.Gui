@@ -25,7 +25,6 @@ public class CharMap : View, IDesignable
     [RequiresDynamicCode ("AOT")]
     public CharMap ()
     {
-        base.ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
@@ -98,6 +97,20 @@ public class CharMap : View, IDesignable
         VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
+
+        // The scrollbars are in the Padding. VisualRole.Focus/Active are used to draw the
+        // CharMap headers. Override Padding to force it to draw to match.
+        Padding!.GettingAttributeForRole += PaddingOnGettingAttributeForRole;
+    }
+
+    private void PaddingOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
+    {
+        if (e.Role != VisualRole.Focus && e.Role != VisualRole.Active)
+        {
+            e.NewValue = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        }
+
+        e.Cancel = true;
     }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
@@ -249,28 +262,40 @@ public class CharMap : View, IDesignable
             return true;
         }
 
-        int cursorCol = GetCursor (SelectedCodePoint).X + Viewport.X - RowLabelWidth - 1;
-        int cursorRow = GetCursor (SelectedCodePoint).Y + Viewport.Y - 1;
+        int selectedCol = SelectedCodePoint % 16;
+        int selectedRow = SelectedCodePoint / 16;
 
-        SetAttribute (GetHotNormalColor ());
+        // Headers
+
+        // Clear the header area
         Move (0, 0);
-        AddStr (new (' ', RowLabelWidth + 1));
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        AddStr (new (' ', Viewport.Width));
 
         int firstColumnX = RowLabelWidth - Viewport.X;
 
         // Header
+        var x = 0;
+
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
-            int x = firstColumnX + hexDigit * COLUMN_WIDTH;
+            x = firstColumnX + hexDigit * COLUMN_WIDTH;
 
             if (x > RowLabelWidth - 2)
             {
                 Move (x, 0);
-                SetAttribute (GetHotNormalColor ());
+                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
                 AddStr (" ");
-                SetAttribute (HasFocus && cursorCol + firstColumnX == x ? GetHotFocusColor () : GetHotNormalColor ());
+
+                // Swap Active/Focus so the selected column is highlighted
+                if (hexDigit == selectedCol)
+
+                {
+                    SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
+                }
+
                 AddStr ($"{hexDigit:x}");
-                SetAttribute (GetHotNormalColor ());
+                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
                 AddStr (" ");
             }
         }
@@ -280,32 +305,54 @@ public class CharMap : View, IDesignable
         {
             // What row is this?
             int row = (y + Viewport.Y - 1) / _rowHeight;
-
             int val = row * 16;
+
+            // Draw the row label (U+XXXX_)
+            SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            Move (0, y);
+
+            // Swap Active/Focus so the selected row is highlighted
+            if (y + Viewport.Y - 1 == selectedRow)
+            {
+                SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
+            }
 
             if (val > MAX_CODE_POINT)
             {
-                break;
+                // No row
+                Move (0, y);
+                AddStr (new (' ', RowLabelWidth));
+
+                continue;
             }
 
-            Move (firstColumnX + COLUMN_WIDTH, y);
-            SetAttribute (GetNormalColor ());
+            if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
+            {
+                AddStr ($"U+{val / 16:x5}_");
+            }
+            else
+            {
+                AddStr (new (' ', RowLabelWidth));
+            }
+
+            // Draw the row
+            SetAttributeForRole (VisualRole.Normal);
 
             for (var col = 0; col < 16; col++)
             {
-                int x = firstColumnX + COLUMN_WIDTH * col + 1;
+                x = firstColumnX + COLUMN_WIDTH * col + 1;
 
-                if (x < 0 || x > Viewport.Width - 1)
+                if (x < RowLabelWidth || x > Viewport.Width - 1)
                 {
                     continue;
                 }
 
                 Move (x, y);
 
-                // If we're at the cursor position, and we don't have focus, invert the colors.
-                if (row == cursorRow && x == cursorCol && !HasFocus)
+                // If we're at the cursor position highlight the cell
+                if (row == selectedRow && col == selectedCol)
                 {
-                    SetAttribute (GetFocusColor ());
+                    SetAttributeForRole (VisualRole.Active);
                 }
 
                 int scalar = val + col;
@@ -355,30 +402,17 @@ public class CharMap : View, IDesignable
                 }
                 else
                 {
-                    // Draw the width of the rune
-                    SetAttribute (GetHotNormalColor ());
+                    // Draw the width of the rune faint
+                    Attribute attr = GetAttributeForRole (VisualRole.Normal);
+                    SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
                     AddStr ($"{width}");
                 }
 
-                // If we're at the cursor position, and we don't have focus, revert the colors to normal
-                if (row == cursorRow && x == cursorCol && !HasFocus)
+                // If we're at the cursor position, and we don't have focus
+                if (row == selectedRow && col == selectedCol)
                 {
-                    SetAttribute (GetNormalColor ());
+                    SetAttributeForRole (VisualRole.Normal);
                 }
-            }
-
-            // Draw row label (U+XXXX_)
-            Move (0, y);
-
-            SetAttribute (HasFocus && y + Viewport.Y - 1 == cursorRow ? GetHotFocusColor () : GetHotNormalColor ());
-
-            if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
-            {
-                AddStr ($"U+{val / 16:x5}_ ");
-            }
-            else
-            {
-                AddStr (new (' ', RowLabelWidth));
             }
         }
 
@@ -523,6 +557,13 @@ public class CharMap : View, IDesignable
 
     private bool TryGetCodePointFromPosition (Point position, out int codePoint)
     {
+        if (position.X < RowLabelWidth || position.Y < 1)
+        {
+            codePoint = 0;
+
+            return false;
+        }
+
         int row = (position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
         int col = (position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 

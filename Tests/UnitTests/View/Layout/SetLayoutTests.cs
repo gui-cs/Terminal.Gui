@@ -1,5 +1,6 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.LayoutTests;
 
@@ -26,12 +27,12 @@ public class SetLayoutTests (ITestOutputHelper output)
 
         var rs = Application.Begin (Application.Top);
 
-        Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
-        Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height));
+        Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
 
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
-        Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
+        Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
 
         Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);
 

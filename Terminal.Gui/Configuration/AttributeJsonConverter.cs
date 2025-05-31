@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
+[RequiresUnreferencedCode ("AOT")]
+
 internal class AttributeJsonConverter : JsonConverter<Attribute>
 {
     private static AttributeJsonConverter _instance;
@@ -32,6 +35,9 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         var attribute = new Attribute ();
         Color? foreground = null;
         Color? background = null;
+        TextStyle? style = null;
+
+        string propertyName = string.Empty;
 
         while (reader.Read ())
         {
@@ -39,60 +45,56 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
             {
                 if (foreground is null || background is null)
                 {
-                    throw new JsonException ("Both Foreground and Background colors must be provided.");
+                    throw new JsonException ($"{propertyName}: Both Foreground and Background colors must be provided.");
                 }
 
-                return new Attribute (foreground.Value, background.Value);
+                if (style.HasValue)
+                {
+                    return new Attribute (foreground.Value, background.Value, style.Value);
+                }
+                else
+                {
+                    return new Attribute (foreground.Value, background.Value);
+                }
             }
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
+                throw new JsonException ($"{propertyName}: Unexpected token when parsing Attribute: {reader.TokenType}.");
             }
 
-            string propertyName = reader.GetString ();
+            propertyName = reader.GetString ();
             reader.Read ();
-            var color = $"\"{reader.GetString ()}\"";
+            var property = $"\"{reader.GetString ()}\"";
 
-            switch (propertyName?.ToLower ())
+            try
             {
-                case "foreground":
-                    foreground = JsonSerializer.Deserialize (color, SerializerContext.Color);
+                switch (propertyName?.ToLower ())
+                {
+                    case "foreground":
+                        foreground = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
-                    break;
-                case "background":
-                    background = JsonSerializer.Deserialize (color, SerializerContext.Color);
+                        break;
+                    case "background":
+                        background = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
-                    break;
+                        break;
+                    case "style":
+                        style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
 
-                //case "bright":
-                //case "bold":
-                //	attribute.Bright = reader.GetBoolean ();
-                //	break;
-                //case "dim":
-                //	attribute.Dim = reader.GetBoolean ();
-                //	break;
-                //case "underline":
-                //	attribute.Underline = reader.GetBoolean ();
-                //	break;
-                //case "blink":
-                //	attribute.Blink = reader.GetBoolean ();
-                //	break;
-                //case "reverse":
-                //	attribute.Reverse = reader.GetBoolean ();
-                //	break;
-                //case "hidden":
-                //	attribute.Hidden = reader.GetBoolean ();
-                //	break;
-                //case "strike-through":
-                //	attribute.StrikeThrough = reader.GetBoolean ();
-                //	break;				
-                default:
-                    throw new JsonException ($"Unknown Attribute property {propertyName}.");
+                        break;
+
+                    default:
+                        throw new JsonException ($"{propertyName}: Unknown Attribute property .");
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new JsonException ($"{propertyName}: \"{property}\" - {ex.Message}");
             }
         }
 
-        throw new JsonException ("Attribute");
+        throw new JsonException ($"{propertyName}: Bad Attribute.");
     }
 
     public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
@@ -102,6 +104,11 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
         writer.WritePropertyName (nameof (Attribute.Background));
         ColorJsonConverter.Instance.Write (writer, value.Background, options);
+        if (value.Style != TextStyle.None)
+        {
+            writer.WritePropertyName (nameof (Attribute.Style));
+            JsonSerializer.Serialize (writer, value.Style, ConfigurationManager.SerializerContext.TextStyle);
+        }
 
         writer.WriteEndObject ();
     }
