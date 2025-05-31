@@ -6,8 +6,7 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root
-///     drives etc).
+///     The base-class for <see cref="OpenDialog"/> and <see cref="SaveDialog"/>
 /// </summary>
 public class FileDialog : Dialog, IDesignable
 {

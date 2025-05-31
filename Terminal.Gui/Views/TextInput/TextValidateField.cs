@@ -3,7 +3,7 @@
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Text field that validates input through a  <see cref="ITextValidateProvider"/></summary>
+/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
 public class TextValidateField : View
 {
     private const int DEFAULT_LENGTH = 10;

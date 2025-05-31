@@ -2,7 +2,7 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     The Label <see cref="View"/> displays text that describes the View next in the <see cref="View.SubViews"/>. When
+///     Displays text that describes the View next in the <see cref="View.SubViews"/>. When
 ///     Label
 ///     receives a <see cref="Command.HotKey"/> command it will pass it to the next <see cref="View"/> in
 ///     <see cref="View.SubViews"/>.

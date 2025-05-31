@@ -15,8 +15,8 @@ Write-Host "Looking for view files in: $ApiPath"
 
 # Get all .yml files in the API directory that are Views
 if ($Debug) {
-    Write-Host "DEBUG MODE: Only processing Button view" -ForegroundColor Cyan
-    $viewFiles = Get-ChildItem -Path $ApiPath -Filter "Terminal.Gui.Views.Button.yml"
+    $viewFiles = Get-ChildItem -Path $ApiPath -Filter "Terminal.Gui.Views.FileDialog.yml"
+    Write-Host "DEBUG MODE: Only processing" $viewFiles -ForegroundColor Cyan
 } else {
     $viewFiles = Get-ChildItem -Path $ApiPath -Filter "Terminal.Gui.Views.*.yml"
 }
@@ -28,8 +28,6 @@ $content = @"
 
 *Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
 
-| View | Description | Example |
-|------|-------------|---------|
 "@
 
 # Process each view file
@@ -96,17 +94,15 @@ foreach ($file in $viewFiles) {
             Write-Host "Running: dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile" -ForegroundColor Cyan
             
             dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile
-#            Write-Host "Command result: $result" -ForegroundColor Yellow
-#            Write-Host "Exit code: $?" -ForegroundColor Yellow
             
             if (Test-Path $tempFile) {
                 $output = Get-Content $tempFile -Raw
-                Write-Host "Tempfile: $tempFile"
-                Write-Host "File size: $((Get-Item $tempFile).Length) bytes" -ForegroundColor Magenta
-                #Remove-Item $tempFile
                 if ($output -and $output.Trim()) {
-                    $viewOutput = '```' + "`n$($output.Trim())`n" + '```'
+                    $lines = $output.Trim() -split "`n"
+                    $trimmedLines = $lines | ForEach-Object { $_.TrimEnd() }
+                    $viewOutput = "``````" + "`n" + $($trimmedLines -join "`n") + "`n" + "``````"
                 }
+                Write-Host "View output: $viewOutput" -ForegroundColor Blue
             } else {
                 Write-Host "Temp file was not created!" -ForegroundColor Red
             }
@@ -120,7 +116,7 @@ foreach ($file in $viewFiles) {
         }
         
         Write-Host "Found view: $name"
-        $views += "| [$name](~/api/$($file.BaseName).yml) | $description | $viewOutput |"
+        $views += "### [$name](~/api/$($file.BaseName).yml)`n`n$description`n`n$viewOutput`n"
     }
     catch {
         Write-Host "  Error processing $($file.Name): $_" -ForegroundColor Red
@@ -128,7 +124,6 @@ foreach ($file in $viewFiles) {
         Write-Host (Get-Content $file.FullName -Raw)
     }
 }
-
 
 Write-Host "Sorting views..."
 # Sort the views alphabetically

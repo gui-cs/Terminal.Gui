@@ -13,20 +13,7 @@ using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Determine which <see cref="System.IO"/> type to open.</summary>
-public enum OpenMode
-{
-    /// <summary>Opens only file or files.</summary>
-    File,
-
-    /// <summary>Opens only directory or directories.</summary>
-    Directory,
-
-    /// <summary>Opens files and directories.</summary>
-    Mixed
-}
-
-/// <summary>The <see cref="OpenDialog"/>provides an interactive dialog box for users to select files or directories.</summary>
+/// <summary>Provides an interactive <see cref="Dialog"/> for selecting files or directories for opening</summary>
 /// <remarks>
 ///     <para>
 ///         The open dialog can be used to select files for opening, it can be configured to allow multiple items to be

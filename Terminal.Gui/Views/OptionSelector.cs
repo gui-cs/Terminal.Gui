@@ -317,7 +317,7 @@ public class OptionSelector : View, IOrientation, IDesignable
     public bool EnableForDesign ()
     {
         AssignHotKeysToCheckBoxes = true;
-        Options = new [] { "Option 1", "Option 2", "Option 3" };
+        Options = ["Option 1", "Option 2", "Third Option", "Option Quattro"];
 
         return true;
     }

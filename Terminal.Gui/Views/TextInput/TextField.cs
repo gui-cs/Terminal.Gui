@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Single-line text entry <see cref="View"/></summary>
+/// <summary>Single-line text editor.</summary>
 /// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
 public class TextField : View, IDesignable
 {

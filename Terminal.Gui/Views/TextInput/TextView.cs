@@ -6,11 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Multi-line text editing <see cref="View"/>.</summary>
+/// <summary>Fully featured multi-line text editor</summary>
 /// <remarks>
-///     <para>
-///         <see cref="TextView"/> provides a fully featured multi-line text editor.
-///     </para>
 ///     <list type="table">
 ///         <listheader>
 ///             <term>Shortcut</term> <description>Action performed</description>
