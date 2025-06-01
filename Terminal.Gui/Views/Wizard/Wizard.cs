@@ -1,7 +1,6 @@
 ﻿#nullable enable
-using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (
@@ -145,20 +144,11 @@ public class Wizard : Dialog
 
             if (base.Modal)
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"];
+                SchemeName = "Dialog";
                 BorderStyle = LineStyle.Rounded;
             }
             else
             {
-                if (SuperView is { })
-                {
-                    ColorScheme = SuperView.ColorScheme;
-                }
-                else
-                {
-                    ColorScheme = Colors.ColorSchemes ["Base"];
-                }
-
                 CanFocus = true;
                 BorderStyle = LineStyle.None;
             }

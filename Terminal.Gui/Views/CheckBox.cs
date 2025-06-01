@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
 /// <remarks>
@@ -12,7 +13,7 @@ public class CheckBox : View
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed | HighlightStyle.Hover;
 
     /// <summary>

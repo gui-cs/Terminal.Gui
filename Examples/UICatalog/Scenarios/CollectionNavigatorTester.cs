@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -82,7 +81,7 @@ public class CollectionNavigatorTester : Scenario
     public override void Main ()
     {
         Application.Init ();
-        top = new Toplevel { ColorScheme = Colors.ColorSchemes ["Base"] };
+        top = new Toplevel { SchemeName = "Base" };
 
         var allowMarking = new MenuItem ("Allow _Marking", "", null)
         {

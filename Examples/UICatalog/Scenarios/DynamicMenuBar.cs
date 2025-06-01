@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Terminal.Gui;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 
@@ -594,7 +593,7 @@ public class DynamicMenuBar : Scenario
 
             var lblMenuBar = new Label
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
                 TextAlignment = Alignment.Center,
                 X = Pos.Right (btnPrevious) + 1,
                 Y = Pos.Top (btnPrevious),
@@ -632,7 +631,7 @@ public class DynamicMenuBar : Scenario
 
             _lstMenus = new ()
             {
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
                 X = Pos.Right (btnPrevious) + 1,
                 Y = Pos.Top (btnPrevious) + 2,
                 Width = lblMenuBar.Width,

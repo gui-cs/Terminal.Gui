@@ -2,7 +2,10 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Views;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
 
 namespace ReactiveExample;
 
@@ -96,8 +99,8 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
                 ViewModel
                     .WhenAnyValue (x => x.IsValid)
-                    .Select (valid => valid ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"])
-                    .BindTo (validation, x => x.ColorScheme)
+                    .Select (valid => valid ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme ("Error"))
+                    .BindTo (validation, x => x.GetScheme ())
                     .DisposeWith (_disposable);
             })
             .AddControlAfter<Button> ((previous, login) =>

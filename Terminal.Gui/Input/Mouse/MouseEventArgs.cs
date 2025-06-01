@@ -1,11 +1,11 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Specifies the event arguments for <see cref="Terminal.Gui.MouseEventArgs"/>. This is a higher-level construct than
-///     the wrapped <see cref="Terminal.Gui.MouseEventArgs"/> class and is used for the events defined on
+///     Specifies the event arguments for <see cref="MouseEventArgs"/>. This is a higher-level construct than
+///     the wrapped <see cref="MouseEventArgs"/> class and is used for the events defined on
 ///     <see cref="View"/> and subclasses
 ///     of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 /// </summary>
@@ -95,7 +95,7 @@ public class MouseEventArgs : HandledEventArgs
                            || Flags.HasFlag (MouseFlags.WheeledLeft)
                            || Flags.HasFlag (MouseFlags.WheeledRight);
 
-    /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="Terminal.Gui.MouseEventArgs"/>.</summary>
-    /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="Terminal.Gui.MouseEventArgs"/>.</returns>
+    /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEventArgs"/>.</summary>
+    /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEventArgs"/>.</returns>
     public override string ToString () { return $"({ScreenPosition}):{Flags}:{View?.Id}:{Position}"; }
 }

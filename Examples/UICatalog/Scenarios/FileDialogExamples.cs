@@ -3,7 +3,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

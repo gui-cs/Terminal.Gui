@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -31,7 +30,7 @@ public class TextFormatterDemo : Scenario
 
         var blockText = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             X = 0,
             Y = 0,
 
@@ -78,7 +77,7 @@ public class TextFormatterDemo : Scenario
 
                 Width = Dim.Fill (),
                 Height = 1,
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
                 Text = text
             };
 
@@ -89,7 +88,7 @@ public class TextFormatterDemo : Scenario
 
                 Width = Dim.Fill (),
                 Height = multiLineHeight,
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
                 Text = text
             };
         }

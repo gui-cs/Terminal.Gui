@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>Defines rendering options that affect how the tree is displayed.</summary>
 public class TreeStyle

@@ -1,9 +1,8 @@
 #nullable enable
 
 using System.ComponentModel;
-using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
@@ -104,7 +103,7 @@ public class MenuItemv2 : Shortcut
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
-        Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
+        // Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
         bool? ret = null;
 
         bool quit = false;
@@ -129,7 +128,7 @@ public class MenuItemv2 : Shortcut
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {
                 // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-                Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
+                // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
                 quit = true;
             }
         }
@@ -150,7 +149,7 @@ public class MenuItemv2 : Shortcut
             else
             {
                 // Is this an Application-bound command?
-                Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
+                // Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
                 ret = Application.InvokeCommandsBoundToKey (Key);
             }
         }

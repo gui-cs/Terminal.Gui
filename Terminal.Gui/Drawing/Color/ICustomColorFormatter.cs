@@ -1,5 +1,5 @@
 #nullable enable
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>An interface to support custom formatting and parsing of <see cref="Color"/> values.</summary>
 public interface ICustomColorFormatter : IFormatProvider, ICustomFormatter

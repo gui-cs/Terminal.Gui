@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -175,7 +174,7 @@ public class Progress : Scenario
 
         internal ProgressDemo ()
         {
-            ColorScheme = Colors.ColorSchemes ["Dialog"];
+            SchemeName = "Dialog";
 
             LeftFrame = new FrameView
             {
@@ -214,7 +213,7 @@ public class Progress : Scenario
                 Width = Dim.Fill () - 1,
                 Height = 1,
                 Fraction = 0.25F,
-                ColorScheme = Colors.ColorSchemes ["Error"]
+                SchemeName = "Error"
             };
             Add (ActivityProgressBar);
 
@@ -233,7 +232,7 @@ public class Progress : Scenario
                 Y = Pos.Bottom (ActivityProgressBar) + 1,
                 Width = Dim.Fill () - Spinner.Width,
                 Height = 1,
-                ColorScheme = Colors.ColorSchemes ["Error"]
+                SchemeName = "Error"
             };
             Add (PulseProgressBar);
 

@@ -60,7 +60,6 @@ public class DrawTests (ITestOutputHelper output)
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Base"]
         };
 
         var viewBottom = new View
@@ -71,7 +70,6 @@ public class DrawTests (ITestOutputHelper output)
             Width = 1,
             Height = 6,
             VerticalTextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Base"]
         };
         Toplevel top = new ();
         top.Add (viewRight, viewBottom);
@@ -107,7 +105,7 @@ public class DrawTests (ITestOutputHelper output)
                                                """,
                                                output,
                                                Application.Driver,
-                                               Colors.ColorSchemes ["Base"]!.Normal
+                                               SchemeManager.GetSchemes () ["Base"]!.Normal
                                               );
         top.Dispose ();
     }
@@ -701,7 +699,7 @@ At 0,0
         view.Frame = new (3, 3, 10, 1);
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         //Application.Refresh();
         top.Draw ();
 
@@ -753,7 +751,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         View.SetClipToScreen ();
         top.Draw ();
 
@@ -802,7 +800,7 @@ At 0,0
         view.Frame = new (1, 1, 10, 1);
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         top.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -852,7 +850,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
         View.SetClipToScreen ();
 
         top.Draw ();

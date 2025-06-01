@@ -1,5 +1,6 @@
 #nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Control that hosts multiple sub views, presenting a single one at once.</summary>
 public class TabView : View

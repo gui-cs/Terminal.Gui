@@ -43,7 +43,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Attribute.Default,
             new (fg, bg),
             new (Color.Black, bg),
-            new (fg.GetDarkerColor (), bg.GetDarkerColor ())
+            new (fg.GetDimColor (), bg.GetDimColor ())
         };
 
         var superView = new Toplevel
@@ -51,8 +51,8 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Height = 3,
             Width = 3,
             Text = "012ABC!@#",
-            ColorScheme = new (new Attribute (fg, bg))
         };
+        superView.SetScheme (new (new Attribute (fg, bg)));
         superView.TextFormatter.WordWrap = true;
 
         View view = new ()
@@ -61,8 +61,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Height = Dim.Auto (),
             Text = "*",
             ShadowStyle = style,
-            ColorScheme = new (Attribute.Default)
         };
+        view.SetScheme (new (Attribute.Default));
+
         superView.Add (view);
         Application.TopLevels.Push (superView);
         Application.LayoutAndDraw (true);
@@ -132,6 +133,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
     public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
+        Application.Init (new FakeDriver ());
         var superView = new View
         {
             Height = 10, Width = 10

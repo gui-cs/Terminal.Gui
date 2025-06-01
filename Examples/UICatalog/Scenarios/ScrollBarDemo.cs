@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -25,7 +24,7 @@ public class ScrollBarDemo : Scenario
             X = 0,
             Width = 75,
             Height = 25 + 4,
-            ColorScheme = Colors.ColorSchemes ["Base"],
+            SchemeName = "Base",
             Arrangement = ViewArrangement.Resizable
         };
         demoFrame!.Padding!.Thickness = new (1);
@@ -46,7 +45,7 @@ public class ScrollBarDemo : Scenario
             X = Pos.AnchorEnd (),
             Width = 5,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Error"],
+            SchemeName = "Error",
         };
 
         demoFrame.Add (controlledList);

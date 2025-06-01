@@ -4,14 +4,58 @@ namespace Terminal.Gui.DrawingTests;
 
 public class AnsiColorNameResolverTests
 {
-    private readonly AnsiColorNameResolver _candidate = new();
+    private readonly AnsiColorNameResolver _candidate = new ();
+    [Fact]
+    public void TryNameColor_Resolves_All_ColorName16 ()
+    {
+        var resolver = new AnsiColorNameResolver ();
+
+        foreach (ColorName16 name in Enum.GetValues<ColorName16> ())
+        {
+            var color = new Color (name);
+            bool success = resolver.TryNameColor (color, out string? resultName);
+
+            Assert.True (success, $"Expected TryNameColor to succeed for {name}");
+            Assert.Equal (name.ToString (), resultName);
+        }
+    }
+
+    [Fact]
+    public void TryParseColor_Resolves_All_ColorName16_Names ()
+    {
+        var resolver = new AnsiColorNameResolver ();
+
+        foreach (ColorName16 name in Enum.GetValues<ColorName16> ())
+        {
+            bool success = resolver.TryParseColor (name.ToString (), out Color parsed);
+
+            Assert.True (success, $"Expected TryParseColor to succeed for {name}");
+            Assert.Equal (new Color (name), parsed);
+        }
+    }
+
+    public static IEnumerable<object []> AnsiColorName16NumericValues =>
+        Enum.GetValues<ColorName16> ()
+            .Select (e => new object [] { ((int)e).ToString () });
+    [Theory]
+    [MemberData (nameof (AnsiColorName16NumericValues))]
+    public void TryParseColor_Accepts_Enum_UnderlyingNumbers (string numeric)
+    {
+        var resolver = new AnsiColorNameResolver ();
+
+        bool success = resolver.TryParseColor (numeric, out _);
+
+        Assert.True (success, $"Expected numeric enum value '{numeric}' to resolve successfully.");
+    }
+
+
 
     [Fact]
     public void GetNames_Returns16ColorNames ()
     {
-        string[] expected = Enum.GetNames<ColorName16>();
+        string [] expected = Enum.GetNames<ColorName16> ();
 
-        string[] actual = _candidate.GetColorNames ().ToArray();
+        string [] actual = _candidate.GetColorNames ().ToArray ();
 
         Assert.Equal (expected, actual);
     }
@@ -37,7 +81,7 @@ public class AnsiColorNameResolverTests
     {
         var expected = (true, expectedName);
 
-        bool actualSuccess = _candidate.TryNameColor(new Color(r, g, b), out string? actualName);
+        bool actualSuccess = _candidate.TryNameColor (new Color (r, g, b), out string? actualName);
         var actual = (actualSuccess, actualName);
 
         Assert.Equal (expected, actual);
@@ -76,7 +120,7 @@ public class AnsiColorNameResolverTests
     [InlineData ("brightblue", 59, 120, 255)]
     public void TryParseColor_ReturnsExpectedColor (string inputName, byte r, byte g, byte b)
     {
-        var expected = (true, new Color(r, g, b));
+        var expected = (true, new Color (r, g, b));
 
         bool actualSuccess = _candidate.TryParseColor (inputName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
@@ -88,7 +132,7 @@ public class AnsiColorNameResolverTests
     [InlineData ("12", 231, 72, 86)] // ColorName16.BrightRed
     public void TryParseColor_ResolvesValidEnumNumber (string inputName, byte r, byte g, byte b)
     {
-        var expected = (true, new Color(r, g, b));
+        var expected = (true, new Color (r, g, b));
 
         bool actualSuccess = _candidate.TryParseColor (inputName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
@@ -102,7 +146,7 @@ public class AnsiColorNameResolverTests
     [InlineData ("brightlight")]
     public void TryParseColor_FailsOnInvalidColorName (string? invalidName)
     {
-        var expected = (false, default(Color));
+        var expected = (false, default (Color));
 
         bool actualSuccess = _candidate.TryParseColor (invalidName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
@@ -114,7 +158,7 @@ public class AnsiColorNameResolverTests
     [InlineData ("-12")]
     public void TryParseColor_FailsOnInvalidEnumNumber (string invalidName)
     {
-        var expected = (false, default(Color));
+        var expected = (false, default (Color));
 
         bool actualSuccess = _candidate.TryParseColor (invalidName, out Color actualColor);
         var actual = (actualSuccess, actualColor);

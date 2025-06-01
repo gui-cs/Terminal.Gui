@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -21,7 +20,7 @@ public class Wizards : Scenario
             X = Pos.Center (),
             Y = 0,
             Width = Dim.Percent (75),
-            ColorScheme = Colors.ColorSchemes ["Base"],
+            SchemeName = "Base",
             Title = "Wizard Options"
         };
         win.Add (frame);
@@ -99,7 +98,7 @@ public class Wizards : Scenario
 
         var actionLabel = new Label
         {
-            X = Pos.Right (label), Y = Pos.AnchorEnd (1), ColorScheme = Colors.ColorSchemes ["Error"]
+            X = Pos.Right (label), Y = Pos.AnchorEnd (1), SchemeName = "Error"
         };
         win.Add (actionLabel);
 
@@ -278,7 +277,7 @@ public class Wizards : Scenario
                                                Width = Dim.Fill (),
                                                WordWrap = true,
                                                AllowsTab = false,
-                                               ColorScheme = Colors.ColorSchemes ["Base"]
+                                               SchemeName = "Base"
                                            };
 
                                            someText.Height = Dim.Fill (

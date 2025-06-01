@@ -1,4 +1,4 @@
-﻿using static Terminal.Gui.Dim;
+﻿using static Terminal.Gui.ViewBase.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 

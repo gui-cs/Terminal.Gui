@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -36,7 +35,7 @@ public class ListsAndCombos : Scenario
         // ListView
         var lbListView = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             X = 0,
 
             Width = Dim.Percent (40),
@@ -46,7 +45,7 @@ public class ListsAndCombos : Scenario
         var listview = new ListView
         {
             X = 0,
-            Y = Pos.Bottom (lbListView) + 1,
+            Y = Pos.Bottom (lbListView) + 2,
             Height = Dim.Fill (2),
             Width = Dim.Percent (40),
             Source = new ListWrapper<string> (items)
@@ -92,7 +91,7 @@ public class ListsAndCombos : Scenario
         // ComboBox
         var lbComboBox = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             X = Pos.Right (lbListView) + 1,
 
             Width = Dim.Percent (40),

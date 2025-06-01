@@ -1,5 +1,4 @@
 #nullable enable
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -17,7 +16,7 @@ public sealed class Transparent : Scenario
             Title = GetQuitKeyAndName (),
         };
         appWindow.BorderStyle = LineStyle.None;
-        appWindow.ColorScheme = Colors.ColorSchemes ["Error"];
+        appWindow.SchemeName = "Error";
 
         appWindow.Text = "App Text - Centered Vertically and Horizontally.\n2nd Line of Text.\n3rd Line of Text.";
         appWindow.TextAlignment = Alignment.Center;
@@ -45,9 +44,12 @@ public sealed class Transparent : Scenario
             Y = 4,
             Title = "_AppButton",
         };
-        appButton.Accepting += (sender, args) => MessageBox.Query ("AppButton", "Transparency is cool!", "_Ok");
+        appButton.Accepting += (sender, args) =>
+                               {
+                                   MessageBox.Query ("AppButton", "Transparency is cool!", "_Ok");
+                                   args.Handled = true;
+                               };
         appWindow.Add (appButton);
-
 
         var tv = new TransparentView ()
         {
@@ -75,13 +77,13 @@ public sealed class Transparent : Scenario
             TextFormatter.Alignment = Alignment.Center;
             TextFormatter.VerticalAlignment = Alignment.Center;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent | Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
             BorderStyle = LineStyle.RoundedDotted;
-            base.ColorScheme = Colors.ColorSchemes ["Base"];
+            //SchemeName = "Base";
 
             var transparentSubView = new View ()
             {
-                Text = "Sizable/Movable View with border. Should be opaque. The shadow should be semi-opaque.",
+                Text = "Sizable/Movable View with border. Should be opaque. No Shadow.",
                 Id = "transparentSubView",
                 X = 4,
                 Y = 8,
@@ -89,31 +91,36 @@ public sealed class Transparent : Scenario
                 Height = 8,
                 BorderStyle = LineStyle.Dashed,
                 Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-               // ShadowStyle = ShadowStyle.Transparent,
+                // ShadowStyle = ShadowStyle.Transparent,
             };
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
-            transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
-            transparentSubView.Visible = false;
+            transparentSubView.SchemeName = "Dialog";
+            //transparentSubView.Visible = false;
 
             Button button = new Button ()
             {
                 Title = "_Opaque Shadows No Worky",
                 X = Pos.Center (),
                 Y = 2,
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                SchemeName = "Dialog",
             };
-            button.Visible = false;
+            button.Accepting += (sender, args) =>
+                                {
+                                    MessageBox.Query ("Clicked!", "Button in Transparent View", "_Ok");
+                                    args.Handled = true;
+                                };
+            //button.Visible = false;
 
 
             var shortcut = new Shortcut ()
             {
                 Id = "shortcut",
                 X = Pos.Center (),
-                Y = Pos.AnchorEnd(),
+                Y = Pos.AnchorEnd (),
                 Title = "A _Shortcut",
                 HelpText = "Help!",
                 Key = Key.F11,
-                ColorScheme = Colors.ColorSchemes ["Base"]
+                SchemeName = "Base"
 
             };
 
@@ -126,6 +133,12 @@ public sealed class Transparent : Scenario
             base.Add (button);
             base.Add (shortcut);
             base.Add (transparentSubView);
+
+            //Padding.Thickness = new (1);
+            //Padding.SchemeName = "Error";
+
+            Margin!.Thickness = new (1);
+           // Margin.ViewportSettings |= Terminal.Gui.ViewportSettingsFlags.Transparent;
         }
 
         /// <inheritdoc />

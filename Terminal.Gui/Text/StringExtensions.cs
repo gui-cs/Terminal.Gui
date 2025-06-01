@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Buffers;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>Extensions to <see cref="string"/> to support TUI text manipulation.</summary>
 public static class StringExtensions

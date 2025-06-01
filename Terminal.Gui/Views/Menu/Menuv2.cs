@@ -1,8 +1,9 @@
 ﻿#nullable enable
+
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
@@ -25,7 +26,7 @@ public class Menuv2 : Bar, IDesignable
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
         if (Border is { })
         {
@@ -36,7 +37,7 @@ public class Menuv2 : Bar, IDesignable
 
         Arrangement = ViewArrangement.Overlapped;
 
-        Applied += OnConfigurationManagerApplied;
+        CM.Applied += OnConfigurationManagerApplied;
 
         KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
         AddCommand (Command.Quit, Quit);
@@ -70,7 +71,7 @@ public class Menuv2 : Bar, IDesignable
     /// <summary>
     ///     Gets or sets the default Border Style for Menus.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
 
     private MenuItemv2? _superMenuItem;
@@ -212,7 +213,7 @@ public class Menuv2 : Bar, IDesignable
 
                     void MenuItemOnAccepted (object? sender, CommandEventArgs e)
                     {
-                        Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
+                        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
                         RaiseAccepted (e.Context);
                     }
                 }
@@ -230,7 +231,7 @@ public class Menuv2 : Bar, IDesignable
     {
         // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
 
-        Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
+        // Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
 
         // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
         // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
@@ -259,6 +260,16 @@ public class Menuv2 : Bar, IDesignable
         var ret = false;
 
         if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        {
+            // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+            // And causes just the menu to quit.
+            // Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+            return true;
+        }
+
+        // Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
+        // Command.Accept to the SuperMenuItem if it exists.
+        if (SuperView is null && SuperMenuItem is { })
         {
             Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
             ret = SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
@@ -497,7 +508,7 @@ public class Menuv2 : Bar, IDesignable
 
         if (disposing)
         {
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
 }

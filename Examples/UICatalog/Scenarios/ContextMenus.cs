@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using JetBrains.Annotations;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -24,7 +23,7 @@ public class ContextMenus : Scenario
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
-            ColorScheme = Colors.ColorSchemes ["Toplevel"]
+            SchemeName = "Toplevel"
         };
 
         var text = "Context Menu";

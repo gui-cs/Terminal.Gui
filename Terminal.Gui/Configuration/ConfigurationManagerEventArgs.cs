@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>Event arguments for the <see cref="ConfigurationManager"/> events.</summary>
 public class ConfigurationManagerEventArgs : EventArgs
@@ -9,12 +9,3 @@ public class ConfigurationManagerEventArgs : EventArgs
     public ConfigurationManagerEventArgs () { }
 }
 
-/// <summary>Event arguments for the <see cref="ThemeManager"/> events.</summary>
-public class ThemeManagerEventArgs : EventArgs
-{
-    /// <summary>Initializes a new instance of <see cref="ThemeManagerEventArgs"/></summary>
-    public ThemeManagerEventArgs (string newTheme) { NewTheme = newTheme; }
-
-    /// <summary>The name of the new active theme.</summary>
-    public string NewTheme { get; set; } = string.Empty;
-}

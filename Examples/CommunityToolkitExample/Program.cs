@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+
 
 namespace CommunityToolkitExample;
 
@@ -9,10 +12,11 @@ public static class Program
 
     private static void Main (string [] args)
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Services = ConfigureServices ();
         Application.Init ();
         Application.Run (Services.GetRequiredService<LoginView> ());
-        Application.Top?.Dispose();
+        Application.Top?.Dispose ();
         Application.Shutdown ();
     }
 

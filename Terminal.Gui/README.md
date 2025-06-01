@@ -16,9 +16,8 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 
 - `Clipboard\` - Classes related to clipboard access.
 
-- `Input\` - Classes relating to keyboard and mouse input. Includes `Responder`, which is the base class for `View`
+- `Input\` - Classes relating to keyboard and mouse input. 
 	- `Events.cs` - Defines keyboard and mouse-related structs & classes. 
-	- `Responder` - Base class for the windowing class hierarchy. Implements support for keyboard & mouse input.
 	- etc...
 
 - `Text\` - Classes related to text processing
@@ -26,7 +25,7 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 - `Drawing\` - Classes related to drawing 
 
 - `View\` - The `View` class heirarchy, not including any sub-classes
-	- `View.cs` - Derived from `Responder`, the base class for non-modal visual elements such as controls.
+	- `View.cs` - The base class for non-modal visual elements such as controls.
 	- `Layout\`	
 		- `PosDim.cs` - Implements *Computed Layout* system. These classes have deep dependencies on `View`.
 

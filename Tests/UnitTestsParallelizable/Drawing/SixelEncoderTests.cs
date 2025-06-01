@@ -1,5 +1,4 @@
-﻿using Color = Terminal.Gui.Color;
-
+﻿
 namespace Terminal.Gui.DrawingTests;
 
 public class SixelEncoderTests

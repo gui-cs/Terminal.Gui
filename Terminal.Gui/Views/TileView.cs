@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="View"/> consisting of a moveable bar that divides the display area into resizeable
@@ -181,10 +182,7 @@ public class TileView : View
     /// <inheritdoc/>
     protected override void OnDrawComplete (DrawContext? context)
     {
-        if (ColorScheme is { })
-        {
-            SetAttribute (ColorScheme.Normal);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
 
         var lc = new LineCanvas ();
 
@@ -239,10 +237,7 @@ public class TileView : View
             }
         }
 
-        if (ColorScheme is { })
-        {
-            SetAttribute (ColorScheme.Normal);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
 
         foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Viewport))
         {

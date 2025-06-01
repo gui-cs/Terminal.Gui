@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -19,7 +18,7 @@ public class ViewportSettings : Scenario
             Id = "ViewportSettingsDemoView";
             Width = Dim.Fill ();
             Height = Dim.Fill ();
-            base.ColorScheme = Colors.ColorSchemes ["Base"];
+            SchemeName = "base";
 
             base.Text =
                 "Text (ViewportSettingsDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
@@ -28,8 +27,8 @@ public class ViewportSettings : Scenario
             Arrangement = ViewArrangement.Resizable;
 
             SetContentSize (new (60, 40));
-            ViewportSettings |= Terminal.Gui.ViewportSettings.ClearContentOnly;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.ClipContentOnly;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClearContentOnly;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClipContentOnly;
             VerticalScrollBar.Visible = true;
 
             // Things this view knows how to do
@@ -103,13 +102,13 @@ public class ViewportSettings : Scenario
             Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            SchemeName = "Toplevel",
             BorderStyle = LineStyle.None
         };
 
         var adornmentsEditor = new AdornmentsEditor
         {
-            X = Pos.AnchorEnd(),
+            X = Pos.AnchorEnd (),
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
         };
@@ -117,7 +116,7 @@ public class ViewportSettings : Scenario
 
         ViewportSettingsEditor viewportSettingsEditor = new ViewportSettingsEditor ()
         {
-            Y = Pos.AnchorEnd(),
+            Y = Pos.AnchorEnd (),
             //X = Pos.Right (adornmentsEditor),
         };
         app.Add (viewportSettingsEditor);
@@ -125,7 +124,7 @@ public class ViewportSettings : Scenario
         var view = new ViewportSettingsDemoView
         {
             Title = "ViewportSettings Demo View",
-            Width = Dim.Fill (Dim.Func (() => app.IsInitialized ? adornmentsEditor.Frame.Width+1: 1)),
+            Width = Dim.Fill (Dim.Func (() => app.IsInitialized ? adornmentsEditor.Frame.Width + 1 : 1)),
             Height = Dim.Fill (Dim.Func (() => app.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
         };
 
@@ -139,13 +138,14 @@ public class ViewportSettings : Scenario
 
         colorPicker.ColorChanged += (s, e) =>
                                     {
-                                        colorPicker.SuperView.ColorScheme = new (colorPicker.SuperView.ColorScheme)
-                                        {
-                                            Normal = new (
-                                                          colorPicker.SuperView.ColorScheme.Normal.Foreground,
-                                                          e.CurrentValue
-                                                         )
-                                        };
+                                        colorPicker.SuperView!.SetScheme (
+                                                                         new (colorPicker.SuperView.GetScheme ())
+                                                                         {
+                                                                             Normal = new (
+                                                                                           colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                                           e.CurrentValue
+                                                                                          )
+                                                                         });
                                     };
 
         var textView = new TextView

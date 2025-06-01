@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a region composed of one or more rectangles, providing methods for geometric set operations such as

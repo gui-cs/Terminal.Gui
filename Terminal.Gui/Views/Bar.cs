@@ -1,5 +1,6 @@
 #nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a horizontally or vertically oriented container for <see cref="Shortcut"/>s to be used as a menu, toolbar, or status
@@ -198,7 +199,7 @@ public class Bar : View, IOrientation, IDesignable
                 {
                     View barItem = SubViews.ElementAt (index);
 
-                    //barItem.ColorScheme = ColorScheme;
+                    //barItem.Scheme = Scheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
 
@@ -232,7 +233,7 @@ public class Bar : View, IOrientation, IDesignable
                         View barItem = SubViews.ElementAt (index);
 
 
-                       // barItem.ColorScheme = ColorScheme;
+                       // barItem.Scheme = Scheme;
 
                         if (!barItem.Visible)
                         {

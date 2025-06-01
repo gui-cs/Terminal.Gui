@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 #nullable enable
 /// <summary>Describes a series of data that can be rendered into a <see cref="GraphView"/>></summary>
 public interface ISeries

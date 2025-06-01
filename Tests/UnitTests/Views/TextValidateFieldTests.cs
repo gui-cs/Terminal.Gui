@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Terminal.Gui.TextValidateProviders;
 
 namespace Terminal.Gui.ViewsTests;
 

@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Event arguments for <see cref="Command"/> events. Set <see cref="HandledEventArgs.Handled"/> to
