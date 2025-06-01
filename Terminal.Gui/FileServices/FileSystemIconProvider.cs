@@ -1,6 +1,6 @@
 using System.IO.Abstractions;
 
-namespace Terminal.Gui.Views;
+namespace Terminal.Gui.FileServices;
 
 /// <summary>Determines which symbol to use to represent files and directories.</summary>
 public class FileSystemIconProvider
