@@ -46,22 +46,22 @@ public static class DeepCloner
         {
             return default (T?);
         }
-        // For AOT environments, use source generation exclusively
-        if (IsAotEnvironment ())
-        {
-            if (TryUseSourceGeneratedCloner<T> (source, out T? result))
-            {
-                return result;
-            }
+        //// For AOT environments, use source generation exclusively
+        //if (IsAotEnvironment ())
+        //{
+        //    if (TryUseSourceGeneratedCloner<T> (source, out T? result))
+        //    {
+        //        return result;
+        //    }
 
-            // If in AOT but source generation failed, throw an exception
-            // instead of silently falling back to reflection
-            //throw new InvalidOperationException (
-            //                                     $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
-            //                                     $"for AOT-compatible cloning.");
-            Logging.Error ($"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
-                          $"for AOT-compatible cloning.");
-        }
+        //    // If in AOT but source generation failed, throw an exception
+        //    // instead of silently falling back to reflection
+        //    //throw new InvalidOperationException (
+        //    //                                     $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+        //    //                                     $"for AOT-compatible cloning.");
+        //    Logging.Error ($"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+        //                  $"for AOT-compatible cloning.");
+        //}
 
         // Use reflection-based approach, which should have better performance in non-AOT environments
         ConcurrentDictionary<object, object> visited = new (ReferenceEqualityComparer.Instance);
