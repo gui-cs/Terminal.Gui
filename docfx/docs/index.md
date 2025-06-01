@@ -26,7 +26,7 @@ Welcome to the Terminal.Gui documentation! This comprehensive guide covers every
 - [Layout System](~/docs/layout.md) - View positioning, sizing, and arrangement
 - [Lexicon & Taxonomy](~/docs/lexicon.md) - Terminology and concepts used throughout Terminal.Gui
 - [Logging & Metrics](~/docs/logging.md) - Comprehensive logging and performance monitoring
-- [Main Loop & Event Processing](~/docs/mainloop.md) - Application lifecycle and event dispatching
+- [Multitasking](~/docs/multitasking.md) - Application lifecycle and event dispatching
 - [Mouse Input](~/docs/mouse.md) - Mouse event handling and interaction patterns
 - [Navigation](~/docs/navigation.md) - Focus management, keyboard navigation, and accessibility
 - [Popovers](~/docs/Popovers.md) - Drawing outside viewport boundaries for menus and popups
@@ -34,5 +34,5 @@ Welcome to the Terminal.Gui documentation! This comprehensive guide covers every
 
 ## API Reference
 
-For detailed API documentation, see the [API Reference](~/api).
+For detailed API documentation, see the [API Reference](~/api/Terminal.Gui.App.yml).
 

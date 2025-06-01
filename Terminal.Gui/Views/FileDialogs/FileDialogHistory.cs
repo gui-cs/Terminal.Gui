@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 
-namespace Terminal.Gui.FileServices;
+namespace Terminal.Gui.Views;
 
 internal class FileDialogHistory
 {

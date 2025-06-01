@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO.Abstractions;
 using static System.Environment;
 
-namespace Terminal.Gui.FileServices;
+namespace Terminal.Gui.Views;
 
 /// <summary>Stores style settings for <see cref="FileDialog"/>.</summary>
 public class FileDialogStyle
