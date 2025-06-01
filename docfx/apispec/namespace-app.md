@@ -22,6 +22,6 @@ Application.Shutdown();
 
 ## See Also
 
-- [Logging](logging.md)
-- [Mainloop](mainloop.md)
+- [Logging](~/docs/logging.md)
+- [Mainloop](~/docs/multitasking.md)
 <!-- - [Application](application.md) -->

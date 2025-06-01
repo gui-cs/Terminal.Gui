@@ -91,7 +91,7 @@ The Command can be invoked even if the `View` that defines them is not focused o
 
 ### **Key Events**
 
-Keyboard events are retrieved from [Console Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](mainloop.md). The console driver raises the @Terminal.Gui.Drivers.ConsoleDriver.KeyDown and @Terminal.Gui.Drivers.ConsoleDriver.KeyUp events which invoke @Terminal.Gui.App.Application.RaiseKeyDownEvent* and @Terminal.Gui.App.Application.RaiseKeyUpEvent(Terminal.Gui.Input.Key) respectively.
+Keyboard events are retrieved from [Console Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The console driver raises the @Terminal.Gui.Drivers.ConsoleDriver.KeyDown and @Terminal.Gui.Drivers.ConsoleDriver.KeyUp events which invoke @Terminal.Gui.App.Application.RaiseKeyDownEvent* and @Terminal.Gui.App.Application.RaiseKeyUpEvent(Terminal.Gui.Input.Key) respectively.
 
 > [!NOTE]
 > Not all drivers/platforms support sensing distinct KeyUp events. These drivers will simulate KeyUp events by raising KeyUp after KeyDown.

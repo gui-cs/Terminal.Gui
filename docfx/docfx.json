@@ -42,7 +42,8 @@
         ],
         "exclude": [
           "_site/**",
-          "includes/**"
+          "includes/**",
+          "apispec/**"
         ]
       }
     ],
