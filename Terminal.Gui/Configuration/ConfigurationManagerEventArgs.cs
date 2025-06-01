@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>Event arguments for the <see cref="ConfigurationManager"/> events.</summary>
 public class ConfigurationManagerEventArgs : EventArgs

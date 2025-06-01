@@ -2,7 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Numerics;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 public readonly partial record struct Color
 {
@@ -53,7 +53,7 @@ public readonly partial record struct Color
     public static implicit operator Color (uint u) { return new Color (u); }
 
     /// <summary>
-    ///     Implicit conversion from <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> to <see cref="Color"/> via lookup from
+    ///     Implicit conversion from <see cref="GetClosestNamedColor16(Color)"/> to <see cref="Color"/> via lookup from
     ///     <see cref="ColorExtensions.ColorName16ToColorMap"/>.
     /// </summary>
     [Pure]

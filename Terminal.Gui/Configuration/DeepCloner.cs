@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Provides deep cloning functionality for Terminal.Gui configuration objects.
@@ -56,9 +56,11 @@ public static class DeepCloner
 
             // If in AOT but source generation failed, throw an exception
             // instead of silently falling back to reflection
-            throw new InvalidOperationException (
-                                                 $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
-                                                 $"for AOT-compatible cloning.");
+            //throw new InvalidOperationException (
+            //                                     $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+            //                                     $"for AOT-compatible cloning.");
+            Logging.Error ($"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+                          $"for AOT-compatible cloning.");
         }
 
         // Use reflection-based approach, which should have better performance in non-AOT environments

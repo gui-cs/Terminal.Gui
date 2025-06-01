@@ -1,7 +1,7 @@
 using System.Data;
 using System.Globalization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Delegate for providing color to <see cref="TableView"/> cells based on the value being rendered</summary>
 /// <param name="args">Contains information about the cell for which color is needed</param>
@@ -14,8 +14,8 @@ public delegate Scheme CellColorGetterDelegate (CellColorGetterArgs args);
 public delegate Scheme RowColorGetterDelegate (RowColorGetterArgs args);
 
 /// <summary>
-///     View for tabular data based on a <see cref="ITableSource"/>.
-///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
+///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
+///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
 /// </summary>
 public class TableView : View, IDesignable
 {

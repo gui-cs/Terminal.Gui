@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 internal class DefaultSearchMatcher : ISearchMatcher
 {

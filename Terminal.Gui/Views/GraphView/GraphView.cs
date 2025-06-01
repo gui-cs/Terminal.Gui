@@ -1,7 +1,8 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
 
-/// <summary>View for rendering graphs (bar, scatter, etc...).</summary>
+namespace Terminal.Gui.Views;
+
+/// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling</summary>
 public class GraphView : View, IDesignable
 {
     /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
@@ -9,8 +10,8 @@ public class GraphView : View, IDesignable
     {
         CanFocus = true;
 
-        AxisX = new HorizontalAxis ();
-        AxisY = new VerticalAxis ();
+        AxisX = new ();
+        AxisY = new ();
 
         // Things this view knows how to do
         AddCommand (
@@ -188,12 +189,12 @@ public class GraphView : View, IDesignable
     /// </returns>
     public Point GraphSpaceToScreen (PointF location)
     {
-        return new Point (
-                          (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
+        return new (
+                    (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
-                          // screen coordinates are top down while graph coordinates are bottom up
-                          Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
-                         );
+                    // screen coordinates are top down while graph coordinates are bottom up
+                    Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+                   );
     }
 
     ///<inheritdoc/>
@@ -201,7 +202,7 @@ public class GraphView : View, IDesignable
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {
-            throw new Exception ($"{nameof (CellSize)} cannot be 0");
+            throw new ($"{nameof (CellSize)} cannot be 0");
         }
 
         SetDriverColorToGraphColor ();
@@ -212,7 +213,7 @@ public class GraphView : View, IDesignable
         for (var i = 0; i < Viewport.Height; i++)
         {
             Move (0, i);
-            Driver?.AddStr (new string (' ', Viewport.Width));
+            Driver?.AddStr (new (' ', Viewport.Width));
         }
 
         // If there is no data do not display a graph
@@ -275,6 +276,7 @@ public class GraphView : View, IDesignable
         {
             a.Render (this);
         }
+
         return true;
     }
 
@@ -290,8 +292,8 @@ public class GraphView : View, IDesignable
     /// </summary>
     public void Reset ()
     {
-        ScrollOffset = new PointF (0, 0);
-        CellSize = new PointF (1, 1);
+        ScrollOffset = new (0, 0);
+        CellSize = new (1, 1);
         AxisX.Reset ();
         AxisY.Reset ();
         Series.Clear ();
@@ -389,5 +391,4 @@ public class GraphView : View, IDesignable
 
         return true;
     }
-
 }

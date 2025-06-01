@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
 using JetBrains.Annotations;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -156,11 +155,11 @@ public class ListViewWithSelection : Scenario
     {
         if (stateEventArgs.NewValue == CheckState.Checked)
         {
-            _listView.ViewportSettings |= Terminal.Gui.ViewportSettings.AllowYGreaterThanContentHeight;
+            _listView.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
         }
         else
         {
-            _listView.ViewportSettings &= ~Terminal.Gui.ViewportSettings.AllowYGreaterThanContentHeight;
+            _listView.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
         }
         _appWindow.SetNeedsDraw ();
     }

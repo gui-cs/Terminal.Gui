@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Terminal.Gui;
 using static UICatalog.Scenarios.DynamicMenuBar;
 
 namespace UICatalog.Scenarios;

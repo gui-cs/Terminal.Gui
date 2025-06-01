@@ -1,8 +1,9 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a user interface for displaying and selecting flags.
+///     Provides a user interface for displaying and selecting non-mutually-exclusive flags.
 ///     Flags can be set from a dictionary or directly from an enum type.
 /// </summary>
 public class FlagSelector : View, IOrientation, IDesignable

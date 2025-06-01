@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

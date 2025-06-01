@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
 public enum ProgressBarStyle
@@ -78,7 +79,7 @@ public class ProgressBar : View, IDesignable
     /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
     public ProgressBarFormat ProgressBarFormat { get; set; } = ProgressBarFormat.Simple;
 
-    /// <summary>Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/></summary>
+    /// <summary>Gets/Sets the progress bar style based on the <see cref="Views.ProgressBarStyle"/></summary>
     public ProgressBarStyle ProgressBarStyle
     {
         get => _progressBarStyle;

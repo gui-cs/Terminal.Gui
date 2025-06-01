@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Provides an abstraction for common keyboard operations and state. Used for processing keyboard input and
@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         This class provides a high-level abstraction with helper methods and properties for common keyboard
-///         operations. Use this class instead of the <see cref="Terminal.Gui.KeyCode"/> enumeration for keyboard input
+///         operations. Use this class instead of the <see cref="Drivers.KeyCode"/> enumeration for keyboard input
 ///         whenever possible.
 ///     </para>
 ///     <para></para>
@@ -63,7 +63,7 @@ namespace Terminal.Gui;
 ///                 <description>
 ///                     Keys are persisted as <c>"[Modifiers]+[Key]</c>. For example
 ///                     <c>new Key(Key.Delete).WithAlt.WithDel</c> is persisted as <c>"Ctrl+Alt+Delete"</c>. See
-///                     <see cref="ToString()"/> and <see cref="TryParse(string, out Terminal.Gui.Key)"/> for more
+///                     <see cref="ToString()"/> and <see cref="TryParse(string, out Key)"/> for more
 ///                     information.
 ///                 </description>
 ///             </item>
@@ -123,7 +123,7 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>
     ///     Constructs a new Key from a string describing the key. See
-    ///     <see cref="TryParse(string, out Terminal.Gui.Key)"/> for information on the format of the string.
+    ///     <see cref="TryParse(string, out Key)"/> for information on the format of the string.
     /// </summary>
     /// <param name="str">The string describing the key.</param>
     public Key (string str)
@@ -236,7 +236,7 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>The encoded key value.</summary>
     /// <para>
-    ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90
+    ///     IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Drivers.KeyCode"/>) as values between 65 and 90
     ///     corresponding to the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g.
     ///     <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII values
     ///     for uppercase characters, these enum values represent *lowercase*, un-shifted characters.

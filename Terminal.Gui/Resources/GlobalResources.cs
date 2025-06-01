@@ -4,7 +4,7 @@ using System.Collections;
 using System.Globalization;
 using System.Resources;
 
-namespace Terminal.Gui.Resources;
+namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Provide static access to the ResourceManagerWrapper

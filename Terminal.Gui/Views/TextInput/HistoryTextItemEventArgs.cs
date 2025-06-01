@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Event arguments for <see cref="HistoryText"/> item events. Used by <see cref="TextField"/> and <see cref="TextView"/>.

@@ -1,7 +1,8 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
 
-/// <summary>The <see cref="ColorPicker16"/> <see cref="View"/> Color picker.</summary>
+namespace Terminal.Gui.Views;
+
+/// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
 public class ColorPicker16 : View
 {
     /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>

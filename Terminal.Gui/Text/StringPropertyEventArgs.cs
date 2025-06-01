@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>Event args for <see langword="string"/> type property events</summary>
 public class StringPropertyEventArgs : CancelEventArgs

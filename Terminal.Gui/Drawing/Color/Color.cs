@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a 24-bit color encoded in ARGB32 format.
@@ -178,7 +178,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     will return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> of the closest 24-bit color value. Set
+    ///     Get returns the <see cref="GetClosestNamedColor16(Color)"/> of the closest 24-bit color value. Set
     ///     sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
@@ -189,7 +189,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> to check if this <see cref="Color"/> is closer
+    ///     The <see cref="GetClosestNamedColor16(Color)"/> to check if this <see cref="Color"/> is closer
     ///     to than any other configured named color.
     /// </param>
     /// <returns>
@@ -209,11 +209,11 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="color">
-    ///     The color to test against the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> value in
+    ///     The color to test against the <see cref="GetClosestNamedColor16(Color)"/> value in
     ///     <paramref name="namedColor"/>.
     /// </param>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> to check if this <see cref="Color"/> is closer
+    ///     The <see cref="GetClosestNamedColor16(Color)"/> to check if this <see cref="Color"/> is closer
     ///     to than any other configured named color.
     /// </param>
     /// <returns>

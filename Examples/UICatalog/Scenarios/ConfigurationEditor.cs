@@ -1,13 +1,9 @@
 ﻿#nullable enable
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Configuration Editor", "Editor of Terminal.Gui Config Files")]
+[ScenarioMetadata ("Configuration Editor", "Edits of Terminal.Gui Config Files")]
 [ScenarioCategory ("TabView")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Files and IO")]
@@ -15,22 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Configuration")]
 public class ConfigurationEditor : Scenario
 {
-    //private static Scheme _editorScheme = SchemeManager.GetScheme (Schemes.Base);
-
-    //private static Action? _editorSchemeChanged;
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
-
-    //[ConfigurationProperty (Scope = typeof (AppSettingsScope))]
-    //public static Scheme EditorScheme
-    //{
-    //    get => _editorScheme;
-    //    set
-    //    {
-    //        _editorScheme = value;
-    //        _editorSchemeChanged?.Invoke ();
-    //    }
-    //}
 
     public override void Main ()
     {
@@ -38,33 +20,37 @@ public class ConfigurationEditor : Scenario
 
         Window? win = new ();
 
-        _lenShortcut = new Shortcut ()
+        _lenShortcut = new ()
         {
             Title = "",
         };
 
-        var quitShortcut = new Shortcut ()
+        Shortcut quitShortcut = new ()
         {
             Key = Application.QuitKey,
             Title = $"Quit",
             Action = Quit
         };
 
-        var reloadShortcut = new Shortcut ()
+        Shortcut reloadShortcut = new  ()
         {
             Key = Key.F5.WithShift,
             Title = "Reload",
         };
-        reloadShortcut.Accepting += (s, e) => { Reload (); };
+        reloadShortcut.Accepting += (s, e) =>
+                                    {
+                                        Reload ();
+                                        e.Handled = true;
+                                    };
 
-        var saveShortcut = new Shortcut ()
+        Shortcut saveShortcut = new  ()
         {
             Key = Key.F4,
             Title = "Save",
             Action = Save
         };
 
-        var statusBar = new StatusBar ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
+        StatusBar statusBar = new ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
         _tabView = new ()
         {
@@ -77,43 +63,19 @@ public class ConfigurationEditor : Scenario
         win.Loaded += (s, a) =>
                       {
                           Open ();
-                          //_editorSchemeChanged?.Invoke ();
                       };
-
-
-
-        //_editorSchemeChanged += OnEditorSchemeChanged;
 
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
 
         Application.Run (win);
-        //_editorSchemeChanged -= OnEditorSchemeChanged;
         win.Dispose ();
-        win = null;
-
         Application.Shutdown ();
 
         return;
 
-        //void OnEditorSchemeChanged ()
-        //{
-        //    if (Application.Top is { })
-        //    {
-        //        return;
-        //    }
-
-        //    foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
-        //    {
-        //        t.SetScheme (EditorScheme);
-        //    }
-        //}
-
         void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
         {
-            if (win is { })
-            {
-                win.SetNeedsDraw ();
-            }
+            Application.Top?.SetNeedsDraw ();
         }
     }
     public void Save ()
@@ -126,7 +88,7 @@ public class ConfigurationEditor : Scenario
 
     private void Open ()
     {
-        foreach (var config in ConfigurationManager.SourcesManager!.Sources)
+        foreach (KeyValuePair<ConfigLocations, string> config in ConfigurationManager.SourcesManager!.Sources)
         {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
             var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
@@ -145,7 +107,7 @@ public class ConfigurationEditor : Scenario
 
             }
 
-            Tab tab = new Tab ()
+            Tab tab = new ()
             {
                 View = editor,
                 DisplayText = config.Key.ToString ()
@@ -186,32 +148,37 @@ public class ConfigurationEditor : Scenario
                                                                     return null;
                                                                 }).Cast<ConfigTextView> ())
         {
-            if (editor.IsDirty)
+            if (!editor.IsDirty)
             {
-                int result = MessageBox.Query (
-                                               "Save Changes",
-                                               $"Save changes to {editor.FileInfo!.Name}",
-                                               "_Yes",
-                                               "_No",
-                                               "_Cancel"
-                                              );
+                continue;
+            }
 
-                if (result == -1 || result == 2)
-                {
-                    // user cancelled
-                }
+            int result = MessageBox.Query (
+                                           "Save Changes",
+                                           $"Save changes to {editor.FileInfo!.Name}",
+                                           "_Yes",
+                                           "_No",
+                                           "_Cancel"
+                                          );
 
-                if (result == 0)
-                {
+            switch (result)
+            {
+                case 0:
                     editor.Save ();
-                }
+
+                    break;
+
+                default:
+                case -1 or 2:
+                    // user cancelled
+                    return;
             }
         }
 
         Application.RequestStop ();
     }
 
-    private void Reload ()
+    private static void Reload ()
     {
         if (Application.Navigation?.GetFocused () is ConfigTextView editor)
         {
@@ -226,7 +193,7 @@ public class ConfigurationEditor : Scenario
             TabStop = TabBehavior.TabGroup;
         }
 
-        internal FileInfo? FileInfo { get; set; }
+        internal FileInfo? FileInfo { get; init; }
 
         internal void Read ()
         {
@@ -247,15 +214,17 @@ public class ConfigurationEditor : Scenario
                 string? name = assembly
                                .GetManifestResourceNames ()
                                .FirstOrDefault (x => x.EndsWith ("config.json"));
-                if (!string.IsNullOrEmpty (name))
-                {
 
-                    using Stream? stream = assembly.GetManifestResourceStream (name);
-                    using var reader = new StreamReader (stream!);
-                    Text = reader.ReadToEnd ();
-                    ReadOnly = true;
-                    Enabled = true;
+                if (string.IsNullOrEmpty (name))
+                {
+                    return;
                 }
+
+                using Stream? stream = assembly.GetManifestResourceStream (name);
+                using var reader = new StreamReader (stream!);
+                Text = reader.ReadToEnd ();
+                ReadOnly = true;
+                Enabled = true;
 
                 return;
             }

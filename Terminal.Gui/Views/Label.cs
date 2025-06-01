@@ -1,10 +1,9 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
-///     The Label <see cref="View"/> displays text that describes the View next in the <see cref="View.SubViews"/>. When
-///     Label
-///     receives a <see cref="Command.HotKey"/> command it will pass it to the next <see cref="View"/> in
-///     <see cref="View.SubViews"/>.
+///     Displays text that describes the View next in the <see cref="View.SubViews"/>. When
+///     the user presses a hotkey that matches the <see cref="View.HotKey"/> of the Label, the next <see cref="View"/> in
+///     <see cref="View.SubViews"/> will be activated.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -35,7 +34,7 @@ public class Label : View, IDesignable
     {
         if (!CanFocus)
         {
-            e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, data: this)) == true;
+            e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, this)) == true;
         }
     }
 

@@ -1,5 +1,5 @@
 ﻿using Xunit.Abstractions;
-using static Terminal.Gui.Pos;
+using static Terminal.Gui.ViewBase.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 

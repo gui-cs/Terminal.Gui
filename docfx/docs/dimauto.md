@@ -1,5 +1,12 @@
 # Dim.Auto Deep Dive
 
+## See Also
+
+* [Lexicon & Taxonomy](lexicon.md)
+* [Layout](layout.md)
+
+## Overview
+
 The `Dim.Auto` type is a type of `Dim` that automatically sizes the view based on its content. This is useful when you want to size a view based on the content it contains. That content can either be the `Text`, the `SubViews`, or something else defined by the view.
 
 Like all `Dim` types, `Dim.Auto` is used to set the `Width` or `Height` of a view and can be combined with other `Dim` types using addition or subtraction (see. `DimCombine`).

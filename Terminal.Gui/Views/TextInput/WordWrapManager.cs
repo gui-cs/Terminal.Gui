@@ -1,5 +1,6 @@
 #nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Manages word wrapping for a <see cref="TextModel"/> in a <see cref="TextView"/>.

@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using Xunit.Abstractions;
-using static Terminal.Gui.StandardColors;
 
 namespace Terminal.Gui.DrawingTests;
 
@@ -22,7 +21,7 @@ public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
 
         Assert.True (parsed, $"TryParseColor should succeed for {name}");
 
-        Color expectedColor = new (GetArgb (standardColor));
+        Color expectedColor = new (Drawing.StandardColors.GetArgb (standardColor));
 
         Assert.Equal (expectedColor.R, actualColor.R);
         Assert.Equal (expectedColor.G, actualColor.G);
@@ -33,7 +32,7 @@ public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
     [MemberData (nameof (StandardColors))]
     public void TryNameColor_ResolvesAllStandardColors (StandardColor standardColor)
     {
-        Color color = new (GetArgb (standardColor));
+        Color color = new (Drawing.StandardColors.GetArgb (standardColor));
 
         bool success = _candidate.TryNameColor (color, out string? resolvedName);
 
@@ -45,7 +44,7 @@ public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
         Assert.True (success, $"TryNameColor should succeed for {standardColor}");
 
         List<string> expectedNames = Enum.GetNames<StandardColor> ()
-            .Where (name => GetArgb (Enum.Parse<StandardColor> (name)) == color.Argb)
+            .Where (name => Drawing.StandardColors.GetArgb (Enum.Parse<StandardColor> (name)) == color.Argb)
             .ToList ();
 
         Assert.Contains (resolvedName, expectedNames);
@@ -58,7 +57,7 @@ public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
 
         foreach (StandardColor sc in Enum.GetValues<StandardColor> ())
         {
-            Color color = new (GetArgb (sc));
+            Color color = new (Drawing.StandardColors.GetArgb (sc));
             if (!_candidate.TryNameColor (color, out _))
             {
                 unmapped.Add (sc);

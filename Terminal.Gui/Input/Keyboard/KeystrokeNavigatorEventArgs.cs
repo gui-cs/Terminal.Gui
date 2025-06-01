@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Input;
 
 /// <summary>Event arguments for the <see cref="CollectionNavigatorBase.SearchStringChanged"/> event.</summary>
 public class KeystrokeNavigatorEventArgs : EventArgs

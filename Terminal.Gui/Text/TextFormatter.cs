@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Diagnostics;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>
 ///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal and vertical alignment, text direction,

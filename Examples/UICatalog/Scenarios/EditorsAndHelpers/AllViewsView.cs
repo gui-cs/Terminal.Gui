@@ -1,5 +1,4 @@
-﻿using Terminal.Gui;
-
+﻿
 namespace UICatalog.Scenarios;
 
 public class AllViewsView : View

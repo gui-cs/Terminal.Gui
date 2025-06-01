@@ -158,7 +158,7 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            ViewportSettings = ViewportSettings.AllowNegativeLocation
+            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation
         };
         view.Layout ();
 
@@ -257,7 +257,7 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = viewWidth,
             Height = viewHeight,
-            ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize
+            ViewportSettings = ViewportSettingsFlags.AllowLocationGreaterThanContentSize
         };
         var newViewport = new Rectangle (10, 10, viewWidth, viewHeight);
 
@@ -275,7 +275,7 @@ public class ViewportTests (ITestOutputHelper output)
         var view = new View ();
         view.SetContentSize (new (100, 100));
         var newViewport = new Rectangle (0, 0, 200, 200);
-        view.ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize;
+        view.ViewportSettings = ViewportSettingsFlags.AllowLocationGreaterThanContentSize;
 
         // Act
         view.Viewport = newViewport;
@@ -290,7 +290,7 @@ public class ViewportTests (ITestOutputHelper output)
         // Arrange
         var view = new View ();
         var newViewport = new Rectangle (-10, -10, 100, 100);
-        view.ViewportSettings = ViewportSettings.AllowNegativeLocation;
+        view.ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation;
 
         // Act
         view.Viewport = newViewport;
@@ -305,7 +305,7 @@ public class ViewportTests (ITestOutputHelper output)
         // Arrange
         var view = new View ();
         var newViewport = new Rectangle (-10, -10, 100, 100);
-        view.ViewportSettings = ViewportSettings.None;
+        view.ViewportSettings = ViewportSettingsFlags.None;
 
         // Act
         view.Viewport = newViewport;

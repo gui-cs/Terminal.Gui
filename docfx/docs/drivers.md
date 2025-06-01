@@ -1,8 +1,24 @@
 
 # Cross-Platform Driver Model
 
-**Terminal.Gui** has support for [ncurses](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/ConsoleDrivers/CursesDriver/CursesDriver.cs), [`System.Console`](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/ConsoleDrivers/NetDriver.cs), and a full [Win32 Console](https://github.com/gui-cs/Terminal.Gui/blob/master/Terminal.Gui/ConsoleDrivers/WindowsDriver.cs) front-end.
+[!IMPORTANT]
+> In v1, the driver model was a source of pain and confusion. In v2, our goal is to make the driver model a source of pride and joy. It is still a work in progress. We will update this document as we add more information.
 
-`ncurses` is used on Mac/Linux/Unix with color support based on what your library is compiled with; the Windows driver supports full color and mouse, and an easy-to-debug `System.Console` can be used on Windows and Unix, but lacks mouse support.
+## Overview
 
-You can force the use of `System.Console` on Unix as well; see `Core.cs`.
+The driver model is the mechanism by which Terminal.Gui can support multiple platforms. Windows, Mac, Linux, and even (eventually) web browsers are supported.
+
+## Drivers
+
+### Legacy
+
+- `WindowsDriver` - A driver that uses the Windows API to draw to the console.
+- `NetDriver` - A driver that uses the .NET `System.Console` to draw to the console.
+- `CursesDriver` - A driver that uses the ncurses library to draw to the console.
+
+### In Development for v2
+
+- `v2win` - A driver optimized for Windows.
+- `v2net` - A driver that uses the .NET `System.Console` to draw to the console and works on all platforms.
+
+

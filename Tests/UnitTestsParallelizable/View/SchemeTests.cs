@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using Terminal.Gui;
 using Xunit;
 
 namespace Terminal.Gui.ViewTests;
