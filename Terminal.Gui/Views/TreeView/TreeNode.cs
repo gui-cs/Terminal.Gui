@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface to implement when you want the regular (non-generic) <see cref="TreeView"/> to automatically

@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+
 
 namespace CommunityToolkitExample;
 

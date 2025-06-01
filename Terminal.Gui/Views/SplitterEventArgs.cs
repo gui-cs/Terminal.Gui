@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>Provides data for <see cref="TileView"/> events.</summary>
 public class SplitterEventArgs : EventArgs

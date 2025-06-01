@@ -75,7 +75,6 @@
         <Using Include="JetBrains.Annotations.PureAttribute" Alias="PureAttribute" />
         <Using Include="System.Drawing" />
         <Using Include="System.Text" />
-        <Using Include="Terminal.Gui.EnumExtensions" />
     </ItemGroup>
     <!-- =================================================================== -->
     <!-- Assembly names for which internal items are visible -->

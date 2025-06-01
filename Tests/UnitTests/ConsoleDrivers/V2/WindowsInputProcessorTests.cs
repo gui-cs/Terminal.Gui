@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using InputRecord = Terminal.Gui.WindowsConsole.InputRecord;
-using ButtonState = Terminal.Gui.WindowsConsole.ButtonState;
-using EventFlags = Terminal.Gui.WindowsConsole.EventFlags;
-using ControlKeyState = Terminal.Gui.WindowsConsole.ControlKeyState;
-using MouseEventRecord = Terminal.Gui.WindowsConsole.MouseEventRecord;
+using InputRecord = Terminal.Gui.Drivers.WindowsConsole.InputRecord;
+using ButtonState = Terminal.Gui.Drivers.WindowsConsole.ButtonState;
+using EventFlags = Terminal.Gui.Drivers.WindowsConsole.EventFlags;
+using ControlKeyState = Terminal.Gui.Drivers.WindowsConsole.ControlKeyState;
+using MouseEventRecord = Terminal.Gui.Drivers.WindowsConsole.MouseEventRecord;
 
 namespace UnitTests.ConsoleDrivers.V2;
 

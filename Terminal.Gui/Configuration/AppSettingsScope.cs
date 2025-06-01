@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>The <see cref="Scope{T}"/> class for application-defined configuration settings.</summary>
 /// <remarks></remarks>

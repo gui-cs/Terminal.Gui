@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Describes the discovered state of sixel support and ancillary information

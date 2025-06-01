@@ -1,5 +1,4 @@
 using System;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

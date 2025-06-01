@@ -8,7 +8,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
 public class ComboBox : View, IDesignable

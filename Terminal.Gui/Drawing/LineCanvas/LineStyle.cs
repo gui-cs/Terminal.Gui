@@ -1,7 +1,7 @@
 #nullable enable
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Defines the style of lines for a <see cref="LineCanvas"/>.</summary>
 [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]

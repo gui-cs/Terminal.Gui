@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
@@ -185,7 +185,7 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     {
         if (IsEmpty)
         {
-            throw new JsonException ($@"Empty!");
+            //throw new JsonException ($@"Empty!");
         }
     }
 }

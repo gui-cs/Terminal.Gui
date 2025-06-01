@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Builds a palette of a given size for a given set of input colors.

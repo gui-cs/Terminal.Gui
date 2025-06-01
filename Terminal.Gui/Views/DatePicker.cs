@@ -7,9 +7,9 @@
 using System.Data;
 using System.Globalization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
-/// <summary>The <see cref="DatePicker"/> <see cref="View"/> Date Picker.</summary>
+/// <summary>Lets the user pick a date from a visual calendar.</summary>
 public class DatePicker : View
 {
     private TableView _calendar;

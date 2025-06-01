@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface for supplying data to a <see cref="TreeView{T}"/> on demand as root level nodes are expanded by the

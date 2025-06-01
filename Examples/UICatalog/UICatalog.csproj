@@ -48,6 +48,5 @@
         <Using Include="System.Drawing.PointF" Alias="PointF" />
         <Using Include="System.Drawing.Size" Alias="Size" />
         <Using Include="System.Drawing.SizeF" Alias="SizeF" />
-        <Using Include="Terminal.Gui.EnumExtensions" />
     </ItemGroup>
 </Project>

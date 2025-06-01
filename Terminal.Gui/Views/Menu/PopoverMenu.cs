@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a cascading menu that pops over all other content. Can be used as a context menu or a drop-down

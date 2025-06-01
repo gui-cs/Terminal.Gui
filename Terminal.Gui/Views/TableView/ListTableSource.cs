@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Data;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Collections.IList"/>.  This class is

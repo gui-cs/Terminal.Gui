@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. The

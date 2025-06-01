@@ -1,9 +1,9 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
-///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
-///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.Schemes ["Dialog"]</c> scheme and has a
-///     1 cell padding around the edges.
+///     A <see cref="Toplevel.Modal"/> <see cref="Window"/>. Supports a simple API for adding <see cref="Button"/>s
+///     across the bottom. By default, the <see cref="Dialog"/> is centered and used the <see cref="Schemes.Dialog"/>
+///     scheme.
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
@@ -38,9 +38,8 @@ public class Dialog : Window
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 80;
 
-
     /// <summary>
-    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
@@ -61,7 +60,8 @@ public class Dialog : Window
     /// <remarks>
     ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
     ///     set
-    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="Application.Top"/>, if there is one. Otherwise,
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="Application.Top"/>, if
+    ///     there is one. Otherwise,
     ///     it will be bound by the screen dimensions.
     /// </remarks>
     public Dialog ()
@@ -87,8 +87,8 @@ public class Dialog : Window
     // BUGBUG: Calls these methods.
     // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
 
-    /// <inheritdoc />
-    /// <inheritdoc />
+    /// <inheritdoc/>
+    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal || role == VisualRole.Focus)
@@ -110,7 +110,7 @@ public class Dialog : Window
         get
         {
 #if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && WasDisposed)
+            if (EnableDebugIDisposableAsserts && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }
@@ -120,7 +120,7 @@ public class Dialog : Window
         set
         {
 #if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && WasDisposed)
+            if (EnableDebugIDisposableAsserts && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }

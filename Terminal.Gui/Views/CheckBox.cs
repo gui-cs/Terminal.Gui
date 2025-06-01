@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
 /// <remarks>

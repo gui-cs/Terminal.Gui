@@ -1,9 +1,11 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     True color picker using HSL
+///     Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with
+///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
 public partial class ColorPicker : View, IDesignable
 {

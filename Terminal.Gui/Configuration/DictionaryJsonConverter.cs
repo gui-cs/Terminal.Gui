@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 [RequiresUnreferencedCode ("AOT")]
 internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>

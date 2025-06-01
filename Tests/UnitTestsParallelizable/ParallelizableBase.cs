@@ -1,3 +1,4 @@
+
 namespace UnitTests.Parallelizable;
 
 /// <summary>

@@ -85,7 +85,7 @@ public class GetViewsUnderLocationTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettings.TransparentMouse);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.TransparentMouse);
 
         // Assert
         if (expectedViewsFound.Length == 0)
@@ -117,7 +117,7 @@ public class GetViewsUnderLocationTests
         var location = new Point (testX, testY);
 
         // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettings.TransparentMouse);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.TransparentMouse);
 
         // Assert
         Assert.Contains (viewsUnderMouse, v => v == Application.Top);
@@ -139,7 +139,7 @@ public class GetViewsUnderLocationTests
             Width = 10, Height = 10
         };
 
-        Assert.Same (Application.Top, View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ());
+        Assert.Same (Application.Top, View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ());
         Application.Top.Dispose ();
         Application.ResetState (true);
     }
@@ -167,7 +167,7 @@ public class GetViewsUnderLocationTests
         };
         Application.Top.Add (subview);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
@@ -197,7 +197,7 @@ public class GetViewsUnderLocationTests
         };
         Application.Top.Add (subview);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
@@ -229,7 +229,7 @@ public class GetViewsUnderLocationTests
         subview.Visible = true;
         Assert.True (subview.Visible);
         Assert.False (Application.Top.Visible);
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
@@ -262,7 +262,7 @@ public class GetViewsUnderLocationTests
         };
         Application.Top.Add (subview);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
@@ -283,7 +283,7 @@ public class GetViewsUnderLocationTests
         Application.Top = new ()
         {
             Width = 10, Height = 10,
-            ViewportSettings = ViewportSettings.AllowNegativeLocation
+            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation
         };
         Application.Top.Viewport = new (offset, offset, 10, 10);
 
@@ -294,7 +294,7 @@ public class GetViewsUnderLocationTests
         };
         Application.Top.Add (subview);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
@@ -328,7 +328,7 @@ public class GetViewsUnderLocationTests
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
@@ -367,7 +367,7 @@ public class GetViewsUnderLocationTests
         };
         Application.Top.Add (subview);
 
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
         string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (expectedViewsFound, foundIds);
@@ -404,7 +404,7 @@ public class GetViewsUnderLocationTests
         subview.Border.Id = "border";
         Application.Top.Add (subview);
 
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
         string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (expectedViewsFound, foundIds);
@@ -438,11 +438,11 @@ public class GetViewsUnderLocationTests
             Width = 5, Height = 5
         };
         subview.Border!.Thickness = new (1);
-        subview.Border.ViewportSettings = ViewportSettings.TransparentMouse;
+        subview.Border.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         subview.Border.Id = "border";
         Application.Top.Add (subview);
 
-        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse);
+        List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
         string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (expectedViewsFound, foundIds);
@@ -490,7 +490,7 @@ public class GetViewsUnderLocationTests
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == paddingSubView);
         Application.Top.Dispose ();
@@ -541,7 +541,7 @@ public class GetViewsUnderLocationTests
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == paddingSubView);
         Application.Top.Dispose ();
@@ -585,7 +585,7 @@ public class GetViewsUnderLocationTests
 
         Application.Top.Add (subviews [0]);
 
-        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettings.TransparentMouse).LastOrDefault ();
+        View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
         Assert.Equal (expectedSubViewFound, subviews.IndexOf (found!));
         Application.Top.Dispose ();
         Application.ResetState (true);
@@ -632,7 +632,7 @@ public class GetViewsUnderLocationTests
         view.Add (subView);
         Application.Top.Add (view);
 
-        List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettings.TransparentMouse);
+        List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
 
         string [] foundIds = found.Select (v => v!.Id).ToArray ();
 
@@ -685,7 +685,7 @@ public class GetViewsUnderLocationTests
         view.Add (popOver);
         Application.Top.Add (view);
 
-        List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettings.TransparentMouse);
+        List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
 
         string [] foundIds = found.Select (v => v!.Id).ToArray ();
 
@@ -719,7 +719,7 @@ public class GetViewsUnderLocationTests
         Application.TopLevels.Push (secondaryToplevel);
         Application.Top = secondaryToplevel;
 
-        List<View?> found = View.GetViewsUnderLocation (new (2, 2), ViewportSettings.TransparentMouse);
+        List<View?> found = View.GetViewsUnderLocation (new (2, 2), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == topToplevel.Id);
         Assert.Contains (found, v => v == topToplevel);
 
@@ -753,7 +753,7 @@ public class GetViewsUnderLocationTests
         Application.TopLevels.Push (secondaryToplevel);
         Application.Top = secondaryToplevel;
 
-        List<View?> found = View.GetViewsUnderLocation (new (7, 7), ViewportSettings.TransparentMouse);
+        List<View?> found = View.GetViewsUnderLocation (new (7, 7), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == secondaryToplevel.Id);
         Assert.DoesNotContain (found, v => v?.Id == topToplevel.Id);
 
@@ -786,15 +786,15 @@ public class GetViewsUnderLocationTests
         Application.TopLevels.Push (secondaryToplevel);
         Application.Top = secondaryToplevel;
 
-        secondaryToplevel.Margin.ViewportSettings = ViewportSettings.None;
+        secondaryToplevel.Margin.ViewportSettings = ViewportSettingsFlags.None;
 
-        List<View?> found = View.GetViewsUnderLocation (new (5, 5), ViewportSettings.TransparentMouse);
+        List<View?> found = View.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v == secondaryToplevel);
         Assert.Contains (found, v => v == secondaryToplevel.Margin);
         Assert.DoesNotContain (found, v => v?.Id == topToplevel.Id);
 
-        secondaryToplevel.Margin.ViewportSettings = ViewportSettings.TransparentMouse;
-        found = View.GetViewsUnderLocation (new (5, 5), ViewportSettings.TransparentMouse);
+        secondaryToplevel.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        found = View.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (found, v => v == secondaryToplevel);
         Assert.DoesNotContain (found, v => v == secondaryToplevel.Margin);
         Assert.Contains (found, v => v?.Id == topToplevel.Id);
@@ -829,7 +829,7 @@ public class GetViewsUnderLocationTests
         Application.TopLevels.Push (secondaryToplevel);
         Application.Top = secondaryToplevel;
 
-        List<View?> found = View.GetViewsUnderLocation (new (20, 20), ViewportSettings.TransparentMouse);
+        List<View?> found = View.GetViewsUnderLocation (new (20, 20), ViewportSettingsFlags.TransparentMouse);
         Assert.Empty (found);
 
         topToplevel.Dispose ();

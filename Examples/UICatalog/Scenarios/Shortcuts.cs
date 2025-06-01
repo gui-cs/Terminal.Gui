@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.Collections.ObjectModel;
-using Terminal.Gui;
 using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;

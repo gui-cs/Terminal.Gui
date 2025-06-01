@@ -2,7 +2,7 @@
 
 TreeView is a control for navigating hierarchical objects. It comes in two forms `TreeView` and `TreeView<T>`.
 
-[TreeView API Reference](~/api/Terminal.Gui.TreeView.yml)
+[TreeView API Reference](~/api/Terminal.Gui.Views.TreeView.yml)
 
 ## Using TreeView
 

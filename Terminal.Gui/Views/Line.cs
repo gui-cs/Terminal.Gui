@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.

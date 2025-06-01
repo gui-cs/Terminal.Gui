@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ICollectionNavigator"/> sub-interface for <see cref="ListView"/> and <see cref="TreeView"/>. See also
-///     <see cref="ListView.KeystrokeNavigator"/> / <see cref="TreeView.KeystrokeNavigator"/>
+///     <see cref="ListView"/> / <see cref="TreeView"/>
 /// </summary>
 public interface IListCollectionNavigator : ICollectionNavigator
 {

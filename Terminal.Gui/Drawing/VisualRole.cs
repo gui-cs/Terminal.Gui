@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents the semantic visual role of a visual element rendered by a <see cref="View"/>. Each VisualRole maps to

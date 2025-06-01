@@ -1,10 +1,12 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+using ColorHelper;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A bar representing a single component of a <see cref="Color"/> e.g.
-///     the Red portion of a <see cref="ColorModel.RGB"/>.
+///     the Red portion of a <see cref="RGB"/>.
 /// </summary>
 internal abstract class ColorBar : View, IColorBar
 {
@@ -57,7 +59,7 @@ internal abstract class ColorBar : View, IColorBar
 
     /// <summary>
     ///     The currently selected amount of the color component stored by this class e.g.
-    ///     the amount of Hue in a <see cref="ColorModel.HSL"/>.
+    ///     the amount of Hue in a <see cref="HSL"/>.
     /// </summary>
     public int Value
     {

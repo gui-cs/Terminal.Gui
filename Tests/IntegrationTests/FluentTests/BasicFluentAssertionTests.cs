@@ -1,5 +1,4 @@
-﻿using Terminal.Gui;
-using TerminalGuiFluentTesting;
+﻿using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;

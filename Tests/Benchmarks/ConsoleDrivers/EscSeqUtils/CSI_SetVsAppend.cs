@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using Tui = Terminal.Gui;
+using Tui = Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.Benchmarks.ConsoleDrivers.EscSeqUtils;
 
