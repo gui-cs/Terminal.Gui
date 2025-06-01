@@ -56,9 +56,11 @@ public static class DeepCloner
 
             // If in AOT but source generation failed, throw an exception
             // instead of silently falling back to reflection
-            throw new InvalidOperationException (
-                                                 $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
-                                                 $"for AOT-compatible cloning.");
+            //throw new InvalidOperationException (
+            //                                     $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+            //                                     $"for AOT-compatible cloning.");
+            Logging.Error ($"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+                          $"for AOT-compatible cloning.");
         }
 
         // Use reflection-based approach, which should have better performance in non-AOT environments
