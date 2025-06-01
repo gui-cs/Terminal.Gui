@@ -1,4 +1,4 @@
-name: Ensure that Release builds are not broken
+name: Ensure that Release Build of Solution Builds Correctly
 
 on:
   push:
