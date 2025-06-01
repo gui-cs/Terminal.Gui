@@ -175,8 +175,8 @@ public class SchemeTests
         {
             if (args.Role == VisualRole.Focus)
             {
-                args.NewValue = customAttribute;
-                args.Cancel = true;
+                args.Result = customAttribute;
+                args.Handled = true;
             }
         };
 

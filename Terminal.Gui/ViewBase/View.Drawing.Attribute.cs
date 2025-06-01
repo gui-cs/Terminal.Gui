@@ -43,13 +43,14 @@ public partial class View
             return schemeAttribute;
         }
 
-        VisualRoleEventArgs args = new (role, newValue: ref schemeAttribute, currentValue: ref schemeAttribute);
+        VisualRoleEventArgs args = new (role, result: schemeAttribute);
         GettingAttributeForRole?.Invoke (this, args);
 
-        if (args.Cancel)
-        {
+        if (args is { Handled: true, Result: { } })
+
             // A handler may have changed the attribute
-            return args.NewValue;
+        {
+            return args.Result.Value;
         }
 
         if (HighlightStyle != HighlightStyle.None)

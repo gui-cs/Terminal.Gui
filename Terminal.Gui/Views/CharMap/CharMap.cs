@@ -106,10 +106,10 @@ public class CharMap : View, IDesignable
     {
         if (e.Role != VisualRole.Focus && e.Role != VisualRole.Active)
         {
-            e.NewValue = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            e.Result = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
         }
 
-        e.Cancel = true;
+        e.Handled = true;
     }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)

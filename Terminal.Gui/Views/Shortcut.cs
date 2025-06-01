@@ -492,16 +492,16 @@ public class Shortcut : View, IOrientation, IDesignable
             case VisualRole.Normal:
                 if (HasFocus)
                 {
-                    e.Cancel = true;
-                    e.NewValue = GetAttributeForRole (VisualRole.Focus);
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.Focus);
                 }
                 break;
 
             case VisualRole.HotNormal:
                 if (HasFocus)
                 {
-                    e.Cancel = true;
-                    e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.HotFocus);
                 }
                 break;
         }
@@ -687,8 +687,8 @@ public class Shortcut : View, IOrientation, IDesignable
                                            {
                                                if (args.Role == VisualRole.Normal)
                                                {
-                                                   args.NewValue = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
-                                                   args.Cancel = true;
+                                                   args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
+                                                   args.Handled = true;
                                                }
                                            };
         KeyView.ClearingViewport += (sender, args) =>
