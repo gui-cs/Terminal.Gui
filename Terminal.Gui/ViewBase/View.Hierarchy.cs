@@ -447,26 +447,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     #region SubViewOrdering
 
     /// <summary>
-    ///     Moves <paramref name="subview"/> to the end of the <see cref="SubViews"/> list keeping the original sorting.
-    /// </summary>
-    /// <param name="subview">The subview to move.</param>
-    public void MoveOverlappedSubViewToEnd (View subview)
-    {
-        PerformActionForSubView (
-                                 subview,
-                                 x =>
-                                 {
-                                     while (InternalSubViews!.IndexOf (x) != InternalSubViews.Count - 1)
-                                     {
-                                         var v = InternalSubViews [0];
-                                         InternalSubViews!.Remove (v);
-                                         InternalSubViews.Add (v);
-                                     }
-                                 }
-                                );
-    }
-
-    /// <summary>
     ///     Moves <paramref name="subview"/> one position towards the end of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
@@ -489,10 +469,29 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     /// <summary>
     ///     Moves <paramref name="subview"/> to the end of the <see cref="SubViews"/> list.
+    ///     If the <see cref="Arrangement"/> is <see cref="ViewArrangement.Overlapped"/>, keeps the original sorting.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
     public void MoveSubViewToEnd (View subview)
     {
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            PerformActionForSubView (
+                                     subview,
+                                     x =>
+                                     {
+                                         while (InternalSubViews!.IndexOf (x) != InternalSubViews.Count - 1)
+                                         {
+                                             View v = InternalSubViews [0];
+                                             InternalSubViews!.Remove (v);
+                                             InternalSubViews.Add (v);
+                                         }
+                                     }
+                                    );
+
+            return;
+        }
+
         PerformActionForSubView (
                                  subview,
                                  x =>
