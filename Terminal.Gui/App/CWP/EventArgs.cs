@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.App;
 
 #pragma warning disable CS1711
 /// <summary>
