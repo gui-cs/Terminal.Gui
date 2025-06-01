@@ -15,7 +15,7 @@ jobs:
     # Ensure that RELEASE builds are not broken
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Checkout ${{ github.ref_name }}
       uses: actions/checkout@v4
 
     - name: Setup .NET Core

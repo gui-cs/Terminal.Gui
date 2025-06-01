@@ -1,4 +1,4 @@
-name: Publish Terminal.Gui
+name: Publish Terminal.Gui to Nuget
 
 on:
   push:
@@ -14,9 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout ${{ github.ref_name }}
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # fetch-depth is needed for GitVersion
+        fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v3.1.11
@@ -37,10 +38,10 @@ jobs:
         dotnet-quality: 'ga'
 
     - name: Build Release Terminal.Gui
-      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Debug
+      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
 
     - name: Pack Release Terminal.Gui ${{ steps.gitversion.outputs.SemVer }} for Nuget
-      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Debug --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
     # - name: Test to generate Code Coverage Report
     #   run: |

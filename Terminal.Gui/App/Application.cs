@@ -1,5 +1,21 @@
 #nullable enable
-using System.Diagnostics;
+
+// We use global using directives to simplify the code and avoid repetitive namespace declarations.
+// Put them here so they are available throughout the application.
+// Do not put them in AssemblyInfo.cs as it will break GitVersion's /updateassemblyinfo
+global using Attribute = Terminal.Gui.Drawing.Attribute;
+global using Color = Terminal.Gui.Drawing.Color;
+global using CM = Terminal.Gui.Configuration.ConfigurationManager;
+global using Terminal.Gui.App;
+global using Terminal.Gui.Drivers;
+global using Terminal.Gui.Input;
+global using Terminal.Gui.Configuration;
+global using Terminal.Gui.ViewBase;
+global using Terminal.Gui.Views;
+global using Terminal.Gui.Drawing;
+global using Terminal.Gui.Text;
+global using Terminal.Gui.Resources;
+global using Terminal.Gui.FileServices;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
