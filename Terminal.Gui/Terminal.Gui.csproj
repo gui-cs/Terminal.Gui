@@ -156,11 +156,6 @@
         </VisualStudio>
     </ProjectExtensions>
 
-    <Target Name="PreBuildCleanup" BeforeTargets="BeforeBuild" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
-        <Exec Command="rm -rf ~/.nuget/packages/terminal.gui/2.0.0" Condition=" '$(OS)' != 'Windows_NT' " />
-    </Target>
-
     <Target Name="CopyNuGetPackagesToLocalPackagesFolder" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
         <PropertyGroup>
             <!-- Define the path for local_packages relative to the project directory -->
