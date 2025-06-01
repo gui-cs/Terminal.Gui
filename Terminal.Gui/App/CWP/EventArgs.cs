@@ -11,8 +11,8 @@ public class EventArgs<T> : EventArgs where T : notnull
     /// <summary>Initializes a new instance of the <see cref="EventArgs{T}"/> class.</summary>
     /// <param name="currentValue">The current value of the property.</param>
     /// <typeparam name="T">The type of the value.</typeparam>
-    public EventArgs (in T currentValue) { CurrentValue = currentValue; }
+    public EventArgs (in T currentValue) { Result = currentValue; }
 
     /// <summary>The current value of the property.</summary>
-    public T CurrentValue { get; }
+    public T Result { get; }
 }

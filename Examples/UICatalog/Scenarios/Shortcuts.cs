@@ -85,7 +85,7 @@ public class Shortcuts : Scenario
                                                                                        v => v is Shortcut { Width: not DimAbsolute });
                                                                                   IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
-                                                                                  if (e.NewValue == CheckState.Checked)
+                                                                                  if (e.Result == CheckState.Checked)
                                                                                   {
                                                                                       max = (from Shortcut? peer in enumerable
                                                                                              select peer.Key.ToString ().GetColumns ()).Prepend (max)
@@ -143,7 +143,7 @@ public class Shortcuts : Scenario
                                                                                      {
                                                                                          var peer = (Shortcut)view;
 
-                                                                                         if (e.NewValue == CheckState.Checked)
+                                                                                         if (e.Result == CheckState.Checked)
                                                                                          {
                                                                                              peer.AlignmentModes &= ~AlignmentModes.EndToStart;
                                                                                          }
@@ -181,7 +181,7 @@ public class Shortcuts : Scenario
                                                                                  {
                                                                                      if (peer.CanFocus)
                                                                                      {
-                                                                                         peer.CommandView.CanFocus = e.NewValue == CheckState.Checked;
+                                                                                         peer.CommandView.CanFocus = e.Result == CheckState.Checked;
                                                                                      }
                                                                                  }
                                                                              }
@@ -449,7 +449,7 @@ public class Shortcuts : Scenario
                                 {
                                     if (o is { })
                                     {
-                                        eventSource.Add ($"ColorChanged: {o.GetType ().Name} - {args.CurrentValue}");
+                                        eventSource.Add ($"ColorChanged: {o.GetType ().Name} - {args.Result}");
                                         eventLog.MoveDown ();
 
                                         Application.Top.SetScheme (
@@ -457,7 +457,7 @@ public class Shortcuts : Scenario
                                                                    {
                                                                        Normal = new (
                                                                                      Application.Top!.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                                     args.CurrentValue,
+                                                                                     args.Result,
                                                                                      Application.Top!.GetAttributeForRole (VisualRole.Normal).Style)
                                                                    });
                                     }

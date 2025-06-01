@@ -68,13 +68,13 @@ public class CharacterMap : Scenario
 
         _charMap.SelectedCodePointChanged += (sender, args) =>
                                              {
-                                                 if (Rune.IsValid (args.CurrentValue))
+                                                 if (Rune.IsValid (args.Result))
                                                  {
-                                                     jumpEdit.Text = ((Rune)args.CurrentValue).ToString ();
+                                                     jumpEdit.Text = ((Rune)args.Result).ToString ();
                                                  }
                                                  else
                                                  {
-                                                     jumpEdit.Text = $"U+{args.CurrentValue:x5}";
+                                                     jumpEdit.Text = $"U+{args.Result:x5}";
                                                  }
                                              };
 

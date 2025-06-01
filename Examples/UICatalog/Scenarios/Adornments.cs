@@ -51,7 +51,7 @@ public class Adornments : Scenario
                                                              {
                                                                  Normal = new (
                                                                                color.SuperView.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                               e.CurrentValue,
+                                                                               e.Result,
                                                                                color.SuperView.GetAttributeForRole (VisualRole.Normal).Style
                                                                               )
                                                              });

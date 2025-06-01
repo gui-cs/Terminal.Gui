@@ -175,7 +175,7 @@ public class ExpanderButton : Button
 
         if (!args.Cancel)
         {
-            _collapsed = args.NewValue;
+            _collapsed = args.Result;
 
             ExpandOrCollapse (_collapsed);
         }

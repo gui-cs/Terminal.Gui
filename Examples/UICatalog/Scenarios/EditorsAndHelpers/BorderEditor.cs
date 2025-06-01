@@ -91,9 +91,9 @@ public class BorderEditor : AdornmentEditor
             SetNeedsLayout ();
         }
 
-        void OnCkbTitleOnToggle (object? _, CancelEventArgs<CheckState> args)
+        void OnCkbTitleOnToggle (object? _, ResultEventArgs<CheckState> args)
         {
-            if (args.NewValue == CheckState.Checked)
+            if (args.Result == CheckState.Checked)
 
             {
                 ((Border)AdornmentToEdit!).Settings |= BorderSettings.Title;
@@ -105,9 +105,9 @@ public class BorderEditor : AdornmentEditor
             }
         }
 
-        void OnCkbGradientOnToggle (object? _, CancelEventArgs<CheckState> args)
+        void OnCkbGradientOnToggle (object? _, ResultEventArgs<CheckState> args)
         {
-            if (args.NewValue == CheckState.Checked)
+            if (args.Result == CheckState.Checked)
 
             {
                 ((Border)AdornmentToEdit!).Settings |= BorderSettings.Gradient;

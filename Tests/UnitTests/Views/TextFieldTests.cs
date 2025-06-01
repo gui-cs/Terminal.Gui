@@ -350,9 +350,9 @@ public class TextFieldTests (ITestOutputHelper output)
 
         void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
         {
-            if (e.NewValue.GetRuneCount () > 11)
+            if (e.Result.GetRuneCount () > 11)
             {
-                e.NewValue = e.NewValue [..11];
+                e.Result = e.Result [..11];
             }
         }
 
@@ -416,7 +416,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.TextChanging += (s, e) =>
                            {
-                               newText = e.NewValue;
+                               newText = e.Result;
                                oldText = e.CurrentValue;
                            };
 
@@ -957,7 +957,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         _textField.TextChanging += (s, e) =>
                                    {
-                                       Assert.Equal ("changing", e.NewValue);
+                                       Assert.Equal ("changing", e.Result);
 
                                        if (cancel)
                                        {

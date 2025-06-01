@@ -96,7 +96,7 @@ public partial class ColorPicker : View, IDesignable
     /// <summary>
     ///     Fired when color is changed.
     /// </summary>
-    public event EventHandler<ColorEventArgs>? ColorChanged;
+    public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
@@ -280,7 +280,7 @@ public partial class ColorPicker : View, IDesignable
     private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)
     {
         // if the new value of Focused is true then it is an enter event so ignore
-        if (e.NewValue)
+        if (e.Result)
         {
             return;
         }
@@ -306,7 +306,7 @@ public partial class ColorPicker : View, IDesignable
     private void UpdateValueFromName (object? sender, HasFocusEventArgs e)
     {
         // if the new value of Focused is true then it is an enter event so ignore
-        if (e.NewValue)
+        if (e.Result)
         {
             return;
         }
@@ -335,7 +335,7 @@ public partial class ColorPicker : View, IDesignable
     private void UpdateValueFromTextField (object? sender, HasFocusEventArgs e)
     {
         // if the new value of Focused is true then it is an enter event so ignore
-        if (e.NewValue)
+        if (e.Result)
         {
             return;
         }

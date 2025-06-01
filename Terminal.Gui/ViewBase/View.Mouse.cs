@@ -50,7 +50,7 @@ public partial class View // Mouse APIs
     ///     Gets whether the mouse is currently hovering over the View's <see cref="Viewport"/>. Is <see langword="true"/> after
     ///     <see cref="MouseEnter"/> has been raised, and before <see cref="MouseLeave"/> is raised.
     /// </summary>
-    public bool MouseHovering { get; internal set; }
+    public bool MouseState { get; internal set; }
 
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's
@@ -86,7 +86,7 @@ public partial class View // Mouse APIs
             return true;
         }
 
-        MouseHovering = true;
+        MouseState = true;
 
         if (HighlightStyle != HighlightStyle.None)
         {
@@ -204,7 +204,7 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-        MouseHovering = false;
+        MouseState = false;
 
         if (HighlightStyle != HighlightStyle.None)
         {
@@ -628,10 +628,22 @@ public partial class View // Mouse APIs
 
     #region Highlight Handling
 
-
     /// <summary>
-    ///     Gets or sets whether the <see cref="View"/> will be highlighted visually by mouse interaction.
+    ///     Gets or sets which mouse interactions should cause the View to be highlighted.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     <see cref="HighlightStyle.Hover"/> is set by default, which means the View will be highlighted when the mouse is over it. The default behavior of <see cref="SetAttributeForRole"/>
+    ///     is to use the <see cref="Drawing.VisualRole.Highlight"/> role for the highlight Attribute.
+    /// </para>
+    /// <para>
+    ///     <see cref="HighlightStyle.Pressed"/> means the View will be highlighted when the mouse is pressed over it. <see cref="Border"/>'s default behavior is to use 
+    ///     the <see cref="Drawing.VisualRole.Highlight"/> role when the Border is pressed for Arrangement.
+    /// </para>
+    /// <para>
+    ///     <see cref="HighlightStyle.PressedOutside"/> means the View will be highlighted when the mouse was pressed inside it and then moved outside of it.
+    /// </para>
+    /// </remarks>
     public HighlightStyle HighlightStyle { get; set; }
 
     /// <summary>
@@ -652,25 +664,6 @@ public partial class View // Mouse APIs
         return args.Cancel;
     }
 
-    /// <summary>
-    ///     Called when the view is to be highlighted. The <see cref="HighlightStyle"/> passed in the event indicates the
-    ///     highlight style that will be applied. The view can modify the highlight style by setting the
-    ///     <see cref="CancelEventArgs{T}.NewValue"/> property.
-    /// </summary>
-    /// <param name="args">
-    ///     Set the <see cref="CancelEventArgs{T}.NewValue"/> property to <see langword="true"/>, to cancel, indicating custom
-    ///     highlighting.
-    /// </param>
-    /// <returns><see langword="true"/>, to cancel, indicating custom highlighting.</returns>
-    protected virtual bool OnHighlight (CancelEventArgs<HighlightStyle> args) { return false; }
-
-    /// <summary>
-    ///     Raised when the view is to be highlighted. The <see cref="HighlightStyle"/> passed in the event indicates the
-    ///     highlight style that will be applied. The view can modify the highlight style by setting the
-    ///     <see cref="CancelEventArgs{T}.NewValue"/> property.
-    ///     Set to <see langword="true"/>, to cancel, indicating custom highlighting.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
 
     /// <summary>
     ///     INTERNAL Enables the highlight for the view when the mouse is pressed. Called from OnMouseEvent.
@@ -693,7 +686,7 @@ public partial class View // Mouse APIs
         // TODO: Make the highlight colors configurable
         if (!CanFocus)
         {
-            return false;
+          //  return false;
         }
 
         HighlightStyle copy = HighlightStyle;
@@ -708,6 +701,26 @@ public partial class View // Mouse APIs
         Margin?.RaiseHighlight (args);
         return args.Cancel;
     }
+    /// <summary>
+    ///     Called to indicate the View should be highlighted or not. The <see cref="HighlightStyle"/> passed in the event indicates the
+    ///     highlight style that will be applied. The view can modify the highlight style by setting the
+    ///     <see cref="CancelEventArgs{T}.Result"/> property.
+    /// </summary>
+    /// <param name="args">
+    ///     Set the <see cref="CancelEventArgs{T}.Result"/> property to <see langword="true"/>, to cancel, indicating custom
+    ///     highlighting.
+    /// </param>
+    /// <returns><see langword="true"/>, to cancel, indicating custom highlighting.</returns>
+    protected virtual bool OnHighlight (CancelEventArgs<HighlightStyle> args) { return false; }
+
+    /// <summary>
+    ///     Raised to indicate the View should be highlighted or not. The <see cref="HighlightStyle"/> passed in the event args indicates the
+    ///     highlight style that should be applied. The view can modify the highlight style by setting the
+    ///     <see cref="CancelEventArgs{T}.Result"/> property.
+    ///     Set to <see langword="true"/>, to cancel, indicating custom highlighting.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
+
 
     #endregion Highlight Handling
 

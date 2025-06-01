@@ -24,7 +24,7 @@ public class CancelEventArgs<T> : CancelEventArgs where T : notnull
     public CancelEventArgs (ref readonly T currentValue, ref T newValue, bool cancel = false) : base (cancel)
     {
         CurrentValue = currentValue;
-        NewValue = newValue;
+        Result = newValue;
     }
 
     /// <summary>
@@ -35,12 +35,12 @@ public class CancelEventArgs<T> : CancelEventArgs where T : notnull
     protected CancelEventArgs (T currentValue, T newValue)
     {
         CurrentValue = currentValue;
-        NewValue = newValue;
+        Result = newValue;
     }
 
     /// <summary>The current value of the property.</summary>
     public T CurrentValue { get; }
 
     /// <summary>The value the property will be set to if the event is not cancelled.</summary>
-    public T NewValue { get; set; }
+    public T Result { get; set; }
 }

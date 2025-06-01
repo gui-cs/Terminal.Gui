@@ -623,10 +623,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void OnCheckedStateChanging (object sender, CancelEventArgs e)
+        void OnCheckedStateChanging (object sender, ResultEventArgs<CheckState> e)
         {
             checkedInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 }

@@ -47,15 +47,19 @@ public partial class View
         GettingAttributeForRole?.Invoke (this, args);
 
         if (args is { Handled: true, Result: { } })
-
-            // A handler may have changed the attribute
         {
+            // A handler may have changed the attribute
             return args.Result.Value;
         }
 
-        if (HighlightStyle != HighlightStyle.None)
+        if (role != VisualRole.Disabled && HighlightStyle != HighlightStyle.None)
         {
-            if (MouseHovering && HighlightStyle.HasFlag (HighlightStyle.Hover) && role != VisualRole.Highlight && role != VisualRole.Disabled)
+            // The default behavior for HighlightStyle.Hover is to use the Highlight role
+            if (MouseHovering && HighlightStyle.HasFlag (HighlightStyle.Hover) && role != VisualRole.Highlight)
+            {
+                schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
+            } 
+            else if (HighlightStyle.HasFlag (HighlightStyle.Pressed) && role != VisualRole.Highlight)
             {
                 schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
             }

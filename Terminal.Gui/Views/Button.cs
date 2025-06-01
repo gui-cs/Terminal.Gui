@@ -139,7 +139,7 @@ public class Button : View, IDesignable
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.CurrentValue;
+        base.Text = e.Result;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

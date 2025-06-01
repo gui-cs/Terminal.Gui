@@ -55,8 +55,23 @@ public partial class Border : Adornment
 
         HighlightStyle |= HighlightStyle.Pressed;
 
+        Highlight += (sender, args) =>
+                     {
+                         if (args.Result == HighlightStyle.Pressed)
+                         {
+                             _pressed = true;
+                         }
+                         else
+                         {
+                             _pressed = false;
+                         }
+                     };
+
         ThicknessChanged += OnThicknessChanged;
     }
+
+    // True if the border is to be highlighted
+    private bool _pressed;
 
 
     // TODO: Move DrawIndicator out of Border and into View
@@ -275,6 +290,7 @@ public partial class Border : Adornment
 
         LineStyle lineStyle = LineStyle;
 
+
         if (Settings.FastHasFlags (BorderSettings.Title))
         {
             if (Thickness.Top == 2)
@@ -332,9 +348,16 @@ public partial class Border : Adornment
             bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
             bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 
-            Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
+            //Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
 
-            SetAttributeForRole (VisualRole.Normal);
+            Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
+
+            if (_pressed)
+            {
+                normalAttribute = GetAttributeForRole (VisualRole.Highlight);
+            }
+
+            SetAttribute (normalAttribute);
 
             if (drawTop)
             {
@@ -348,7 +371,7 @@ public partial class Border : Adornment
                                  borderBounds.Width,
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver?.GetAttribute ()
+                                 normalAttribute
                                 );
                 }
                 else
@@ -363,7 +386,7 @@ public partial class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver?.GetAttribute ()
+                                     normalAttribute
                                     );
                     }
 
@@ -377,7 +400,7 @@ public partial class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver?.GetAttribute ()
+                                     normalAttribute
                                     );
 
                         lc?.AddLine (
@@ -385,7 +408,7 @@ public partial class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver?.GetAttribute ()
+                                     normalAttribute
                                     );
                     }
 
@@ -396,7 +419,7 @@ public partial class Border : Adornment
                                  2,
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver?.GetAttribute ()
+                                 normalAttribute
                                 );
 
                     // Add a vert line for ╔╡
@@ -405,7 +428,7 @@ public partial class Border : Adornment
                                  titleBarsLength,
                                  Orientation.Vertical,
                                  LineStyle.Single,
-                                 Driver?.GetAttribute ()
+                                 normalAttribute
                                 );
 
                     // Add a vert line for ╞
@@ -420,7 +443,7 @@ public partial class Border : Adornment
                                  titleBarsLength,
                                  Orientation.Vertical,
                                  LineStyle.Single,
-                                 Driver?.GetAttribute ()
+                                 normalAttribute
                                 );
 
                     // Add the right hand line for ╞═════╗
@@ -435,7 +458,7 @@ public partial class Border : Adornment
                                  borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver?.GetAttribute ()
+                                 normalAttribute
                                 );
                 }
             }
@@ -449,7 +472,7 @@ public partial class Border : Adornment
                              sideLineLength,
                              Orientation.Vertical,
                              lineStyle,
-                             Driver?.GetAttribute ()
+                             normalAttribute
                             );
             }
 #endif
@@ -461,7 +484,7 @@ public partial class Border : Adornment
                              borderBounds.Width,
                              Orientation.Horizontal,
                              lineStyle,
-                             Driver?.GetAttribute ()
+                             normalAttribute
                             );
             }
 
@@ -472,11 +495,11 @@ public partial class Border : Adornment
                              sideLineLength,
                              Orientation.Vertical,
                              lineStyle,
-                             Driver?.GetAttribute ()
+                             normalAttribute
                             );
             }
 
-            SetAttribute (prevAttr);
+           // SetAttribute (prevAttr);
 
             // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
             if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))

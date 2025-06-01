@@ -112,7 +112,7 @@ public class AllViewsTester : Scenario
 
         _arrangementEditor.ExpanderButton.CollapsedChanging += (sender, args) =>
                                                                {
-                                                                   _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue;
+                                                                   _adornmentsEditor.ExpanderButton.Collapsed = args.Result;
                                                                };
         _arrangementEditor.Border!.Thickness = new (1);
 

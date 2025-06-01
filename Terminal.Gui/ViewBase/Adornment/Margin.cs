@@ -235,7 +235,7 @@ public class Margin : Adornment
             return;
         }
 
-        if (_pressed && e.NewValue == HighlightStyle.None)
+        if (_pressed && e.Result == HighlightStyle.None)
         {
             // If the view is pressed and the highlight is being removed, move the shadow back.
             // Note, for visual effects reasons, we only move horizontally.
@@ -261,7 +261,7 @@ public class Margin : Adornment
             return;
         }
 
-        if (!_pressed && e.NewValue.HasFlag (HighlightStyle.Pressed))
+        if (!_pressed && e.Result.HasFlag (HighlightStyle.Pressed))
         {
             // If the view is not pressed and we want highlight move the shadow
             // Note, for visual effects reasons, we only move horizontally.

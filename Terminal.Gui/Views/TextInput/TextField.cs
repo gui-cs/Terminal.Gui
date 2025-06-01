@@ -534,7 +534,7 @@ public class TextField : View, IDesignable
             ClearAllSelection ();
 
             // Note we use NewValue here; TextChanging subscribers may have changed it
-            _text = args.NewValue.EnumerateRunes ().ToList ();
+            _text = args.Result.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {

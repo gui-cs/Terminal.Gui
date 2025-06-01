@@ -137,7 +137,7 @@ public class Mouse : Scenario
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3753
         cbHighlightOnPress.CheckedStateChanging += (s, e) =>
                                                    {
-                                                       if (e.NewValue == CheckState.Checked)
+                                                       if (e.Result == CheckState.Checked)
                                                        {
                                                            demo.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                                        }
@@ -148,7 +148,7 @@ public class Mouse : Scenario
 
                                                        foreach (View subview in demo.SubViews)
                                                        {
-                                                           if (e.NewValue == CheckState.Checked)
+                                                           if (e.Result == CheckState.Checked)
                                                            {
                                                                subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                                            }
@@ -160,7 +160,7 @@ public class Mouse : Scenario
 
                                                        foreach (View subview in demo.Padding.SubViews)
                                                        {
-                                                           if (e.NewValue == CheckState.Checked)
+                                                           if (e.Result == CheckState.Checked)
                                                            {
                                                                subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                                            }
@@ -291,28 +291,57 @@ public class Mouse : Scenario
                 Padding.MouseEnter += PaddingOnMouseEnter;
                 Padding.MouseLeave += PaddingOnMouseLeave;
 
-                void PaddingOnMouseEnter (object o, CancelEventArgs e)
-                {
-                    Padding.SchemeName = "Error";
-                }
+                void PaddingOnMouseEnter (object o, CancelEventArgs e) { Padding.SchemeName = "Error"; }
 
-                void PaddingOnMouseLeave (object o, EventArgs e)
-                {
-                    Padding.SchemeName = "Dialog";
-                }
+                void PaddingOnMouseLeave (object o, EventArgs e) { Padding.SchemeName = "Dialog"; }
 
                 Border!.Thickness = new Thickness (1);
                 Border.LineStyle = LineStyle.Rounded;
+
+
+                Highlight += (sender, args) =>
+                             {
+                                 if (args.Result == HighlightStyle.Pressed)
+                                 {
+                                     _pressed = true;
+                                     SetNeedsDraw();
+                                 }
+                                 else
+                                 {
+                                     _pressed = false;
+                                 }
+                             };
+
             }
 
+
             MouseLeave += (s, e) =>
-                          {
-                              Text = "Leave";
-                          };
+                              {
+                                  Text = "Leave";
+                              };
             MouseEnter += (s, e) =>
-                          {
-                              Text = "Enter";
-                          };
+                                  {
+                                      Text = "Enter";
+                                  };
         }
+
+        /// <inheritdoc />
+        protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+        {
+            if ( role == VisualRole.Highlight)
+            {
+                if (_pressed && HighlightStyle.HasFlag (HighlightStyle.Pressed))
+                {
+                    currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
+
+                    return true;
+                }
+            }
+            
+            return base.OnGettingAttributeForRole (in role, ref currentAttribute);
+        }
+
+        // True if the View is to be highlighted
+        private bool _pressed;
     }
 }

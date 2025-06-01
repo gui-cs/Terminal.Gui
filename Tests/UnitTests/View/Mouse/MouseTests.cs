@@ -341,7 +341,7 @@ public class MouseTests : TestsAllViews
 
         void ViewHighlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.NewValue == HighlightStyle.None)
+            if (e.Result == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
@@ -414,7 +414,7 @@ public class MouseTests : TestsAllViews
 
         void ViewHighlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.NewValue == HighlightStyle.None)
+            if (e.Result == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
