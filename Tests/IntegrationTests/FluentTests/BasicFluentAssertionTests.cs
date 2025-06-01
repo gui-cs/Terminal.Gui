@@ -12,7 +12,6 @@ public class BasicFluentAssertionTests
         _out = new TestOutputWriter (outputHelper);
     }
 
-
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void GuiTestContext_NewInstance_Runs (V2TestDriver d)
@@ -23,7 +22,6 @@ public class BasicFluentAssertionTests
         context.WriteOutLogs (_out);
         context.Stop ();
     }
-
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
