@@ -118,10 +118,12 @@ public class SubViewTests
         Assert.Equal (new (5, 5), view.GetContentSize ());
     }
 
-    [Fact]
-    public void MoveSubViewToEnd_ViewArrangement_Overlapped ()
+    [Theory]
+    [InlineData (ViewArrangement.Fixed)]
+    [InlineData (ViewArrangement.Overlapped)]
+    public void MoveSubViewToEnd_ViewArrangement (ViewArrangement arrangement)
     {
-        View superView = new () { Arrangement = ViewArrangement.Overlapped };
+        View superView = new () { Arrangement = arrangement };
 
         var subview1 = new View
         {
