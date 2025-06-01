@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 public readonly partial record struct Color
 {
@@ -459,7 +459,7 @@ public readonly partial record struct Color
     /// <summary>Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.</summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> string
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor16(Color)"/> string
     ///     values.
     /// </param>
     /// <param name="formatProvider">

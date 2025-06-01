@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui;
-using Terminal.Gui.ConsoleDrivers;
 
 namespace TerminalGuiFluentTesting;
 

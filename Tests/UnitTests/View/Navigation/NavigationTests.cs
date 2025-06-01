@@ -134,7 +134,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         view.HasFocusChanged += (s, e) =>
                                 {
-                                    if (e.NewValue)
+                                    if (e.Result)
                                     {
                                         hasFocusTrue++;
                                     }

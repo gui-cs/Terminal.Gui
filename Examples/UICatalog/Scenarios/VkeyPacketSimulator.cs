@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
-using Terminal.Gui.ConsoleDrivers;
 
 namespace UICatalog.Scenarios;
 
@@ -31,7 +29,7 @@ public class VkeyPacketSimulator : Scenario
 
         var inputHorizontalRuler = new Label
         {
-            Y = Pos.Bottom (btnInput), Width = Dim.Fill (), ColorScheme = Colors.ColorSchemes ["Error"]
+            Y = Pos.Bottom (btnInput), Width = Dim.Fill (), SchemeName = "Error"
         };
         win.Add (inputHorizontalRuler);
 
@@ -41,7 +39,7 @@ public class VkeyPacketSimulator : Scenario
 
             Width = 1,
             Height = Dim.Percent (50),
-            ColorScheme = Colors.ColorSchemes ["Error"],
+            SchemeName = "Error",
             TextDirection = TextDirection.TopBottom_LeftRight
         };
         win.Add (inputVerticalRuler);
@@ -67,7 +65,7 @@ public class VkeyPacketSimulator : Scenario
             Y = Pos.Bottom (btnOutput),
 
             Width = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Error"]
+            SchemeName = "Error"
         };
         win.Add (outputHorizontalRuler);
 
@@ -77,7 +75,7 @@ public class VkeyPacketSimulator : Scenario
 
             Width = 1,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Error"],
+            SchemeName = "Error",
             TextDirection = TextDirection.TopBottom_LeftRight
         };
         win.Add (outputVerticalRuler);

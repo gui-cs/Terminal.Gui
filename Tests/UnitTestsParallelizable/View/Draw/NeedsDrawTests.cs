@@ -238,7 +238,7 @@ public class NeedsDrawTests
         };
         Assert.Equal (new (0, 0, 10, 10), superView.Frame);
         Assert.Equal (new (0, 0, 10, 10), superView.Viewport);
-        Assert.Equal (new (0, 0, 10, 10), superView._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 10), superView.NeedsDrawRect);
 
         var view = new View
         {
@@ -248,49 +248,49 @@ public class NeedsDrawTests
         view.Frame = new (0, 1, 2, 3);
         Assert.Equal (new (0, 1, 2, 3), view.Frame);
         Assert.Equal (new (0, 0, 2, 3), view.Viewport);
-        Assert.Equal (new (0, 0, 2, 3), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 2, 3), view.NeedsDrawRect);
 
         superView.Add (view);
         Assert.Equal (new (0, 0, 10, 10), superView.Frame);
         Assert.Equal (new (0, 0, 10, 10), superView.Viewport);
-        Assert.Equal (new (0, 0, 10, 10), superView._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 10), superView.NeedsDrawRect);
         Assert.Equal (new (0, 1, 2, 3), view.Frame);
         Assert.Equal (new (0, 0, 2, 3), view.Viewport);
-        Assert.Equal (new (0, 0, 2, 3), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 2, 3), view.NeedsDrawRect);
 
         view.Frame = new (3, 3, 5, 5);
         Assert.Equal (new (3, 3, 5, 5), view.Frame);
         Assert.Equal (new (0, 0, 5, 5), view.Viewport);
-        Assert.Equal (new (0, 0, 5, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 5, 5), view.NeedsDrawRect);
 
         view.Frame = new (3, 3, 6, 6); // Grow right/bottom 1
         Assert.Equal (new (3, 3, 6, 6), view.Frame);
         Assert.Equal (new (0, 0, 6, 6), view.Viewport);
-        Assert.Equal (new (0, 0, 6, 6), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 6, 6), view.NeedsDrawRect);
 
         view.Frame = new (3, 3, 5, 5); // Shrink right/bottom 1
         Assert.Equal (new (3, 3, 5, 5), view.Frame);
         Assert.Equal (new (0, 0, 5, 5), view.Viewport);
-        Assert.Equal (new (0, 0, 5, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 5, 5), view.NeedsDrawRect);
 
         view.SetContentSize (new (10, 10));
         Assert.Equal (new (3, 3, 5, 5), view.Frame);
         Assert.Equal (new (0, 0, 5, 5), view.Viewport);
-        Assert.Equal (new (0, 0, 5, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 5, 5), view.NeedsDrawRect);
 
         view.Viewport = new (1, 1, 5, 5); // Scroll up/left 1
         Assert.Equal (new (3, 3, 5, 5), view.Frame);
         Assert.Equal (new (1, 1, 5, 5), view.Viewport);
-        Assert.Equal (new (0, 0, 5, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 5, 5), view.NeedsDrawRect);
 
         view.Frame = new (3, 3, 6, 6); // Grow right/bottom 1
         Assert.Equal (new (3, 3, 6, 6), view.Frame);
         Assert.Equal (new (1, 1, 6, 6), view.Viewport);
-        Assert.Equal (new (1, 1, 6, 6), view._needsDrawRect);
+        Assert.Equal (new (1, 1, 6, 6), view.NeedsDrawRect);
 
         view.Frame = new (3, 3, 5, 5);
         Assert.Equal (new (3, 3, 5, 5), view.Frame);
         Assert.Equal (new (1, 1, 5, 5), view.Viewport);
-        Assert.Equal (new (1, 1, 5, 5), view._needsDrawRect);
+        Assert.Equal (new (1, 1, 5, 5), view.NeedsDrawRect);
     }
 }

@@ -22,7 +22,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -56,7 +56,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -77,7 +77,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                         }
@@ -113,7 +113,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -134,7 +134,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                         }
@@ -169,7 +169,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -190,7 +190,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subView.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subViewEnterCount++;
                                         }
@@ -211,7 +211,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subViewSubView1.HasFocusChanging += (s, e) =>
                                             {
-                                                if (e.NewValue)
+                                                if (e.Result)
                                                 {
                                                     subviewSubView1EnterCount++;
                                                 }
@@ -232,7 +232,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subViewSubView2.HasFocusChanging += (s, e) =>
                                             {
-                                                if (e.NewValue)
+                                                if (e.Result)
                                                 {
                                                     subviewSubView2EnterCount++;
                                                 }
@@ -253,7 +253,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subViewSubView3.HasFocusChanging += (s, e) =>
                                             {
-                                                if (e.NewValue)
+                                                if (e.Result)
                                                 {
                                                     subviewSubView3EnterCount++;
                                                 }
@@ -304,7 +304,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                          e.Cancel = true;
@@ -326,7 +326,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                         }
@@ -364,7 +364,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                          e.Cancel = true;
@@ -386,7 +386,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                         }
@@ -424,7 +424,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -445,7 +445,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                             e.Cancel = true;
@@ -485,7 +485,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -506,7 +506,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                             e.Cancel = true;
@@ -561,7 +561,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -600,7 +600,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -621,7 +621,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                         }
@@ -667,7 +667,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanging += (s, e) =>
                                  {
-                                     if (e.NewValue)
+                                     if (e.Result)
                                      {
                                          hasFocusTrueCount++;
                                      }
@@ -688,7 +688,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanging += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subviewHasFocusTrueCount++;
                                         }
@@ -736,7 +736,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanged += (s, e) =>
                                 {
-                                    if (e.NewValue)
+                                    if (e.Result)
                                     {
                                         newValueTrueCount++;
                                     }
@@ -774,7 +774,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanged += (s, e) =>
                                 {
-                                    if (e.NewValue)
+                                    if (e.Result)
                                     {
                                         newValueTrueCount++;
                                     }
@@ -795,7 +795,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subview.HasFocusChanged += (s, e) =>
                                    {
-                                       if (e.NewValue)
+                                       if (e.Result)
                                        {
                                            subviewNewValueTrueCount++;
                                        }
@@ -854,7 +854,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanged += (s, e) =>
                                 {
-                                    if (e.NewValue)
+                                    if (e.Result)
                                     {
                                         viewEnterCount++;
                                     }
@@ -875,7 +875,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subView.HasFocusChanged += (s, e) =>
                                    {
-                                       if (e.NewValue)
+                                       if (e.Result)
                                        {
                                            subViewEnterCount++;
                                        }
@@ -896,7 +896,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subViewSubView1.HasFocusChanged += (s, e) =>
                                            {
-                                               if (e.NewValue)
+                                               if (e.Result)
                                                {
                                                    subviewSubView1EnterCount++;
                                                }
@@ -917,7 +917,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subViewSubView2.HasFocusChanged += (s, e) =>
                                            {
-                                               if (e.NewValue)
+                                               if (e.Result)
                                                {
                                                    subviewSubView2EnterCount++;
                                                }
@@ -937,7 +937,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         subViewSubView3.HasFocusChanged += (s, e) =>
                                            {
-                                               if (e.NewValue)
+                                               if (e.Result)
                                                {
                                                    subviewSubView3EnterCount++;
                                                }
@@ -1005,7 +1005,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
         view.HasFocusChanged += (s, e) =>
                                 {
-                                    if (e.NewValue)
+                                    if (e.Result)
                                     {
                                         Assert.True (view.HasFocus);
                                         Assert.True (subView1.HasFocus);

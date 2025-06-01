@@ -1,7 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Drawing;
 
 namespace CommunityToolkitExample;
 
@@ -29,7 +30,7 @@ internal partial class LoginViewModel : ObservableObject
     private string _usernameLengthMessage;
     
     [ObservableProperty]
-    private ColorScheme? _validationColorScheme;
+    private Scheme? _validationScheme;
 
     [ObservableProperty]
     private string _validationMessage;
@@ -107,14 +108,14 @@ internal partial class LoginViewModel : ObservableObject
              case LoginActions.Clear:
                 LoginProgressMessage = message;
                 ValidationMessage = INVALID_LOGIN_MESSAGE;
-                ValidationColorScheme = Colors.ColorSchemes ["Error"];
+                ValidationScheme = SchemeManager.GetScheme ("Error");
                 break;
             case LoginActions.LoginProgress:
                 LoginProgressMessage = message;
                 break;
             case LoginActions.Validation:
                 ValidationMessage = CanLogin ? VALID_LOGIN_MESSAGE : INVALID_LOGIN_MESSAGE;
-                ValidationColorScheme = CanLogin ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"];
+                ValidationScheme = CanLogin ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme("Error");
                 break;
         }
         WeakReferenceMessenger.Default.Send (new Message<LoginActions> { Value = loginAction });

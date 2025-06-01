@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -41,7 +40,9 @@ public class CharacterMap : Scenario
             X = 0,
             Y = 1,
             Width = Dim.Fill (Dim.Func (() => _categoryList!.Frame.Width)),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+           // SchemeName = "Base"
+
         };
         top.Add (_charMap);
 
@@ -50,7 +51,8 @@ public class CharacterMap : Scenario
             X = Pos.Right (_charMap) + 1,
             Y = Pos.Y (_charMap),
             HotKeySpecifier = (Rune)'_',
-            Text = "_Jump To:"
+            Text = "_Jump To:",
+            //SchemeName = "Dialog"
         };
         top.Add (jumpLabel);
 
@@ -60,18 +62,19 @@ public class CharacterMap : Scenario
             Y = Pos.Y (_charMap),
             Width = 17,
             Caption = "e.g. 01BE3 or ✈",
+            //SchemeName = "Dialog"
         };
         top.Add (jumpEdit);
 
         _charMap.SelectedCodePointChanged += (sender, args) =>
                                              {
-                                                 if (Rune.IsValid (args.CurrentValue))
+                                                 if (Rune.IsValid (args.Result))
                                                  {
-                                                     jumpEdit.Text = ((Rune)args.CurrentValue).ToString ();
+                                                     jumpEdit.Text = ((Rune)args.Result).ToString ();
                                                  }
                                                  else
                                                  {
-                                                     jumpEdit.Text = $"U+{args.CurrentValue:x5}";
+                                                     jumpEdit.Text = $"U+{args.Result:x5}";
                                                  }
                                              };
 
@@ -79,10 +82,9 @@ public class CharacterMap : Scenario
         {
             X = Pos.Right (jumpEdit) + 1,
             Y = Pos.Y (_charMap),
-            ColorScheme = Colors.ColorSchemes ["error"],
+            SchemeName = "error",
             Text = "err",
             Visible = false
-
         };
         top.Add (_errorLabel);
 
@@ -92,6 +94,7 @@ public class CharacterMap : Scenario
             X = Pos.Right (_charMap), 
             Y = Pos.Bottom (jumpLabel), 
             Height = Dim.Fill (),
+            //SchemeName = "Dialog"
         };
         _categoryList.FullRowSelect = true;
         _categoryList.MultiSelect = false;

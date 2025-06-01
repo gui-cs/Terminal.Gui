@@ -128,7 +128,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
 
         subView1.HasFocusChanged += (s, e) =>
         {
-            if (e.NewValue)
+            if (e.Result)
             {
                 subView1HasFocusChangedTrueCount++;
             }
@@ -143,7 +143,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
 
         subView2.HasFocusChanged += (s, e) =>
         {
-            if (e.NewValue)
+            if (e.Result)
             {
                 subView2HasFocusChangedTrueCount++;
             }

@@ -1,5 +1,4 @@
-﻿using Terminal.Gui;
-
+﻿
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("WizardAsView", "Shows using the Wizard class in an non-modal way")]

@@ -1,4 +1,4 @@
-name: Ensure that Release builds are not broken
+name: Ensure that Release Build of Solution Builds Correctly
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     # Ensure that RELEASE builds are not broken
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Checkout ${{ github.ref_name }}
       uses: actions/checkout@v4
 
     - name: Setup .NET Core
@@ -25,7 +25,7 @@ jobs:
         dotnet-quality: 'ga'
 
     - name: Build Release Terminal.Gui
-      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release
+      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
 
     - name: Pack Release Terminal.Gui
       run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages

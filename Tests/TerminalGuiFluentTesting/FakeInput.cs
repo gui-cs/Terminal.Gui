@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Terminal.Gui;
 
 namespace TerminalGuiFluentTesting;
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -87,7 +86,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyList)
         };
-        appKeyListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        appKeyListView.SchemeName = "TopLevel";
         win.Add (appKeyListView);
 
         // View key events...
@@ -115,7 +114,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyDownList)
         };
-        onKeyDownListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        appKeyListView.SchemeName = "TopLevel";
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
@@ -135,7 +134,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyDownNotHandledList)
         };
-        onKeyDownNotHandledListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        appKeyListView.SchemeName = "TopLevel";
         win.Add (onKeyDownNotHandledListView);
 
 
@@ -156,7 +155,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (swallowedList)
         };
-        onSwallowedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        appKeyListView.SchemeName = "TopLevel";
         win.Add (onSwallowedListView);
 
         if (Application.Driver is IConsoleDriverFacade fac)

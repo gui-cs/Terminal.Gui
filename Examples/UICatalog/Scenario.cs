@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog;
 
@@ -182,7 +181,7 @@ public class Scenario : IDisposable
 
     private void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
     {
-        if (a.CurrentValue)
+        if (a.Result)
         {
             lock (_timeoutLock!)
             {
@@ -197,7 +196,7 @@ public class Scenario : IDisposable
                 cd.Refreshed += (sender, args) =>
                                                  {
                                                      BenchmarkResults.RefreshedCount++;
-                                                     if (args.CurrentValue)
+                                                     if (args.Result)
                                                      {
                                                          BenchmarkResults.UpdatedCount++;
                                                      }

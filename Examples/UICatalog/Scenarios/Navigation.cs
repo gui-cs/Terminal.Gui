@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Timers;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -32,7 +31,7 @@ public class Navigation : Scenario
         };
         app.Add (adornmentsEditor);
 
-        var arrangementEditor = new ArrangementEditor()
+        var arrangementEditor = new ArrangementEditor ()
         {
             X = Pos.Right (adornmentsEditor),
             Y = 0,
@@ -179,7 +178,7 @@ public class Navigation : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.ColorScheme.Normal.Background;
+        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
         colorPicker.ColorChanged += ColorPicker_ColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
@@ -192,7 +191,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            SchemeName = "TopLevel",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -215,15 +214,15 @@ public class Navigation : Scenario
 
         testFrame.SetFocus ();
         Application.Run (app);
-       // timer.Close ();
+        // timer.Close ();
         app.Dispose ();
         Application.Shutdown ();
 
         return;
 
-        void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
+        void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
         {
-            testFrame.ColorScheme = testFrame.ColorScheme with { Normal = new (testFrame.ColorScheme.Normal.Foreground, e.CurrentValue) };
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
         }
     }
 
@@ -236,7 +235,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            SchemeName = "TopLevel",
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

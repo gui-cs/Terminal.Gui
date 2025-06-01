@@ -454,19 +454,21 @@ public class ShortcutTests
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3664
     [Fact]
-    public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
+    public void Scheme_SetScheme_Does_Not_Fault_3664 ()
     {
         Application.Top = new ();
         Application.Navigation = new ();
         var shortcut = new Shortcut ();
 
-        Application.Top.ColorScheme = null;
+        Application.Top.SetScheme (null);
 
-        Assert.Null (shortcut.ColorScheme);
+        Assert.False (shortcut.HasScheme);
+        Assert.NotNull (shortcut.GetScheme ());
 
         shortcut.HasFocus = true;
 
-        Assert.Null (shortcut.ColorScheme);
+        Assert.False (shortcut.HasScheme);
+        Assert.NotNull (shortcut.GetScheme ());
 
         Application.Top.Dispose ();
         Application.ResetState ();

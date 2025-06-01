@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -163,9 +162,9 @@ public class SpinnerViewStyles : Scenario
                                           }
                                       };
 
-        ckbReverse.CheckedStateChanging += (s, e) => { spinner.SpinReverse = e.NewValue == CheckState.Checked; };
+        ckbReverse.CheckedStateChanging += (s, e) => { spinner.SpinReverse = e.Result == CheckState.Checked; };
 
-        ckbBounce.CheckedStateChanging += (s, e) => { spinner.SpinBounce = e.NewValue == CheckState.Checked; };
+        ckbBounce.CheckedStateChanging += (s, e) => { spinner.SpinBounce = e.Result == CheckState.Checked; };
 
         app.Unloaded += App_Unloaded;
 

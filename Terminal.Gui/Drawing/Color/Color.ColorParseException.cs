@@ -1,7 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>An exception thrown when something goes wrong when trying to parse a <see cref="Color"/>.</summary>
 /// <remarks>Contains additional information to help locate the problem. <br/> Not intended to be thrown by consumers.</remarks>

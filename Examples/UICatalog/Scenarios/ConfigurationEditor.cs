@@ -1,75 +1,56 @@
 ﻿#nullable enable
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Configuration Editor", "Edits Terminal.Gui Config Files.")]
+[ScenarioMetadata ("Configuration Editor", "Edits of Terminal.Gui Config Files")]
 [ScenarioCategory ("TabView")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
+[ScenarioCategory ("Configuration")]
 public class ConfigurationEditor : Scenario
 {
-    private static ColorScheme _editorColorScheme = new ()
-    {
-        Normal = new Attribute (Color.Red, Color.White),
-        Focus = new Attribute (Color.Red, Color.Black),
-        HotFocus = new Attribute (Color.BrightRed, Color.Black),
-        HotNormal = new Attribute (Color.Magenta, Color.White)
-    };
-
-    private static Action? _editorColorSchemeChanged;
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
-
-    [SerializableConfigurationProperty (Scope = typeof (AppScope))]
-    public static ColorScheme EditorColorScheme
-    {
-        get => _editorColorScheme;
-        set
-        {
-            _editorColorScheme = value;
-            _editorColorSchemeChanged?.Invoke ();
-        }
-    }
 
     public override void Main ()
     {
         Application.Init ();
 
-        Toplevel top = new ();
+        Window? win = new ();
 
-        _lenShortcut = new Shortcut ()
+        _lenShortcut = new ()
         {
             Title = "",
         };
 
-        var quitShortcut = new Shortcut ()
+        Shortcut quitShortcut = new ()
         {
             Key = Application.QuitKey,
             Title = $"Quit",
             Action = Quit
         };
 
-        var reloadShortcut = new Shortcut ()
+        Shortcut reloadShortcut = new  ()
         {
             Key = Key.F5.WithShift,
             Title = "Reload",
         };
-        reloadShortcut.Accepting += (s, e) => { Reload (); };
+        reloadShortcut.Accepting += (s, e) =>
+                                    {
+                                        Reload ();
+                                        e.Handled = true;
+                                    };
 
-        var saveShortcut = new Shortcut ()
+        Shortcut saveShortcut = new  ()
         {
             Key = Key.F4,
             Title = "Save",
             Action = Save
         };
 
-        var statusBar = new StatusBar ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
+        StatusBar statusBar = new ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
         _tabView = new ()
         {
@@ -77,34 +58,25 @@ public class ConfigurationEditor : Scenario
             Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height))
         };
 
-        top.Add (_tabView, statusBar);
+        win.Add (_tabView, statusBar);
 
-        top.Loaded += (s, a) =>
+        win.Loaded += (s, a) =>
                       {
                           Open ();
-                          _editorColorSchemeChanged?.Invoke ();
                       };
 
-        void OnEditorColorSchemeChanged ()
-        {
-            if (Application.Top is { })
-            {
-                return;
-            }
+        ConfigurationManager.Applied += ConfigurationManagerOnApplied;
 
-            foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
-            {
-                t.ColorScheme = EditorColorScheme;
-            }
-        }
-
-        _editorColorSchemeChanged += OnEditorColorSchemeChanged;
-
-        Application.Run (top);
-        _editorColorSchemeChanged -= OnEditorColorSchemeChanged;
-        top.Dispose ();
-
+        Application.Run (win);
+        win.Dispose ();
         Application.Shutdown ();
+
+        return;
+
+        void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
+        {
+            Application.Top?.SetNeedsDraw ();
+        }
     }
     public void Save ()
     {
@@ -116,7 +88,7 @@ public class ConfigurationEditor : Scenario
 
     private void Open ()
     {
-        foreach (var config in ConfigurationManager.Settings!.Sources)
+        foreach (KeyValuePair<ConfigLocations, string> config in ConfigurationManager.SourcesManager!.Sources)
         {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
             var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
@@ -129,7 +101,13 @@ public class ConfigurationEditor : Scenario
                 FileInfo = fileInfo,
             };
 
-            Tab tab = new Tab ()
+            if (config.Value == "HardCoded")
+            {
+                editor.Title = "HardCoded";
+
+            }
+
+            Tab tab = new ()
             {
                 View = editor,
                 DisplayText = config.Key.ToString ()
@@ -170,32 +148,37 @@ public class ConfigurationEditor : Scenario
                                                                     return null;
                                                                 }).Cast<ConfigTextView> ())
         {
-            if (editor.IsDirty)
+            if (!editor.IsDirty)
             {
-                int result = MessageBox.Query (
-                                               "Save Changes",
-                                               $"Save changes to {editor.FileInfo!.Name}",
-                                               "_Yes",
-                                               "_No",
-                                               "_Cancel"
-                                              );
+                continue;
+            }
 
-                if (result == -1 || result == 2)
-                {
-                    // user cancelled
-                }
+            int result = MessageBox.Query (
+                                           "Save Changes",
+                                           $"Save changes to {editor.FileInfo!.Name}",
+                                           "_Yes",
+                                           "_No",
+                                           "_Cancel"
+                                          );
 
-                if (result == 0)
-                {
+            switch (result)
+            {
+                case 0:
                     editor.Save ();
-                }
+
+                    break;
+
+                default:
+                case -1 or 2:
+                    // user cancelled
+                    return;
             }
         }
 
         Application.RequestStop ();
     }
 
-    private void Reload ()
+    private static void Reload ()
     {
         if (Application.Navigation?.GetFocused () is ConfigTextView editor)
         {
@@ -210,7 +193,7 @@ public class ConfigurationEditor : Scenario
             TabStop = TabBehavior.TabGroup;
         }
 
-        internal FileInfo? FileInfo { get; set; }
+        internal FileInfo? FileInfo { get; init; }
 
         internal void Read ()
         {
@@ -231,28 +214,35 @@ public class ConfigurationEditor : Scenario
                 string? name = assembly
                                .GetManifestResourceNames ()
                                .FirstOrDefault (x => x.EndsWith ("config.json"));
-                if (!string.IsNullOrEmpty (name))
-                {
 
-                    using Stream? stream = assembly.GetManifestResourceStream (name);
-                    using var reader = new StreamReader (stream!);
-                    Text = reader.ReadToEnd ();
-                    ReadOnly = true;
-                    Enabled = true;
+                if (string.IsNullOrEmpty (name))
+                {
+                    return;
                 }
+
+                using Stream? stream = assembly.GetManifestResourceStream (name);
+                using var reader = new StreamReader (stream!);
+                Text = reader.ReadToEnd ();
+                ReadOnly = true;
+                Enabled = true;
 
                 return;
             }
 
-            if (FileInfo!.FullName.Contains ("RuntimeConfig"))
+            if (FileInfo!.FullName.Contains ("HardCoded"))
+            {
+                Text = ConfigurationManager.GetHardCodedConfig ()!;
+                ReadOnly = true;
+                Enabled = true;
+            }
+            else if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {
                 Text = ConfigurationManager.RuntimeConfig!;
-
             }
             else if (!FileInfo.Exists)
             {
                 // Create empty config file
-                Text = ConfigurationManager.GetEmptyJson ();
+                Text = ConfigurationManager.GetEmptyConfig ();
             }
             else
             {

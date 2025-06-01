@@ -2,7 +2,8 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Event args for the <see cref="TreeView{T}.DrawLine"/> event</summary>
 /// <typeparam name="T"></typeparam>
@@ -28,7 +29,7 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     public T Model { get; init; }
 
     /// <summary>
-    ///     The rune and color of each symbol that will be rendered.  Note that only <see cref="ColorScheme.Normal"/> is
+    ///     The rune and color of each symbol that will be rendered.  Note that only <see cref="Scheme.Normal"/> is
     ///     respected.  You can modify these to change what is rendered.
     /// </summary>
     /// <remarks>Changing the length of this collection may result in corrupt rendering</remarks>

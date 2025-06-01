@@ -19,15 +19,15 @@ public class BorderTests (ITestOutputHelper output)
         view.Border!.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new ()
+        view.SetScheme (new ()
         {
             Normal = new (Color.Red, Color.Green),
             Focus = new (Color.Green, Color.Red)
-        };
-        Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
-        Assert.Equal (ColorName16.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
+        });
+        Assert.NotEqual (view.GetScheme ().Normal.Foreground, view.GetScheme ().Focus.Foreground);
+        Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
 
         superView.BeginInit ();
         superView.EndInit ();
@@ -35,34 +35,34 @@ public class BorderTests (ITestOutputHelper output)
 
         var expected = @"─┤A├─";
         DriverAssert.AssertDriverContentsAre (expected, output);
-        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.GetScheme ().Normal);
 
         view.CanFocus = true;
         view.SetFocus ();
         View.SetClipToScreen ();
         view.Draw ();
-        Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
-        Assert.Equal (view.ColorScheme.Focus.Foreground, view.Border.GetFocusColor ().Foreground);
-        Assert.Equal (view.ColorScheme.Normal.Foreground, view.Border.GetNormalColor ().Foreground);
-        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.ColorScheme.Normal, view.GetFocusColor ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground);
+        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground);
+        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.GetScheme ().Normal, view.GetAttributeForRole (VisualRole.Focus));
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void Border_Uses_Parent_ColorScheme ()
+    public void Border_Uses_Parent_Scheme ()
     {
         var view = new View { Title = "A", Height = 2, Width = 5 };
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new ()
+        view.SetScheme (new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
-        };
-        Assert.Equal (ColorName16.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetNormalColor (), view.Border.GetNormalColor ());
-        Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
+        });
+        Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
 
         view.BeginInit ();
         view.EndInit ();
@@ -70,7 +70,7 @@ public class BorderTests (ITestOutputHelper output)
 
         var expected = @"─┤A├─";
         DriverAssert.AssertDriverContentsAre (expected, output);
-        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.GetScheme ().Normal);
     }
 
     [Theory]
@@ -727,7 +727,7 @@ public class BorderTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single};
 
         top.Add (frame);
         RunState rs = Application.Begin (top);
@@ -755,7 +755,7 @@ public class BorderTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
+        var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
         RunState rs = Application.Begin (top);

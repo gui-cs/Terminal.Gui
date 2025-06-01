@@ -1,5 +1,4 @@
 using System.Reflection;
-using Terminal.Gui;
 using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 

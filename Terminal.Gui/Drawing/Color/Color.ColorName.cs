@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Defines the 16 legacy color names and values that can be used to set the foreground and background colors in

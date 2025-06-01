@@ -4,37 +4,12 @@
   "FileDialogStyle.DefaultUseColors": false,
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
   "AppSettings": {
-    "UICatalog.StatusBar": true,
-    "ConfigurationEditor.EditorColorScheme": {
-      "Normal": {
-        "Foreground": "Red",
-        "Background": "White"
-      },
-      "Focus": {
-        "Foreground": "Green",
-        "Background": "White"
-      },
-      "HotNormal": {
-        "Foreground": "Black",
-        "Background": "White"
-      },
-      "HotFocus": {
-        "Foreground": "White",
-        "Background": "BrightRed"
-      },
-      "Disabled": {
-        "Foreground": "DarkGray",
-        "Background": "White"
-      }
-    }
+    "UICatalog.StatusBar": true
   },
   "Themes": [
     {
       "Hot Dog Stand": {
-        "Button.DefaultShadow": "Opaque",
-        "Dialog.DefaultShadow": "Transparent",
-        "Dialog.DefaultButtonAlignment": "Center",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "Toplevel": {
               "Normal": {
@@ -160,10 +135,24 @@
     },
     {
       "UI Catalog Theme": {
-        "Button.DefaultShadow": "Opaque",
-        "Dialog.DefaultShadow": "Transparent",
-        "Dialog.DefaultButtonAlignment": "Center",
-        "ColorSchemes": [
+        "Window.DefaultShadow": "Transparent",
+        "CheckBox.DefaultHighlightStyle": "Hover, Pressed, PressedOutside",
+        "MessageBox.DefaultButtonAlignment": "Start",
+        "StatusBar.DefaultSeparatorLineStyle": "Single",
+        "Dialog.DefaultMinimumWidth": 80,
+        "MessageBox.DefaultBorderStyle": "Dotted",
+        "NerdFonts.Enable": false,
+        "MessageBox.DefaultMinimumWidth": 0,
+        "Window.DefaultBorderStyle": "Double",
+        "Dialog.DefaultShadow": "Opaque",
+        "Dialog.DefaultButtonAlignment": "Start",
+        "Button.DefaultShadow": "Transparent",
+        "FrameView.DefaultBorderStyle": "Double",
+        "MessageBox.DefaultMinimumHeight": 0,
+        "Button.DefaultHighlightStyle": "Hover, Pressed",
+        "Menuv2.DefaultBorderStyle": "Heavy",
+        "MenuBarv2.DefaultBorderStyle": "Heavy",
+        "Schemes": [
           {
             "UI Catalog Scheme": {
               "Normal": {

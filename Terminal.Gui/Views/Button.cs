@@ -1,4 +1,5 @@
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A button View that can be pressed with the mouse or keyboard.
@@ -31,13 +32,13 @@ public class Button : View, IDesignable
     /// <summary>
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.Pressed | HighlightStyle.Hover;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
@@ -138,7 +139,7 @@ public class Button : View, IDesignable
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.CurrentValue;
+        base.Text = e.Result;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

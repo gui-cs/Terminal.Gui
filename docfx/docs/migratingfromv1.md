@@ -85,7 +85,7 @@ When measuring the screen space taken up by a `string` you can use the extension
 
 In v1, @Terminal.Gui.View was derived from `Responder` which supported `IDisposable`. In v2, `Responder` has been removed and @Terminal.Gui.View is the base-class supporting `IDisposable`. 
 
-In v1, @Terminal.Gui./Terminal.Gui.Application.Init) automatically created a toplevel view and set [Application.Top](~/api/Terminal.Gui.Application.Top. In v2, @Terminal.Gui.Application.Init no longer automatically creates a toplevel or sets @Terminal.Gui.Application.Top; app developers must explicitly create the toplevel view and pass it to @Terminal.Gui.Application.Run (or use `Application.Run<myTopLevel>`). Developers are responsible for calling `Dispose` on any toplevel they create before exiting. 
+In v1, @Terminal.Gui./Terminal.Gui.Application.Init) automatically created a toplevel view and set [Application.Top](~/api/Terminal.Gui.Application.Top. In v2, @Terminal.Gui.App.Application.Init no longer automatically creates a toplevel or sets @Terminal.Gui.App.Application.Top; app developers must explicitly create the toplevel view and pass it to @Terminal.Gui.App.Application.Run (or use `Application.Run<myTopLevel>`). Developers are responsible for calling `Dispose` on any toplevel they create before exiting. 
 
 ### How to Fix
 
@@ -115,9 +115,9 @@ In v1, @Terminal.Gui./Terminal.Gui.Application.Init) automatically created a top
 In v2, the layout system has been improved to make it easier to create complex user interfaces. If you are using custom layouts in your application, you may need to update them to use the new layout system.
 
 * The distinction between `Absolute Layout` and `Computed Layout` has been removed, as has the `LayoutStyle` enum. v1 drew a false distinction between these styles. 
-* @Terminal.Gui.View.Frame now represents the position and size of the view in the superview's coordinate system. The `Frame` property is of type `Rectangle`.
-* @Terminal.Gui.View.Bounds has been replaced by @Terminal.Gui.View.Viewport. The `Viewport` property represents the visible area of the view in its own coordinate system. The `Viewport` property is of type `Rectangle`.
-* @Terminal.Gui.View.GetContentSize represents the size of the view's content. This replaces `ScrollView` and `ScrollBarView` in v1. See more below.
+* @Terminal.Gui.ViewBase.View.Frame now represents the position and size of the view in the superview's coordinate system. The `Frame` property is of type `Rectangle`.
+* @Terminal.Gui.ViewBase.View.Bounds has been replaced by @Terminal.Gui.ViewBase.View.Viewport. The `Viewport` property represents the visible area of the view in its own coordinate system. The `Viewport` property is of type `Rectangle`.
+* @Terminal.Gui.ViewBase.View.GetContentSize represents the size of the view's content. This replaces `ScrollView` and `ScrollBarView` in v1. See more below.
 
 ### How to Fix
 
@@ -128,7 +128,7 @@ In v2, the layout system has been improved to make it easier to create complex u
 * Update any code that assumed `Bounds.Location` was always `Point.Empty`.
 * Update any code that used `Bounds` to refer to the size of the view's content. Use `GetContentSize()` instead.
 * Update any code that assumed `Bounds.Size` was the same as `Frame.Size`. `Frame.Size` defines the size of the view in the superview's coordinate system, while `Viewport.Size` defines the visible area of the view in its own coordinate system.
-* Use @Terminal.Gui.View.GetAdornmentsThickness to get the total thickness of the view's border, margin, and padding.
+* Use @Terminal.Gui.ViewBase.View.GetAdornmentsThickness to get the total thickness of the view's border, margin, and padding.
 * Not assume a View can draw outside of 'Viewport'. Use the 'Margin', 'Border', and 'Padding' Adornments to do things outside of `Viewport`. View subclasses should not implement their own concept of padding or margins but leverage these `Adornments` instead. 
 * Mouse and draw events now provide coordinates relative to the `Viewport` not the `Frame`.
 
@@ -144,21 +144,21 @@ In v1, `View.AutoSize` was used to size a view to its `Text`. In v2, `View.AutoS
 
 In v2, the `Border`, `Margin`, and `Padding` properties have been added to all views. This simplifies view development and enables a sophisticated look and feel. If you are using custom borders, margins, or padding in your application, you may need to update them to use the new properties.
 
-* `View.Border` is now of type @Terminal.Gui.Adornment. @Terminal.Gui.View.BorderStyle is provided as a convenience property to set the border style (`myView.BorderStyle = LineStyle.Double`).
+* `View.Border` is now of type @Terminal.Gui.Adornment. @Terminal.Gui.ViewBase.View.BorderStyle is provided as a convenience property to set the border style (`myView.BorderStyle = LineStyle.Double`).
 
 ### How to Fix
 
 ## Built-in Scrolling
 
-In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base @Terminal.Gui.View class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content is described by @Terminal.Gui.View.GetContentSize. See [Layout](layout.md) for details.
+In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base @Terminal.Gui.View class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content is described by @Terminal.Gui.ViewBase.View.GetContentSize. See [Layout](layout.md) for details.
 
-@Terminal.Gui.ScrollBar replaces `ScrollBarView` with a much cleaner implementation of a scrollbar. In addition, @Terminal.Gui.View.VerticalScrollBar and @Terminal.Gui.View.HorizontalScrollBar provide a simple way to enable scroll bars in any View with almost no code. See See [Scrolling Deep Dive](scrolling.md) for more.
+@Terminal.Gui.ScrollBar replaces `ScrollBarView` with a much cleaner implementation of a scrollbar. In addition, @Terminal.Gui.ViewBase.View.VerticalScrollBar and @Terminal.Gui.ViewBase.View.HorizontalScrollBar provide a simple way to enable scroll bars in any View with almost no code. See See [Scrolling Deep Dive](scrolling.md) for more.
 
 ### How to Fix
 
-* Replace `ScrollView` with @Terminal.Gui.View and use `Viewport` and @Terminal.Gui.View.GetContentSize to control scrolling.
+* Replace `ScrollView` with @Terminal.Gui.View and use `Viewport` and @Terminal.Gui.ViewBase.View.GetContentSize to control scrolling.
 * Update any code that assumed `Bounds.Location` was always `Point.Empty`.
-* Update any code that used `Bounds` to refer to the size of the view's content. Use @Terminal.Gui.View.GetContentSize instead.
+* Update any code that used `Bounds` to refer to the size of the view's content. Use @Terminal.Gui.ViewBase.View.GetContentSize instead.
 * Update any code that assumed `Bounds.Size` was the same as `Frame.Size`. `Frame.Size` defines the size of the view in the superview's coordinate system, while `Viewport.Size` defines the visible area of the view in its own coordinate system.
 * Replace `ScrollBarView` with @Terminal.Gui.ScrollBar. See [Scrolling Deep Dive](scrolling.md) for more.
 
@@ -168,15 +168,15 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 
 * The @Terminal.Gui.Key class replaces the `KeyEvent` struct and provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level @Terminal.Gui.KeyCode enum when possible. See @Terminal.Gui.Key for more details.
 * The preferred way to enable Application-wide or View-heirarchy-dependent keystrokes is to use the @Terminal.Gui.Shortcut View or the built-in View's that utilize it, such as the @Terminal.Gui.Bar-based views.
-* The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a @Terminal.Gui.Command. A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the @Terminal.Gui.View.Keybindings to configure the key bindings.
+* The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a @Terminal.Gui.Input.Command. A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the @Terminal.Gui.ViewBase.View.Keybindings to configure the key bindings.
 * For better consistency and user experience, the default key for closing an app or `Toplevel` is now `Esc` (it was previously `Ctrl+Q`).
 * The `Application.RootKeyEvent` method has been replaced with `Application.KeyDown`
 
 ### How to Fix
 
 * Replace `KeyEvent` with `Key`
-* Use @Terminal.Gui.View.AddCommand to define commands your view supports.
-* Use @Terminal.Gui.View.Keybindings to configure key bindings to `Command`s.
+* Use @Terminal.Gui.ViewBase.View.AddCommand to define commands your view supports.
+* Use @Terminal.Gui.ViewBase.View.Keybindings to configure key bindings to `Command`s.
 * It should be very uncommon for v2 code to override `OnKeyPressed` etc... 
 * Anywhere `Ctrl+Q` was hard-coded as the "quit key", replace with `Application.QuitKey`.
 * See *Navigation* below for more information on v2's navigation keys.
@@ -187,7 +187,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 + Application.KeyDown(object? sender, Key e)
 ```
 
-## **@"Terminal.Gui.Command" has been expanded and simplified
+## **@"Terminal.Gui.Input.Command" has been expanded and simplified
 
 In v1, the `Command` enum had duplicate entries and inconsistent naming. In v2 it has been both expanded and simplified.
 
@@ -201,16 +201,16 @@ The API for mouse input is now internally consistent and easier to use.
 
 * The @Terminal.Gui.MouseEventArgs class replaces `MouseEventEventArgs`.
 * More granular APIs are provided to ease handling specific mouse actions. See [Mouse API](mouse.md).
-* Views can use the @Terminal.Gui.View.Highlight event to have the view be visibly highlighted on various mouse events.
-* Views can set `View.WantContinousButtonPresses = true` to have their @Terminal.Gui.Command.Accept command be invoked repeatedly as the user holds a mouse button down on the view.
+* Views can use the @Terminal.Gui.ViewBase.View.Highlight event to have the view be visibly highlighted on various mouse events.
+* Views can set `View.WantContinousButtonPresses = true` to have their @Terminal.Gui.Input.Command.Accept command be invoked repeatedly as the user holds a mouse button down on the view.
 * Mouse and draw events now provide coordinates relative to the `Viewport` not the `Screen`.
 * The `Application.RootMouseEvent` method has been replaced with `Application.MouseEvent`
 
 ### How to Fix
 
 * Replace `MouseEventEventArgs` with `MouseEvent`
-* Use the @Terminal.Gui.View.Highlight event to have the view be visibly highlighted on various mouse events.
-* Set `View.WantContinousButtonPresses = true` to have the @Terminal.Gui.Command.Accept command be invoked repeatedly as the user holds a mouse button down on the view.
+* Use the @Terminal.Gui.ViewBase.View.Highlight event to have the view be visibly highlighted on various mouse events.
+* Set `View.WantContinousButtonPresses = true` to have the @Terminal.Gui.Input.Command.Accept command be invoked repeatedly as the user holds a mouse button down on the view.
 * Update any code that assumed mouse events provided coordinates relative to the `Screen`.
 * Replace `Application.RootMouseEvent` with `Application.MouseEvent`.  
 
@@ -241,8 +241,8 @@ In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the st
 
 #### How to Fix (Cursor API)
 
-* Use @Terminal.Gui.View.CursorPosition to set the cursor position in a view. Set @Terminal.Gui.View.CursorPosition to `null` to hide the cursor.
-* Set @Terminal.Gui.View.CursorVisibility to the cursor style you want to use.
+* Use @Terminal.Gui.ViewBase.View.CursorPosition to set the cursor position in a view. Set @Terminal.Gui.ViewBase.View.CursorPosition to `null` to hide the cursor.
+* Set @Terminal.Gui.ViewBase.View.CursorVisibility to the cursor style you want to use.
 * Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
 
 ### Focus
@@ -266,9 +266,9 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 
 ### How to Fix (Focus API)
 
-* Set @Terminal.Gui.View.CanFocus to `true` for any View sub-class that wants to be focusable.
-* Use @Terminal.Gui.Application.Navigation.GetFocused to get the most focused view in the application.
-* Use @Terminal.Gui.Application.Navigation.AdvanceFocus to cause focus to change.
+* Set @Terminal.Gui.ViewBase.View.CanFocus to `true` for any View sub-class that wants to be focusable.
+* Use @Terminal.Gui.App.Application.Navigation.GetFocused to get the most focused view in the application.
+* Use @Terminal.Gui.App.Application.Navigation.AdvanceFocus to cause focus to change.
 
 ### Keyboard Navigation
 
@@ -376,7 +376,7 @@ Replace references to nested types with the new standalone version
 
 ## View and Text Alignment Changes
 
-In v1, both `TextAlignment` and `VerticalTextAlignment` enums were used to align text in views. In v2, these enums have been replaced with the @Terminal.Gui.Alignment enum. The @Terminal.Gui.View.TextAlignment property controls horizontal text alignment and the @Terminal.Gui.View.VerticalTextAlignment property controls vertical text alignment.
+In v1, both `TextAlignment` and `VerticalTextAlignment` enums were used to align text in views. In v2, these enums have been replaced with the @Terminal.Gui.Alignment enum. The @Terminal.Gui.ViewBase.View.TextAlignment property controls horizontal text alignment and the @Terminal.Gui.ViewBase.View.VerticalTextAlignment property controls vertical text alignment.
 
 v2 now supports @Terminal.Gui.Pos.Align which enables views to be easily aligned within their Superview. 
 
@@ -460,17 +460,17 @@ In v2, these methods have been named correctly.
 
 ## `Mdi` Replaced by `ViewArrangement.Overlapped`
 
-In v1, it apps with multiple overlapping views could be created using a set of APIs spread across `Application` (e.g. `Application.MdiTop`) and `Toplevel` (e.g. `IsMdiContainer`). This functionality has been replaced in v2 with @Terminal.Gui.View.Arrangement. Specifically, overlapped views with @Terminal.Gui.View.Arrangement having the @Terminal.Gui.ViewArrangement.Overlapped flag set will be arranged in an overlapped fashion using the order in their SuperView's subview list as the Z-order. 
+In v1, it apps with multiple overlapping views could be created using a set of APIs spread across `Application` (e.g. `Application.MdiTop`) and `Toplevel` (e.g. `IsMdiContainer`). This functionality has been replaced in v2 with @Terminal.Gui.ViewBase.View.Arrangement. Specifically, overlapped views with @Terminal.Gui.ViewBase.View.Arrangement having the @Terminal.Gui.ViewBase.ViewArrangement.Overlapped flag set will be arranged in an overlapped fashion using the order in their SuperView's subview list as the Z-order. 
 
-Setting the @Terminal.Gui.ViewArrangement.Movable flag will enable the overlapped views to be movable with the mouse or keyboard (`Ctrl+F5` to activate).
+Setting the @Terminal.Gui.ViewBase.ViewArrangement.Movable flag will enable the overlapped views to be movable with the mouse or keyboard (`Ctrl+F5` to activate).
 
-Setting the @Terminal.Gui.ViewArrangement.Sizable flag will enable the overlapped views to be resized with the mouse or keyboard (`Ctrl+F5` to activate).
+Setting the @Terminal.Gui.ViewBase.ViewArrangement.Sizable flag will enable the overlapped views to be resized with the mouse or keyboard (`Ctrl+F5` to activate).
 
 In v1, only Views derived from `Toplevel` could be overlapped. In v2, any view can be.
 
 v1 conflated the concepts of 
 
-## `ContextMenu` replaced by `PopoverMenu`
+## `PopoverMenu` replaced by `PopoverMenu`
 
 `PopoverMenu` replaces `ContrextMenu`. 
 
@@ -494,6 +494,6 @@ new (
 
 * To simplify programming, any `View` added as a SubView another `View` will have it's lifecycle owned by the Superview; when a `View` is disposed, it will call `Dispose` on all the items in the `SubViews` property. Note this behavior is the same as it was in v1, just clarified.
 
-* In v1, `Application.End` called `Dispose ()` on @Terminal.Gui.Application.Top (via `Runstate.Toplevel`). This was incorrect as it meant that after `Application.Run` returned, `Application.Top` had been disposed, and any code that wanted to interrogate the results of `Run` by accessing `Application.Top` only worked by accident. This is because GC had not actually happened; if it had the application would have crashed. In v2 `Application.End` does NOT call `Dispose`, and it is the caller to `Application.Run` who is responsible for disposing the `Toplevel` that was either passed to `Application.Run (View)` or created by `Application.Run<T> ()`.
+* In v1, `Application.End` called `Dispose ()` on @Terminal.Gui.App.Application.Top (via `Runstate.Toplevel`). This was incorrect as it meant that after `Application.Run` returned, `Application.Top` had been disposed, and any code that wanted to interrogate the results of `Run` by accessing `Application.Top` only worked by accident. This is because GC had not actually happened; if it had the application would have crashed. In v2 `Application.End` does NOT call `Dispose`, and it is the caller to `Application.Run` who is responsible for disposing the `Toplevel` that was either passed to `Application.Run (View)` or created by `Application.Run<T> ()`.
 
 * Any code that creates a `Toplevel`, either by using `top = new()` or by calling either `top = Application.Run ()` or `top = ApplicationRun<T>()` must call `top.Dispose` when complete. The exception to this is if `top` is passed to `myView.Add(top)` making it a subview of `myView`. This is because the semantics of `Add` are that the `myView` takes over responsibility for the subviews lifetimes. Of course, if someone calls `myView.Remove(top)` to remove said subview, they then re-take responsbility for `top`'s lifetime and they must call `top.Dispose`.

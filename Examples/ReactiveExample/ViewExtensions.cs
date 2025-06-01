@@ -1,5 +1,6 @@
 ﻿using System;
-using Terminal.Gui;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
 
 namespace ReactiveExample;
 public static class ViewExtensions

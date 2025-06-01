@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Describes a mouse event over a specific <see cref="Tab"/> in a <see cref="TabView"/>.</summary>
 public class TabMouseEventArgs : HandledEventArgs

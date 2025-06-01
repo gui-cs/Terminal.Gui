@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
-using static Terminal.Gui.Pos;
+using static Terminal.Gui.ViewBase.Dim;
+using static Terminal.Gui.ViewBase.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 

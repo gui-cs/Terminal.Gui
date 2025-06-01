@@ -469,7 +469,7 @@ public class AdvanceFocusTests ()
 
         subView1.HasFocusChanged += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subView1HasFocusChangedTrueCount++;
                                         }
@@ -484,7 +484,7 @@ public class AdvanceFocusTests ()
 
         subView2.HasFocusChanged += (s, e) =>
                                     {
-                                        if (e.NewValue)
+                                        if (e.Result)
                                         {
                                             subView2HasFocusChangedTrueCount++;
                                         }
@@ -553,7 +553,7 @@ public class AdvanceFocusTests ()
 
         subView1.HasFocusChanging += (s, e) =>
                                      {
-                                         if (e.NewValue)
+                                         if (e.Result)
                                          {
                                              subView1HasFocusChangingTrueCount++;
                                          }
@@ -568,7 +568,7 @@ public class AdvanceFocusTests ()
 
         subView2.HasFocusChanging += (s, e) =>
                                      {
-                                         if (e.NewValue)
+                                         if (e.Result)
                                          {
                                              subView2HasFocusChangingTrueCount++;
                                          }

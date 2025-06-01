@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Terminal.Gui;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
 
 namespace CommunityToolkitExample;
 
@@ -47,7 +48,7 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
                 {
                     loginProgressLabel.Text = ViewModel.LoginProgressMessage;
                     validationLabel.Text = ViewModel.ValidationMessage;
-                    validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
+                    validationLabel.SetScheme (ViewModel.ValidationScheme);
                     break;
                 }
             case LoginActions.LoginProgress:
@@ -58,11 +59,11 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
             case LoginActions.Validation:
                 {
                     validationLabel.Text = ViewModel.ValidationMessage;
-                    validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
+                    validationLabel.SetScheme (ViewModel.ValidationScheme);
                     break;
                 }
         }
-        SetText();
+        SetText ();
         // BUGBUG: This should not be needed:
         Application.LayoutAndDraw ();
     }

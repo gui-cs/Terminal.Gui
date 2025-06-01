@@ -1,5 +1,13 @@
 # Deep Dive into Command and View.Command in Terminal.Gui
 
+## See Also
+
+* [Lexicon & Taxonomy](lexicon.md)
+* [Cancellable Work Pattern](cancellable-work-pattern.md)
+* [Events](events.md)
+
+## Overview
+
 The `Command` system in Terminal.Gui provides a standardized framework for defining and executing actions that views can perform, such as selecting items, accepting input, or navigating content. Implemented primarily through the `View.Command` APIs, this system integrates tightly with input handling (e.g., keyboard and mouse events) and leverages the *Cancellable Work Pattern* to ensure extensibility, cancellation, and decoupling. Central to this system are the `Selecting` and `Accepting` events, which encapsulate common user interactions: `Selecting` for changing a view’s state or preparing it for interaction (e.g., toggling a checkbox, focusing a menu item), and `Accepting` for confirming an action or state (e.g., executing a menu command, submitting a dialog).
 
 This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Selecting` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the need for additional events (`Selected`/`Accepted`) and the propagation of `Selecting` events, drawing on insights from `Menuv2`, `MenuItemv2`, `MenuBarv2`, `CheckBox`, and `FlagSelector`. These implementations highlight the system’s application in hierarchical (menus) and stateful (checkboxes, flag selectors) contexts. The document reflects the current implementation, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Select`. An appendix briefly summarizes proposed changes from a filed issue to rename `Command.Select` to `Command.Activate`, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
@@ -18,7 +26,7 @@ The `Command` system in Terminal.Gui defines a set of standard actions via the `
 The `Command` system bridges user input and view behavior, enabling:
 - **Consistency**: Standard commands ensure predictable interactions (e.g., `Enter` triggers `Accept` in buttons, menus, checkboxes).
 - **Extensibility**: Custom handlers and events allow behavior customization.
-- **Decoupling**: Events reduce reliance on subclassing, though current propagation mechanisms may require subview-superview coordination.
+- **Decoupling**: Events reduce reliance on sub-classing, though current propagation mechanisms may require subview-superview coordination.
 
 ### Note on `Cancel` Property
 The `CommandEventArgs` class uses a `Cancel` property to indicate that a command event (e.g., `Accepting`) should stop processing. This is misleading, as it implies action negation rather than completion. A filed issue proposes replacing `Cancel` with `Handled` to align with input events (e.g., `Key.Handled`). This document uses `Cancel` to reflect the current implementation, with the appendix summarizing the proposed change.

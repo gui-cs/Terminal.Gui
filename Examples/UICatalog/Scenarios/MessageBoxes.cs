@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -221,7 +220,7 @@ public class MessageBoxes : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (label) + 1,
-            ColorScheme = Colors.ColorSchemes ["Error"],
+            SchemeName = "Error",
             TextAlignment = Alignment.Center,
             Text = " "
         };

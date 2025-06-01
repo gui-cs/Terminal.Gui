@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Provides a collection of <see cref="MouseFlags"/> bound to <see cref="Command"/>s.

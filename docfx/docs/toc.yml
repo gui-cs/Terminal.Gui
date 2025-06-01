@@ -9,7 +9,7 @@
 - name: Arrangement
   href: arrangement.md
 - name: Cancellable Work Pattern
-  href: cancellable_work_pattern.md
+  href: cancellable-work-pattern.md
 - name: Configuration
   href: config.md
 - name: Command Deep Dive
@@ -24,6 +24,8 @@
   href: drivers.md
 - name: Events Deep Dive
   href: events.md
+- name: Lexicon & Taxonomy
+  href: lexicon.md
 - name: Keyboard
   href: keyboard.md
 - name: Layout Engine
@@ -31,7 +33,7 @@
 - name: Mouse
   href: mouse.md
 - name: Multi-Tasking
-  href: mainloop.md
+  href: multitasking.md
 - name: Navigation
   href: navigation.md
 - name: Popovers

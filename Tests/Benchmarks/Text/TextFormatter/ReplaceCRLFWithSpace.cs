@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using Tui = Terminal.Gui;
+using Terminal.Gui.Text;
+using Tui = Terminal.Gui.Text;
 
 namespace Terminal.Gui.Benchmarks.Text.TextFormatter;
 

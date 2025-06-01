@@ -185,7 +185,7 @@ public class HasFocusTests () : TestsAllViews
 
         subView1.HasFocusChanged += (s, e) =>
         {
-            if (e.NewValue)
+            if (e.Result)
             {
                 subView1HasFocusChangedTrueCount++;
             }
@@ -200,7 +200,7 @@ public class HasFocusTests () : TestsAllViews
 
         subView2.HasFocusChanged += (s, e) =>
         {
-            if (e.NewValue)
+            if (e.Result)
             {
                 subView2HasFocusChangedTrueCount++;
             }

@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Input;
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>

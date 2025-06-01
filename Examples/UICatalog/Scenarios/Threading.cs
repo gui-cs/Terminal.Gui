@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -66,7 +65,7 @@ public class Threading : Scenario
             Y = Pos.Y (_btnActionCancel) + 6,
             Width = 10,
             Height = 10,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"]
+            SchemeName = "TopLevel"
         };
 
         win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
@@ -77,7 +76,7 @@ public class Threading : Scenario
             Y = Pos.Y (_itemsList),
             Width = 50,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (_log)
         };
 

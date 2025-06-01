@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿#nullable enable
+using Moq;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -17,6 +18,7 @@ public class ApplicationPopoverTests
         // Assert
         Assert.Contains (popover, popoverManager.Popovers);
     }
+
 
     [Fact]
     public void DeRegister_RemovesPopover ()
@@ -38,7 +40,7 @@ public class ApplicationPopoverTests
     public void Show_SetsActivePopover ()
     {
         // Arrange
-        var popover = new Mock<IPopoverTestClass> ().Object;
+        var popover = new Mock<PopoverTestClass> ().Object;
         var popoverManager = new ApplicationPopover ();
 
         // Act
@@ -68,7 +70,7 @@ public class ApplicationPopoverTests
     public void DispatchKeyDown_ActivePopoverGetsKey ()
     {
         // Arrange
-        var popover = new IPopoverTestClass ();
+        var popover = new PopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
         popoverManager.Show (popover);
 
@@ -84,7 +86,7 @@ public class ApplicationPopoverTests
     public void DispatchKeyDown_ActivePopoverGetsHotKey ()
     {
         // Arrange
-        var popover = new IPopoverTestClass ();
+        var popover = new PopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
         popoverManager.Show (popover);
 
@@ -92,7 +94,7 @@ public class ApplicationPopoverTests
         popoverManager.DispatchKeyDown (Key.N.WithCtrl);
 
         // Assert
-        Assert.Equal(1, popover.NewCommandInvokeCount);
+        Assert.Equal (1, popover.NewCommandInvokeCount);
         Assert.Contains (Key.N.WithCtrl, popover.HandledKeys);
     }
 
@@ -101,8 +103,8 @@ public class ApplicationPopoverTests
     public void DispatchKeyDown_InactivePopoverGetsHotKey ()
     {
         // Arrange
-        var activePopover = new IPopoverTestClass () { Id = "activePopover" };
-        var inactivePopover = new IPopoverTestClass () { Id = "inactivePopover" }; ;
+        var activePopover = new PopoverTestClass () { Id = "activePopover" };
+        var inactivePopover = new PopoverTestClass () { Id = "inactivePopover" }; ;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
@@ -121,8 +123,8 @@ public class ApplicationPopoverTests
     public void DispatchKeyDown_InactivePopoverDoesGetKey ()
     {
         // Arrange
-        var activePopover = new IPopoverTestClass ();
-        var inactivePopover = new IPopoverTestClass ();
+        var activePopover = new PopoverTestClass ();
+        var inactivePopover = new PopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
         popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
@@ -134,16 +136,16 @@ public class ApplicationPopoverTests
         Assert.Contains (Key.A, activePopover.HandledKeys);
         Assert.NotEmpty (inactivePopover.HandledKeys);
     }
-    
-    public class IPopoverTestClass : View, IPopover
+
+    public class PopoverTestClass : View, IPopover
     {
         public List<Key> HandledKeys { get; } = new List<Key> ();
         public int NewCommandInvokeCount { get; private set; }
 
-        public IPopoverTestClass ()
+        public PopoverTestClass ()
         {
             CanFocus = true;
-            AddCommand(Command.New, NewCommandHandler );
+            AddCommand (Command.New, NewCommandHandler!);
             HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
 
             bool? NewCommandHandler (ICommandContext ctx)
@@ -159,5 +161,8 @@ public class ApplicationPopoverTests
             HandledKeys.Add (key);
             return false;
         }
+
+        /// <inheritdoc />
+        public Toplevel? Toplevel { get; set; }
     }
 }

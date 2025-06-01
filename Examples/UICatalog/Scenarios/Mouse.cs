@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -138,7 +137,7 @@ public class Mouse : Scenario
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3753
         cbHighlightOnPress.CheckedStateChanging += (s, e) =>
                                                    {
-                                                       if (e.NewValue == CheckState.Checked)
+                                                       if (e.Result == CheckState.Checked)
                                                        {
                                                            demo.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                                        }
@@ -149,7 +148,7 @@ public class Mouse : Scenario
 
                                                        foreach (View subview in demo.SubViews)
                                                        {
-                                                           if (e.NewValue == CheckState.Checked)
+                                                           if (e.Result == CheckState.Checked)
                                                            {
                                                                subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                                            }
@@ -161,7 +160,7 @@ public class Mouse : Scenario
 
                                                        foreach (View subview in demo.Padding.SubViews)
                                                        {
-                                                           if (e.NewValue == CheckState.Checked)
+                                                           if (e.Result == CheckState.Checked)
                                                            {
                                                                subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                                            }
@@ -205,7 +204,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = 50,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
@@ -236,7 +235,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);
@@ -278,7 +277,7 @@ public class Mouse : Scenario
             CanFocus = true;
             Id = "mouseEventDemoView";
 
-            Padding.Thickness = new Thickness (1, 1, 1, 1);
+            Padding!.Thickness = new Thickness (1, 1, 1, 1);
 
             Initialized += OnInitialized;
 
@@ -287,33 +286,62 @@ public class Mouse : Scenario
                 TextAlignment = Alignment.Center;
                 VerticalTextAlignment = Alignment.Center;
 
-                Padding.ColorScheme = new ColorScheme (new Attribute (Color.Black));
+                Padding!.SetScheme (new Scheme (new Attribute (Color.Black)));
 
                 Padding.MouseEnter += PaddingOnMouseEnter;
                 Padding.MouseLeave += PaddingOnMouseLeave;
 
-                void PaddingOnMouseEnter (object o, CancelEventArgs e)
-                {
-                    Padding.ColorScheme = Colors.ColorSchemes ["Error"];
-                }
+                void PaddingOnMouseEnter (object o, CancelEventArgs e) { Padding.SchemeName = "Error"; }
 
-                void PaddingOnMouseLeave (object o, EventArgs e)
-                {
-                    Padding.ColorScheme = Colors.ColorSchemes ["Dialog"];
-                }
+                void PaddingOnMouseLeave (object o, EventArgs e) { Padding.SchemeName = "Dialog"; }
 
-                Border.Thickness = new Thickness (1);
+                Border!.Thickness = new Thickness (1);
                 Border.LineStyle = LineStyle.Rounded;
+
+
+                Highlight += (sender, args) =>
+                             {
+                                 if (args.Result == HighlightStyle.Pressed)
+                                 {
+                                     _pressed = true;
+                                     SetNeedsDraw();
+                                 }
+                                 else
+                                 {
+                                     _pressed = false;
+                                 }
+                             };
+
             }
 
+
             MouseLeave += (s, e) =>
-                          {
-                              Text = "Leave";
-                          };
+                              {
+                                  Text = "Leave";
+                              };
             MouseEnter += (s, e) =>
-                          {
-                              Text = "Enter";
-                          };
+                                  {
+                                      Text = "Enter";
+                                  };
         }
+
+        /// <inheritdoc />
+        protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+        {
+            if ( role == VisualRole.Highlight)
+            {
+                if (_pressed && HighlightStyle.HasFlag (HighlightStyle.Pressed))
+                {
+                    currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
+
+                    return true;
+                }
+            }
+            
+            return base.OnGettingAttributeForRole (in role, ref currentAttribute);
+        }
+
+        // True if the View is to be highlighted
+        private bool _pressed;
     }
 }

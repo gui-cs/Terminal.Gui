@@ -705,7 +705,7 @@ public class TreeViewTests (ITestOutputHelper output)
                                                          );
 
         tv.AddObject ("1");
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
 
         tv.LayoutSubViews ();
         tv.Draw ();
@@ -744,7 +744,7 @@ public class TreeViewTests (ITestOutputHelper output)
                                                          );
 
         tv.AddObject ("1");
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
 
         tv.LayoutSubViews ();
         tv.Draw ();
@@ -820,7 +820,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -875,7 +875,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
@@ -950,7 +950,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
@@ -1026,7 +1026,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1066,7 +1066,7 @@ FFFFFFFFFF
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1122,7 +1122,7 @@ oot two
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1211,11 +1211,11 @@ oot two
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.ColorScheme = new ColorScheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
-        // create a new color scheme
+        // create a new scheme
         var pink = new Attribute (Color.Magenta, Color.Black);
         var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
@@ -1240,13 +1240,13 @@ oot two
 ",
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
+                                               tv.GetScheme ().Normal,
                                                pink
                                               );
 
-        var pinkScheme = new ColorScheme { Normal = pink, Focus = hotpink };
+        var pinkScheme = new Scheme { Normal = pink, Focus = hotpink };
 
-        // and a delegate that uses the pink color scheme 
+        // and a delegate that uses the pink scheme 
         // for nodes "pink"
         tv.ColorGetter = n => n.Text.Equals ("pink") ? pinkScheme : null;
 
@@ -1278,7 +1278,7 @@ oot two
 ",
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
+                                               tv.GetScheme ().Normal,
                                                pink
                                               );
     }

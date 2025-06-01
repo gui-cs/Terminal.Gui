@@ -21,14 +21,9 @@ The *Cancellable Work Pattern* is designed to achieve the following:
 3. **Cancellation**: Enable halting of a phase or the entire workflow, giving consumers control over the process.
 4. **Decoupling**: Use events to reduce reliance on inheritance, minimizing the need for subclasses to understand base class details.
 
-## Components
+## Lexicon and Taxonomy
 
-The *Cancellable Work Pattern* consists of the following components:
-- **Workflow**: A sequence of phases, which may be multi-phase (e.g., rendering in `View.Draw`), linear (e.g., key processing in `View.Keyboard`), per-unit (e.g., command execution in `View.Command`), or event-driven (e.g., key handling in `Application.Keyboard`, property changes in `OrientationHelper`).
-- **Notifications**: Events (e.g., `DrawingText`, `KeyDown`, `Activating`, `OrientationChanging`) and virtual methods (e.g., `OnDrawingText`, `OnKeyDown`, `OnActivating`, `OnOrientationChanging`) raised at each phase to notify observers.
-- **Cancellation**: Mechanisms to halt a phase or workflow, such as setting `Cancel`/`Handled` properties in event arguments or returning `bool` from virtual methods.
-- **Context**: Data passed to observers for informed decision-making, such as `DrawContext` (drawing), `Key` (keyboard), `ICommandContext` (commands), or `CancelEventArgs<Orientation>` (orientation).
-- **Default Behavior**: A standard implementation for each phase, such as `DrawText` (drawing), `InvokeCommands` (keyboard and application-level), `RaiseActivating` (commands), or updating a property (`OrientationHelper`).
+[!INCLUDE [Events Lexicon](~/includes/events-lexicon.md)]
 
 ## Implementation in Terminal.Gui
 

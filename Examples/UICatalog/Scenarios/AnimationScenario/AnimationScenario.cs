@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

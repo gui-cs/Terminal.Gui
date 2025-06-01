@@ -3,19 +3,19 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 /// Color name resolver for <see cref="ColorName16"/>.
 /// </summary>
 public class AnsiColorNameResolver : IColorNameResolver
 {
-    private static readonly ImmutableArray<string> AnsiColorNames = ImmutableArray.Create(Enum.GetNames<ColorName16>());
+    private static readonly ImmutableArray<string> _ansiColorNames = ImmutableArray.Create (Enum.GetNames<ColorName16> ());
 
     /// <inheritdoc/>
     public IEnumerable<string> GetColorNames ()
     {
-        return AnsiColorNames;
+        return _ansiColorNames;
     }
 
     /// <inheritdoc/>

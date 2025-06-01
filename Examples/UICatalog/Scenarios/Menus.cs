@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Terminal.Gui;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace UICatalog.Scenarios;
@@ -33,7 +32,7 @@ public class Menus : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);

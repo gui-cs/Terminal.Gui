@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface for all <see cref="ITableSource"/> which present an object per row (of type <typeparamref name="T"/>

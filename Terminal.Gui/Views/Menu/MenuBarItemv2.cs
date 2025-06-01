@@ -1,6 +1,7 @@
 #nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBarv2"/>.
@@ -121,13 +122,13 @@ public class MenuBarItemv2 : MenuItemv2
 
             void OnPopoverVisibleChanged (object? sender, EventArgs args)
             {
-                Logging.Debug ($"OnPopoverVisibleChanged - {Title} - Visible = {_popoverMenu?.Visible} ");
+                // Logging.Debug ($"OnPopoverVisibleChanged - {Title} - Visible = {_popoverMenu?.Visible} ");
                 PopoverMenuOpen = _popoverMenu?.Visible ?? false;
             }
 
             void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args)
             {
-                Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source?.Title} - {args.Context?.Command}");
+                // Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source?.Title} - {args.Context?.Command}");
                 RaiseAccepted (args.Context);
             }
         }
@@ -153,14 +154,23 @@ public class MenuBarItemv2 : MenuItemv2
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void RaisePopoverMenuOpenChanged ()
     {
         OnPopoverMenuOpenChanged();
         PopoverMenuOpenChanged?.Invoke (this, new EventArgs<bool> (PopoverMenuOpen));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     protected virtual void OnPopoverMenuOpenChanged () {}
 
+    /// <summary>
+    /// 
+    /// </summary>
     public event EventHandler<EventArgs<bool>>? PopoverMenuOpenChanged;
 
     /// <inheritdoc />
@@ -186,7 +196,7 @@ public class MenuBarItemv2 : MenuItemv2
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
     }
 
     /// <inheritdoc/>

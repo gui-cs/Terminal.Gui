@@ -2,7 +2,7 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Indicates the size of scrollable content and controls the position of the visible content, either vertically or
@@ -434,7 +434,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             return;
         }
 
-        RaiseSliderPositionChangeEvents (_sliderPosition, e.CurrentValue);
+        RaiseSliderPositionChangeEvents (_sliderPosition, e.Result);
     }
 
     private void SliderOnScroll (object? sender, EventArgs<int> e)
@@ -446,14 +446,14 @@ public class ScrollBar : View, IOrientation, IDesignable
 
         int calculatedSliderPos = CalculateSliderPositionFromContentPosition (
                                                                               _position,
-                                                                              e.CurrentValue >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
+                                                                              e.Result >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
 
         if (calculatedSliderPos == _sliderPosition)
         {
             return;
         }
 
-        int sliderScrolledAmount = e.CurrentValue;
+        int sliderScrolledAmount = e.Result;
         int calculatedPosition = CalculatePositionFromSliderPosition (calculatedSliderPos + sliderScrolledAmount);
 
         Position = calculatedPosition;
@@ -610,7 +610,7 @@ public class ScrollBar : View, IOrientation, IDesignable
     {
         OrientationChanged += (sender, args) =>
                               {
-                                  if (args.CurrentValue == Orientation.Vertical)
+                                  if (args.Result == Orientation.Vertical)
                                   {
                                       Width = 1;
                                       Height = Dim.Fill ();

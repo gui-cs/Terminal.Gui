@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
 using JetBrains.Annotations;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -99,7 +98,7 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
         };
-        _eventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        _eventListView.SchemeName = "TopLevel";
         _appWindow.Add (_eventListView);
 
         _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");
@@ -124,9 +123,9 @@ public class ListViewWithSelection : Scenario
         Application.Shutdown ();
     }
 
-    private void CustomRenderCB_Toggle (object sender, CancelEventArgs<CheckState> stateEventArgs)
+    private void CustomRenderCB_Toggle (object sender, ResultEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.CurrentValue == CheckState.Checked)
+        if (stateEventArgs.Result == CheckState.Checked)
         {
             _listView.SetSource (_scenarios);
         }
@@ -138,29 +137,29 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
+    private void AllowsMarkingCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
+        _listView.AllowsMarking = stateEventArgs.Result == CheckState.Checked;
         _allowMultipleCb.Enabled = _listView.AllowsMarking;
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMultipleSelectionCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
+    private void AllowsMultipleSelectionCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
+        _listView.AllowsMultipleSelection = stateEventArgs.Result == CheckState.Checked;
         _appWindow.SetNeedsDraw ();
     }
 
 
-    private void AllowYGreaterThanContentHeightCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
+    private void AllowYGreaterThanContentHeightCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.NewValue == CheckState.Checked)
+        if (stateEventArgs.Result == CheckState.Checked)
         {
-            _listView.ViewportSettings |= Terminal.Gui.ViewportSettings.AllowYGreaterThanContentHeight;
+            _listView.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
         }
         else
         {
-            _listView.ViewportSettings &= ~Terminal.Gui.ViewportSettings.AllowYGreaterThanContentHeight;
+            _listView.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
         }
         _appWindow.SetNeedsDraw ();
     }

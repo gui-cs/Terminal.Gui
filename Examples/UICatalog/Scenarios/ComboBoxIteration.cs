@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -26,7 +25,7 @@ public class ComboBoxIteration : Scenario
 
         var lbComboBox = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SchemeName = "TopLevel",
             X = Pos.Right (lbListView) + 1,
             Width = Dim.Percent (40)
         };

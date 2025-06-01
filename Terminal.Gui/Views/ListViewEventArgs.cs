@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="EventArgs"/> for <see cref="ListView"/> events.</summary>
 public class ListViewItemEventArgs : EventArgs

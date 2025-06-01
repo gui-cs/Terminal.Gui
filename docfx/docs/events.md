@@ -4,8 +4,9 @@ Terminal.Gui exposes and uses events in many places. This deep dive covers the p
 
 ## See Also
 
-* [Cancellable Work Pattern](cancellable_work_pattern.md)
+* [Cancellable Work Pattern](cancellable-work-pattern.md)
 * [Command Deep Dive](command.md)
+* [Lexicon & Taxonomy](lexicon.md)
 
 ## Tenets for Terminal.Gui Events (Unless you know better ones...)
 
@@ -15,14 +16,7 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 ## Lexicon and Taxonomy
 
-* *Action*
-* *Event*
-* *Command*
-* *Invoke*
-* *Raise*
-* *Listen*
-* *Handle/Handling/Handled* - Applies to scenarios where an event can either be handled by an event listener (or override) vs not handled. Events that originate from a user action like mouse moves and key presses are examples. 
-* *Cancel/Cancelling/Cancelled* - Applies to scenarios where something can be cancelled. Changing the `Orientation` of a `Slider` is cancelable.
+[!INCLUDE [Events Lexicon](~/includes/events-lexicon.md)]
 
 ## Useful External Documentation
 
@@ -35,6 +29,10 @@ Tenets higher in the list have precedence over tenets lower in the list.
 TG follows the *naming* advice provided in [.NET Naming Guidelines - Names of Events](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN#names-of-events).
 
 ## Common Event Patterns
+
+### Cancellable Work Pattern
+
+The [Cancellable Work Pattern](cancellable-work-pattern.md) is a pattern that allows for the cancellation of work.
 
 ### OnEvent/Event
 

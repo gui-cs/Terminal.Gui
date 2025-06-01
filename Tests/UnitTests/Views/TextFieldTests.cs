@@ -350,9 +350,9 @@ public class TextFieldTests (ITestOutputHelper output)
 
         void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
         {
-            if (e.NewValue.GetRuneCount () > 11)
+            if (e.Result.GetRuneCount () > 11)
             {
-                e.NewValue = e.NewValue [..11];
+                e.Result = e.Result [..11];
             }
         }
 
@@ -416,7 +416,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.TextChanging += (s, e) =>
                            {
-                               newText = e.NewValue;
+                               newText = e.Result;
                                oldText = e.CurrentValue;
                            };
 
@@ -808,10 +808,10 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Attribute [] attributes =
         {
-            _textField.ColorScheme.Focus,
+            _textField.GetAttributeForRole (VisualRole.Focus),
             new (
-                 _textField.ColorScheme.Focus.Background,
-                 _textField.ColorScheme.Focus.Foreground
+                 _textField.GetAttributeForRole (VisualRole.Focus).Background,
+                 _textField.GetAttributeForRole (VisualRole.Focus).Foreground
                 )
         };
 
@@ -957,7 +957,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         _textField.TextChanging += (s, e) =>
                                    {
-                                       Assert.Equal ("changing", e.NewValue);
+                                       Assert.Equal ("changing", e.Result);
 
                                        if (cancel)
                                        {
@@ -1632,11 +1632,9 @@ Les Miśerables",
         {
             base.Before (methodUnderTest);
 
-            //Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+            //Application.Top.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
-                ColorScheme = new (Colors.ColorSchemes ["Base"]),
-
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)
                 Text = "TAB to jump between text fields.",

@@ -1,13 +1,18 @@
-﻿// This is a simple example application.  For the full range of functionality
+﻿// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
+
+// This is a simple example application.  For the full range of functionality
 // see the UICatalog project
 
-// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
-
-using System;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
+using Attribute = Terminal.Gui.Drawing.Attribute;
 
 // Override the default configuration for the application to use the Light theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
+ConfigurationManager.Enable(ConfigLocations.All);
 
 Application.Run<ExampleWindow> ().Dispose ();
 
@@ -21,7 +26,7 @@ Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
 // Defines a top-level window with border and title
 public class ExampleWindow : Window
 {
-    public static string UserName;
+    public static string UserName { get; set; }
 
     public ExampleWindow ()
     {
