@@ -342,7 +342,7 @@ public class Mouse : Scenario
 
                 MouseStateChanged += (_, args) =>
                                      {
-                                         if (args.Result.HasFlag (MouseState.PressedOutside))
+                                         if (args.Value.HasFlag (MouseState.PressedOutside))
                                          {
                                              Border.LineStyle = LineStyle.Dotted;
                                          }

@@ -151,12 +151,6 @@ public partial class View
 
         _scheme = scheme;
 
-        // BUGBUG: This should be in Border.cs somehow
-        if (Border is { } && Border.LineStyle != LineStyle.None && Border.HasScheme)
-        {
-            Border.SetScheme (_scheme);
-        }
-
         SetNeedsDraw ();
 
         return true;

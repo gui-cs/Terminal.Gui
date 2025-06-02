@@ -615,7 +615,7 @@ public class MouseTests : TestsAllViews
         /// <inheritdoc/>
         protected override void OnMouseStateChanged (EventArgs<MouseState> args)
         {
-            switch (args.Result)
+            switch (args.Value)
             {
                 case MouseState.None:
                     MouseStateNoneCount++;

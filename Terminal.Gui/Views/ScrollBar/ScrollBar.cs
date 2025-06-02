@@ -434,7 +434,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             return;
         }
 
-        RaiseSliderPositionChangeEvents (_sliderPosition, e.Result);
+        RaiseSliderPositionChangeEvents (_sliderPosition, e.Value);
     }
 
     private void SliderOnScroll (object? sender, EventArgs<int> e)
@@ -446,14 +446,14 @@ public class ScrollBar : View, IOrientation, IDesignable
 
         int calculatedSliderPos = CalculateSliderPositionFromContentPosition (
                                                                               _position,
-                                                                              e.Result >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
+                                                                              e.Value >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
 
         if (calculatedSliderPos == _sliderPosition)
         {
             return;
         }
 
-        int sliderScrolledAmount = e.Result;
+        int sliderScrolledAmount = e.Value;
         int calculatedPosition = CalculatePositionFromSliderPosition (calculatedSliderPos + sliderScrolledAmount);
 
         Position = calculatedPosition;
@@ -610,7 +610,7 @@ public class ScrollBar : View, IOrientation, IDesignable
     {
         OrientationChanged += (sender, args) =>
                               {
-                                  if (args.Result == Orientation.Vertical)
+                                  if (args.Value == Orientation.Vertical)
                                   {
                                       Width = 1;
                                       Height = Dim.Fill ();

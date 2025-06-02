@@ -658,7 +658,7 @@ public partial class View // Mouse APIs
     /// <param name="args"></param>
     private void RaiseMouseStateChanged (EventArgs<MouseState> args)
     {
-        Logging.Debug ($"{Id} - {args.Result} -> {args.Result}");
+        Logging.Debug ($"{Id} - {args.Value} -> {args.Value}");
 
         OnMouseStateChanged (args);
 

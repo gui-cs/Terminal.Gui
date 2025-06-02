@@ -168,9 +168,9 @@ public class UICatalogTop : Toplevel
 
             _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
             {
-                Application.Force16Colors = args.Result == CheckState.Checked;
+                Application.Force16Colors = args.Value == CheckState.Checked;
 
-                _force16ColorsShortcutCb!.CheckedState = args.Result;
+                _force16ColorsShortcutCb!.CheckedState = args.Value;
                 Application.LayoutAndDraw ();
             };
 
@@ -287,7 +287,7 @@ public class UICatalogTop : Toplevel
                 CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked
             };
 
-            _disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Result == CheckState.Checked; };
+            _disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
 
             menuItems.Add (
                            new MenuItemv2

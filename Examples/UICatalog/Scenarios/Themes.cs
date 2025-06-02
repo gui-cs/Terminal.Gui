@@ -144,7 +144,7 @@ public sealed class Themes : Scenario
 
         allViewsCheckBox.CheckedStateChanged += (sender, args) =>
                                                 {
-                                                    if (args.Result == CheckState.Checked)
+                                                    if (args.Value == CheckState.Checked)
                                                     {
                                                         viewListView.Visible = false;
                                                         appWindow.Remove (viewFrame);

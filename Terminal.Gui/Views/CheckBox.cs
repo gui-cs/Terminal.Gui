@@ -68,7 +68,7 @@ public class CheckBox : View
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
     {
-        base.Text = e.Result;
+        base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

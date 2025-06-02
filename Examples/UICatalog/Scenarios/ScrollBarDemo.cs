@@ -352,33 +352,33 @@ public class ScrollBarDemo : Scenario
         {
             scrollBar.ScrollableContentSizeChanged += (s, e) =>
                                   {
-                                      eventLog.Log ($"SizeChanged: {e.Result}");
+                                      eventLog.Log ($"SizeChanged: {e.Value}");
 
-                                      if (scrollContentSize.Value != e.Result)
+                                      if (scrollContentSize.Value != e.Value)
                                       {
-                                          scrollContentSize.Value = e.Result;
+                                          scrollContentSize.Value = e.Value;
                                       }
                                   };
 
             scrollBar.SliderPositionChanged += (s, e) =>
                                             {
-                                                eventLog.Log ($"SliderPositionChanged: {e.Result}");
+                                                eventLog.Log ($"SliderPositionChanged: {e.Value}");
                                                 eventLog.Log ($"  Position: {scrollBar.Position}");
-                                                scrollSliderPosition.Text = e.Result.ToString ();
+                                                scrollSliderPosition.Text = e.Value.ToString ();
                                             };
 
             scrollBar.Scrolled += (s, e) =>
                                {
-                                   eventLog.Log ($"Scrolled: {e.Result}");
+                                   eventLog.Log ($"Scrolled: {e.Value}");
                                    eventLog.Log ($"  SliderPosition: {scrollBar.GetSliderPosition ()}");
-                                   scrolled.Text = e.Result.ToString ();
+                                   scrolled.Text = e.Value.ToString ();
                                };
 
             scrollBar.PositionChanged += (s, e) =>
                                              {
-                                                 eventLog.Log ($"PositionChanged: {e.Result}");
-                                                 scrollPosition.Value = e.Result;
-                                                 controlledList.Viewport = controlledList.Viewport with { Y = e.Result };
+                                                 eventLog.Log ($"PositionChanged: {e.Value}");
+                                                 scrollPosition.Value = e.Value;
+                                                 controlledList.Viewport = controlledList.Viewport with { Y = e.Value };
                                              };
 
 

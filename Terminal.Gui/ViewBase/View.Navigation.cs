@@ -637,6 +637,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return (true, false);
     }
 
+    // TODO: CWP: FocusChanging should use an event arg type derived from ResultEventArgs<bool> so that its more obvious
+    // TODO: the result can be changed.
     private bool RaiseFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
     {
         Debug.Assert (currentFocused is null || currentFocused is { HasFocus: true });
@@ -882,6 +884,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         SetNeedsDraw ();
     }
 
+    // TODO: CWP: FocusChanged should not be using event args derived from CancelEventArgs, as it is not cancellable.
     private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
         // If we are the most focused view, we need to set the focused view in Application.Navigation

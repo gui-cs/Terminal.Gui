@@ -90,7 +90,7 @@ public class ScenariosStressTests : TestsAllViews
 
         void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
-            if (a.Result)
+            if (a.Value)
             {
                 lock (_timeoutLock)
                 {
@@ -106,7 +106,7 @@ public class ScenariosStressTests : TestsAllViews
                                      {
                                          refreshedCount++;
 
-                                         if (args.Result)
+                                         if (args.Value)
                                          {
                                              updatedCount++;
                                          }
@@ -124,7 +124,7 @@ public class ScenariosStressTests : TestsAllViews
                 stopwatch!.Stop ();
             }
 
-            _output.WriteLine ($"Initialized == {a.Result}");
+            _output.WriteLine ($"Initialized == {a.Value}");
         }
 
         void OnApplicationOnIteration (object? s, IterationEventArgs a)
