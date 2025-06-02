@@ -307,7 +307,7 @@ public class FlagSelector : View, IOrientation, IDesignable
             Title = nameWithHotKey,
             Id = name,
             Data = flag,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStyle = ViewBase.MouseState.Over
         };
 
         checkbox.GettingAttributeForRole += (_, e) =>

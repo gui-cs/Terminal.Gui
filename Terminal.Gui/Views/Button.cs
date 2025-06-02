@@ -39,7 +39,7 @@ public class Button : View, IDesignable
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.Pressed | HighlightStyle.Hover;
+    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.Pressed | ViewBase.MouseState.Over;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
@@ -99,33 +99,6 @@ public class Button : View, IDesignable
 
         return false;
     }
-
-    private bool _wantContinuousButtonPressed;
-
-    /// <inheritdoc/>
-    public override bool WantContinuousButtonPressed
-    {
-        get => _wantContinuousButtonPressed;
-        set
-        {
-            if (value == _wantContinuousButtonPressed)
-            {
-                return;
-            }
-
-            _wantContinuousButtonPressed = value;
-
-            if (_wantContinuousButtonPressed)
-            {
-                HighlightStyle |= HighlightStyle.PressedOutside;
-            }
-            else
-            {
-                HighlightStyle &= ~HighlightStyle.PressedOutside;
-            }
-        }
-    }
-
     private void Button_MouseClick (object sender, MouseEventArgs e)
     {
         if (e.Handled)

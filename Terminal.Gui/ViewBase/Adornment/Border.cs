@@ -53,29 +53,10 @@ public partial class Border : Adornment
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
-        HighlightStyle |= HighlightStyle.Pressed;
-
-        Highlight += (sender, args) =>
-                     {
-                         if (args.Result == HighlightStyle.Pressed)
-                         {
-                             _pressed = true;
-                         }
-                         else
-                         {
-                             _pressed = false;
-                         }
-                     };
-
         ThicknessChanged += OnThicknessChanged;
     }
 
-    // True if the border is to be highlighted
-    private bool _pressed;
-
-
     // TODO: Move DrawIndicator out of Border and into View
-
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
         if (IsInitialized)
@@ -132,7 +113,15 @@ public partial class Border : Adornment
     {
         base.BeginInit ();
 
+        if (Parent is null)
+        {
+            return;
+        }
+
         ShowHideDrawIndicator ();
+
+        HighlightStyle |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
+
 #if SUBVIEW_BASED_BORDER
         if (Parent is { })
         {
@@ -352,7 +341,7 @@ public partial class Border : Adornment
 
             Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
-            if (_pressed)
+            if (MouseState.HasFlag (MouseState.Pressed))
             {
                 normalAttribute = GetAttributeForRole (VisualRole.Highlight);
             }
@@ -499,7 +488,7 @@ public partial class Border : Adornment
                             );
             }
 
-           // SetAttribute (prevAttr);
+            // SetAttribute (prevAttr);
 
             // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
             if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))

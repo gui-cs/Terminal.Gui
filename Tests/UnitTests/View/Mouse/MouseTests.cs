@@ -298,9 +298,9 @@ public class MouseTests : TestsAllViews
     }
 
     [Theory (Skip = "This test needs to be redone.")]
-    [InlineData (HighlightStyle.None, 0, 0)]
-    [InlineData (HighlightStyle.Pressed | HighlightStyle.PressedOutside, 1, 1)]
-    public void HighlightOnPress_Fires_Events_And_Highlights (HighlightStyle highlightOnPress, int expectedEnabling, int expectedDisabling)
+    [InlineData (MouseState.None, 0, 0)]
+    [InlineData (MouseState.Pressed | MouseState.PressedNotOver, 1, 1)]
+    public void HighlightOnPress_Fires_Events_And_Highlights (MouseState highlightOnPress, int expectedEnabling, int expectedDisabling)
     {
         var view = new View
         {
@@ -318,7 +318,7 @@ public class MouseTests : TestsAllViews
 
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
-        if (highlightOnPress != HighlightStyle.None)
+        if (highlightOnPress != MouseState.None)
         {
             Assert.NotEqual (originalScheme, view.GetScheme ());
         }
@@ -339,9 +339,9 @@ public class MouseTests : TestsAllViews
 
         return;
 
-        void ViewHighlight (object sender, CancelEventArgs<HighlightStyle> e)
+        void ViewHighlight (object sender, CancelEventArgs<MouseState> e)
         {
-            if (e.Result == HighlightStyle.None)
+            if (e.Result == MouseState.None)
             {
                 disablingHighlight++;
             }
@@ -363,7 +363,7 @@ public class MouseTests : TestsAllViews
         var view = new View
         {
             CanFocus = true,
-            HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside,
+            HighlightStyle = MouseState.Pressed | MouseState.PressedNotOver,
             Height = 1,
             Width = 1
         };
@@ -412,9 +412,9 @@ public class MouseTests : TestsAllViews
 
         return;
 
-        void ViewHighlight (object sender, CancelEventArgs<HighlightStyle> e)
+        void ViewHighlight (object sender, CancelEventArgs<MouseState> e)
         {
-            if (e.Result == HighlightStyle.None)
+            if (e.Result == MouseState.None)
             {
                 disablingHighlight++;
             }
