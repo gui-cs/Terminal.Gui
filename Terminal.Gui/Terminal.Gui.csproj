@@ -188,6 +188,6 @@
         <Message Text="Copy completed successfully." Importance="high" />
 
         <!-- Install NuGet Package to Global Cache -->
-        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;%USERPROFILE%\.nuget\packages&quot; --skip-duplicate" />
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" />
     </Target>
 </Project>
