@@ -35,5 +35,10 @@ jobs:
         dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
         dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
 
+    - name: Build Release AOT and Self-Contained
+      run: |
+        dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release
+        dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release
+
     - name: Build Release Solution
       run: dotnet build --configuration Release
