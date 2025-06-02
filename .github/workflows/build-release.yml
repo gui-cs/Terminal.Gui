@@ -40,5 +40,8 @@ jobs:
         dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release
         dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release
 
+    - name: Restore Solution Packages
+      run: dotnet restore
+
     - name: Build Release Solution without restore
       run: dotnet build --configuration Release --no-restore
