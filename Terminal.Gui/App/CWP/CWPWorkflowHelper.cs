@@ -1,78 +1,129 @@
-﻿//#nullable enable
-//using System;
-//using System.ComponentModel;
+﻿#nullable enable
+namespace Terminal.Gui.App;
 
-//namespace Terminal.Gui.App;
+using System;
 
-///// <summary>
-///// 
-///// </summary>
-//public static class CWPWorkflowHelper
-//{
-//    /// <summary>
-//    /// Executes a single-phase CWP workflow with a virtual method, event, and default action.
-//    /// </summary>
-//    /// <typeparam name="TArgs">Type of event arguments, must inherit from CancelEventArgs.</typeparam>
-//    /// <param name="onMethod">Virtual method, returns true to cancel.</param>
-//    /// <param name="eventHandler">Event to raise.</param>
-//    /// <param name="args">Event arguments with Cancel/Handled property.</param>
-//    /// <param name="defaultAction">Default action to execute if not handled.</param>
-//    /// <returns>True if handled, false if not, null if no event subscribers.</returns>
-//    public static bool? Execute<TArgs> (
-//        Func<TArgs, bool> onMethod,
-//        EventHandler<TArgs>? eventHandler,
-//        TArgs args,
-//        Action? defaultAction = null)
-//        where TArgs : CancelEventArgs
-//    {
-//        if (onMethod (args) || args.Cancel)
-//        {
-//            return true;
-//        }
 
-//        eventHandler?.Invoke (null, args);
-//        if (args.Cancel)
-//        {
-//            return true;
-//        }
+/// <summary>
+///     Provides helper methods for executing single-phase and result-producing workflows in the Cancellable Work Pattern (CWP).
+/// </summary>
+/// <remarks>
+///     <para>
+///         Used for workflows that allow customization or cancellation, such as command execution
+///         (e.g., <see cref="View.RaiseAccepting"/>) or scheme resolution (e.g., <see cref="View.GetScheme"/>).
+///         The <see cref="Execute{T}"/> method handles workflows without results, while
+///         <see cref="ExecuteWithResult{TResult}"/> handles workflows producing results.
+///     </para>
+/// </remarks>
+/// <seealso cref="ResultEventArgs{T}"/>
+public static class CWPWorkflowHelper
+{
+    /// <summary>
+    ///     Executes a single-phase CWP workflow with a virtual method, event, and optional default action.
+    /// </summary>
+    /// <typeparam name="T">The type of the result in the event arguments.</typeparam>
+    /// <param name="onMethod">The virtual method invoked first, returning true to mark the workflow as handled.</param>
+    /// <param name="eventHandler">The event handler to invoke, or null if no handlers are subscribed.</param>
+    /// <param name="args">The event arguments containing a result and handled status.</param>
+    /// <param name="defaultAction">The default action to execute if the workflow is not handled, or null if none.</param>
+    /// <returns>True if the workflow was handled, false if not, or null if no event handlers are subscribed.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown if <paramref name="onMethod"/> or <paramref name="args"/> is null.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///         ResultEventArgs<bool> args = new();
+    ///         Func<ResultEventArgs<bool>, bool> onAccepting = _ => false;
+    ///         EventHandler<ResultEventArgs<bool>>? acceptingHandler = null;
+    ///         Action? defaultAction = () => args.Result = true;
+    ///         bool? handled = CWPWorkflowHelper.Execute(onAccepting, acceptingHandler, args, defaultAction);
+    ///     </code>
+    /// </example>
+    public static bool? Execute<T> (
+        Func<ResultEventArgs<T>, bool> onMethod,
+        EventHandler<ResultEventArgs<T>>? eventHandler,
+        ResultEventArgs<T> args,
+        Action? defaultAction = null)
+    {
+        ArgumentNullException.ThrowIfNull (onMethod);
+        ArgumentNullException.ThrowIfNull (args);
 
-//        if (defaultAction != null)
-//        {
-//            defaultAction ();
-//            return true;
-//        }
+        bool handled = onMethod (args) || args.Handled;
+        if (handled)
+        {
+            return true;
+        }
 
-//        return eventHandler == null ? null : false;
-//    }
+        eventHandler?.Invoke (null, args);
+        if (args.Handled)
+        {
+            return true;
+        }
 
-//    /// <summary>
-//    /// Executes a CWP workflow with a result, suitable for methods like GetScheme.
-//    /// </summary>
-//    /// <typeparam name="TArgs">Type of event arguments.</typeparam>
-//    /// <typeparam name="TResult">Type of result.</typeparam>
-//    /// <param name="onMethod">Virtual method, returns true to cancel.</param>
-//    /// <param name="eventHandler">Event to raise.</param>
-//    /// <param name="args">Event arguments with result property.</param>
-//    /// <param name="defaultAction">Default action returning a result.</param>
-//    /// <returns>Result or default if handled/cancelled.</returns>
-//    public static TResult ExecuteWithResult<TArgs, TResult> (
-//        Func<TArgs, bool> onMethod,
-//        EventHandler<TArgs>? eventHandler,
-//        TArgs args,
-//        Func<TResult> defaultAction)
-//        where TArgs : CancelEventArgs<TResult>
-//    {
-//        if (onMethod (args) || args.Cancel)
-//        {
-//            return args.Result ?? default!;
-//        }
+        if (defaultAction is {})
+        {
+            defaultAction ();
+            return true;
+        }
 
-//        eventHandler?.Invoke (null, args);
-//        if (args.Cancel)
-//        {
-//            return args.Result ?? default!;
-//        }
+        return eventHandler is null ? null : false;
+    }
 
-//        return defaultAction ();
-//    }
-//}
+    /// <summary>
+    ///     Executes a CWP workflow that produces a result, suitable for methods like <see cref="View.GetScheme"/>.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result, which may be a nullable reference type (e.g., <see cref="Scheme"/>?).</typeparam>
+    /// <param name="onMethod">The virtual method invoked first, returning true to mark the workflow as handled.</param>
+    /// <param name="eventHandler">The event handler to invoke, or null if no handlers are subscribed.</param>
+    /// <param name="args">The event arguments containing a result and handled status.</param>
+    /// <param name="defaultAction">The default action that produces the result if the workflow is not handled.</param>
+    /// <returns>The result from the event arguments or the default action.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown if <paramref name="onMethod"/>, <paramref name="args"/>, or <paramref name="defaultAction"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if <see cref="ResultEventArgs{T}.Result"/> is null for non-nullable reference types when <see cref="ResultEventArgs{T}.Handled"/> is true.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///         ResultEventArgs<Scheme?> args = new();
+    ///         Func<ResultEventArgs<Scheme?>, bool> onGettingScheme = _ => false;
+    ///         EventHandler<ResultEventArgs<Scheme?>>? gettingSchemeHandler = null;
+    ///         Func<Scheme> defaultAction = () => SchemeManager.GetScheme("Base");
+    ///         Scheme scheme = CWPWorkflowHelper.ExecuteWithResult(onGettingScheme, gettingSchemeHandler, args, defaultAction);
+    ///     </code>
+    /// </example>
+    public static TResult ExecuteWithResult<TResult> (
+        Func<ResultEventArgs<TResult>, bool> onMethod,
+        EventHandler<ResultEventArgs<TResult>>? eventHandler,
+        ResultEventArgs<TResult> args,
+        Func<TResult> defaultAction)
+    {
+        ArgumentNullException.ThrowIfNull (onMethod);
+        ArgumentNullException.ThrowIfNull (args);
+        ArgumentNullException.ThrowIfNull (defaultAction);
+
+        bool handled = onMethod (args) || args.Handled;
+        if (handled)
+        {
+            if (args.Result is null && !typeof (TResult).IsValueType && !Nullable.GetUnderlyingType (typeof (TResult))?.IsValueType == true)
+            {
+                throw new InvalidOperationException ("Result cannot be null for non-nullable reference types when Handled is true.");
+            }
+            return args.Result!;
+        }
+
+        eventHandler?.Invoke (null, args);
+
+        if (!args.Handled)
+        {
+            return defaultAction ();
+        }
+
+        if (args.Result is null && !typeof (TResult).IsValueType && !Nullable.GetUnderlyingType (typeof (TResult))?.IsValueType == true)
+        {
+            throw new InvalidOperationException ("Result cannot be null for non-nullable reference types when Handled is true.");
+        }
+        return args.Result!;
+    }
+}

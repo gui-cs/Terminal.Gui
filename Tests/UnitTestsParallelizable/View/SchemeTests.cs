@@ -159,7 +159,7 @@ public class SchemeTests
         var view = new View ();
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
-        view.SettingScheme += (sender, args) => args.Cancel = true;
+        view.SchemeChanging += (sender, args) => args.Handled = true;
 
         view.SetScheme (dialogScheme);
 
@@ -246,7 +246,7 @@ public class SchemeTests
             return true;
         }
 
-        protected override bool OnSettingScheme (in Scheme? scheme)
+        protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
         {
             return true; // Prevent setting the scheme
         }

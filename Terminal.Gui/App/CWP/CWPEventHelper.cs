@@ -1,8 +1,8 @@
-﻿namespace Terminal.Gui.App;
+﻿#nullable enable
+namespace Terminal.Gui.App;
 
 using System;
 
-#nullable enable
 
 /// <summary>
 ///     Provides helper methods for executing event-driven workflows in the Cancellable Work Pattern (CWP).
@@ -43,10 +43,7 @@ public static class CWPEventHelper
         EventHandler<ResultEventArgs<T>>? eventHandler,
         ResultEventArgs<T> args)
     {
-        if (args == null)
-        {
-            throw new ArgumentNullException (nameof (args));
-        }
+        ArgumentNullException.ThrowIfNull (args);
 
         if (eventHandler == null)
         {

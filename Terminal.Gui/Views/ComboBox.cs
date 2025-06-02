@@ -111,10 +111,10 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnSettingScheme (in Scheme scheme)
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
     {
-        _listview.SetScheme(scheme);
-        return base.OnSettingScheme (in scheme);
+        _listview.SetScheme(args.NewValue);
+        return base.OnSettingScheme (args);
     }
 
     /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>

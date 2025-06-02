@@ -184,7 +184,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         if (v.NeedsDraw || v.NeedsLayout)
         {
-            Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
+           // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 
             return true;
         }

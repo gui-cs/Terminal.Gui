@@ -1,8 +1,5 @@
 ﻿namespace Terminal.Gui.App;
 
-using System;
-using System.Collections.Generic;
-
 #nullable enable
 
 /// <summary>
@@ -21,17 +18,24 @@ public static class CWPPropertyHelper
     /// <summary>
     ///     Executes a CWP workflow for a property change, with pre- and post-change events.
     /// </summary>
-    /// <typeparam name="T">The type of the property value, which may be a nullable reference type (e.g., <see cref="string"/>?).</typeparam>
+    /// <typeparam name="T">
+    ///     The type of the property value, which may be a nullable reference type (e.g., <see cref="string"/>
+    ///     ?).
+    /// </typeparam>
     /// <param name="currentValue">The current property value, which may be null for nullable types.</param>
     /// <param name="newValue">The proposed new property value, which may be null for nullable types.</param>
     /// <param name="onChanging">The virtual method invoked before the change, returning true to cancel.</param>
     /// <param name="changingEvent">The pre-change event raised to allow modification or cancellation.</param>
     /// <param name="onChanged">The virtual method invoked after the change.</param>
     /// <param name="changedEvent">The post-change event raised to notify of the completed change.</param>
-    /// <param name="finalValue">The final value after the workflow, reflecting any modifications, which may be null for nullable types.</param>
+    /// <param name="finalValue">
+    ///     The final value after the workflow, reflecting any modifications, which may be null for
+    ///     nullable types.
+    /// </param>
     /// <returns>True if the property was changed, false if cancelled.</returns>
     /// <exception cref="InvalidOperationException">
-    ///     Thrown if <see cref="ValueChangingEventArgs{T}.NewValue"/> is null for non-nullable reference types after the workflow.
+    ///     Thrown if <see cref="ValueChangingEventArgs{T}.NewValue"/> is null for non-nullable reference types after the
+    ///     workflow.
     /// </exception>
     /// <example>
     ///     <code>
@@ -53,31 +57,37 @@ public static class CWPPropertyHelper
         EventHandler<ValueChangingEventArgs<T>>? changingEvent,
         Action<ValueChangedEventArgs<T>>? onChanged,
         EventHandler<ValueChangedEventArgs<T>>? changedEvent,
-        out T finalValue)
+        out T finalValue
+    )
     {
         if (EqualityComparer<T>.Default.Equals (currentValue, newValue))
         {
             finalValue = currentValue;
+
             return false;
         }
 
         ValueChangingEventArgs<T> args = new (currentValue, newValue);
         bool cancelled = onChanging (args) || args.Handled;
+
         if (cancelled)
         {
             finalValue = currentValue;
+
             return false;
         }
 
         changingEvent?.Invoke (null, args);
+
         if (args.Handled)
         {
             finalValue = currentValue;
+
             return false;
         }
 
         // Validate NewValue for non-nullable reference types
-        if (args.NewValue == null && !typeof (T).IsValueType && !Nullable.GetUnderlyingType (typeof (T))?.IsValueType == true)
+        if (args.NewValue is null && !typeof (T).IsValueType && !Nullable.GetUnderlyingType (typeof (T))?.IsValueType == true)
         {
             throw new InvalidOperationException ("NewValue cannot be null for non-nullable reference types.");
         }
