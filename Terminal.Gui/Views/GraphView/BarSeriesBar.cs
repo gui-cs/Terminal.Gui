@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>A single bar in a <see cref="BarSeries"/></summary>
 public class BarSeriesBar

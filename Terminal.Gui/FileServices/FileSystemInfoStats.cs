@@ -1,8 +1,7 @@
 ﻿using System.Globalization;
 using System.IO.Abstractions;
-using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 /// <summary>
 ///     Wrapper for <see cref="FileSystemInfo"/> that contains additional information (e.g. <see cref="IsParent"/>)

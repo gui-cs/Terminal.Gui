@@ -1,6 +1,6 @@
 // This code is a C# port from python library Terminal Text Effects  https://github.com/ChrisBuilds/terminaltexteffects/
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Describes the pattern that a <see cref="Gradient"/> results in e.g. <see cref="Vertical"/>,

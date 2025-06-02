@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     The 16 foreground color codes used by ANSI Esc sequences for 256 color terminals. Add 10 to these values for

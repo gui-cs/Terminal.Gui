@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Event args for when a <see cref="Key"/> is changed from one value to a new value (e.g. in

@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 // TODO: FrameView is mis-named, really. It's far more about it being a TabGroup than a frame. 
 
@@ -8,7 +9,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/> and
+///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="float"/> and
 ///         inherits it's scheme from the <see cref="View.SuperView"/>.
 ///     </para>
 ///     <para>
@@ -19,7 +20,7 @@ namespace Terminal.Gui;
 public class FrameView : View
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.FrameView"/> class.
+    ///     Initializes a new instance of the <see cref="FrameView"/> class.
     ///     layout.
     /// </summary>
     public FrameView ()

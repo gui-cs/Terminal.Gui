@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="ITableSource"/>

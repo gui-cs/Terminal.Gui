@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Styles for <see cref="FlagSelector"/>.

@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Represents the state of a <see cref="CheckBox"/>.

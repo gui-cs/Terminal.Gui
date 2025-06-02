@@ -1,6 +1,5 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.LayoutTests;
 

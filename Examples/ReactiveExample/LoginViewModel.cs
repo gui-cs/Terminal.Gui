@@ -1,12 +1,9 @@
-using System;
-using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
-using Terminal.Gui;
+using Terminal.Gui.Input;
 
 namespace ReactiveExample;
 

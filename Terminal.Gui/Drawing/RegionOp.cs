@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Specifies the operation to perform when combining two regions or a <see cref="Region"/> with a

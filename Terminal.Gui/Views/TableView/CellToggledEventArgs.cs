@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Event args for the <see cref="TableView.CellToggled"/> event.</summary>
 public class CellToggledEventArgs : EventArgs

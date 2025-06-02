@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Globalization;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -61,8 +60,8 @@ public class TableEditor : Scenario
              "Cuneiform Numbers and Punctuation"
             ),
         new (
-             (uint)(Terminal.Gui.UnicodeRange.Ranges.Max (r => r.End) - 16),
-             (uint)Terminal.Gui.UnicodeRange.Ranges.Max (r => r.End),
+             (uint)(Terminal.Gui.Views.UnicodeRange.Ranges.Max (r => r.End) - 16),
+             (uint)Terminal.Gui.Views.UnicodeRange.Ranges.Max (r => r.End),
              "End"
             ),
         new (0x0020, 0x007F, "Basic Latin"),

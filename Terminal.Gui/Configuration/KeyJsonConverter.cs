@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>Support for <see cref="Key"/> in JSON in the form of "Ctrl-X" or "Alt-Shift-F1".</summary>
 public class KeyJsonConverter : JsonConverter<Key>

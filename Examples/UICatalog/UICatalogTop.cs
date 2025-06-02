@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui;
-using Command = Terminal.Gui.Command;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 #nullable enable

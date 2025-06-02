@@ -1,12 +1,13 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     An overlapped container for other views with a border and optional title.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Window has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/>, <see cref="View.Arrangement"/>
+///         Window has <see cref="View.BorderStyle"/> set to <see cref="float"/>, <see cref="View.Arrangement"/>
 ///         set to <see cref="ViewArrangement.Overlapped"/>, and
 ///         uses the "Base" <see cref="Scheme"/> scheme by default.
 ///     </para>

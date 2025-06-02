@@ -1,12 +1,11 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UnitTests;
 
 /// <summary>
-///     Provides xUnit-style assertions for <see cref="Terminal.Gui.IConsoleDriver"/> contents.
+///     Provides xUnit-style assertions for <see cref="IConsoleDriver"/> contents.
 /// </summary>
 internal partial class DriverAssert
 {

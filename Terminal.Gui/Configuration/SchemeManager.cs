@@ -1,17 +1,14 @@
 ﻿#nullable enable
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
-///     Holds the <see cref="Scheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
-///     themselves. A Scheme is a mapping from <see cref="VisualRole"/>s (such as <see cref="VisualRole.Focus"/>) to <see cref="Attribute"/>s.
+///     Holds the <see cref="Drawing.Scheme"/>s that define the <see cref="System.Attribute"/>s that are used by views to render
+///     themselves. A Scheme is a mapping from <see cref="Drawing.VisualRole"/>s (such as <see cref="Drawing.VisualRole.Focus"/>) to <see cref="System.Attribute"/>s.
 ///     A Scheme defines how a `View` should look based on its purpose (e.g. Menu or Dialog).
 /// </summary>
 public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<string, Scheme?>
@@ -28,7 +25,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     internal static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes ()!; }
 
     /// <summary>
-    ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
+    ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Drawing.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
@@ -111,7 +108,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     }
 
     /// <summary>
-    ///     Gets the <see cref="Scheme"/> for the specified <see cref="Gui.Schemes"/>.
+    ///     Gets the <see cref="Scheme"/> for the specified <see cref="Drawing.Schemes"/>.
     /// </summary>
     /// <param name="schemeName"></param>
     /// <returns></returns>

@@ -3,15 +3,11 @@
 // TextView.cs: multi-line text editing
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Terminal.Gui.Resources;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
-/// <summary>Multi-line text editing <see cref="View"/>.</summary>
+/// <summary>Fully featured multi-line text editor</summary>
 /// <remarks>
-///     <para>
-///         <see cref="TextView"/> provides a fully featured multi-line text editor.
-///     </para>
 ///     <list type="table">
 ///         <listheader>
 ///             <term>Shortcut</term> <description>Action performed</description>

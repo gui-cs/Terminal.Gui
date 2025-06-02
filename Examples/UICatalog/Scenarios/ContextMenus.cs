@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using JetBrains.Annotations;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

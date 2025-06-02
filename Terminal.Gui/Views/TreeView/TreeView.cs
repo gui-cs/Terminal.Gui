@@ -4,7 +4,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface for all non-generic members of <see cref="TreeView{T}"/>.

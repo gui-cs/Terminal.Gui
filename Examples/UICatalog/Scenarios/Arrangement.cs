@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Terminal.Gui;
 using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;
@@ -192,7 +191,7 @@ public class Arrangement : Scenario
         TransparentView transparentView = new ()
         {
             Title = "Transparent",
-            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent,
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent,
             X = 30,
             Y = 5,
             Width = 35,
@@ -209,7 +208,7 @@ public class Arrangement : Scenario
         testFrame.Add (new TransparentView ()
         {
             Title = "Transparent|TransparentMouse",
-            ViewportSettings = Terminal.Gui.ViewportSettings.TransparentMouse | Terminal.Gui.ViewportSettings.Transparent
+            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse | Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
         });
 
         adornmentsEditor.AutoSelectSuperView = testFrame;
@@ -336,7 +335,7 @@ public class Arrangement : Scenario
             Width = 30;
             Height = 10;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent | Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
 
             Padding!.Thickness = new Thickness (1);
 

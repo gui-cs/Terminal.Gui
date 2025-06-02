@@ -4,7 +4,6 @@ using System.Collections;
 using System.Globalization;
 using System.Resources;
 using System.Runtime.CompilerServices;
-using Terminal.Gui.Resources;
 
 namespace Terminal.Gui.ResourcesTests;
 

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
@@ -78,7 +79,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
 
     /// <summary>Converts the string into a <see cref="List{Cell}"/>.</summary>
     /// <param name="str">The string to convert.</param>
-    /// <param name="attribute">The <see cref="Gui.Scheme"/> to use.</param>
+    /// <param name="attribute">The <see cref="Scheme"/> to use.</param>
     /// <returns></returns>
     public static List<Cell> ToCellList (string str, Attribute? attribute = null)
     {

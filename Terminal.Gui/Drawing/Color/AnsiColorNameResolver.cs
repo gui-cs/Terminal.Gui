@@ -3,7 +3,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 /// Color name resolver for <see cref="ColorName16"/>.

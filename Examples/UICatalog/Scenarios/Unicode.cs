@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

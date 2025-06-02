@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using UnitTests;
 using Xunit.Abstractions;
-using static Terminal.Gui.ConfigurationManager;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 

@@ -1,10 +1,10 @@
 #nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Enables the user to increase or decrease a value with the mouse or keyboard.
+///     Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 /// </summary>
 /// <remarks>
 ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,

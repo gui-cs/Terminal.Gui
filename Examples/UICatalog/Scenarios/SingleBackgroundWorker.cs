@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 

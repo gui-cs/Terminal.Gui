@@ -2,7 +2,8 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Event args for the <see cref="TreeView{T}.DrawLine"/> event</summary>
 /// <typeparam name="T"></typeparam>

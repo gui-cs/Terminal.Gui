@@ -1,6 +1,5 @@
-﻿using Terminal.Gui.Resources;
-
-namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 public partial class ColorPicker
 {

@@ -55,7 +55,6 @@ To add a new **Scenario** simply:
 The sample below is provided in the `.\UICatalog\Scenarios` directory as a generic sample that can be copied and re-named:
 
 ```csharp
-using Terminal.Gui;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]

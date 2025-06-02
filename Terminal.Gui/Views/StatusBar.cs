@@ -1,6 +1,7 @@
 #nullable enable
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of

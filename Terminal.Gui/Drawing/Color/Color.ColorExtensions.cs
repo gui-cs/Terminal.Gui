@@ -2,7 +2,7 @@
 using System.Collections.Frozen;
 using ColorHelper;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 internal static class ColorExtensions
 {

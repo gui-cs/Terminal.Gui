@@ -2,18 +2,13 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     The ScrollSlider can be dragged with the mouse, constrained by the size of the Viewport of it's superview. The
-///     ScrollSlider can be
+///     Represents the proportion of the visible content to the Viewport in a <see cref="ScrollBar"/>.
+///     Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be
 ///     oriented either vertically or horizontally.
 /// </summary>
-/// <remarks>
-///     <para>
-///         Used to represent the proportion of the visible content to the Viewport in a <see cref="Scrolled"/>.
-///     </para>
-/// </remarks>
 public class ScrollSlider : View, IOrientation, IDesignable
 {
     /// <summary>

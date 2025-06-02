@@ -1,7 +1,7 @@
 #nullable enable
 using System.Diagnostics;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting a single item from a list of options.
@@ -317,7 +317,7 @@ public class OptionSelector : View, IOrientation, IDesignable
     public bool EnableForDesign ()
     {
         AssignHotKeysToCheckBoxes = true;
-        Options = new [] { "Option 1", "Option 2", "Option 3" };
+        Options = ["Option 1", "Option 2", "Third Option", "Option Quattro"];
 
         return true;
     }

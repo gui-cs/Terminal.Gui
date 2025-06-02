@@ -6,7 +6,7 @@
 // - Bug showing the last line
 // 
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Defines the event arguments for <see cref="HexView.PositionChanged"/> event.</summary>
 public class HexViewEventArgs : EventArgs

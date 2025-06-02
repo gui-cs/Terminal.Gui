@@ -2,7 +2,7 @@
 
 Logging has come to Terminal.Gui! You can now enable comprehensive logging of the internals of the library. This can help diagnose issues with specific terminals, keyboard cultures and/or operating system specific issues.
 
-To enable file logging you should set the static property `Logging.Logger` to an instance of `Microsoft.Extensions.Logging.ILogger`. If your program already uses logging you can provide a shared instance or instance from Dependency Injection (DI).
+To enable file logging you should set the static property @Terminal.Gui.App.Logging.Logger to an instance of `Microsoft.Extensions.Logging.ILogger`. If your program already uses logging you can provide a shared instance or instance from Dependency Injection (DI).
 
 Alternatively you can create a new log to ensure only Terminal.Gui logs appear.
 

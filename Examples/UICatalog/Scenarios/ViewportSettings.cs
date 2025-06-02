@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -28,8 +27,8 @@ public class ViewportSettings : Scenario
             Arrangement = ViewArrangement.Resizable;
 
             SetContentSize (new (60, 40));
-            ViewportSettings |= Terminal.Gui.ViewportSettings.ClearContentOnly;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.ClipContentOnly;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClearContentOnly;
+            ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClipContentOnly;
             VerticalScrollBar.Visible = true;
 
             // Things this view knows how to do

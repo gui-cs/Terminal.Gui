@@ -1,6 +1,6 @@
 ﻿// TextView.cs: multi-line text editing
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Event arguments for events for when the contents of the TextView change. E.g. the

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Arguments for a <see cref="CellColorGetterDelegate"/>.  Describes a cell for which a rendering

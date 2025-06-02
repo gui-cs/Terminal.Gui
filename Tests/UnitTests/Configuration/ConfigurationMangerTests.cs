@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using ColorHelper;
 using Xunit.Abstractions;
-using static Terminal.Gui.ConfigurationManager;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 using File = System.IO.File;
 
 #pragma warning disable IDE1006
