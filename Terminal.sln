@@ -50,8 +50,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfContained", "Examples\SelfContained\SelfContained.csproj", "{524DEA78-7E7C-474D-B42D-52ED4C04FF14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00F366F8-DEE4-482C-B9FD-6DB0200B79E5} = {00F366F8-DEE4-482C-B9FD-6DB0200B79E5}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "Examples\NativeAot\NativeAot.csproj", "{E6D716C6-AC94-4150-B10A-44AE13F79344}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00F366F8-DEE4-482C-B9FD-6DB0200B79E5} = {00F366F8-DEE4-482C-B9FD-6DB0200B79E5}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Tests\Benchmarks\Benchmarks.csproj", "{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}"
 EndProject
