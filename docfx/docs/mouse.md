@@ -20,8 +20,12 @@ Tenets higher in the list have precedence over tenets lower in the list.
 *Terminal.Gui* provides the following APIs for handling mouse input:
 
 * **MouseEventArgs** - @Terminal.Gui.Input.MouseEventArgs provides a platform-independent abstraction for common mouse operations. It is used for processing mouse input and raising mouse events.
+
 * **Mouse Bindings** - Mouse Bindings provide a declarative method for handling mouse input in View implementations. The View calls Terminal.Gui.ViewBase.View.AddCommand* to declare it supports a particular command and then uses @Terminal.Gui.Input.MouseBindings to indicate which mouse events will invoke the command. 
+
 * **Mouse Events** - The Mouse Bindings API is rich enough to support the  majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. drag & drop). Use @Terminal.Gui.ViewBase.View.MouseEvent and related events in these cases.
+
+* **Mouse State** - @Terminal.Gui.ViewBase.View.MouseState provides a abstraction for the current state of the mouse, enabling views to do interesting things like change their appearance based on the mouse state.
 
 Each of these APIs are described more fully below.
 
@@ -45,6 +49,14 @@ At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.Input.MouseEventA
 
 When the user does something with the mouse, the `ConsoleDriver` maps the platform-specific mouse event into a `MouseEventArgs` and calls `Application.RaiseMouseEvent`. Then, `Application.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `Application` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be raised with the event arguments indicating which mouse button was double-clicked. 
 
+## Mouse State
+
+The @Terminal.Gui.ViewBase.View.MouseState property provides a abstraction for the current state of the mouse, enabling views to do interesting things like change their appearance based on the mouse state.
+
+It works in conjunction with the @Terminal.Gui.ViewBase.View.HighlightStates which is a list of mouse states that will cause a view to become highlighted.
+
+Subscribe to the @Terminal.Gui.ViewBase.View.MouseStateChanged event to be notified when the mouse state changes.
+
 ## Mouse Button and Movement Concepts
 
 * **Down** - Indicates the user pushed a mouse button down.
@@ -60,4 +72,7 @@ The @Terminal.Gui.App.Application.MouseEvent event can be used if an application
 ## Mouse Enter/Leave Events
 
 The @Terminal.Gui.ViewBase.View.MouseEnter and @Terminal.Gui.ViewBase.View.MouseLeave events enable a View to take action when the mouse is over the view. Internally, this is used to enable @Terminal.Gui.ViewBase.View.Highlight.
+
+
+
 

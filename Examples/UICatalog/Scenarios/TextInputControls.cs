@@ -33,7 +33,7 @@ public class TextInputControls : Scenario
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
         textField.TextChanging += TextFieldTextChanging;
 
-        void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
+        void TextFieldTextChanging (object sender, ResultEventArgs<string> e)
         {
             singleWordGenerator.AllSuggestions = Regex.Matches (e.Result, "\\w+")
                                                       .Select (s => s.Value)

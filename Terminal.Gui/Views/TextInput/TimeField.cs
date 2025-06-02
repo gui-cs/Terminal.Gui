@@ -432,7 +432,7 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, CancelEventArgs<string> e)
+    private void TextField_TextChanging (object sender, ResultEventArgs<string> e)
     {
         try
         {
@@ -468,14 +468,14 @@ public class TimeField : TextField
                                          out TimeSpan result
                                         ))
             {
-                e.Cancel = true;
+                e.Handled = true;
             }
 
             AdjCursorPosition (CursorPosition);
         }
         catch (Exception)
         {
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 }

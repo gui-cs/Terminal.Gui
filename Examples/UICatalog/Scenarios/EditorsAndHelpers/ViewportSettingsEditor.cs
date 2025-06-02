@@ -195,7 +195,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void ContentSizeWidthValueChanged (object? sender, CancelEventArgs<int> e)
         {
-            if (e.Result < 0)
+            if (e.NewValue < 0)
             {
                 e.Cancel = true;
 
@@ -203,7 +203,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
 
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            ViewToEdit!.SetContentSize (ViewToEdit.GetContentSize () with { Width = e.Result });
+            ViewToEdit!.SetContentSize (ViewToEdit.GetContentSize () with { Width = e.NewValue });
         }
 
         var labelComma = new Label
@@ -223,7 +223,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void ContentSizeHeightValueChanged (object? sender, CancelEventArgs<int> e)
         {
-            if (e.Result < 0)
+            if (e.NewValue < 0)
             {
                 e.Cancel = true;
 
@@ -231,7 +231,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
 
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            ViewToEdit?.SetContentSize (ViewToEdit.GetContentSize () with { Height = e.Result });
+            ViewToEdit?.SetContentSize (ViewToEdit.GetContentSize () with { Height = e.NewValue });
         }
 
         _cbClearContentOnly = new ()

@@ -798,7 +798,7 @@ public class DynamicMenuBar : Scenario
                                               }
                                               else
                                               {
-                                                  e.Cancel = true;
+                                                  e.Handled = true;
                                                   txtDelimiter.SelectAll ();
                                               }
                                           };

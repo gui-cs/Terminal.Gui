@@ -259,7 +259,7 @@ public sealed class PosAlignDemo : Scenario
 
         addedViewsUpDown.ValueChanging += (s, e) =>
                                           {
-                                              if (e.Result < 0)
+                                              if (e.NewValue < 0)
                                               {
                                                   e.Cancel = true;
 
@@ -267,10 +267,10 @@ public sealed class PosAlignDemo : Scenario
                                               }
 
                                               // Add or remove buttons
-                                              if (e.Result < e.CurrentValue)
+                                              if (e.NewValue < e.CurrentValue)
                                               {
                                                   // Remove buttons
-                                                  for (int i = e.CurrentValue - 1; i >= e.Result; i--)
+                                                  for (int i = e.CurrentValue - 1; i >= e.NewValue; i--)
                                                   {
                                                       Button button = addedViews [i];
                                                       appWindow.Remove (button);
@@ -279,10 +279,10 @@ public sealed class PosAlignDemo : Scenario
                                                   }
                                               }
 
-                                              if (e.Result > e.CurrentValue)
+                                              if (e.NewValue > e.CurrentValue)
                                               {
                                                   // Add buttons
-                                                  for (int i = e.CurrentValue; i < e.Result; i++)
+                                                  for (int i = e.CurrentValue; i < e.NewValue; i++)
                                                   {
                                                       var button = new Button
                                                       {

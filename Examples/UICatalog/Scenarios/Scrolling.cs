@@ -84,11 +84,11 @@ public class Scrolling : Scenario
                                            };
         app.Add (ahCheckBox);
 
-        demoView.VerticalScrollBar.VisibleChanging += (sender, args) => { vCheckBox.CheckedState = args.Result ? CheckState.Checked : CheckState.UnChecked; };
+        demoView.VerticalScrollBar.VisibleChanging += (sender, args) => { vCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
         demoView.HorizontalScrollBar.VisibleChanging += (sender, args) =>
                                                         {
-                                                            hCheckBox.CheckedState = args.Result ? CheckState.Checked : CheckState.UnChecked;
+                                                            hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked;
                                                         };
 
         // Add a progress bar to cause constant redraws

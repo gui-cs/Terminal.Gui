@@ -622,7 +622,7 @@ public class WizardTests ()
 
         r.TitleChanging += (s, args) =>
                            {
-                               Assert.Equal (expectedDuring, args.Result);
+                               Assert.Equal (expectedDuring, args.NewValue);
                                args.Cancel = cancel;
                            };
 

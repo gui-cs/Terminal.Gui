@@ -6,10 +6,9 @@ namespace Terminal.Gui.App;
 ///     such as property changes in the Cancellable Work Pattern (CWP).
 /// </summary>
 /// <remarks>
-///     Used for workflows where an existing value (e.g., property) is being modified or cancelled, such for property
-///     changes like <see cref="Orientation"/>.
+///     Used for workflows where an existing value (e.g., property) is being modified.
 /// </remarks>
-/// <typeparam name="T">The type of the value being changed.</typeparam>
+/// <typeparam name="T">The type of the value being modified.</typeparam>
 /// <seealso cref="ResultEventArgs{T}"/>
 public class ValueChangingEventArgs<T>
 {
