@@ -206,7 +206,7 @@ internal class TextModel
         return sb.ToString ();
     }
 
-    public (int col, int row)? WordBackward (int fromCol, int fromRow)
+    public (int col, int row)? WordBackward (int fromCol, int fromRow, bool useSameRuneType)
     {
         if (fromRow == 0 && fromCol == 0)
         {
@@ -245,7 +245,7 @@ internal class TextModel
 
             RuneType runeType = GetRuneType (rune);
 
-            int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
+            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
                                    ? col
                                    : -1;
 
@@ -253,7 +253,7 @@ internal class TextModel
             {
                 if (Rune.IsWhiteSpace (nRune))
                 {
-                    while (MovePrev (ref nCol, ref nRow, out nRune))
+                    while (MovePrev (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))
                         {
@@ -280,7 +280,7 @@ internal class TextModel
                         return;
                     }
 
-                    while (MovePrev (ref nCol, ref nRow, out nRune))
+                    while (MovePrev (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune))
                         {
@@ -293,7 +293,7 @@ internal class TextModel
                         }
 
                         lastValidCol =
-                            (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+                            (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
                                 ? nCol
                                 : lastValidCol;
                     }
@@ -306,7 +306,7 @@ internal class TextModel
                 }
                 else
                 {
-                    if (!MovePrev (ref nCol, ref nRow, out nRune))
+                    if (!MovePrev (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         return;
                     }
@@ -321,7 +321,7 @@ internal class TextModel
                     }
 
                     lastValidCol =
-                        (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+                        (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
                             ? nCol
                             : lastValidCol;
 
@@ -358,7 +358,7 @@ internal class TextModel
         }
     }
 
-    public (int col, int row)? WordForward (int fromCol, int fromRow)
+    public (int col, int row)? WordForward (int fromCol, int fromRow, bool useSameRuneType)
     {
         if (fromRow == _lines.Count - 1 && fromCol == GetLine (_lines.Count - 1).Count)
         {
@@ -373,7 +373,7 @@ internal class TextModel
             Rune rune = RuneAt (col, row)!.Value.Rune;
             RuneType runeType = GetRuneType (rune);
 
-            int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
+            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
                                    ? col
                                    : -1;
 
@@ -381,7 +381,7 @@ internal class TextModel
             {
                 if (Rune.IsWhiteSpace (nRune))
                 {
-                    while (MoveNext (ref nCol, ref nRow, out nRune))
+                    while (MoveNext (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))
                         {
@@ -401,7 +401,7 @@ internal class TextModel
                         return;
                     }
 
-                    while (MoveNext (ref nCol, ref nRow, out nRune))
+                    while (MoveNext (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune))
                         {
@@ -414,7 +414,7 @@ internal class TextModel
                         }
 
                         lastValidCol =
-                            (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+                            (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
                                 ? nCol
                                 : lastValidCol;
                     }
@@ -427,12 +427,12 @@ internal class TextModel
                 }
                 else
                 {
-                    if (!MoveNext (ref nCol, ref nRow, out nRune))
+                    if (!MoveNext (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         return;
                     }
 
-                    if (!IsSameRuneType (nRune, runeType) && !Rune.IsWhiteSpace (nRune))
+                    if (!IsSameRuneType (nRune, runeType, useSameRuneType) && !Rune.IsWhiteSpace (nRune))
                     {
                         return;
                     }
@@ -447,7 +447,7 @@ internal class TextModel
                     }
 
                     lastValidCol =
-                        (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+                        (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
                             ? nCol
                             : lastValidCol;
 
@@ -966,7 +966,7 @@ internal class TextModel
         return RuneType.IsUnknown;
     }
 
-    private bool IsSameRuneType (Rune newRune, RuneType runeType)
+    private bool IsSameRuneType (Rune newRune, RuneType runeType, bool useSameRuneType)
     {
         RuneType rt = GetRuneType (newRune);
 
@@ -992,7 +992,7 @@ internal class TextModel
         return false;
     }
 
-    private bool MoveNext (ref int col, ref int row, out Rune rune)
+    private bool MoveNext (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
@@ -1001,7 +1001,10 @@ internal class TextModel
             col++;
             rune = line [col].Rune;
 
-            if (col + 1 == line.Count && !Rune.IsLetterOrDigit (rune) && !Rune.IsWhiteSpace (line [col - 1].Rune))
+            if (col + 1 == line.Count
+                && !Rune.IsLetterOrDigit (rune)
+                && !Rune.IsWhiteSpace (line [col - 1].Rune)
+                && IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType))
             {
                 col++;
             }
@@ -1033,19 +1036,25 @@ internal class TextModel
         return false;
     }
 
-    private bool MovePrev (ref int col, ref int row, out Rune rune)
+    private bool MovePrev (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
         if (col > 0)
         {
-            col--;
             rune = line [col].Rune;
 
-            return true;
+            if (IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType))
+            {
+                col--;
+
+                return true;
+            }
+
+            return false;
         }
 
-        if (row == 0)
+        if (row == 0 || col == 0)
         {
             rune = default (Rune);
 

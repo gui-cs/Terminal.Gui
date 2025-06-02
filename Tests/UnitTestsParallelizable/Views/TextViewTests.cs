@@ -1679,9 +1679,9 @@ public class TextViewTests
     {
         var model = new TextModel ();
         model.LoadString ("Test");
-        (int col, int row)? newPos = model.WordBackward (0, 0);
+        (int col, int row)? newPos = model.WordBackward (0, 0, false);
         Assert.Null (newPos);
-        newPos = model.WordForward (4, 0);
+        newPos = model.WordForward (4, 0, false);
         Assert.Null (newPos);
     }
 
