@@ -31,8 +31,8 @@ jobs:
       run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages
 
     - name: Restore AOT and Self-Contained projects
-      run: dotnet restore "../Examples/NativeAot/NativeAot.csproj" -f |
-          dotnet restore "../Examples/SelfContained/SelfContained.csproj" -f
+      run: dotnet restore "/Examples/NativeAot/NativeAot.csproj" -f |
+          dotnet restore "/Examples/SelfContained/SelfContained.csproj" -f
 
     - name: Build Release Solution
       run: dotnet build --configuration Release
