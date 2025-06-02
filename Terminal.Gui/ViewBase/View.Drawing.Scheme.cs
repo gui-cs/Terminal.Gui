@@ -22,18 +22,18 @@ public partial class View
                 return;
             }
 
-            if (OnSettingSchemeName (in _schemeName, ref value))
+            if (OnSettingSchemeName (value))
             {
                 _schemeName = value;
                 return;
             }
 
-            StringPropertyEventArgs args = new (in _schemeName, ref value);
+            ResultEventArgs<string> args = new (value);
             SettingSchemeName?.Invoke (this, args);
 
-            if (args.Cancel)
+            if (args.Handled)
             {
-                _schemeName = args.NewString;
+                _schemeName = args.Result;
 
                 return;
             }
@@ -45,16 +45,15 @@ public partial class View
     /// <summary>
     ///     Called when the <see cref="Scheme"/> for the View is to be set.
     /// </summary>
-    /// <param name="currentName"></param>
     /// <param name="newName"></param>
     /// <returns><see langword="true"/> to stop default behavior.</returns>
-    protected virtual bool OnSettingSchemeName (in string? currentName, ref string? newName) { return false; }
+    protected virtual bool OnSettingSchemeName (string? newName) { return false; }
 
     /// <summary>Raised when the <see cref="Scheme"/> for the View is to be set.</summary>
     /// <returns>
     ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
     /// </returns>
-    public event EventHandler<StringPropertyEventArgs>? SettingSchemeName;
+    public event EventHandler<ResultEventArgs<string>>? SettingSchemeName;
 
     // Both holds the set Scheme and is used to determine if a Scheme has been set or not
     private Scheme? _scheme;
@@ -77,12 +76,12 @@ public partial class View
             return newScheme!;
         }
 
-        var args = new SchemeEventArgs (in _scheme, ref newScheme);
+        var args = new ResultEventArgs<Scheme?> (newScheme);
         GettingScheme?.Invoke (this, args);
 
-        if (args.Cancel)
+        if (args.Handled)
         {
-            return args.NewScheme!;
+            return args.Result!;
         }
 
         if (!HasScheme && !string.IsNullOrEmpty (SchemeName))
@@ -119,7 +118,7 @@ public partial class View
     /// <returns>
     ///     Set `Cancel` to <see langword="true"/> to stop default behavior.
     /// </returns>
-    public event EventHandler<SchemeEventArgs>? GettingScheme;
+    public event EventHandler<ResultEventArgs<Scheme?>>? GettingScheme;
 
     /// <summary>
     ///     Sets the Scheme for the View. Raises <see cref="SettingScheme"/> event before setting the scheme.

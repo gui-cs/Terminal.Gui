@@ -32,7 +32,7 @@ public class SchemeViewer : FrameView
     }
 
     /// <inheritdoc/>
-    protected override bool OnSettingSchemeName (in string? currentName, ref string? newName)
+    protected override bool OnSettingSchemeName (string? newName)
     {
         Title = newName ?? "null";
 
@@ -41,6 +41,6 @@ public class SchemeViewer : FrameView
             v.SchemeName = newName;
         }
 
-        return base.OnSettingSchemeName (in currentName, ref newName);
+        return base.OnSettingSchemeName (newName);
     }
 }
