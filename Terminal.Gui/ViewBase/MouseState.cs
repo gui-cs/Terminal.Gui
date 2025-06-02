@@ -15,10 +15,10 @@ public enum MouseState
     None = 0,
 
     /// <summary>
-    ///     The mouse is over the <see cref="View.Viewport"/> (but not pressed). Set between the <see cref="View.MouseEnter"/>
+    ///     The mouse is in the <see cref="View.Viewport"/> (but not pressed). Set between the <see cref="View.MouseEnter"/>
     ///     and <see cref="View.MouseLeave"/> events.
     /// </summary>
-    Over = 1,
+    In = 1,
 
     /// <summary>
     ///     The mouse is over the <see cref="View.Viewport"/> and is pressed.
@@ -26,7 +26,7 @@ public enum MouseState
     Pressed = 2,
 
     /// <summary>
-    ///     The mouse is not over the <see cref="View.Viewport"/> and is pressed.
+    ///     The mouse is outside the <see cref="View.Viewport"/> and is pressed.
     /// </summary>
-    PressedNotOver = 4
+    PressedOutside = 4
 }

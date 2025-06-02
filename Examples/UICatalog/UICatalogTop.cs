@@ -310,7 +310,7 @@ public class UICatalogTop : Toplevel
                 AssignHotKeysToCheckBoxes = true,
                 Options = Enum.GetNames<LogLevel> (),
                 SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-                HighlightStyle = Terminal.Gui.ViewBase.MouseState.Over
+                HighlightStyle = Terminal.Gui.ViewBase.MouseState.In
             };
 
             _logLevelRg.SelectedItemChanged += (_, args) =>

@@ -132,14 +132,14 @@ public class Mouse : Scenario
 
         win.Add (demo);
 
-        cbHighlightOnPress.CheckedState = demo.HighlightStyle == (MouseState.Pressed | MouseState.PressedNotOver) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPress.CheckedState = demo.HighlightStyle == (MouseState.Pressed | MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3753
         cbHighlightOnPress.CheckedStateChanging += (s, e) =>
                                                    {
                                                        if (e.Result == CheckState.Checked)
                                                        {
-                                                           demo.HighlightStyle = MouseState.Pressed | MouseState.PressedNotOver;
+                                                           demo.HighlightStyle = MouseState.Pressed | MouseState.PressedOutside;
                                                        }
                                                        else
                                                        {
@@ -150,7 +150,7 @@ public class Mouse : Scenario
                                                        {
                                                            if (e.Result == CheckState.Checked)
                                                            {
-                                                               subview.HighlightStyle = MouseState.Pressed | MouseState.PressedNotOver;
+                                                               subview.HighlightStyle = MouseState.Pressed | MouseState.PressedOutside;
                                                            }
                                                            else
                                                            {
@@ -162,7 +162,7 @@ public class Mouse : Scenario
                                                        {
                                                            if (e.Result == CheckState.Checked)
                                                            {
-                                                               subview.HighlightStyle = MouseState.Pressed | MouseState.PressedNotOver;
+                                                               subview.HighlightStyle = MouseState.Pressed | MouseState.PressedOutside;
                                                            }
                                                            else
                                                            {
@@ -299,7 +299,7 @@ public class Mouse : Scenario
                 Border.LineStyle = LineStyle.Rounded;
 
 
-                Highlight += (sender, args) =>
+                MouseStateChanging += (sender, args) =>
                              {
                                  if (args.Result.HasFlag (MouseState.Pressed))
                                  {

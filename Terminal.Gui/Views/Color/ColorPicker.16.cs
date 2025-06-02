@@ -280,7 +280,7 @@ public class ColorPicker16 : View
 
     private void SetInitialProperties ()
     {
-        HighlightStyle = ViewBase.MouseState.PressedNotOver | ViewBase.MouseState.Pressed;
+        HighlightStyle = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed;
 
         CanFocus = true;
         AddCommands ();

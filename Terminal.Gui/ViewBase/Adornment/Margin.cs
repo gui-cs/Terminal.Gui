@@ -113,7 +113,7 @@ public class Margin : Adornment
         ShadowStyle = base.ShadowStyle;
 
         // TODO: Move to method.
-        Parent.Highlight += OnParentOnHighlight;
+        Parent.MouseStateChanging += OnParentOnHighlight;
     }
 
     /// <inheritdoc/>

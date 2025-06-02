@@ -291,6 +291,13 @@ public class MouseTests : TestsAllViews
         Assert.Equal (2, clickedCount);
         me.Handled = false;
 
+        // Stay in Viewport
+        me.Flags = MouseFlags.Button1Pressed;
+        me.Position = me.Position with { X = 0 };
+        view.NewMouseEvent (me);
+        Assert.Equal (3, clickedCount);
+        me.Handled = false;
+
         view.Dispose ();
 
         // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
@@ -299,7 +306,7 @@ public class MouseTests : TestsAllViews
 
     [Theory (Skip = "This test needs to be redone.")]
     [InlineData (MouseState.None, 0, 0)]
-    [InlineData (MouseState.Pressed | MouseState.PressedNotOver, 1, 1)]
+    [InlineData (MouseState.Pressed | MouseState.PressedOutside, 1, 1)]
     public void HighlightOnPress_Fires_Events_And_Highlights (MouseState highlightOnPress, int expectedEnabling, int expectedDisabling)
     {
         var view = new View
@@ -312,7 +319,7 @@ public class MouseTests : TestsAllViews
 
         var enablingHighlight = 0;
         var disablingHighlight = 0;
-        view.Highlight += ViewHighlight;
+        view.MouseStateChanging += ViewHighlight;
         view.SetScheme (new (new Attribute (ColorName16.Red, ColorName16.Blue)));
         Scheme originalScheme = view.GetScheme ();
 
@@ -358,70 +365,235 @@ public class MouseTests : TestsAllViews
     [InlineData (0)]
     [InlineData (1)]
     [InlineData (10)]
-    public void HighlightOnPress_Move_Keeps_Highlight (int x)
+    public void MouseState_None_Button1_Pressed_Move_No_Changes (int x)
     {
-        var view = new View
+        var testView = new MouseEventTestView
         {
-            CanFocus = true,
-            HighlightStyle = MouseState.Pressed | MouseState.PressedNotOver,
-            Height = 1,
-            Width = 1
+            HighlightStyle = MouseState.None
         };
-        var enablingHighlight = 0;
-        var disablingHighlight = 0;
-        view.Highlight += ViewHighlight;
-        bool inViewport = view.Viewport.Contains (x, 0);
+
+        bool inViewport = testView.Viewport.Contains (x, 0);
 
         // Start at 0,0 ; in viewport
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
-        Assert.Equal (1, enablingHighlight);
-        Assert.Equal (0, disablingHighlight);
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (0, testView.MouseStateInCount);
+        Assert.Equal (0, testView.MouseStatePressedCount);
+        Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+        Assert.Equal (0, testView.MouseStateNoneCount);
 
         // Move to x,0 
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
         if (inViewport)
         {
-            Assert.Equal (2, enablingHighlight);
-            Assert.Equal (0, disablingHighlight);
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
         }
         else
         {
-            Assert.Equal (2, enablingHighlight);
-            Assert.Equal (0, disablingHighlight);
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
         }
 
         // Move backto 0,0 ; in viewport
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
         if (inViewport)
         {
-            Assert.Equal (3, enablingHighlight);
-            Assert.Equal (0, disablingHighlight);
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
         }
         else
         {
-            Assert.Equal (3, enablingHighlight);
-            Assert.Equal (0, disablingHighlight);
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
         }
 
-        view.Dispose ();
+        testView.Dispose ();
 
         // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
         Application.ResetState (true);
+    }
 
-        return;
-
-        void ViewHighlight (object sender, CancelEventArgs<MouseState> e)
+    [Theory]
+    [InlineData (0)]
+    [InlineData (1)]
+    [InlineData (10)]
+    public void MouseState_Pressed_Button1_Pressed_Move_Keeps_Pressed (int x)
+    {
+        var testView = new MouseEventTestView
         {
-            if (e.Result == MouseState.None)
+            HighlightStyle = MouseState.Pressed
+        };
+
+        bool inViewport = testView.Viewport.Contains (x, 0);
+
+        // Start at 0,0 ; in viewport
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (0, testView.MouseStateInCount);
+        Assert.Equal (1, testView.MouseStatePressedCount);
+        Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+        Assert.Equal (0, testView.MouseStateNoneCount);
+
+        // Move to x,0 
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+
+        if (inViewport)
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (1, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+        else
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (1, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+
+        // Move backto 0,0 ; in viewport
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+
+        if (inViewport)
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (1, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+        else
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (1, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+
+        testView.Dispose ();
+
+        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        Application.ResetState (true);
+    }
+
+    [Theory]
+    [InlineData (0)]
+    [InlineData (1)]
+    [InlineData (10)]
+    public void MouseState_PressedOutside_Button1_Pressed_Move_Rises_PressedOutside (int x)
+    {
+        var testView = new MouseEventTestView
+        {
+            HighlightStyle = MouseState.PressedOutside,
+            WantContinuousButtonPressed = true
+        };
+
+        bool inViewport = testView.Viewport.Contains (x, 0);
+
+        // Start at 0,0 ; in viewport
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (0, testView.MouseStateInCount);
+        Assert.Equal (0, testView.MouseStatePressedCount);
+        Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+        Assert.Equal (0, testView.MouseStateNoneCount);
+
+        // Move to x,0 
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+
+        if (inViewport)
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+        else
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (1, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+
+        // Move backto 0,0 ; in viewport
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+
+        if (inViewport)
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+        else
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (1, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+
+        testView.Dispose ();
+
+        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        Application.ResetState (true);
+    }
+
+    private class MouseEventTestView : View
+    {
+        public int MouseEnterCount { get; private set; }
+        public int MouseLeaveCount { get; private set; }
+        public int MouseStatePressedOutsideCount { get; private set; }
+        public int MouseStateInCount { get; private set; }
+        public int MouseStatePressedCount { get; private set; }
+        public int MouseStateNoneCount { get; private set; }
+
+        public MouseEventTestView ()
+        {
+            Height = 1;
+            Width = 1;
+            CanFocus = true;
+            Id = "mouseEventTestView";
+
+            MouseLeave += (s, e) => { MouseEnterCount++; };
+            MouseEnter += (s, e) => { MouseLeaveCount++; };
+        }
+
+        /// <inheritdoc/>
+        protected override bool OnMouseStateChanging (CancelEventArgs<MouseState> args)
+        {
+            switch (args.Result)
             {
-                disablingHighlight++;
+                case MouseState.None:
+                    MouseStateNoneCount++;
+
+                    break;
+                case MouseState.In:
+                    MouseStateInCount++;
+
+                    break;
+
+                case MouseState.Pressed:
+                    MouseStatePressedCount++;
+
+                    break;
+
+                case MouseState.PressedOutside:
+                    MouseStatePressedOutsideCount++;
+
+                    break;
             }
-            else
-            {
-                enablingHighlight++;
-            }
+
+            return base.OnMouseStateChanging (args);
         }
     }
 }

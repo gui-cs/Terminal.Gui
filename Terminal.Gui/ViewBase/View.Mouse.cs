@@ -81,7 +81,7 @@ public partial class View // Mouse APIs
             return true;
         }
 
-        MouseState |= MouseState.Over;
+        MouseState |= MouseState.In;
 
         if (HighlightStyle != ViewBase.MouseState.None)
         {
@@ -169,7 +169,7 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-        MouseState &= ~MouseState.Over;
+        MouseState &= ~MouseState.In;
 
         // TODO: Should we also MouseState &= ~MouseState.Pressed; ??
 
@@ -359,7 +359,7 @@ public partial class View // Mouse APIs
             {
                 //SetPressedHighlight (ViewBase.MouseState.None);
                 MouseState &= ~MouseState.Pressed;
-                MouseState &= ~MouseState.PressedNotOver;
+                MouseState &= ~MouseState.PressedOutside;
             }
 
             return mouseEvent.Handled = true;
@@ -420,9 +420,9 @@ public partial class View // Mouse APIs
                     //                        HighlightStyle.HasFlag (ViewBase.MouseState.PressedNotOver)
                     //                            ? ViewBase.MouseState.PressedNotOver
                     //                            : ViewBase.MouseState.None))
-                    if (HighlightStyle.HasFlag (MouseState.PressedNotOver))
+                    if (HighlightStyle.HasFlag (MouseState.PressedOutside))
                     {
-                        MouseState |= MouseState.PressedNotOver;
+                        MouseState |= MouseState.PressedOutside;
                         return true;
                     }
                 }
@@ -540,7 +540,7 @@ public partial class View // Mouse APIs
             //    return true;
             //}
             MouseState &= ~MouseState.Pressed;
-            MouseState &= ~MouseState.PressedNotOver;
+            MouseState &= ~MouseState.PressedOutside;
 
             // If mouse is still in bounds, generate a click
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
@@ -607,7 +607,7 @@ public partial class View // Mouse APIs
 
     #endregion Mouse Wheel Events
 
-    #region Highlight Handling
+    #region MouseState Handling
 
     private MouseState _mouseState;
 
@@ -627,7 +627,7 @@ public partial class View // Mouse APIs
 
             CancelEventArgs<MouseState> args = new (currentValue: ref _mouseState, newValue: ref value);
 
-            if (RaiseHighlight (args))
+            if (RaiseMouseStateChanging (args))
             {
                 return;
             }
@@ -642,7 +642,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="MouseState.Over"/> is set by default, which means the View will be highlighted when the
+    ///         <see cref="ViewBase.MouseState.In"/> is set by default, which means the View will be highlighted when the
     ///         mouse is over it. The default behavior of <see cref="SetAttributeForRole"/>
     ///         is to use the <see cref="Drawing.VisualRole.Highlight"/> role for the highlight Attribute.
     ///     </para>
@@ -652,26 +652,26 @@ public partial class View // Mouse APIs
     ///         the <see cref="Drawing.VisualRole.Highlight"/> role when the Border is pressed for Arrangement.
     ///     </para>
     ///     <para>
-    ///         <see cref="ViewBase.MouseState.PressedNotOver"/> means the View will be highlighted when the mouse was pressed
+    ///         <see cref="ViewBase.MouseState.PressedOutside"/> means the View will be highlighted when the mouse was pressed
     ///         inside it and then moved outside of it.
     ///     </para>
     /// </remarks>
     public MouseState HighlightStyle { get; set; }
 
     /// <summary>
-    ///     INTERNAL Raises the <see cref="Highlight"/> event. Returns <see langword="true"/> if the event was handled,
+    ///     INTERNAL Raises the <see cref="MouseStateChanging"/> event. Returns <see langword="true"/> if the event was handled,
     ///     <see langword="false"/> otherwise.
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    private bool RaiseHighlight (CancelEventArgs<MouseState> args)
+    private bool RaiseMouseStateChanging (CancelEventArgs<MouseState> args)
     {
-        if (OnHighlight (args))
+        if (OnMouseStateChanging (args))
         {
             return true;
         }
 
-        Highlight?.Invoke (this, args);
+        MouseStateChanging?.Invoke (this, args);
 
         return args.Cancel;
     }
@@ -726,7 +726,7 @@ public partial class View // Mouse APIs
     ///     highlighting.
     /// </param>
     /// <returns><see langword="true"/>, to cancel, indicating custom highlighting.</returns>
-    protected virtual bool OnHighlight (CancelEventArgs<MouseState> args) { return false; }
+    protected virtual bool OnMouseStateChanging (CancelEventArgs<MouseState> args) { return false; }
 
     /// <summary>
     ///     Raised to indicate the View should be highlighted or not. The <see cref="HighlightStyle"/> passed in the event args
@@ -735,9 +735,9 @@ public partial class View // Mouse APIs
     ///     <see cref="CancelEventArgs{T}.Result"/> property.
     ///     Set to <see langword="true"/>, to cancel, indicating custom highlighting.
     /// </summary>
-    public event EventHandler<CancelEventArgs<MouseState>>? Highlight;
+    public event EventHandler<CancelEventArgs<MouseState>>? MouseStateChanging;
 
-    #endregion Highlight Handling
+    #endregion MouseState Handling
 
     private void DisposeMouse () { }
 }

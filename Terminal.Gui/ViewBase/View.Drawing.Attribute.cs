@@ -55,7 +55,7 @@ public partial class View
         if (role != VisualRole.Disabled && HighlightStyle != MouseState.None)
         {
             // The default behavior for HighlightStyle of MouseState.Over is to use the Highlight role
-            if (((HighlightStyle.HasFlag (MouseState.Over) && MouseState.HasFlag (MouseState.Over))
+            if (((HighlightStyle.HasFlag (MouseState.In) && MouseState.HasFlag (MouseState.In))
                  || (HighlightStyle.HasFlag (MouseState.Pressed) && MouseState.HasFlag (MouseState.Pressed)))
                  && role != VisualRole.Highlight)
             {

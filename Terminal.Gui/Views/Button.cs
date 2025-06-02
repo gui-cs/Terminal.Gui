@@ -39,7 +39,7 @@ public class Button : View, IDesignable
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.Pressed | ViewBase.MouseState.Over;
+    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.Pressed | ViewBase.MouseState.In;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()

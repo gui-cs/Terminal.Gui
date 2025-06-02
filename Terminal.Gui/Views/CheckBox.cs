@@ -14,7 +14,7 @@ public class CheckBox : View
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.PressedNotOver | ViewBase.MouseState.Pressed | ViewBase.MouseState.Over;
+    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed | ViewBase.MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
