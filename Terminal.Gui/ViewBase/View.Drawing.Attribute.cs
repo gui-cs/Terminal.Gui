@@ -25,7 +25,7 @@ public partial class View
     ///     to cancel the method, and return a different attribute.
     ///     </para>
     ///     <para>
-    ///     If <see cref="HighlightStyle"/> is not <see cref="HighlightStyle.None"/> and <see cref="MouseHovering"/> is <see langword="true"/>,
+    ///     If <see cref="HighlightStyle"/> is not <see cref="ViewBase.MouseState.None"/> and <see cref="MouseHovering"/> is <see langword="true"/>,
     ///     the <see cref="Drawing.VisualRole.Highlight"/> will be used instead of <paramref name="role"/>.
     ///     To override this behavior use  <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
     ///     to cancel the method, and return a different attribute.
@@ -52,14 +52,12 @@ public partial class View
             return args.Result.Value;
         }
 
-        if (role != VisualRole.Disabled && HighlightStyle != HighlightStyle.None)
+        if (role != VisualRole.Disabled && HighlightStyle != MouseState.None)
         {
-            // The default behavior for HighlightStyle.Hover is to use the Highlight role
-            if (MouseHovering && HighlightStyle.HasFlag (HighlightStyle.Hover) && role != VisualRole.Highlight)
-            {
-                schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
-            } 
-            else if (HighlightStyle.HasFlag (HighlightStyle.Pressed) && role != VisualRole.Highlight)
+            // The default behavior for HighlightStyle of MouseState.Over is to use the Highlight role
+            if (((HighlightStyle.HasFlag (MouseState.In) && MouseState.HasFlag (MouseState.In))
+                 || (HighlightStyle.HasFlag (MouseState.Pressed) && MouseState.HasFlag (MouseState.Pressed)))
+                 && role != VisualRole.Highlight)
             {
                 schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
             }

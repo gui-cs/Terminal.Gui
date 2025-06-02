@@ -132,29 +132,29 @@ public class Mouse : Scenario
 
         win.Add (demo);
 
-        cbHighlightOnPress.CheckedState = demo.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPress.CheckedState = demo.HighlightStyle == (MouseState.Pressed | MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3753
         cbHighlightOnPress.CheckedStateChanging += (s, e) =>
                                                    {
                                                        if (e.Result == CheckState.Checked)
                                                        {
-                                                           demo.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
+                                                           demo.HighlightStyle = MouseState.Pressed | MouseState.PressedOutside;
                                                        }
                                                        else
                                                        {
-                                                           demo.HighlightStyle = HighlightStyle.None;
+                                                           demo.HighlightStyle = MouseState.None;
                                                        }
 
                                                        foreach (View subview in demo.SubViews)
                                                        {
                                                            if (e.Result == CheckState.Checked)
                                                            {
-                                                               subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
+                                                               subview.HighlightStyle = MouseState.Pressed | MouseState.PressedOutside;
                                                            }
                                                            else
                                                            {
-                                                               subview.HighlightStyle = HighlightStyle.None;
+                                                               subview.HighlightStyle = MouseState.None;
                                                            }
                                                        }
 
@@ -162,11 +162,11 @@ public class Mouse : Scenario
                                                        {
                                                            if (e.Result == CheckState.Checked)
                                                            {
-                                                               subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
+                                                               subview.HighlightStyle = MouseState.Pressed | MouseState.PressedOutside;
                                                            }
                                                            else
                                                            {
-                                                               subview.HighlightStyle = HighlightStyle.None;
+                                                               subview.HighlightStyle = MouseState.None;
                                                            }
                                                        }
 
@@ -299,16 +299,17 @@ public class Mouse : Scenario
                 Border.LineStyle = LineStyle.Rounded;
 
 
-                Highlight += (sender, args) =>
+                MouseStateChanging += (sender, args) =>
                              {
-                                 if (args.Result == HighlightStyle.Pressed)
+                                 if (args.Result.HasFlag (MouseState.Pressed))
                                  {
                                      _pressed = true;
-                                     SetNeedsDraw();
+                                     SetNeedsDraw ();
                                  }
                                  else
                                  {
                                      _pressed = false;
+                                     SetNeedsDraw ();
                                  }
                              };
 
@@ -328,16 +329,16 @@ public class Mouse : Scenario
         /// <inheritdoc />
         protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
         {
-            if ( role == VisualRole.Highlight)
+            if (role == VisualRole.Normal)
             {
-                if (_pressed && HighlightStyle.HasFlag (HighlightStyle.Pressed))
+                if (_pressed && HighlightStyle.HasFlag (MouseState.Pressed))
                 {
                     currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
 
                     return true;
                 }
             }
-            
+
             return base.OnGettingAttributeForRole (in role, ref currentAttribute);
         }
 

@@ -51,7 +51,7 @@ public class SettingsScopeTests
 
         ThemeScope scope = dict [ThemeManager.DEFAULT_THEME_NAME];
         Assert.NotNull (scope);
-        Assert.Equal (HighlightStyle.Hover | HighlightStyle.Pressed, scope ["Button.DefaultHighlightStyle"].PropertyValue);
+        Assert.Equal (MouseState.In | MouseState.Pressed, scope ["Button.DefaultHighlightStyle"].PropertyValue);
 
 
         RuntimeConfig = """
@@ -66,7 +66,7 @@ public class SettingsScopeTests
                                 {
                                   "NewTheme":
                                     {
-                                        "Button.DefaultHighlightStyle": "Hover"
+                                        "Button.DefaultHighlightStyle": "Over"
                                     }
                                 }                        
                             ]
@@ -77,8 +77,8 @@ public class SettingsScopeTests
 
         // assert
         Assert.Equal (2, ThemeManager.GetThemes ().Count);
-        Assert.Equal (HighlightStyle.None, (HighlightStyle)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStyle"].PropertyValue!);
-        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.GetThemes () ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (MouseState.None, (MouseState)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (MouseState.In, (MouseState)ThemeManager.GetThemes () ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
 
         RuntimeConfig = """
                         {
@@ -96,8 +96,8 @@ public class SettingsScopeTests
 
         // assert
         Assert.Equal (2, ThemeManager.GetThemes ().Count);
-        Assert.Equal (HighlightStyle.Pressed, (HighlightStyle)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultHighlightStyle"].PropertyValue!);
-        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (MouseState.Pressed, (MouseState)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
 
         // clean up
         Disable (resetToHardCodedDefaults: true);
