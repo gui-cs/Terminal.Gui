@@ -2,14 +2,18 @@
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Provides data for events that allow modification of a value in a cancellable workflow,
-///     such as property changes in the Cancellable Work Pattern (CWP).
+///     Provides data for events that allow modification or cancellation of a property change in the Cancellable Work Pattern (CWP).
 /// </summary>
 /// <remarks>
-///     Used for workflows where an existing value (e.g., property) is being modified.
+///     <para>
+///         Used in pre-change events raised by <see cref="CWPPropertyHelper.ChangeProperty{T}"/> to allow handlers to
+///         modify the proposed value or cancel the change, such as for <see cref="View.SchemeName"/> or
+///         <see cref="OrientationHelper"/>.
+///     </para>
 /// </remarks>
-/// <typeparam name="T">The type of the value being modified.</typeparam>
-/// <seealso cref="ResultEventArgs{T}"/>
+/// <typeparam name="T">The type of the property value, which may be a nullable reference type (e.g., <see cref="string"/>?).</typeparam>
+/// <seealso cref="ValueChangedEventArgs{T}"/>
+/// <seealso cref="CWPPropertyHelper"/>
 public class ValueChangingEventArgs<T>
 {
     /// <summary>
@@ -23,32 +27,17 @@ public class ValueChangingEventArgs<T>
     public T NewValue { get; set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the change has been handled.
-    ///     If true, the change is considered complete or cancelled, per the CWP.
+    ///     Gets or sets a value indicating whether the change has been handled. If true, the change is cancelled.
     /// </summary>
     public bool Handled { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ValueChangingEventArgs{T}"/> class.
     /// </summary>
-    /// <param name="currentValue">The current value before the change.</param>
-    /// <param name="newValue">The proposed new value.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown if <paramref name="currentValue"/> or <paramref name="newValue"/> is
-    ///     null for non-nullable reference types.
-    /// </exception>
+    /// <param name="currentValue">The current value before the change, which may be null for nullable types.</param>
+    /// <param name="newValue">The proposed new value, which may be null for nullable types.</param>
     public ValueChangingEventArgs (T currentValue, T newValue)
     {
-        if (currentValue is null && !typeof (T).IsValueType)
-        {
-            throw new ArgumentNullException (nameof (currentValue));
-        }
-
-        if (newValue is null && !typeof (T).IsValueType)
-        {
-            throw new ArgumentNullException (nameof (newValue));
-        }
-
         CurrentValue = currentValue;
         NewValue = newValue;
     }

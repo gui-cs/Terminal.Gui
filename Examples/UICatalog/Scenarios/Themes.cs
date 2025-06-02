@@ -125,20 +125,20 @@ public sealed class Themes : Scenario
 
         viewListView.SelectedItem = 0;
 
-        themeViewer.SettingSchemeName += (sender, args) =>
-                                         {
-                                             if (_view is { })
-                                             {
-                                                 Application.Top!.SchemeName = args.Result;
+        themeViewer.SchemeNameChanging += (sender, args) =>
+                                          {
+                                              if (_view is { })
+                                              {
+                                                  Application.Top!.SchemeName = args.NewValue;
 
-                                                 if (_view.HasScheme)
-                                                 {
-                                                     _view.SetScheme (null);
-                                                 }
+                                                  if (_view.HasScheme)
+                                                  {
+                                                      _view.SetScheme (null);
+                                                  }
 
-                                                 _view.SchemeName = args.Result;
-                                             }
-                                         };
+                                                  _view.SchemeName = args.NewValue;
+                                              }
+                                          };
 
         AllViewsView? allViewsView = null;
 

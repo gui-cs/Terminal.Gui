@@ -8,52 +8,96 @@ public partial class View
     private string? _schemeName;
 
     /// <summary>
-    ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the scheme inherited from the
-    ///     SuperView. If a Scheme was explicitly set (<see cref="HasScheme"/> is <see langword="true"/>),
-    ///     this property will be ignored.
+    ///     Gets or sets the name of the scheme to use for this <see cref="View"/>. If set, it overrides the scheme
+    ///     inherited from the <see cref="SuperView"/>. If a scheme was explicitly set (<see cref="HasScheme"/> is
+    ///     true), this property is ignored.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="SchemeNameChanging"/> event
+    ///         is raised before the change, and <see cref="SchemeNameChanged"/> is raised after.
+    ///     </para>
+    /// </remarks>
+    /// <value>The scheme name, or null if no scheme name is set.</value>
+    /// <seealso cref="SchemeNameChanging"/>
+    /// <seealso cref="SchemeNameChanged"/>
     public string? SchemeName
     {
         get => _schemeName;
         set
         {
-            if (_schemeName == value)
+            bool changed = CWPPropertyHelper.ChangeProperty (
+                _schemeName,
+                value,
+                OnSchemeNameChanging,
+                SchemeNameChanging,
+                OnSchemeNameChanged,
+                SchemeNameChanged,
+                out string? finalValue);
+
+            if (changed)
             {
-                return;
+                _schemeName = finalValue;
             }
-
-            if (OnSettingSchemeName (value))
-            {
-                _schemeName = value;
-                return;
-            }
-
-            ResultEventArgs<string> args = new (value);
-            SettingSchemeName?.Invoke (this, args);
-
-            if (args.Handled)
-            {
-                _schemeName = args.Result;
-
-                return;
-            }
-
-            _schemeName = value;
         }
     }
 
     /// <summary>
-    ///     Called when the <see cref="Scheme"/> for the View is to be set.
+    ///     Called before the <see cref="SchemeName"/> property changes, allowing subclasses to cancel or modify the change.
     /// </summary>
-    /// <param name="newName"></param>
-    /// <returns><see langword="true"/> to stop default behavior.</returns>
-    protected virtual bool OnSettingSchemeName (string? newName) { return false; }
+    /// <param name="args">The event arguments containing the current and proposed new scheme name.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnSchemeNameChanging (ValueChangingEventArgs<string?> args)
+    {
+        return false;
+    }
 
-    /// <summary>Raised when the <see cref="Scheme"/> for the View is to be set.</summary>
-    /// <returns>
-    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
-    /// </returns>
-    public event EventHandler<ResultEventArgs<string>>? SettingSchemeName;
+    /// <summary>
+    ///     Called after the <see cref="SchemeName"/> property changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new scheme name.</param>
+    protected virtual void OnSchemeNameChanged (ValueChangedEventArgs<string?> args)
+    {
+    }
+
+    /// <summary>
+    ///     Raised before the <see cref="SchemeName"/> property changes, allowing handlers to modify or cancel the change.
+    /// </summary>
+    /// <remarks>
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
+    ///     <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///         view.SchemeNameChanging += (sender, args) =>
+    ///         {
+    ///             if (args.NewValue == "InvalidScheme")
+    ///             {
+    ///                 args.Handled = true;
+    ///                 Console.WriteLine("Invalid scheme name cancelled.");
+    ///             }
+    ///         };
+    ///     </code>
+    /// </example>
+    public event EventHandler<ValueChangingEventArgs<string?>>? SchemeNameChanging;
+
+    /// <summary>
+    ///     Raised after the <see cref="SchemeName"/> property changes, notifying handlers of the completed change.
+    /// </summary>
+    /// <remarks>
+    ///     Provides the old and new scheme name via <see cref="ValueChangedEventArgs{T}.OldValue"/> and
+    ///     <see cref="ValueChangedEventArgs{T}.NewValue"/>, which may be null.
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///         view.SchemeNameChanged += (sender, args) =>
+    ///         {
+    ///             Console.WriteLine($"SchemeName changed from {args.OldValue ?? "none"} to {args.NewValue ?? "none"}.");
+    ///         };
+    ///     </code>
+    /// </example>
+    public event EventHandler<ValueChangedEventArgs<string?>>? SchemeNameChanged;
 
     // Both holds the set Scheme and is used to determine if a Scheme has been set or not
     private Scheme? _scheme;

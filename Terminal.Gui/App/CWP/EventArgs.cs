@@ -10,7 +10,7 @@ namespace Terminal.Gui.App;
 ///     when a property has been changed.
 /// </remarks>
 /// <typeparam name="T">The type of the value.</typeparam>
-public class EventArgs<T> : EventArgs where T : notnull
+public class EventArgs<T> : EventArgs /*where T : notnull*/
 {
     /// <summary>Initializes a new instance of the <see cref="EventArgs{T}"/> class.</summary>
     /// <param name="currentValue">The current value of the property.</param>
