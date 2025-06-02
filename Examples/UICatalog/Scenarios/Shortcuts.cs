@@ -64,7 +64,7 @@ public class Shortcuts : Scenario
             {
                 Text = "_Align Keys",
                 CanFocus = false,
-                HighlightStyle = MouseState.None
+                HighlightStates = MouseState.None
             },
             Key = Key.F5.WithCtrl.WithAlt.WithShift
         };
@@ -118,7 +118,7 @@ public class Shortcuts : Scenario
             {
                 Text = "Command _First",
                 CanFocus = false,
-                HighlightStyle = MouseState.None
+                HighlightStates = MouseState.None
             },
             Key = Key.F.WithCtrl
         };
@@ -213,7 +213,7 @@ public class Shortcuts : Scenario
             {
                 Title = "_Button",
                 ShadowStyle = ShadowStyle.None,
-                HighlightStyle = MouseState.None
+                HighlightStates = MouseState.None
             },
             Key = Key.K
         };

@@ -39,13 +39,13 @@ public class Button : View, IDesignable
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.Pressed | ViewBase.MouseState.In;
+    public static MouseState DefaultHighlightStates { get; set; } = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
-        TextAlignment = Alignment.Center;
-        VerticalTextAlignment = Alignment.Center;
+        base.TextAlignment = Alignment.Center;
+        base.VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
@@ -67,8 +67,8 @@ public class Button : View, IDesignable
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
 
-        ShadowStyle = DefaultShadow;
-        HighlightStyle = DefaultHighlightStyle;
+        base.ShadowStyle = DefaultShadow;
+        HighlightStates = DefaultHighlightStates;
     }
 
     private bool? HandleHotKeyCommand (ICommandContext commandContext)

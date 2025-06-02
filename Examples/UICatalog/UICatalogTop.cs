@@ -186,7 +186,7 @@ public class UICatalogTop : Toplevel
             {
                 _themesRg = new ()
                 {
-                    HighlightStyle = Terminal.Gui.ViewBase.MouseState.None,
+                    HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
                 };
 
                 _themesRg.SelectedItemChanged += (_, args) =>
@@ -210,7 +210,7 @@ public class UICatalogTop : Toplevel
 
                 _topSchemeRg = new ()
                 {
-                    HighlightStyle = Terminal.Gui.ViewBase.MouseState.None,
+                    HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
                 };
 
                 _topSchemeRg.SelectedItemChanged += (_, args) =>
@@ -261,7 +261,7 @@ public class UICatalogTop : Toplevel
             {
                 CanFocus = true,
                 Styles = FlagSelectorStyles.ShowNone,
-                HighlightStyle = Terminal.Gui.ViewBase.MouseState.None,
+                HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
             };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
             _diagnosticFlagsSelector.AssignHotKeysToCheckBoxes = true;
@@ -310,7 +310,7 @@ public class UICatalogTop : Toplevel
                 AssignHotKeysToCheckBoxes = true,
                 Options = Enum.GetNames<LogLevel> (),
                 SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-                HighlightStyle = Terminal.Gui.ViewBase.MouseState.In
+                HighlightStates = Terminal.Gui.ViewBase.MouseState.In
             };
 
             _logLevelRg.SelectedItemChanged += (_, args) =>

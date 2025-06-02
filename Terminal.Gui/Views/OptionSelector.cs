@@ -179,7 +179,7 @@ public class OptionSelector : View, IOrientation, IDesignable
             Title = nameWithHotKey,
             Id = name,
             Data = index,
-            //HighlightStyle = HighlightStyle.Hover,
+            //HighlightStates = HighlightStates.Hover,
             RadioStyle = true
         };
 

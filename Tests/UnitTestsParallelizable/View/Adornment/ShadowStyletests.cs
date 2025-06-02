@@ -44,7 +44,7 @@ public class ShadowStyleTests
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             Text = "0123",
-            HighlightStyle = MouseState.Pressed,
+            HighlightStates = MouseState.Pressed,
             ShadowStyle = style,
             CanFocus = true
         };

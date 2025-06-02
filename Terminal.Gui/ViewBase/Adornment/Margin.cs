@@ -33,8 +33,6 @@ public class Margin : Adornment
     /// <inheritdoc/>
     public Margin (View parent) : base (parent)
     {
-        /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
-
         SubViewLayout += Margin_LayoutStarted;
 
         // Margin should not be focusable
@@ -112,8 +110,7 @@ public class Margin : Adornment
 
         ShadowStyle = base.ShadowStyle;
 
-        // TODO: Move to method.
-        Parent.MouseStateChanging += OnParentOnHighlight;
+        Parent.MouseStateChanged += OnParentOnMouseStateChanged;
     }
 
     /// <inheritdoc/>
@@ -221,14 +218,20 @@ public class Margin : Adornment
         set => base.ShadowStyle = SetShadow (value);
     }
 
-    private void OnParentOnHighlight (object? sender, CancelEventArgs<MouseState> args)
+    private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)
     {
         if (sender is not View parent || Thickness == Thickness.Empty || ShadowStyle == ShadowStyle.None)
         {
             return;
         }
 
-        bool pressed = args.Result.HasFlag (parent.HighlightStyle);
+        bool pressed = args.Result.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag(MouseState.Pressed);
+        bool pressedOutside = args.Result.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside); ;
+
+        if (pressedOutside)
+        {
+            pressed = false;
+        }
 
         if (MouseState.HasFlag (MouseState.Pressed) && !pressed)
         {
@@ -258,7 +261,7 @@ public class Margin : Adornment
 
         if (!MouseState.HasFlag (MouseState.Pressed) && pressed)
         {
-            // If the view is not pressed and we want highlight move the shadow
+            // If the view is not pressed, and we want highlight move the shadow
             // Note, for visual effects reasons, we only move horizontally.
             // TODO: Add a setting or flag that lets the view move vertically as well.
             Thickness = new (

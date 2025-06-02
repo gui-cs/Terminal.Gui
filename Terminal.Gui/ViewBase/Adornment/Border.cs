@@ -120,7 +120,7 @@ public partial class Border : Adornment
 
         ShowHideDrawIndicator ();
 
-        HighlightStyle |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
+        HighlightStates |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
 
 #if SUBVIEW_BASED_BORDER
         if (Parent is { })
