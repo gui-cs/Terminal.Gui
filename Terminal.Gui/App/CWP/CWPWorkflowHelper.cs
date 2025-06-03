@@ -32,10 +32,10 @@ public static class CWPWorkflowHelper
     /// </exception>
     /// <example>
     ///     <code>
-    ///         ResultEventArgs<bool> args = new();
-    ///         Func<ResultEventArgs<bool>, bool> onAccepting = _ => false;
-    ///         EventHandler<ResultEventArgs<bool>>? acceptingHandler = null;
-    ///         Action? defaultAction = () => args.Result = true;
+    ///         ResultEventArgs&lt;bool&gt; args = new();
+    ///         Func&lt;ResultEventArgs&lt;bool&gt;, bool&gt; onAccepting = _ =&gt; false;
+    ///         EventHandler&lt;ResultEventArgs&lt;bool&gt;&gt;? acceptingHandler = null;
+    ///         Action? defaultAction = () =&gt; args.Result = true;
     ///         bool? handled = CWPWorkflowHelper.Execute(onAccepting, acceptingHandler, args, defaultAction);
     ///     </code>
     /// </example>

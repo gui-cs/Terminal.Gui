@@ -41,14 +41,14 @@ public static class CWPPropertyHelper
     ///     <code>
     ///         string? current = null;
     ///         string? proposed = "Base";
-    ///         Func<ValueChangingEventArgs<string?>, bool> onChanging = args => false;
-    ///         EventHandler<ValueChangingEventArgs<string?>>? changingEvent = null;
-    ///         Action<ValueChangedEventArgs<string?>>? onChanged = args =>
+    ///         Func&lt;ValueChangingEventArgs&lt;string?&gt;, bool&gt; onChanging = args =&gt; false;
+    ///         EventHandler&lt;ValueChangingEventArgs&lt;string?&gt;&gt;? changingEvent = null;
+    ///         Action&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? onChanged = args =&gt;
     ///             Console.WriteLine($"SchemeName changed to {args.NewValue ?? "none"}.");
-    ///         EventHandler<ValueChangedEventArgs<string?>>? changedEvent = null;
+    ///         EventHandler&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? changedEvent = null;
     ///         bool changed = CWPPropertyHelper.ChangeProperty(
     ///             current, proposed, onChanging, changingEvent, onChanged, changedEvent, out string? final);
-    ///     </code>
+    ///     &lt;/code&gt;
     /// </example>
     public static bool ChangeProperty<T> (
         T currentValue,
