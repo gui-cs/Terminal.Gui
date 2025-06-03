@@ -164,7 +164,7 @@ public partial class View // Drawing APIs
         }
     }
 
-    private void DoDrawAdornments (Region? originalClip)
+    internal void DoDrawAdornments (Region? originalClip)
     {
         if (this is Adornment)
         {

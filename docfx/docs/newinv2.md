@@ -1,88 +1,175 @@
 # Terminal.Gui v2
 
-This document provides an overview of the new features and improvements in Terminal.Gui v2.
+This document provides an in-depth overview of the new features, improvements, and architectural changes in Terminal.Gui v2 compared to v1.
 
 For information on how to port code from v1 to v2, see the [v1 To v2 Migration Guide](migratingfromv1.md).
 
-## Modern Look & Feel 
+## Architectural Overhaul and Design Philosophy
 
-Apps built with Terminal.Gui now feel modern thanks to these improvements:
+Terminal.Gui v2 represents a fundamental rethinking of the library's architecture, driven by the need for better maintainability, performance, and developer experience. The primary design goals in v2 include:
 
-* *TrueColor support* - 24-bit color support for Windows, Mac, and Linux. Legacy 16-color systems are still supported, automatically. See [TrueColor](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#truecolor) for details.
-* *Enhanced Borders and Padding* - Terminal.Gui now supports a `Border`, `Margin`, and `Padding` property on all views. This simplifies View development and enables a sophisticated look and feel. See [Adornments](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#adornments) for details.
-* *User Configurable Color Themes* - See [Color Themes](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#color-themes) for details.
-* *Enhanced Unicode/Wide Character support* - Terminal.Gui now supports the full range of Unicode/wide characters. See [Unicode](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#unicode) for details.
-* [LineCanvas](~/api/Terminal.Gui.Drawing.LineCanvas.yml) - Terminal.Gui now supports a line canvas enabling high-performance drawing of lines and shapes using box-drawing glyphs. `LineCanvas` provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details.
+- **Decoupling of Concepts**: In v1, many concepts like focus management, layout, and input handling were tightly coupled, leading to fragile and hard-to-predict behavior. v2 explicitly separates these concerns, resulting in a more modular and testable codebase.
+- **Performance Optimization**: v2 reduces overhead in rendering, event handling, and view management by streamlining internal data structures and algorithms.
+- **Modern .NET Practices**: The API has been updated to align with contemporary .NET conventions, such as using events with `EventHandler<T>` and leveraging modern C# features like target-typed `new` and file-scoped namespaces.
+- **Accessibility and Usability**: v2 places a stronger emphasis on ensuring that terminal applications are accessible, with improved keyboard navigation and visual feedback.
 
-## Simplified API
+This architectural shift has resulted in the removal of thousands of lines of redundant or overly complex code from v1, replaced with cleaner, more focused implementations.
 
-The entire library has been reviewed and simplified. As a result, the API is more consistent and uses modern .NET API standards (e.g. for events). This refactoring resulted in the removal of thousands of lines of code, better unit tests, and higher performance than v1.
+## Modern Look & Feel - Technical Details
 
-## [View](~/api/Terminal.Gui.ViewBase.View.yml) Improvements
-* *Improved!* View Lifetime Management is Now Deterministic - In v1 the rules for lifetime management of `View` objects was unclear and led to non-dterministic behavior and hard to diagnose bugs. This was particularly acute in the behavior of `Application.Run`. In v2, the rules are clear and the code and unit test infrastructure tries to enforce them. See [Migrating From v1 To v2](migratingfromv1.md) for more details.
-* *New!* Adornments - Adornments are a special form of View that appear outside the `Viewport`: @Terminal.Gui.ViewBase.View.Margin, @Terminal.Gui.ViewBase.View.Border, and @Terminal.Gui.ViewBase.View.Padding.
-* *New!* Built-in Scrolling/Virtual Content Area - In v1, to have a view a user could scroll required either a bespoke scrolling implementation, inheriting from `ScrollView`, or managing the complexity of `ScrollBarView` directly. In v2, the base-View class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a portal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content described by `View.GetContentSize()`. See [Layout](layout.md) for details.
-* *Improved!* @Terminal.Gui.Views.ScrollBar replaces `ScrollBarView` with a much cleaner implementation of a scrollbar. In addition, @Terminal.Gui.ViewBase.View.VerticalScrollBar and @Terminal.Gui.ViewBase.View.HorizontalScrollBar provide a simple way to enable scroll bars in any View with almost no code. See See [Scrolling Deep Dive](scrolling.md) for more.
-* *New!* @Terminal.Gui.ViewBase.DimAuto - Automatically sizes the view to fit the view's Text, SubViews, or ContentArea.
-* *Improved!* @Terminal.Gui.ViewBase.PosAnchorEnd - New to v2 is `Pos.AnchorEnd ()` (with no parameters) which allows a view to be anchored to the right or bottom of the SuperView. 
-* *New!* @Terminal.Gui.ViewBase.PosAlign - Aligns a set of views horizontally or vertically (left, right, center, etc...).
-* *New!* @Terminal.Gui.ViewBase.View.Arrangement enables tiled and overlapped view arrangement and moving/resizing Views with the keyboard and mouse. See [Arrangement](arrangement.md).
-* *Improved!* Keyboard [Navigation](navigation.md) has been revamped to be more reliability and ensure TUI apps built with Terminal.Gui are accessible. 
-* *New!* Sizable/Movable views - Any view can now be set to have resizeable borders and/or be dragged around.
-* *Improved!* Consistent tabbing behavior - Tab navigation now behaves as expected, cleanly and consistently.
+### TrueColor Support
+- **Implementation**: v2 introduces 24-bit color support by extending the `Attribute` class to handle RGB values, with fallback to 16-color mode for older terminals. This is evident in the `ConsoleDriver` implementations, which now map colors to the appropriate terminal escape sequences.
+- **Impact**: Developers can now use a full spectrum of colors without manual palette management, as seen in v1. The `Color` struct in v2 supports direct RGB input, and drivers handle the translation to terminal capabilities.
+- **Usage**: See the `ColorPicker` view for an example of how TrueColor is leveraged to provide a rich color selection UI.
 
-## New and Improved Built-in Views
+### Enhanced Borders and Padding (Adornments)
+- **Implementation**: v2 introduces a new `Adornment` class hierarchy, with `Margin`, `Border`, and `Padding` as distinct view-like entities that wrap content. This is a significant departure from v1, where borders were often hardcoded or required custom drawing.
+- **Code Change**: In v1, `View` had rudimentary border support via properties like `BorderStyle`. In v2, `View` has a `Border` property of type `Border`, which is itself a configurable entity with properties like `Thickness` and `Effect3D`.
+- **Impact**: This allows for consistent border rendering across all views and simplifies custom view development by providing a reusable adornment framework.
 
-* *[DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml)* - NEW! 
-* *ScrollView* - Replaced by built-in scrolling.
-* *@"Terminal.Gui.Views.ScrollBar"* - Replaces *ScrollBarView* with a much simpler view.
-* *[Slider](~/api/Terminal.Gui.Views.Slider.yml)* - NEW!
-* *[Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)* - NEW! An opinionated (visually & API) View for displaying a command, helptext, key.
-* *[Bar](~/api/Terminal.Gui.Views.Bar.yml)* - NEW! Building-block View for containing Shortcuts. Opinionated relative to Orientation but minimially so. The basis for the new StatusBar, MenuBar, and Menu views.
-* *[StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)* - New implementation based on `Bar`
-* *[MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml)* - COMING SOON! New implementation based on `Bar`
-* *[PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml)* - COMING SOON! New implementation based on `Bar`
-* *[FileDialog](~/api/Terminal.Gui.Views.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView`. 
-* *[TableView](~/api/Terminal.Gui.Views.TableView.yml)* - No longer just DataTable, now supports any collections, checkboxes and even expandable trees
-* *@"Terminal.Gui.Views.ColorPicker"* - Fully supports TrueColor with the ability to choose a color using HSV, RGB, or HSL as well as W3C standard color names.
+### User Configurable Color Themes
+- **Implementation**: v2 adds a `ConfigurationManager` that supports loading and saving color schemes from configuration files. Themes are applied via `ColorScheme` objects, which can be customized per view or globally.
+- **Impact**: Unlike v1, where color schemes were static or required manual override, v2 enables end-users to personalize the UI without code changes, enhancing accessibility and user preference support.
 
-## Beauty
+### Enhanced Unicode/Wide Character Support
+- **Implementation**: v2 improves Unicode handling by correctly managing wide characters in text rendering and input processing. The `TextFormatter` class now accounts for Unicode width in layout calculations.
+- **Impact**: This fixes v1 issues where wide characters (e.g., CJK scripts) could break layout or input handling, making Terminal.Gui v2 suitable for international applications.
 
-Terminal.Gui has never been prettier
+### LineCanvas
+- **Implementation**: A new `LineCanvas` class provides a drawing API for creating lines and shapes using box-drawing characters. It includes logic for auto-joining lines at intersections, selecting appropriate glyphs dynamically.
+- **Code Example**: In v2, `LineCanvas` is used internally by views like `Border` to draw clean, connected lines, a feature absent in v1.
+- **Impact**: Developers can create complex diagrams or UI elements with minimal effort, improving the visual fidelity of terminal applications.
 
-* *ShowBorders* - Get that 3D 'pop' for your buttons
-* *Gradient* - Render beautiful true color borders, titles etc with the new Gradient API
+## Simplified API - Under the Hood
 
+### API Consistency and Reduction
+- **Change**: v2 revisits every public API, consolidating redundant methods and properties. For example, v1 had multiple focus-related methods scattered across `View` and `Application`; v2 centralizes these in `ApplicationNavigation`.
+- **Impact**: This reduces the learning curve for new developers and minimizes the risk of using deprecated or inconsistent APIs.
+- **Example**: The v1 `View.MostFocused` property is replaced by `Application.Navigation.GetFocused()`, reducing traversal overhead and clarifying intent.
 
-## Configuration Manager
+### Modern .NET Standards
+- **Change**: Events in v2 use `EventHandler<T>` instead of v1's custom delegate types. Methods follow consistent naming (e.g., `OnHasFocusChanged` vs. v1's varied naming).
+- **Impact**: Developers familiar with .NET conventions will find v2 more intuitive, and tools like IntelliSense provide better support due to standardized signatures.
 
-Terminal.Gui now supports a configuration manager enabling library and app settings to be persisted and loaded from the file system. See [Configuration Manager](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#configuration-manager) for details.
+### Performance Gains
+- **Change**: v2 optimizes rendering by minimizing unnecessary redraws through a smarter `NeedsDisplay` system and reducing object allocations in hot paths like event handling.
+- **Impact**: Applications built with v2 will feel snappier, especially in complex UIs with many views or frequent updates, addressing v1 performance bottlenecks.
 
-## Logging & Metrics
+## View Improvements - Deep Dive
 
-Terminal.Gui now features multi level logging of engine internals and system performance metrics (redraws, invoke durations etc).  Never again wonder why your frame rate is low, or a given terminal/distro does not behave as expected.
-See [Logging](logging.md) for details.
+### Deterministic View Lifetime Management
+- **v1 Issue**: Lifetime rules for `View` objects were unclear, leading to memory leaks or premature disposal, especially with `Application.Run`.
+- **v2 Solution**: v2 defines explicit rules for view disposal and ownership, enforced by unit tests. `Application.Run` now clearly manages the lifecycle of `Toplevel` views, ensuring deterministic cleanup.
+- **Impact**: Developers can predict when resources are released, reducing bugs related to dangling references or uninitialized states.
 
-## Sixel Image Support
+### Adornments Framework
+- **Technical Detail**: Adornments are implemented as nested views that surround the content area, each with its own drawing and layout logic. For instance, `Border` can draw 3D effects or custom glyphs.
+- **Code Change**: In v2, `View` has properties like `Margin`, `Border`, and `Padding`, each configurable independently, unlike v1's limited border support.
+- **Impact**: This modular approach allows for reusable UI elements and simplifies creating visually consistent applications.
 
-Recently added to Windows Terminal and long supported in mainstream linux terminals, this graphics protcol allows images and even animations to be rendered directly into the console.
+### Built-in Scrolling/Virtual Content Area
+- **v1 Issue**: Scrolling required using `ScrollView` or manual offset management, which was error-prone.
+- **v2 Solution**: Every `View` in v2 has a `Viewport` rectangle representing the visible portion of a potentially larger content area defined by `GetContentSize()`. Changing `Viewport.Location` scrolls the content.
+- **Code Example**: In v2, `TextView` uses this to handle large text buffers without additional wrapper views.
+- **Impact**: Simplifies implementing scrollable content and reduces the need for specialized container views.
 
-## Updated Keyboard API
+### Improved ScrollBar
+- **Change**: v2 replaces `ScrollBarView` with `ScrollBar`, a cleaner implementation integrated with the built-in scrolling system. `VerticalScrollBar` and `HorizontalScrollBar` properties on `View` enable scroll bars with minimal code.
+- **Impact**: Developers can add scroll bars to any view without managing separate view hierarchies, a significant usability improvement over v1.
 
-The API for handling keyboard input is significantly improved. See [Keyboard API](keyboard.md).
+### DimAuto, PosAnchorEnd, and PosAlign
+- **DimAuto**: Automatically sizes views based on content or subviews, reducing manual layout calculations.
+- **PosAnchorEnd**: Allows anchoring to the right or bottom of a superview, enabling flexible layouts not easily achievable in v1.
+- **PosAlign**: Provides alignment options (left, center, right) for multiple views, streamlining UI design.
+- **Impact**: These features reduce boilerplate layout code and support responsive designs in terminal constraints.
 
-* The `Key` class replaces the `KeyEvent` struct and provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible. See [Key](~/api/Terminal.Gui.Input.Key.yml) for more details.
-* The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a [Command](~/api/Terminal.Gui.Input.Command.yml). A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the `View.Keybindings` to configure the key bindings.
-* For better consistency and user experience, the default key for closing an app or `Toplevel` is now `Esc` (it was previously `Ctrl+Q`).
+### View Arrangement
+- **Technical Detail**: The `Arrangement` property on `View` supports flags like `Movable`, `Resizable`, and `Overlapped`, enabling dynamic UI interactions via keyboard and mouse.
+- **Code Example**: `Window` in v2 uses `Arrangement` to allow dragging and resizing, a feature requiring custom logic in v1.
+- **Impact**: Developers can create desktop-like experiences in the terminal with minimal effort.
 
-## Updated Mouse API
+### Keyboard Navigation Overhaul
+- **v1 Issue**: Navigation was inconsistent, with coupled concepts like `CanFocus` and `TabStop` leading to unpredictable focus behavior.
+- **v2 Solution**: v2 decouples these concepts, introduces `TabBehavior` enum for clearer intent (`TabStop`, `TabGroup`, `NoStop`), and centralizes navigation logic in `ApplicationNavigation`.
+- **Impact**: Ensures accessibility by guaranteeing keyboard access to all focusable elements, with unit tests enforcing navigation keys on built-in views.
 
-The API for mouse input is now internally consistent and easiser to use.
+### Sizable/Movable Views
+- **Implementation**: Any view can be made resizable or movable by setting `Arrangement` flags, with built-in mouse and keyboard handlers for interaction.
+- **Impact**: Enhances user experience by allowing runtime UI customization, a feature limited to specific views like `Window` in v1.
 
-* The `MouseEvent` class replaces `MouseEventEventArgs`.
-* More granular APIs are provided to ease handling specific mouse actions. See [Mouse API](mouse.md).
-* Views can use the `View.Highlight` event to have the view be visibly highlighted on various mouse events.
-* Views can set `View.WantContinousButtonPresses = true` to have their `Command.Accept` command be invoked repeatedly as the user holds a mouse button down on the view.
+## New and Improved Built-in Views - Detailed Analysis
 
-## AOT support
-*AOT/single file app support* now works out of the box.
+### New Views
+- **DatePicker**: Provides a calendar-based date selection UI, leveraging v2's improved drawing and navigation systems.
+- **Slider**: A new control for range selection, using `LineCanvas` for smooth rendering and supporting TrueColor for visual feedback.
+- **Shortcut**: An opinionated view for command display with key bindings, simplifying status bar or toolbar creation.
+- **Bar**: A foundational view for horizontal or vertical layouts of `Shortcut` or other items, used in `StatusBar`, `MenuBar`, and `PopoverMenu`.
+- **FileDialog**: Modernized with a `TreeView` for navigation, icons using Unicode glyphs, and search functionality, far surpassing v1's basic dialog.
+- **ColorPicker**: Leverages TrueColor for a comprehensive color selection experience, supporting multiple color models (HSV, RGB, HSL).
+
+### Improved Views
+- **ScrollView**: Deprecated in favor of built-in scrolling on `View`, reducing complexity and view hierarchy depth.
+- **TableView**: Now supports generic collections, checkboxes, and tree structures, moving beyond v1's `DataTable` limitation, with improved rendering performance.
+- **StatusBar**: Rebuilt on `Bar`, providing a more flexible and visually appealing status display.
+
+## Beauty - Visual Enhancements
+
+### Borders
+- **Implementation**: Uses the `Border` adornment to render 3D effects or custom styles, configurable per view.
+- **Impact**: Adds visual depth to UI elements, making applications feel more polished compared to v1's flat borders.
+
+### Gradient
+- **Implementation**: A new `Gradient` API allows rendering color transitions across view elements, using TrueColor for smooth effects.
+- **Impact**: Enables modern-looking UI elements like gradient borders or backgrounds, not possible in v1 without custom drawing.
+
+## Configuration Manager - Persistence and Customization
+- **Technical Detail**: `ConfigurationManager` in v2 uses JSON or other formats to persist settings like themes, key bindings, and view properties to disk.
+- **Code Change**: Unlike v1, where settings were ephemeral or hardcoded, v2 provides a centralized system for loading/saving configurations.
+- **Impact**: Allows for user-specific customizations and library-wide settings without recompilation, enhancing flexibility.
+
+## Logging & Metrics - Debugging and Performance
+- **Implementation**: v2 introduces a multi-level logging system for internal operations (e.g., rendering, input handling) and metrics for performance tracking (e.g., frame rate, redraw times).
+- **Impact**: Developers can diagnose issues like slow redraws or terminal compatibility problems, a capability absent in v1, reducing guesswork in debugging.
+
+## Sixel Image Support - Graphics in Terminal
+- **Technical Detail**: v2 supports the Sixel protocol for rendering images and animations directly in compatible terminals (e.g., Windows Terminal, xterm).
+- **Code Change**: New rendering logic in console drivers detects terminal support and handles Sixel data transmission.
+- **Impact**: Brings graphical capabilities to terminal applications, far beyond v1's text-only rendering, opening up new use cases like image previews.
+
+## Updated Keyboard API - Comprehensive Input Handling
+
+### Key Class
+- **Change**: Replaces v1's `KeyEvent` struct with a `Key` class, providing a high-level abstraction over raw key codes with properties for modifiers and key type.
+- **Impact**: Simplifies keyboard handling by abstracting platform differences, making code more portable and readable.
+
+### Key Bindings
+- **Implementation**: v2 introduces a binding system mapping keys to `Command` enums via `View.KeyBindings`, with scopes (`Application`, `Focused`, `HotKey`) for priority.
+- **Impact**: Replaces v1's ad-hoc key handling with a structured approach, allowing views to declare supported commands and customize responses easily.
+- **Example**: `TextField` in v2 binds `Key.Tab` to text insertion rather than focus change, customizable by developers.
+
+### Default Close Key
+- **Change**: Changed from `Ctrl+Q` in v1 to `Esc` in v2 for closing apps or `Toplevel` views.
+- **Impact**: Aligns with common user expectations, improving UX consistency across terminal applications.
+
+## Updated Mouse API - Enhanced Interaction
+
+### MouseEvent Class
+- **Change**: Replaces `MouseEventEventArgs` with `MouseEvent`, providing a cleaner structure for mouse data (position, flags).
+- **Impact**: Simplifies event handling with a more intuitive API, reducing errors in mouse interaction logic.
+
+### Granular Mouse Handling
+- **Implementation**: v2 offers specific events for clicks, double-clicks, and movement, with flags for button states.
+- **Impact**: Developers can handle complex mouse interactions (e.g., drag-and-drop) more easily than in v1.
+
+### Highlight Event and Continuous Button Presses
+- **Highlight**: Views can visually respond to mouse hover or click via the `Highlight` event.
+- **Continuous Presses**: Setting `WantContinuousButtonPresses = true` repeats `Command.Accept` during button hold, useful for sliders or buttons.
+- **Impact**: Enhances interactive feedback, making terminal UIs feel more responsive.
+
+## AOT Support - Deployment and Performance
+- **Implementation**: v2 ensures compatibility with Ahead-of-Time compilation and single-file applications by avoiding reflection patterns problematic for AOT.
+- **Impact**: Simplifies deployment for environments requiring AOT (e.g., .NET Native), a feature not explicitly supported in v1, reducing runtime overhead.
+
+## Conclusion
+
+Terminal.Gui v2 is a transformative update, addressing core limitations of v1 through architectural redesign, performance optimizations, and feature enhancements. From TrueColor and adornments for visual richness to decoupled navigation and modern input APIs for usability, v2 provides a robust foundation for building sophisticated terminal applications. The detailed changes in view management, configuration, and debugging tools empower developers to create more maintainable and user-friendly applications.
