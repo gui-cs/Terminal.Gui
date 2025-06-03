@@ -16,9 +16,9 @@ public class ColorPickerTests
         cp.ColorChanged += (s, e) =>
                            {
                                count++;
-                               newColor = e.CurrentValue;
+                               newColor = e.Result;
 
-                               Assert.Equal (cp.SelectedColor, e.CurrentValue);
+                               Assert.Equal (cp.SelectedColor, e.Result);
                            };
 
         cp.SelectedColor = new (1, 2, 3);

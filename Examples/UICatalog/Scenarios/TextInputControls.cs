@@ -33,9 +33,9 @@ public class TextInputControls : Scenario
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
         textField.TextChanging += TextFieldTextChanging;
 
-        void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
+        void TextFieldTextChanging (object sender, ResultEventArgs<string> e)
         {
-            singleWordGenerator.AllSuggestions = Regex.Matches (e.NewValue, "\\w+")
+            singleWordGenerator.AllSuggestions = Regex.Matches (e.Result, "\\w+")
                                                       .Select (s => s.Value)
                                                       .Distinct ()
                                                       .ToList ();
@@ -121,7 +121,7 @@ public class TextInputControls : Scenario
         {
             X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
-        chxReadOnly.CheckedStateChanging += (sender, args) => textView.ReadOnly = args.NewValue == CheckState.Checked;
+        chxReadOnly.CheckedStateChanging += (sender, args) => textView.ReadOnly = args.Result == CheckState.Checked;
         win.Add (chxReadOnly);
 
         // By default TextView is a multi-line control. It can be forced to 
@@ -139,7 +139,7 @@ public class TextInputControls : Scenario
             CheckedState = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.CheckedStateChanging += (s, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
+        chxWordWrap.CheckedStateChanging += (s, e) => textView.WordWrap = e.Result == CheckState.Checked;
         win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
@@ -155,7 +155,7 @@ public class TextInputControls : Scenario
 
         chxMultiline.CheckedStateChanging += (s, e) =>
                                 {
-                                    textView.Multiline = e.NewValue == CheckState.Checked;
+                                    textView.Multiline = e.Result == CheckState.Checked;
 
                                     if (!textView.Multiline && chxWordWrap.CheckedState == CheckState.Checked)
                                     {
@@ -173,7 +173,7 @@ public class TextInputControls : Scenario
 
         chxCaptureTabs.CheckedStateChanging += (s, e) =>
                                   {
-                                      if (e.NewValue == CheckState.Checked)
+                                      if (e.Result == CheckState.Checked)
                                       {
                                           textView.KeyBindings.Add (keyTab, Command.Tab);
                                           textView.KeyBindings.Add (keyBackTab, Command.BackTab);
@@ -184,7 +184,7 @@ public class TextInputControls : Scenario
                                           textView.KeyBindings.Remove (keyBackTab);
                                       }
 
-                                      textView.AllowsTab = e.NewValue == CheckState.Checked;
+                                      textView.AllowsTab = e.Result == CheckState.Checked;
                                   };
         win.Add (chxCaptureTabs);
 

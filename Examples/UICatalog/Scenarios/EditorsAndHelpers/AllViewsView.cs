@@ -1,4 +1,4 @@
-﻿
+﻿#nullable enable
 namespace UICatalog.Scenarios;
 
 public class AllViewsView : View
@@ -80,7 +80,7 @@ public class AllViewsView : View
 
             if (view is { })
             {
-                FrameView? frame = new ()
+                FrameView frame = new ()
                 {
                     CanFocus = true,
                     Title = type.Name,
@@ -181,7 +181,7 @@ public class AllViewsView : View
             view.Height = MAX_VIEW_FRAME_HEIGHT - 2;
         }
 
-        if (!view.Width.Has<DimAuto> (out _))
+        if (!view.Width!.Has<DimAuto> (out _))
         {
             view.Width = Dim.Fill ();
         }

@@ -80,7 +80,7 @@ public class ApplicationTests
 
         void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.CurrentValue)
+            if (a.Value)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
@@ -447,7 +447,7 @@ public class ApplicationTests
 
         void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.CurrentValue)
+            if (a.Value)
             {
                 initialized = true;
             }

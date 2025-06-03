@@ -9,3 +9,15 @@ public class ConfigurationManagerEventArgs : EventArgs
     public ConfigurationManagerEventArgs () { }
 }
 
+
+//public class ConfigurationLoadEventArgs : ResultEventArgs<SettingsScope>
+//{
+//    public ConfigLocations Location { get; }
+//    public string? Path { get; }
+
+//    public ConfigurationLoadEventArgs (ConfigLocations location, string? path)
+//    {
+//        Location = location;
+//        Path = path;
+//    }
+//}

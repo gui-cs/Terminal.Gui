@@ -14,7 +14,7 @@ public class CheckBox : View
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed | HighlightStyle.Hover;
+    public static MouseState DefaultHighlightStates { get; set; } = MouseState.PressedOutside | MouseState.Pressed | MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
@@ -46,7 +46,7 @@ public class CheckBox : View
 
         TitleChanged += Checkbox_TitleChanged;
 
-        HighlightStyle = DefaultHighlightStyle;
+        HighlightStates = DefaultHighlightStates;
     }
 
     private bool? AdvanceAndSelect (ICommandContext? commandContext)
@@ -68,7 +68,7 @@ public class CheckBox : View
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
     {
-        base.Text = e.CurrentValue;
+        base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -152,7 +152,7 @@ public class CheckBox : View
             return null;
         }
 
-        CancelEventArgs<CheckState> e = new (in _checkedState, ref value);
+        ResultEventArgs<CheckState> e = new (value);
 
         if (OnCheckedStateChanging (e))
         {
@@ -161,9 +161,9 @@ public class CheckBox : View
 
         CheckedStateChanging?.Invoke (this, e);
 
-        if (e.Cancel)
+        if (e.Handled)
         {
-            return e.Cancel;
+            return e.Handled;
         }
 
         _checkedState = value;
@@ -184,7 +184,7 @@ public class CheckBox : View
     ///         The state change can be cancelled by setting the args.Cancel to <see langword="true"/>.
     ///     </para>
     /// </remarks>
-    protected virtual bool OnCheckedStateChanging (CancelEventArgs<CheckState> args) { return false; }
+    protected virtual bool OnCheckedStateChanging (ResultEventArgs<CheckState> args) { return false; }
 
     /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
@@ -192,7 +192,7 @@ public class CheckBox : View
     ///         This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
     ///     </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs<CheckState>>? CheckedStateChanging;
+    public event EventHandler<ResultEventArgs<CheckState>>? CheckedStateChanging;
 
     /// <summary>Called when the <see cref="CheckBox"/> state has changed.</summary>
     protected virtual void OnCheckedStateChanged (EventArgs<CheckState> args) { }
@@ -221,32 +221,32 @@ public class CheckBox : View
     public bool? AdvanceCheckState ()
     {
         CheckState oldValue = CheckedState;
-        CancelEventArgs<CheckState> e = new (in _checkedState, ref oldValue);
+        ResultEventArgs<CheckState> e = new (oldValue);
 
         switch (CheckedState)
         {
             case CheckState.None:
-                e.NewValue = CheckState.Checked;
+                e.Result = CheckState.Checked;
 
                 break;
             case CheckState.Checked:
-                e.NewValue = CheckState.UnChecked;
+                e.Result = CheckState.UnChecked;
 
                 break;
             case CheckState.UnChecked:
                 if (AllowCheckStateNone)
                 {
-                    e.NewValue = CheckState.None;
+                    e.Result = CheckState.None;
                 }
                 else
                 {
-                    e.NewValue = CheckState.Checked;
+                    e.Result = CheckState.Checked;
                 }
 
                 break;
         }
 
-        bool? cancelled = ChangeCheckedState (e.NewValue);
+        bool? cancelled = ChangeCheckedState (e.Result);
 
         return cancelled;
     }

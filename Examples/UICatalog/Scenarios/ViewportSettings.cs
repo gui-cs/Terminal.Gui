@@ -143,7 +143,7 @@ public class ViewportSettings : Scenario
                                                                          {
                                                                              Normal = new (
                                                                                            colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                                           e.CurrentValue
+                                                                                           e.Result
                                                                                           )
                                                                          });
                                     };

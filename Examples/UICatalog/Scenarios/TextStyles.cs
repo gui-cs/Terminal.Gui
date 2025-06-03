@@ -81,8 +81,13 @@ public sealed class TestStyles : Scenario
                                                   {
                                                       return;
                                                   }
-                                                  args.NewValue = args.NewValue with { Style = style };
-                                                  args.Cancel = true;
+
+                                                  if (args.Result is { })
+                                                  {
+                                                      args.Result = args.Result.Value with { Style = style };
+                                                  }
+
+                                                  args.Handled = true;
                                               };
 
             appWindow.Add (button);
@@ -125,8 +130,12 @@ public sealed class TestStyles : Scenario
             };
             button.GettingAttributeForRole += (_, args) =>
                                               {
-                                                  args.NewValue = args.NewValue with { Style = combination };
-                                                  args.Cancel = true;
+                                                  if (args.Result is { })
+                                                  {
+                                                      args.Result = args.Result.Value with { Style = combination };
+                                                  }
+
+                                                  args.Handled = true;
                                               };
             appWindow.Add (button);
         }

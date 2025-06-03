@@ -598,7 +598,7 @@ public class WizardTests ()
         Assert.Equal (string.Empty, r.Title);
 
         var expected = string.Empty;
-        r.TitleChanged += (s, args) => { Assert.Equal (r.Title, args.CurrentValue); };
+        r.TitleChanged += (s, args) => { Assert.Equal (r.Title, args.Value); };
 
         expected = "title";
         r.Title = expected;

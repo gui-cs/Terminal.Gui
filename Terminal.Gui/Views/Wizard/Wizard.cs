@@ -563,7 +563,7 @@ public class Wizard : Dialog
     {
         if (string.IsNullOrEmpty (_wizardTitle))
         {
-            _wizardTitle = e.CurrentValue;
+            _wizardTitle = e.Value;
         }
     }
 }

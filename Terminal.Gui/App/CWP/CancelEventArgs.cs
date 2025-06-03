@@ -1,19 +1,20 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.App;
 
 #pragma warning disable CS1711
 
 /// <summary>
-///     <see cref="EventArgs"/> for events that convey changes to a property of type <typeparamref name="T"/>.
+///      Provides data for events that can be cancelled without a changeable result in a cancellable workflow in the Cancellable Work Pattern (CWP).
 /// </summary>
-/// <typeparam name="T">The type of the value that was part of the change being canceled.</typeparam>
 /// <remarks>
-///     Events that use this class can be cancellable. Where applicable, the <see cref="CancelEventArgs.Cancel"/> property
-///     should be set to
-///     <see langword="true"/> to prevent the state change from occurring.
+///     Used for workflows where a change (e.g., a simple property change) can be cancelled, but the
+///     value being changed is not directly modified by the event handlers.
 /// </remarks>
+/// <typeparam name="T">The type of the value that is being changed.</typeparam>
+/// <seealso cref="ValueChangingEventArgs{T}"/>
+/// <seealso cref="ResultEventArgs{T}"/>
 public class CancelEventArgs<T> : CancelEventArgs where T : notnull
 {
     /// <summary>Initializes a new instance of the <see cref="CancelEventArgs{T}"/> class.</summary>

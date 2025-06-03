@@ -124,8 +124,8 @@ public class TextFormatterDemo : Scenario
                                    {
                                        for (int i = 0; i < alignments.Count; i++)
                                        {
-                                           singleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
-                                           multipleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
+                                           singleLines [i].Text = e.Result == CheckState.Checked ? text : unicode;
+                                           multipleLines [i].Text = e.Result == CheckState.Checked ? text : unicode;
                                        }
                                    };
 
