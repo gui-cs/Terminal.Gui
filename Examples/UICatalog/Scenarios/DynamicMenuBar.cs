@@ -249,7 +249,7 @@ public class DynamicMenuBar : Scenario
 
             CkbSubMenu.CheckedStateChanged += (s, e) =>
                                   {
-                                      if (e.Result == CheckState.Checked)
+                                      if (e.Value == CheckState.Checked)
                                       {
                                           CkbIsTopLevel.CheckedState = CheckState.UnChecked;
                                           CkbIsTopLevel.SetNeedsDraw ();
@@ -275,7 +275,7 @@ public class DynamicMenuBar : Scenario
                                           if (_hasParent)
                                           {
                                               TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.UnChecked
-                                                                     && e.Result == CheckState.UnChecked;
+                                                                     && e.Value == CheckState.UnChecked;
                                           }
                                       }
                                   };
@@ -284,7 +284,7 @@ public class DynamicMenuBar : Scenario
                                     {
                                         if (_menuItem != null)
                                         {
-                                            _menuItem.AllowNullChecked = e.Result == CheckState.Checked;
+                                            _menuItem.AllowNullChecked = e.Value == CheckState.Checked;
                                         }
                                     };
 
@@ -798,7 +798,7 @@ public class DynamicMenuBar : Scenario
                                               }
                                               else
                                               {
-                                                  e.Cancel = true;
+                                                  e.Handled = true;
                                                   txtDelimiter.SelectAll ();
                                               }
                                           };

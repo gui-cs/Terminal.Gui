@@ -111,11 +111,11 @@ public class HexEditor : Scenario
 
         addressWidthUpDown.ValueChanging += (sender, args) =>
                                             {
-                                                args.Cancel = args.Result is < 0 or > 8;
+                                                args.Cancel = args.NewValue is < 0 or > 8;
 
                                                 if (!args.Cancel)
                                                 {
-                                                    _hexView.AddressWidth = args.Result;
+                                                    _hexView.AddressWidth = args.NewValue;
 
                                                     // ReSharper disable once AccessToDisposedClosure
                                                     addressUpDown.Format = $"0x{{0:X{_hexView.AddressWidth}}}";
@@ -124,11 +124,11 @@ public class HexEditor : Scenario
 
         addressUpDown.ValueChanging += (sender, args) =>
                                        {
-                                           args.Cancel = args.Result is < 0;
+                                           args.Cancel = args.NewValue is < 0;
 
                                            if (!args.Cancel)
                                            {
-                                               _hexView.Address = args.Result;
+                                               _hexView.Address = args.NewValue;
                                            }
                                        };
 

@@ -184,7 +184,7 @@ public class DateField : TextField
         }
     }
 
-    private void DateField_Changing (object sender, CancelEventArgs<string> e)
+    private void OnTextChanging (object sender, ResultEventArgs<string> e)
     {
         try
         {
@@ -210,6 +210,7 @@ public class DateField : TextField
 
             if ($" {date}" != e.Result)
             {
+                // Change the date format to match the current culture
                 e.Result = $" {date}".Replace (RightToLeftMark, "");
             }
 
@@ -217,7 +218,7 @@ public class DateField : TextField
         }
         catch (Exception)
         {
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -375,7 +376,7 @@ public class DateField : TextField
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
         Date = date;
         CursorPosition = 1;
-        TextChanging += DateField_Changing;
+        TextChanging += OnTextChanging;
 
         // Things this view knows how to do
         AddCommand (

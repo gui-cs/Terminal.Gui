@@ -13,6 +13,7 @@ using System;
 ///     being produced or cancelled, such as for methods like <see cref="View.GetAttributeForRole"/>.
 /// </remarks>
 /// <typeparam name="T">The type of the result.</typeparam>
+/// <seealso cref="CancelEventArgs{T}"/>
 /// <seealso cref="ValueChangingEventArgs{T}"/>
 public class ResultEventArgs<T>
 {

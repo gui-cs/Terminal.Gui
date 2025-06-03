@@ -32,15 +32,15 @@ public class SchemeViewer : FrameView
     }
 
     /// <inheritdoc/>
-    protected override bool OnSettingSchemeName (in string? currentName, ref string? newName)
+    protected override bool OnSchemeNameChanging (ValueChangingEventArgs<string?> args)
     {
-        Title = newName ?? "null";
+        Title = args.NewValue ?? "null";
 
         foreach (VisualRoleViewer v in SubViews.OfType<VisualRoleViewer> ())
         {
-            v.SchemeName = newName;
+            v.SchemeName = args.NewValue;
         }
 
-        return base.OnSettingSchemeName (in currentName, ref newName);
+        return base.OnSchemeNameChanging (args);
     }
 }

@@ -14,7 +14,7 @@ public class CheckBox : View
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStyle { get; set; } = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed | ViewBase.MouseState.In;
+    public static MouseState DefaultHighlightStates { get; set; } = MouseState.PressedOutside | MouseState.Pressed | MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
@@ -46,7 +46,7 @@ public class CheckBox : View
 
         TitleChanged += Checkbox_TitleChanged;
 
-        HighlightStyle = DefaultHighlightStyle;
+        HighlightStates = DefaultHighlightStates;
     }
 
     private bool? AdvanceAndSelect (ICommandContext? commandContext)
@@ -68,7 +68,7 @@ public class CheckBox : View
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
     {
-        base.Text = e.Result;
+        base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

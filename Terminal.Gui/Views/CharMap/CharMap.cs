@@ -442,9 +442,6 @@ public class CharMap : View, IDesignable
 
     #region Mouse Handling
 
-    // TODO: Use this to demonstrate using a popover to show glyph info on hover
-    // public event EventHandler<ListViewItemEventArgs>? Hover;
-
     private bool? HandleSelectCommand (ICommandContext? commandContext)
     {
         Point position = GetCursor (SelectedCodePoint);

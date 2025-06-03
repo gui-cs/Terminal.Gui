@@ -3,8 +3,13 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     Describes the current state of the mouse in relation to a <see cref="View"/>.
+///     Used to describe the state of the mouse in relation to a <see cref="View"/> (<see cref="View.MouseState"/>) and to
+///     specify visual effects,
+///     such as highlighting a button when the mouse is over it or changing the appearance of a view when the mouse is
+///     pressed (<see cref="View.HighlightStates"/>).
 /// </summary>
+/// <seealso cref="View.MouseState"/>
+/// <seealso cref="View.HighlightStates"/>
 [JsonConverter (typeof (JsonStringEnumConverter<MouseState>))]
 [Flags]
 public enum MouseState
@@ -21,12 +26,14 @@ public enum MouseState
     In = 1,
 
     /// <summary>
-    ///     The mouse is over the <see cref="View.Viewport"/> and is pressed.
+    ///     The mouse is in the <see cref="View.Viewport"/> and is pressed.
     /// </summary>
     Pressed = 2,
 
     /// <summary>
-    ///     The mouse is outside the <see cref="View.Viewport"/> and is pressed.
+    ///     The mouse is outside the <see cref="View.Viewport"/> and is pressed. If
+    ///     <see cref="View.WantContinuousButtonPressed"/> is true,
+    ///     this flag is ignored so that the view remains in the pressed state until the mouse is released.
     /// </summary>
     PressedOutside = 4
 }

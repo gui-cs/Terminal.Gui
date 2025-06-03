@@ -229,49 +229,49 @@ public class AdornmentEditor : EditorBase
 
     private void Top_ValueChanging (object? sender, CancelEventArgs<int> e)
     {
-        if (e.Result < 0 || AdornmentToEdit is null)
+        if (e.NewValue < 0 || AdornmentToEdit is null)
         {
             e.Cancel = true;
 
             return;
         }
 
-        AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, e.Result, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
+        AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, e.NewValue, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
     private void Left_ValueChanging (object? sender, CancelEventArgs<int> e)
     {
-        if (e.Result < 0 || AdornmentToEdit is null)
+        if (e.NewValue < 0 || AdornmentToEdit is null)
         {
             e.Cancel = true;
 
             return;
         }
 
-        AdornmentToEdit.Thickness = new (e.Result, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
+        AdornmentToEdit.Thickness = new (e.NewValue, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
     private void Right_ValueChanging (object? sender, CancelEventArgs<int> e)
     {
-        if (e.Result < 0 || AdornmentToEdit is null)
+        if (e.NewValue < 0 || AdornmentToEdit is null)
         {
             e.Cancel = true;
 
             return;
         }
 
-        AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, e.Result, AdornmentToEdit.Thickness.Bottom);
+        AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, e.NewValue, AdornmentToEdit.Thickness.Bottom);
     }
 
     private void Bottom_ValueChanging (object? sender, CancelEventArgs<int> e)
     {
-        if (e.Result < 0 || AdornmentToEdit is null)
+        if (e.NewValue < 0 || AdornmentToEdit is null)
         {
             e.Cancel = true;
 
             return;
         }
 
-        AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, e.Result);
+        AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, e.NewValue);
     }
 }

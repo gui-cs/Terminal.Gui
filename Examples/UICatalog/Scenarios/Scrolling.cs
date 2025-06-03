@@ -53,7 +53,7 @@ public class Scrolling : Scenario
             CheckedState = demoView.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
         };
         app.Add (hCheckBox);
-        hCheckBox.CheckedStateChanged += (sender, args) => { demoView.HorizontalScrollBar.Visible = args.Result == CheckState.Checked; };
+        hCheckBox.CheckedStateChanged += (sender, args) => { demoView.HorizontalScrollBar.Visible = args.Value == CheckState.Checked; };
 
         //// NOTE: This call to EnableScrollBar is technically not needed because the reference
         //// NOTE: to demoView.HorizontalScrollBar below will cause it to be lazy created.
@@ -67,7 +67,7 @@ public class Scrolling : Scenario
             CheckedState = demoView.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
         };
         app.Add (vCheckBox);
-        vCheckBox.CheckedStateChanged += (sender, args) => { demoView.VerticalScrollBar.Visible = args.Result == CheckState.Checked; };
+        vCheckBox.CheckedStateChanged += (sender, args) => { demoView.VerticalScrollBar.Visible = args.Value == CheckState.Checked; };
 
         var ahCheckBox = new CheckBox
         {
@@ -84,11 +84,11 @@ public class Scrolling : Scenario
                                            };
         app.Add (ahCheckBox);
 
-        demoView.VerticalScrollBar.VisibleChanging += (sender, args) => { vCheckBox.CheckedState = args.Result ? CheckState.Checked : CheckState.UnChecked; };
+        demoView.VerticalScrollBar.VisibleChanging += (sender, args) => { vCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
         demoView.HorizontalScrollBar.VisibleChanging += (sender, args) =>
                                                         {
-                                                            hCheckBox.CheckedState = args.Result ? CheckState.Checked : CheckState.UnChecked;
+                                                            hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked;
                                                         };
 
         // Add a progress bar to cause constant redraws

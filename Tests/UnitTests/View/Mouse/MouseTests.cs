@@ -304,60 +304,41 @@ public class MouseTests : TestsAllViews
         Application.ResetState (true);
     }
 
-    [Theory (Skip = "This test needs to be redone.")]
-    [InlineData (MouseState.None, 0, 0)]
-    [InlineData (MouseState.Pressed | MouseState.PressedOutside, 1, 1)]
-    public void HighlightOnPress_Fires_Events_And_Highlights (MouseState highlightOnPress, int expectedEnabling, int expectedDisabling)
-    {
-        var view = new View
-        {
-            CanFocus = true,
-            HighlightStyle = highlightOnPress,
-            Height = 1,
-            Width = 1
-        };
+    //[Theory]
+    //[InlineData (true, MouseState.None, 0, 0, 0, 0)]
+    //[InlineData (true, MouseState.In, 0, 0, 0, 0)]
+    //[InlineData (true, MouseState.Pressed, 0, 0, 1, 0)]
+    //[InlineData (true, MouseState.PressedOutside, 0, 0, 0, 1)]
+    //public void MouseState_Button1_Pressed_Then_Released_Outside (bool inViewport, MouseState highlightFlags, int noneCount, int expectedInCount, int expectedPressedCount, int expectedPressedOutsideCount)
+    //{
+    //    var testView = new MouseEventTestView
+    //    {
+    //        HighlightStates = highlightFlags
+    //    };
 
-        var enablingHighlight = 0;
-        var disablingHighlight = 0;
-        view.MouseStateChanging += ViewHighlight;
-        view.SetScheme (new (new Attribute (ColorName16.Red, ColorName16.Blue)));
-        Scheme originalScheme = view.GetScheme ();
+    //    Assert.Equal (0, testView.MouseStateInCount);
+    //    Assert.Equal (0, testView.MouseStatePressedCount);
+    //    Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+    //    Assert.Equal (0, testView.MouseStateNoneCount);
 
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+    //    testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (inViewport ? 0 : 1, 0) });
+    //    Assert.Equal (expectedInCount, testView.MouseStateInCount);
+    //    Assert.Equal (expectedPressedCount, testView.MouseStatePressedCount);
+    //    Assert.Equal (expectedPressedOutsideCount, testView.MouseStatePressedOutsideCount);
+    //    Assert.Equal (noneCount, testView.MouseStateNoneCount);
 
-        if (highlightOnPress != MouseState.None)
-        {
-            Assert.NotEqual (originalScheme, view.GetScheme ());
-        }
-        else
-        {
-            Assert.Equal (originalScheme, view.GetScheme ());
-        }
+    //    testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (inViewport ? 0 : 1, 0) });
+    //    Assert.Equal (expectedInCount, testView.MouseStateInCount);
+    //    Assert.Equal (expectedPressedCount, testView.MouseStatePressedCount);
+    //    Assert.Equal (expectedPressedOutsideCount, testView.MouseStatePressedOutsideCount);
+    //    Assert.Equal (noneCount, testView.MouseStateNoneCount);
 
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released });
-        Assert.Equal (originalScheme, view.GetScheme ());
-        Assert.Equal (expectedEnabling, enablingHighlight);
-        Assert.Equal (expectedDisabling, disablingHighlight);
+    //    testView.Dispose ();
 
-        view.Dispose ();
+    //    // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+    //    Application.ResetState (true);
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
-        Application.ResetState (true);
-
-        return;
-
-        void ViewHighlight (object sender, CancelEventArgs<MouseState> e)
-        {
-            if (e.Result == MouseState.None)
-            {
-                disablingHighlight++;
-            }
-            else
-            {
-                enablingHighlight++;
-            }
-        }
-    }
+    //}
 
     // TODO: Add tests for each combination of HighlightFlags
 
@@ -369,7 +350,7 @@ public class MouseTests : TestsAllViews
     {
         var testView = new MouseEventTestView
         {
-            HighlightStyle = MouseState.None
+            HighlightStates = MouseState.None
         };
 
         bool inViewport = testView.Viewport.Contains (x, 0);
@@ -382,7 +363,7 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, testView.MouseStateNoneCount);
 
         // Move to x,0 
-        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (x, 0) });
 
         if (inViewport)
         {
@@ -431,7 +412,7 @@ public class MouseTests : TestsAllViews
     {
         var testView = new MouseEventTestView
         {
-            HighlightStyle = MouseState.Pressed
+            HighlightStates = MouseState.Pressed
         };
 
         bool inViewport = testView.Viewport.Contains (x, 0);
@@ -444,7 +425,7 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, testView.MouseStateNoneCount);
 
         // Move to x,0 
-        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (x, 0) });
 
         if (inViewport)
         {
@@ -489,12 +470,12 @@ public class MouseTests : TestsAllViews
     [InlineData (0)]
     [InlineData (1)]
     [InlineData (10)]
-    public void MouseState_PressedOutside_Button1_Pressed_Move_Rises_PressedOutside (int x)
+    public void MouseState_PressedOutside_Button1_Pressed_Move_Raises_PressedOutside (int x)
     {
         var testView = new MouseEventTestView
         {
-            HighlightStyle = MouseState.PressedOutside,
-            WantContinuousButtonPressed = true
+            HighlightStates = MouseState.PressedOutside,
+            WantContinuousButtonPressed = false
         };
 
         bool inViewport = testView.Viewport.Contains (x, 0);
@@ -507,7 +488,7 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, testView.MouseStateNoneCount);
 
         // Move to x,0 
-        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (x, 0) });
 
         if (inViewport)
         {
@@ -539,7 +520,7 @@ public class MouseTests : TestsAllViews
             Assert.Equal (0, testView.MouseStateInCount);
             Assert.Equal (0, testView.MouseStatePressedCount);
             Assert.Equal (1, testView.MouseStatePressedOutsideCount);
-            Assert.Equal (0, testView.MouseStateNoneCount);
+            Assert.Equal (1, testView.MouseStateNoneCount);
         }
 
         testView.Dispose ();
@@ -548,6 +529,69 @@ public class MouseTests : TestsAllViews
         Application.ResetState (true);
     }
 
+
+    [Theory]
+    [InlineData (0)]
+    [InlineData (1)]
+    [InlineData (10)]
+    public void MouseState_PressedOutside_Button1_Pressed_Move_Raises_PressedOutside_WantContinuousButtonPressed (int x)
+    {
+        var testView = new MouseEventTestView
+        {
+            HighlightStates = MouseState.PressedOutside,
+            WantContinuousButtonPressed = true
+        };
+
+        bool inViewport = testView.Viewport.Contains (x, 0);
+
+        // Start at 0,0 ; in viewport
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (0, testView.MouseStateInCount);
+        Assert.Equal (0, testView.MouseStatePressedCount);
+        Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+        Assert.Equal (0, testView.MouseStateNoneCount);
+
+        // Move to x,0 
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (x, 0) });
+
+        if (inViewport)
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+        else
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+
+        // Move backto 0,0 ; in viewport
+        testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+
+        if (inViewport)
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+        else
+        {
+            Assert.Equal (0, testView.MouseStateInCount);
+            Assert.Equal (0, testView.MouseStatePressedCount);
+            Assert.Equal (0, testView.MouseStatePressedOutsideCount);
+            Assert.Equal (0, testView.MouseStateNoneCount);
+        }
+
+        testView.Dispose ();
+
+        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        Application.ResetState (true);
+    }
     private class MouseEventTestView : View
     {
         public int MouseEnterCount { get; private set; }
@@ -569,9 +613,9 @@ public class MouseTests : TestsAllViews
         }
 
         /// <inheritdoc/>
-        protected override bool OnMouseStateChanging (CancelEventArgs<MouseState> args)
+        protected override void OnMouseStateChanged (EventArgs<MouseState> args)
         {
-            switch (args.Result)
+            switch (args.Value)
             {
                 case MouseState.None:
                     MouseStateNoneCount++;
@@ -593,7 +637,7 @@ public class MouseTests : TestsAllViews
                     break;
             }
 
-            return base.OnMouseStateChanging (args);
+            base.OnMouseStateChanged (args);
         }
     }
 }

@@ -219,7 +219,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseSelecting (ICommandContext? ctx)
     {
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
@@ -266,7 +266,7 @@ public partial class View // Command APIs
     protected bool? RaiseHandlingHotKey ()
     {
         CommandEventArgs args = new () { Context = new CommandContext<KeyBinding> { Command = Command.HotKey } };
-        Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
+        //Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.

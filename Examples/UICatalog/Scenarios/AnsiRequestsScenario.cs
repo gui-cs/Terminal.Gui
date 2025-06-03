@@ -257,7 +257,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         cbDar.ValueChanging += (s, e) =>
         {
-            if (e.Result < 0 || e.Result > 20)
+            if (e.NewValue < 0 || e.NewValue > 20)
             {
                 e.Cancel = true;
             }

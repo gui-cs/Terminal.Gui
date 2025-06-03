@@ -296,12 +296,12 @@ public static class ThemeManager
     internal static void OnThemeChanged (string previousThemeName, string newThemeName)
     {
         Logging.Debug ($"Themes.OnThemeChanged({previousThemeName}) -> {Theme}");
-        StringPropertyEventArgs args = new StringPropertyEventArgs (in previousThemeName, ref newThemeName!);
+        EventArgs<string> args = new (newThemeName);
         ThemeChanged?.Invoke (null, args);
     }
 
     /// <summary>Raised when the selected theme has changed.</summary>
-    public static event EventHandler<StringPropertyEventArgs>? ThemeChanged;
+    public static event EventHandler<EventArgs<string>>? ThemeChanged;
 
     /// <summary>
     ///     Validates all themes in the <see cref="Themes"/> dictionary.

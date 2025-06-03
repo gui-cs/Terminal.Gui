@@ -399,7 +399,7 @@ public class Sliders : Scenario
 
         innerSpacingUpDown.ValueChanging += (sender, e) =>
                                             {
-                                                if (e.Result < 0)
+                                                if (e.NewValue < 0)
                                                 {
                                                     e.Cancel = true;
 
@@ -408,7 +408,7 @@ public class Sliders : Scenario
 
                                                 foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
-                                                    s.MinimumInnerSpacing = e.Result;
+                                                    s.MinimumInnerSpacing = e.NewValue;
                                                 }
                                             };
 

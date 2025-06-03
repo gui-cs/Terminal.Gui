@@ -198,7 +198,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         if (sender is MenuBarItemv2 mbi)
         {
-            if (e.Result)
+            if (e.Value)
             {
                 Active = true;
             }

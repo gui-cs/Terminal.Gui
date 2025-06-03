@@ -168,7 +168,9 @@ public class ConfigurationEditor : Scenario
 
                     break;
 
-                default:
+                case 1:
+                    // user decided not save changes
+                    break;
                 case -1 or 2:
                     // user cancelled
                     return;

@@ -348,7 +348,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         _textField.TextChanging += TextFieldTextChanging;
 
-        void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
+        void TextFieldTextChanging (object sender, ResultEventArgs<string> e)
         {
             if (e.Result.GetRuneCount () > 11)
             {
@@ -417,7 +417,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.TextChanging += (s, e) =>
                            {
                                newText = e.Result;
-                               oldText = e.CurrentValue;
+                               oldText = tf.Text;
                            };
 
         var top = new Toplevel ();
@@ -961,7 +961,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
                                        if (cancel)
                                        {
-                                           e.Cancel = true;
+                                           e.Handled = true;
                                        }
                                    };
 

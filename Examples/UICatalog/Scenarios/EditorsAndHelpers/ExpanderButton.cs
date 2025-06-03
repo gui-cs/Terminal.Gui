@@ -43,7 +43,7 @@ public class ExpanderButton : Button
 
         Orientation = Orientation.Vertical;
 
-        HighlightStyle = Terminal.Gui.ViewBase.MouseState.None;
+        HighlightStates = Terminal.Gui.ViewBase.MouseState.None;
 
         Initialized += ExpanderButton_Initialized;
 
@@ -175,7 +175,7 @@ public class ExpanderButton : Button
 
         if (!args.Cancel)
         {
-            _collapsed = args.Result;
+            _collapsed = args.NewValue;
 
             ExpandOrCollapse (_collapsed);
         }
