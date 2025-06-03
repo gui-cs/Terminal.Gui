@@ -25,7 +25,10 @@ public class ApplicationV2Tests
     [Fact]
     public void Init_CreatesKeybindings ()
     {
+        var orig = ApplicationImpl.Instance;
+
         var v2 = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (v2);
 
         Application.KeyBindings.Clear ();
 
@@ -36,12 +39,17 @@ public class ApplicationV2Tests
         Assert.NotEmpty (Application.KeyBindings.GetBindings ());
 
         v2.Shutdown ();
+
+        ApplicationImpl.ChangeInstance (orig);
     }
 
     [Fact]
     public void Init_DriverIsFacade ()
     {
+        var orig = ApplicationImpl.Instance;
+
         var v2 = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
         v2.Init ();
@@ -53,11 +61,15 @@ public class ApplicationV2Tests
         v2.Shutdown ();
 
         Assert.Null (Application.Driver);
+
+        ApplicationImpl.ChangeInstance (orig);
     }
 
     [Fact]
     public void Init_ExplicitlyRequestWin ()
     {
+        var orig = ApplicationImpl.Instance;
+
         Assert.Null (Application.Driver);
         var netInput = new Mock<INetInput> (MockBehavior.Strict);
         var netOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
@@ -77,6 +89,7 @@ public class ApplicationV2Tests
                                     () => netOutput.Object,
                                     () => winInput.Object,
                                     () => winOutput.Object);
+        ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
         v2.Init (null, "v2win");
@@ -90,11 +103,15 @@ public class ApplicationV2Tests
         Assert.Null (Application.Driver);
 
         winInput.VerifyAll ();
+
+        ApplicationImpl.ChangeInstance (orig);
     }
 
     [Fact]
     public void Init_ExplicitlyRequestNet ()
     {
+        var orig = ApplicationImpl.Instance;
+
         var netInput = new Mock<INetInput> (MockBehavior.Strict);
         var netOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
         var winInput = new Mock<IWindowsInput> (MockBehavior.Strict);
@@ -112,6 +129,7 @@ public class ApplicationV2Tests
                                     () => netOutput.Object,
                                     () => winInput.Object,
                                     () => winOutput.Object);
+        ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
         v2.Init (null, "v2net");
@@ -125,6 +143,8 @@ public class ApplicationV2Tests
         Assert.Null (Application.Driver);
 
         netInput.VerifyAll ();
+
+        ApplicationImpl.ChangeInstance (orig);
     }
 
     private void SetupRunInputMockMethodToBlock (Mock<IWindowsInput> winInput)
@@ -159,12 +179,17 @@ public class ApplicationV2Tests
     [Fact]
     public void NoInitThrowOnRun ()
     {
+        var orig = ApplicationImpl.Instance;
+
         Assert.Null (Application.Driver);
         var app = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (app);
 
         var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));
         Assert.Equal ("Run cannot be accessed before Initialization", ex.Message);
         app.Shutdown();
+
+        ApplicationImpl.ChangeInstance (orig);
     }
 
     [Fact]
@@ -449,6 +474,8 @@ public class ApplicationV2Tests
     [Fact]
     public void Shutdown_Called_Repeatedly_DoNotDuplicateDisposeOutput ()
     {
+        var orig = ApplicationImpl.Instance;
+
         var netInput = new Mock<INetInput> ();
         SetupRunInputMockMethodToBlock (netInput);
         Mock<IConsoleOutput>? outputMock = null;
@@ -459,6 +486,7 @@ public class ApplicationV2Tests
                                    () => (outputMock = new Mock<IConsoleOutput> ()).Object,
                                    Mock.Of<IWindowsInput>,
                                    Mock.Of<IConsoleOutput>);
+        ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "v2net");
 
@@ -466,11 +494,17 @@ public class ApplicationV2Tests
         v2.Shutdown ();
         v2.Shutdown ();
         outputMock!.Verify (o => o.Dispose (), Times.Once);
+
+        ApplicationImpl.ChangeInstance (orig);
     }
+
     [Fact]
     public void Init_Called_Repeatedly_WarnsAndIgnores ()
     {
+        var orig = ApplicationImpl.Instance;
+
         var v2 = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
         v2.Init ();
@@ -496,12 +530,12 @@ public class ApplicationV2Tests
 
         // Restore the original null logger to be polite to other tests
         Logging.Logger = beforeLogger;
+
+        ApplicationImpl.ChangeInstance (orig);
     }
 
-
-    // QUESTION: What does this test really test? It's poorly named.
     [Fact]
-    public void Open_CallsContinueWithOnUIThread ()
+    public void Open_Calls_ContinueWith_On_UIThread ()
     {
         var orig = ApplicationImpl.Instance;
 
