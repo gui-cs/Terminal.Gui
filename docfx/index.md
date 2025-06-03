@@ -1,3 +1,16 @@
+# Terminal.Gui Documentation
+
+Welcome to the official documentation for Terminal.Gui, a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET.
+
+## Key Resources
+
+- [Getting Started](docs/getting-started.md) - Learn how to start using Terminal.Gui.
+- [Events Deep Dive](docs/events.md) - Detailed guide on event handling and the Cancellable Work Pattern.
+- [View Documentation](docs/View.md) - Information on creating and customizing views.
+- [Keyboard Handling](docs/keyboard.md) - Guide to managing keyboard input.
+- [Mouse Support](docs/mouse.md) - Details on implementing mouse interactions.
+- [Showcase](docs/showcase.md) - Explore applications and examples built with Terminal.Gui.
+
 # Terminal.Gui v2 - Cross Platform Terminal UI toolkit for .NET
 
 A toolkit for building rich console apps for .NET that run on Windows, the Mac, and Linux.

@@ -28,8 +28,10 @@ Terminal.Gui uses several types of events:
 
 The [Cancellable Work Pattern (CWP)](cancellable-work-pattern.md) is a core pattern in Terminal.Gui that provides a consistent way to handle cancellable operations. An "event" has two components:
 
-1. **Virtual Method**: `protected virtual OnMethod()` that can be overridden to customize behavior
+1. **Virtual Method**: `protected virtual OnMethod()` that can be overridden in a subclass so the subclass can participate
 2. **Event**: `public event EventHandler<>` that allows external subscribers to participate
+
+The virtual method is called first, letting subclasses have priority. Then the event is invoked.
 
 Optional CWP Helper Classes are provided to provide consistency.
 
@@ -70,7 +72,7 @@ public class MyView : View
 
 Terminal.Gui provides static helper classes to implement CWP:
 
-##### Property Changes
+#### Property Changes
 
 For property changes, use `CWPPropertyHelper.ChangeProperty`:
 
@@ -115,7 +117,7 @@ public class MyView : View
 }
 ```
 
-##### Workflows
+#### Workflows
 
 For general workflows, use `CWPWorkflowHelper`:
 
@@ -344,4 +346,52 @@ public interface ICommandContext
 
 TG follows the *naming* advice provided in [.NET Naming Guidelines - Names of Events](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN#names-of-events).
 
+## Known Issues
 
+### Proposed Enhancement: Command Propagation
+
+The *Cancellable Work Pattern* in `View.Command` currently supports local `Command.Activate` and propagating `Command.Accept`. To address hierarchical coordination needs (e.g., `MenuBarv2` popovers, `Dialog` closing), a `PropagatedCommands` property is proposed (Issue #4050):
+
+- **Change**: Add `IReadOnlyList<Command> PropagatedCommands` to `View`, defaulting to `[Command.Accept]`. `Raise*` methods propagate if the command is in `SuperView?.PropagatedCommands` and `args.Handled` is `false`.
+- **Example**:
+
+  ```csharp
+  public IReadOnlyList<Command> PropagatedCommands { get; set; } = new List<Command> { Command.Accept };
+  protected bool? RaiseAccepting(ICommandContext? ctx)
+  {
+      CommandEventArgs args = new() { Context = ctx };
+      if (OnAccepting(args) || args.Handled)
+      {
+          return true;
+      }
+      Accepting?.Invoke(this, args);
+      if (!args.Handled && SuperView?.PropagatedCommands.Contains(Command.Accept) == true)
+      {
+          return SuperView.InvokeCommand(Command.Accept, ctx);
+      }
+      return Accepting is null ? null : args.Handled;
+  }
+  ```
+
+- **Impact**: Enables `Command.Activate` propagation for `MenuBarv2` while preserving `Command.Accept` propagation, maintaining decoupling and avoiding noise from irrelevant commands.
+
+### **Conflation in FlagSelector**:
+   - **Issue**: `CheckBox.Activating` triggers `Accepting`, conflating state change and confirmation.
+   - **Recommendation**: Refactor to separate `Activating` and `Accepting`:
+     ```csharp
+     checkbox.Activating += (sender, args) =>
+     {
+         if (RaiseAccepting(args.Context) is true)
+         {
+             args.Handled = true;
+         }
+     };
+     ```
+
+### **Propagation Limitations**:
+   - **Issue**: Local `Command.Activate` restricts `MenuBarv2` coordination; `Command.Accept` uses hacks (#3925).
+   - **Recommendation**: Adopt `PropagatedCommands` to enable targeted propagation, as proposed.
+
+### **Complexity in Multi-Phase Workflows**:
+   - **Issue**: `View.Draw`'s multi-phase workflow can be complex for developers to customize.
+   - **Recommendation**: Provide clearer phase-specific documentation and examples.

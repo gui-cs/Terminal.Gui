@@ -86,10 +86,10 @@ public static class CWPWorkflowHelper
     /// </exception>
     /// <example>
     ///     <code>
-    ///         ResultEventArgs<Scheme?> args = new();
-    ///         Func<ResultEventArgs<Scheme?>, bool> onGettingScheme = _ => false;
-    ///         EventHandler<ResultEventArgs<Scheme?>>? gettingSchemeHandler = null;
-    ///         Func<Scheme> defaultAction = () => SchemeManager.GetScheme("Base");
+    ///         ResultEventArgs&lt;Scheme?&gt; args = new();
+    ///         Func&lt;ResultEventArgs&lt;Scheme?&gt;, bool&gt; onGettingScheme = _ =&gt; false;
+    ///         EventHandler&lt;ResultEventArgs&lt;Scheme?&gt;&gt;? gettingSchemeHandler = null;
+    ///         Func&lt;Scheme&gt; defaultAction = () =&gt; SchemeManager.GetScheme("Base");
     ///         Scheme scheme = CWPWorkflowHelper.ExecuteWithResult(onGettingScheme, gettingSchemeHandler, args, defaultAction);
     ///     </code>
     /// </example>

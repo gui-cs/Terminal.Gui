@@ -48,7 +48,7 @@ public static class CWPPropertyHelper
     ///         EventHandler&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? changedEvent = null;
     ///         bool changed = CWPPropertyHelper.ChangeProperty(
     ///             current, proposed, onChanging, changingEvent, onChanged, changedEvent, out string? final);
-    ///     &lt;/code&gt;
+    ///     </code>
     /// </example>
     public static bool ChangeProperty<T> (
         T currentValue,
