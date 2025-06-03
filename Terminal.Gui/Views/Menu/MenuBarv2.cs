@@ -198,7 +198,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         if (sender is MenuBarItemv2 mbi)
         {
-            if (e.CurrentValue)
+            if (e.Value)
             {
                 Active = true;
             }
@@ -541,7 +541,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                      {
                                                          Normal = new (
                                                                        GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                       args.CurrentValue,
+                                                                       args.Result,
                                                                        GetAttributeForRole (VisualRole.Normal).Style)
                                                      });
                                       };

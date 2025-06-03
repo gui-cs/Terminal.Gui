@@ -274,7 +274,7 @@ public class ScrollBarDemo : Scenario
             Text = $"_AutoShow",
             CheckedState = scrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
         };
-        autoShow.CheckedStateChanging += (s, e) => scrollBar.AutoShow = e.NewValue == CheckState.Checked;
+        autoShow.CheckedStateChanging += (s, e) => scrollBar.AutoShow = e.Result == CheckState.Checked;
         demoFrame.Add (autoShow);
 
         var lblSliderPosition = new Label
@@ -352,33 +352,33 @@ public class ScrollBarDemo : Scenario
         {
             scrollBar.ScrollableContentSizeChanged += (s, e) =>
                                   {
-                                      eventLog.Log ($"SizeChanged: {e.CurrentValue}");
+                                      eventLog.Log ($"SizeChanged: {e.Value}");
 
-                                      if (scrollContentSize.Value != e.CurrentValue)
+                                      if (scrollContentSize.Value != e.Value)
                                       {
-                                          scrollContentSize.Value = e.CurrentValue;
+                                          scrollContentSize.Value = e.Value;
                                       }
                                   };
 
             scrollBar.SliderPositionChanged += (s, e) =>
                                             {
-                                                eventLog.Log ($"SliderPositionChanged: {e.CurrentValue}");
+                                                eventLog.Log ($"SliderPositionChanged: {e.Value}");
                                                 eventLog.Log ($"  Position: {scrollBar.Position}");
-                                                scrollSliderPosition.Text = e.CurrentValue.ToString ();
+                                                scrollSliderPosition.Text = e.Value.ToString ();
                                             };
 
             scrollBar.Scrolled += (s, e) =>
                                {
-                                   eventLog.Log ($"Scrolled: {e.CurrentValue}");
+                                   eventLog.Log ($"Scrolled: {e.Value}");
                                    eventLog.Log ($"  SliderPosition: {scrollBar.GetSliderPosition ()}");
-                                   scrolled.Text = e.CurrentValue.ToString ();
+                                   scrolled.Text = e.Value.ToString ();
                                };
 
             scrollBar.PositionChanged += (s, e) =>
                                              {
-                                                 eventLog.Log ($"PositionChanged: {e.CurrentValue}");
-                                                 scrollPosition.Value = e.CurrentValue;
-                                                 controlledList.Viewport = controlledList.Viewport with { Y = e.CurrentValue };
+                                                 eventLog.Log ($"PositionChanged: {e.Value}");
+                                                 scrollPosition.Value = e.Value;
+                                                 controlledList.Viewport = controlledList.Viewport with { Y = e.Value };
                                              };
 
 

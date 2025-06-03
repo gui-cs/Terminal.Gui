@@ -1,6 +1,8 @@
 ﻿#nullable enable
 namespace Terminal.Gui.ViewBase;
 
+
+
 /// <summary>
 ///     Helper class for implementing <see cref="IOrientation"/>.
 /// </summary>
@@ -135,3 +137,33 @@ public class OrientationHelper
     /// </remarks>
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 }
+
+
+//public class OrientationHelper
+//{
+//    private Orientation _orientation;
+
+//    public Orientation Orientation
+//    {
+//        get => _orientation;
+//        set
+//        {
+//            CWPPropertyHelper.ChangeProperty (
+//                                              currentValue: _orientation,
+//                                              newValue: ref value,
+//                                              onChanging: args => OnOrientationChanging (args),
+//                                              changingEvent: OrientationChanging,
+//                                              onChanged: args => OnOrientationChanged (args),
+//                                              changedEvent: OrientationChanged
+//                                             );
+//            _orientation = value;
+//        }
+//    }
+
+//    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
+//    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
+
+//    protected virtual bool OnOrientationChanging (CancelEventArgs<Orientation> args) => false;
+//    protected virtual void OnOrientationChanged (EventArgs<Orientation> args) { }
+//}
+

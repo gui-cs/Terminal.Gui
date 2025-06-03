@@ -406,7 +406,7 @@ public class UICatalog
 
             void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
             {
-                if (e.CurrentValue)
+                if (e.Value)
                 {
                     sw.Start ();
                 }

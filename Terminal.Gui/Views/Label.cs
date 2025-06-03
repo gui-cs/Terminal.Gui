@@ -40,7 +40,7 @@ public class Label : View, IDesignable
 
     private void Label_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.CurrentValue;
+        base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

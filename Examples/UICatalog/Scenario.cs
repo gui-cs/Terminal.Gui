@@ -181,7 +181,7 @@ public class Scenario : IDisposable
 
     private void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
     {
-        if (a.CurrentValue)
+        if (a.Value)
         {
             lock (_timeoutLock!)
             {
@@ -196,7 +196,7 @@ public class Scenario : IDisposable
                 cd.Refreshed += (sender, args) =>
                                                  {
                                                      BenchmarkResults.RefreshedCount++;
-                                                     if (args.CurrentValue)
+                                                     if (args.Value)
                                                      {
                                                          BenchmarkResults.UpdatedCount++;
                                                      }

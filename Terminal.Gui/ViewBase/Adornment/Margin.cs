@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -32,11 +33,6 @@ public class Margin : Adornment
     /// <inheritdoc/>
     public Margin (View parent) : base (parent)
     {
-        /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
-
-        // BUGBUG: We should not set HighlightStyle.Pressed here, but wherever it is actually needed
-        // HighlightStyle |= HighlightStyle.Pressed;
-        Highlight += Margin_Highlight;
         SubViewLayout += Margin_LayoutStarted;
 
         // Margin should not be focusable
@@ -81,7 +77,7 @@ public class Margin : Adornment
         {
             var view = stack.Pop ();
 
-            if (view.Margin?.GetCachedClip() != null)
+            if (view.Margin?.GetCachedClip () != null)
             {
                 view.Margin.NeedsDraw = true;
                 Region? saved = GetClip ();
@@ -113,15 +109,9 @@ public class Margin : Adornment
         }
 
         ShadowStyle = base.ShadowStyle;
+
+        Parent.MouseStateChanged += OnParentOnMouseStateChanged;
     }
-
-    ///// <inheritdoc />
-    //protected override bool OnGettingScheme (out Scheme? scheme)
-    //{
-    //    scheme = Parent?.SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
-
-    //    return true;
-    //}
 
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()
@@ -153,12 +143,12 @@ public class Margin : Adornment
     /// <inheritdoc />
     protected override bool OnDrawingText ()
     {
-        return ViewportSettings.HasFlag(ViewportSettingsFlags.Transparent);
+        return ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
     }
 
     #region Shadow
 
-    private bool _pressed;
+    // private bool _pressed;
     private ShadowView? _bottomShadow;
     private ShadowView? _rightShadow;
 
@@ -228,14 +218,22 @@ public class Margin : Adornment
         set => base.ShadowStyle = SetShadow (value);
     }
 
-    private void Margin_Highlight (object? sender, CancelEventArgs<HighlightStyle> e)
+    private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)
     {
-        if (Thickness == Thickness.Empty || ShadowStyle == ShadowStyle.None)
+        if (sender is not View parent || Thickness == Thickness.Empty || ShadowStyle == ShadowStyle.None)
         {
             return;
         }
 
-        if (_pressed && e.NewValue == HighlightStyle.None)
+        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag(MouseState.Pressed);
+        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside); ;
+
+        if (pressedOutside)
+        {
+            pressed = false;
+        }
+
+        if (MouseState.HasFlag (MouseState.Pressed) && !pressed)
         {
             // If the view is pressed and the highlight is being removed, move the shadow back.
             // Note, for visual effects reasons, we only move horizontally.
@@ -256,14 +254,14 @@ public class Margin : Adornment
                 _bottomShadow.Visible = true;
             }
 
-            _pressed = false;
+            MouseState &= ~MouseState.Pressed;
 
             return;
         }
 
-        if (!_pressed && e.NewValue.HasFlag (HighlightStyle.Pressed))
+        if (!MouseState.HasFlag (MouseState.Pressed) && pressed)
         {
-            // If the view is not pressed and we want highlight move the shadow
+            // If the view is not pressed, and we want highlight move the shadow
             // Note, for visual effects reasons, we only move horizontally.
             // TODO: Add a setting or flag that lets the view move vertically as well.
             Thickness = new (
@@ -271,7 +269,7 @@ public class Margin : Adornment
                              Thickness.Top + PRESS_MOVE_VERTICAL,
                              Thickness.Right - PRESS_MOVE_HORIZONTAL,
                              Thickness.Bottom - PRESS_MOVE_VERTICAL);
-            _pressed = true;
+            MouseState |= MouseState.Pressed;
 
             if (_rightShadow is { })
             {

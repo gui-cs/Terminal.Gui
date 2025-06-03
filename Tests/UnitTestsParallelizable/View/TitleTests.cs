@@ -18,7 +18,7 @@ public class TitleTests
 
         r.TitleChanged += (s, args) =>
                           {
-                              Assert.Equal (r.Title, args.CurrentValue);
+                              Assert.Equal (r.Title, args.Value);
                           };
 
         expected = "title";

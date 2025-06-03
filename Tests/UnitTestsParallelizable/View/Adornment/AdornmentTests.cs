@@ -1,8 +1,63 @@
-﻿namespace Terminal.Gui.ViewTests;
+﻿#nullable enable
+namespace Terminal.Gui.ViewTests;
 
 [Collection ("Global Test Setup")]
 public class AdornmentTests
 {
+    //private class TestView : View
+    //{
+    //    public bool BorderDrawn { get; set; }
+    //    public bool PaddingDrawn { get; set; }
+
+    //    /// <inheritdoc />
+    //    protected override bool OnDrawingContent () 
+    //    {
+    //        if (Border is { } && Border.Thickness != Thickness.Empty)
+    //        {
+    //            BorderDrawn = true;
+    //            Border.Draw ();
+    //        }
+    //        if (Padding is { } && Padding.Thickness != Thickness.Empty)
+    //        {
+    //            PaddingDrawn = true;
+    //            Padding.Draw ();
+    //        }
+
+    //        return base.OnDrawingContent ();
+    //    }
+    //}
+
+    //[Fact]
+    //public void DrawAdornments_UsesCWPEventHelper ()
+    //{
+    //    var view = new TestView
+    //    {
+    //        Id = "view"
+    //    };
+    //    view.Border!.Thickness = new Thickness (1);
+    //    view.Padding!.Thickness = new Thickness (1);
+
+    //    // Test cancellation
+    //    view.DrawingAdornments += OnDrawingAdornmentsHandled;
+    //    view.DoDrawAdornments (originalClip: null);
+    //    Assert.False (view.BorderDrawn);
+    //    Assert.False (view.PaddingDrawn);
+    //    view.DrawingAdornments -= OnDrawingAdornmentsHandled;
+
+    //    // Test successful drawing
+    //    view.DrawingAdornments += OnDrawingAdornmentsAssert;
+    //    view.BorderDrawn = false;
+    //    view.PaddingDrawn = false;
+    //    view.DoDrawAdornments (originalClip: null);
+    //    Assert.True (view.BorderDrawn);
+    //    Assert.True (view.PaddingDrawn);
+
+    //    view.Dispose ();
+
+    //    void OnDrawingAdornmentsHandled (object? sender, DrawAdornmentsEventArgs args) => args.Handled = true;
+    //    void OnDrawingAdornmentsAssert (object? sender, DrawAdornmentsEventArgs args) => Assert.Null (args.Context);
+    //}
+
     [Fact]
     public void Viewport_Location_Always_Empty_Size_Correct ()
     {

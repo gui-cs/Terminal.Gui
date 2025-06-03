@@ -223,9 +223,9 @@ public class Arrangement : Scenario
 
         return;
 
-        void ColorPickerColorChanged (object sender, ColorEventArgs e)
+        void ColorPickerColorChanged (object sender, ResultEventArgs<Color> e)
         {
-            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.CurrentValue) });
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
         }
     }
 

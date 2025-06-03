@@ -307,7 +307,7 @@ public class FlagSelector : View, IOrientation, IDesignable
             Title = nameWithHotKey,
             Id = name,
             Data = flag,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = ViewBase.MouseState.In
         };
 
         checkbox.GettingAttributeForRole += (_, e) =>
@@ -320,36 +320,36 @@ public class FlagSelector : View, IOrientation, IDesignable
                                            switch (e.Role)
                                            {
                                                case VisualRole.Normal:
-                                                   e.Cancel = true;
+                                                   e.Handled = true;
 
                                                    if (!HasFocus)
                                                    {
-                                                       e.NewValue = GetAttributeForRole (VisualRole.Focus);
+                                                       e.Result = GetAttributeForRole (VisualRole.Focus);
                                                    }
                                                    else
                                                    {
                                                        // If _scheme was set, it's because of Hover
                                                        if (checkbox.HasScheme)
                                                        {
-                                                           e.NewValue = checkbox.GetAttributeForRole (VisualRole.Normal);
+                                                           e.Result = checkbox.GetAttributeForRole (VisualRole.Normal);
                                                        }
                                                        else
                                                        {
-                                                           e.NewValue = GetAttributeForRole (VisualRole.Normal);
+                                                           e.Result = GetAttributeForRole (VisualRole.Normal);
                                                        }
                                                    }
 
                                                    break;
 
                                                case VisualRole.HotNormal:
-                                                   e.Cancel = true;
+                                                   e.Handled = true;
                                                    if (!HasFocus)
                                                    {
-                                                       e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
+                                                       e.Result = GetAttributeForRole (VisualRole.HotFocus);
                                                    }
                                                    else
                                                    {
-                                                       e.NewValue = GetAttributeForRole (VisualRole.HotNormal);
+                                                       e.Result = GetAttributeForRole (VisualRole.HotNormal);
                                                    }
 
                                                    break;

@@ -6,3 +6,20 @@
 
 - name: Source
   href: https://github.com/gui-cs/Terminal.Gui
+
+- name: Documentation
+  href: docs/
+  items:
+    - name: Getting Started
+      href: docs/getting-started.md
+    - name: Events Deep Dive
+      href: docs/events.md
+    - name: View Documentation
+      href: docs/View.md
+    - name: Keyboard Handling
+      href: docs/keyboard.md
+    - name: Mouse Support
+      href: docs/mouse.md
+    - name: Showcase
+      href: docs/showcase.md
+    # Add other existing documentation entries as needed

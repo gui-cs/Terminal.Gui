@@ -111,8 +111,8 @@ public class Images : Scenario
 
         _cbSupportsSixel.CheckedStateChanging += (s, e) =>
                                                  {
-                                                     _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
-                                                     SetupSixelSupported (e.NewValue == CheckState.Checked);
+                                                     _sixelSupportResult.IsSupported = e.Result == CheckState.Checked;
+                                                     SetupSixelSupported (e.Result == CheckState.Checked);
                                                      ApplyShowTabViewHack ();
                                                  };
 
@@ -126,7 +126,7 @@ public class Images : Scenario
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => Application.Force16Colors = evt.Result == CheckState.UnChecked;
         _win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };

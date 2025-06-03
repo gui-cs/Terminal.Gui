@@ -1,5 +1,7 @@
 ﻿namespace Terminal.Gui.ViewBase;
 
+// TODO: CWP: FocusChanging should use an event arg type derived from ResultEventArgs<bool> so that its more obvious
+// TODO: the result can be changed.
 /// <summary>The event arguments for <see cref="View.HasFocus"/> events.</summary>
 public class HasFocusEventArgs : CancelEventArgs<bool>
 {

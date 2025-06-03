@@ -95,13 +95,12 @@ public class Adornment : View, IDesignable
         return true;
     }
 
-    /// <param name="scheme"></param>
     /// <inheritdoc />
-    protected override bool OnSettingScheme (in Scheme? scheme)
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
     {
         Parent?.SetNeedsDraw ();
 
-        _scheme = scheme;
+        _scheme = args.NewValue;
         return false;
     }
 

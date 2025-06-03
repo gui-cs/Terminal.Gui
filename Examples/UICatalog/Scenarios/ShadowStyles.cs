@@ -82,7 +82,7 @@ public class ShadowStyles : Scenario
         colorPicker.ColorChanged += (sender, args) =>
                                     {
                                         var normal = app.GetScheme ().Normal;
-                                        app.SetScheme (app.GetScheme() with {Normal = new Attribute(normal.Foreground, args.CurrentValue)});
+                                        app.SetScheme (app.GetScheme() with {Normal = new Attribute(normal.Foreground, args.Result)});
                                     };
         app.Add (button, colorPicker);
 

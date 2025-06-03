@@ -501,7 +501,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.NewValue != CheckState.Checked);
+        justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.Result != CheckState.Checked);
 
         justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
@@ -521,7 +521,7 @@ public class TextAlignmentAndDirection : Scenario
 
         wrapCheckbox.CheckedStateChanging += (s, e) =>
                                 {
-                                    if (e.CurrentValue == CheckState.Checked)
+                                    if (e.Result == CheckState.Checked)
                                     {
                                         foreach (View t in multiLineLabels)
                                         {
