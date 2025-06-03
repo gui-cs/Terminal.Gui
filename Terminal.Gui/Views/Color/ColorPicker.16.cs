@@ -53,7 +53,7 @@ public class ColorPicker16 : View
     }
 
     /// <summary>Fired when a color is picked.</summary>
-    public event EventHandler<ColorEventArgs>? ColorChanged;
+    public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <summary>Cursor for the selected color.</summary>
     public Point Cursor
@@ -280,7 +280,7 @@ public class ColorPicker16 : View
 
     private void SetInitialProperties ()
     {
-        HighlightStyle = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
+        HighlightStates = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed;
 
         CanFocus = true;
         AddCommands ();

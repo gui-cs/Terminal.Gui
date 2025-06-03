@@ -415,7 +415,7 @@ public class Bars : Scenario
             Title = "_File",
             HelpText = "File Menu",
             Key = Key.D0.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         var editMenuBarItem = new Shortcut
@@ -423,7 +423,7 @@ public class Bars : Scenario
             Title = "_Edit",
             HelpText = "Edit Menu",
             Key = Key.D1.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         var helpMenuBarItem = new Shortcut
@@ -431,7 +431,7 @@ public class Bars : Scenario
             Title = "_Help",
             HelpText = "Halp Menu",
             Key = Key.D2.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
@@ -445,7 +445,7 @@ public class Bars : Scenario
             Title = "Z_igzag",
             Key = Key.I.WithCtrl,
             Text = "Gonna zig zag",
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         var shortcut2 = new Shortcut
@@ -453,7 +453,7 @@ public class Bars : Scenario
             Title = "Za_G",
             Text = "Gonna zag",
             Key = Key.G.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         var shortcut3 = new Shortcut
@@ -461,7 +461,7 @@ public class Bars : Scenario
             Title = "_Three",
             Text = "The 3rd item",
             Key = Key.D3.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         var line = new Line ()
@@ -475,13 +475,13 @@ public class Bars : Scenario
             Title = "_Four",
             Text = "Below the line",
             Key = Key.D3.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStates = MouseState.In
         };
 
         shortcut4.CommandView = new CheckBox ()
         {
             Title = shortcut4.Title,
-            HighlightStyle = HighlightStyle.None,
+            HighlightStates = MouseState.None,
             CanFocus = false
         };
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.

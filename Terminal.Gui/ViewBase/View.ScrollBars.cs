@@ -139,7 +139,7 @@ public partial class View
                                      {
                                          Viewport = Viewport with
                                          {
-                                             Y = Math.Min (args.CurrentValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
+                                             Y = Math.Min (args.Value, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
                                          };
                                      };
 
@@ -160,7 +160,7 @@ public partial class View
                                      {
                                          Viewport = Viewport with
                                          {
-                                             X = Math.Min (args.CurrentValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
+                                             X = Math.Min (args.Value, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
                                          };
                                      };
 

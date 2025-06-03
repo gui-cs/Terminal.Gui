@@ -46,7 +46,7 @@ public class TrueColors : Scenario
             Enabled = canTrueColor,
             Text = "Force 16 colors"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Force16Colors = evt.NewValue == CheckState.Checked; };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Force16Colors = evt.Result == CheckState.Checked; };
         app.Add (cbUseTrueColor);
 
         y += 2;

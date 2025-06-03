@@ -190,9 +190,9 @@ public class ColorPickers : Scenario
 
         cbShowTextFields.CheckedStateChanging += (_, e) =>
                                                 {
-                                                    foregroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
+                                                    foregroundColorPicker.Style.ShowTextFields = e.Result == CheckState.Checked;
                                                     foregroundColorPicker.ApplyStyleChanges ();
-                                                    backgroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
+                                                    backgroundColorPicker.Style.ShowTextFields = e.Result == CheckState.Checked;
                                                     backgroundColorPicker.ApplyStyleChanges ();
                                                 };
         app.Add (cbShowTextFields);
@@ -209,9 +209,9 @@ public class ColorPickers : Scenario
 
         cbShowName.CheckedStateChanging += (_, e) =>
                                            {
-                                               foregroundColorPicker.Style.ShowColorName = e.NewValue == CheckState.Checked;
+                                               foregroundColorPicker.Style.ShowColorName = e.Result == CheckState.Checked;
                                                foregroundColorPicker.ApplyStyleChanges ();
-                                               backgroundColorPicker.Style.ShowColorName = e.NewValue == CheckState.Checked;
+                                               backgroundColorPicker.Style.ShowColorName = e.Result == CheckState.Checked;
                                                backgroundColorPicker.ApplyStyleChanges ();
                                            };
         app.Add (cbShowName);
@@ -226,7 +226,7 @@ public class ColorPickers : Scenario
     }
 
     /// <summary>Fired when background color is changed.</summary>
-    private void BackgroundColor_ColorChanged (object sender, EventArgs e)
+    private void BackgroundColor_ColorChanged (object sender, ResultEventArgs<Color> e)
     {
         UpdateColorLabel (_backgroundColorLabel,
                           backgroundColorPicker.Visible ?
@@ -237,7 +237,7 @@ public class ColorPickers : Scenario
     }
 
     /// <summary>Fired when foreground color is changed.</summary>
-    private void ForegroundColor_ColorChanged (object sender, EventArgs e)
+    private void ForegroundColor_ColorChanged (object sender, ResultEventArgs<Color> e)
     {
         UpdateColorLabel (_foregroundColorLabel,
                           foregroundColorPicker.Visible ?

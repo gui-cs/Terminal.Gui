@@ -220,9 +220,9 @@ public class Navigation : Scenario
 
         return;
 
-        void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
+        void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
         {
-            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.CurrentValue) });
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
         }
     }
 

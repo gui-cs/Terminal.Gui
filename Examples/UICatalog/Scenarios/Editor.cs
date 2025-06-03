@@ -901,14 +901,14 @@ public class Editor : Scenario
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, CheckedState = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.CheckedStateChanging += (s, e) => _matchCase = e.NewValue == CheckState.Checked;
+        ckbMatchCase.CheckedStateChanging += (s, e) => _matchCase = e.Result == CheckState.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox
         {
             X = 0, Y = Pos.Top (ckbMatchCase) + 1, CheckedState = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.CheckedStateChanging += (s, e) => _matchWholeWord = e.NewValue == CheckState.Checked;
+        ckbMatchWholeWord.CheckedStateChanging += (s, e) => _matchWholeWord = e.Result == CheckState.Checked;
         d.Add (ckbMatchWholeWord);
         return d;
     }
@@ -1159,14 +1159,14 @@ public class Editor : Scenario
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, CheckedState = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.CheckedStateChanging += (s, e) => _matchCase = e.NewValue == CheckState.Checked;
+        ckbMatchCase.CheckedStateChanging += (s, e) => _matchCase = e.Result == CheckState.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox
         {
             X = 0, Y = Pos.Top (ckbMatchCase) + 1, CheckedState = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.CheckedStateChanging += (s, e) => _matchWholeWord = e.NewValue == CheckState.Checked;
+        ckbMatchWholeWord.CheckedStateChanging += (s, e) => _matchWholeWord = e.Result == CheckState.Checked;
         d.Add (ckbMatchWholeWord);
 
         return d;

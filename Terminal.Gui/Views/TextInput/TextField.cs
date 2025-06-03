@@ -518,10 +518,10 @@ public class TextField : View, IDesignable
             }
 
             string newText = value.Replace ("\t", "").Split ("\n") [0];
-            CancelEventArgs<string> args = new (ref oldText, ref newText);
-            OnTextChanging (args);
+            ResultEventArgs<string> args = new (newText);
+            RaiseTextChanging (args);
 
-            if (args.Cancel)
+            if (args.Handled)
             {
                 if (_cursorPosition > _text.Count)
                 {
@@ -534,7 +534,7 @@ public class TextField : View, IDesignable
             ClearAllSelection ();
 
             // Note we use NewValue here; TextChanging subscribers may have changed it
-            _text = args.NewValue.EnumerateRunes ().ToList ();
+            _text = args.Result.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -1067,15 +1067,20 @@ public class TextField : View, IDesignable
         return true;
     }
 
-    /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
+    /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>
     /// <param name="args">The event arguments.</param>
-    /// <returns><see langword="true"/> if the event was cancelled.</returns>
-    public bool OnTextChanging (CancelEventArgs<string> args)
+    /// <returns><see langword="true"/> if the event was cancelled or the text was adjusted by the event.</returns>
+    public bool RaiseTextChanging (ResultEventArgs<string> args)
     {
+        // TODO: CWP: Add an OnTextChanging protected virtual method that can be overridden to handle text changing events.
+
         TextChanging?.Invoke (this, args);
 
-        return args.Cancel;
+        return args.Handled;
     }
+
+    /// <summary>Raised before <see cref="Text"/> changes. The change can be canceled the text adjusted.</summary>
+    public event EventHandler<ResultEventArgs<string>> TextChanging;
 
     /// <summary>Paste the selected text from the clipboard.</summary>
     public virtual void Paste ()
@@ -1167,8 +1172,6 @@ public class TextField : View, IDesignable
     ///// </summary>
     //public event EventHandler<StateEventArgs<string>> TextChanged;
 
-    /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<CancelEventArgs<string>> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()

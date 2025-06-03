@@ -268,7 +268,7 @@ public class ProgressBarStyles : Scenario
         ckbBidirectional.CheckedStateChanging += (s, e) =>
                                    {
                                        marqueesBlocksPB.BidirectionalMarquee =
-                                                                  marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
+                                                                  marqueesContinuousPB.BidirectionalMarquee = e.Result == CheckState.Checked;
                                    };
 
 

@@ -139,15 +139,17 @@ public class SchemeTests
     public void GettingScheme_Event_CanOverrideScheme ()
     {
         var view = new View ();
-        var customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
+        var customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"]! with { Normal = Attribute.Default };
 
+        Assert.NotEqual (Attribute.Default, view.GetScheme ().Normal);
         view.GettingScheme += (sender, args) =>
-        {
-            args.NewScheme = customScheme;
-            args.Cancel = true;
-        };
+                              {
+                                  args.Result = customScheme;
+                                  args.Handled = true;
+                              };
 
         Assert.Equal (customScheme, view.GetScheme ());
+        Assert.Equal (Attribute.Default, view.GetScheme ().Normal);
         view.Dispose ();
     }
 
@@ -157,7 +159,7 @@ public class SchemeTests
         var view = new View ();
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
-        view.SettingScheme += (sender, args) => args.Cancel = true;
+        view.SchemeChanging += (sender, args) => args.Handled = true;
 
         view.SetScheme (dialogScheme);
 
@@ -175,8 +177,8 @@ public class SchemeTests
         {
             if (args.Role == VisualRole.Focus)
             {
-                args.NewValue = customAttribute;
-                args.Cancel = true;
+                args.Result = customAttribute;
+                args.Handled = true;
             }
         };
 
@@ -208,7 +210,7 @@ public class SchemeTests
         subView.SchemeName = "Error";
 
         var errorScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
-        Assert.Equal (errorScheme, subView.GetScheme());
+        Assert.Equal (errorScheme, subView.GetScheme ());
 
         subView.Dispose ();
         superView.Dispose ();
@@ -220,7 +222,7 @@ public class SchemeTests
         var view = new View ();
         var baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
 
-        Assert.Equal (baseScheme, view.GetScheme());
+        Assert.Equal (baseScheme, view.GetScheme ());
         view.Dispose ();
     }
 
@@ -231,7 +233,7 @@ public class SchemeTests
         view.SchemeName = "Dialog";
 
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
-        Assert.Equal (dialogScheme, view.GetScheme());
+        Assert.Equal (dialogScheme, view.GetScheme ());
 
         view.Dispose ();
     }
@@ -244,7 +246,7 @@ public class SchemeTests
             return true;
         }
 
-        protected override bool OnSettingScheme (in Scheme? scheme)
+        protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
         {
             return true; // Prevent setting the scheme
         }

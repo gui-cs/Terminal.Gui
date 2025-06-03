@@ -13,7 +13,7 @@ public class TextFieldTests
         Assert.Equal ("A", tf.Text);
 
         // cancel the next keystroke
-        tf.TextChanging += (s, e) => e.Cancel = e.NewValue == "AB";
+        tf.TextChanging += (s, e) => e.Handled = e.Result == "AB";
         tf.NewKeyDownEvent (Key.B.WithShift);
 
         // B was canceled so should just be A

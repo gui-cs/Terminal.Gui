@@ -10,8 +10,8 @@ We welcome contributions from the community. See [Issues](https://github.com/gui
 
 Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) branching model. 
 
-* The `v1_release_` and `v2_release` branches are always stable, and always matches the most recently released Nuget package.
-* The `v1__develop` and `v2_develop` branches are where new development and bug-fixes happen. `v2_develop` is the default Github branch.
+* The `v1_release` and `v2_release` branches are always stable, and always match the most recently released Nuget package.
+* The `v1_develop` and `v2_develop` branches are where new development and bug-fixes happen. `v2_develop` is the default Github branch.
 
 ### Forking Terminal.Gui
 
@@ -141,34 +141,8 @@ Great care has been provided thus far in ensuring **Terminal.Gui** has great [AP
 
 ### Defining Events
 
-The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/) provides these guidelines for defining events:
+See https://gui-cs.github.io/Terminal.GuiV2Docs/docs/events.html
 
-> Events always refer to some action, either one that is happening or one that has occurred. Therefore, as with methods, events are named with verbs, and verb tense is used to indicate the time when the event is raised.
->
-> ✔️ DO name events with a verb or a verb phrase.
-> 
-> Examples include Clicked, Painting, DroppedDown, and so on.
-> 
-> ✔️ DO give events names with a concept of before and after, using the present and past tenses.
-> 
-> For example, a close event that is raised before a window is closed would be called Closing, and one that is raised after the window is closed would be called Closed.
-> 
-> ❌ DO NOT use "Before" or "After" prefixes or postfixes to indicate pre- and post-events. Use present and past tenses as just described.
-> 
-> ✔️ DO name event handlers (delegates used as types of events) with the "EventHandler" suffix, as shown in the following example:
-> 
-> ✔️ DO name event argument classes with the "EventArgs" suffix.
-
-1. We follow the naming guidelines provided in https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN
-2. We use the `event EventHandler<T>` idiom.
-3. For public APIs, the class that can raise the event will implement:
-   - A `virtual` event raising function, named as `OnEventToRaise`. Typical implementations will simply do a `EventToRaise?.Invoke(this, eventArgs)`.
-   - An `event` as in `public event EventHandler<EventArgs> EventToRaise`
-   - Consumers of the event can do `theobject.EventToRaise += (sender, args) => {};`
-   - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
-4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
-
-See also: https://www.codeproject.com../docs/20550/C-Event-Implementation-Fundamentals-Best-Practices
 
 ### Defining new `View` classes
 

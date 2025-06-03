@@ -43,7 +43,7 @@ public enum VisualRole
     HotActive,
 
     /// <summary>
-    ///     The visual role for elements that are highlighted (e.g., when the mouse is hovering over a <see cref="Button"/>).
+    ///     The visual role for elements that are highlighted (e.g., when the mouse is inside over a <see cref="Button"/>).
     /// </summary>
     Highlight,
 

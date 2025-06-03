@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Mouse", "Demonstrates how to capture mouse events")]
+[ScenarioMetadata ("Mouse", "Demonstrates Mouse Events and States")]
 [ScenarioCategory ("Mouse and Keyboard")]
 public class Mouse : Scenario
 {
@@ -15,6 +12,7 @@ public class Mouse : Scenario
 
         Window win = new ()
         {
+            Id = "win",
             Title = GetQuitKeyAndName ()
         };
 
@@ -73,104 +71,151 @@ public class Mouse : Scenario
 
         win.Add (cbWantContinuousPresses);
 
-        CheckBox cbHighlightOnPress = new ()
+        CheckBox cbHighlightOnPressed = new ()
         {
             X = Pos.Right (filterSlider),
             Y = Pos.Bottom (cbWantContinuousPresses),
-            Title = "_Highlight on Press"
+            Title = "_Highlight on Pressed"
         };
 
-        win.Add (cbHighlightOnPress);
+        win.Add (cbHighlightOnPressed);
+
+        CheckBox cbHighlightOnPressedOutside = new ()
+        {
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (cbHighlightOnPressed),
+            Title = "_Highlight on PressedOutside"
+        };
+
+        win.Add (cbHighlightOnPressedOutside);
 
         var demo = new MouseEventDemoView
         {
+            Id = "demo",
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (cbHighlightOnPress),
+            Y = Pos.Bottom (cbHighlightOnPressedOutside),
             Width = Dim.Fill (),
             Height = 15,
-            Title = "Enter/Leave Demo",
+            Title = "Enter/Leave Demo"
         };
 
-        demo.Padding.Initialized += DemoPaddingOnInitialized;
+        demo.Padding!.Initialized += DemoPaddingOnInitialized;
 
         void DemoPaddingOnInitialized (object o, EventArgs eventArgs)
         {
-            demo.Padding.Add (
-                              new MouseEventDemoView ()
-                              {
-                                  X = 0,
-                                  Y = 0,
-                                  Width = Dim.Fill (),
-                                  Height = Dim.Func (() => demo.Padding.Thickness.Top),
-                                  Title = "inPadding",
-                                  Id = "inPadding"
-                              });
+            demo.Padding!.Add (
+                               new MouseEventDemoView
+                               {
+                                   X = 0,
+                                   Y = 0,
+                                   Width = Dim.Fill (),
+                                   Height = Dim.Func (() => demo.Padding.Thickness.Top),
+                                   Title = "inPadding",
+                                   Id = "inPadding"
+                               });
             demo.Padding.Thickness = demo.Padding.Thickness with { Top = 5 };
         }
 
-        View sub1 = new MouseEventDemoView ()
+        View sub1 = new MouseEventDemoView
         {
             X = 0,
             Y = 0,
             Width = Dim.Percent (20),
             Height = Dim.Fill (),
             Title = "sub1",
-            Id = "sub1",
+            Id = "sub1"
         };
         demo.Add (sub1);
 
-        demo.Add (
-                  new MouseEventDemoView ()
-                  {
-                      X = Pos.Right (sub1) - 4,
-                      Y = Pos.Top (sub1) + 1,
-                      Width = Dim.Percent (20),
-                      Height = Dim.Fill (1),
-                      Title = "sub2",
-                      Id = "sub2",
-                  });
+        View sub2 = new MouseEventDemoView
+        {
+            X = Pos.Right (sub1) - 4,
+            Y = Pos.Top (sub1) + 1,
+            Width = Dim.Percent (20),
+            Height = Dim.Fill (1),
+            Title = "sub2",
+            Id = "sub2"
+        };
+
+        demo.Add (sub2);
 
         win.Add (demo);
 
-        cbHighlightOnPress.CheckedState = demo.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPressed.CheckedState = demo.HighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
 
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3753
-        cbHighlightOnPress.CheckedStateChanging += (s, e) =>
-                                                   {
-                                                       if (e.NewValue == CheckState.Checked)
-                                                       {
-                                                           demo.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
-                                                       }
-                                                       else
-                                                       {
-                                                           demo.HighlightStyle = HighlightStyle.None;
-                                                       }
+        cbHighlightOnPressed.CheckedStateChanging += (s, e) =>
+                                                     {
+                                                         if (e.Result == CheckState.Checked)
+                                                         {
+                                                             demo.HighlightStates |= MouseState.Pressed;
+                                                         }
+                                                         else
+                                                         {
+                                                             demo.HighlightStates &= ~MouseState.Pressed;
+                                                         }
 
-                                                       foreach (View subview in demo.SubViews)
-                                                       {
-                                                           if (e.NewValue == CheckState.Checked)
-                                                           {
-                                                               subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
-                                                           }
-                                                           else
-                                                           {
-                                                               subview.HighlightStyle = HighlightStyle.None;
-                                                           }
-                                                       }
+                                                         foreach (View subview in demo.SubViews)
+                                                         {
+                                                             if (e.Result == CheckState.Checked)
+                                                             {
+                                                                 subview.HighlightStates |= MouseState.Pressed;
+                                                             }
+                                                             else
+                                                             {
+                                                                 subview.HighlightStates &= ~MouseState.Pressed;
+                                                             }
+                                                         }
 
-                                                       foreach (View subview in demo.Padding.SubViews)
-                                                       {
-                                                           if (e.NewValue == CheckState.Checked)
-                                                           {
-                                                               subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
-                                                           }
-                                                           else
-                                                           {
-                                                               subview.HighlightStyle = HighlightStyle.None;
-                                                           }
-                                                       }
+                                                         foreach (View subview in demo.Padding.SubViews)
+                                                         {
+                                                             if (e.Result == CheckState.Checked)
+                                                             {
+                                                                 subview.HighlightStates |= MouseState.Pressed;
+                                                             }
+                                                             else
+                                                             {
+                                                                 subview.HighlightStates &= ~MouseState.Pressed;
+                                                             }
+                                                         }
+                                                     };
 
-                                                   };
+        cbHighlightOnPressedOutside.CheckedState = demo.HighlightStates.HasFlag (MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+
+        cbHighlightOnPressedOutside.CheckedStateChanging += (s, e) =>
+                                                            {
+                                                                if (e.Result == CheckState.Checked)
+                                                                {
+                                                                    demo.HighlightStates |= MouseState.PressedOutside;
+                                                                }
+                                                                else
+                                                                {
+                                                                    demo.HighlightStates &= ~MouseState.PressedOutside;
+                                                                }
+
+                                                                foreach (View subview in demo.SubViews)
+                                                                {
+                                                                    if (e.Result == CheckState.Checked)
+                                                                    {
+                                                                        subview.HighlightStates |= MouseState.PressedOutside;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        subview.HighlightStates &= ~MouseState.PressedOutside;
+                                                                    }
+                                                                }
+
+                                                                foreach (View subview in demo.Padding.SubViews)
+                                                                {
+                                                                    if (e.Result == CheckState.Checked)
+                                                                    {
+                                                                        subview.HighlightStates |= MouseState.PressedOutside;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        subview.HighlightStates &= ~MouseState.PressedOutside;
+                                                                    }
+                                                                }
+                                                            };
 
         cbWantContinuousPresses.CheckedStateChanging += (s, e) =>
                                                         {
@@ -185,9 +230,7 @@ public class Mouse : Scenario
                                                             {
                                                                 subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
                                                             }
-
                                                         };
-
 
         var label = new Label
         {
@@ -241,12 +284,12 @@ public class Mouse : Scenario
         win.Add (label, winLog);
 
         clearButton.Accepting += (s, e) =>
-                              {
-                                  appLogList.Clear ();
-                                  appLog.SetSource (appLogList);
-                                  winLogList.Clear ();
-                                  winLog.SetSource (winLogList);
-                              };
+                                 {
+                                     appLogList.Clear ();
+                                     appLog.SetSource (appLogList);
+                                     winLogList.Clear ();
+                                     winLog.SetSource (winLogList);
+                                 };
 
         win.MouseEvent += (sender, a) =>
                           {
@@ -277,42 +320,56 @@ public class Mouse : Scenario
             CanFocus = true;
             Id = "mouseEventDemoView";
 
-            Padding!.Thickness = new Thickness (1, 1, 1, 1);
-
             Initialized += OnInitialized;
+
+            MouseLeave += (s, e) => { Text = "Leave"; };
+            MouseEnter += (s, e) => { Text = "Enter"; };
+
+            return;
 
             void OnInitialized (object sender, EventArgs e)
             {
                 TextAlignment = Alignment.Center;
                 VerticalTextAlignment = Alignment.Center;
 
-                Padding!.SetScheme (new Scheme (new Attribute (Color.Black)));
+                Padding!.Thickness = new (1, 1, 1, 1);
+                Padding!.SetScheme (new (new Attribute (Color.Black)));
+                Padding.Id = $"{Id}.Padding";
 
-                Padding.MouseEnter += PaddingOnMouseEnter;
-                Padding.MouseLeave += PaddingOnMouseLeave;
-
-                void PaddingOnMouseEnter (object o, CancelEventArgs e)
-                {
-                    Padding.SchemeName = "Error";
-                }
-
-                void PaddingOnMouseLeave (object o, EventArgs e)
-                {
-                    Padding.SchemeName = "Dialog";
-                }
-
-                Border!.Thickness = new Thickness (1);
+                Border!.Thickness = new (1);
                 Border.LineStyle = LineStyle.Rounded;
+                Border.Id = $"{Id}.Border";
+
+                MouseStateChanged += (_, args) =>
+                                     {
+                                         if (args.Value.HasFlag (MouseState.PressedOutside))
+                                         {
+                                             Border.LineStyle = LineStyle.Dotted;
+                                         }
+                                         else
+                                         {
+                                             Border.LineStyle = LineStyle.Single;
+                                         }
+
+                                         SetNeedsDraw ();
+                                     };
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+        {
+            if (role == VisualRole.Normal)
+            {
+                if (MouseState.HasFlag (MouseState.Pressed) && HighlightStates.HasFlag (MouseState.Pressed))
+                {
+                    currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
+
+                    return true;
+                }
             }
 
-            MouseLeave += (s, e) =>
-                          {
-                              Text = "Leave";
-                          };
-            MouseEnter += (s, e) =>
-                          {
-                              Text = "Enter";
-                          };
+            return base.OnGettingAttributeForRole (in role, ref currentAttribute);
         }
     }
 }

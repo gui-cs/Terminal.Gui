@@ -136,7 +136,7 @@
     {
       "UI Catalog Theme": {
         "Window.DefaultShadow": "Transparent",
-        "CheckBox.DefaultHighlightStyle": "Hover, Pressed, PressedOutside",
+        "CheckBox.DefaultHighlightStates": "In, Pressed, PressedOutside",
         "MessageBox.DefaultButtonAlignment": "Start",
         "StatusBar.DefaultSeparatorLineStyle": "Single",
         "Dialog.DefaultMinimumWidth": 80,
@@ -149,7 +149,7 @@
         "Button.DefaultShadow": "Transparent",
         "FrameView.DefaultBorderStyle": "Double",
         "MessageBox.DefaultMinimumHeight": 0,
-        "Button.DefaultHighlightStyle": "Hover, Pressed",
+        "Button.DefaultHighlightStates": "In, Pressed",
         "Menuv2.DefaultBorderStyle": "Heavy",
         "MenuBarv2.DefaultBorderStyle": "Heavy",
         "Schemes": [
