@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
@@ -36,12 +37,8 @@ public sealed class ApplicationPopover : IDisposable
     {
         if (popover is { } && !_popovers.Contains (popover))
         {
-
             // When created, set IPopover.Toplevel to the current Application.Top
-            if (popover.Toplevel is null)
-            {
-                popover.Toplevel = Application.Top;
-            }
+            popover.Toplevel ??= Application.Top;
 
             _popovers.Add (popover);
         }
@@ -62,19 +59,20 @@ public sealed class ApplicationPopover : IDisposable
     /// <returns></returns>
     public bool DeRegister (IPopover? popover)
     {
-        if (popover is { } && _popovers.Contains (popover))
+        if (popover is null || !_popovers.Contains (popover))
         {
-            if (GetActivePopover () == popover)
-            {
-                _activePopover = null;
-            }
-
-            _popovers.Remove (popover);
-
-            return true;
+            return false;
         }
 
-        return false;
+        if (GetActivePopover () == popover)
+        {
+            _activePopover = null;
+        }
+
+        _popovers.Remove (popover);
+
+        return true;
+
     }
 
     private IPopover? _activePopover;
@@ -111,6 +109,18 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View newPopover)
         {
+            if (!(newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) &&
+                  newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)))
+            {
+                throw new InvalidOperationException ("Popovers must have ViewportSettings.Transparent and ViewportSettings.TransparentMouse set.");
+            }
+
+            if (newPopover.KeyBindings.GetFirstFromCommands (Command.Quit) is null)
+            {
+                throw new InvalidOperationException ("Popovers must have a key binding for Command.Quit.");
+            }
+
+
             Register (popover);
 
             if (!newPopover.IsInitialized)
@@ -127,7 +137,7 @@ public sealed class ApplicationPopover : IDisposable
 
     /// <summary>
     ///     Causes the specified popover to be hidden.
-    ///     If the popover is dervied from <see cref="PopoverBaseImpl"/>, this is the same as setting
+    ///     If the popover is derived from <see cref="PopoverBaseImpl"/>, this is the same as setting
     ///     <see cref="View.Visible"/> to <see langword="false"/>.
     /// </summary>
     /// <param name="popover"></param>
@@ -143,6 +153,22 @@ public sealed class ApplicationPopover : IDisposable
     }
 
     /// <summary>
+    ///     Hides a popover view if it supports the quit command and is currently visible. It checks for the command's
+    ///     support before hiding.
+    /// </summary>
+    /// <param name="visiblePopover">The view that is being checked and potentially hidden based on its visibility and command support.</param>
+    internal static void HideWithQuitCommand (View visiblePopover)
+    {
+        if (visiblePopover.Visible
+            && (!visiblePopover.GetSupportedCommands ().Contains (Command.Quit)
+            || (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)))
+        {
+            visiblePopover.Visible = false;
+        }
+    }
+
+
+    /// <summary>
     ///     Called when the user presses a key. Dispatches the key to the active popover, if any,
     ///     otherwise to the popovers in the order they were registered. Inactive popovers only get hotkeys.
     /// </summary>
@@ -155,7 +181,7 @@ public sealed class ApplicationPopover : IDisposable
 
         if (activePopover is { Visible: true })
         {
-            Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
+            //Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
 
             if (activePopover.NewKeyDownEvent (key))
             {
@@ -177,7 +203,7 @@ public sealed class ApplicationPopover : IDisposable
             }
 
             // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
-            Logging.Debug ($"Inactive - Calling NewKeyDownEvent ({key}) on {popoverView.Title}");
+            //Logging.Debug ($"Inactive - Calling NewKeyDownEvent ({key}) on {popoverView.Title}");
             hotKeyHandled = popoverView.NewKeyDownEvent (key);
 
             if (hotKeyHandled is true)

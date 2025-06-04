@@ -185,11 +185,7 @@ public static partial class Application // Mouse handling
             && Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
         {
-            // TODO: Build a use/test case for the popover not handling Quit
-            if (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)
-            {
-                visiblePopover.Visible = false;
-            }
+            ApplicationPopover.HideWithQuitCommand (visiblePopover);
 
             // Recurse once so the event can be handled below the popover
             RaiseMouseEvent (mouseEvent);
@@ -205,10 +201,10 @@ public static partial class Application // Mouse handling
         if (Initialized)
         {
             WantContinuousButtonPressedView = deepestViewUnderMouse switch
-                                              {
-                                                  { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-                                                  _ => null
-                                              };
+            {
+                { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+                _ => null
+            };
         }
 
         // May be null before the prior condition or the condition may set it as null.

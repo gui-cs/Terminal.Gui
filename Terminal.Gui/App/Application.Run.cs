@@ -577,11 +577,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
-            // TODO: Build a use/test case for the popover not handling Quit
-            if (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)
-            {
-                visiblePopover.Visible = false;
-            }
+            ApplicationPopover.HideWithQuitCommand (visiblePopover);
         }
 
         runState.Toplevel.OnUnloaded ();
