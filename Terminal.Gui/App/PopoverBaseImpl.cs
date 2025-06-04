@@ -50,6 +50,23 @@ public abstract class PopoverBaseImpl : View, IPopover
         //TextFormatter.VerticalAlignment = Alignment.End;
         //TextFormatter.Alignment = Alignment.End;
         //base.Text = "popover";
+
+        AddCommand (Command.Quit, Quit);
+        KeyBindings.Add (Application.QuitKey, Command.Quit);
+
+        return;
+
+        bool? Quit (ICommandContext? ctx)
+        {
+            if (!Visible)
+            {
+                return false;
+            }
+
+            Visible = false;
+
+            return true;
+        }
     }
 
     /// <inheritdoc/>

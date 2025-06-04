@@ -109,9 +109,18 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View newPopover)
         {
-            Debug.Assert(newPopover.ViewportSettings.HasFlag(ViewportSettingsFlags.Transparent) 
-                         && newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
-                         "Popovers must have ViewportSettings.Transparent and ViewportSettings.TransparentMouse set.");
+            if (!(newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) &&
+                  newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)))
+            {
+                throw new InvalidOperationException ("Popovers must have ViewportSettings.Transparent and ViewportSettings.TransparentMouse set.");
+            }
+
+            if (newPopover.KeyBindings.GetFirstFromCommands (Command.Quit) is null)
+            {
+                throw new InvalidOperationException ("Popovers must have a key binding for Command.Quit.");
+            }
+
+
             Register (popover);
 
             if (!newPopover.IsInitialized)
@@ -150,8 +159,9 @@ public sealed class ApplicationPopover : IDisposable
     /// <param name="visiblePopover">The view that is being checked and potentially hidden based on its visibility and command support.</param>
     internal static void HideWithQuitCommand (View visiblePopover)
     {
-        if (!visiblePopover.GetSupportedCommands ().Contains (Command.Quit)
-            || (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible))
+        if (visiblePopover.Visible
+            && (!visiblePopover.GetSupportedCommands ().Contains (Command.Quit)
+            || (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)))
         {
             visiblePopover.Visible = false;
         }
@@ -171,7 +181,7 @@ public sealed class ApplicationPopover : IDisposable
 
         if (activePopover is { Visible: true })
         {
-            Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
+            //Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
 
             if (activePopover.NewKeyDownEvent (key))
             {
@@ -193,7 +203,7 @@ public sealed class ApplicationPopover : IDisposable
             }
 
             // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
-            Logging.Debug ($"Inactive - Calling NewKeyDownEvent ({key}) on {popoverView.Title}");
+            //Logging.Debug ($"Inactive - Calling NewKeyDownEvent ({key}) on {popoverView.Title}");
             hotKeyHandled = popoverView.NewKeyDownEvent (key);
 
             if (hotKeyHandled is true)
