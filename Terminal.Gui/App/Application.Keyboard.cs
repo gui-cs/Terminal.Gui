@@ -98,17 +98,11 @@ public static partial class Application // Keyboard handling
             }
             else
             {
-                // BUGBUG: this seems unneeded.
-                if (!KeyBindings.TryGet (key, out KeyBinding keybinding))
-                {
-                    return null;
-                }
-
                 bool? toReturn = null;
 
-                foreach (Command command in keybinding.Commands)
+                foreach (Command command in binding.Commands)
                 {
-                    toReturn = InvokeCommand (command, key, keybinding);
+                    toReturn = InvokeCommand (command, key, binding);
                 }
 
                 handled = toReturn ?? true;
