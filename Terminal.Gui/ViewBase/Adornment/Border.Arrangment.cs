@@ -35,6 +35,8 @@ public partial class Border
             return false;
         }
 
+        MouseState |= MouseState.Pressed;
+
         // Add Commands and KeyBindings - Note it's ok these get added each time. KeyBindings are cleared in EndArrange()
         AddArrangeModeKeyBindings ();
 
@@ -425,6 +427,8 @@ public partial class Border
         // Debug.Assert (_arranging != ViewArrangement.Fixed);
         Arranging = ViewArrangement.Fixed;
 
+        MouseState &= ~MouseState.Pressed;
+
         Application.MouseEvent -= ApplicationOnMouseEvent;
 
         if (Application.MouseGrabView == this && _dragPosition.HasValue)
@@ -496,8 +500,6 @@ public partial class Border
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
 
-                SetPressedHighlight (HighlightStyle);
-
                 // Determine the mode based on where the click occurred
                 ViewArrangement arrangeMode = DetermineArrangeModeFromClick ();
                 EnterArrangeMode (arrangeMode);
@@ -522,7 +524,6 @@ public partial class Border
         {
             _dragPosition = null;
             Application.UngrabMouse ();
-            SetPressedHighlight (HighlightStyle.None);
 
             EndArrangeMode ();
 

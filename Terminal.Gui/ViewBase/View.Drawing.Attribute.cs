@@ -12,21 +12,21 @@ public partial class View
     public Attribute GetCurrentAttribute () { return Driver?.GetAttribute () ?? Attribute.Default; }
 
     /// <summary>
-    ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="Drawing.VisualRole"/>
-    ///     from the <see cref="Drawing.Scheme"/>.
+    ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>
+    ///     from the <see cref="Scheme"/>.
     ///     <para>
     ///         Raises <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
     ///         which can cancel the default behavior, and optionally change the attribute in the event args.
     ///     </para>
     ///     <para>
-    ///     If <see cref="Enabled"/> is <see langword="false"/>, <see cref="Drawing.VisualRole.Disabled"/>
+    ///     If <see cref="Enabled"/> is <see langword="false"/>, <see cref="VisualRole.Disabled"/>
     ///     will be used instead of <paramref name="role"></paramref>.
     ///     To override this behavior use  <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
     ///     to cancel the method, and return a different attribute.
     ///     </para>
     ///     <para>
-    ///     If <see cref="HighlightStyle"/> is not <see cref="HighlightStyle.None"/> and <see cref="MouseHovering"/> is <see langword="true"/>,
-    ///     the <see cref="Drawing.VisualRole.Highlight"/> will be used instead of <paramref name="role"/>.
+    ///     If <see cref="HighlightStates"/> is not <see cref="MouseState.None"/> and <see cref="MouseState"/> is <see cref="MouseState.In"/>
+    ///     the <see cref="VisualRole.Highlight"/> will be used instead of <paramref name="role"/>.
     ///     To override this behavior use  <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
     ///     to cancel the method, and return a different attribute.
     ///     </para>
@@ -43,18 +43,21 @@ public partial class View
             return schemeAttribute;
         }
 
-        VisualRoleEventArgs args = new (role, newValue: ref schemeAttribute, currentValue: ref schemeAttribute);
+        VisualRoleEventArgs args = new (role, result: schemeAttribute);
         GettingAttributeForRole?.Invoke (this, args);
 
-        if (args.Cancel)
+        if (args is { Handled: true, Result: { } })
         {
             // A handler may have changed the attribute
-            return args.NewValue;
+            return args.Result.Value;
         }
 
-        if (HighlightStyle != HighlightStyle.None)
+        if (role != VisualRole.Disabled && HighlightStates != MouseState.None)
         {
-            if (MouseHovering && HighlightStyle.HasFlag (HighlightStyle.Hover) && role != VisualRole.Highlight && role != VisualRole.Disabled)
+            // The default behavior for HighlightStates of MouseState.Over is to use the Highlight role
+            if (((HighlightStates.HasFlag (MouseState.In) && MouseState.HasFlag (MouseState.In))
+                 || (HighlightStates.HasFlag (MouseState.Pressed) && MouseState.HasFlag (MouseState.Pressed)))
+                 && role != VisualRole.Highlight && !HasFocus)
             {
                 schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
             }

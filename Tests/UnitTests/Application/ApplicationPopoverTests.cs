@@ -21,6 +21,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_Shutdown_Resets_PopoverManager ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -37,6 +38,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_End_Does_Not_Reset_PopoverManager ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -59,6 +61,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_End_Hides_Active ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -87,6 +90,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_Shutdown_Disposes_Registered_Popovers ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -104,6 +108,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_Shutdown_Does_Not_Dispose_DeRegistered_Popovers ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -126,6 +131,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_Shutdown_Does_Not_Dispose_ActiveNotRegistered_Popover ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -148,6 +154,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Register_SetsTopLevel ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
@@ -166,6 +173,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Keyboard_Events_Go_Only_To_Popover_Associated_With_Toplevel ()
     {
+        Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());

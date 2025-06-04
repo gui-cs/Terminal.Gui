@@ -432,15 +432,15 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, CancelEventArgs<string> e)
+    private void TextField_TextChanging (object sender, ResultEventArgs<string> e)
     {
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.NewValue.Length; i++)
+            for (var i = 0; i < e.Result.Length; i++)
             {
-                if (e.NewValue [i] == ' ')
+                if (e.Result [i] == ' ')
                 {
                     spaces++;
                 }
@@ -451,31 +451,31 @@ public class TimeField : TextField
             }
 
             spaces += FieldLength;
-            string trimmedText = e.NewValue [..spaces];
+            string trimmedText = e.Result [..spaces];
             spaces -= FieldLength;
             trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
 
-            if (trimmedText != e.NewValue)
+            if (trimmedText != e.Result)
             {
-                e.NewValue = trimmedText;
+                e.Result = trimmedText;
             }
 
             if (!TimeSpan.TryParseExact (
-                                         e.NewValue.Trim (),
+                                         e.Result.Trim (),
                                          Format.Trim (),
                                          CultureInfo.CurrentCulture,
                                          TimeSpanStyles.None,
                                          out TimeSpan result
                                         ))
             {
-                e.Cancel = true;
+                e.Handled = true;
             }
 
             AdjCursorPosition (CursorPosition);
         }
         catch (Exception)
         {
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 }

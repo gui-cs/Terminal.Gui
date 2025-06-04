@@ -87,7 +87,7 @@ public class ScenarioTests : TestsAllViews
 
         void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
-            if (a.CurrentValue)
+            if (a.Value)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
@@ -103,7 +103,7 @@ public class ScenarioTests : TestsAllViews
                 shutdownGracefully = true;
             }
 
-            _output.WriteLine ($"Initialized == {a.CurrentValue}; shutdownGracefully == {shutdownGracefully}.");
+            _output.WriteLine ($"Initialized == {a.Value}; shutdownGracefully == {shutdownGracefully}.");
         }
 
         // If the scenario doesn't close within abortTime ms, this will force it to quit

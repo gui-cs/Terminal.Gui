@@ -125,26 +125,26 @@ public sealed class Themes : Scenario
 
         viewListView.SelectedItem = 0;
 
-        themeViewer.SettingSchemeName += (sender, args) =>
-                                         {
-                                             if (_view is { })
-                                             {
-                                                 Application.Top!.SchemeName = args.NewString;
+        themeViewer.SchemeNameChanging += (sender, args) =>
+                                          {
+                                              if (_view is { })
+                                              {
+                                                  Application.Top!.SchemeName = args.NewValue;
 
-                                                 if (_view.HasScheme)
-                                                 {
-                                                     _view.SetScheme (null);
-                                                 }
+                                                  if (_view.HasScheme)
+                                                  {
+                                                      _view.SetScheme (null);
+                                                  }
 
-                                                 _view.SchemeName = args.NewString;
-                                             }
-                                         };
+                                                  _view.SchemeName = args.NewValue;
+                                              }
+                                          };
 
         AllViewsView? allViewsView = null;
 
         allViewsCheckBox.CheckedStateChanged += (sender, args) =>
                                                 {
-                                                    if (args.CurrentValue == CheckState.Checked)
+                                                    if (args.Value == CheckState.Checked)
                                                     {
                                                         viewListView.Visible = false;
                                                         appWindow.Remove (viewFrame);

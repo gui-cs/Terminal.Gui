@@ -96,7 +96,7 @@ public partial class ColorPicker : View, IDesignable
     /// <summary>
     ///     Fired when color is changed.
     /// </summary>
-    public event EventHandler<ColorEventArgs>? ColorChanged;
+    public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()

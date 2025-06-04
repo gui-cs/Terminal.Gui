@@ -39,13 +39,13 @@ public class Button : View, IDesignable
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.Pressed | HighlightStyle.Hover;
+    public static MouseState DefaultHighlightStates { get; set; } = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
-        TextAlignment = Alignment.Center;
-        VerticalTextAlignment = Alignment.Center;
+        base.TextAlignment = Alignment.Center;
+        base.VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
@@ -67,8 +67,8 @@ public class Button : View, IDesignable
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
 
-        ShadowStyle = DefaultShadow;
-        HighlightStyle = DefaultHighlightStyle;
+        base.ShadowStyle = DefaultShadow;
+        HighlightStates = DefaultHighlightStates;
     }
 
     private bool? HandleHotKeyCommand (ICommandContext commandContext)
@@ -99,33 +99,6 @@ public class Button : View, IDesignable
 
         return false;
     }
-
-    private bool _wantContinuousButtonPressed;
-
-    /// <inheritdoc/>
-    public override bool WantContinuousButtonPressed
-    {
-        get => _wantContinuousButtonPressed;
-        set
-        {
-            if (value == _wantContinuousButtonPressed)
-            {
-                return;
-            }
-
-            _wantContinuousButtonPressed = value;
-
-            if (_wantContinuousButtonPressed)
-            {
-                HighlightStyle |= HighlightStyle.PressedOutside;
-            }
-            else
-            {
-                HighlightStyle &= ~HighlightStyle.PressedOutside;
-            }
-        }
-    }
-
     private void Button_MouseClick (object sender, MouseEventArgs e)
     {
         if (e.Handled)
@@ -139,7 +112,7 @@ public class Button : View, IDesignable
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.CurrentValue;
+        base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

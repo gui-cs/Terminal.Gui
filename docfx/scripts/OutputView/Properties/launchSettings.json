@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OutputView": {
+      "commandName": "Project",
+      "commandLineArgs": "--view=FileDialog"
+    }
+  }
+}

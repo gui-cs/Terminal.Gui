@@ -415,6 +415,7 @@ public class Buttons : Scenario
 
         var repeatButton = new Button
         {
+            Id = "repeatButton",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accept Co_unt: {acceptCount}",

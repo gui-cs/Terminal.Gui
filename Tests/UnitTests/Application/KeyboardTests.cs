@@ -447,9 +447,9 @@ public class KeyboardTests
 
         void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.CurrentValue);
+            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.Value);
 
-            if (a.CurrentValue)
+            if (a.Value)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;

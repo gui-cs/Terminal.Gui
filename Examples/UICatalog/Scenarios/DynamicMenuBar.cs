@@ -142,9 +142,9 @@ public class DynamicMenuBar : Scenario
 
             TextHotKey.TextChanging += (s, e) =>
                                        {
-                                           if (!string.IsNullOrEmpty (e.NewValue) && char.IsLower (e.NewValue [0]))
+                                           if (!string.IsNullOrEmpty (e.Result) && char.IsLower (e.Result [0]))
                                            {
-                                               e.NewValue = e.NewValue.ToUpper ();
+                                               e.Result = e.Result.ToUpper ();
                                            }
                                        };
             TextHotKey.TextChanged += (s, _) => TextHotKey.SelectAll ();
@@ -208,20 +208,20 @@ public class DynamicMenuBar : Scenario
 
             CkbIsTopLevel.CheckedStateChanging += (s, e) =>
                                      {
-                                         if ((_menuItem != null && _menuItem.Parent != null && e.NewValue == CheckState.Checked)
-                                             || (_menuItem == null && _hasParent && e.NewValue == CheckState.Checked))
+                                         if ((_menuItem != null && _menuItem.Parent != null && e.Result == CheckState.Checked)
+                                             || (_menuItem == null && _hasParent && e.Result == CheckState.Checked))
                                          {
                                              MessageBox.ErrorQuery (
                                                                     "Invalid IsTopLevel",
                                                                     "Only menu bar can have top level menu item!",
                                                                     "Ok"
                                                                    );
-                                             e.Cancel = true;
+                                             e.Handled = true;
 
                                              return;
                                          }
 
-                                         if (e.NewValue == CheckState.Checked)
+                                         if (e.Result == CheckState.Checked)
                                          {
                                              CkbSubMenu.CheckedState = CheckState.UnChecked;
                                              CkbSubMenu.SetNeedsDraw ();
@@ -243,13 +243,13 @@ public class DynamicMenuBar : Scenario
                                              TextAction.Text = "";
 
                                              TextShortcutKey.Enabled =
-                                                 e.NewValue == CheckState.Checked && CkbSubMenu.CheckedState == CheckState.UnChecked;
+                                                 e.Result == CheckState.Checked && CkbSubMenu.CheckedState == CheckState.UnChecked;
                                          }
                                      };
 
             CkbSubMenu.CheckedStateChanged += (s, e) =>
                                   {
-                                      if (e.CurrentValue == CheckState.Checked)
+                                      if (e.Value == CheckState.Checked)
                                       {
                                           CkbIsTopLevel.CheckedState = CheckState.UnChecked;
                                           CkbIsTopLevel.SetNeedsDraw ();
@@ -275,7 +275,7 @@ public class DynamicMenuBar : Scenario
                                           if (_hasParent)
                                           {
                                               TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.UnChecked
-                                                                     && e.CurrentValue == CheckState.UnChecked;
+                                                                     && e.Value == CheckState.UnChecked;
                                           }
                                       }
                                   };
@@ -284,7 +284,7 @@ public class DynamicMenuBar : Scenario
                                     {
                                         if (_menuItem != null)
                                         {
-                                            _menuItem.AllowNullChecked = e.CurrentValue == CheckState.Checked;
+                                            _menuItem.AllowNullChecked = e.Value == CheckState.Checked;
                                         }
                                     };
 
@@ -792,13 +792,13 @@ public class DynamicMenuBar : Scenario
 
             txtDelimiter.TextChanging += (s, e) =>
                                           {
-                                              if (!string.IsNullOrEmpty (e.NewValue))
+                                              if (!string.IsNullOrEmpty (e.Result))
                                               {
-                                                  Key.Separator = e.NewValue.ToRunes () [0];
+                                                  Key.Separator = e.Result.ToRunes () [0];
                                               }
                                               else
                                               {
-                                                  e.Cancel = true;
+                                                  e.Handled = true;
                                                   txtDelimiter.SelectAll ();
                                               }
                                           };

@@ -921,17 +921,21 @@ internal class WindowsDriver : ConsoleDriver
             }
             await Task.Delay (delay);
 
-            var me = new MouseEventArgs
-            {
-                ScreenPosition = _pointMove,
-                Flags = mouseFlag
-            };
-
             //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
+                Point pointMove = _pointMove;
                 // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-                Application.Invoke (() => OnMouseEvent (me));
+                Application.Invoke (() =>
+                                    {
+                                        var me = new MouseEventArgs
+                                        {
+                                            ScreenPosition = pointMove,
+                                            Position = pointMove,
+                                            Flags = mouseFlag
+                                        };
+                                        OnMouseEvent (me);
+                                    });
             }
         }
     }

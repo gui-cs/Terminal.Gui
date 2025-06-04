@@ -170,7 +170,7 @@ public class AdornmentEditor : EditorBase
 
         _diagThicknessCheckBox.CheckedStateChanging += (s, e) =>
                                                        {
-                                                           if (e.NewValue == CheckState.Checked)
+                                                           if (e.Result == CheckState.Checked)
                                                            {
                                                                AdornmentToEdit!.Diagnostics |= ViewDiagnosticFlags.Thickness;
                                                            }
@@ -196,7 +196,7 @@ public class AdornmentEditor : EditorBase
 
         _diagRulerCheckBox.CheckedStateChanging += (s, e) =>
                                                    {
-                                                       if (e.NewValue == CheckState.Checked)
+                                                       if (e.Result == CheckState.Checked)
                                                        {
                                                            AdornmentToEdit!.Diagnostics |= ViewDiagnosticFlags.Ruler;
                                                        }
@@ -210,7 +210,7 @@ public class AdornmentEditor : EditorBase
         _diagRulerCheckBox.Y = Pos.Bottom (_diagThicknessCheckBox);
     }
 
-    private EventHandler<ColorEventArgs> ColorPickerColorChanged ()
+    private EventHandler<ResultEventArgs<Color>> ColorPickerColorChanged ()
     {
         return (o, a) =>
                {

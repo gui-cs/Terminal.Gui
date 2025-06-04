@@ -60,7 +60,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        HighlightStyle = HighlightStyle.None;
+        HighlightStates = ViewBase.MouseState.None;
         CanFocus = true;
 
         if (Border is { })
@@ -481,7 +481,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.VerticalTextAlignment = Alignment.Center;
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
-        //CommandView.HighlightStyle = HighlightStyle.None;
+        //CommandView.HighlightStates = HighlightStates.None;
         CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
@@ -492,16 +492,16 @@ public class Shortcut : View, IOrientation, IDesignable
             case VisualRole.Normal:
                 if (HasFocus)
                 {
-                    e.Cancel = true;
-                    e.NewValue = GetAttributeForRole (VisualRole.Focus);
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.Focus);
                 }
                 break;
 
             case VisualRole.HotNormal:
                 if (HasFocus)
                 {
-                    e.Cancel = true;
-                    e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.HotFocus);
                 }
                 break;
         }
@@ -547,7 +547,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
-        HelpView.HighlightStyle = HighlightStyle.None;
+        HelpView.HighlightStates = ViewBase.MouseState.None;
 
         HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -681,14 +681,14 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        KeyView.HighlightStyle = HighlightStyle.None;
+        KeyView.HighlightStates = ViewBase.MouseState.None;
 
         KeyView.GettingAttributeForRole += (sender, args) =>
                                            {
                                                if (args.Role == VisualRole.Normal)
                                                {
-                                                   args.NewValue = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
-                                                   args.Cancel = true;
+                                                   args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
+                                                   args.Handled = true;
                                                }
                                            };
         KeyView.ClearingViewport += (sender, args) =>

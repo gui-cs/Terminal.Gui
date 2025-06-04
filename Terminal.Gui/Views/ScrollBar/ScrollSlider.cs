@@ -26,7 +26,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
         OnOrientationChanged (Orientation);
 
-        HighlightStyle = HighlightStyle.Hover;
+        HighlightStates = ViewBase.MouseState.In;
     }
 
     #region IOrientation members

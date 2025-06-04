@@ -106,7 +106,7 @@ public class ThemeViewer : FrameView
         }
     }
 
-    private void OnThemeManagerOnThemeChanged (object? _, StringPropertyEventArgs args) { Title = args.NewString!; }
+    private void OnThemeManagerOnThemeChanged (object? _, EventArgs<string> args) { Title = args.Value!; }
 
     protected override void Dispose (bool disposing)
     {
