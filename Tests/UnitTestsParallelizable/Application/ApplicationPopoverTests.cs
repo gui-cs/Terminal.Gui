@@ -144,6 +144,7 @@ public class ApplicationPopoverTests
 
         public PopoverTestClass ()
         {
+            ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
             CanFocus = true;
             AddCommand (Command.New, NewCommandHandler!);
             HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
