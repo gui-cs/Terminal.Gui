@@ -428,7 +428,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
             if (!ReferenceEquals (oldValue, value))
             {
-                OnActivateionChanged (new (this, oldValue, value));
+                OnSelectionChanged (new (this, oldValue, value));
             }
         }
     }
@@ -1355,7 +1355,7 @@ public class TreeView<T> : View, ITreeView where T : class
         multiSelectedRegions.Push (new (map.ElementAt (0), map.Count, map));
         SetNeedsDraw ();
 
-        OnActivateionChanged (new (this, SelectedObject, SelectedObject));
+        OnSelectionChanged (new (this, SelectedObject, SelectedObject));
     }
 
     /// <summary>Called when the <see cref="SelectedObject"/> changes.</summary>
@@ -1443,9 +1443,9 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <param name="e"></param>
     protected virtual void OnObjectActivated (ObjectActivatedEventArgs<T> e) { ObjectActivated?.Invoke (this, e); }
 
-    /// <summary>Raises the SelectionChanged event.</summary>
+    /// <summary>Raises the <see cref="SelectionChanged"/> event.</summary>
     /// <param name="e"></param>
-    protected virtual void OnActivateionChanged (SelectionChangedEventArgs<T> e) { SelectionChanged?.Invoke (this, e); }
+    protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e) { SelectionChanged?.Invoke (this, e); }
 
     /// <summary>
     ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of
