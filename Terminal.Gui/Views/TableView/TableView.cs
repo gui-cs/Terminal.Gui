@@ -242,7 +242,7 @@ public class TableView : View, IDesignable
         AddCommand (Command.Accept, () => OnCellActivated (new (Table, SelectedColumn, SelectedRow)));
 
         AddCommand (
-                    Command.Select, // was Command.ToggleChecked
+                    Command.Activate, // was Command.ToggleChecked
                     ctx =>
                     {
                         if (ToggleCurrentCellSelection () is true)
@@ -460,7 +460,7 @@ public class TableView : View, IDesignable
     /// </summary>
     public event EventHandler<CellActivatedEventArgs> CellActivated;
 
-    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.Select"/></summary>
+    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.Activate"/></summary>
     public event EventHandler<CellToggledEventArgs> CellToggled;
 
     /// <summary>
@@ -1574,7 +1574,7 @@ public class TableView : View, IDesignable
     /// <param name="pt1Y">Origin point for the selection in Y</param>
     /// <param name="pt2X">End point for the selection in X</param>
     /// <param name="pt2Y">End point for the selection in Y</param>
-    /// <param name="toggle">True if selection is result of <see cref="Command.Select"/></param>
+    /// <param name="toggle">True if selection is result of <see cref="Command.Activate"/></param>
     /// <returns></returns>
     private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
     {

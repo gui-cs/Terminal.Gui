@@ -56,7 +56,7 @@ internal sealed class Menu : View
                    );
 
         AddCommand (
-                    Command.Select,
+                    Command.Activate,
                     ctx =>
                     {
                         if (ctx is not CommandContext<KeyBinding> keyCommandContext)
@@ -133,7 +133,7 @@ internal sealed class Menu : View
 
                     if (menuItem.ShortcutKey != Key.Empty)
                     {
-                        KeyBinding keyBinding = new ([Command.Select], this, data: menuItem);
+                        KeyBinding keyBinding = new ([Command.Activate], this, data: menuItem);
 
                         // Remove an existent ShortcutKey
                         menuItem._menuBar.HotKeyBindings.Remove (menuItem.ShortcutKey!);

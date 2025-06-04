@@ -297,7 +297,7 @@ public class MenuItem
 
         if (ShortcutKey != Key.Empty)
         {
-            KeyBinding keyBinding = new ([Command.Select], null, data: this);
+            KeyBinding keyBinding = new ([Command.Activate], null, data: this);
             // Remove an existent ShortcutKey
             _menuBar.HotKeyBindings.Remove (ShortcutKey!);
             _menuBar.HotKeyBindings.Add (ShortcutKey!, keyBinding);

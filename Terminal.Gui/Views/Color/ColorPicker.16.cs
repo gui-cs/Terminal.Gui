@@ -195,7 +195,7 @@ public class ColorPicker16 : View
         AddCommand (Command.Up, (ctx) => MoveUp (ctx));
         AddCommand (Command.Down, (ctx) => MoveDown (ctx));
 
-        AddCommand (Command.Select, (ctx) =>
+        AddCommand (Command.Activate, (ctx) =>
                                     {
                                         var set = false;
 

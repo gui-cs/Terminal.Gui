@@ -10,7 +10,7 @@ public partial class View // Keyboard APIs
     private void SetupKeyboard ()
     {
         KeyBindings = new (this);
-        KeyBindings.Add (Key.Space, Command.Select);
+        KeyBindings.Add (Key.Space, Command.Activate);
         KeyBindings.Add (Key.Enter, Command.Accept);
 
         HotKeyBindings = new (this);

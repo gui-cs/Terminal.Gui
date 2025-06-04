@@ -13,11 +13,11 @@ public partial class View // Mouse APIs
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
-        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Select);
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
     }
 
     /// <summary>

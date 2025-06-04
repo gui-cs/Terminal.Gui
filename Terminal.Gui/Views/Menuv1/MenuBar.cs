@@ -143,7 +143,7 @@ public class MenuBar : View, IDesignable
                                                       }
                                                       return Select (Menus.IndexOf (keyCommandContext.Binding.Data));
                                                   });
-        AddCommand (Command.Select, ctx =>
+        AddCommand (Command.Activate, ctx =>
                                     {
                                         if (ctx is not CommandContext<KeyBinding> keyCommandContext)
                                         {
@@ -221,7 +221,7 @@ public class MenuBar : View, IDesignable
                     // Technically this will never run because MenuBarItems don't have shortcuts
                     // unless the IsTopLevel is true
                     HotKeyBindings.Remove (menuBarItem.ShortcutKey!);
-                    KeyBinding keyBinding = new ([Command.Select], this, data: menuBarItem);
+                    KeyBinding keyBinding = new ([Command.Activate], this, data: menuBarItem);
                     HotKeyBindings.Add (menuBarItem.ShortcutKey!, keyBinding);
                 }
 

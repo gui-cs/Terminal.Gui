@@ -172,7 +172,7 @@ public class FileDialog : Dialog, IDesignable
             FullRowSelect = true,
         };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;

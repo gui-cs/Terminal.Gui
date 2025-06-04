@@ -57,7 +57,7 @@ public class HexView : View, IDesignable
         _leftSideHasFocus = true;
         _firstNibble = true;
 
-        AddCommand (Command.Select, HandleMouseClick);
+        AddCommand (Command.Activate, HandleMouseClick);
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.Down, () => MoveDown (BytesPerLine));
@@ -101,8 +101,8 @@ public class HexView : View, IDesignable
         KeyBindings.Remove (Key.Enter);
 
         // The Select handler deals with both single and double clicks
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Select);
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 

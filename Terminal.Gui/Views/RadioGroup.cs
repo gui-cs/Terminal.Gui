@@ -16,7 +16,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         Height = Dim.Auto (DimAutoStyle.Content);
 
         // Select (Space key or mouse click) - The default implementation sets focus. RadioGroup does not.
-        AddCommand (Command.Select, HandleSelectCommand);
+        AddCommand (Command.Activate, HandleSelectCommand);
 
         // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, HandleAcceptCommand);
@@ -59,7 +59,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             if (item is null || HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
             {
                 // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
-                return InvokeCommand (Command.Select);
+                return InvokeCommand (Command.Activate);
             }
         }
 

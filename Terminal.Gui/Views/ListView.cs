@@ -106,7 +106,7 @@ public class ListView : View, IDesignable
                                     });
 
         // Select (Space key and single-click) - If markable, change mark and raise Select event
-        AddCommand (Command.Select, (ctx) =>
+        AddCommand (Command.Activate, (ctx) =>
                                     {
                                         if (_allowsMarking)
                                         {
@@ -168,7 +168,7 @@ public class ListView : View, IDesignable
         KeyBindings.Add (Key.End, Command.End);
 
         // Key.Space is already bound to Command.Select; this gives us select then move down
-        KeyBindings.Add (Key.Space.WithShift, [Command.Select, Command.Down]);
+        KeyBindings.Add (Key.Space.WithShift, [Command.Activate, Command.Down]);
 
         // Use the form of Add that lets us pass context to the handler
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));

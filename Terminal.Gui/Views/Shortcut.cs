@@ -239,7 +239,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // Hotkey -
         AddCommand (Command.HotKey, DispatchCommand);
         // Select (Space key or click) -
-        AddCommand (Command.Select, DispatchCommand);
+        AddCommand (Command.Activate, DispatchCommand);
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Select on CommandView ({CommandView.GetType ().Name}).");
 
-            CommandView.InvokeCommand (Command.Select, keyCommandContext);
+            CommandView.InvokeCommand (Command.Activate, keyCommandContext);
         }
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseSelecting ...");
@@ -459,7 +459,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand<KeyBinding> (Command.Select, new ([Command.Select], null, this));
+                    InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
                 }
 
                 e.Handled = true;

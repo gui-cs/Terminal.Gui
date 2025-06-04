@@ -140,7 +140,7 @@ public class ViewCommandTests
         Assert.Equal (canFocus, view.CanFocus);
         Assert.False (view.HasFocus);
 
-        view.InvokeCommand (Command.Select);
+        view.InvokeCommand (Command.Activate);
 
         Assert.Equal (1, view.OnSelectingCount);
 
@@ -156,7 +156,7 @@ public class ViewCommandTests
         Assert.False (view.HasFocus);
 
         view.HandleOnSelecting = true;
-        Assert.True (view.InvokeCommand (Command.Select));
+        Assert.True (view.InvokeCommand (Command.Activate));
 
         Assert.Equal (1, view.OnSelectingCount);
 
@@ -171,7 +171,7 @@ public class ViewCommandTests
 
         view.Selecting += ViewOnSelect;
 
-        bool? ret = view.InvokeCommand (Command.Select);
+        bool? ret = view.InvokeCommand (Command.Activate);
         Assert.True (ret);
         Assert.True (selectingInvoked);
 
@@ -192,7 +192,7 @@ public class ViewCommandTests
 
         view.Selecting += ViewOnSelecting;
 
-        view.InvokeCommand (Command.Select);
+        view.InvokeCommand (Command.Activate);
         Assert.True (selecting);
 
         return;

@@ -27,7 +27,7 @@ public class CheckBox : View
         CanFocus = true;
 
         // Select (Space key and single-click) - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.Select, AdvanceAndSelect);
+        AddCommand (Command.Activate, AdvanceAndSelect);
 
         // Hotkey - Advance state and raise Select event - DO NOT raise Accept
         AddCommand (Command.HotKey, ctx =>

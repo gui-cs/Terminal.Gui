@@ -13,7 +13,7 @@ public class TableSelection
     }
 
     /// <summary>
-    ///     True if the selection was made through <see cref="Command.Select"/> and therefore should persist even
+    ///     True if the selection was made through <see cref="Command.Activate"/> and therefore should persist even
     ///     through keyboard navigation.
     /// </summary>
     public bool IsToggled { get; set; }

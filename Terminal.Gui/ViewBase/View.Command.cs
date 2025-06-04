@@ -38,7 +38,7 @@ public partial class View // Command APIs
 
         // Space or single-click - Raise Selecting
         AddCommand (
-                    Command.Select,
+                    Command.Activate,
                     ctx =>
                     {
                         if (RaiseSelecting (ctx) is true)
@@ -203,9 +203,9 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? Accepting;
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state.
     ///     Calls <see cref="OnSelecting"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
-    ///     event. The default <see cref="Command.Select"/> handler calls this method.
+    ///     event. The default <see cref="Command.Activate"/> handler calls this method.
     /// </summary>
     /// <remarks>
     ///     The <see cref="Selecting"/> event should be raised after the state of the View has been changed and before see
@@ -236,7 +236,7 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> and return <see langword="true"/> to indicate the event was
     ///     handled and processing should stop.
     /// </summary>
@@ -245,7 +245,7 @@ public partial class View // Command APIs
     protected virtual bool OnSelecting (CommandEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View
+    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View
     ///     to change state.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.

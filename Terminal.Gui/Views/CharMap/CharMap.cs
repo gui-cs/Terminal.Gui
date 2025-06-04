@@ -43,7 +43,7 @@ public class CharMap : View, IDesignable
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
 
         AddCommand (Command.Accept, HandleAcceptCommand);
-        AddCommand (Command.Select, HandleSelectCommand);
+        AddCommand (Command.Activate, HandleSelectCommand);
         AddCommand (Command.Context, HandleContextCommand);
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
