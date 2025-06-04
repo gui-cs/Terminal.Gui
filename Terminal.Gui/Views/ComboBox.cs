@@ -171,7 +171,7 @@ public class ComboBox : View, IDesignable
                     SetValue ("", true);
                 }
 
-                OnActivatedChanged ();
+                OnSelectedChanged ();
             }
         }
     }
@@ -350,7 +350,7 @@ public class ComboBox : View, IDesignable
 
     /// <summary>Invokes the SelectedChanged event if it is defined.</summary>
     /// <returns></returns>
-    public virtual bool OnActivatedChanged ()
+    public virtual bool OnSelectedChanged ()
     {
         // Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
         // So we cannot optimize. Ie: Don't call if not changed
@@ -435,7 +435,7 @@ public class ComboBox : View, IDesignable
         {
             Text = string.Empty;
             _selectedItem = _lastSelectedItem;
-            OnActivatedChanged ();
+            OnSelectedChanged ();
         }
 
         return Collapse ();
@@ -785,7 +785,7 @@ public class ComboBox : View, IDesignable
         if (!isFromSelectedItem)
         {
             _selectedItem = GetSelectedItemFromSource (_text);
-            OnActivatedChanged ();
+            OnSelectedChanged ();
         }
     }
 

@@ -346,7 +346,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         _selected = value;
         Cursor = Math.Max (_selected, 0);
 
-        OnActivatedItemChanged (value, SelectedItem);
+        OnSelectedItemChanged (value, SelectedItem);
         SelectedItemChanged?.Invoke (this, new (SelectedItem, savedSelected));
 
         SetNeedsDraw ();
@@ -465,7 +465,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
-    protected virtual void OnActivatedItemChanged (int selectedItem, int previousSelectedItem) { }
+    protected virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem) { }
 
     /// <summary>
     ///     Gets or sets the <see cref="RadioLabels"/> index for the cursor. The cursor may or may not be the selected

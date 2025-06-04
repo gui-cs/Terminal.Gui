@@ -202,7 +202,7 @@ public class Menuv2 : Bar
     {
         // Logging.Debug ($"{Title} ({selected?.Title})");
 
-        OnActivatedMenuItemChanged (selected);
+        OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);
     }
 
@@ -210,7 +210,7 @@ public class Menuv2 : Bar
     ///     Called when the selected menu item has changed.
     /// </summary>
     /// <param name="selected"></param>
-    protected virtual void OnActivatedMenuItemChanged (MenuItemv2? selected)
+    protected virtual void OnSelectedMenuItemChanged (MenuItemv2? selected)
     {
     }
 

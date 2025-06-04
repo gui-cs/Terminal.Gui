@@ -61,7 +61,7 @@ public class OptionSelector : View, IOrientation, IDesignable
 
     private void RaiseSelectedItemChanged (int? previousSelectedItem)
     {
-        OnActivatedItemChanged (SelectedItem, previousSelectedItem);
+        OnSelectedItemChanged (SelectedItem, previousSelectedItem);
         if (SelectedItem.HasValue)
         {
             SelectedItemChanged?.Invoke (this, new (SelectedItem, previousSelectedItem));
@@ -71,7 +71,7 @@ public class OptionSelector : View, IOrientation, IDesignable
     /// <summary>
     ///     Called when <see cref="SelectedItem"/> has changed.
     /// </summary>
-    protected virtual void OnActivatedItemChanged (int? selectedItem, int? previousSelectedItem) { }
+    protected virtual void OnSelectedItemChanged (int? selectedItem, int? previousSelectedItem) { }
 
     /// <summary>
     ///     Raised when <see cref="SelectedItem"/> has changed.
