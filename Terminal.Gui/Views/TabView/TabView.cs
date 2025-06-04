@@ -236,7 +236,7 @@ public class TabView : View
                     SelectedTab?.SetFocus ();
                 }
 
-                OnSelectedTabChanged (old!, _selectedTab!);
+                OnActivatedTabChanged (old!, _selectedTab!);
             }
             SetNeedsLayout ();
         }
@@ -519,7 +519,7 @@ public class TabView : View
     }
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
-    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab)
+    protected virtual void OnActivatedTabChanged (Tab oldTab, Tab newTab)
     {
         SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
     }

@@ -58,7 +58,7 @@ public class CheckBox : View
             return true;
         }
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }

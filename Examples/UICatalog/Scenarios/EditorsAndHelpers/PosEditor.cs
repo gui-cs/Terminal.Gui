@@ -92,7 +92,7 @@ public class PosEditor : EditorBase
         };
         Add (label);
         _posRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
-        _posRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
+        _posRadioGroup.SelectedItemChanged += OnRadioGroupOnActivatedItemChanged;
 
         _valueEdit = new ()
         {
@@ -121,7 +121,7 @@ public class PosEditor : EditorBase
         Add (_posRadioGroup);
     }
 
-    private void OnRadioGroupOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { PosChanged (); }
+    private void OnRadioGroupOnActivatedItemChanged (object? s, SelectedItemChangedArgs selected) { PosChanged (); }
 
     // These need to have same order 
     private readonly List<string> _posNames = ["Absolute", "Align", "AnchorEnd", "Center", "Func", "Percent"];

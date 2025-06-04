@@ -317,7 +317,7 @@ Item 4",
                                                       output
                                                      );
 
-        // EnsureSelectedItemVisible is auto enabled on the OnSelectedChanged
+        // EnsureSelectedItemVisible is auto enabled on the OnActivatedChanged
         lv.SelectedItem = 6;
         Application.LayoutAndDraw ();
 

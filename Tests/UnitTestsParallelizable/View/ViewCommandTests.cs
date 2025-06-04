@@ -126,7 +126,7 @@ public class ViewCommandTests
 
     #endregion OnAccept/Accept tests
 
-    #region OnSelect/Select tests
+    #region OnActivate/Select tests
 
     [Theory]
     [CombinatorialData]
@@ -142,7 +142,7 @@ public class ViewCommandTests
 
         view.InvokeCommand (Command.Activate);
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnActivatingCount);
 
         Assert.Equal (1, view.SelectingCount);
 
@@ -150,36 +150,36 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void Select_Command_Handle_OnSelecting_NoEvent ()
+    public void Select_Command_Handle_OnActivating_NoEvent ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        view.HandleOnSelecting = true;
+        view.HandleOnActivating = true;
         Assert.True (view.InvokeCommand (Command.Activate));
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnActivatingCount);
 
         Assert.Equal (0, view.SelectingCount);
     }
 
     [Fact]
-    public void Select_Handle_Event_OnSelecting_Returns_True ()
+    public void Select_Handle_Event_OnActivating_Returns_True ()
     {
         var view = new View ();
-        var selectingInvoked = false;
+        var activatingInvoked = false;
 
-        view.Selecting += ViewOnSelect;
+        view.Activating += ViewOnActivate;
 
         bool? ret = view.InvokeCommand (Command.Activate);
         Assert.True (ret);
-        Assert.True (selectingInvoked);
+        Assert.True (activatingInvoked);
 
         return;
 
-        void ViewOnSelect (object sender, CommandEventArgs e)
+        void ViewOnActivate (object sender, CommandEventArgs e)
         {
-            selectingInvoked = true;
+            activatingInvoked = true;
             e.Handled = true;
         }
     }
@@ -188,16 +188,16 @@ public class ViewCommandTests
     public void Select_Command_Invokes_Selecting_Event ()
     {
         var view = new View ();
-        var selecting = false;
+        var activating = false;
 
-        view.Selecting += ViewOnSelecting;
+        view.Activating += ViewOnActivating;
 
         view.InvokeCommand (Command.Activate);
-        Assert.True (selecting);
+        Assert.True (activating);
 
         return;
 
-        void ViewOnSelecting (object sender, CommandEventArgs e) { selecting = true; }
+        void ViewOnActivating (object sender, CommandEventArgs e) { activating = true; }
     }
 
     [Fact]
@@ -206,10 +206,10 @@ public class ViewCommandTests
         var view = new ViewEventTester ();
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnActivatingCount);
     }
 
-    #endregion OnSelect/Select tests
+    #endregion OnActivate/Select tests
 
     #region OnHotKey/HotKey tests
 
@@ -286,7 +286,7 @@ public class ViewCommandTests
                                   HandlingHotKeyCount++;
                               };
 
-            Selecting += (s, a) =>
+            Activating += (s, a) =>
                          {
                              a.Handled = HandleSelecting;
                              SelectingCount++;
@@ -327,18 +327,18 @@ public class ViewCommandTests
 
         public bool HandleHandlingHotKey { get; set; }
 
-        public int OnSelectingCount { get; set; }
+        public int OnActivatingCount { get; set; }
         public int SelectingCount { get; set; }
-        public bool HandleOnSelecting { get; set; }
+        public bool HandleOnActivating { get; set; }
         public bool HandleSelecting { get; set; }
 
 
         /// <inheritdoc/>
-        protected override bool OnSelecting (CommandEventArgs args)
+        protected override bool OnActivating (CommandEventArgs args)
         {
-            OnSelectingCount++;
+            OnActivatingCount++;
 
-            return HandleOnSelecting;
+            return HandleOnActivating;
         }
 
         public int OnCommandNotBoundCount { get; set; }

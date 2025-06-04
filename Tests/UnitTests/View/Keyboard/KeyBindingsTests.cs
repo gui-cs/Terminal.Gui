@@ -159,7 +159,7 @@ public class KeyBindingsTests ()
     {
         var hotKeyRaised = false;
         var acceptRaised = false;
-        var selectRaised = false;
+        var activatingRaised = false;
         Application.Top = new Toplevel ();
         var view = new View
         {
@@ -170,26 +170,26 @@ public class KeyBindingsTests ()
         Application.Top.Add (view);
         view.HandlingHotKey += (s, e) => hotKeyRaised = true;
         view.Accepting += (s, e) => acceptRaised = true;
-        view.Selecting += (s, e) => selectRaised = true;
+        view.Activating += (s, e) => activatingRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);
         Assert.True (Application.RaiseKeyDownEvent (Key.T));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.False (activatingRaised);
 
         hotKeyRaised = false;
         Assert.True (Application.RaiseKeyDownEvent (Key.T.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.False (activatingRaised);
 
         hotKeyRaised = false;
         view.HotKey = KeyCode.E;
         Assert.True (Application.RaiseKeyDownEvent (Key.E.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.False (activatingRaised);
 
         Application.Top.Dispose ();
         Application.ResetState (true);

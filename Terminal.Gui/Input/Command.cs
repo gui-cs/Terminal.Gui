@@ -53,7 +53,7 @@ public enum Command
     ///         In some cases, activating a View just sets focus to it, while in others it may trigger an action.
     ///     </para>
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelecting"/>.
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseActivating"/>.
     ///     </para>
     /// </summary>
     Activate,

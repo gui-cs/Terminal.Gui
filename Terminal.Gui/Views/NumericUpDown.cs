@@ -101,7 +101,7 @@ public class NumericUpDown<T> : View where T : notnull
                         }
 
                         // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseSelecting (ctx) is true)
+                        //if (RaiseActivating (ctx) is true)
                         //{
                         //    return true;
                         //}
@@ -124,7 +124,7 @@ public class NumericUpDown<T> : View where T : notnull
                         }
 
                         // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseSelecting (ctx) is true)
+                        //if (RaiseActivating (ctx) is true)
                         //{
                         //    return true;
                         //}

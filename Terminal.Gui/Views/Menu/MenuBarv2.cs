@@ -297,7 +297,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnSelectedMenuItemChanged (MenuItemv2? selected)
+    protected override void OnActivatedMenuItemChanged (MenuItemv2? selected)
     {
         // Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
 

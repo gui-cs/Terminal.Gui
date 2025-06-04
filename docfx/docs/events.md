@@ -213,14 +213,14 @@ public class Aligner : INotifyPropertyChanged
 
 ### 4. Event Propagation
 
-Events in Terminal.Gui often propagate through the view hierarchy. For example, in `Button`, the `Selecting` and `Accepting` events are raised as part of the command handling process:
+Events in Terminal.Gui often propagate through the view hierarchy. For example, in `Button`, the `Activating` and `Accepting` events are raised as part of the command handling process:
 
 ```csharp
 private bool? HandleHotKeyCommand (ICommandContext commandContext)
 {
     bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-    if (RaiseSelecting (commandContext) is true)
+    if (RaiseActivating (commandContext) is true)
     {
         return true;
     }
@@ -244,7 +244,7 @@ private bool? HandleHotKeyCommand (ICommandContext commandContext)
 }
 ```
 
-This example shows how `Button` first raises the `Selecting` event, and if not canceled, proceeds to raise the `Accepting` event. If `Accepting` is not handled and the button is the default, it invokes the `Accept` command on the `SuperView`, demonstrating event propagation up the view hierarchy.
+This example shows how `Button` first raises the `Activating` event, and if not canceled, proceeds to raise the `Accepting` event. If `Accepting` is not handled and the button is the default, it invokes the `Accept` command on the `SuperView`, demonstrating event propagation up the view hierarchy.
 
 ## Event Context
 

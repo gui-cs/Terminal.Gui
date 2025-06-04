@@ -909,7 +909,7 @@ public class RuneTests
     [InlineData ("𝔹", "utf-8", 4)]
     [InlineData ("𝔹", "utf-16", 4)]
     [InlineData ("𝔹", "utf-32", 3)]
-    public void GetEncodingLength_ReturnsLengthBasedOnSelectedEncoding (string runeStr, string encodingName, int expectedLength)
+    public void GetEncodingLength_ReturnsLengthBasedOnActivatedEncoding (string runeStr, string encodingName, int expectedLength)
     {
         Rune rune = runeStr.EnumerateRunes ().Single ();
         var encoding = Encoding.GetEncoding (encodingName);

@@ -270,9 +270,9 @@ public class Shortcut : View, IOrientation, IDesignable
             CommandView.InvokeCommand (Command.Activate, keyCommandContext);
         }
 
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseSelecting ...");
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
@@ -413,7 +413,7 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 
             // Clean up old 
-            _commandView.Selecting -= CommandViewOnSelecting;
+            _commandView.Activating -= CommandViewOnActivating;
             _commandView.Accepting -= CommandViewOnAccepted;
             Remove (_commandView);
             _commandView?.Dispose ();
@@ -439,7 +439,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Title = _commandView.Text;
 
-            _commandView.Selecting += CommandViewOnSelecting;
+            _commandView.Activating += CommandViewOnActivating;
             _commandView.Accepting += CommandViewOnAccepted;
 
             //ShowHide ();
@@ -453,7 +453,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 e.Handled = true;
             }
 
-            void CommandViewOnSelecting (object? sender, CommandEventArgs e)
+            void CommandViewOnActivating (object? sender, CommandEventArgs e)
             {
                 if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this) ||
                     e.Context is CommandContext<MouseBinding>)

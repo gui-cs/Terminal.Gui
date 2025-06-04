@@ -85,13 +85,13 @@ public class ShortcutTests
 
         var commandViewAcceptCount = 0;
         shortcut.CommandView.Accepting += (s, e) => { commandViewAcceptCount++; };
-        var commandViewSelectCount = 0;
-        shortcut.CommandView.Selecting += (s, e) => { commandViewSelectCount++; };
+        var commandViewAcceptingCount = 0;
+        shortcut.CommandView.Activating += (s, e) => { commandViewAcceptingCount++; };
 
         var shortcutAcceptCount = 0;
         shortcut.Accepting += (s, e) => { shortcutAcceptCount++; };
-        var shortcutSelectCount = 0;
-        shortcut.Selecting += (s, e) => { shortcutSelectCount++; };
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (s, e) => { shortcutActivatingCount++; };
 
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
@@ -105,9 +105,9 @@ public class ShortcutTests
                                   });
 
         Assert.Equal (expectedShortcutAccepted, shortcutAcceptCount);
-        Assert.Equal (expectedShortcutSelected, shortcutSelectCount);
+        Assert.Equal (expectedShortcutSelected, shortcutActivatingCount);
         Assert.Equal (expectedCommandViewAccepted, commandViewAcceptCount);
-        Assert.Equal (expectedCommandViewSelected, commandViewSelectCount);
+        Assert.Equal (expectedCommandViewSelected, commandViewAcceptingCount);
 
         Application.Top.Dispose ();
         Application.ResetState (true);
@@ -203,7 +203,7 @@ public class ShortcutTests
         shortcut.CommandView.Accepting += (s, e) => { checkboxAccepted++; };
 
         var checkboxSelected = 0;
-        shortcut.CommandView.Selecting += (s, e) =>
+        shortcut.CommandView.Activating += (s, e) =>
                                          {
                                              if (e.Handled)
                                              {
@@ -217,7 +217,7 @@ public class ShortcutTests
         Application.Top.LayoutSubViews ();
 
         var selected = 0;
-        shortcut.Selecting += (s, e) =>
+        shortcut.Activating += (s, e) =>
         {
             selected++;
         };
@@ -278,7 +278,7 @@ public class ShortcutTests
         shortcut.Accepting += (s, e) => accepted++;
 
         var selected = 0;
-        shortcut.Selecting += (s, e) => selected++;
+        shortcut.Activating += (s, e) => selected++;
 
         Application.RaiseKeyDownEvent (key);
 
@@ -330,7 +330,7 @@ public class ShortcutTests
                              };
 
         var selected = 0;
-        shortcut.Selecting += (s, e) => selected++;
+        shortcut.Activating += (s, e) => selected++;
 
         Application.RaiseKeyDownEvent (key);
 

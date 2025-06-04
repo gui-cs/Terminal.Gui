@@ -47,7 +47,7 @@ public class TextFieldTests
     {
         TextField tf = new ();
 
-        tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
+        tf.Activating += (sender, args) => Assert.Fail ("Activating should not be raised.");
 
         Toplevel top = new ();
         top.Add (tf);
@@ -62,15 +62,15 @@ public class TextFieldTests
     {
         TextField tf = new ();
 
-        var selectingCount = 0;
-        tf.Selecting += (sender, args) => selectingCount++;
+        var activatingCount = 0;
+        tf.Activating += (sender, args) => activatingCount++;
 
         Toplevel top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
 
         top.Dispose ();
     }

@@ -363,7 +363,7 @@ public class HexView : View, IDesignable
             return false;
         }
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }

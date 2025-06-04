@@ -43,7 +43,7 @@ public class BorderEditor : AdornmentEditor
         };
         Add (_rbBorderStyle);
 
-        _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
+        _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnActivatedItemChanged;
 
         _ckbTitle = new ()
         {
@@ -73,7 +73,7 @@ public class BorderEditor : AdornmentEditor
 
         return;
 
-        void OnRbBorderStyleOnSelectedItemChanged (object? s, SelectedItemChangedArgs args)
+        void OnRbBorderStyleOnActivatedItemChanged (object? s, SelectedItemChangedArgs args)
         {
             LineStyle prevBorderStyle = AdornmentToEdit!.BorderStyle;
             ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.SelectedItem!;

@@ -608,9 +608,9 @@ public class ButtonTests (ITestOutputHelper output)
             WantContinuousButtonPressed = true
         };
 
-        var selectingCount = 0;
+        var activatingCount = 0;
 
-        button.Selecting += (s, e) => selectingCount++;
+        button.Activating += (s, e) => activatingCount++;
         var acceptedCount = 0;
 
         button.Accepting += (s, e) =>
@@ -622,19 +622,19 @@ public class ButtonTests (ITestOutputHelper output)
         me = new ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
         me = new ();
         me.Flags = released;
         button.NewMouseEvent (me);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
         me = new ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
-        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptedCount);
 
         button.Dispose ();
@@ -664,23 +664,23 @@ public class ButtonTests (ITestOutputHelper output)
                                 e.Handled = true;
                             };
 
-        var selectingCount = 0;
+        var activatingCount = 0;
 
-        button.Selecting += (s, e) =>
+        button.Activating += (s, e) =>
                             {
-                                selectingCount++;
+                                activatingCount++;
                                 e.Handled = true;
                             };
 
         me.Flags = pressed;
         button.NewMouseEvent (me);
         Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
 
         me.Flags = released;
         button.NewMouseEvent (me);
         Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
 
         button.Dispose ();
     }

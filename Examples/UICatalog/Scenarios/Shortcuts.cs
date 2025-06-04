@@ -427,7 +427,7 @@ public class Shortcuts : Scenario
             BoxWidth = 1
         };
 
-        bgColorShortcut.Selecting += (o, args) =>
+        bgColorShortcut.Activating += (o, args) =>
                                      {
                                          //args.Cancel = true;
                                      };
@@ -482,18 +482,18 @@ public class Shortcuts : Scenario
 
         foreach (Shortcut shortcut in Application.Top.SubViews.OfType<Shortcut> ())
         {
-            shortcut.Selecting += (o, args) =>
+            shortcut.Activating += (o, args) =>
                                   {
                                       if (args.Handled)
                                       {
                                           return;
                                       }
 
-                                      eventSource.Add ($"{shortcut!.Id}.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                                      eventSource.Add ($"{shortcut!.Id}.Activating: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                                       eventLog.MoveDown ();
                                   };
 
-            shortcut.CommandView.Selecting += (o, args) =>
+            shortcut.CommandView.Activating += (o, args) =>
                                               {
                                                   if (args.Handled)
                                                   {
@@ -501,7 +501,7 @@ public class Shortcuts : Scenario
                                                   }
 
                                                   eventSource.Add (
-                                                                   $"{shortcut!.Id}.CommandView.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                                                                   $"{shortcut!.Id}.CommandView.Activating: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                                                   eventLog.MoveDown ();
                                                   args.Handled = true;
                                               };

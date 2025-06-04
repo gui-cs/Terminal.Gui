@@ -372,9 +372,9 @@ public class FlagSelector : View, IOrientation, IDesignable
         //                                      }
         //                                  };
 
-        checkbox.Selecting += (sender, args) =>
+        checkbox.Activating += (sender, args) =>
                               {
-                                  if (RaiseSelecting (args.Context) is true)
+                                  if (RaiseActivating (args.Context) is true)
                                   {
                                       args.Handled = true;
 

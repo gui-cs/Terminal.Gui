@@ -247,7 +247,7 @@ public class TableView : View, IDesignable
                     {
                         if (ToggleCurrentCellSelection () is true)
                         {
-                            return RaiseSelecting (ctx) is true;
+                            return RaiseActivating (ctx) is true;
                         }
 
                         return false;
@@ -388,7 +388,7 @@ public class TableView : View, IDesignable
 
             if (oldValue != selectedColumn)
             {
-                OnSelectedCellChanged (
+                OnActivatedCellChanged (
                                        new (
                                             Table,
                                             oldValue,
@@ -413,7 +413,7 @@ public class TableView : View, IDesignable
 
             if (oldValue != selectedRow)
             {
-                OnSelectedCellChanged (
+                OnActivatedCellChanged (
                                        new (
                                             Table,
                                             SelectedColumn,
@@ -1286,7 +1286,7 @@ public class TableView : View, IDesignable
     protected virtual void OnCellToggled (CellToggledEventArgs args) { CellToggled?.Invoke (this, args); }
 
     /// <summary>Invokes the <see cref="SelectedCellChanged"/> event</summary>
-    protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args) { SelectedCellChanged?.Invoke (this, args); }
+    protected virtual void OnActivatedCellChanged (SelectedCellChangedEventArgs args) { SelectedCellChanged?.Invoke (this, args); }
 
     /// <summary>
     ///     Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to with

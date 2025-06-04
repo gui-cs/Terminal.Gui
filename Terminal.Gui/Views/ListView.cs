@@ -64,7 +64,7 @@ public class ListView : View, IDesignable
         // 
         AddCommand (Command.Up, (ctx) =>
                                 {
-                                    if (RaiseSelecting (ctx) == true)
+                                    if (RaiseActivating (ctx) == true)
                                     {
                                         return true;
                                     }
@@ -72,14 +72,14 @@ public class ListView : View, IDesignable
                                 });
         AddCommand (Command.Down, (ctx) =>
                                   {
-                                      if (RaiseSelecting (ctx) == true)
+                                      if (RaiseActivating (ctx) == true)
                                       {
                                           return true;
                                       }
                                       return MoveDown ();
                                   });
 
-        // TODO: add RaiseSelecting to all of these
+        // TODO: add RaiseActivating to all of these
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
@@ -110,7 +110,7 @@ public class ListView : View, IDesignable
                                     {
                                         if (_allowsMarking)
                                         {
-                                            if (RaiseSelecting (ctx) == true)
+                                            if (RaiseActivating (ctx) == true)
                                             {
                                                 return true;
                                             }
@@ -131,7 +131,7 @@ public class ListView : View, IDesignable
                                         if (SelectedItem == -1)
                                         {
                                             SelectedItem = 0;
-                                            if (RaiseSelecting (ctx) == true)
+                                            if (RaiseActivating (ctx) == true)
                                             {
                                                 return true;
 
@@ -279,7 +279,7 @@ public class ListView : View, IDesignable
             }
 
             _selected = value;
-            OnSelectedChanged ();
+            OnActivatedChanged ();
         }
     }
 
@@ -509,7 +509,7 @@ public class ListView : View, IDesignable
             // return true;
         }
 
-        OnSelectedChanged ();
+        OnActivatedChanged ();
         SetNeedsDraw ();
 
         if (me.Flags == MouseFlags.Button1DoubleClicked)
@@ -536,7 +536,7 @@ public class ListView : View, IDesignable
             // valid values range, we should select the bottommost valid value.
             // This can occur if the backing data source changes.
             _selected = _source.Count - 1;
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
         else if (_selected + 1 < _source.Count)
@@ -553,12 +553,12 @@ public class ListView : View, IDesignable
                 Viewport = Viewport with { Y = _selected };
             }
 
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
         else if (_selected == 0)
         {
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
         else if (_selected >= Viewport.Y + Viewport.Height)
@@ -588,7 +588,7 @@ public class ListView : View, IDesignable
                 };
             }
 
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
 
@@ -603,7 +603,7 @@ public class ListView : View, IDesignable
         {
             _selected = 0;
             Viewport = Viewport with { Y = _selected };
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
 
@@ -642,7 +642,7 @@ public class ListView : View, IDesignable
                 Viewport = Viewport with { Y = 0 };
             }
 
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
 
@@ -664,7 +664,7 @@ public class ListView : View, IDesignable
         {
             _selected = n;
             Viewport = Viewport with { Y = _selected };
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
 
@@ -687,7 +687,7 @@ public class ListView : View, IDesignable
             // valid values range, we should select the bottommost valid value.
             // This can occur if the backing data source changes.
             _selected = _source.Count - 1;
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
         else if (_selected > 0)
@@ -708,7 +708,7 @@ public class ListView : View, IDesignable
                 Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
             }
 
-            OnSelectedChanged ();
+            OnActivatedChanged ();
             SetNeedsDraw ();
         }
         else if (_selected < Viewport.Y)
@@ -840,7 +840,7 @@ public class ListView : View, IDesignable
     // TODO: Use standard event model
     /// <summary>Invokes the <see cref="SelectedItemChanged"/> event if it is defined.</summary>
     /// <returns></returns>
-    public virtual bool OnSelectedChanged ()
+    public virtual bool OnActivatedChanged ()
     {
         if (_selected != _lastSelectedItem)
         {

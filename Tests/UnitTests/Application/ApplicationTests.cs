@@ -990,7 +990,7 @@ public class ApplicationTests
         //                                                     w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
         //Assert.NotNull (exception);
 
-        // TODO: Re-enable this when we are done debug logging of ctx.Source.Title in RaiseSelecting
+        // TODO: Re-enable this when we are done debug logging of ctx.Source.Title in RaiseActivating
         //exception = Record.Exception (() => Assert.Equal (string.Empty, w.Title)); // Invalid - w has been disposed and cannot be accessed
         //Assert.NotNull (exception);
         //exception = Record.Exception (() => w.Title = "NewTitle"); // Invalid - w has been disposed and cannot be accessed

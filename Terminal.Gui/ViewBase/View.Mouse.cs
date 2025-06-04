@@ -476,7 +476,7 @@ public partial class View // Mouse APIs
 
         // Post-conditions
 
-        // By default, this will raise Selecting/OnSelecting - Subclasses can override this via AddCommand (Command.Select ...).
+        // By default, this will raise Activating/OnActivating - Subclasses can override this via AddCommand (Command.Select ...).
         args.Handled = InvokeCommandsBoundToMouse (args) == true;
 
         return args.Handled;

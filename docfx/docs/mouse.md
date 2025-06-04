@@ -44,8 +44,8 @@ public class MyView : View
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         MouseBindings.Add (MouseFlags.WheelDown, Command.ScrollDown);
         
-        AddCommand (Command.Select, () => SelectItem());
-        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
+        AddCommand (Command.Activate, () => SelectItem());
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
     }
 }
 ```

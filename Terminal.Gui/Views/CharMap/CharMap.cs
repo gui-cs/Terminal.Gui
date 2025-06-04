@@ -114,7 +114,7 @@ public class CharMap : View, IDesignable
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
@@ -462,7 +462,7 @@ public class CharMap : View, IDesignable
             }
         }
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }

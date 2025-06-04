@@ -93,7 +93,7 @@ public class DimEditor : EditorBase
         };
         Add (label);
         _dimRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
-        _dimRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
+        _dimRadioGroup.SelectedItemChanged += OnRadioGroupOnActivatedItemChanged;
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
@@ -121,7 +121,7 @@ public class DimEditor : EditorBase
 
     }
 
-    private void OnRadioGroupOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }
+    private void OnRadioGroupOnActivatedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }
 
     // These need to have same order 
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent",];
