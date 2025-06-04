@@ -136,7 +136,7 @@ public class CsvEditor : Scenario
 
         appWindow.Add (_tableView);
 
-        _tableView.SelectedCellChanged += OnActivatedCellChanged;
+        _tableView.SelectedCellChanged += OnSelectedCellChanged;
         _tableView.CellActivated += EditCurrentCell;
         _tableView.KeyDown += TableViewKeyPress;
 
@@ -426,7 +426,7 @@ public class CsvEditor : Scenario
         return false;
     }
 
-    private void OnActivatedCellChanged (object sender, SelectedCellChangedEventArgs e)
+    private void OnSelectedCellChanged (object sender, SelectedCellChangedEventArgs e)
     {
         // only update the text box if the user is not manually editing it
         if (!_selectedCellTextField.HasFocus)
