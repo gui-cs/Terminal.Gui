@@ -258,7 +258,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 menu.Visible = false;
                 menu.Accepting += MenuOnAccepting;
                 menu.Accepted += MenuAccepted;
-                menu.SelectedMenuItemChanged += MenuOnActivatedMenuItemChanged;
+                menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
             }
         }
     }
@@ -587,7 +587,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
 
-    private void MenuOnActivatedMenuItemChanged (object? sender, MenuItemv2? e)
+    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
         // Logging.Debug ($"{Title} - e.Title: {e?.Title}");
         ShowSubMenu (e);
@@ -615,7 +615,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             {
                 menu.Accepting -= MenuOnAccepting;
                 menu.Accepted -= MenuAccepted;
-                menu.SelectedMenuItemChanged -= MenuOnActivatedMenuItemChanged;
+                menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
             }
 
             _root?.Dispose ();
