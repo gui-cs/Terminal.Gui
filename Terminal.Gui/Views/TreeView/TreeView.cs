@@ -366,6 +366,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
 
     // TODO: Update to use Key instead of KeyCode
+    // BUGBUG: Activation is the wrong term here. It's accepting the current selection.
     /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
     public KeyCode ObjectActivationKey
     {
@@ -1140,6 +1141,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <exception cref="NotImplementedException"></exception>
     public void MovePageUp (bool expandSelection = false) { AdjustSelection (-Viewport.Height, expandSelection); }
 
+    // BUGBUG: Activation is the wrong term here. It's accepting the current selection.
     /// <summary>
     ///     This event is raised when an object is activated e.g. by double clicking or pressing
     ///     <see cref="ObjectActivationKey"/>.
