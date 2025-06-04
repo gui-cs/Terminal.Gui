@@ -17,7 +17,7 @@ This deep dive explores the `Command` and `View.Command` APIs, focusing on the `
 The `Command` system in Terminal.Gui defines a set of standard actions via the `Command` enum (e.g., `Command.Activate`, `Command.Accept`, `Command.HotKey`, `Command.StartOfPage`). These actions are triggered by user inputs (e.g., key presses, mouse clicks) or programmatically, enabling consistent view interactions.
 
 ### Key Components
-- **Command Enum**: Defines actions like `Select` (state change or interaction preparation), `Accept` (action confirmation), `HotKey` (hotkey activation), and others (e.g., `StartOfPage` for navigation).
+- **Command Enum**: Defines actions like `Activate` (state change or interaction preparation), `Accept` (action confirmation), `HotKey` (hotkey activation), and others (e.g., `StartOfPage` for navigation).
 - **Command Handlers**: Views register handlers using `View.AddCommand`, specifying a `CommandImplementation` delegate that returns `bool?` (`null`: no command executed; `false`: executed but not handled; `true`: handled or canceled).
 - **Command Routing**: Commands are invoked via `View.InvokeCommand`, executing the handler or raising `CommandNotBound` if no handler exists.
 - **Cancellable Work Pattern**: Command execution uses events (e.g., `Activating`, `Accepting`) and virtual methods (e.g., `OnActivating`, `OnAccepting`) for modification or cancellation, with `Cancel` indicating processing should stop.
@@ -69,7 +69,7 @@ private void SetupCommands()
 }
 ```
 
-- **Default Commands**: `Accept`, `Select`, `HotKey`, `NotBound`.
+- **Default Commands**: `Accept`, `Activate`, `HotKey`, `NotBound`.
 - **Customization**: Views override or add commands (e.g., `CheckBox` for state toggling, `MenuItemv2` for menu actions).
 
 ### Command Invocation
@@ -650,7 +650,7 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
 
 ## Conclusion
 
-The `Command` and `View.Command` system in Terminal.Gui provides a robust framework for handling view actions, with `Activating` and `Accepting` serving as opinionated mechanisms for state changes/preparation and action confirmations. The system is effectively implemented across `Menuv2`, `MenuBarv2`, `CheckBox`, and `FlagSelector`, supporting a range of stateful and stateless interactions. However, limitations in terminology (`Select`’s ambiguity), cancellation semantics (`Cancel`’s misleading implication), and propagation (local `Activating` handling) highlight areas for improvement.
+The `Command` and `View.Command` system in Terminal.Gui provides a robust framework for handling view actions, with `Activating` and `Accepting` serving as opinionated mechanisms for state changes/preparation and action confirmations. The system is effectively implemented across `Menuv2`, `MenuBarv2`, `CheckBox`, and `FlagSelector`, supporting a range of stateful and stateless interactions. However, limitations in terminology (`Activate`’s ambiguity), cancellation semantics (`Cancel`’s misleading implication), and propagation (local `Activating` handling) highlight areas for improvement.
 
 The `Activating`/`Accepting` distinction is clear in principle but requires careful documentation to avoid confusion, particularly for stateless views where `Activating` is focus-driven and for views like `FlagSelector` where implementation flaws conflate the two concepts. View-specific events like `SelectedMenuItemChanged`, `CheckedStateChanged`, and `ValueChanged` are sufficient for post-selection notifications, negating the need for a generic `Selected` event. The `Accepted` event is valuable in hierarchical views like `Menuv2` and `MenuBarv2` but not universally required, suggesting inclusion in `Bar` or `Toplevel` rather than `View`.
 
