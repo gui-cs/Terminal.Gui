@@ -156,7 +156,16 @@
         </VisualStudio>
     </ProjectExtensions>
 
+    <!--<Target Name="PreBuildCleanup" BeforeTargets="BeforeBuild" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
+        <Exec Command="rm -rf ~/.nuget/packages/terminal.gui/2.0.0" Condition=" '$(OS)' != 'Windows_NT' " />
+    </Target>-->
+        
     <Target Name="CopyNuGetPackagesToLocalPackagesFolder" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
+	    <!-- Remove older NuGet Package from Global Cache -->
+	    <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
+	    <Exec Command="rm -rf ~/.nuget/packages/terminal.gui/2.0.0" Condition=" '$(OS)' != 'Windows_NT' " />
+
         <PropertyGroup>
             <!-- Define the path for local_packages relative to the project directory -->
             <LocalPackagesPath>$(MSBuildThisFileDirectory)..\local_packages\</LocalPackagesPath>
@@ -181,5 +190,9 @@
 
         <!-- Log success -->
         <Message Text="Copy completed successfully." Importance="high" />
+
+        <!-- Install NuGet Package to Global Cache -->
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" Condition=" '$(OS)' == 'Windows_NT' "/>
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages" Condition=" '$(OS)' != 'Windows_NT' "/>
     </Target>
 </Project>
