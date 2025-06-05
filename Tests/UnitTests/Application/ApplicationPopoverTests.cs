@@ -2,9 +2,6 @@
 
 public class ApplicationPopoverTests
 {
-
-
-
     [Fact]
     public void Application_Init_Initializes_PopoverManager ()
     {
@@ -200,6 +197,71 @@ public class ApplicationPopoverTests
 
         popover.Dispose ();
         Assert.Equal (1, popover.DisposedCount);
+        Application.ResetState (true);
+    }
+
+    // See: https://github.com/gui-cs/Terminal.Gui/issues/4122
+    [Theory]
+    [InlineData (0, 0, new [] { "top" })]
+    [InlineData (10, 10, new string [] { })]
+    [InlineData (1, 1, new [] { "top", "view" })]
+    [InlineData (5, 5, new [] { "top" })]
+    [InlineData (6, 6, new [] { "popoverSubView" })]
+    [InlineData (7, 7, new [] { "top" })]
+    [InlineData (3, 3, new [] { "top" })]
+    public void GetViewsUnderMouse_Supports_ActivePopover (int mouseX, int mouseY, string [] viewIdStrings)
+    {
+        Application.ResetState (true);
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+        Application.Top = new ()
+        {
+            Frame = new (0, 0, 10, 10),
+            Id = "top"
+        };
+
+        View view = new ()
+        {
+            Id = "view",
+            X = 1,
+            Y = 1,
+            Width = 2,
+            Height = 2,
+        }; // at 1,1 to 3,2 (screen)
+
+        Application.Top.Add (view);
+
+        PopoverTestClass popover = new ()
+        {
+            Id = "popover",
+            X = 5,
+            Y = 5,
+            Width = 3,
+            Height = 3,
+        }; // at 5,5 to 8,8 (screen)
+
+        View popoverSubView = new ()
+        {
+            Id = "popoverSubView",
+            X = 1,
+            Y = 1,
+            Width = 1,
+            Height = 1,
+        }; // at 6,6 to 7,7 (screen)
+
+        popover.Add (popoverSubView);
+
+        Application.Popover?.Show (popover);
+
+        List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
+
+        string [] foundIds = found.Select (v => v!.Id).ToArray ();
+
+        Assert.Equal (viewIdStrings, foundIds);
+
+        popover.Dispose ();
+        Application.Top.Dispose ();
         Application.ResetState (true);
     }
 
