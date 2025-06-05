@@ -12,7 +12,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     private Scheme _scheme;
     private View _hostControl;
     private View _top;  // The _hostControl's SuperView
-    private View _popup;
+    internal View _popup;
     private int _toRenderLength;
 
     /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
@@ -268,7 +268,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
         {
             LastPopupPos = null;
-            Visible = false;
+
+            if (Visible)
+            {
+                Close ();
+            }
 
             if (Suggestions.Count == 0)
             {
