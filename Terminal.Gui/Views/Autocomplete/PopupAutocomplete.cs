@@ -11,7 +11,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     private bool _closed;
     private Scheme _scheme;
     private View _hostControl;
-    private View _top;  // The _hostControl's SuperView
+    private View _top; // The _hostControl's SuperView
     internal View _popup;
     private int _toRenderLength;
 
@@ -70,6 +70,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                 {
                     _top.Initialized += _top_Initialized;
                 }
+
                 _top.Removed += _top_Removed;
             }
         }
@@ -376,16 +377,16 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         if (PopupInsideContainer)
         {
             _popup.Frame = new (
-                               new (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
-                               new (width, height)
-                              );
+                                new (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
+                                new (width, height)
+                               );
         }
         else
         {
             _popup.Frame = new (
-                               renderAt with { X = HostControl.Frame.X + renderAt.X },
-                               new (width, height)
-                              );
+                                renderAt with { X = HostControl.Frame.X + renderAt.X },
+                                new (width, height)
+                               );
         }
 
         _popup.Move (0, 0);
@@ -423,6 +424,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         ClearSuggestions ();
         Visible = false;
         _closed = true;
+
         //RemovePopupFromTop ();
         _popup.Visible = false;
         HostControl?.SetNeedsDraw ();
@@ -565,7 +567,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             _top?.Remove (_popup);
             _popup.Dispose ();
             _popup = null;
-
         }
     }
 
@@ -575,6 +576,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             _top = sender as View;
         }
+
         AddPopupToTop ();
     }
 
