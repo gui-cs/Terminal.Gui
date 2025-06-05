@@ -1166,7 +1166,7 @@ public partial class View // Layout APIs
 
             result.AddRange (GetViewsUnderLocation (visiblePopover, screenLocation, excludeViewportSettingsFlags));
 
-            if (result.Count > 1)
+            if (result.Count > 0)
             {
                 return result;
             }

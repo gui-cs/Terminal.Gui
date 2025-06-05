@@ -153,11 +153,9 @@ public enum ViewportSettingsFlags
     /// </summary>
     Transparent = 0b_0001_0000_0000,
 
-    // BUGBUG: The API docs here are wrong: If a TransparentMouse View has subviews, those subviews WILL get mouse events. 
-    // BUGBUG: That's an important feature that enables Popovers to work.
     /// <summary>
-    ///     If set the View will be transparent to mouse events: Any mouse event that occurs over the View (and it's SubViews) will be passed to the
-    ///     Views below it.
+    ///     If set the View will be transparent to mouse events: Specifically, any mouse event that occurs over the View that is NOT occupied by a SubView
+    ///     will not be captured by the View.
     ///     <para>
     ///         Combine this with <see cref="Transparent"/> to get a view that is both visually transparent and transparent to the mouse.
     ///     </para>
