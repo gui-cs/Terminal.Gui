@@ -24,18 +24,22 @@ public class Label : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         // On HoKey, pass it to the next view
-        AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer);
+        AddCommand (Command.HotKey, RaiseHotKeyOnNextPeer);
 
         TitleChanged += Label_TitleChanged;
-        MouseClick += Label_MouseClick;
     }
 
-    private void Label_MouseClick (object sender, MouseEventArgs e)
+    /// <inheritdoc/>
+    protected override bool OnMouseClick (MouseEventArgs args)
     {
         if (!CanFocus)
         {
-            e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, this)) == true;
+            // If the Label cannot focus (the default) invoke the HotKey command
+            // This lets the user click on the Label to invoke the next View's HotKey
+            return InvokeCommand<MouseBinding> (Command.HotKey, new ([Command.HotKey], args)) == true;
         }
+
+        return base.OnMouseClick (args);
     }
 
     private void Label_TitleChanged (object sender, EventArgs<string> e)
@@ -58,7 +62,7 @@ public class Label : View, IDesignable
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
-    private bool? InvokeHotKeyOnNextPeer (ICommandContext commandContext)
+    private bool? RaiseHotKeyOnNextPeer (ICommandContext commandContext)
     {
         if (RaiseHandlingHotKey () == true)
         {
@@ -77,12 +81,13 @@ public class Label : View, IDesignable
 
         if (HotKey.IsValid)
         {
-            // If the Label has a hotkey, we need to find the next view in the subview list
+            // If the Label has a hotkey, we need to find the next peer-view and pass the
+            // command on to it.
             int me = SuperView?.SubViews.IndexOf (this) ?? -1;
 
             if (me != -1 && me < SuperView?.SubViews.Count - 1)
             {
-                return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
+                return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey, commandContext) == true;
             }
         }
 

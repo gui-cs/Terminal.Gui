@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Net.Mime;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
@@ -26,22 +28,16 @@ public class CheckBox : View
 
         CanFocus = true;
 
-        // Select (Space key and single-click) - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.Activate, AdvanceAndSelect);
+        // Activate (Space key and single-click) - Advance state and raise Accepting event
+        // - DO NOT raise Accept
+        // - DO NOT SetFocus
+        AddCommand (Command.Activate, AdvanceAndActivate);
 
-        // Hotkey - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.HotKey, ctx =>
-                                    {
-                                        if (RaiseHandlingHotKey () is true)
-                                        {
-                                            return true;
-                                        }
-                                        return AdvanceAndSelect (ctx);
-                                    });
+        // Accept (Enter key) - Raise Accept event
+        // - DO NOT advance state
+        // The default Accept handler does that.
 
-        // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, RaiseAccepting);
-
+        // Enable double-clicking to Accept
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
@@ -49,7 +45,18 @@ public class CheckBox : View
         HighlightStates = DefaultHighlightStates;
     }
 
-    private bool? AdvanceAndSelect (ICommandContext? commandContext)
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        // Invoke Activate on ourselves
+        if (InvokeCommand (Command.Activate, args.Context) is true)
+        {
+            return true;
+        }
+        return base.OnHandlingHotKey (args);
+    }
+
+    private bool? AdvanceAndActivate (ICommandContext? commandContext)
     {
         bool? cancelled = AdvanceCheckState ();
 

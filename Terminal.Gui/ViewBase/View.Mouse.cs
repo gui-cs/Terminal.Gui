@@ -440,7 +440,7 @@ public partial class View // Mouse APIs
 
     #region Mouse Click Events
 
-    /// <summary>Raises the <see cref="OnMouseClick"/>/<see cref="MouseClick"/> event.</summary>
+    /// <summary>Low-level API. Raises the <see cref="OnMouseClick"/>/<see cref="MouseClick"/> event.</summary>
     /// <remarks>
     ///     <para>
     ///         Called when the mouse is either clicked or double-clicked.
@@ -483,7 +483,8 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called when a mouse click occurs. Check <see cref="MouseEventArgs.Flags"/> to see which button was clicked.
+    ///     Low-level API. Called when a mouse click occurs. Check <see cref="MouseEventArgs.Flags"/> to see which button was clicked.
+    ///     To determine if the user wants to accept the View's state, use <see cref="OnAccepting"/> instead.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -499,7 +500,10 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected virtual bool OnMouseClick (MouseEventArgs args) { return false; }
 
-    /// <summary>Raised when a mouse click occurs.</summary>
+    /// <summary>
+    ///     Low-level API. Raised when a mouse click occurs. Check <see cref="MouseEventArgs.Flags"/> to see which button was clicked.
+    ///     To determine if the user wants to accept the View's state, use <see cref="Accepting"/> instead.
+    /// </summary>
     /// <remarks>
     ///     <para>
     ///         Raised when the mouse is either clicked or double-clicked.
