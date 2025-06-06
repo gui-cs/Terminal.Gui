@@ -597,6 +597,11 @@ public class TextViewTests
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
+        Assert.Equal ($".{Environment.NewLine}Second line.", tv.Text);
+        Assert.Equal (2, tv.Lines);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -612,11 +617,21 @@ public class TextViewTests
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
+        Assert.Equal (".", tv.Text);
+        Assert.Equal (1, tv.Lines);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Undo
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
+        Assert.Equal (".", tv.Text);
+        Assert.Equal (1, tv.Lines);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
@@ -629,6 +644,11 @@ public class TextViewTests
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
+        Assert.Equal (2, tv.Lines);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
+        Assert.Equal ($".{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
@@ -649,6 +669,11 @@ public class TextViewTests
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
+        Assert.Equal ($".{Environment.NewLine}Second line.", tv.Text);
+        Assert.Equal (2, tv.Lines);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -660,6 +685,11 @@ public class TextViewTests
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("line.", tv.Text);
+        Assert.Equal (1, tv.Lines);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
+        Assert.Equal (".", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
