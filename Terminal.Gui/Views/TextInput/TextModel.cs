@@ -1028,7 +1028,23 @@ internal class TextModel
     {
         RuneType rt = GetRuneType (newRune);
 
-        return rt == runeType;
+        if (useSameRuneType)
+        {
+            return rt == runeType;
+        }
+
+        switch (runeType)
+        {
+            case RuneType.IsSymbol:
+            case RuneType.IsPunctuation:
+                return rt is RuneType.IsSymbol or RuneType.IsPunctuation;
+            case RuneType.IsWhiteSpace:
+            case RuneType.IsLetterOrDigit:
+            case RuneType.IsUnknown:
+                return rt == runeType;
+            default:
+                throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null);
+        }
     }
 
     private bool MatchWholeWord (string source, string matchText, int index = 0)
