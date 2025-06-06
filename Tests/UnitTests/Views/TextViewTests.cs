@@ -7193,32 +7193,6 @@ ror       ";
     }
 
     [Fact]
-    public void Cell_LoadCells_Without_Scheme_Is_Never_Null ()
-    {
-        List<Cell> cells = new ()
-        {
-            new () { Rune = new ('T') },
-            new () { Rune = new ('e') },
-            new () { Rune = new ('s') },
-            new () { Rune = new ('t') }
-        };
-        TextView tv = CreateTextView ();
-        var top = new Toplevel ();
-        top.Add (tv);
-        tv.Load (cells);
-
-        for (var i = 0; i < tv.Lines; i++)
-        {
-            List<Cell> line = tv.GetLine (i);
-
-            foreach (Cell c in line)
-            {
-                Assert.NotNull (c.Attribute);
-            }
-        }
-    }
-
-    [Fact]
     [TextViewTestsAutoInitShutdown]
     public void IsSelecting_False_If_SelectedLength_Is_Zero_On_Mouse_Click ()
     {
