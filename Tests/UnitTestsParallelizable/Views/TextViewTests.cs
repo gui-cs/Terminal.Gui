@@ -2084,5 +2084,325 @@ public class TextViewTests
         }
     }
 
+    [Theory]
+    [InlineData ("", false, "")]
+    [InlineData ("", true, "")]
+    [InlineData (" ", false, "")]
+    [InlineData (" ", true, "")]
+    [InlineData ("  ", false, "")]
+    [InlineData ("  ", true, "")]
+    [InlineData ("a", false, "")]
+    [InlineData ("a", true, "")]
+    [InlineData ("a ", false, "")]
+    [InlineData ("a ", true, "")]
+    [InlineData (" a ", false, "a ", "")]
+    [InlineData (" a ", true, "a ", "")]
+    [InlineData ("  H1  ", false, "H1  ", "")]
+    [InlineData ("  H1  ", true, "H1  ", "")]
+    [InlineData ("a$", false, "$", "")]
+    [InlineData ("a$", true, "$", "")]
+    [InlineData ("a$#", false, "$#", "")]
+    [InlineData ("a$#", true, "$#", "#", "")]
+    [InlineData ("  a$#  ", false, "a$#  ", "$#  ", "")]
+    [InlineData ("  a$#  ", true, "a$#  ", "$#  ", "#  ", "")]
+    [InlineData ("\"$schema\"", false, "schema\"", "\"", "")]
+    [InlineData ("\"$schema\"", true, "$schema\"", "schema\"", "\"", "")]
+    [InlineData ("\": \"", false, "\"", "")]
+    [InlineData ("\": \"", true, "\"", "")]
+    [InlineData ("\"$schema\": \"", false, "schema\": \"", "\": \"", "\"", "")]
+    [InlineData ("\"$schema\": \"", true, "$schema\": \"", "schema\": \"", "\": \"", "\"", "")]
+    [InlineData ("1ºªA", false, "")]
+    [InlineData ("1ºªA", true, "")]
+    [InlineData (
+                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
+                    false,
+                    "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
+                    "")]
+    [InlineData (
+                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
+                    true,
+                    "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
+                    "|$=+´`~^<>£€¨",
+                    "")]
+    [InlineData (
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    false,
+                    "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "\"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "\"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    ".github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    ".io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    ".GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "/schemas/tui-config-schema.json\"\r\n}",
+                    "schemas/tui-config-schema.json\"\r\n}",
+                    "/tui-config-schema.json\"\r\n}",
+                    "tui-config-schema.json\"\r\n}",
+                    "-config-schema.json\"\r\n}",
+                    "config-schema.json\"\r\n}",
+                    "-schema.json\"\r\n}",
+                    "schema.json\"\r\n}",
+                    ".json\"\r\n}",
+                    "json\"\r\n}",
+                    "\"\r\n}",
+                    "\r\n}",
+                    "}",
+                    "")]
+    [InlineData (
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    true,
+                    "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "\"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "\"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    ".github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    ".io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    ".GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    "/schemas/tui-config-schema.json\"\r\n}",
+                    "schemas/tui-config-schema.json\"\r\n}",
+                    "/tui-config-schema.json\"\r\n}",
+                    "tui-config-schema.json\"\r\n}",
+                    "-config-schema.json\"\r\n}",
+                    "config-schema.json\"\r\n}",
+                    "-schema.json\"\r\n}",
+                    "schema.json\"\r\n}",
+                    ".json\"\r\n}",
+                    "json\"\r\n}",
+                    "\"\r\n}",
+                    "\r\n}",
+                    "}",
+                    "")]
+    public void WordForward_WordWrap_False_True (string text, bool useSameRuneType, params string [] expectedText)
+    {
+        TextView tv = CreateTextView ();
+        tv.UseSameRuneTypeForWords = useSameRuneType;
+
+        ProcessDeleteWithCtrl ();
+
+        tv.WordWrap = true;
+        ProcessDeleteWithCtrl ();
+
+        void ProcessDeleteWithCtrl ()
+        {
+            tv.Text = text;
+            var idx = 0;
+
+            while (!string.IsNullOrEmpty (tv.Text))
+            {
+                tv.NewKeyDownEvent (Key.Delete.WithCtrl);
+                Assert.Equal (expectedText [idx].Replace ("\r\n", Environment.NewLine), tv.Text);
+                idx++;
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData ("", false, "")]
+    [InlineData ("", true, "")]
+    [InlineData (" ", false, "")]
+    [InlineData (" ", true, "")]
+    [InlineData ("  ", false, "")]
+    [InlineData ("  ", true, "")]
+    [InlineData ("a", false, "")]
+    [InlineData ("a", true, "")]
+    [InlineData ("a ", false, "")]
+    [InlineData ("a ", true, "")]
+    [InlineData (" a ", false, " ", "")]
+    [InlineData (" a ", true, " ", "")]
+    [InlineData ("  H1  ", false, "  ", "")]
+    [InlineData ("  H1  ", true, "  ", "")]
+    [InlineData ("a$", false, "a", "")]
+    [InlineData ("a$", true, "a", "")]
+    [InlineData ("a$#", false, "a", "")]
+    [InlineData ("a$#", true, "a$", "a", "")]
+    [InlineData ("  a$#  ", false, "  a", "  ", "")]
+    [InlineData ("  a$#  ", true, "  a$", "  a", "  ", "")]
+    [InlineData ("\"$schema\"", false, "\"$schema", "\"$", "")]
+    [InlineData ("\"$schema\"", true, "\"$schema", "\"$", "\"", "")]
+    [InlineData ("\"$schema\": \"", false, "\"$schema\": ", "\"$schema", "\"$", "")]
+    [InlineData ("\"$schema\": \"", true, "\"$schema\": ", "\"$schema", "\"$", "\"", "")]
+    [InlineData ("1ºªA", false, "")]
+    [InlineData ("1ºªA", true, "")]
+    [InlineData (
+                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
+                    false,
+                    "ºª",
+                    "")]
+    [InlineData (
+                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
+                    true,
+                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]",
+                    "ºª",
+                    "")]
+    [InlineData (
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    false,
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github",
+                    "{\r\n  \"$schema\": \"https://gui-cs.",
+                    "{\r\n  \"$schema\": \"https://gui-cs",
+                    "{\r\n  \"$schema\": \"https://gui-",
+                    "{\r\n  \"$schema\": \"https://gui",
+                    "{\r\n  \"$schema\": \"https://",
+                    "{\r\n  \"$schema\": \"https",
+                    "{\r\n  \"$schema\": \"",
+                    "{\r\n  \"$schema\": ",
+                    "{\r\n  \"$schema",
+                    "{\r\n  \"$",
+                    "{\r\n  ",
+                    "{\r\n",
+                    "{",
+                    "")]
+    [InlineData (
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n}",
+                    true,
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"\r\n",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json\"",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/schemas",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs/",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.GuiV2Docs",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.io",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github.",
+                    "{\r\n  \"$schema\": \"https://gui-cs.github",
+                    "{\r\n  \"$schema\": \"https://gui-cs.",
+                    "{\r\n  \"$schema\": \"https://gui-cs",
+                    "{\r\n  \"$schema\": \"https://gui-",
+                    "{\r\n  \"$schema\": \"https://gui",
+                    "{\r\n  \"$schema\": \"https://",
+                    "{\r\n  \"$schema\": \"https",
+                    "{\r\n  \"$schema\": \"",
+                    "{\r\n  \"$schema\": ",
+                    "{\r\n  \"$schema",
+                    "{\r\n  \"$",
+                    "{\r\n  \"",
+                    "{\r\n  ",
+                    "{\r\n",
+                    "{",
+                    "")]
+    public void WordBackward_WordWrap_False_True (string text, bool useSameRuneType, params string [] expectedText)
+    {
+        TextView tv = CreateTextView ();
+        tv.UseSameRuneTypeForWords = useSameRuneType;
+
+        ProcessBackspaceWithCtrl ();
+
+        tv.WordWrap = true;
+        ProcessBackspaceWithCtrl ();
+
+        void ProcessBackspaceWithCtrl ()
+        {
+            tv.Text = text;
+            tv.MoveEnd ();
+            var idx = 0;
+
+            while (!string.IsNullOrEmpty (tv.Text))
+            {
+                tv.NewKeyDownEvent (Key.Backspace.WithCtrl);
+                Assert.Equal (expectedText [idx].Replace ("\r\n", Environment.NewLine), tv.Text);
+                idx++;
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData ("", 0, false, "")]
+    [InlineData ("", 0, true, "")]
+    [InlineData ("a", 0, false, "a")]
+    [InlineData ("a", 0, true, "a")]
+    [InlineData ("a:", 0, false, "a")]
+    [InlineData ("a:", 0, true, "a")]
+    [InlineData ("a:", 1, false, ":")]
+    [InlineData ("a:", 1, true, ":")]
+    [InlineData ("a ", 0, false, "a ")]
+    [InlineData ("a ", 0, true, "a")]
+    [InlineData ("a ", 1, false, "a ")]
+    [InlineData ("a ", 1, true, "a")]
+    [InlineData ("a b", 0, false, "a ")]
+    [InlineData ("a b", 0, true, "a")]
+    [InlineData ("a b", 1, false, "a ")]
+    [InlineData ("a b", 1, true, "a")]
+    [InlineData ("a b ", 2, false, "b ")]
+    [InlineData ("a b ", 2, true, "b")]
+    [InlineData ("a b ", 3, false, "b ")]
+    [InlineData ("a b ", 3, true, "b")]
+    [InlineData (" a b ", 0, false, " ")]
+    [InlineData (" a b ", 0, true, " ")]
+    [InlineData (" a  b ", 2, false, "  ")]
+    [InlineData (" a  b ", 2, true, "  ")]
+    [InlineData (" a  b ", 3, false, "  ")]
+    [InlineData (" a  b ", 3, true, "  ")]
+    [InlineData (" H1$&#2you ", 2, false, "H1")]
+    [InlineData (" H1$&#2you ", 2, true, "H1")]
+    [InlineData (" H1$&#2you ", 3, false, "$&#")]
+    [InlineData (" H1$&#2you ", 3, true, "$&#")]
+    [InlineData (" H1$&#2you ", 4, false, "$&#")]
+    [InlineData (" H1$&#2you ", 4, true, "$&#")]
+    [InlineData (" H1$&#2you ", 5, false, "$&#")]
+    [InlineData (" H1$&#2you ", 5, true, "$&#")]
+    [InlineData (" H1$&#2you ", 6, false, "2you ")]
+    [InlineData (" H1$&#2you ", 6, true, "2you")]
+    public void ProcessDoubleClickSelection_False_True (string text, int col, bool selectWordOnly, string expectedText)
+    {
+        TextView tv = CreateTextView ();
+        tv.Text = text;
+        tv.SelectWordOnlyOnDoubleClick = selectWordOnly;
+
+        Assert.True (tv.NewMouseEvent (new () { Position = new (col, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.Equal (expectedText, tv.SelectedText);
+    }
+
     private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }
 }
