@@ -477,6 +477,64 @@ internal class TextModel
         }
     }
 
+    public (int startCol, int col, int row)? ProcessDoubleClickSelection (int fromStartCol, int fromCol, int fromRow, bool useSameRuneType, bool selectWordOnly)
+    {
+        List<Cell> line = GetLine (fromRow);
+
+        int startCol = fromStartCol;
+        int col = fromCol;
+        int row = fromRow;
+
+        (int col, int row)? newPos = WordForward (col, row, useSameRuneType);
+
+        if (newPos.HasValue)
+        {
+            col = row == newPos.Value.row ? newPos.Value.col : 0;
+        }
+
+        if (startCol > 0
+            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ()).Trim () == ""
+            && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Rune == (Rune)' ')))
+        {
+            while (startCol > 0 && line [startCol - 1].Rune == (Rune)' ')
+            {
+                startCol--;
+            }
+        }
+        else
+        {
+            newPos = WordBackward (col, row, useSameRuneType);
+
+            if (newPos is { })
+            {
+                startCol = row == newPos.Value.row ? newPos.Value.col : line.Count;
+            }
+        }
+
+        if (selectWordOnly)
+        {
+            List<Rune> selRunes = line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ();
+
+            if (StringExtensions.ToString (selRunes).Trim () != "")
+            {
+                for (int i = selRunes.Count - 1; i > -1; i--)
+                {
+                    if (selRunes [i] == (Rune)' ')
+                    {
+                        col--;
+                    }
+                }
+            }
+        }
+
+        if (fromStartCol != startCol || fromCol != col || fromRow != row)
+        {
+            return (startCol, col, row);
+        }
+
+        return null;
+    }
+
     internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
     {
         List<Rune> runes = new ();

@@ -1020,6 +1020,13 @@ public class TextView : View, IDesignable
     /// </summary>
     public bool UseSameRuneTypeForWords { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether the word navigation should select only the word itself without spaces around it or with the
+    ///     spaces at right.
+    ///     Default is <c>false</c> meaning that the spaces at right are included in the selection.
+    /// </summary>
+    public bool SelectWordOnlyOnDoubleClick { get; set; }
+
     /// <summary>Allows clearing the <see cref="HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText?.Clear (_model.GetAllLines ()); }
 
@@ -1694,29 +1701,19 @@ public class TextView : View, IDesignable
             }
 
             ProcessMouseClick (ev, out List<Cell> line);
-            (int col, int row)? newPos;
-
-            if (CurrentColumn == line.Count
-                || (CurrentColumn > 0 && (line [CurrentColumn - 1].Rune.Value != ' ' || line [CurrentColumn].Rune.Value == ' ')))
-            {
-                newPos = _model.WordBackward (CurrentColumn, CurrentRow, UseSameRuneTypeForWords);
-
-                if (newPos.HasValue)
-                {
-                    CurrentColumn = CurrentRow == newPos.Value.row ? newPos.Value.col : 0;
-                }
-            }
 
             if (!IsSelecting)
             {
                 StartSelecting ();
             }
 
-            newPos = _model.WordForward (CurrentColumn, CurrentRow, UseSameRuneTypeForWords);
+            (int startCol, int col, int row)? newPos = _model.ProcessDoubleClickSelection (SelectionStartColumn, CurrentColumn, CurrentRow, UseSameRuneTypeForWords, SelectWordOnlyOnDoubleClick);
 
-            if (newPos is { } && newPos.HasValue)
+            if (newPos.HasValue)
             {
-                CurrentColumn = CurrentRow == newPos.Value.row ? newPos.Value.col : line.Count;
+                SelectionStartColumn = newPos.Value.startCol;
+                CurrentColumn = newPos.Value.col;
+                CurrentRow = newPos.Value.row;
             }
 
             PositionCursor ();
