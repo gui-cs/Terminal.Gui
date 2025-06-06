@@ -22,13 +22,13 @@ public class OptionSelector : View, IOrientation, IDesignable
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
-        // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, HandleAcceptCommand);
+        // Enter key - Accept the currently selected item
+        // DoubleClick - Activate (focus) and Accept the item under the mouse
+        // Space key - Toggle the currently selected item
+        // Click - Activate (focus) and Activate the item under the mouse
 
         CreateCheckBoxes ();
     }
-
-    private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
 
     private int? _selectedItem;
 
@@ -232,18 +232,18 @@ public class OptionSelector : View, IOrientation, IDesignable
 
         checkbox.Activating += (sender, args) =>
         {
+            // Activating doesn't normally propogate, so we do it here
             if (RaiseActivating (args.Context) is true)
             {
                 args.Handled = true;
 
                 return;
             }
-            ;
 
-            if (RaiseAccepting (args.Context) is true)
-            {
-                args.Handled = true;
-            }
+            //if (RaiseAccepting (args.Context) is true)
+            //{
+            //    args.Handled = true;
+            //}
         };
 
         checkbox.CheckedStateChanged += (sender, args) =>

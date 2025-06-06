@@ -22,13 +22,13 @@ public class FlagSelector : View, IOrientation, IDesignable
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
-        // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, HandleAcceptCommand);
+        // Enter key - Accept the currently selected item
+        // DoubleClick - Activate (focus) and Accept the item under the mouse
+        // Space key - Toggle the currently selected item
+        // Click - Activate (focus) and Activate the item under the mouse
 
         CreateCheckBoxes ();
     }
-
-    private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
 
     private uint? _value;
 
@@ -71,7 +71,7 @@ public class FlagSelector : View, IOrientation, IDesignable
         OnValueChanged ();
         if (Value.HasValue)
         {
-            ValueChanged?.Invoke (this, new EventArgs<uint> (Value.Value));
+            ValueChanged?.Invoke (this, new EventArgs<uint?> (Value.Value));
         }
     }
 
@@ -83,7 +83,7 @@ public class FlagSelector : View, IOrientation, IDesignable
     /// <summary>
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
-    public event EventHandler<EventArgs<uint>>? ValueChanged;
+    public event EventHandler<EventArgs<uint?>>? ValueChanged;
 
     private FlagSelectorStyles _styles;
 
@@ -180,7 +180,7 @@ public class FlagSelector : View, IOrientation, IDesignable
     public IReadOnlyDictionary<uint, string>? Flags
     {
         get => _flags;
-        internal set
+        private set
         {
             _flags = value;
 
