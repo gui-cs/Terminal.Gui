@@ -54,6 +54,10 @@ jobs:
      
        # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
 
+    - name: Run UnitTests.AOT
+      run: |
+       dotnet test Tests/UnitTests.AOT --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests.AOT/coverlet.runsettings --diag:logs/UnitTests.AOT/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+
     - name: Upload Test Logs
       if: always()
       uses: actions/upload-artifact@v4
