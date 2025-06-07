@@ -19,6 +19,7 @@ public class OptionSelector : View, IOrientation, IDesignable
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
@@ -26,8 +27,52 @@ public class OptionSelector : View, IOrientation, IDesignable
         // DoubleClick - Activate (focus) and Accept the item under the mouse
         // Space key - Toggle the currently selected item
         // Click - Activate (focus) and Activate the item under the mouse
+        // Not Focused:
+        //  HotKey - Activate (focus). Do NOT change state.
+        //  Item HotKey - Toggle the item (Do NOT Activate)
+        // Focused:
+        //  HotKey - Toggle the currently selected item
+        //  Item HotKey - Toggle the item.
+        AddCommand (Command.Activate, HandleActivateCommand);
+        AddCommand (Command.HotKey, HandleHotKeyCommand);
 
         CreateCheckBoxes ();
+    }
+
+
+    private bool? HandleActivateCommand (ICommandContext? ctx)
+    {
+        return RaiseActivating (ctx);
+    }
+
+    private bool? HandleHotKeyCommand (ICommandContext? ctx)
+    {
+        // If the command did not come from a keyboard event, ignore it
+        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+        {
+            return false;
+        }
+
+        if (HasFocus)
+        {
+            if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
+            {
+                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+                return InvokeCommand (Command.Activate, ctx);
+            }
+        }
+
+
+        if (RaiseHandlingHotKey (ctx) == true)
+        {
+            return true;
+        }
+
+
+        // Default Command.Hotkey sets focus
+        SetFocus ();
+
+        return false;
     }
 
     private int? _selectedItem;
@@ -42,7 +87,7 @@ public class OptionSelector : View, IOrientation, IDesignable
         {
             if (value < 0 || value >= SubViews.OfType<CheckBox> ().Count ())
             {
-                throw new ArgumentOutOfRangeException (nameof (value), @$"SelectedItem must be between 0 and {SubViews.OfType<CheckBox> ().Count ()-1}");
+                throw new ArgumentOutOfRangeException (nameof (value), @$"SelectedItem must be between 0 and {SubViews.OfType<CheckBox> ().Count () - 1}");
 
             }
             if (_selectedItem == value)
@@ -195,7 +240,7 @@ public class OptionSelector : View, IOrientation, IDesignable
                 case VisualRole.Normal:
                     e.Handled = true;
 
-                    if (!HasFocus)
+                    if (!HasFocus && !CanFocus)
                     {
                         e.Result = GetAttributeForRole (VisualRole.Focus);
                     }
@@ -204,7 +249,7 @@ public class OptionSelector : View, IOrientation, IDesignable
                         // If _scheme was set, it's because of Hover
                         if (checkbox.HasScheme)
                         {
-                            e.Result = checkbox.GetAttributeForRole(VisualRole.Normal);
+                            e.Result = checkbox.GetAttributeForRole (VisualRole.Normal);
                         }
                         else
                         {
@@ -217,7 +262,7 @@ public class OptionSelector : View, IOrientation, IDesignable
                 case VisualRole.HotNormal:
                     e.Handled = true;
 
-                    if (!HasFocus)
+                    if (!HasFocus && !CanFocus)
                     {
                         e.Result = GetAttributeForRole (VisualRole.HotFocus);
                     }
@@ -231,30 +276,67 @@ public class OptionSelector : View, IOrientation, IDesignable
         };
 
         checkbox.Activating += (sender, args) =>
-        {
-            // Activating doesn't normally propogate, so we do it here
-            if (RaiseActivating (args.Context) is true)
-            {
-                args.Handled = true;
+                               {
+                                   // Activating doesn't normally propogate, so we do it here
+                                   if (RaiseActivating (args.Context) is true)
+                                   {
+                                       args.Handled = true;
 
-                return;
-            }
+                                       return;
+                                   }
 
-            //if (RaiseAccepting (args.Context) is true)
-            //{
-            //    args.Handled = true;
-            //}
-        };
+                                   CommandContext<KeyBinding>? keyCommandContext = args.Context as CommandContext<KeyBinding>?;
+                                   if (keyCommandContext is null && (int)checkbox.Data == SelectedItem)
+                                   {
+                                       // Mouse should not change the state
+                                       checkbox.CheckedState = CheckState.Checked;
+                                   }
 
-        checkbox.CheckedStateChanged += (sender, args) =>
-        {
-            if (checkbox.CheckedState == CheckState.Checked)
-            {
-                SelectedItem = index;
-            }
-        };
+                                   if (keyCommandContext is { } && (int)checkbox.Data == SelectedItem)
+                                   {
+                                       Cycle ();
+                                   }
+                                   else
+                                   {
+                                       SelectedItem = (int)checkbox.Data;
+
+                                       if (HasFocus)
+                                       {
+                                           SubViews.OfType<CheckBox> ().ToArray () [SelectedItem!.Value].SetFocus ();
+                                       }
+
+                                   }
+
+                                   //if (!CanFocus && RaiseAccepting (args.Context) is true)
+                                   //{
+                                   //    args.Handled = true;
+                                   //}
+                               };
+
+        checkbox.Accepting += (sender, args) =>
+                              {
+                                  SelectedItem = (int)checkbox.Data;
+                              };
+
 
         return checkbox;
+    }
+
+    private void Cycle ()
+    {
+        if (SelectedItem == SubViews.OfType<CheckBox> ().Count () - 1)
+        {
+            SelectedItem = 0;
+        }
+        else
+        {
+            SelectedItem++;
+        }
+
+        if (HasFocus)
+        {
+            SubViews.OfType<CheckBox> ().ToArray () [SelectedItem!.Value].SetFocus ();
+        }
     }
 
     private void SetLayout ()

@@ -187,6 +187,8 @@ public class MessageBoxes : Scenario
             X = Pos.Right (label) + 1, 
             Y = Pos.Top (label), 
             RadioLabels = ["_Query", "_Error"],
+            BorderStyle = LineStyle.Double,
+            Title = "Sty_le"
         };
         frame.Add (styleRadioGroup);
 

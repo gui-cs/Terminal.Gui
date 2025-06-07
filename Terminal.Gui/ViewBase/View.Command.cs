@@ -22,9 +22,9 @@ public partial class View // Command APIs
         // HotKey - SetFocus and raise HandlingHotKey
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    ctx =>
                     {
-                        if (RaiseHandlingHotKey () is true)
+                        if (RaiseHandlingHotKey (ctx) is true)
                         {
                             return true;
                         }
@@ -263,9 +263,10 @@ public partial class View // Command APIs
     ///     continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected bool? RaiseHandlingHotKey ()
+    protected bool? RaiseHandlingHotKey (ICommandContext? ctx)
     {
-        CommandEventArgs args = new () { Context = new CommandContext<KeyBinding> { Command = Command.HotKey } };
+        //CommandEventArgs args = new () { Context = new CommandContext<KeyBinding> { Command = Command.HotKey } };
+        CommandEventArgs args = new () { Context = ctx };
         //Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.

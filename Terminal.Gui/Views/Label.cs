@@ -64,7 +64,7 @@ public class Label : View, IDesignable
 
     private bool? RaiseHotKeyOnNextPeer (ICommandContext commandContext)
     {
-        if (RaiseHandlingHotKey () == true)
+        if (RaiseHandlingHotKey (commandContext) == true)
         {
             return true;
         }
