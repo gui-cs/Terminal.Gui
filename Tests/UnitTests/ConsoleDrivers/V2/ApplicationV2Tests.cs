@@ -22,7 +22,7 @@ public class ApplicationV2Tests
                     Mock.Of<IConsoleOutput>);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Init_CreatesKeybindings ()
     {
         var orig = ApplicationImpl.Instance;
@@ -43,7 +43,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Init_DriverIsFacade ()
     {
         var orig = ApplicationImpl.Instance;
@@ -65,7 +65,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Init_ExplicitlyRequestWin ()
     {
         var orig = ApplicationImpl.Instance;
@@ -107,7 +107,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Init_ExplicitlyRequestNet ()
     {
         var orig = ApplicationImpl.Instance;
@@ -192,7 +192,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void InitRunShutdown_Top_Set_To_Null_After_Shutdown ()
     {
         var orig = ApplicationImpl.Instance;
@@ -231,7 +231,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void InitRunShutdown_Running_Set_To_False ()
     {
         var orig = ApplicationImpl.Instance;
@@ -276,7 +276,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void InitRunShutdown_End_Is_Called ()
     {
         var orig = ApplicationImpl.Instance;
@@ -341,7 +341,7 @@ public class ApplicationV2Tests
     }
 
 
-    [Fact]
+    [SkipIfAOTFact]
     public void InitRunShutdown_QuitKey_Quits ()
     {
         var orig = ApplicationImpl.Instance;
@@ -388,7 +388,7 @@ public class ApplicationV2Tests
     }
 
 
-    [Fact]
+    [SkipIfAOTFact]
     public void InitRunShutdown_Generic_IdleForExit ()
     {
         var orig = ApplicationImpl.Instance;
@@ -413,7 +413,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Shutdown_Closing_Closed_Raised ()
     {
         var orig = ApplicationImpl.Instance;
@@ -471,7 +471,7 @@ public class ApplicationV2Tests
         return true;
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Shutdown_Called_Repeatedly_DoNotDuplicateDisposeOutput ()
     {
         var orig = ApplicationImpl.Instance;
@@ -498,7 +498,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Init_Called_Repeatedly_WarnsAndIgnores ()
     {
         var orig = ApplicationImpl.Instance;
@@ -534,7 +534,7 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void Open_Calls_ContinueWith_On_UIThread ()
     {
         var orig = ApplicationImpl.Instance;
