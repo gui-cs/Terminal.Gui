@@ -3,10 +3,34 @@
     "NativeAot": {
       "commandName": "Project"
     },
+    "NativeAot --driver NetDriver": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver NetDriver"
+    },
+    "NativeAot --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2win -dl Trace"
+    },
+    "NativeAot --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net -dl Trace"
+    },
     "WSL : NativeAot": {
       "commandName": "Executable",
       "executablePath": "wsl",
       "commandLineArgs": "dotnet NativeAot.dll",
+      "distributionName": ""
+    },
+    "WSL: NativeAot --driver NetDriver": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet NativeAot.dll --driver NetDriver",
+      "distributionName": ""
+    },
+    "WSL: NativeAot --driver v2net": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet NativeAot.dll --driver v2net -dl Trace",
       "distributionName": ""
     }
   }
