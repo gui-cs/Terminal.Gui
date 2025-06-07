@@ -57,9 +57,6 @@
 		<Using Include="Terminal.Gui" />
 		<Using Include="Xunit" />
 	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Input\Mouse\" />
-	</ItemGroup>
 	<PropertyGroup Label="FineCodeCoverage">
 		<Enabled>
 			False
