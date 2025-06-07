@@ -84,7 +84,7 @@
 		<!-- Link all .cs files from UnitTests, excluding bin and obj folders -->
 		<Compile Include="../UnitTests/**/*.cs" Exclude="../UnitTests/**/bin/**;../UnitTests/**/obj/**" Link="%(RecursiveDir)%(Filename)%(Extension)" />
 		<!-- Link other potential files like .cshtml, .resx, etc., if needed -->
-		<None Include="../UnitTests/**/*.*" Exclude="../UnitTests/**/bin/**;../UnitTests/**/obj/**;../UnitTests/MoqTests/**;../UnitTests/**/*.cs;../UnitTests/**/*.csproj;../UnitTests/**/*.sln" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+		<None Include="../UnitTests/**/*.*" Exclude="../UnitTests/**/bin/**;../UnitTests/**/obj/**;../UnitTests/MoqTests/**;../UnitTests/**/*.cs;../UnitTests/**/*.csproj;../UnitTests/**/*.sln;../UnitTests/**/*.runsettings" Link="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 	<ItemGroup>
