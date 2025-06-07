@@ -1881,8 +1881,3 @@ tab_width = 4
 indent_style = space
 indent_size = 2
 tab_width = 2
-
-[*.{appxmanifest,axaml,axml,build,config,cs,csproj,dbml,discomap,dtd,jsproj,lsproj,njsproj,nuspec,paml,proj,props,resw,resx,StyleCop,targets,tasks,vb,vbproj,xaml,xamlx,xml,xoml,xsd}]
-indent_style = space
-indent_size = 4
-tab_width = 4
