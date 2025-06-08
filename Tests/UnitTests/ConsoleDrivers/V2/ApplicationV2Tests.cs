@@ -7,7 +7,6 @@ using Moq;
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests
 {
-
     private ApplicationV2 NewApplicationV2 ()
     {
         var netInput = new Mock<INetInput> ();
@@ -161,6 +160,7 @@ public class ApplicationV2Tests
                                               })
                 .Verifiable (Times.Once);
     }
+
     private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
     {
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
@@ -340,7 +340,6 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-
     [SkipIfAOTFact]
     public void InitRunShutdown_QuitKey_Quits ()
     {
@@ -386,7 +385,6 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
 
     [SkipIfAOTFact]
     public void InitRunShutdown_Generic_IdleForExit ()
