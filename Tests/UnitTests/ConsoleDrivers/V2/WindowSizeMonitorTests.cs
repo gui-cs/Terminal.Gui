@@ -3,7 +3,7 @@
 namespace UnitTests.ConsoleDrivers.V2;
 public class WindowSizeMonitorTests
 {
-    [SkipIfAOTFact]
+    [FactSkipIfAOT]
     public void TestWindowSizeMonitor_RaisesEventWhenChanges ()
     {
         var consoleOutput = new Mock<IConsoleOutput> ();
@@ -37,7 +37,7 @@ public class WindowSizeMonitorTests
         Assert.Equal (new Size (20, 20), result [1].Size);
     }
 
-    [SkipIfAOTFact]
+    [FactSkipIfAOT]
     public void TestWindowSizeMonitor_DoesNotRaiseEventWhen_NoChanges ()
     {
         var consoleOutput = new Mock<IConsoleOutput> ();
