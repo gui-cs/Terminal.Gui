@@ -22,13 +22,53 @@ public class FlagSelector : View, IOrientation, IDesignable
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
-        // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, HandleAcceptCommand);
+        // Enter key - Accept the currently selected item
+        // DoubleClick - Activate (focus) and Accept the item under the mouse
+        // Space key - Toggle the currently selected item
+        // Click - Activate (focus) and Activate the item under the mouse
+        // Not Focused:
+        //  HotKey - Activate (focus). Do NOT change state.
+        //  Item HotKey - Toggle the item (Do NOT Activate)
+        // Focused:
+        //  HotKey - Toggle the currently selected item
+        //  Item HotKey - Toggle the item.
+
+        AddCommand (Command.HotKey, HandleHotKeyCommand);
 
         CreateCheckBoxes ();
     }
 
-    private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
+
+    private bool? HandleHotKeyCommand (ICommandContext? ctx)
+    {
+        // If the command did not come from a keyboard event, ignore it
+        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+        {
+            return false;
+        }
+
+        if (HasFocus)
+        {
+            if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
+            {
+                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+                return InvokeCommand (Command.Activate);
+            }
+        }
+
+        if (RaiseHandlingHotKey (ctx) == true)
+        {
+            return true;
+        }
+
+        ;
+
+        // Default Command.Hotkey sets focus
+        SetFocus ();
+
+        return true;
+    }
+
 
     private uint? _value;
 
@@ -71,7 +111,7 @@ public class FlagSelector : View, IOrientation, IDesignable
         OnValueChanged ();
         if (Value.HasValue)
         {
-            ValueChanged?.Invoke (this, new EventArgs<uint> (Value.Value));
+            ValueChanged?.Invoke (this, new EventArgs<uint?> (Value.Value));
         }
     }
 
@@ -83,7 +123,7 @@ public class FlagSelector : View, IOrientation, IDesignable
     /// <summary>
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
-    public event EventHandler<EventArgs<uint>>? ValueChanged;
+    public event EventHandler<EventArgs<uint?>>? ValueChanged;
 
     private FlagSelectorStyles _styles;
 
@@ -180,7 +220,7 @@ public class FlagSelector : View, IOrientation, IDesignable
     public IReadOnlyDictionary<uint, string>? Flags
     {
         get => _flags;
-        internal set
+        private set
         {
             _flags = value;
 
@@ -379,12 +419,6 @@ public class FlagSelector : View, IOrientation, IDesignable
                                       args.Handled = true;
 
                                       return;
-                                  }
-                                  ;
-
-                                  if (RaiseAccepting (args.Context) is true)
-                                  {
-                                      args.Handled = true;
                                   }
                               };
 

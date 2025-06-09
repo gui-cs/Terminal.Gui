@@ -8,71 +8,127 @@
 
 ## Overview
 
-The `Command` system in Terminal.Gui provides a standardized framework for defining and executing actions that views can perform, such as selecting items, accepting input, or navigating content. Implemented primarily through the `View.Command` APIs, this system integrates tightly with input handling (e.g., keyboard and mouse events) and leverages the *Cancellable Work Pattern* to ensure extensibility, cancellation, and decoupling. Central to this system are the `Activating` and `Accepting` events, which encapsulate common user interactions: `Activating` for changing a view's state or preparing it for interaction (e.g., toggling a checkbox, focusing a menu item), and `Accepting` for confirming an action or state (e.g., executing a menu command, submitting a dialog).
+The `Command` system in Terminal.Gui provides a standardized framework for defining and executing actions that views can perform, such as selecting items, accepting input, or navigating content. Implemented primarily through the `View.Command` APIs, this system integrates tightly with input handling (e.g., keyboard and mouse events) and leverages the *Cancellable Work Pattern* to ensure extensibility, cancellation, and decoupling.
 
-This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Activating` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the current state of these commands across various `View` sub-classes, documenting inconsistencies in their usage as tasks to be addressed. The document reflects the current implementation as observed in the codebase, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Activate`. An appendix briefly summarizes proposed changes from a filed issue to rename `Command.Activate`, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
+Central to this system are the `Activating` and `Accepting` events, which encapsulate common user interactions: `Activating` for changing a view's state or preparing it for interaction (e.g., toggling a checkbox, focusing a menu item), and `Accepting` for confirming an action or state (e.g., executing a menu command, submitting a dialog).
 
 ## Overview of the Command System
 
-The `Command` system in Terminal.Gui defines a set of standard actions via the `Command` enum (e.g., `Command.Activate`, `Command.Accept`, `Command.HotKey`, `Command.StartOfPage`). These actions are triggered by user inputs (e.g., key presses, mouse clicks) or programmatically, enabling consistent view interactions.
+The `Command` system in Terminal.Gui defines a set of standard actions via the `Command` enum (e.g., `Command.Activate`, `Command.Accept`, `Command.HotKey`, `Command.StartOfPage`). These actions are triggered by user inputs (e.g., by default, `Key.Space` and `MouseFlags.Button1Clicked` are bound to `Command.Activate`, while `Key.Enter` is bound to `Command.Accept`).
 
 ### Key Components
+
 - **Command Enum**: Defines actions like `Activate` (state change or interaction preparation), `Accept` (action confirmation), `HotKey` (hotkey activation), and others (e.g., `StartOfPage` for navigation).
 - **Command Handlers**: Views register handlers using `View.AddCommand`, specifying a `CommandImplementation` delegate that returns `bool?` (`null`: no command executed; `false`: executed but not handled; `true`: handled or canceled).
 - **Command Routing**: Commands are invoked via `View.InvokeCommand`, executing the handler or raising `CommandNotBound` if no handler exists.
 - **Cancellable Work Pattern**: Command execution uses events (e.g., `Activating`, `Accepting`) and virtual methods (e.g., `OnActivating`, `OnAccepting`) for modification or cancellation, with `Cancel` indicating processing should stop.
 
 ### Role in Terminal.Gui
+
 The `Command` system bridges user input and view behavior, enabling:
-- **Consistency**: Standard commands ensure predictable interactions (e.g., `Enter` triggers `Accept` in buttons, menus, checkboxes).
+- **Consistency**: Standard commands ensure predictable interactions (e.g., `Enter` triggers `Accept` in buttons and menus).
 - **Extensibility**: Custom handlers and events allow behavior customization.
 - **Decoupling**: Events reduce reliance on sub-classing, though current propagation mechanisms may require subview-superview coordination.
 
-### Note on `Cancel` Property
-The `CommandEventArgs` class uses a `Cancel` property to indicate that a command event (e.g., `Accepting`) should stop processing. This is misleading, as it implies action negation rather than completion. A filed issue proposes replacing `Cancel` with `Handled` to align with input events (e.g., `Key.Handled`). This document uses `Cancel` to reflect the current implementation, with the appendix summarizing the proposed change.
+## Default Command Implementations
 
-## Implementation in View.Command
+How a View responds to a Command is up to that View. However, several have default implementations in the base `View` class to enable consistent behavior for the most common user actions. 
 
-The `View.Command` APIs in the `View` class provide infrastructure for registering, invoking, and routing commands, adhering to the *Cancellable Work Pattern*.
+`View` binds the following keyboard and mouse actions:
 
-### Command Registration
-Views register commands using `View.AddCommand`, associating a `Command` with a `CommandImplementation` delegate. The delegate's `bool?` return controls processing flow.
+```cs
+        KeyBindings.Add (Key.Space, Command.Activate);
+        KeyBindings.Add (Key.Enter, Command.Accept);
 
-**Example**: Default commands in `View.SetupCommands`:
-```csharp
-private void SetupCommands()
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
+```
+
+- @Terminal.Gui.Input.Command.NotBound - Default implementation raises @Terminal.Gui.ViewBase.CommandNotBound.
+- @Terminal.Gui.Input.Command.Accept - Provides built-in support for a most common user action on Views: Accepting state. The efault implementation raises @Terminal.Gui.ViewBase.Accepting. If an override does not handle the command, the peer-Views are checked to see if any is a `Button` with `IsDefault` set. If so, `Accept` is invoked on that view. This enables "Default Button" support in forms. If there is no default button, or the default button does not handle the event, `Accept` is propagated up the SuperView hierarchy until handled.
+- @Terminal.Gui.Input.Command.Activate - Provides built-in support for a common user action in Views: making the view, or something within the view active. The default implementation raises @Terminal.Gui.ViewBase.Activating and, if it wasn't handled and the view can be focused, sets focus to the View.
+- @Terminal.Gui.Input.Command.HotKey - Provides support for accepting or activating a View with the keyboard. The default implementation raises @Terminal.Gui.ViewBase.HotKey and, if it wasn't handled, sets focus to the View.
+
+Each of these default implementations uses CWP-style events to enable subclasses or external code to override or change the default behavior. For example, @Terminal.Gui.Views.Shortcut overrides the default `Accept` behavior of the SubViews it contains so that whenever the user causes an acceptance action on one of it's SubViews, `e.Handled` is set to `true` so that the `Accept` is ignored.
+
+Views can also override the default behavior by simply registering a new command handler while ensuring the default implementation is still given first chance by calling `RaiseXXX` where `XXX` is the name of the command. @Terminal.Gui.Views.Label overrides the default for `HotKey` in this manner:
+
+```cs
+// On HoKey, pass it to the next peer view
+AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer);
+
+// ...
+private bool? InvokeHotKeyOnNextPeer (ICommandContext commandContext)
 {
-    AddCommand(Command.Accept, RaiseAccepting);
-    AddCommand(Command.Activate, ctx =>
+    if (RaiseHandlingHotKey () == true)
     {
-        if (RaiseActivating(ctx) is true)
-        {
-            return true;
-        }
-        if (CanFocus)
-        {
-            SetFocus();
-            return true;
-        }
-        return false;
-    });
-    AddCommand(Command.HotKey, () =>
-    {
-        if (RaiseHandlingHotKey() is true)
-        {
-            return true;
-        }
-        SetFocus();
         return true;
-    });
-    AddCommand(Command.NotBound, RaiseCommandNotBound);
+    }
+
+    if (CanFocus)
+    {
+        SetFocus ();
+
+        // Always return true on hotkey, even if SetFocus fails because
+        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
+        // This is the same behavior as the base (View).
+        return true;
+    }
+
+    if (HotKey.IsValid)
+    {
+        // If the Label has a hotkey, we need to find the next peer-view and pass the
+        // command on to it.
+        int me = SuperView?.SubViews.IndexOf (this) ?? -1;
+
+        if (me != -1 && me < SuperView?.SubViews.Count - 1)
+        {
+            return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
+        }
+    }
+
+    return false;
+}
+
+```
+
+An illustrative case-study is to compare @Terminal.Gui.Views.Button and @Terminal.Gui.Views.Checkbox and how they handle the HotKey command differently.
+
+When a user presses the HotKey for a Button, they expect the button to both gain focus and accept. However, for a Checkbox, the user does not want the Checkbox to gain focus, but does want the state of the Checkbox to advance. A Checkbox is only accepted if the user double-clicks on it or presses `Enter` while it has focus.
+
+To enable this, @Terminal.Gui.Views.Checkbox replaces the built-in HotKey behavior to that if a user presses the Checkbox's hotkey, the @Terminal.Gui.Views.Checkbox.CheckState advances. 
+
+```cs
+// Activate (Space key and single-click) - Advance state and raise Accepting event
+// - DO NOT raise Accept
+// - DO NOT SetFocus
+AddCommand (Command.Activate, AdvanceAndActivate);
+
+// Accept (Enter key) - Raise Accept event
+// - DO NOT advance state
+// The default Accept handler does that.
+
+// Enable double-clicking to Accept
+MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
+
+// ...
+
+protected override bool OnHandlingHotKey (CommandEventArgs args)
+{
+    // Invoke Activate on ourselves
+    if (InvokeCommand (Command.Activate, args.Context) is true)
+    {
+        return true;
+    }
+    return base.OnHandlingHotKey (args);
 }
 ```
 
-- **Default Commands**: `Accept`, `Activate`, `HotKey`, `NotBound`.
-- **Customization**: Views override or add commands (e.g., `CheckBox` for state toggling, `MenuItemv2` for menu actions).
-
 ### Command Invocation
+
 Commands are invoked via `View.InvokeCommand` or `View.InvokeCommands`, passing an `ICommandContext` for context (e.g., source view, binding details). Unhandled commands trigger `CommandNotBound`.
 
 **Example**:

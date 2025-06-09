@@ -39,15 +39,6 @@ public enum Command
     Accept,
 
     /// <summary>
-    ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
-    ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
-    ///         <see cref="View.RaiseHandlingHotKey"/>.
-    ///     </para>
-    /// </summary>
-    HotKey,
-
-    /// <summary>
     ///     Activates the View or an item in the View (e.g. a list item or menu item) without necessarily accepting it.
     ///     <para>
     ///         In some cases, activating a View just sets focus to it, while in others it may trigger an action.
@@ -60,7 +51,16 @@ public enum Command
 
     #endregion
 
-    #region Movement Commands
+    #region Navigation Commands
+
+    /// <summary>
+    ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
+    ///     <para>
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
+    ///         <see cref="View.RaiseHandlingHotKey"/>.
+    ///     </para>
+    /// </summary>
+    HotKey,
 
     /// <summary>Moves up one (cell, line, etc...).</summary>
     Up,

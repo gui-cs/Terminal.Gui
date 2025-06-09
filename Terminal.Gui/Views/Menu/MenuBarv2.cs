@@ -31,11 +31,11 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    ctx =>
                     {
                         // Logging.Debug ($"{Title} - Command.HotKey");
 
-                        if (RaiseHandlingHotKey () is true)
+                        if (RaiseHandlingHotKey (ctx) is true)
                         {
                             return true;
                         }

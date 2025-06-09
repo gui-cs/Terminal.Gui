@@ -1,4 +1,4 @@
-# Mouse API
+# Mouse Deep Dive
 
 ## See Also
 
@@ -19,13 +19,11 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 *Terminal.Gui* provides the following APIs for handling mouse input:
 
-* **MouseEventArgs** - @Terminal.Gui.Input.MouseEventArgs provides a platform-independent abstraction for common mouse operations. It is used for processing mouse input and raising mouse events.
-
 * **Mouse Bindings** - Mouse Bindings provide a declarative method for handling mouse input in View implementations. The View calls @Terminal.Gui.ViewBase.View.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.Input.MouseBindings to indicate which mouse events will invoke the command. 
 
-* **Mouse Events** - The Mouse Bindings API is rich enough to support the majority of use-cases. However, in some cases subscribing directly to mouse events is needed (e.g. drag & drop). Use @Terminal.Gui.ViewBase.View.MouseEvent and related events in these cases.
-
 * **Mouse State** - @Terminal.Gui.ViewBase.View.MouseState provides an abstraction for the current state of the mouse, enabling views to do interesting things like change their appearance based on the mouse state.
+
+* **Low-Level Mouse Events** - The **Mouse Bindings** and **Mouse State** APIs are rich enough to support the majority of use-cases. However, in some cases subscribing directly to mouse events is needed (e.g. drag & drop). Use @Terminal.Gui.ViewBase.View.MouseEvent and related events in these cases.
 
 Each of these APIs are described more fully below.
 
@@ -62,7 +60,38 @@ Here are some common mouse binding patterns used throughout Terminal.Gui:
 * **Scroll Events**: `MouseFlags.WheelUp` and `MouseFlags.WheelDown` for scrolling content
 * **Drag Events**: `MouseFlags.Button1Pressed` combined with mouse move tracking for drag operations
 
-## Mouse Events
+## Mouse State
+
+The @Terminal.Gui.ViewBase.View.MouseState property provides an abstraction for the current state of the mouse, enabling views to do interesting things like change their appearance based on the mouse state.
+
+Mouse states include:
+* **Normal** - Default state when mouse is not interacting with the view
+* **Over** - Mouse is positioned over the view
+* **Pressed** - Mouse button is pressed down while over the view
+* **Clicked** - Mouse was clicked on the view
+
+It works in conjunction with the @Terminal.Gui.ViewBase.View.HighlightStates which is a list of mouse states that will cause a view to become highlighted.
+
+Subscribe to the @Terminal.Gui.ViewBase.View.MouseStateChanged event to be notified when the mouse state changes:
+
+```cs
+view.MouseStateChanged += (sender, e) => 
+{
+    switch (e.NewState)
+    {
+        case MouseState.Over:
+            // Change appearance when mouse hovers
+            break;
+        case MouseState.Pressed:
+            // Change appearance when pressed
+            break;
+    }
+};
+```
+
+## Low-Level Mouse Events
+
+> ![NOTE] App developers should use @Terminal.Gui.Input.MouseBindings instead of these low-level APIs.
 
 At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.Input.MouseEventArgs class. The @Terminal.Gui.Input.MouseEventArgs class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a @Terminal.Gui.Input.MouseEventArgs instance, and most of the mouse-related APIs are simply helper functions for decoding a @Terminal.Gui.Input.MouseEventArgs.
 
@@ -114,36 +143,7 @@ public class CustomView : View
 }
 ```
 
-## Mouse State
-
-The @Terminal.Gui.ViewBase.View.MouseState property provides an abstraction for the current state of the mouse, enabling views to do interesting things like change their appearance based on the mouse state.
-
-Mouse states include:
-* **Normal** - Default state when mouse is not interacting with the view
-* **Over** - Mouse is positioned over the view
-* **Pressed** - Mouse button is pressed down while over the view
-* **Clicked** - Mouse was clicked on the view
-
-It works in conjunction with the @Terminal.Gui.ViewBase.View.HighlightStates which is a list of mouse states that will cause a view to become highlighted.
-
-Subscribe to the @Terminal.Gui.ViewBase.View.MouseStateChanged event to be notified when the mouse state changes:
-
-```cs
-view.MouseStateChanged += (sender, e) => 
-{
-    switch (e.NewState)
-    {
-        case MouseState.Over:
-            // Change appearance when mouse hovers
-            break;
-        case MouseState.Pressed:
-            // Change appearance when pressed
-            break;
-    }
-};
-```
-
-## Mouse Button and Movement Concepts
+### Mouse Button and Movement Concepts
 
 * **Down** - Indicates the user pushed a mouse button down.
 * **Pressed** - Indicates the mouse button is down; for example if the mouse was pressed down and remains down for a period of time.
@@ -153,7 +153,7 @@ view.MouseStateChanged += (sender, e) =>
 * **Moved** - Indicates the mouse moved to a new location since the last mouse event.
 * **Wheel** - Indicates the mouse wheel was scrolled up or down.
 
-## Global Mouse Handling
+### Global Mouse Handling
 
 The @Terminal.Gui.App.Application.MouseEvent event can be used if an application wishes to receive all mouse events before they are processed by individual views:
 
@@ -169,7 +169,9 @@ Application.MouseEvent += (sender, e) =>
 };
 ```
 
-## Mouse Enter/Leave Events
+### Mouse Enter/Leave Events
+
+> ![NOTE] App developers should use @Terminal.Gui.ViewBase.View.MouseState and @Terminal.Gui.ViewBase.View.HighlightStates to change the visual appearance of a View during mouse movement.
 
 The @Terminal.Gui.ViewBase.View.MouseEnter and @Terminal.Gui.ViewBase.View.MouseLeave events enable a View to take action when the mouse enters or exits the view boundary. Internally, this is used to enable @Terminal.Gui.ViewBase.View.Highlight functionality:
 
@@ -187,7 +189,7 @@ view.MouseLeave += (sender, e) =>
 };
 ```
 
-## Mouse Coordinate Systems
+### Mouse Coordinate Systems
 
 Mouse coordinates in Terminal.Gui are provided in multiple coordinate systems:
 
@@ -200,12 +202,12 @@ The `MouseEventArgs` provides both coordinate systems:
 
 ## Best Practices
 
-* **Use Mouse Bindings** when possible for simple mouse interactions - they integrate well with the Command system
+* **Use Mouse Bindings** when possible for mouse interactions - they integrate well with the Command system, are simple to implement, and drive user experience consistency.
+* **Use Mouse State** to provide visual feedback when users hover or interact with views.
 * **Handle Mouse Events directly** for complex interactions like drag-and-drop or custom gestures  
 * **Respect platform conventions** - use right-click for context menus, double-click for default actions
 * **Provide keyboard alternatives** - ensure all mouse functionality has keyboard equivalents
 * **Test with different terminals** - mouse support varies between terminal applications
-* **Use Mouse State** to provide visual feedback when users hover or interact with views
 
 ## Limitations and Considerations
 

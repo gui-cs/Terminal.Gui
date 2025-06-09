@@ -15,10 +15,20 @@ public class RadioGroup : View, IDesignable, IOrientation
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        // Select (Space key or mouse click) - The default implementation sets focus. RadioGroup does not.
-        AddCommand (Command.Activate, HandleSelectCommand);
+        // BUGBUG: Clicking on a RadioItem does not set focus to the RadioGroup
 
-        // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
+        // Enter key - Accept the currently selected item
+        // DoubleClick - Activate (focus) and Accept the item under the mouse
+        // Space key - Toggle the currently selected item
+        // Click - Activate (focus) and Activate the item under the mouse
+        // Not Focused:
+        //  HotKey - Activate (focus). Do NOT change state.
+        //  Item HotKey - Toggle the item (Do NOT Activate)
+        // Focused:
+        //  HotKey - Toggle the currently selected item
+        //  Item HotKey - Toggle the item.
+
+        AddCommand (Command.Activate, HandleActivateCommand);
         AddCommand (Command.Accept, HandleAcceptCommand);
 
         // Hotkey - ctx may indicate a radio item hotkey was pressed. Behavior depends on HasFocus
@@ -94,7 +104,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             return false;
         }
 
-        if (RaiseHandlingHotKey () == true)
+        if (RaiseHandlingHotKey (ctx) == true)
         {
             return true;
         }
@@ -119,7 +129,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         return RaiseAccepting (ctx);
     }
 
-    private bool? HandleSelectCommand (ICommandContext? ctx)
+    private bool? HandleActivateCommand (ICommandContext? ctx)
     {
         if (ctx is CommandContext<MouseBinding> mouseCommandContext
             && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.Button1Clicked))
