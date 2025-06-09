@@ -26,6 +26,11 @@ namespace Terminal.Gui.App;
 ///         by setting <see cref="View.Width"/> and <see cref="View.Height"/> in your derived class.
 ///     </para>
 ///     <para>
+///         <b>Mouse:</b><br/>
+///         Popovers are transparent to mouse events (see <see cref="ViewportSettingsFlags.TransparentMouse"/>),
+///         meaning mouse events in a popover that are not also within a subview of the popover will not be captured.
+///     </para>
+///     <para>
 ///         <b>Custom Popovers:</b><br/>
 ///         To create a custom popover, inherit from <see cref="PopoverBaseImpl"/> and add your own content and logic.
 ///     </para>
