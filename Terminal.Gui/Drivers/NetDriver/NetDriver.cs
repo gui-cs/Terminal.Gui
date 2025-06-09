@@ -3,9 +3,6 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.Drivers.NetEvents;
 
@@ -232,6 +229,8 @@ internal class NetDriver : ConsoleDriver
     /// <inheritdoc />
     public override MainLoop Init ()
     {
+        Console.OutputEncoding = Encoding.UTF8;
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)

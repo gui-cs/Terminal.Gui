@@ -22,6 +22,8 @@ public class NetOutput : IConsoleOutput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
 
+        Console.OutputEncoding = Encoding.UTF8;
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
