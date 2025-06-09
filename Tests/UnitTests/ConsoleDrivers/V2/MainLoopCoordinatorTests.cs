@@ -5,7 +5,7 @@ using Moq;
 namespace UnitTests.ConsoleDrivers.V2;
 public class MainLoopCoordinatorTests
 {
-    [SkipIfAOTFact]
+    [FactSkipIfAOT]
     public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
 
