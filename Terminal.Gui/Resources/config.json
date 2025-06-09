@@ -511,8 +511,8 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Goldenrod",
-                "Background": "WhiteSmoke",
+                "Foreground": "Black",
+                "Background": "LemonChiffon",
                 "Style": "None"
               },
               "ReadOnly": {
@@ -565,8 +565,8 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Goldenrod",
-                "Background": "WhiteSmoke",
+                "Foreground": "Black",
+                "Background": "LemonChiffon",
                 "Style": "None"
               },
               "ReadOnly": {
@@ -669,7 +669,7 @@
               },
               "Highlight": {
                 "Foreground": "Black",
-                "Background": "LightGray",
+                "Background": "LemonChiffon",
                 "Style": "None"
               },
               "Editable": {
@@ -727,7 +727,7 @@
                 "Style": "None"
               },
               "Editable": {
-                "Foreground": "Goldenrod",
+                "Foreground": "Black",
                 "Background": "WhiteSmoke",
                 "Style": "None"
               },

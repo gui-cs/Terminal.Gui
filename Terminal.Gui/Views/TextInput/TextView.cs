@@ -3,6 +3,7 @@
 // TextView.cs: multi-line text editing
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui.Views;
 
@@ -1868,6 +1869,7 @@ public class TextView : View, IDesignable
 
             if (col < right)
             {
+                SetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
                 ClearRegion (col, row, right, row + 1);
             }
 
@@ -1876,10 +1878,9 @@ public class TextView : View, IDesignable
 
         if (row < bottom)
         {
+            SetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
             ClearRegion (Viewport.Left, row, right, bottom);
         }
-
-        //PositionCursor ();
 
         _isDrawing = false;
 
