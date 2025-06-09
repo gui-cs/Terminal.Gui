@@ -26,7 +26,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         protected override void OnClearedViewport () { OnClearedViewportCalled++; }
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void DoClearViewport_ViewportIsTransparent_DoesNotClear ()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         Assert.Equal (0, view.Object.OnClearedViewportCalled);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void DoClearViewport_OnClearingViewportReturnsTrue_DoesNotClear ()
     {
         // Arrange
@@ -55,7 +55,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         Assert.Equal (0, view.Object.OnClearedViewportCalled);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void DoClearViewport_ClearingViewportEventCancelled_DoesNotClear ()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         Assert.Equal (0, view.Object.OnClearedViewportCalled);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void DoClearViewport_ClearsViewport ()
     {
         // Arrange
@@ -82,7 +82,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         Assert.Equal (1, view.Object.OnClearedViewportCalled);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void DoClearViewport_RaisesClearingViewportEvent ()
     {
         // Arrange

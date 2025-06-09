@@ -82,6 +82,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="Benchmarks" />
         <InternalsVisibleTo Include="UnitTests" />
+        <InternalsVisibleTo Include="UnitTests.AOT" />
         <InternalsVisibleTo Include="UnitTests.Parallelizable" />
         <InternalsVisibleTo Include="StressTests" />
         <InternalsVisibleTo Include="IntegrationTests" />
@@ -162,9 +163,9 @@
     </Target>-->
         
     <Target Name="CopyNuGetPackagesToLocalPackagesFolder" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
-	    <!-- Remove older NuGet Package from Global Cache -->
-	    <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
-	    <Exec Command="rm -rf ~/.nuget/packages/terminal.gui/2.0.0" Condition=" '$(OS)' != 'Windows_NT' " />
+        <!-- Remove older NuGet Package from Global Cache -->
+        <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
+        <Exec Command="rm -rf ~/.nuget/packages/terminal.gui/2.0.0" Condition=" '$(OS)' != 'Windows_NT' " />
 
         <PropertyGroup>
             <!-- Define the path for local_packages relative to the project directory -->

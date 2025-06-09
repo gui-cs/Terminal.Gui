@@ -17,7 +17,7 @@ public class AnsiRequestSchedulerTests
         _scheduler = new AnsiRequestScheduler (_parserMock.Object, () => _staticNow);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void SendOrSchedule_SendsDeviceAttributeRequest_WhenNoOutstandingRequests ()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class AnsiRequestSchedulerTests
         Assert.True (result); // Should send immediately
         _parserMock.Verify ();
     }
-    [Fact]
+    [SkipIfAOTFact]
     public void SendOrSchedule_QueuesRequest_WhenOutstandingRequestExists ()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class AnsiRequestSchedulerTests
     }
 
 
-    [Fact]
+    [SkipIfAOTFact]
     public void RunSchedule_ThrottleNotExceeded_AllowSend ()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class AnsiRequestSchedulerTests
         _parserMock.Verify ();
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void RunSchedule_ThrottleExceeded_QueueRequest ()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class AnsiRequestSchedulerTests
         _parserMock.Verify ();
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void EvictStaleRequests_RemovesStaleRequest_AfterTimeout ()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class AnsiRequestSchedulerTests
         _parserMock.Verify ();
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void RunSchedule_DoesNothing_WhenQueueIsEmpty ()
     {
         // Act
@@ -201,7 +201,7 @@ public class AnsiRequestSchedulerTests
         Assert.Empty (_scheduler.QueuedRequests);
     }
 
-    [Fact]
+    [SkipIfAOTFact]
     public void SendOrSchedule_ManagesIndependentTerminatorsCorrectly ()
     {
         // Arrange

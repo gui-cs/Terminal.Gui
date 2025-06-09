@@ -6,7 +6,7 @@ using Moq;
 namespace UnitTests.ConsoleDrivers.V2;
 public class MainLoopTTests
 {
-    [Fact]
+    [SkipIfAOTFact]
     public void MainLoopT_NotInitialized_Throws()
     {
         var m = new MainLoop<int> ();
