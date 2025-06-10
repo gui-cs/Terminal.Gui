@@ -32,6 +32,13 @@
       "commandLineArgs": "dotnet UICatalog.dll --driver NetDriver",
       "distributionName": ""
     },
+    "WSL: UICatalog --driver v2net": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2net",
+      "distributionName": ""
+    },
+
     "Benchmark All": {
       "commandName": "Project",
       "commandLineArgs": "--benchmark"

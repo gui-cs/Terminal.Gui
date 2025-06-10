@@ -77,6 +77,17 @@ public static partial class Application // Initialization (Init/Shutdown)
             throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
 
+        var driverNameOrForceDriver = driverName ?? ForceDriver;
+
+        if (driverNameOrForceDriver?.StartsWith ("v2") ?? false)
+        {
+            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+            ApplicationImpl.Instance.Init (driver, driverNameOrForceDriver);
+            Debug.Assert (Driver is { });
+
+            return;
+        }
+
         if (!calledViaRunT)
         {
             // Reset all class variables (Application is a singleton).

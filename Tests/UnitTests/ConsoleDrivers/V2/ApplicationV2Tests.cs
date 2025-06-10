@@ -362,7 +362,6 @@ public class ApplicationV2Tests
                                               if (Application.Top != null)
                                               {
                                                   Application.RaiseKeyDownEvent (Application.QuitKey);
-                                                  return false;
                                               }
 
                                               return false;
@@ -575,8 +574,6 @@ public class ApplicationV2Tests
                                               {
                                                   b.NewKeyDownEvent (Key.Enter);
                                                   b.NewKeyUpEvent (Key.Enter);
-
-                                                  return false;
                                               }
 
                                               return false;
