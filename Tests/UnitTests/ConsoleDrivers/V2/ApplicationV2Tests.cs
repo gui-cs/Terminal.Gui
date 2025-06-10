@@ -7,6 +7,10 @@ using Moq;
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests
 {
+    public ApplicationV2Tests ()
+    {
+        ConsoleDriver.RunningUnitTests = true;
+    }
 
     private ApplicationV2 NewApplicationV2 ()
     {

@@ -3,6 +3,11 @@
 namespace UnitTests.ConsoleDrivers.V2;
 public class WindowSizeMonitorTests
 {
+    public WindowSizeMonitorTests ()
+    {
+        ConsoleDriver.RunningUnitTests = false;
+    }
+
     [Fact]
     public void TestWindowSizeMonitor_RaisesEventWhenChanges ()
     {
