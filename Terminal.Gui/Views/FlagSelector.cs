@@ -3,8 +3,9 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a user interface for displaying and selecting non-mutually-exclusive flags.
-///     Flags can be set from a dictionary or directly from an enum type.
+///     Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary.
+///     <see cref="FlagSelector{TFlagsEnum}"/> provides a type-safe version where a `[Flags]` <see langword="enum"/> can be
+///     provided.
 /// </summary>
 public class FlagSelector : View, IOrientation, IDesignable
 {
@@ -35,7 +36,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
         AddCommand (Command.HotKey, HandleHotKeyCommand);
 
-        CreateCheckBoxes ();
+        CreateSubViews ();
     }
 
 
@@ -80,7 +81,7 @@ public class FlagSelector : View, IOrientation, IDesignable
         get => _value;
         set
         {
-            if (_value == value)
+            if (_updatingChecked || _value == value)
             {
                 return;
             }
@@ -97,9 +98,9 @@ public class FlagSelector : View, IOrientation, IDesignable
                 UpdateChecked ();
             }
 
-            if (ValueEdit is { })
+            if (_valueField is { })
             {
-                ValueEdit.Text = _value.ToString ();
+                _valueField.Text = _value.ToString ();
             }
 
             RaiseValueChanged ();
@@ -142,7 +143,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
             _styles = value;
 
-            CreateCheckBoxes ();
+            CreateSubViews ();
         }
     }
 
@@ -153,7 +154,7 @@ public class FlagSelector : View, IOrientation, IDesignable
     public virtual void SetFlags (IReadOnlyDictionary<uint, string> flags)
     {
         Flags = flags;
-        CreateCheckBoxes ();
+        CreateSubViews ();
         UpdateChecked ();
     }
 
@@ -231,7 +232,7 @@ public class FlagSelector : View, IOrientation, IDesignable
         }
     }
 
-    private TextField? ValueEdit { get; set; }
+    private TextField? _valueField;
 
     private bool _assignHotKeysToCheckBoxes;
 
@@ -250,7 +251,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                 return;
             }
             _assignHotKeysToCheckBoxes = value;
-            CreateCheckBoxes ();
+            CreateSubViews ();
             UpdateChecked ();
         }
     }
@@ -262,16 +263,16 @@ public class FlagSelector : View, IOrientation, IDesignable
     /// </summary>
     public List<Key> UsedHotKeys { get; } = [];
 
-    private void CreateCheckBoxes ()
+    private void CreateSubViews ()
     {
         if (Flags is null)
         {
             return;
         }
 
-        foreach (CheckBox cb in RemoveAll<CheckBox> ())
+        foreach (View sv in RemoveAll ())
         {
-            cb.Dispose ();
+            sv.Dispose ();
         }
 
         if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (0))
@@ -289,25 +290,21 @@ public class FlagSelector : View, IOrientation, IDesignable
             Add (CreateCheckBox (Flags.ElementAt (index).Value, Flags.ElementAt (index).Key));
         }
 
-        if (Styles.HasFlag (FlagSelectorStyles.ShowValueEdit))
+        if (Styles.HasFlag (FlagSelectorStyles.ShowValue))
         {
-            ValueEdit = new ()
+            _valueField = new ()
             {
-                Id = "valueEdit",
-                CanFocus = false,
+                Id = "valueField",
                 Text = Value.ToString (),
+                // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
                 ReadOnly = true,
             };
 
-            Add (ValueEdit);
+            Add (_valueField);
         }
 
         SetLayout ();
-
-        return;
-
-
     }
 
     /// <summary>
@@ -352,75 +349,57 @@ public class FlagSelector : View, IOrientation, IDesignable
 
         checkbox.GettingAttributeForRole += (_, e) =>
                                        {
-                                           if (SuperView is { HasFocus: false })
-                                           {
-                                               return;
-                                           }
+                                           //if (SuperView is { HasFocus: false })
+                                           //{
+                                           //    return;
+                                           //}
 
-                                           switch (e.Role)
-                                           {
-                                               case VisualRole.Normal:
-                                                   e.Handled = true;
+                                           //switch (e.Role)
+                                           //{
+                                           //    case VisualRole.Normal:
+                                           //        e.Handled = true;
 
-                                                   if (!HasFocus)
-                                                   {
-                                                       e.Result = GetAttributeForRole (VisualRole.Focus);
-                                                   }
-                                                   else
-                                                   {
-                                                       // If _scheme was set, it's because of Hover
-                                                       if (checkbox.HasScheme)
-                                                       {
-                                                           e.Result = checkbox.GetAttributeForRole (VisualRole.Normal);
-                                                       }
-                                                       else
-                                                       {
-                                                           e.Result = GetAttributeForRole (VisualRole.Normal);
-                                                       }
-                                                   }
+                                           //        if (!HasFocus)
+                                           //        {
+                                           //            e.Result = GetAttributeForRole (VisualRole.Focus);
+                                           //        }
+                                           //        else
+                                           //        {
+                                           //            // If _scheme was set, it's because of Hover
+                                           //            if (checkbox.HasScheme)
+                                           //            {
+                                           //                e.Result = checkbox.GetAttributeForRole (VisualRole.Normal);
+                                           //            }
+                                           //            else
+                                           //            {
+                                           //                e.Result = GetAttributeForRole (VisualRole.Normal);
+                                           //            }
+                                           //        }
 
-                                                   break;
+                                           //        break;
 
-                                               case VisualRole.HotNormal:
-                                                   e.Handled = true;
-                                                   if (!HasFocus)
-                                                   {
-                                                       e.Result = GetAttributeForRole (VisualRole.HotFocus);
-                                                   }
-                                                   else
-                                                   {
-                                                       e.Result = GetAttributeForRole (VisualRole.HotNormal);
-                                                   }
+                                           //    case VisualRole.HotNormal:
+                                           //        e.Handled = true;
+                                           //        if (!HasFocus)
+                                           //        {
+                                           //            e.Result = GetAttributeForRole (VisualRole.HotFocus);
+                                           //        }
+                                           //        else
+                                           //        {
+                                           //            e.Result = GetAttributeForRole (VisualRole.HotNormal);
+                                           //        }
 
-                                                   break;
-                                           }
+                                           //        break;
+                                           //}
                                        };
 
-        //checkbox.GettingFocusColor += (_, e) =>
-        //                                  {
-        //                                      if (SuperView is { HasFocus: true })
-        //                                      {
-        //                                          e.Cancel = true;
-        //                                          if (!HasFocus)
-        //                                          {
-        //                                              e.NewValue = GetAttributeForRole (VisualRole.Normal);
-        //                                          }
-        //                                          else
-        //                                          {
-        //                                              e.NewValue = GetAttributeForRole (VisualRole.Focus);
-        //                                          }
-        //                                      }
-        //                                  };
-
-        checkbox.Activating += (sender, args) =>
-                              {
-                                  if (RaiseActivating (args.Context) is true)
-                                  {
-                                      args.Handled = true;
-
-                                      return;
-                                  }
-                              };
+        checkbox.CheckedStateChanging += (sender, args) =>
+                                         {
+                                             if (checkbox.CheckedState == CheckState.Checked && (uint)checkbox.Data == 0 && Value == 0)
+                                             {
+                                                 args.Handled = true;
+                                             }
+                                         };
 
         checkbox.CheckedStateChanged += (sender, args) =>
                                         {
@@ -445,6 +424,54 @@ public class FlagSelector : View, IOrientation, IDesignable
                                             Value = newValue;
                                         };
 
+        checkbox.HandlingHotKey += (sender, args) =>
+                                   {
+
+                                   };
+
+        checkbox.Activating += (sender, args) =>
+                               {
+                                   // Activating doesn't normally propogate, so we do it here
+                                   if (RaiseActivating (args.Context) is true || !HasFocus)
+                                   {
+                                       args.Handled = true;
+
+                                       return;
+                                   }
+
+                                   //CommandContext<KeyBinding>? keyCommandContext = args.Context as CommandContext<KeyBinding>?;
+                                   //if (keyCommandContext is null && (int)checkbox.Data == SelectedItem)
+                                   //{
+                                   //    // Mouse should not change the state
+                                   //    checkbox.CheckedState = CheckState.Checked;
+                                   //}
+
+                                   //if (keyCommandContext is { } && (int)checkbox.Data == SelectedItem)
+                                   //{
+                                   //    Cycle ();
+                                   //}
+                                   //else
+                                   //{
+                                   //    SelectedItem = (int)checkbox.Data;
+
+                                   //    if (HasFocus)
+                                   //    {
+                                   //        SubViews.OfType<CheckBox> ().ToArray () [SelectedItem!.Value].SetFocus ();
+                                   //    }
+
+                                   //}
+
+                                   //if (!CanFocus && RaiseAccepting (args.Context) is true)
+                                   //{
+                                   //    args.Handled = true;
+                                   //}
+                               };
+
+        //checkbox.Accepting += (sender, args) =>
+        //                      {
+        //                          SelectedItem = (int)checkbox.Data;
+        //                      };
+
         return checkbox;
     }
     private void SetLayout ()
@@ -454,11 +481,12 @@ public class FlagSelector : View, IOrientation, IDesignable
             if (Orientation == Orientation.Vertical)
             {
                 sv.X = 0;
-                sv.Y = Pos.Align (Alignment.Start);
+                sv.Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
+                sv.Margin!.Thickness = Thickness.Empty;
             }
             else
             {
-                sv.X = Pos.Align (Alignment.Start);
+                sv.X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 sv.Y = 0;
                 sv.Margin!.Thickness = new (0, 0, 1, 0);
             }
@@ -475,28 +503,36 @@ public class FlagSelector : View, IOrientation, IDesignable
 
     private void UncheckNone ()
     {
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => sv.Title != "None"))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (uint)sv.Data! != 0))
         {
-            cb.CheckedState = CheckState.UnChecked;
+            cb.CheckedState = (Value != 0) ? CheckState.UnChecked : CheckState.Checked;
         }
     }
 
+    private bool _updatingChecked = false;
     private void UpdateChecked ()
     {
+        if (_updatingChecked)
+        {
+            return;
+        }
+        _updatingChecked = true;
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            var flag = (uint)(cb.Data ?? throw new InvalidOperationException ("ComboBox.Data must be set"));
+            var flag = (uint)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
 
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
-            if (flag == 0 && Value != 0)
+            if (flag == 0)
             {
-                cb.CheckedState = CheckState.UnChecked;
+                cb.CheckedState = (Value != 0) ? CheckState.UnChecked : CheckState.Checked;
             }
             else
             {
                 cb.CheckedState = (Value & flag) == flag ? CheckState.Checked : CheckState.UnChecked;
             }
         }
+
+        _updatingChecked = false;
     }
 
 
@@ -537,7 +573,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                                            {
                                                FlagSelectorStyles.None => "_No Style",
                                                FlagSelectorStyles.ShowNone => "_Show None Value Style",
-                                               FlagSelectorStyles.ShowValueEdit => "Show _Value Editor Style",
+                                               FlagSelectorStyles.ShowValue => "Show _Value Editor Style",
                                                FlagSelectorStyles.All => "_All Styles",
                                                _ => f.ToString ()
                                            });

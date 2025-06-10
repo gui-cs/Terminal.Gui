@@ -68,7 +68,7 @@ public class FlagSelectorTests
         flagSelector.SetFlags<FlagSelectorStyles> (f => f switch
         {
             FlagSelectorStyles.ShowNone => "Show None Value",
-            FlagSelectorStyles.ShowValueEdit => "Show Value Editor",
+            FlagSelectorStyles.ShowValue => "Show Value Editor",
             FlagSelectorStyles.All => "Everything",
             _ => f.ToString ()
         });
@@ -77,7 +77,7 @@ public class FlagSelectorTests
                                 .ToDictionary (f => Convert.ToUInt32 (f), f => f switch
                                 {
                                     FlagSelectorStyles.ShowNone => "Show None Value",
-                                    FlagSelectorStyles.ShowValueEdit => "Show Value Editor",
+                                    FlagSelectorStyles.ShowValue => "Show Value Editor",
                                     FlagSelectorStyles.All => "Everything",
                                     _ => f.ToString ()
                                 });
@@ -170,7 +170,7 @@ public class FlagSelectorTests
         flagSelector.SetFlagNames (f => f switch
         {
             FlagSelectorStyles.ShowNone => "Show None Value",
-            FlagSelectorStyles.ShowValueEdit => "Show Value Editor",
+            FlagSelectorStyles.ShowValue => "Show Value Editor",
             FlagSelectorStyles.All => "Everything",
             _ => f.ToString ()
         });
@@ -179,7 +179,7 @@ public class FlagSelectorTests
                                 .ToDictionary (f => Convert.ToUInt32 (f), f => f switch
                                 {
                                     FlagSelectorStyles.ShowNone => "Show None Value",
-                                    FlagSelectorStyles.ShowValueEdit => "Show Value Editor",
+                                    FlagSelectorStyles.ShowValue => "Show Value Editor",
                                     FlagSelectorStyles.All => "Everything",
                                     _ => f.ToString ()
                                 });
@@ -198,7 +198,7 @@ public class FlagSelectorTests
         var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == Convert.ToUInt32 (FlagSelectorStyles.ShowNone));
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == Convert.ToUInt32 (FlagSelectorStyles.ShowValueEdit));
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == Convert.ToUInt32 (FlagSelectorStyles.ShowValue));
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
     }
 
@@ -300,7 +300,7 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void HotKey_No_SelectedItem_Selects_First ()
+    public void HotKey_Null_Value_Does_Not_Change_Value ()
     {
         var superView = new View
         {
@@ -324,14 +324,14 @@ public class FlagSelectorTests
         Assert.False (flagSelector.HasFocus);
         Assert.Null (flagSelector.Value);
 
-        flagSelector.InvokeCommand (Command.HotKey);
+        flagSelector.InvokeCommand (Command.HotKey, new KeyBinding ());
 
-        Assert.Equal ((uint)9, flagSelector.Value);
-        Assert.False (flagSelector.HasFocus);
+        Assert.True (flagSelector.HasFocus);
+        Assert.Null (flagSelector.Value);
     }
 
     [Fact]
-    public void HotKeys_Change_Value_And_Does_Not_SetFocus ()
+    public void Item_HotKey_Null_Value_Changes_Value_And_Does_Not_SetFocus ()
     {
         var superView = new View
         {
