@@ -373,7 +373,7 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding)
+    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding) where TBindingType : IInputBinding
     {
         bool? toReturn = null;
 
@@ -412,7 +412,7 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding)
+    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding) where TBindingType : IInputBinding
     {
         if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {

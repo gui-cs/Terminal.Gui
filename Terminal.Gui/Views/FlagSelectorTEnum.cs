@@ -2,13 +2,14 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a user interface for displaying and selecting non-mutually-exclusive flags.
-///     Flags can be set from a dictionary or directly from an enum type.
+///     Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way.
+///     <see cref="FlagSelector"/> provides a non-type-safe version. <see cref="TFlagsEnum"/> must be a valid enum type with
+///     the '[Flags]' attribute.
 /// </summary>
-public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enum
+public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : struct, Enum
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="FlagSelector{TEnum}"/> class.
+    ///     Initializes a new instance of the <see cref="FlagSelector{TFlagsEnum}"/> class.
     /// </summary>
     public FlagSelector ()
     {
@@ -16,11 +17,11 @@ public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enu
     }
 
     /// <summary>
-    /// Gets or sets the value of the selected flags.
+    ///     Gets or sets the value of the selected flags.
     /// </summary>
-    public new TEnum? Value
+    public new TFlagsEnum? Value
     {
-        get => base.Value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), base.Value.Value) : (TEnum?)null;
+        get => base.Value.HasValue ? (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), base.Value.Value) : (TFlagsEnum?)null;
         set => base.Value = value.HasValue ? Convert.ToUInt32 (value.Value) : (uint?)null;
     }
 
@@ -43,16 +44,16 @@ public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enu
     ///        });
     ///     </code>
     /// </example>
-    public void SetFlagNames (Func<TEnum, string> nameSelector)
+    public void SetFlagNames (Func<TFlagsEnum, string> nameSelector)
     {
-        Dictionary<uint, string> flagsDictionary = Enum.GetValues<TEnum> ()
+        Dictionary<uint, string> flagsDictionary = Enum.GetValues<TFlagsEnum> ()
                                                        .ToDictionary (f => Convert.ToUInt32 (f), nameSelector);
         base.SetFlags (flagsDictionary);
     }
 
     private void SetFlags ()
     {
-        Dictionary<uint, string> flagsDictionary = Enum.GetValues<TEnum> ()
+        Dictionary<uint, string> flagsDictionary = Enum.GetValues<TFlagsEnum> ()
                                                        .ToDictionary (f => Convert.ToUInt32 (f), f => f.ToString ());
         base.SetFlags (flagsDictionary);
     }
@@ -69,25 +70,25 @@ public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enu
     /// <inheritdoc />
     protected override CheckBox CreateCheckBox (string name, uint flag)
     {
-        var checkbox = base.CreateCheckBox (name, flag);
+        CheckBox checkbox = base.CreateCheckBox (name, flag);
         checkbox.CheckedStateChanged += (sender, args) =>
                                         {
-                                            TEnum? newValue = Value;
+                                            TFlagsEnum? newValue = Value;
 
                                             if (checkbox.CheckedState == CheckState.Checked)
                                             {
                                                 if (flag == default!)
                                                 {
-                                                    newValue = new TEnum ();
+                                                    newValue = new TFlagsEnum ();
                                                 }
                                                 else
                                                 {
-                                                    newValue = (TEnum)Enum.ToObject (typeof (TEnum), Convert.ToUInt32 (newValue) | flag);
+                                                    newValue = (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), Convert.ToUInt32 (newValue) | flag);
                                                 }
                                             }
                                             else
                                             {
-                                                newValue = (TEnum)Enum.ToObject (typeof (TEnum), Convert.ToUInt32 (newValue) & ~flag);
+                                                newValue = (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), Convert.ToUInt32 (newValue) & ~flag);
                                             }
 
                                             Value = newValue;
@@ -95,5 +96,4 @@ public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enu
 
         return checkbox;
     }
-
 }

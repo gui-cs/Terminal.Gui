@@ -39,7 +39,6 @@ public class OptionSelector : View, IOrientation, IDesignable
         CreateCheckBoxes ();
     }
 
-
     private bool? HandleActivateCommand (ICommandContext? ctx)
     {
         return RaiseActivating (ctx);
@@ -230,49 +229,49 @@ public class OptionSelector : View, IOrientation, IDesignable
 
         checkbox.GettingAttributeForRole += (_, e) =>
         {
-            if (SuperView is { HasFocus: false })
-            {
-                return;
-            }
+            //if (SuperView is { HasFocus: false })
+            //{
+            //    return;
+            //}
 
-            switch (e.Role)
-            {
-                case VisualRole.Normal:
-                    e.Handled = true;
+            //switch (e.Role)
+            //{
+            //    case VisualRole.Normal:
+            //        e.Handled = true;
 
-                    if (!HasFocus && !CanFocus)
-                    {
-                        e.Result = GetAttributeForRole (VisualRole.Focus);
-                    }
-                    else
-                    {
-                        // If _scheme was set, it's because of Hover
-                        if (checkbox.HasScheme)
-                        {
-                            e.Result = checkbox.GetAttributeForRole (VisualRole.Normal);
-                        }
-                        else
-                        {
-                            e.Result = GetAttributeForRole (VisualRole.Normal);
-                        }
-                    }
+            //        if (!HasFocus && !CanFocus)
+            //        {
+            //            e.Result = GetAttributeForRole (VisualRole.Focus);
+            //        }
+            //        else
+            //        {
+            //            // If _scheme was set, it's because of Hover
+            //            if (checkbox.HasScheme)
+            //            {
+            //                e.Result = checkbox.GetAttributeForRole (VisualRole.Normal);
+            //            }
+            //            else
+            //            {
+            //                e.Result = GetAttributeForRole (VisualRole.Normal);
+            //            }
+            //        }
 
-                    break;
+            //        break;
 
-                case VisualRole.HotNormal:
-                    e.Handled = true;
+            //    case VisualRole.HotNormal:
+            //        e.Handled = true;
 
-                    if (!HasFocus && !CanFocus)
-                    {
-                        e.Result = GetAttributeForRole (VisualRole.HotFocus);
-                    }
-                    else
-                    {
-                        e.Result = GetAttributeForRole (VisualRole.HotNormal);
-                    }
+            //        if (!HasFocus && !CanFocus)
+            //        {
+            //            e.Result = GetAttributeForRole (VisualRole.HotFocus);
+            //        }
+            //        else
+            //        {
+            //            e.Result = GetAttributeForRole (VisualRole.HotNormal);
+            //        }
 
-                    break;
-            }
+            //        break;
+            //}
         };
 
         checkbox.Activating += (sender, args) =>
@@ -346,11 +345,11 @@ public class OptionSelector : View, IOrientation, IDesignable
             if (Orientation == Orientation.Vertical)
             {
                 sv.X = 0;
-                sv.Y = Pos.Align (Alignment.Start);
+                sv.Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
             }
             else
             {
-                sv.X = Pos.Align (Alignment.Start);
+                sv.X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 sv.Y = 0;
                 sv.Margin!.Thickness = new (0, 0, 1, 0);
             }

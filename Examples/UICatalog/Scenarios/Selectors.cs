@@ -19,6 +19,7 @@ public sealed class Selectors : Scenario
         };
 
         FrameView? optionSelectorsFrame = null;
+        FrameView? flagSelectorsFrame = null;
 
         OptionSelector orientationSelector = new ()
         {
@@ -30,6 +31,14 @@ public sealed class Selectors : Scenario
         };
         orientationSelector.SelectedItemChanged += OrientationSelectorOnSelectedItemChanged;
 
+        CheckBox showBorderAndTitle = new ()
+        {
+            X = Pos.Right(orientationSelector) + 1,
+            Title = "Show Border _& Title",
+            CheckedState = CheckState.Checked
+        };
+        showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
+
         optionSelectorsFrame = new ()
         {
             Y = Pos.Bottom (orientationSelector),
@@ -38,23 +47,22 @@ public sealed class Selectors : Scenario
             Title = $"_OptionSelectors",
         };
 
-        Label optionSelectorLabel = new ()
+        Label label = new ()
         {
             Title = "Fo_ur Options:",
-
         };
 
         OptionSelector optionSelector = new ()
         {
-            X = Pos.Right(optionSelectorLabel) + 1,
+            X = Pos.Right(label) + 1,
             Title = "Fou_r Options",
             BorderStyle = LineStyle.Dotted,
             Options = new List<string> () { "Option _1", "Option _2", "Option _3", "Option _Quattro" },
             SelectedItem = 0
         };
-        optionSelectorsFrame.Add (optionSelectorLabel, optionSelector);
+        optionSelectorsFrame.Add (label, optionSelector);
 
-        FrameView flagSelectorsFrame = new ()
+        flagSelectorsFrame = new ()
         {
             Y = Pos.Top (optionSelectorsFrame),
             X = Pos.Right (optionSelectorsFrame),
@@ -63,7 +71,45 @@ public sealed class Selectors : Scenario
             Title = $"_FlagSelectors",
         };
 
-        appWindow.Add (orientationSelector, optionSelectorsFrame, flagSelectorsFrame);
+        label = new ()
+        {
+            Title = "FlagSelector _(uint):",
+        };
+
+        FlagSelector flagSelector = new ()
+        {
+            X = Pos.Right (label) + 1,
+            BorderStyle = LineStyle.Dotted,
+            Title = "FlagSe_lector (uint)",
+            Styles = FlagSelectorStyles.All,
+        };
+        flagSelector.SetFlags (new Dictionary<uint, string>
+            {
+                { 0b_0001, "_0x0001 One" },
+                { 0b_0010, "0x0010 T_wo" },
+                { 0b_0100, "0_x0100 Quattro" },
+                { 0b_1000, "0x1000 _Eight" },
+                { 0b_1111, "0x1111 Fifteen" },
+            });
+        flagSelectorsFrame.Add (label, flagSelector);
+
+        label = new ()
+        {
+            Y = Pos.Bottom(flagSelector),
+            Title = "FlagSelector<ViewDiagnosticFlags>_):",
+        };
+        FlagSelector<ViewDiagnosticFlags> flagSelectorT = new ()
+        {
+            X = Pos.Right (label) + 1,
+            BorderStyle = LineStyle.Dotted,
+            Title = "FlagSelector<_ViewDiagnosticFlags>)",
+            Y = Pos.Bottom(flagSelector),
+            Styles = FlagSelectorStyles.All,
+            AssignHotKeysToCheckBoxes = true
+        };
+        flagSelectorsFrame.Add (label, flagSelectorT);
+
+        appWindow.Add (orientationSelector, showBorderAndTitle, optionSelectorsFrame, flagSelectorsFrame);
 
 
         // Run - Start the application.
@@ -83,6 +129,29 @@ public sealed class Selectors : Scenario
             foreach (OptionSelector selector in optionSelectors)
             {
                 selector.Orientation = orientationSelector.SelectedItem == 0 ? Orientation.Vertical : Orientation.Horizontal;
+            }
+            List<FlagSelector> flagsSelectors = flagSelectorsFrame.SubViews.OfType<FlagSelector> ().ToList ();
+
+            foreach (FlagSelector selector in flagsSelectors)
+            {
+                selector.Orientation = orientationSelector.SelectedItem == 0 ? Orientation.Vertical : Orientation.Horizontal;
+            }
+
+        }
+
+        void ShowBorderAndTitleOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
+        {
+            List<OptionSelector> optionSelectors = optionSelectorsFrame.SubViews.OfType<OptionSelector> ().ToList ();
+
+            foreach (OptionSelector selector in optionSelectors)
+            {
+                selector.Border.Thickness = e.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
+            }
+            List<FlagSelector> flagsSelectors = flagSelectorsFrame.SubViews.OfType<FlagSelector> ().ToList ();
+
+            foreach (FlagSelector selector in flagsSelectors)
+            {
+                selector.Border.Thickness = e.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
             }
         }
     }
