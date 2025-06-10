@@ -629,6 +629,7 @@ public class UICatalog
         // 'app' closed cleanly.
         foreach (View? inst in View.Instances)
         {
+            
             Debug.Assert (inst.WasDisposed);
         }
 
