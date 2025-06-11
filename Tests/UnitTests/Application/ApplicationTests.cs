@@ -1125,6 +1125,8 @@ public class ApplicationTests
     [InlineData ("CursesDriver", typeof (CursesDriver))]
     public void Run_T_Call_Init_ForceDriver_Should_Pick_Correct_Driver (string driverName, Type expectedType)
     {
+        Assert.True (ConsoleDriver.RunningUnitTests);
+
         var result = false;
 
         Task.Run (() =>
