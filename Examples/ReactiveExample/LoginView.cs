@@ -6,6 +6,7 @@ using Terminal.Gui.Configuration;
 using Terminal.Gui.Views;
 using Terminal.Gui.App;
 using Terminal.Gui.ViewBase;
+using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace ReactiveExample;
 
@@ -15,6 +16,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
     private const string ErrorMessage = "Please enter a valid user name and password.";
     private const string ProgressMessage = "Logging in...";
     private const string IdleMessage = "Press 'Login' to log in.";
+    private readonly Shortcut _shVersion;
 
     private readonly CompositeDisposable _disposable = [];
 
@@ -142,6 +144,21 @@ public class LoginView : Window, IViewFor<LoginViewModel>
                     .BindTo (progress, x => x.Text)
                     .DisposeWith (_disposable);
             });
+        _shVersion = new () { Title = "Version Info", CanFocus = false };
+        this.AddControl<StatusBar> (x =>
+                                                    {
+                                                        x.Visible = true;
+                                                        x.AlignmentModes = AlignmentModes.IgnoreFirstOrLast;
+                                                        x.CanFocus = false;
+                                                        x.Add (_shVersion);
+                                                    });
+        Loaded += LoadedHandler;
+    }
+
+    private void LoadedHandler (object? sender, EventArgs? args)
+    {
+        _shVersion.Title =
+            $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Application.Driver!.GetVersionInfo ()}";
     }
 
     public LoginViewModel ViewModel { get; set; }
@@ -154,6 +171,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
     protected override void Dispose (bool disposing)
     {
+        Loaded -= LoadedHandler;
         _disposable.Dispose ();
         base.Dispose (disposing);
     }

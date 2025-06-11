@@ -12,7 +12,7 @@ public static class Program
     private static void Main (string [] args)
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
+        Application.Init (null, args.Length > 0 ? args [0] : null);
         RxApp.MainThreadScheduler = TerminalScheduler.Default;
         RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
         Application.Run (new LoginView (new LoginViewModel ()));

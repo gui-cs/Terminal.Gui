@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Terminal.Gui.App;
-using Terminal.Gui.ViewBase;
+using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace CommunityToolkitExample;
 
@@ -74,5 +74,11 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
         usernameLengthLabel.Text = ViewModel.UsernameLengthMessage;
         passwordInput.Text = ViewModel.Password;
         passwordLengthLabel.Text = ViewModel.PasswordLengthMessage;
+    }
+
+    private void LoadedHandler (object? sender, EventArgs? args)
+    {
+        _shVersion.Title =
+            $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Application.Driver!.GetVersionInfo ()}";
     }
 }

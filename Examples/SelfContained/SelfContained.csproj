@@ -10,6 +10,10 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.DotNet.PlatformAbstractions" />
+	</ItemGroup>
+
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
     <TrimmerRootAssembly Include="Terminal.Gui" />
@@ -20,4 +24,11 @@
     <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Example\ExampleWindow.cs" Link="ExampleWindow.cs" />
+  </ItemGroup>
+
+	<Target Name="CopyLaunchSettings" BeforeTargets="Build">
+		<Copy SourceFiles="..\Example\Properties\launchSettings.json" DestinationFiles="Properties\launchSettings.json" />
+	</Target>
 </Project>
