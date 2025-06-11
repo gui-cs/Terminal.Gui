@@ -395,6 +395,17 @@ public class OptionSelector : View, IOrientation, IDesignable
     #endregion IOrientation
 
     /// <inheritdoc/>
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (behavior is { } && behavior != TabStop)
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         AssignHotKeysToCheckBoxes = true;

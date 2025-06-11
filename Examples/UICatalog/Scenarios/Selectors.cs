@@ -15,7 +15,7 @@ public sealed class Selectors : Scenario
         Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
+            BorderStyle = LineStyle.None,
         };
 
         FrameView? optionSelectorsFrame = null;
@@ -31,20 +31,21 @@ public sealed class Selectors : Scenario
         };
         orientationSelector.SelectedItemChanged += OrientationSelectorOnSelectedItemChanged;
 
-        CheckBox showBorderAndTitle = new ()
-        {
-            X = Pos.Right(orientationSelector) + 1,
-            Title = "Show Border _& Title",
-            CheckedState = CheckState.Checked
-        };
-        showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
+        //CheckBox showBorderAndTitle = new ()
+        //{
+        //    X = Pos.Right(orientationSelector) + 1,
+        //    Title = "Show Border _& Title",
+        //    CheckedState = CheckState.Checked
+        //};
+        //showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
 
         optionSelectorsFrame = new ()
         {
             Y = Pos.Bottom (orientationSelector),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            Title = $"_OptionSelectors",
+            Title = $"O_ptionSelectors",
+            TabStop = TabBehavior.TabStop
         };
 
         Label label = new ()
@@ -54,11 +55,11 @@ public sealed class Selectors : Scenario
 
         OptionSelector optionSelector = new ()
         {
-            X = Pos.Right(label) + 1,
+            //X = Pos.Right(label) + 1,
             Title = "Fou_r Options",
             BorderStyle = LineStyle.Dotted,
             Options = new List<string> () { "Option _1", "Option _2", "Option _3", "Option _Quattro" },
-            SelectedItem = 0
+            SelectedItem = 0,
         };
         optionSelectorsFrame.Add (label, optionSelector);
 
@@ -69,6 +70,7 @@ public sealed class Selectors : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Title = $"_FlagSelectors",
+            TabStop = TabBehavior.TabStop
         };
 
         label = new ()
@@ -96,20 +98,20 @@ public sealed class Selectors : Scenario
         label = new ()
         {
             Y = Pos.Bottom(flagSelector),
-            Title = "FlagSelector<ViewDiagnosticFlags>_):",
+            Title = "_<ViewDiagnosticFlags>:",
         };
         FlagSelector<ViewDiagnosticFlags> flagSelectorT = new ()
         {
             X = Pos.Right (label) + 1,
             BorderStyle = LineStyle.Dotted,
-            Title = "FlagSelector<_ViewDiagnosticFlags>)",
+            Title = "<ViewD_iagnosticFlags>",
             Y = Pos.Bottom(flagSelector),
             Styles = FlagSelectorStyles.All,
             AssignHotKeysToCheckBoxes = true
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
 
-        appWindow.Add (orientationSelector, showBorderAndTitle, optionSelectorsFrame, flagSelectorsFrame);
+        appWindow.Add (orientationSelector,/* showBorderAndTitle,*/ optionSelectorsFrame, flagSelectorsFrame);
 
 
         // Run - Start the application.

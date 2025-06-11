@@ -39,7 +39,6 @@ public class FlagSelector : View, IOrientation, IDesignable
         CreateSubViews ();
     }
 
-
     private bool? HandleHotKeyCommand (ICommandContext? ctx)
     {
         // If the command did not come from a keyboard event, ignore it
@@ -563,6 +562,17 @@ public class FlagSelector : View, IOrientation, IDesignable
     public void OnOrientationChanged (Orientation newOrientation) { SetLayout (); }
 
     #endregion IOrientation
+
+    /// <inheritdoc/>
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (behavior is { } && behavior != TabStop)
+        {
+            return false;
+        }
+
+        return false;
+    }
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
