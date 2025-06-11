@@ -1155,6 +1155,48 @@ public class ApplicationTests
         Assert.True (result);
     }
 
+    [Fact]
+    public void Run_T_With_Legacy_Driver_Does_Not_Call_ResetState_After_Init ()
+    {
+        Assert.False (Application.Initialized);
+        Application.Init ();
+        Assert.True (Application.Initialized);
+        Application.Iteration += (_, _) => Application.RequestStop ();
+        Application.Run<TestToplevel> ();
+        Assert.NotNull (Application.Driver);
+        Assert.NotNull (Application.Top);
+        Assert.False (Application.Top!.Running);
+        Application.Top!.Dispose ();
+        Shutdown ();
+    }
+
+    [Fact]
+    public void Run_T_With_V2_Driver_Does_Not_Call_ResetState_After_Init ()
+    {
+        Assert.False (Application.Initialized);
+        Application.Init (null, "v2net");
+        Assert.True (Application.Initialized);
+        Task.Run (() =>
+                  {
+                      Task.Delay (300).Wait ();
+                  }).ContinueWith (
+                                   (t, _) =>
+                                   {
+                                       // no longer loading
+                                       Application.Invoke (() =>
+                                                           {
+                                                               Application.RequestStop ();
+                                                           });
+                                   },
+                                   TaskScheduler.FromCurrentSynchronizationContext ());
+        Application.Run<TestToplevel> ();
+        Assert.NotNull (Application.Driver);
+        Assert.NotNull (Application.Top);
+        Assert.False (Application.Top!.Running);
+        Application.Top!.Dispose ();
+        Shutdown ();
+    }
+
     // TODO: Add tests for Run that test errorHandler
 
     #endregion

@@ -40,11 +40,6 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        if (driverName?.StartsWith ("v2") ?? false)
-        {
-            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
-        }
-
         ApplicationImpl.Instance.Init (driver, driverName);
     }
 
@@ -77,28 +72,13 @@ public static partial class Application // Initialization (Init/Shutdown)
             throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
 
-        var driverNameOrForceDriver = driverName ?? ForceDriver;
-
-        if (driverNameOrForceDriver?.StartsWith ("v2") ?? false)
-        {
-            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
-            ApplicationImpl.Instance.Init (driver, driverNameOrForceDriver);
-            Debug.Assert (Driver is { });
-
-            return;
-        }
+        ForceDriver = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
 
         if (!calledViaRunT)
         {
             // Reset all class variables (Application is a singleton).
             ResetState (ignoreDisposed: true);
         }
-
-        Debug.Assert (Navigation is null);
-        Navigation = new ();
-
-        Debug.Assert(Popover is null);
-        Popover = new ();
 
         // For UnitTests
         if (driver is { })
@@ -115,8 +95,6 @@ public static partial class Application // Initialization (Init/Shutdown)
                 //}
             }
         }
-
-        AddKeyBindings ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))
@@ -148,6 +126,14 @@ public static partial class Application // Initialization (Init/Shutdown)
                 {
                     Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
                 }
+                else if (ForceDriver?.StartsWith ("v2") ?? false)
+                {
+                    ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+                    ApplicationImpl.Instance.Init (driver, ForceDriver);
+                    Debug.Assert (Driver is { });
+
+                    return;
+                }
                 else
                 {
                     throw new ArgumentException (
@@ -156,6 +142,14 @@ public static partial class Application // Initialization (Init/Shutdown)
                 }
             }
         }
+
+        Debug.Assert (Navigation is null);
+        Navigation = new ();
+
+        Debug.Assert (Popover is null);
+        Popover = new ();
+
+        AddKeyBindings ();
 
         try
         {
