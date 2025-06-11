@@ -54,7 +54,7 @@ namespace UICatalog;
 /// </remarks>
 public class UICatalog
 {
-    private static string _forceDriver = string.Empty;
+    private static string? _forceDriver = null;
 
     public static string LogFilePath { get; set; } = string.Empty;
     public static LoggingLevelSwitch LogLevelSwitch { get; } = new ();
