@@ -47,6 +47,11 @@ public class NetOutput : IConsoleOutput
     /// <inheritdoc/>
     public void Write (IOutputBuffer buffer)
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         if (Console.WindowHeight < 1
             || buffer.Contents.Length != buffer.Rows * buffer.Cols
             || buffer.Rows != Console.WindowHeight)
@@ -197,7 +202,16 @@ public class NetOutput : IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public Size GetWindowSize () { return new (Console.WindowWidth, Console.WindowHeight); }
+    public Size GetWindowSize ()
+    {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            // For unit tests, we return a default size.
+            return Size.Empty;
+        }
+
+        return new (Console.WindowWidth, Console.WindowHeight);
+    }
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {

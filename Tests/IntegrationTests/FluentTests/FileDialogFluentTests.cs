@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.Globalization;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using TerminalGuiFluentTesting;
@@ -12,6 +13,7 @@ public class FileDialogFluentTests
 
     public FileDialogFluentTests (ITestOutputHelper outputHelper)
     {
+        CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
         _out = new TestOutputWriter (outputHelper);
     }
 

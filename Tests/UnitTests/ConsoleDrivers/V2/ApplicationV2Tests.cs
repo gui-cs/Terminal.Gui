@@ -7,6 +7,11 @@ using Moq;
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests
 {
+    public ApplicationV2Tests ()
+    {
+        ConsoleDriver.RunningUnitTests = true;
+    }
+
     private ApplicationV2 NewApplicationV2 ()
     {
         var netInput = new Mock<INetInput> ();
@@ -361,7 +366,6 @@ public class ApplicationV2Tests
                                               if (Application.Top != null)
                                               {
                                                   Application.RaiseKeyDownEvent (Application.QuitKey);
-                                                  return false;
                                               }
 
                                               return false;
@@ -573,8 +577,6 @@ public class ApplicationV2Tests
                                               {
                                                   b.NewKeyDownEvent (Key.Enter);
                                                   b.NewKeyUpEvent (Key.Enter);
-
-                                                  return false;
                                               }
 
                                               return false;

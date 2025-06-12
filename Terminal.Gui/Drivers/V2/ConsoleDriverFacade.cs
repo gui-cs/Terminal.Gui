@@ -64,7 +64,19 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
-    public Rectangle Screen => new (new (0, 0), _output.GetWindowSize ());
+    public Rectangle Screen
+    {
+        get
+        {
+            if (ConsoleDriver.RunningUnitTests)
+            {
+                // In unit tests, we don't have a real output, so we return an empty rectangle.
+                return Rectangle.Empty;
+            }
+
+            return new (new (0, 0), _output.GetWindowSize ());
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject

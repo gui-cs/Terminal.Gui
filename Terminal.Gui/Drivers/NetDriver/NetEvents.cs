@@ -19,6 +19,11 @@ internal class NetEvents : IDisposable
     {
         _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
 
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         Task.Run (() =>
         {
             try
@@ -29,7 +34,8 @@ internal class NetEvents : IDisposable
             { }
         }, _netEventsDisposed.Token);
 
-        Task.Run (() => {
+        Task.Run (() =>
+        {
             try
             {
                 CheckWindowSizeChange ();

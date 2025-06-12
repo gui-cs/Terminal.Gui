@@ -17,6 +17,12 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     public NetInput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (NetInput)}");
+
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
@@ -39,7 +45,15 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     }
 
     /// <inheritdoc/>
-    protected override bool Peek () { return Console.KeyAvailable; }
+    protected override bool Peek ()
+    {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return false;
+        }
+
+        return Console.KeyAvailable;
+    }
 
     /// <inheritdoc/>
     protected override IEnumerable<ConsoleKeyInfo> Read ()

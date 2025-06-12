@@ -20,6 +20,11 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
     /// <inheritdoc/>
     public bool Poll ()
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return false;
+        }
+
         Size size = _consoleOut.GetWindowSize ();
 
         if (size != _lastSize)
