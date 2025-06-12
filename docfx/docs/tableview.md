@@ -1,6 +1,7 @@
 # Table View
 
-**These are the v1 API docs**. The v2 API docs are [here](https://gui-cs.github.io/Terminal.GuiV2Docs/).
+> [!NOTE]
+> This is the v1 API documentation. For v2 go here: https://gui-cs.github.io/Terminal.Gui
 
 This control supports viewing and editing tabular data. It provides a view of a [System.DataTable](https://docs.microsoft.com/en-us/dotnet/api/system.data.datatable?view=net-5.0).
 

@@ -1,6 +1,7 @@
-*Terminal.Gui* provides a rich set of views and controls for building terminal user interfaces:
+*Terminal.Gui v1* provides a rich set of views and controls for building terminal user interfaces:
 
-**These are the v1 API docs**. The v2 API docs are [here](https://gui-cs.github.io/Terminal.GuiV2Docs/).
+> [!NOTE]
+> This is the v1 API documentation. For v2 go here: https://gui-cs.github.io/Terminal.Gui
 
 * [Button](~/api/Terminal.Gui.Button.yml) - A View that provides an item that invokes an System.Action when activated by the user.
 * [CheckBox](~/api/Terminal.Gui.CheckBox.yml) - Shows an on/off toggle that the user can set.

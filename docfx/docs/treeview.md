@@ -1,6 +1,7 @@
 # Tree View
 
-**These are the v1 API docs**. The v2 API docs are [here](https://gui-cs.github.io/Terminal.GuiV2Docs/).
+> [!NOTE]
+> This is the v1 API documentation. For v2 go here: https://gui-cs.github.io/Terminal.Gui
 
 TreeView is a control for navigating hierarchical objects. It comes in two forms `TreeView` and `TreeView<T>`.
 
