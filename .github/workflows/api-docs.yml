@@ -6,10 +6,6 @@ on:
     paths: 
       - docfx/**
 
-permissions:
-  id-token: write 
-  pages: write
-
 jobs:
   deploy:
     name: Build and Deploy v1 API docs to github-pages
