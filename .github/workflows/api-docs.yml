@@ -2,7 +2,7 @@ name: Build and publish v2 API docs
 
 on:
   push:
-    branches: [v2_release, v2_develop]
+    branches: [v2_develop]
 
 permissions:
   id-token: write 
