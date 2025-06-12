@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Build and Deploy API docs to github-pages
+    name: Build and Deploy v1 API docs to github-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -38,7 +38,7 @@ jobs:
       with:
         path: docfx/_site
        
-    - name: v1_release Repository Dispatch ${{ github.ref_name }}
+    - name: Terminal.GuiV1Docs Repository Dispatch ${{ github.ref_name }}
       if: github.ref_name == 'v1_release'
       uses: peter-evans/repository-dispatch@v3
       with:
