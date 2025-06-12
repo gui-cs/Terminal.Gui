@@ -14,7 +14,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         See the <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/scrolling.html">Scrolling Deep Dive</see>.
+///         See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/scrolling.html">Scrolling Deep Dive</see>.
 ///     </para>
 ///     <para>
 ///         By default, the built-in View scrollbars (<see cref="View.VerticalScrollBar"/>/

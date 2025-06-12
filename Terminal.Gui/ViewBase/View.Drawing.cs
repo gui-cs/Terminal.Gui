@@ -41,7 +41,7 @@ public partial class View // Drawing APIs
     ///         or <see cref="NeedsLayout"/> set.
     ///     </para>
     ///     <para>
-    ///         See the View Drawing Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/drawing.html"/>.
+    ///         See the View Drawing Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/>.
     ///     </para>
     /// </remarks>
     public void Draw (DrawContext? context = null)

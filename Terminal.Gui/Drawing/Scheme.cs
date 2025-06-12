@@ -22,7 +22,7 @@ namespace Terminal.Gui.Drawing;
 ///         Use <see cref="SchemeManager"/> to manage available schemes and apply them to views.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/drawing.html"/> for more information.
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
 ///     </para>
 /// </summary>
 /// <remarks>

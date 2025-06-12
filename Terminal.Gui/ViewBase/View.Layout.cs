@@ -24,7 +24,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
@@ -201,7 +201,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -244,7 +244,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -286,7 +286,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -332,7 +332,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -404,7 +404,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         This method is intended to be called by the layout engine to
@@ -433,7 +433,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         This method is intended to be called by the layout engine to
@@ -589,7 +589,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the

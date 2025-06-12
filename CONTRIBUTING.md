@@ -141,7 +141,7 @@ Great care has been provided thus far in ensuring **Terminal.Gui** has great [AP
 
 ### Defining Events
 
-See https://gui-cs.github.io/Terminal.GuiV2Docs/docs/events.html
+See https://gui-cs.github.io/Terminal.Gui/docs/events.html
 
 
 ### Defining new `View` classes
