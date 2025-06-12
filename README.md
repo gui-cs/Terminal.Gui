@@ -16,10 +16,10 @@ The premier toolkit for building rich console apps for Windows, the Mac, and Lin
 > :warning: **Note:**  
 > `v1` is in maintenance mode and we will only accept PRs for issues impacting existing functionality.
 
-* The current `prealpha` release of Terminal.Gui v2 is ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui)
+* The current `Alpha` release of Terminal.Gui v2 is ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui)
 
 > :warning: **Note:**  
-> Developers starting new TUI projects are encouraged to target `v2`. The API is significantly changed, and significantly improved. There will be breaking changes in the API before Beta, but the core API is stable.
+> Developers starting new TUI projects are encouraged to target `v2 Alpha`. The API is significantly changed, and significantly improved. There will be breaking changes in the API before Beta, but the core API is stable.
 
 ![Sample app](docfx/images/sample.gif)
 
@@ -46,27 +46,27 @@ There is also a [visual designer](https://github.com/gui-cs/TerminalGuiDesigner)
 
 # Documentation 
 
-The full developer documentation for Terminal.Gui is available at [gui-cs.github.io/Terminal.GuiV2Docs](https://gui-cs.github.io/Terminal.GuiV2Docs/).
+The full developer documentation for Terminal.Gui is available at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui).
 
 ## Getting Started
 
-- [Getting Started](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/getting-started.md) - Quick start guide to create your first Terminal.Gui application
-- [Migrating from v1 to v2](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/migratingfromv1.md) - Complete guide for upgrading existing applications
-- [What's New in v2](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/newinv2.md) - Overview of new features and improvements
+- [Getting Started](https://gui-cs.github.io/Terminal.Gui/docs/getting-started.md) - Quick start guide to create your first Terminal.Gui application
+- [Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1.md) - Complete guide for upgrading existing applications
+- [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2.md) - Overview of new features and improvements
 
 ## API Reference
 
-For detailed API documentation, see the [API Reference](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.App.html).
+For detailed API documentation, see the [API Reference](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.html).
 
 # Installing
 
 Use NuGet to install the `Terminal.Gui` NuGet package: 
 
-## v2 Pre-Alpha 
+## v2 Alpha 
 
 (Infrequently updated, but stable enough for production use)
 ```
-dotnet add package Terminal.Gui --version "2.0.0-prealpha.*"
+dotnet add package Terminal.Gui --version "2.0.0-alpha.*"
 ```
 
 ## v2 Develop
@@ -79,7 +79,7 @@ dotnet add package Terminal.Gui --version "2.0.0-develop.*"
 ## Legacy v1
 
 ```
-dotnet add package Terminal.Gui
+dotnet add package Terminal.Gui --version "1.*
 ```
 
 Or, you can use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
