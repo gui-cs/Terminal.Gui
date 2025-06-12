@@ -33,8 +33,8 @@ branches:
   main:
     # Matches the v2_release branch
     regex: ^v2_release$
-    # Uses 'prealpha' as pre-release label before official release
-    label: prealpha
+    # Uses 'alpha' as pre-release label before `beta`
+    label: alpha
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
     # Specifies v2_develop as the source branch

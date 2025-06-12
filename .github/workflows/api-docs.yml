@@ -17,7 +17,6 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       uses: actions/checkout@v4
 
     - name: DocFX Build
@@ -41,17 +40,17 @@ jobs:
         path: docfx/_site
        
     - name: Deploy to GitHub Pages
-      if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
+      if: github.ref_name github.ref_name == 'v2_develop' || github.ref_name == 'v2_release'
       id: deployment
       uses: actions/deploy-pages@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: v2_develop Repository Dispatch ${{ github.ref_name }}
-      if: github.ref_name == 'v2_develop'
-      uses: peter-evans/repository-dispatch@v3
-      with:
-        token: ${{ secrets.V2DOCS_TOKEN }}
-        repository: gui-cs/Terminal.GuiV2Docs
-        event-type: v2_develop_push
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+    # - name: v2_develop Repository Dispatch ${{ github.ref_name }}
+    #   if: github.ref_name == 'v2_develop'
+    #   uses: peter-evans/repository-dispatch@v3
+    #   with:
+    #     token: ${{ secrets.V2DOCS_TOKEN }}
+    #     repository: gui-cs/Terminal.GuiV2Docs
+    #     event-type: v2_develop_push
+    #     client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
