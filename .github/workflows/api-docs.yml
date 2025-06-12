@@ -2,16 +2,13 @@ name: Build and publish v1 API docs
 
 on:
   push:
-    branches: [v1_release]
+    branches: [ v1_release, v1_develop ]
     paths: 
       - docfx/**
 
 jobs:
   deploy:
-    name: Build and Deploy v1 API docs to github-pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    name: Build and Deploy v1 API docs Terminal.GuiV1Docs Repository
     runs-on: windows-latest
     steps:
     - name: Checkout
