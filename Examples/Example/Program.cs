@@ -11,12 +11,6 @@ ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
 ConfigurationManager.Enable(ConfigLocations.All);
 
 // As Run<T> is used to start the application, it will create an instance of ExampleWindow and run it without needing to explicitly call `Application.Init()`.
-// But it's necessary to call `Application.Init()` to set up the application environment, especially if you want to pass command-line arguments or configure the console driver.
-//Application.Init (null, args.Length > 0 ? args [0] : null);
-
-// Alternatively we can use Application.ForceDriver to set the driver name directly.
-Application.ForceDriver = args.Length > 0 ? args [0] : string.Empty;
-
 Application.Run<ExampleWindow> ().Dispose ();
 
 // Before the application exits, reset Terminal.Gui for clean shutdown

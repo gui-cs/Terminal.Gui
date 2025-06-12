@@ -13,7 +13,7 @@ public static class Program
     {
         ConfigurationManager.Enable (ConfigLocations.All);
         Services = ConfigureServices ();
-        Application.Init (null, args.Length > 0 ? args [0] : null);
+        Application.Init ();
         Application.Run (Services.GetRequiredService<LoginView> ());
         Application.Top?.Dispose ();
         Application.Shutdown ();

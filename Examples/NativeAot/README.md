@@ -1,4 +1,4 @@
-# Terminal.Gui C# SelfContained
+# Terminal.Gui C# NativeAot
 
 This project aims to test the `Terminal.Gui` library to create a simple `native AOT` `self-container` GUI application in C#, ensuring that all its features are available.
 

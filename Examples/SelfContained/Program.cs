@@ -14,7 +14,7 @@ public static class Program
     private static void Main (string [] args)
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init (null, args.Length > 0 ? args [0] : null);
+        Application.Init ();
 
         #region The code in this region is not intended for use in a self-contained single-file. It's just here to make sure there is no functionality break with localization in Terminal.Gui using single-file
 

@@ -27,8 +27,4 @@
   <ItemGroup>
     <Compile Include="..\Example\ExampleWindow.cs" Link="ExampleWindow.cs" />
   </ItemGroup>
-
-	<Target Name="CopyLaunchSettings" BeforeTargets="Build">
-		<Copy SourceFiles="..\Example\Properties\launchSettings.json" DestinationFiles="Properties\launchSettings.json" />
-	</Target>
 </Project>

@@ -6,7 +6,6 @@ using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironm
 // Defines a top-level window with border and title
 public class ExampleWindow : Window
 {
-    private readonly Shortcut _shVersion;
     public static string? UserName { get; set; }
 
     public ExampleWindow ()
@@ -68,42 +67,10 @@ public class ExampleWindow : Window
             e.Handled = true;
         };
 
-        // Create StatusBar
-        StatusBar statusBar = new ()
-        {
-            Visible = true,
-            AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
-            CanFocus = false
-        };
-
-        _shVersion = new ()
-        {
-            Title = "Version Info",
-            CanFocus = false
-        };
-        statusBar.Add (_shVersion); // always add it as the last one
-
         Height = Dim.Fill ();
         Width = Dim.Fill ();
 
-        // Need to manage Loaded event
-        Loaded += LoadedHandler;
-
         // Add the views to the Window
-        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin, statusBar);
-    }
-
-    private void LoadedHandler (object? sender, EventArgs? args)
-    {
-        _shVersion.Title =
-            $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Application.Driver!.GetVersionInfo ()}";
-    }
-
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        Loaded -= LoadedHandler;
-
-        base.Dispose (disposing);
+        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
     }
 }

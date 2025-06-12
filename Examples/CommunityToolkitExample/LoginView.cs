@@ -75,10 +75,4 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
         passwordInput.Text = ViewModel.Password;
         passwordLengthLabel.Text = ViewModel.PasswordLengthMessage;
     }
-
-    private void LoadedHandler (object? sender, EventArgs? args)
-    {
-        _shVersion.Title =
-            $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Application.Driver!.GetVersionInfo ()}";
-    }
 }

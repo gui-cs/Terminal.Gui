@@ -15,8 +15,6 @@ internal partial class LoginView : Window
     private Button loginButton;
     private Button clearButton;
     private Label loginProgressLabel;
-    private Shortcut _shVersion;
-    private StatusBar statusBar;
 
     private void InitializeComponent ()
     {
@@ -62,23 +60,5 @@ internal partial class LoginView : Window
         loginProgressLabel.Width = 40;
         loginProgressLabel.Height = 1;
         Add (loginProgressLabel);
-        statusBar = new StatusBar ();
-        statusBar.Visible = true;
-        statusBar.AlignmentModes = AlignmentModes.IgnoreFirstOrLast;
-        statusBar.CanFocus = false;
-        _shVersion = new Shortcut ();
-        _shVersion.Title = "Version Info";
-        _shVersion.CanFocus = false;
-        statusBar.Add (_shVersion); // always add it as the last one
-        Add (statusBar);
-        Loaded += LoadedHandler;
-    }
-
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        Loaded -= LoadedHandler;
-
-        base.Dispose (disposing);
     }
 }

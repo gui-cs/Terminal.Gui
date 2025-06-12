@@ -11,8 +11,4 @@
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" />
   </ItemGroup>
-
-	<Target Name="CopyLaunchSettings" BeforeTargets="Build">
-		<Copy SourceFiles="..\Example\Properties\launchSettings.json" DestinationFiles="Properties\launchSettings.json" />
-	</Target>
 </Project>
