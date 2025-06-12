@@ -1,6 +1,6 @@
-# This file configures GitVersion 6.x to work with Terminal.Gui's GitFlow branching strategy.
+# V1 0 This file configures GitVersion 6.x to work with Terminal.Gui's GitFlow branching strategy.
 #
-# Terminal.Gui uses the GitFlow branching strategy.
+# Terminal.Gui v1 uses the GitFlow branching strategy.
 # https://gitversion.net/docs/learn/branching-strategies/gitflow/
 #
 # - We have two main branches: `v1_release` and `v1_develop`.
@@ -16,9 +16,9 @@
 # - v1_develop: Develop branch for V1 (historical)
 #
 # Package Naming:
-# - from v1_develop: 2.1.0-develop.1 (minor version increments)
-# - from v1_release (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
-# - from v1_release (release): 2.0.0 (patch version increments)
+# - from v1_develop: 1.1.0-develop.1 (minor version increments)
+# - from v1_release (pre-release): 1.0.0-prealpha.1 or 1.0.0-beta.1
+# - from v1_release (release): 1.0.0 (patch version increments)
 #
 mode: ContinuousDelivery   # GitVersion 6.x uses Mainline mode for GitFlow, focusing on main branch releases
 
@@ -27,7 +27,7 @@ tag-prefix: '[vV]'
 
 branches:
 
-  # V2 Release Branch
+  # V1 Release Branch
   main:
     # Matches the v1_release branch
     regex: ^v1_release$
@@ -35,9 +35,8 @@ branches:
     increment: Patch
     # Specifies v1_develop as the source branch
     source-branches: ['develop']
-    pre-release-weight: 100
 
-  # V2 Development Branch
+  # V1 Development Branch
   develop:
     # Matches the v1_develop branch
     regex: v1_develop
@@ -49,22 +48,6 @@ branches:
     source-branches: []
     # Indicates this branch feeds into release branches
     tracks-release-branches: true
-
-  # # V1 Branches - Included for historical reference
-  # v1_develop:
-  #   regex: v1_develop
-  #   label: v1_develop
-  #   increment: Minor
-  #   source-branches: ['v1_release']
-  #   # Lower weight keeps V1 pre-releases sorted below V2
-  #   pre-release-weight: 100
-
-  # v1_release:
-  #   regex: v1_release
-  #   # Empty label for stable releases
-  #   label: ''
-  #   increment: Patch
-  #   source-branches: ['v1_develop']
 
   # Pull Request Branches
   # Configures versioning for PRs (e.g., 2.0.0-pr.feature-123.1)
