@@ -72,8 +72,6 @@ public static partial class Application // Initialization (Init/Shutdown)
             throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
 
-        ForceDriver = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
-
         if (!calledViaRunT)
         {
             // Reset all class variables (Application is a singleton).
@@ -119,7 +117,7 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
             else
             {
-                List<Type?> drivers = GetDriverTypes ();
+                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
                 Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
 
                 if (driverType is { })
@@ -206,10 +204,10 @@ public static partial class Application // Initialization (Init/Shutdown)
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
-    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types that are available.</summary>
+    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
-    public static List<Type?> GetDriverTypes ()
+    public static (List<Type?>, List<string?>) GetDriverTypes ()
     {
         // use reflection to get the list of drivers
         List<Type?> driverTypes = new ();
@@ -225,7 +223,13 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
         }
 
-        return driverTypes;
+        List<string?> driverTypeNames = driverTypes
+                                        .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
+                                        .Select (d => d!.Name)
+                                        .Union (["v2", "v2win", "v2net"])
+                                        .ToList ()!;
+
+        return (driverTypes, driverTypeNames);
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>

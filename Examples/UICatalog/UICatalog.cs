@@ -77,11 +77,7 @@ public class UICatalog
 
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.").FromAmong (
-             Application.GetDriverTypes ()
-                        .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
-                        .Select (d => d!.Name)
-                        .Union (["v2", "v2win", "v2net"])
-                        .ToArray ()
+             Application.GetDriverTypes ().Item2.ToArray ()!
             );
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
