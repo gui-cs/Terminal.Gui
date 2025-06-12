@@ -44,5 +44,5 @@ jobs:
       with:
         token: ${{ secrets.V2DOCS_TOKEN }}
         repository: gui-cs/Terminal.GuiV1Docs
-        event-type: v2_develop_push
+        event-type: v1_release_push
         client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
