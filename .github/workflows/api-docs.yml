@@ -1,9 +1,8 @@
-name: Build and publish API docs
+name: Build and publish v1 API docs
 
 on:
   push:
-  # only publish v2 (main or develop); v2 is published via the Terminal.GuiV2Docs repo
-    branches: [v1_release, v1_develop]
+    branches: [v1_release]
     paths: 
       - docfx/**
 
@@ -12,7 +11,6 @@ permissions:
   pages: write
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     name: Build and Deploy API docs to github-pages
     environment:
@@ -40,8 +38,11 @@ jobs:
       with:
         path: docfx/_site
        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v3
+    - name: v1_release Repository Dispatch ${{ github.ref_name }}
+      if: github.ref_name == 'v1_release'
+      uses: peter-evans/repository-dispatch@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.V2DOCS_TOKEN }}
+        repository: gui-cs/Terminal.GuiV1Docs
+        event-type: v2_develop_push
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

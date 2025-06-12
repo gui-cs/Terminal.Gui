@@ -2,9 +2,9 @@
   href: docs/overview.md
 - name: Conceptual Docs
   href: docs/index.md
-- name: API Reference
+- name: v1 API Reference
   href: api/Terminal.Gui
 # - name: UI Catalog API
 #   href: api/UICatalog/
 - name: Source
-  href: https://github.com/gui-cs/Terminal.Gui
+  href: https://github.com/gui-cs/Terminal.Gui/tree/v1_release
