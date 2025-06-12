@@ -1,4 +1,4 @@
-# Table View
+# v1 Table View
 
 > [!NOTE]
 > This is the v1 API documentation. For v2 go here: https://gui-cs.github.io/Terminal.Gui
