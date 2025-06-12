@@ -54,7 +54,7 @@ namespace UICatalog;
 /// </remarks>
 public class UICatalog
 {
-    private static string _forceDriver = string.Empty;
+    private static string? _forceDriver = null;
 
     public static string LogFilePath { get; set; } = string.Empty;
     public static LoggingLevelSwitch LogLevelSwitch { get; } = new ();
@@ -325,7 +325,7 @@ public class UICatalog
     {
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
-        Application.ForceDriver = _forceDriver = options.Driver;
+        Application.ForceDriver = (_forceDriver = (string.IsNullOrEmpty(options.Driver) ? null : options.Driver))!;
 
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.

@@ -31,13 +31,13 @@ public sealed class Selectors : Scenario
         };
         orientationSelector.SelectedItemChanged += OrientationSelectorOnSelectedItemChanged;
 
-        //CheckBox showBorderAndTitle = new ()
-        //{
-        //    X = Pos.Right(orientationSelector) + 1,
-        //    Title = "Show Border _& Title",
-        //    CheckedState = CheckState.Checked
-        //};
-        //showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
+        CheckBox showBorderAndTitle = new ()
+        {
+            X = Pos.Right (orientationSelector) + 1,
+            Title = "Show Border _& Title",
+            CheckedState = CheckState.Checked
+        };
+        showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
 
         optionSelectorsFrame = new ()
         {
@@ -111,7 +111,7 @@ public sealed class Selectors : Scenario
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
 
-        appWindow.Add (orientationSelector,/* showBorderAndTitle,*/ optionSelectorsFrame, flagSelectorsFrame);
+        appWindow.Add (orientationSelector, showBorderAndTitle, optionSelectorsFrame, flagSelectorsFrame);
 
 
         // Run - Start the application.
