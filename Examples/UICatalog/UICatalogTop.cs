@@ -127,7 +127,7 @@ public class UICatalogTop : Toplevel
                                               new MenuItemv2 (
                                                               "_Documentation",
                                                               "",
-                                                              () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
+                                                              () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
                                                               Key.F1
                                                              ),
                                               new MenuItemv2 (

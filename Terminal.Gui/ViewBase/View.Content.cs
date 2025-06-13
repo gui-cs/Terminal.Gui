@@ -16,7 +16,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
@@ -55,7 +55,7 @@ public partial class View
     /// </summary>
     /// <remarks>a>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
@@ -164,7 +164,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <list type="bullet">
     ///         <listheader>
@@ -313,7 +313,7 @@ public partial class View
     /// </value>
     /// <remarks>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual

@@ -201,6 +201,8 @@ public class Editor : Scenario
                          CreateAutocomplete (),
                          CreateAllowsTabChecked (),
                          CreateReadOnlyChecked (),
+                         CreateUseSameRuneTypeForWords (),
+                         CreateSelectWordOnlyOnDoubleClick (),
                          new MenuItem (
                                        "Colors",
                                        "",
@@ -774,6 +776,26 @@ public class Editor : Scenario
         //item.Action += () => _scrollBar.KeepContentAlwaysInViewport = (bool)(item.Checked = !item.Checked);
 
         return new [] { item };
+    }
+
+    private MenuItem CreateSelectWordOnlyOnDoubleClick ()
+    {
+        var item = new MenuItem { Title = "SelectWordOnlyOnDoubleClick" };
+        item.CheckType |= MenuItemCheckStyle.Checked;
+        item.Checked = _textView.SelectWordOnlyOnDoubleClick;
+        item.Action += () => _textView.SelectWordOnlyOnDoubleClick = (bool)(item.Checked = !item.Checked);
+
+        return item;
+    }
+
+    private MenuItem CreateUseSameRuneTypeForWords ()
+    {
+        var item = new MenuItem { Title = "UseSameRuneTypeForWords" };
+        item.CheckType |= MenuItemCheckStyle.Checked;
+        item.Checked = _textView.UseSameRuneTypeForWords;
+        item.Action += () => _textView.UseSameRuneTypeForWords = (bool)(item.Checked = !item.Checked);
+
+        return item;
     }
 
     private MenuItem CreateReadOnlyChecked ()

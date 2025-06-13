@@ -153,6 +153,9 @@ This an long line and against TextView.
 This an long line and against TextView.",
                                                        output
                                                       );
+        Assert.Empty (tv.Autocomplete.Suggestions);
+        Assert.False (((PopupAutocomplete)tv.Autocomplete)._popup.Visible);
+
         top.Dispose ();
     }
 

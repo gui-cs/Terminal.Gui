@@ -570,6 +570,19 @@ public class TextField : View, IDesignable
     /// </summary>
     public bool Used { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether the word forward and word backward navigation should use the same or equivalent rune type.
+    ///     Default is <c>false</c> meaning using equivalent rune type.
+    /// </summary>
+    public bool UseSameRuneTypeForWords { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the word navigation should select only the word itself without spaces around it or with the
+    ///     spaces at right.
+    ///     Default is <c>false</c> meaning that the spaces at right are included in the selection.
+    /// </summary>
+    public bool SelectWordOnlyOnDoubleClick { get; set; }
+
     /// <summary>Clear the selected text.</summary>
     public void ClearAllSelection ()
     {
@@ -754,7 +767,7 @@ public class TextField : View, IDesignable
     public virtual void KillWordBackwards ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0);
+        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -777,7 +790,7 @@ public class TextField : View, IDesignable
     public virtual void KillWordForwards ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0);
+        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -857,43 +870,15 @@ public class TextField : View, IDesignable
         {
             EnsureHasFocus ();
             int x = PositionCursor (ev);
-            int sbw = x;
+            (int startCol, int col, int row)? newPos = GetModel ().ProcessDoubleClickSelection (x, x, 0, UseSameRuneTypeForWords, SelectWordOnlyOnDoubleClick);
 
-            if (x == _text.Count
-                || (x > 0 && (char)_text [x - 1].Value != ' ')
-                || (x > 0 && (char)_text [x].Value == ' '))
-            {
-                (int col, int row)? newPosBw = GetModel ().WordBackward (x, 0);
-
-                if (newPosBw is null)
-                {
-                    return true;
-                }
-
-                sbw = newPosBw.Value.col;
-            }
-
-            if (sbw != -1)
-            {
-                x = sbw;
-                PositionCursor (x);
-            }
-
-            (int col, int row)? newPosFw = GetModel ().WordForward (x, 0);
-
-            if (newPosFw is null)
+            if (newPos is null)
             {
                 return true;
             }
 
-            ClearAllSelection ();
-
-            if (newPosFw.Value.col != -1 && sbw != -1)
-            {
-                _cursorPosition = newPosFw.Value.col;
-            }
-
-            PrepareSelection (sbw, newPosFw.Value.col - sbw);
+            SelectedStart = newPos.Value.startCol;
+            CursorPosition = newPos.Value.col;
         }
         else if (ev.Flags == MouseFlags.Button1TripleClicked)
         {
@@ -1502,7 +1487,7 @@ public class TextField : View, IDesignable
     private void MoveWordLeft ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0);
+        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -1528,7 +1513,7 @@ public class TextField : View, IDesignable
 
             if (x > 0)
             {
-                (int col, int row)? newPos = GetModel ().WordBackward (x, 0);
+                (int col, int row)? newPos = GetModel ().WordBackward (x, 0, UseSameRuneTypeForWords);
 
                 if (newPos is null)
                 {
@@ -1548,7 +1533,7 @@ public class TextField : View, IDesignable
     private void MoveWordRight ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0);
+        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -1568,7 +1553,7 @@ public class TextField : View, IDesignable
         if (_cursorPosition < _text.Count)
         {
             int x = _start > -1 && _start > _cursorPosition ? _start : _cursorPosition;
-            (int col, int row)? newPos = GetModel ().WordForward (x, 0);
+            (int col, int row)? newPos = GetModel ().WordForward (x, 0, UseSameRuneTypeForWords);
 
             if (newPos is null)
             {

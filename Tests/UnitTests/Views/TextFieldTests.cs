@@ -607,6 +607,8 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
 #endif
         Assert.Equal ("is is a test.", tf.Text);
+        Assert.Equal ("is a test", tf.SelectedText);
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
         Assert.Equal ("is a test.", tf.SelectedText);
         Assert.Equal (13, tf.CursorPosition);
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
@@ -1340,6 +1342,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
                     break;
                 case 5:
+                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (-1, _textField.SelectedStart);
+                    Assert.Equal (0, _textField.SelectedLength);
+                    Assert.Null (_textField.SelectedText);
+
+                    break;
+                case 6:
                     Assert.Equal (32, _textField.CursorPosition);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
@@ -1501,6 +1510,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
                     break;
                 case 5:
+                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (0, _textField.SelectedStart);
+                    Assert.Equal (31, _textField.SelectedLength);
+                    Assert.Equal ("TAB to jump between text fields", _textField.SelectedText);
+
+                    break;
+                case 6:
                     Assert.Equal (32, _textField.CursorPosition);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (32, _textField.SelectedLength);
@@ -1550,6 +1566,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
                     break;
                 case 3:
+                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (10, _textField.SelectedStart);
+                    Assert.Equal (21, _textField.SelectedLength);
+                    Assert.Equal ("p between text fields", _textField.SelectedText);
+
+                    break;
+                case 4:
                     Assert.Equal (32, _textField.CursorPosition);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (22, _textField.SelectedLength);
