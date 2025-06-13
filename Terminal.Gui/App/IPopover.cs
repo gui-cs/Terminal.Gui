@@ -26,7 +26,26 @@ namespace Terminal.Gui.App;
 ///         </list>
 ///     </para>
 ///     <para>
-///         To implement a custom popover, inherit from <see cref="PopoverBaseImpl"/> or implement this interface directly.
+///         <b>Focus and Input:</b><br/>
+///         When visible, a popover receives focus and input events. If the user clicks outside the popover (and not on a
+///         subview),
+///         presses <see cref="Application.QuitKey"/>, or another popover is shown, the popover will be hidden
+///         automatically.
+///     </para>
+///     <para>
+///         <b>Layout:</b><br/>
+///         When the popover becomes visible, it is automatically laid out to fill the screen by default. You can override
+///         this behavior
+///         by setting <see cref="View.Width"/> and <see cref="View.Height"/> in your derived class.
+///     </para>
+///     <para>
+///         <b>Mouse:</b><br/>
+///         Popovers are transparent to mouse events (see <see cref="ViewportSettingsFlags.TransparentMouse"/>),
+///         meaning mouse events in a popover that are not also within a subview of the popover will not be captured.
+///     </para>
+///     <para>
+///         <b>Custom Popovers:</b><br/>
+///         To create a custom popover, inherit from <see cref="PopoverBaseImpl"/> and add your own content and logic.
 ///     </para>
 /// </remarks>
 public interface IPopover

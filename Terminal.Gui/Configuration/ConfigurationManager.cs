@@ -13,7 +13,7 @@ namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Provides settings and configuration management for Terminal.Gui applications. See the Configuration Deep Dive for
-///     more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/config.html"/>.
+///     more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/config.html"/>.
 ///     <para>
 ///         Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted
 ///         configuration files. The configuration files can be placed in at <c>.tui</c> folder in the user's home
@@ -23,7 +23,7 @@ namespace Terminal.Gui.Configuration;
 ///     </para>
 ///     <para>
 ///         Settings are defined in JSON format, according to this schema:
-///         https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json
+///         https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
 ///     </para>
 ///     <para>
 ///         Settings that will apply to all applications (global settings) reside in files named <c>config.json</c>.

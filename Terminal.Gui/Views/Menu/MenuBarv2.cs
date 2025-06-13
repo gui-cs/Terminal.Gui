@@ -654,7 +654,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                     new MenuItemv2
                                     {
                                         Title = "_Online Help...",
-                                        Action = () => MessageBox.Query ("Online Help", "https://gui-cs.github.io/Terminal.GuiV2Docs", "Ok")
+                                        Action = () => MessageBox.Query ("Online Help", "https://gui-cs.github.io/Terminal.Gui", "Ok")
                                     },
                                     new MenuItemv2
                                     {

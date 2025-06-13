@@ -348,6 +348,9 @@ public class TextFieldTests
         tf.BeginInit ();
         tf.EndInit ();
 
+        Assert.False (tf.UseSameRuneTypeForWords);
+        Assert.Equal (22, tf.CursorPosition);
+
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
         Assert.Equal (15, tf.CursorPosition);
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
@@ -402,14 +405,14 @@ public class TextFieldTests
                                        new () { Position = new (idx, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                       )
                     );
-        Assert.Equal ("movie.", tf.SelectedText);
+        Assert.Equal ("movie", tf.SelectedText);
 
         Assert.True (
                      tf.NewMouseEvent (
                                        new () { Position = new (idx + 1, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                       )
                     );
-        Assert.Equal ("movie.", tf.SelectedText);
+        Assert.Equal ("movie", tf.SelectedText);
     }
 
     [Fact]

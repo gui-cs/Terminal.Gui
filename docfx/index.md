@@ -21,7 +21,7 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 ![Sample](images/sample.gif)
 
 > [!NOTE]
-> This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html
+> This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.GuiV1Docs/
 
 ## Features
 

@@ -206,7 +206,7 @@ internal class TextModel
         return sb.ToString ();
     }
 
-    public (int col, int row)? WordBackward (int fromCol, int fromRow)
+    public (int col, int row)? WordBackward (int fromCol, int fromRow, bool useSameRuneType)
     {
         if (fromRow == 0 && fromCol == 0)
         {
@@ -245,7 +245,7 @@ internal class TextModel
 
             RuneType runeType = GetRuneType (rune);
 
-            int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
+            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
                                    ? col
                                    : -1;
 
@@ -253,19 +253,27 @@ internal class TextModel
             {
                 if (Rune.IsWhiteSpace (nRune))
                 {
-                    while (MovePrev (ref nCol, ref nRow, out nRune))
+                    while (MovePrev (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
+                        lastValidCol = nCol;
+
                         if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))
                         {
-                            lastValidCol = nCol;
-
-                            if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknown)
-                            {
-                                runeType = GetRuneType (nRune);
-                            }
-
-                            break;
+                            rune = nRune;
+                            runeType = GetRuneType (nRune);
                         }
+                    }
+
+                    if (lastValidCol > -1)
+                    {
+                        nCol = lastValidCol;
+                        nRow = fromRow;
+                    }
+
+                    if ((!Rune.IsWhiteSpace (nRune) && Rune.IsWhiteSpace (rune))
+                        || (Rune.IsWhiteSpace (nRune) && !Rune.IsWhiteSpace (rune)))
+                    {
+                        return;
                     }
 
                     if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)))
@@ -276,38 +284,18 @@ internal class TextModel
                         {
                             nCol = lastValidCol + Math.Max (lastValidCol, line.Count);
                         }
-
-                        return;
-                    }
-
-                    while (MovePrev (ref nCol, ref nRow, out nRune))
-                    {
-                        if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune))
-                        {
-                            break;
-                        }
-
-                        if (nRow != fromRow)
-                        {
-                            break;
-                        }
-
-                        lastValidCol =
-                            (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
-                                ? nCol
-                                : lastValidCol;
-                    }
-
-                    if (lastValidCol > -1)
-                    {
-                        nCol = lastValidCol;
-                        nRow = fromRow;
                     }
                 }
                 else
                 {
-                    if (!MovePrev (ref nCol, ref nRow, out nRune))
+                    if (!MovePrev (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
+                        if (lastValidCol > -1)
+                        {
+                            nCol = lastValidCol;
+                            nRow = fromRow;
+                        }
+
                         return;
                     }
 
@@ -321,7 +309,7 @@ internal class TextModel
                     }
 
                     lastValidCol =
-                        (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+                        (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
                             ? nCol
                             : lastValidCol;
 
@@ -350,6 +338,15 @@ internal class TextModel
                 return (col, row);
             }
 
+            if (fromCol == col && fromRow == row && row > 0)
+            {
+                row--;
+                List<Cell> line = GetLine (row);
+                col = line.Count;
+
+                return (col, row);
+            }
+
             return null;
         }
         catch (Exception)
@@ -358,7 +355,7 @@ internal class TextModel
         }
     }
 
-    public (int col, int row)? WordForward (int fromCol, int fromRow)
+    public (int col, int row)? WordForward (int fromCol, int fromRow, bool useSameRuneType)
     {
         if (fromRow == _lines.Count - 1 && fromCol == GetLine (_lines.Count - 1).Count)
         {
@@ -370,10 +367,10 @@ internal class TextModel
 
         try
         {
-            Rune rune = RuneAt (col, row)!.Value.Rune;
+            Rune rune = _lines [row].Count > 0 ? RuneAt (col, row)!.Value.Rune : default (Rune);
             RuneType runeType = GetRuneType (rune);
 
-            int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
+            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
                                    ? col
                                    : -1;
 
@@ -381,14 +378,21 @@ internal class TextModel
             {
                 if (Rune.IsWhiteSpace (nRune))
                 {
-                    while (MoveNext (ref nCol, ref nRow, out nRune))
+                    while (MoveNext (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
+                        lastValidCol = nCol;
+
                         if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))
                         {
-                            lastValidCol = nCol;
-
                             return;
                         }
+                    }
+
+                    lastValidCol = nCol;
+
+                    if (!Rune.IsWhiteSpace (nRune) && Rune.IsWhiteSpace (rune))
+                    {
+                        return;
                     }
 
                     if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)))
@@ -401,24 +405,6 @@ internal class TextModel
                         return;
                     }
 
-                    while (MoveNext (ref nCol, ref nRow, out nRune))
-                    {
-                        if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune))
-                        {
-                            break;
-                        }
-
-                        if (nRow != fromRow)
-                        {
-                            break;
-                        }
-
-                        lastValidCol =
-                            (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
-                                ? nCol
-                                : lastValidCol;
-                    }
-
                     if (lastValidCol > -1)
                     {
                         nCol = lastValidCol;
@@ -427,12 +413,14 @@ internal class TextModel
                 }
                 else
                 {
-                    if (!MoveNext (ref nCol, ref nRow, out nRune))
+                    if (!MoveNext (ref nCol, ref nRow, out nRune, useSameRuneType))
                     {
                         return;
                     }
 
-                    if (!IsSameRuneType (nRune, runeType) && !Rune.IsWhiteSpace (nRune))
+                    lastValidCol = nCol;
+
+                    if (!IsSameRuneType (nRune, runeType, useSameRuneType) && !Rune.IsWhiteSpace (nRune))
                     {
                         return;
                     }
@@ -445,11 +433,6 @@ internal class TextModel
                     {
                         return;
                     }
-
-                    lastValidCol =
-                        (IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
-                            ? nCol
-                            : lastValidCol;
 
                     if (fromRow != nRow)
                     {
@@ -475,6 +458,64 @@ internal class TextModel
         {
             return null;
         }
+    }
+
+    public (int startCol, int col, int row)? ProcessDoubleClickSelection (int fromStartCol, int fromCol, int fromRow, bool useSameRuneType, bool selectWordOnly)
+    {
+        List<Cell> line = GetLine (fromRow);
+
+        int startCol = fromStartCol;
+        int col = fromCol;
+        int row = fromRow;
+
+        (int col, int row)? newPos = WordForward (col, row, useSameRuneType);
+
+        if (newPos.HasValue)
+        {
+            col = row == newPos.Value.row ? newPos.Value.col : 0;
+        }
+
+        if (startCol > 0
+            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ()).Trim () == ""
+            && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Rune == (Rune)' ')))
+        {
+            while (startCol > 0 && line [startCol - 1].Rune == (Rune)' ')
+            {
+                startCol--;
+            }
+        }
+        else
+        {
+            newPos = WordBackward (col, row, useSameRuneType);
+
+            if (newPos is { })
+            {
+                startCol = row == newPos.Value.row ? newPos.Value.col : line.Count;
+            }
+        }
+
+        if (selectWordOnly)
+        {
+            List<Rune> selRunes = line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ();
+
+            if (StringExtensions.ToString (selRunes).Trim () != "")
+            {
+                for (int i = selRunes.Count - 1; i > -1; i--)
+                {
+                    if (selRunes [i] == (Rune)' ')
+                    {
+                        col--;
+                    }
+                }
+            }
+        }
+
+        if (fromStartCol != startCol || fromCol != col || fromRow != row)
+        {
+            return (startCol, col, row);
+        }
+
+        return null;
     }
 
     internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
@@ -966,11 +1007,27 @@ internal class TextModel
         return RuneType.IsUnknown;
     }
 
-    private bool IsSameRuneType (Rune newRune, RuneType runeType)
+    private bool IsSameRuneType (Rune newRune, RuneType runeType, bool useSameRuneType)
     {
         RuneType rt = GetRuneType (newRune);
 
-        return rt == runeType;
+        if (useSameRuneType)
+        {
+            return rt == runeType;
+        }
+
+        switch (runeType)
+        {
+            case RuneType.IsSymbol:
+            case RuneType.IsPunctuation:
+                return rt is RuneType.IsSymbol or RuneType.IsPunctuation;
+            case RuneType.IsWhiteSpace:
+            case RuneType.IsLetterOrDigit:
+            case RuneType.IsUnknown:
+                return rt == runeType;
+            default:
+                throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null);
+        }
     }
 
     private bool MatchWholeWord (string source, string matchText, int index = 0)
@@ -992,7 +1049,7 @@ internal class TextModel
         return false;
     }
 
-    private bool MoveNext (ref int col, ref int row, out Rune rune)
+    private bool MoveNext (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
@@ -1001,9 +1058,18 @@ internal class TextModel
             col++;
             rune = line [col].Rune;
 
-            if (col + 1 == line.Count && !Rune.IsLetterOrDigit (rune) && !Rune.IsWhiteSpace (line [col - 1].Rune))
+            if (col + 1 == line.Count
+                && !Rune.IsLetterOrDigit (rune)
+                && !Rune.IsWhiteSpace (line [col - 1].Rune)
+                && IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType))
             {
                 col++;
+            }
+
+            if (!Rune.IsWhiteSpace (rune)
+                && (Rune.IsWhiteSpace (line [col - 1].Rune) || !IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType)))
+            {
+                return false;
             }
 
             return true;
@@ -1012,28 +1078,20 @@ internal class TextModel
         if (col + 1 == line.Count)
         {
             col++;
+            rune = default (Rune);
+
+            return false;
         }
 
-        while (row + 1 < Count)
-        {
-            col = 0;
-            row++;
-            line = GetLine (row);
-
-            if (line.Count > 0)
-            {
-                rune = line [0].Rune;
-
-                return true;
-            }
-        }
-
+        // End of line
+        col = 0;
+        row++;
         rune = default (Rune);
 
         return false;
     }
 
-    private bool MovePrev (ref int col, ref int row, out Rune rune)
+    private bool MovePrev (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
@@ -1042,28 +1100,15 @@ internal class TextModel
             col--;
             rune = line [col].Rune;
 
-            return true;
-        }
-
-        if (row == 0)
-        {
-            rune = default (Rune);
-
-            return false;
-        }
-
-        while (row > 0)
-        {
-            row--;
-            line = GetLine (row);
-            col = line.Count - 1;
-
-            if (col >= 0)
+            if ((!Rune.IsWhiteSpace (rune)
+                 && !Rune.IsWhiteSpace (line [col + 1].Rune)
+                 && !IsSameRuneType (line [col + 1].Rune, GetRuneType (rune), useSameRuneType))
+                || (Rune.IsWhiteSpace (rune) && !Rune.IsWhiteSpace (line [col + 1].Rune)))
             {
-                rune = line [col].Rune;
-
-                return true;
+                return false;
             }
+
+            return true;
         }
 
         rune = default (Rune);

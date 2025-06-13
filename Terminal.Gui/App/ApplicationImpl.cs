@@ -34,7 +34,7 @@ public class ApplicationImpl : IApplication
     [RequiresDynamicCode ("AOT")]
     public virtual void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        Application.InternalInit (driver, driverName);
+        Application.InternalInit (driver, string.IsNullOrWhiteSpace (driverName) ? Application.ForceDriver : driverName);
     }
 
     /// <summary>
@@ -85,7 +85,12 @@ public class ApplicationImpl : IApplication
         if (!Application.Initialized)
         {
             // Init() has NOT been called.
-            Application.InternalInit (driver, null, true);
+            Application.InternalInit (driver, Application.ForceDriver, true);
+        }
+
+        if (Instance is ApplicationV2)
+        {
+            return Instance.Run<T> (errorHandler, driver);
         }
 
         var top = new T ();
@@ -227,6 +232,8 @@ public class ApplicationImpl : IApplication
 
             Application.OnInitializedChanged (this, new (in init));
         }
+
+        _lazyInstance = new (() => new ApplicationImpl ());
     }
 
     /// <inheritdoc />

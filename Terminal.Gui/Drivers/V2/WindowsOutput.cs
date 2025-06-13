@@ -68,6 +68,11 @@ internal partial class WindowsOutput : IConsoleOutput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
 
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         _screenBuffer = CreateConsoleScreenBuffer (
                                                    DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
                                                    ShareMode.FileShareRead | ShareMode.FileShareWrite,
@@ -171,12 +176,13 @@ internal partial class WindowsOutput : IConsoleOutput
         };
 
         //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
-        if (!WriteToConsole (
-                             new (buffer.Cols, buffer.Rows),
-                             outputBuffer,
-                             bufferCoords,
-                             damageRegion,
-                             Application.Driver!.Force16Colors))
+        if (!ConsoleDriver.RunningUnitTests
+            && !WriteToConsole (
+                                new (buffer.Cols, buffer.Rows),
+                                outputBuffer,
+                                bufferCoords,
+                                damageRegion,
+                                Application.Driver!.Force16Colors))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -312,6 +318,11 @@ internal partial class WindowsOutput : IConsoleOutput
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility)
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         if (Application.Driver!.Force16Colors)
         {
             var info = new WindowsConsole.ConsoleCursorInfo
