@@ -27,8 +27,8 @@ namespace Terminal.Gui.App;
 ///     </para>
 ///     <para>
 ///         <b>Mouse:</b><br/>
-///         Popovers are transparent to mouse events (see <see cref="ViewportSettingsFlags.TransparentMouse"/>,
-///         meaning clicks in  popover that are not also within a subview of the popover will not be captured.
+///         Popovers are transparent to mouse events (see <see cref="ViewportSettingsFlags.TransparentMouse"/>),
+///         meaning mouse events in a popover that are not also within a subview of the popover will not be captured.
 ///     </para>
 ///     <para>
 ///         <b>Custom Popovers:</b><br/>

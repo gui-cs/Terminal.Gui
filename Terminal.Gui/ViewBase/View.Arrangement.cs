@@ -8,7 +8,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     See the View Arrangement Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/arrangement.html"/>
+    ///     See the View Arrangement Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html"/>
     /// </para>
     /// </remarks>
     public ViewArrangement Arrangement { get; set; }

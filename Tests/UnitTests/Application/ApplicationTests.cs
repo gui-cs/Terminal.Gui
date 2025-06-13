@@ -655,7 +655,17 @@ public class ApplicationTests
         Assert.NotNull (SynchronizationContext.Current);
     }
 
-    private void Shutdown () { Application.Shutdown (); }
+    private void Shutdown ()
+    {
+        if (ApplicationImpl.Instance is ApplicationV2)
+        {
+            ApplicationImpl.Instance.Shutdown ();
+        }
+        else
+        {
+            Application.Shutdown ();
+        }
+    }
 
     #region RunTests
 
@@ -1102,6 +1112,89 @@ public class ApplicationTests
 
         Application.Shutdown ();
         Assert.Null (Application.Top);
+    }
+
+    private class TestToplevel : Toplevel { }
+
+    [Theory]
+    [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
+    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
+    [InlineData ("FakeDriver", typeof (FakeDriver))]
+    [InlineData ("NetDriver", typeof (NetDriver))]
+    [InlineData ("WindowsDriver", typeof (WindowsDriver))]
+    [InlineData ("CursesDriver", typeof (CursesDriver))]
+    public void Run_T_Call_Init_ForceDriver_Should_Pick_Correct_Driver (string driverName, Type expectedType)
+    {
+        Assert.True (ConsoleDriver.RunningUnitTests);
+
+        var result = false;
+
+        Task.Run (() =>
+                  {
+                      Task.Delay (300).Wait ();
+                  }).ContinueWith (
+                                   (t, _) =>
+                                   {
+                                       // no longer loading
+                                       Application.Invoke (() =>
+                                                           {
+                                                               result = true;
+                                                               Application.RequestStop ();
+                                                           });
+                                   },
+                                   TaskScheduler.FromCurrentSynchronizationContext ());
+
+        Application.ForceDriver = driverName;
+        Application.Run<TestToplevel> ();
+        Assert.NotNull (Application.Driver);
+        Assert.Equal (expectedType, Application.Driver?.GetType ());
+        Assert.NotNull (Application.Top);
+        Assert.False (Application.Top!.Running);
+        Application.Top!.Dispose ();
+        Shutdown ();
+        Assert.True (result);
+    }
+
+    [Fact]
+    public void Run_T_With_Legacy_Driver_Does_Not_Call_ResetState_After_Init ()
+    {
+        Assert.False (Application.Initialized);
+        Application.Init ();
+        Assert.True (Application.Initialized);
+        Application.Iteration += (_, _) => Application.RequestStop ();
+        Application.Run<TestToplevel> ();
+        Assert.NotNull (Application.Driver);
+        Assert.NotNull (Application.Top);
+        Assert.False (Application.Top!.Running);
+        Application.Top!.Dispose ();
+        Shutdown ();
+    }
+
+    [Fact]
+    public void Run_T_With_V2_Driver_Does_Not_Call_ResetState_After_Init ()
+    {
+        Assert.False (Application.Initialized);
+        Application.Init (null, "v2net");
+        Assert.True (Application.Initialized);
+        Task.Run (() =>
+                  {
+                      Task.Delay (300).Wait ();
+                  }).ContinueWith (
+                                   (t, _) =>
+                                   {
+                                       // no longer loading
+                                       Application.Invoke (() =>
+                                                           {
+                                                               Application.RequestStop ();
+                                                           });
+                                   },
+                                   TaskScheduler.FromCurrentSynchronizationContext ());
+        Application.Run<TestToplevel> ();
+        Assert.NotNull (Application.Driver);
+        Assert.NotNull (Application.Top);
+        Assert.False (Application.Top!.Running);
+        Application.Top!.Dispose ();
+        Shutdown ();
     }
 
     // TODO: Add tests for Run that test errorHandler

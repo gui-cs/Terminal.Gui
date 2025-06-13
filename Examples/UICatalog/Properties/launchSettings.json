@@ -12,6 +12,10 @@
       "commandName": "Project",
       "commandLineArgs": "--driver WindowsDriver"
     },
+    "UICatalog --driver v2": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2 -dl Trace"
+    },
     "UICatalog --driver v2win": {
       "commandName": "Project",
       "commandLineArgs": "--driver v2win -dl Trace"
@@ -30,6 +34,18 @@
       "commandName": "Executable",
       "executablePath": "wsl",
       "commandLineArgs": "dotnet UICatalog.dll --driver NetDriver",
+      "distributionName": ""
+    },
+    "WSL: UICatalog --driver v2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2",
+      "distributionName": ""
+    },
+    "WSL: UICatalog --driver v2net": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2net",
       "distributionName": ""
     },
     "Benchmark All": {

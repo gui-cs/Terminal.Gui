@@ -11,6 +11,6 @@ public class SettingsScopeTests
         // Act
 
         // Assert
-        Assert.Equal ("https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json", settingsScope.Schema);
+        Assert.Equal ("https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json", settingsScope.Schema);
     }
 }

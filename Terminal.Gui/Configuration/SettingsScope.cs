@@ -12,7 +12,7 @@ namespace Terminal.Gui.Configuration;
 /// <example>
 ///     <code>
 ///  {
-///    "$schema" : "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
+///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
 ///    "Application.UseSystemConsole" : true,
 ///    "Theme" : "Default",
 ///    "Themes": {
@@ -42,5 +42,5 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Points to our JSON schema.</summary>
     [JsonInclude]
     [JsonPropertyName ("$schema")]
-    public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json";
+    public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
 }
