@@ -730,6 +730,8 @@ public partial class View // Layout APIs
     /// </value>
     public bool NeedsLayout { get; private set; } = true;
 
+    private readonly object _layoutLock = new ();
+
     /// <summary>
     ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of it's subviews
     ///     (including adornments) need to be laid out in the next Application iteration.
@@ -763,32 +765,35 @@ public partial class View // Layout APIs
         // Use a stack to avoid recursion
         Stack<View> stack = new (SubViews);
 
-        while (stack.Count > 0)
+        lock (_layoutLock)
         {
-            View current = stack.Pop ();
-
-            if (!current.NeedsLayout)
+            while (stack.Count > 0)
             {
-                current.NeedsLayout = true;
+                View current = stack.Pop ();
 
-                if (current.Margin is { SubViews.Count: > 0 })
+                if (!current.NeedsLayout)
                 {
-                    current.Margin.SetNeedsLayout ();
-                }
+                    current.NeedsLayout = true;
 
-                if (current.Border is { SubViews.Count: > 0 })
-                {
-                    current.Border.SetNeedsLayout ();
-                }
+                    if (current.Margin is { SubViews.Count: > 0 })
+                    {
+                        current.Margin.SetNeedsLayout ();
+                    }
 
-                if (current.Padding is { SubViews.Count: > 0 })
-                {
-                    current.Padding.SetNeedsLayout ();
-                }
+                    if (current.Border is { SubViews.Count: > 0 })
+                    {
+                        current.Border.SetNeedsLayout ();
+                    }
 
-                foreach (View subview in current.SubViews)
-                {
-                    stack.Push (subview);
+                    if (current.Padding is { SubViews.Count: > 0 })
+                    {
+                        current.Padding.SetNeedsLayout ();
+                    }
+
+                    foreach (View subview in current.SubViews)
+                    {
+                        stack.Push (subview);
+                    }
                 }
             }
         }
