@@ -35,19 +35,10 @@ public class NumericUpDown<T> : View where T : notnull
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
-            try
+            if (NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
             {
-                if (NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
-                {
-                    Increment = (T)helper!.One;
-                    Value = (T)helper!.Zero;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine (e);
-
-                throw;
+                Increment = (T)helper!.One;
+                Value = (T)helper!.Zero;
             }
         }
 
