@@ -189,13 +189,13 @@ public class UICatalogTop : Toplevel
                     HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
                 };
 
-                _themesRg.SelectedItemChanged += (_, args) =>
+                _themesRg.ValueChanged += (_, args) =>
                                                  {
-                                                     if (args.SelectedItem is null)
+                                                     if (args.Value is null)
                                                      {
                                                          return;
                                                      }
-                                                     ThemeManager.Theme = ThemeManager.GetThemeNames () [args.SelectedItem!.Value];
+                                                     ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
                                                  };
 
                 var menuItem = new MenuItemv2
@@ -213,13 +213,13 @@ public class UICatalogTop : Toplevel
                     HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
                 };
 
-                _topSchemeRg.SelectedItemChanged += (_, args) =>
+                _topSchemeRg.ValueChanged += (_, args) =>
                                                     {
-                                                        if (args.SelectedItem is null)
+                                                        if (args.Value is null)
                                                         {
                                                             return;
                                                         }
-                                                        CachedTopLevelScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [args.SelectedItem!.Value];
+                                                        CachedTopLevelScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [(int)args.Value];
                                                         SchemeName = CachedTopLevelScheme;
                                                         SetNeedsDraw ();
                                                     };
@@ -260,11 +260,11 @@ public class UICatalogTop : Toplevel
             _diagnosticFlagsSelector = new ()
             {
                 CanFocus = true,
-                Styles = FlagSelectorStyles.ShowNone,
+                Styles = SelectorStyles.ShowNoneFlag,
                 HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
             };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
-            _diagnosticFlagsSelector.AssignHotKeysToCheckBoxes = true;
+            _diagnosticFlagsSelector.AssignHotKeys = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
             _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
                                                      {
@@ -307,15 +307,15 @@ public class UICatalogTop : Toplevel
 
             _logLevelRg = new ()
             {
-                AssignHotKeysToCheckBoxes = true,
-                Options = Enum.GetNames<LogLevel> (),
-                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-                HighlightStates = Terminal.Gui.ViewBase.MouseState.In
+                AssignHotKeys = true,
+                Labels = Enum.GetNames<LogLevel> (),
+                Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
+                HighlightStates = MouseState.In
             };
 
-            _logLevelRg.SelectedItemChanged += (_, args) =>
+            _logLevelRg.ValueChanged += (_, args) =>
             {
-                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem!.Value])! };
+                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.Value!.Value])! };
 
                 UICatalog.LogLevelSwitch.MinimumLevel =
                     UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
@@ -351,22 +351,22 @@ public class UICatalogTop : Toplevel
             return;
         }
 
-        _themesRg.SelectedItem = null;
-        _themesRg.AssignHotKeysToCheckBoxes = true;
+        _themesRg.Value = null;
+        _themesRg.AssignHotKeys = true;
         _themesRg.UsedHotKeys.Clear ();
-        _themesRg.Options = ThemeManager.GetThemeNames ();
-        _themesRg.SelectedItem =ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+        _themesRg.Labels = ThemeManager.GetThemeNames ();
+        _themesRg.Value = ThemeManager.GetThemeNames().IndexOf(ThemeManager.GetCurrentThemeName());
 
         if (_topSchemeRg is null)
         {
             return;
         }
 
-        _topSchemeRg.AssignHotKeysToCheckBoxes = true;
+        _topSchemeRg.AssignHotKeys = true;
         _topSchemeRg.UsedHotKeys.Clear ();
-        int? selectedScheme = _topSchemeRg.SelectedItem;
-        _topSchemeRg.Options = SchemeManager.GetSchemeNames ();
-        _topSchemeRg.SelectedItem = selectedScheme;
+        int? selectedScheme = _topSchemeRg.Value;
+        _topSchemeRg.Labels = SchemeManager.GetSchemeNames ();
+        _topSchemeRg.Value = selectedScheme;
 
         if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))
         {
@@ -377,7 +377,7 @@ public class UICatalogTop : Toplevel
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
         {
-            _topSchemeRg.SelectedItem = newSelectedItem;
+            _topSchemeRg.Value = newSelectedItem;
         }
     }
 

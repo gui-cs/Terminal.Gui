@@ -192,7 +192,7 @@
         <Message Text="Copy completed successfully." Importance="high" />
 
         <!-- Install NuGet Package to Global Cache -->
-        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" Condition=" '$(OS)' == 'Windows_NT' "/>
-        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages" Condition=" '$(OS)' != 'Windows_NT' "/>
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" Condition=" '$(OS)' == 'Windows_NT' " />
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages" Condition=" '$(OS)' != 'Windows_NT' " />
     </Target>
 </Project>

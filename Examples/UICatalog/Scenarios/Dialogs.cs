@@ -158,10 +158,10 @@ public class Dialogs : Scenario
             Y = Pos.Top (label),
             Title = "Ali_gn",
             BorderStyle = LineStyle.Dashed,
-            Options = labels,
+            Labels = labels,
         };
         frame.Add (alignmentGroup);
-        alignmentGroup.SelectedItem = labels.IndexOf ("_" + Dialog.DefaultButtonAlignment.ToString ());
+        alignmentGroup.Value = labels.IndexOf ("_" + Dialog.DefaultButtonAlignment.ToString ());
 
         frame.ValidatePosDim = true;
 
@@ -268,7 +268,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Options! [alignmentGroup.SelectedItem!.Value] [1..]),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [1..]),
 
                 Buttons = buttons.ToArray ()
             };

@@ -40,6 +40,8 @@ public sealed class ArrangementEditor : EditorBase
         _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
     }
 
+    private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<int?> e) { throw new NotImplementedException (); }
+
     private void ArrangementEditor_Initialized (object? sender, EventArgs e)
     {
         _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;

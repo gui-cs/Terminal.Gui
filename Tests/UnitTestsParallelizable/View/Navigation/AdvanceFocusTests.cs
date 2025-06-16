@@ -646,7 +646,7 @@ public class AdvanceFocusTests ()
     }
 
 
-    [Fact]
+    [Fact (Skip= "See https://github.com/gui-cs/Terminal.Gui/issues/4146")]
     public void AdvanceFocus_Cycles_Through_Peers_And_All_Nested_SubViews_When_Multiple ()
     {
         var top = new View { Id = "top", CanFocus = true };

@@ -25,7 +25,7 @@ public class MarginEditor : AdornmentEditor
 
         if (AdornmentToEdit is { })
         {
-            _flagSelectorTransparent!.Value = (uint)((Margin)AdornmentToEdit).ViewportSettings;
+            _flagSelectorTransparent!.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
     }
 
@@ -54,13 +54,7 @@ public class MarginEditor : AdornmentEditor
 
         Add (_rgShadow);
 
-        var flags = new Dictionary<uint, string> ()
-        {
-            { (uint)Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent, "Transparent" },
-            { (uint)Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse, "TransparentMouse" }
-        };
-
-        _flagSelectorTransparent = new FlagSelector ()
+        _flagSelectorTransparent = new FlagSelector<ViewportSettingsFlags> ()
         {
             X = 0,
             Y = Pos.Bottom (_rgShadow),
@@ -69,14 +63,12 @@ public class MarginEditor : AdornmentEditor
             Title = "_ViewportSettings",
             BorderStyle = LineStyle.Single,
         };
-        _flagSelectorTransparent.SetFlags(flags.AsReadOnly ());
-
 
         Add (_flagSelectorTransparent);
 
         if (AdornmentToEdit is { })
         {
-            _flagSelectorTransparent.Value = (uint)((Margin)AdornmentToEdit).ViewportSettings;
+            _flagSelectorTransparent.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
 
         _flagSelectorTransparent.ValueChanged += (_, args) =>

@@ -524,8 +524,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
         {
-            Options = ["G_ood", "_Bad", "U_gly"],
-            SelectedItem = 0
+            Labels = ["G_ood", "_Bad", "U_gly"],
         };
 
         var menuBgColorCp = new ColorPicker

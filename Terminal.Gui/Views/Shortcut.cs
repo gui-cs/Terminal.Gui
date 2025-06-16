@@ -230,7 +230,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
 
-    #region Accept/Select/HotKey Command Handling
+    #region Accept/Activate/HotKey Command Handling
 
     private void AddCommands ()
     {
@@ -238,13 +238,13 @@ public class Shortcut : View, IOrientation, IDesignable
         AddCommand (Command.Accept, DispatchCommand);
         // Hotkey -
         AddCommand (Command.HotKey, DispatchCommand);
-        // Select (Space key or click) -
+        // Activate (Space key or click) -
         AddCommand (Command.Activate, DispatchCommand);
     }
 
     /// <summary>
-    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Selected, then Accepting, then invoke the Action, if any).
-    ///     Called when Command.Select, Accept, or HotKey has been invoked on this Shortcut.
+    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Activating, then Accepting, then invoke the Action, if any).
+    ///     Called when Command.Activate, Accept, or HotKey has been invoked on this Shortcut.
     /// </summary>
     /// <param name="commandContext"></param>
     /// <returns>
@@ -261,11 +261,11 @@ public class Shortcut : View, IOrientation, IDesignable
         if (keyCommandContext?.Binding.Data != this)
         {
             // TODO: Optimize this to only do this if CommandView is custom (non View)
-            // Invoke Select on the CommandView to cause it to change state if it wants to
+            // Invoke Activate on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Select on CommandView ({CommandView.GetType ().Name}).");
+            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
             CommandView.InvokeCommand (Command.Activate, keyCommandContext);
         }

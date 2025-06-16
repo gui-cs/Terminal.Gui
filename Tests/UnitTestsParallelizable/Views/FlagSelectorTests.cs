@@ -17,91 +17,25 @@ public class FlagSelectorTests
         Assert.Equal (Orientation.Vertical, flagSelector.Orientation);
     }
 
-    [Fact]
-    public void SetFlags_WithDictionary_ShouldSetFlags ()
-    {
-        var flagSelector = new FlagSelector ();
-        var flags = new Dictionary<uint, string>
-        {
-            { 1, "Flag1" },
-            { 2, "Flag2" }
-        };
-
-        flagSelector.SetFlags (flags);
-
-        Assert.Equal (flags, flagSelector.Flags);
-    }
-
-    [Fact]
-    public void SetFlags_WithDictionary_ShouldSetValue ()
-    {
-        var flagSelector = new FlagSelector ();
-        var flags = new Dictionary<uint, string>
-        {
-            { 1, "Flag1" },
-            { 2, "Flag2" }
-        };
-
-        flagSelector.SetFlags (flags);
-
-        Assert.Equal ((uint)1, flagSelector.Value);
-    }
-
-    [Fact]
-    public void SetFlags_WithEnum_ShouldSetFlags ()
-    {
-        var flagSelector = new FlagSelector ();
-
-        flagSelector.SetFlags<FlagSelectorStyles> ();
-
-        var expectedFlags = Enum.GetValues<FlagSelectorStyles> ()
-                                .ToDictionary (f => Convert.ToUInt32 (f), f => f.ToString ());
-
-        Assert.Equal (expectedFlags, flagSelector.Flags);
-    }
-
-    [Fact]
-    public void SetFlags_WithEnumAndCustomNames_ShouldSetFlags ()
-    {
-        var flagSelector = new FlagSelector ();
-
-        flagSelector.SetFlags<FlagSelectorStyles> (f => f switch
-        {
-            FlagSelectorStyles.ShowNone => "Show None Value",
-            FlagSelectorStyles.ShowValue => "Show Value Editor",
-            FlagSelectorStyles.All => "Everything",
-            _ => f.ToString ()
-        });
-
-        var expectedFlags = Enum.GetValues<FlagSelectorStyles> ()
-                                .ToDictionary (f => Convert.ToUInt32 (f), f => f switch
-                                {
-                                    FlagSelectorStyles.ShowNone => "Show None Value",
-                                    FlagSelectorStyles.ShowValue => "Show Value Editor",
-                                    FlagSelectorStyles.All => "Everything",
-                                    _ => f.ToString ()
-                                });
-
-        Assert.Equal (expectedFlags, flagSelector.Flags);
-    }
 
     [Fact]
     public void Value_Set_ShouldUpdateCheckedState ()
     {
         var flagSelector = new FlagSelector ();
-        var flags = new Dictionary<uint, string>
+        var flags = new Dictionary<int, string>
         {
             { 1, "Flag1" },
             { 2, "Flag2" }
         };
 
-        flagSelector.SetFlags (flags);
+        flagSelector.Values = flags.Keys.ToList ();
+        flagSelector.Labels = flags.Values.ToList ();
         flagSelector.Value = 1;
 
-        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == 1);
+        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == 1);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == 2);
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == 2);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
     }
 
@@ -109,14 +43,15 @@ public class FlagSelectorTests
     public void Styles_Set_ShouldCreateSubViews ()
     {
         var flagSelector = new FlagSelector ();
-        var flags = new Dictionary<uint, string>
+        var flags = new Dictionary<int, string>
         {
             { 1, "Flag1" },
             { 2, "Flag2" }
         };
 
-        flagSelector.SetFlags (flags);
-        flagSelector.Styles = FlagSelectorStyles.ShowNone;
+        flagSelector.Values = flags.Keys.ToList ();
+        flagSelector.Labels = flags.Values.ToList ();
+        flagSelector.Styles = SelectorStyles.ShowNoneFlag;
 
         Assert.Contains (flagSelector.SubViews, sv => sv is CheckBox cb && cb.Title == "None");
     }
@@ -125,13 +60,14 @@ public class FlagSelectorTests
     public void ValueChanged_Event_ShouldBeRaised ()
     {
         var flagSelector = new FlagSelector ();
-        var flags = new Dictionary<uint, string>
+        var flags = new Dictionary<int, string>
         {
             { 1, "Flag1" },
             { 2, "Flag2" }
         };
 
-        flagSelector.SetFlags (flags);
+        flagSelector.Values = flags.Keys.ToList ();
+        flagSelector.Labels = flags.Values.ToList ();
         bool eventRaised = false;
         flagSelector.ValueChanged += (sender, args) => eventRaised = true;
 
@@ -144,7 +80,7 @@ public class FlagSelectorTests
     [Fact]
     public void GenericInitialization_ShouldSetDefaults ()
     {
-        var flagSelector = new FlagSelector<FlagSelectorStyles> ();
+        var flagSelector = new FlagSelector<SelectorStyles> ();
 
         Assert.True (flagSelector.CanFocus);
         Assert.Equal (Dim.Auto (DimAutoStyle.Content), flagSelector.Width);
@@ -153,65 +89,56 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void Generic_SetFlags_Methods_Throw ()
-    {
-        var flagSelector = new FlagSelector<FlagSelectorStyles> ();
-
-        Assert.Throws<InvalidOperationException> (() => flagSelector.SetFlags (new Dictionary<uint, string> ()));
-        Assert.Throws<InvalidOperationException> (() => flagSelector.SetFlags<FlagSelectorStyles> ());
-        Assert.Throws<InvalidOperationException> (() => flagSelector.SetFlags<FlagSelectorStyles> (styles => null));
-    }
-
-    [Fact]
     public void GenericSetFlagNames_ShouldSetFlagNames ()
     {
-        var flagSelector = new FlagSelector<FlagSelectorStyles> ();
+        var flagSelector = new FlagSelector<SelectorStyles> ();
+        flagSelector.Labels = Enum.GetValues<SelectorStyles> ()
+                                 .Select (
+                                          l => l switch
+                                               {
+                                                   SelectorStyles.None => "_No Style",
+                                                   SelectorStyles.ShowNoneFlag => "_Show None Value Style",
+                                                   SelectorStyles.ShowValue => "Show _Value Editor Style",
+                                                   SelectorStyles.All => "_All Styles",
+                                                   _ => l.ToString ()
+                                               }).ToList ();
 
-        flagSelector.SetFlagNames (f => f switch
-        {
-            FlagSelectorStyles.ShowNone => "Show None Value",
-            FlagSelectorStyles.ShowValue => "Show Value Editor",
-            FlagSelectorStyles.All => "Everything",
-            _ => f.ToString ()
-        });
+        Dictionary<int, string> expectedFlags = Enum.GetValues<SelectorStyles> ()
+                                                    .ToDictionary (f => Convert.ToInt32 (f), f => f switch
+                                                                                                  {
+                                                                                                      SelectorStyles.None => "_No Style",
+                                                                                                      SelectorStyles.ShowNoneFlag => "_Show None Value Style",
+                                                                                                      SelectorStyles.ShowValue => "Show _Value Editor Style",
+                                                                                                      SelectorStyles.All => "_All Styles",
+                                                                                                      _ => f.ToString ()
+                                                                                                  });
 
-        var expectedFlags = Enum.GetValues<FlagSelectorStyles> ()
-                                .ToDictionary (f => Convert.ToUInt32 (f), f => f switch
-                                {
-                                    FlagSelectorStyles.ShowNone => "Show None Value",
-                                    FlagSelectorStyles.ShowValue => "Show Value Editor",
-                                    FlagSelectorStyles.All => "Everything",
-                                    _ => f.ToString ()
-                                });
-
-        Assert.Equal (expectedFlags, flagSelector.Flags);
+        Assert.Equal (expectedFlags.Keys, flagSelector.Values);
     }
 
     [Fact]
     public void GenericValue_Set_ShouldUpdateCheckedState ()
     {
-        var flagSelector = new FlagSelector<FlagSelectorStyles> ();
+        var flagSelector = new FlagSelector<SelectorStyles> ();
 
-        flagSelector.SetFlagNames (f => f.ToString ());
-        flagSelector.Value = FlagSelectorStyles.ShowNone;
+        flagSelector.Value = SelectorStyles.ShowNoneFlag;
 
-        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == Convert.ToUInt32 (FlagSelectorStyles.ShowNone));
+        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (uint)cb.Data == Convert.ToUInt32 (FlagSelectorStyles.ShowValue));
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == Convert.ToInt32 (SelectorStyles.ShowValue));
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
     }
 
     [Fact]
     public void GenericValueChanged_Event_ShouldBeRaised ()
     {
-        var flagSelector = new FlagSelector<FlagSelectorStyles> ();
+        var flagSelector = new FlagSelector<SelectorStyles> ();
 
-        flagSelector.SetFlagNames (f => f.ToString ());
         bool eventRaised = false;
         flagSelector.ValueChanged += (sender, args) => eventRaised = true;
 
-        flagSelector.Value = FlagSelectorStyles.ShowNone;
+        flagSelector.Value = SelectorStyles.ShowNoneFlag;
 
         Assert.True (eventRaised);
     }
@@ -221,18 +148,17 @@ public class FlagSelectorTests
     {
         var flagSelector = new FlagSelector ();
         Assert.True (flagSelector.CanFocus);
-        Assert.Null (flagSelector.Flags);
+        Assert.Null (flagSelector.Values);
         Assert.Equal (Rectangle.Empty, flagSelector.Frame);
         Assert.Null (flagSelector.Value);
 
         flagSelector = new ();
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 1, "Flag1" },
-        });
+        flagSelector.Values = [1];
+        flagSelector.Labels = ["Flag1"];
+
         Assert.True (flagSelector.CanFocus);
-        Assert.Single (flagSelector.Flags!);
-        Assert.Equal ((uint)1, flagSelector.Value);
+        Assert.Single (flagSelector.Values!);
+        Assert.Equal ((int)1, flagSelector.Value);
 
         flagSelector = new ()
         {
@@ -241,21 +167,17 @@ public class FlagSelectorTests
             Width = 20,
             Height = 5,
         };
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 1, "Flag1" },
-        });
+        flagSelector.Values = [1];
+        flagSelector.Labels = ["Flag1"];
 
         Assert.True (flagSelector.CanFocus);
-        Assert.Single (flagSelector.Flags!);
+        Assert.Single (flagSelector.Values!);
         Assert.Equal (new (1, 2, 20, 5), flagSelector.Frame);
-        Assert.Equal ((uint)1, flagSelector.Value);
+        Assert.Equal ((int)1, flagSelector.Value);
 
         flagSelector = new () { X = 1, Y = 2 };
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 1, "Flag1" },
-        });
+        flagSelector.Values = [1];
+        flagSelector.Labels = ["Flag1"];
 
         var view = new View { Width = 30, Height = 40 };
         view.Add (flagSelector);
@@ -264,9 +186,9 @@ public class FlagSelectorTests
         view.LayoutSubViews ();
 
         Assert.True (flagSelector.CanFocus);
-        Assert.Single (flagSelector.Flags!);
+        Assert.Single (flagSelector.Values!);
         Assert.Equal (new (1, 2, 7, 1), flagSelector.Frame);
-        Assert.Equal ((uint)1, flagSelector.Value);
+        Assert.Equal ((int)1, flagSelector.Value);
     }
 
     [Fact]
@@ -282,20 +204,17 @@ public class FlagSelectorTests
         {
             Title = "_FlagSelector",
         };
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 0, "_Left" },
-            { 1, "_Right" },
-        });
+        flagSelector.Values = [0, 1];
+        flagSelector.Labels = ["_Left", "_Right"];
 
         superView.Add (flagSelector);
 
         Assert.False (flagSelector.HasFocus);
-        Assert.Equal ((uint)0, flagSelector.Value);
+        Assert.Equal ((int)0, flagSelector.Value);
 
         flagSelector.NewKeyDownEvent (Key.F.WithAlt);
 
-        Assert.Equal ((uint)0, flagSelector.Value);
+        Assert.Equal ((int)0, flagSelector.Value);
         Assert.True (flagSelector.HasFocus);
     }
 
@@ -312,11 +231,8 @@ public class FlagSelectorTests
         {
             Title = "_FlagSelector",
         };
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 0, "_Left" },
-            { 1, "_Right" },
-        });
+        flagSelector.Values = [0, 1];
+        flagSelector.Labels = ["_Left", "_Right"];
         flagSelector.Value = null;
 
         superView.Add (flagSelector);
@@ -330,6 +246,28 @@ public class FlagSelectorTests
         Assert.Null (flagSelector.Value);
     }
 
+
+    [Fact]
+    public void Set_Value_Sets ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+        var flagSelector = new FlagSelector ();
+        flagSelector.Labels = ["_Left", "_Right"];
+        superView.Add (flagSelector);
+
+        Assert.False (flagSelector.HasFocus);
+        Assert.Null (flagSelector.Value);
+
+        flagSelector.Value = 1;
+
+        Assert.False (flagSelector.HasFocus);
+        Assert.Equal (1, flagSelector.Value);
+    }
+
     [Fact]
     public void Item_HotKey_Null_Value_Changes_Value_And_Does_Not_SetFocus ()
     {
@@ -339,31 +277,24 @@ public class FlagSelectorTests
         };
         superView.Add (new View { CanFocus = true });
         var flagSelector = new FlagSelector ();
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 0, "_Left" },
-            { 1, "_Right" },
-        });
+        flagSelector.Labels = ["_Left", "_Right"];
         superView.Add (flagSelector);
 
         Assert.False (flagSelector.HasFocus);
-        Assert.Equal ((uint)0, flagSelector.Value);
+        Assert.Null (flagSelector.Value);
 
         flagSelector.NewKeyDownEvent (Key.R);
 
-        Assert.Equal ((uint)1, flagSelector.Value);
         Assert.False (flagSelector.HasFocus);
+        Assert.Equal (1, flagSelector.Value);
     }
 
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
         var flagSelector = new FlagSelector ();
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 0, "_Left" },
-            { 1, "_Right" },
-        });
+        flagSelector.Values = [0, 1];
+        flagSelector.Labels = ["_Left", "_Right"];
         var accepted = false;
 
         flagSelector.Accepting += OnAccept;
@@ -380,11 +311,8 @@ public class FlagSelectorTests
     public void Accept_Command_Fires_Accept ()
     {
         var flagSelector = new FlagSelector ();
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 0, "_Left" },
-            { 1, "_Right" },
-        });
+        flagSelector.Values = [0, 1];
+        flagSelector.Labels = ["_Left", "_Right"];
         var accepted = false;
 
         flagSelector.Accepting += OnAccept;
@@ -400,13 +328,10 @@ public class FlagSelectorTests
     [Fact]
     public void ValueChanged_Event ()
     {
-        uint? newValue = null;
+        int? newValue = null;
         var flagSelector = new FlagSelector ();
-        flagSelector.SetFlags (new Dictionary<uint, string>
-        {
-            { 0, "_Left" },
-            { 1, "_Right" },
-        });
+        flagSelector.Values = [0, 1];
+        flagSelector.Labels = ["_Left", "_Right"];
 
         flagSelector.ValueChanged += (s, e) =>
         {
