@@ -613,11 +613,8 @@ public class ButtonTests (ITestOutputHelper output)
         button.Selecting += (s, e) => selectingCount++;
         var acceptedCount = 0;
 
-        button.Accepting += (s, e) =>
-                            {
-                                acceptedCount++;
-                                e.Handled = true;
-                            };
+        // No need to set e.Handled = true here, as we are testing the accepting event with mouse clicks which always returns true
+        button.Accepting += (s, e) => acceptedCount++;
 
         me = new ();
         me.Flags = pressed;

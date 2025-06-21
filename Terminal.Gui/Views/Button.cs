@@ -64,8 +64,12 @@ public class Button : View, IDesignable
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button2Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
+
         TitleChanged += Button_TitleChanged;
-        MouseClick += Button_MouseClick;
 
         base.ShadowStyle = DefaultShadow;
         HighlightStates = DefaultHighlightStates;
@@ -89,6 +93,11 @@ public class Button : View, IDesignable
 
         SetFocus ();
 
+        if (commandContext is CommandContext<MouseBinding>)
+        {
+            return true;
+        }
+
         // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
         // TODO: no use-case has been identified for any View other than Button to act like this.
         // If Accept was not handled...
@@ -98,18 +107,6 @@ public class Button : View, IDesignable
         }
 
         return false;
-    }
-
-    private void Button_MouseClick (object sender, MouseEventArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-
-        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
-        InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], this, data: null));
-        e.Handled = true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)

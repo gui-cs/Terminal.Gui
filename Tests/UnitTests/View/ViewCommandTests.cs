@@ -60,8 +60,8 @@ public class ViewCommandTests
                                          Flags = MouseFlags.Button1Clicked
                                      });
 
-        // Button A should have been accepted because B didn't cancel and A IsDefault
-        Assert.Equal (1, aAcceptedCount);
+        // Button A shouldn't have been accepted because mouse click doesn't propagate to the next default button
+        Assert.Equal (0, aAcceptedCount);
         Assert.Equal (1, bAcceptedCount);
 
         bCancelAccepting = true;
@@ -73,8 +73,8 @@ public class ViewCommandTests
                                          Flags = MouseFlags.Button1Clicked
                                      });
 
-        // Button A (IsDefault) should NOT have been accepted because B canceled
-        Assert.Equal (1, aAcceptedCount);
+        // Button A (IsDefault) should NOT have been accepted because mouse click doesn't propagate to the next default button
+        Assert.Equal (0, aAcceptedCount);
         Assert.Equal (2, bAcceptedCount);
 
         Application.ResetState (true);

@@ -147,20 +147,23 @@ public partial class View // Command APIs
         //  - bubbled up the SuperView hierarchy.
         if (!args.Handled)
         {
-            // If there's an IsDefault peer view in SubViews, try it
-            View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
-
-            if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+            if (ctx is not CommandContext<MouseBinding>)
             {
-                // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
-                // TODO: is generic?
+                // If there's an IsDefault peer view in SubViews, try it
+                View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
 
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
-                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
-
-                if (handled == true)
+                if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
                 {
-                    return true;
+                    // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommand that 
+                    // TODO: is generic?
+
+                    Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
+                    bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
+
+                    if (handled == true)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -418,13 +421,43 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (
-                                new CommandContext<TBindingType>
-                                {
-                                    Command = command,
-                                    Source = this,
-                                    Binding = binding
-                                });
+        switch (binding)
+        {
+            case KeyBinding keyBinding:
+                return implementation! (
+                                        new CommandContext<KeyBinding>
+                                        {
+                                            Command = command,
+                                            Source = this,
+                                            Binding = keyBinding,
+                                        });
+            case CommandContext<KeyBinding> keyBinding:
+                return implementation! (
+                                        new CommandContext<KeyBinding>
+                                        {
+                                            Command = command,
+                                            Source = this,
+                                            Binding = keyBinding.Binding,
+                                        });
+            case MouseBinding mouseBinding:
+                return implementation! (
+                                        new CommandContext<MouseBinding>
+                                        {
+                                            Command = command,
+                                            Source = this,
+                                            Binding = mouseBinding,
+                                        });
+            case CommandContext<MouseBinding> mouseBinding:
+                return implementation! (
+                                        new CommandContext<MouseBinding>
+                                        {
+                                            Command = command,
+                                            Source = this,
+                                            Binding = mouseBinding.Binding,
+                                        });
+            default:
+                throw new InvalidOperationException ($"Command {command} is not bound to an implementation.");
+        }
     }
 
     /// <summary>
