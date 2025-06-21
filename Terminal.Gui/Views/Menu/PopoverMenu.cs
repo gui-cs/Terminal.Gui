@@ -97,7 +97,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             // If we are Visible, returning true will stop the QuitKey from propagating
             // If we are not Visible, returning false will allow the QuitKey to propagate
-            return Visible;
+            return !Visible;
         }
 
         bool? MoveLeft (ICommandContext? ctx)
