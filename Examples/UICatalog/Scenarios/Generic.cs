@@ -23,6 +23,7 @@ public sealed class Generic : Scenario
             X = Pos.Center (),
             Y = 1,
             Title = "_Button",
+            IsDefault = true, // This button will be the default button
         };
 
         button.Accepting += (s, e) =>
@@ -30,7 +31,36 @@ public sealed class Generic : Scenario
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 
-        appWindow.Add (button);
+        // Create StatusBar
+        StatusBar statusBar = new ()
+        {
+            Visible = true,
+            CanFocus = false
+        };
+
+        Shortcut scNoAction = new ()
+        {
+            Title = "No action",
+            CanFocus = false
+        };
+        statusBar.Add (scNoAction);
+
+        Shortcut scWithAction = new ()
+        {
+            Title = "With action",
+            CanFocus = false,
+            Action = () => MessageBox.Query ("Shortcut", "With action", "Ok"),
+            Key = Key.F5
+        };
+        scWithAction.Accepting += (s, e) =>
+                                  {
+                                      // This is just to show that the action can be triggered by Accepting event
+                                      scWithAction.Action?.Invoke ();
+                                      e.Handled = true; // Mark the event as handled
+                                  };
+        statusBar.Add (scWithAction);
+
+        appWindow.Add (button, statusBar);
 
         // Run - Start the application.
         Application.Run (appWindow);
