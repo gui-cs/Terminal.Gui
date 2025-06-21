@@ -56,7 +56,6 @@ public sealed class Generic : Scenario
                                   {
                                       // This is just to show that the action can be triggered by Accepting event
                                       scWithAction.Action?.Invoke ();
-                                      e.Handled = true; // Mark the event as handled
                                   };
         statusBar.Add (scWithAction);
 
