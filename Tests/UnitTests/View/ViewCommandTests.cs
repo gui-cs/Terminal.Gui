@@ -74,7 +74,8 @@ public class ViewCommandTests
                                      });
 
         // Button A (IsDefault) should NOT have been accepted because B canceled
-        Assert.Equal (1, aAcceptedCount); Assert.Equal (2, bAcceptedCount);
+        Assert.Equal (1, aAcceptedCount);
+        Assert.Equal (2, bAcceptedCount);
 
         Application.ResetState (true);
     }
