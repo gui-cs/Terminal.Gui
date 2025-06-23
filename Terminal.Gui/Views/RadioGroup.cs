@@ -48,9 +48,6 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         SetupKeyBindings ();
 
-        // By default, single click is already bound to Command.Select
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-
         SubViewLayout += RadioGroup_LayoutStarted;
     }
 

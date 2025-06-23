@@ -93,7 +93,12 @@ public class TreeTableSourceTests : IDisposable
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
+        Application.Top = new Toplevel ()
+        {
+            Frame = new (0, 0, 100, 100),
+        };
         TableView tv = GetTreeTable (out _);
+        Application.Top.Add (tv);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
 
@@ -115,7 +120,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (0, tv.SelectedColumn);
 
-        Assert.True (tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Clicked });
 
         View.SetClipToScreen ();
         tv.Draw ();
@@ -133,15 +138,15 @@ public class TreeTableSourceTests : IDisposable
         DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
-        tv.NewMouseEvent (new MouseEventArgs { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (3, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         DriverAssert.AssertDriverContentsAre (expected, _output);
-        tv.NewMouseEvent (new MouseEventArgs { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (1, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
-        tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Clicked });
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -153,6 +158,8 @@ public class TreeTableSourceTests : IDisposable
 │└+Route 66    │Great race course      │";
 
         DriverAssert.AssertDriverContentsAre (expected, _output);
+
+        Application.ResetState (true);
     }
 
     [Fact]

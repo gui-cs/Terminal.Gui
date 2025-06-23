@@ -23,23 +23,13 @@ public class Label : View, IDesignable
         Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
 
-        // On HoKey, pass it to the next view
+        // On HotKey, pass it to the next view
         AddCommand (Command.HotKey, RaiseHotKeyOnNextPeer);
 
+        // On click, invoke the HotKey command on the next view
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.HotKey);
+
         TitleChanged += Label_TitleChanged;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnMouseClick (MouseEventArgs args)
-    {
-        if (!CanFocus)
-        {
-            // If the Label cannot focus (the default) invoke the HotKey command
-            // This lets the user click on the Label to invoke the next View's HotKey
-            return InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, null)) == true;
-        }
-
-        return base.OnMouseClick (args);
     }
 
     private void Label_TitleChanged (object sender, EventArgs<string> e)
@@ -88,13 +78,17 @@ public class Label : View, IDesignable
             if (me != -1 && me < SuperView?.SubViews.Count - 1)
             {
                 View? nextPeer = SuperView?.SubViews.ElementAt (me + 1);
-                if (nextPeer is null || commandContext is not CommandContext<KeyBinding> keyCommandContext)
+                if (nextPeer is null)
                 {
                     return false;
                 }
 
                 // Swap out the key to the HotKey of the target view
-                keyCommandContext.Binding = keyCommandContext.Binding with {Key = nextPeer.HotKey};
+                CommandContext<KeyBinding>? keyCommandContext = new CommandContext<KeyBinding> ()
+                {
+                    Command = Command.HotKey,
+                    Binding = new ([Command.HotKey], nextPeer, data: null),
+                };
                 return nextPeer.InvokeCommand (Command.HotKey, keyCommandContext) == true;
             }
         }

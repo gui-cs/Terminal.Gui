@@ -100,9 +100,7 @@ public class HexView : View, IDesignable
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
 
-        // The Select handler deals with both single and double clicks
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.Button1DoubleClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 

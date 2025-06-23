@@ -37,9 +37,6 @@ public class CheckBox : View
         // - DO NOT advance state
         // The default Accept handler does that.
 
-        // Enable double-clicking to Accept
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-
         TitleChanged += Checkbox_TitleChanged;
 
         HighlightStates = DefaultHighlightStates;

@@ -18,6 +18,13 @@ public sealed class Generic : Scenario
             BorderStyle = LineStyle.None
         };
 
+        TextField tf = new ()
+        {
+            Text = "Type here...",
+            Width = 20
+        };
+        appWindow.Add (tf);
+
         var button = new Button ()
         {
             X = Pos.Center (),

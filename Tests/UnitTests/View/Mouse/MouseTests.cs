@@ -5,7 +5,16 @@ namespace Terminal.Gui.ViewMouseTests;
 [Trait ("Category", "Input")]
 public class MouseTests : TestsAllViews
 {
-    // TODO: Add more tests that ensure the above test works with positive adornments
+    [Fact]
+    public void Default_MouseBindings ()
+    {
+        var testView = new View ();
+
+        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+
+        Assert.Equal(2, testView.MouseBindings.GetBindings().Count());
+    }
 
     // Test drag to move
     [Theory]
@@ -142,9 +151,6 @@ public class MouseTests : TestsAllViews
 
     [Theory]
     [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
     {
         var me = new MouseEventArgs ();
@@ -173,9 +179,6 @@ public class MouseTests : TestsAllViews
 
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Clicked_Releases_Grab (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
         Application.Init (new FakeDriver ());
@@ -378,9 +381,6 @@ public class MouseTests : TestsAllViews
 
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Press_Repeatedly_Raises_Activating_Repeatedly (
         MouseFlags pressed,
         MouseFlags released,
@@ -429,6 +429,7 @@ public class MouseTests : TestsAllViews
         // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
         Application.ResetState (true);
     }
+
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
@@ -500,7 +501,7 @@ public class MouseTests : TestsAllViews
 
         var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clickedCount++;
+        view.Activating += (s, e) => clickedCount++;
 
         // Start in Viewport
         me.Flags = MouseFlags.Button1Pressed;

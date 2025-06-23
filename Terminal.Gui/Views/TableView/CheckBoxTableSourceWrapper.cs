@@ -29,7 +29,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
 
         tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
 
-        tableView.MouseClick += TableView_MouseClick;
+        tableView.Activating += Table_Activating;
         tableView.CellToggled += TableView_CellToggled;
     }
 
@@ -151,8 +151,14 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         tableView.SetNeedsDraw ();
     }
 
-    private void TableView_MouseClick (object sender, MouseEventArgs e)
+    private void Table_Activating (object sender, CommandEventArgs commandEventArgs)
     {
+        if (commandEventArgs.Context is not CommandContext<MouseBinding> mouseContext)
+        {
+            return;
+        }
+
+        MouseEventArgs e = mouseContext.Binding.MouseEventArgs!;
         // we only care about clicks (not movements)
         if (!e.Flags.HasFlag (MouseFlags.Button1Clicked))
         {

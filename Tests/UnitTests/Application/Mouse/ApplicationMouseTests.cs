@@ -119,11 +119,18 @@ public class ApplicationMouseTests
 
         var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
-        view.MouseClick += (s, e) =>
+        view.Activating += (s, e) =>
                            {
-                               Assert.Equal (expectedX, e.Position.X);
-                               Assert.Equal (expectedY, e.Position.Y);
-                               clicked = true;
+                               if (e.Context is CommandContext<MouseBinding> mouseCommandContext)
+                               {
+                                   Assert.Equal (expectedX, mouseCommandContext.Binding.MouseEventArgs!.Position.X);
+                                   Assert.Equal (expectedY, mouseCommandContext.Binding.MouseEventArgs.Position.Y);
+                                   clicked = true;
+                               }
+                               else
+                               {
+                                   Assert.Fail ();
+                               }
                            };
 
         var top = new Toplevel ();
@@ -221,11 +228,18 @@ public class ApplicationMouseTests
 
         var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
-        view.MouseClick += (s, e) =>
+        view.Activating += (s, e) =>
                            {
-                               Assert.Equal (expectedX, e.Position.X);
-                               Assert.Equal (expectedY, e.Position.Y);
-                               clicked = true;
+                               if (e.Context is CommandContext<MouseBinding> mouseCommandContext)
+                               {
+                                   Assert.Equal (expectedX, mouseCommandContext.Binding.MouseEventArgs!.Position.X);
+                                   Assert.Equal (expectedY, mouseCommandContext.Binding.MouseEventArgs.Position.Y);
+                                   clicked = true;
+                               }
+                               else
+                               {
+                                   Assert.Fail ();
+                               }
                            };
 
         Application.RaiseMouseEvent (mouseEvent);
@@ -439,7 +453,7 @@ public class ApplicationMouseTests
         Application.LayoutAndDraw ();
 
         var clickedCount = 0;
-        view.MouseClick += (s, e) => clickedCount++;
+        view.Activating += (s, e) => clickedCount++;
 
         var me = new MouseEventArgs ();
         Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Pressed, });
