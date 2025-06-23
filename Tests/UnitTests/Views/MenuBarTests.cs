@@ -412,7 +412,8 @@ public class MenuBarTests ()
     // QUESTION: What does Mac do?
     // QUESTION: How bad is it that this test is skipped?
     // QUESTION: Fixing this could be challenging. Should we fix it?
-    [Fact (Skip = "Clicking outside Popover, passes mouse event to MenuBar, which activates the same item again.")]
+    // ANSWER: Yes, already fixed. Now clicking on the menu bar item again closes the menu.
+    [Fact]
     [AutoInitShutdown]
     public void Mouse_Click_Deactivates ()
     {

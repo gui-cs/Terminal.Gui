@@ -133,6 +133,7 @@ public class Menuv2 : Bar
             // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
             return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
+
         return false;
     }
 

@@ -423,19 +423,29 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         menuBarItem.Accepting += OnMenuItemAccepted;
 
-        menuBarItem.PopoverMenu!.Root.SchemeName = SchemeName;
+        menuBarItem.PopoverMenu!.Root!.SchemeName = SchemeName;
 
         return;
 
-        void OnMenuItemAccepted (object? sender, EventArgs args)
+        void OnMenuItemAccepted (object? sender, CommandEventArgs args)
         {
             // Logging.Debug ($"{Title} - OnMenuItemAccepted");
-            menuBarItem.PopoverMenu!.VisibleChanged -= OnMenuItemAccepted;
+            menuBarItem.Accepting -= OnMenuItemAccepted;
 
             if (Active && menuBarItem.PopoverMenu is { Visible: false })
             {
                 Active = false;
                 HasFocus = false;
+            }
+            else if (args.Context is CommandContext<MouseBinding>)
+            {
+                if (Active && menuBarItem.PopoverMenu is { Visible: true })
+                {
+                    Active = false;
+                    HasFocus = false;
+                }
+
+                args.Handled = true;
             }
         }
     }

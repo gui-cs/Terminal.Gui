@@ -187,7 +187,6 @@ public class MenuBarItemv2 : MenuItemv2
                 menuBar.HideActiveItem ();
             }
 
-
             return true;
         }
         return false;
