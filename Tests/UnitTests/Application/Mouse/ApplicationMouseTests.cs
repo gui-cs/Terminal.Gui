@@ -410,4 +410,89 @@ public class ApplicationMouseTests
     }
 
     #endregion
+
+
+    [Theory]
+    [InlineData (MouseState.None)]
+    [InlineData (MouseState.In)]
+    [InlineData (MouseState.Pressed)]
+    [InlineData (MouseState.PressedOutside)]
+    public void RaiseMouseEvent_ButtonClicked_Raises_MouseClick_Once (MouseState states)
+    {
+        Application.Init (new FakeDriver ());
+
+        Application.Top = new Toplevel ()
+        {
+            Id = "top",
+            Height = 10,
+            Width = 10
+        };
+
+        var view = new View
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = false,
+            HighlightStates = states
+        };
+        Application.Top.Add (view);
+        Application.LayoutAndDraw ();
+
+        var clickedCount = 0;
+        view.MouseClick += (s, e) => clickedCount++;
+
+        var me = new MouseEventArgs ();
+        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Pressed, });
+        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Released, });
+        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Clicked, });
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+
+        Assert.Equal (1, clickedCount);
+    }
+
+    [Theory]
+    [InlineData (MouseState.None)]
+    [InlineData (MouseState.In)]
+    [InlineData (MouseState.Pressed)]
+    [InlineData (MouseState.PressedOutside)]
+    public void RaiseMouseEvent_ButtonClicked_Raises_Accept_Once (MouseState states)
+    {
+        Application.Init (new FakeDriver ());
+
+        Application.Top = new Toplevel ()
+        {
+            Id = "top",
+            Height = 10,
+            Width = 10
+        };
+
+        var view = new View
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = false,
+            HighlightStates = states
+        };
+
+        view.MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Accept);
+
+        Application.Top.Add (view);
+        Application.LayoutAndDraw ();
+
+        var clickedCount = 0;
+        view.Accepting += (s, e) => clickedCount++;
+
+        var me = new MouseEventArgs ();
+        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Pressed, });
+        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Released, });
+        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Clicked, });
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+
+        Assert.Equal (1, clickedCount);
+    }
+
 }

@@ -4,6 +4,20 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
+// DoubleClick - Focus, Activate, and Accept the item under the mouse.
+// Click - Focus, Activate, and do NOT Accept the item under the mouse.
+// CanFocus - Not Focused:
+//  HotKey - Restore Focus. Advance Active. Do NOT Accept.
+//  Item HotKey - Focus item. If item is not active, make Active. Do NOT Accept.
+// !CanFocus - Not Focused:
+//  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
+//  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
+// Focused:
+//  Space key - If focused item is Active, move focus to and Acivate next. Else, Activate current. Do NOT Accept.
+//  Enter key - Activate and Accept the focused item.
+//  HotKey - Restore Focus. Advance Active. Do NOT Accept.
+//  Item HotKey - If item is not active, make Active. Do NOT Accept.
+
 /// <summary>
 ///     Provides a user interface for displaying and selecting a single item from a list of options.
 ///     Each option is represented by a checkbox, but only one can be selected at a time.
@@ -17,6 +31,55 @@ public class OptionSelector : SelectorBase, IDesignable
         // really wants that.
         base.Value = 0;
     }
+
+
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (!HasFocus)
+        {
+            if (Value is null)
+            {
+                Value = Values? [0];
+            }
+        }
+        return base.OnHandlingHotKey (args);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        if (args.Context?.Source is not CheckBox checkBox)
+        {
+            return base.OnActivating (args);
+        }
+
+        if (args.Context is CommandContext<KeyBinding> { } && (int)checkBox.Data! == Value)
+        {
+            // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
+            Cycle ();
+
+            return base.OnActivating (args);
+        }
+        else
+        {
+            if (Value == (int)checkBox.Data!)
+            {
+                return true;
+            }
+
+            Value = (int)checkBox.Data!;
+
+            // if (HasFocus)
+            {
+                UpdateChecked ();
+            }
+
+            //return true;
+        }
+        return base.OnActivating (args);
+    }
+
 
     /// <inheritdoc />
     protected override void OnSubViewAdded (View view)
@@ -40,27 +103,29 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             return;
         }
+
+        if (args.Context is CommandContext<MouseBinding> { } && checkbox.CheckedState == CheckState.Checked)
+        {
+            // If user clicks with mouse and item is already checked, do nothing
+            args.Handled = true;
+            return;
+        }
+
+        if (args.Context is CommandContext<KeyBinding> binding && binding.Command == Command.HotKey && checkbox.CheckedState == CheckState.Checked)
+        {
+            // If user uses an item hotkey and the item is already checked, do nothing
+            args.Handled = true;
+            return;
+        }
+
         // Activating doesn't normally propogate, so we do it here
         if (RaiseActivating (args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
-        }
-
-        if (args.Context is CommandContext<KeyBinding> { } && (int)checkbox.Data! == Value)
-        {
-            // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
-            Cycle ();
-        }
-        else
-        {
-            Value = (int)checkbox.Data!;
-
-            if (HasFocus)
-            {
-                UpdateChecked ();
-            }
+            args.Handled = true;
         }
         args.Handled = true;
+
     }
 
     private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
@@ -74,18 +139,20 @@ public class OptionSelector : SelectorBase, IDesignable
 
     private void Cycle ()
     {
-        if (Value == Labels?.Count () - 1)
+        int valueIndex = Values.IndexOf (v => v == Value);
+        if (valueIndex == Values?.Count () - 1)
         {
-            Value = 0;
+            Value = Values! [0];
         }
         else
         {
-            Value++;
+            Value = Values! [++valueIndex];
         }
 
         if (HasFocus)
         {
-            SubViews.OfType<CheckBox> ().ToArray () [Value!.Value].SetFocus ();
+            valueIndex = Values.IndexOf (v => v == Value);
+            SubViews.OfType<CheckBox> ().ToArray () [valueIndex].SetFocus ();
         }
     }
 
@@ -105,6 +172,91 @@ public class OptionSelector : SelectorBase, IDesignable
 
         // Verify at most one is checked
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
+    }
+
+    /// <summary>
+    ///     Gets or sets the list of labels for each value in <see cref="Values"/>.
+    /// </summary>
+    public string [] RadioLabels
+    {
+        get => Labels?.ToArray () ?? [];
+        set => Labels = value;
+    }
+
+    /// <summary>Gets or sets the selected radio label index.</summary>
+    /// <value>The index. -1 if no item is selected.</value>
+    public int SelectedItem
+    {
+        get
+        {
+            if (Value is null)
+            {
+                return -1;
+            }
+
+            return Value.Value;
+        }
+        set
+        {
+            int? prevValue = Value;
+            if (value == -1)
+            {
+                Value = null;
+            }
+            else
+            {
+                Value = value;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnValueChanged (int? value, int? previousValue)
+    {
+        int newValue = -1;
+        int prevValue = -1;
+
+        if (value is { })
+        {
+            newValue = value.Value;
+        }
+
+        if (previousValue is { })
+        {
+            prevValue = previousValue.Value;
+        }
+
+        OnSelectedItemChanged (newValue, prevValue);
+        SelectedItemChanged?.Invoke (this, new (newValue, prevValue));
+    }
+
+    /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
+    /// <param name="selectedItem"></param>
+    /// <param name="previousSelectedItem"></param>
+    protected virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem) { }
+    /// <summary>Raised when the selected radio label has changed.</summary>
+    public event EventHandler<SelectedItemChangedArgs>? SelectedItemChanged;
+
+    /// <summary>
+    ///     Gets or sets the <see cref="RadioLabels"/> index for the cursor. The cursor may or may not be the selected
+    ///     RadioItem.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Maps to either the X or Y position within <see cref="View.Viewport"/> depending on <see cref="Orientation"/>.
+    ///     </para>
+    /// </remarks>
+    public int Cursor
+    {
+        get
+        {
+            if (!CanFocus)
+            {
+                return 0;
+            }
+            return SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+        }
+        set => throw new NotImplementedException ();
     }
 
     /// <inheritdoc/>

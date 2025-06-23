@@ -4,6 +4,17 @@ using System.Collections.Immutable;
 
 namespace Terminal.Gui.Views;
 
+// DoubleClick - Focus, Activate (Toggle), and Accept the item under the mouse.
+// Click - Focus, Activate (Toggle), and do NOT Accept the item under the mouse.
+// Not Focused:
+//  HotKey - Restore Focus. Do NOT change Active.
+//  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
+// Focused:
+//  Space key - Activate (Toggle) focused item. Do NOT Accept.
+//  Enter key - Activate (Toggle) and Accept the focused item.
+//  HotKey - No-op.
+//  Item HotKey - Focus item, Activate (Toggle), and do NOT Accept.
+
 /// <summary>
 ///     Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary.
 ///     <see cref="FlagSelector{TFlagsEnum}"/> provides a type-safe version where a `[Flags]` <see langword="enum"/> can be
@@ -24,7 +35,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.CheckedStateChanging += OnCheckboxOnCheckedStateChanging;
         checkbox.CheckedStateChanged += OnCheckboxOnCheckedStateChanged;
-        checkbox.Activating += OnCheckboxOnActivating;
+      //  checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
@@ -79,10 +90,10 @@ public class FlagSelector : SelectorBase, IDesignable
         // Activating doesn't normally propogate, so we do it here
         if (RaiseActivating (args.Context) is true || !HasFocus)
         {
-            args.Handled = true;
+            //args.Handled = true;
 
-            return;
         }
+        //args.Handled = true;
     }
 
     private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)

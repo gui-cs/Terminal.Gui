@@ -36,7 +36,7 @@ public class Label : View, IDesignable
         {
             // If the Label cannot focus (the default) invoke the HotKey command
             // This lets the user click on the Label to invoke the next View's HotKey
-            return InvokeCommand<MouseBinding> (Command.HotKey, new ([Command.HotKey], args)) == true;
+            return InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, null)) == true;
         }
 
         return base.OnMouseClick (args);
@@ -87,7 +87,15 @@ public class Label : View, IDesignable
 
             if (me != -1 && me < SuperView?.SubViews.Count - 1)
             {
-                return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey, commandContext) == true;
+                View? nextPeer = SuperView?.SubViews.ElementAt (me + 1);
+                if (nextPeer is null || commandContext is not CommandContext<KeyBinding> keyCommandContext)
+                {
+                    return false;
+                }
+
+                // Swap out the key to the HotKey of the target view
+                keyCommandContext.Binding = keyCommandContext.Binding with {Key = nextPeer.HotKey};
+                return nextPeer.InvokeCommand (Command.HotKey, keyCommandContext) == true;
             }
         }
 

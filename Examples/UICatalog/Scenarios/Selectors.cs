@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -21,20 +21,40 @@ public sealed class Selectors : Scenario
         FrameView? optionSelectorsFrame = null;
         FrameView? flagSelectorsFrame = null;
 
-        OptionSelector orientationSelector = new ()
+        OptionSelector<Orientation> orientationSelector = new ()
         {
             Orientation = Orientation.Horizontal,
-            Labels = new List<string> { "_Vertical", "_Horizontal" },
             BorderStyle = LineStyle.Dotted,
-            Title = "Selector Or_ientation"
+            Title = "Selector Or_ientation",
+            Value = Orientation.Vertical
         };
         orientationSelector.ValueChanged += OrientationSelectorOnSelectedItemChanged;
 
-        CheckBox showBorderAndTitle = new ()
+        FlagSelector<SelectorStyles> stylesSelector = new ()
         {
             X = Pos.Right (orientationSelector) + 1,
-            Title = "Show Border _& Title",
-            CheckedState = CheckState.Checked
+            Orientation = Orientation.Horizontal,
+            BorderStyle = LineStyle.Dotted,
+            Title = "Selector St_yles",
+        };
+        stylesSelector.ValueChanged += StylesSelectorOnValueChanged;
+
+        NumericUpDown<int> horizontalSpace = new ()
+        {
+            X = Pos.Right (stylesSelector) + 1,
+            Width = 11,
+            Title = "H_. Space",
+            Value = stylesSelector.HorizontalSpace,
+            BorderStyle = LineStyle.Dotted,
+        };
+        horizontalSpace.ValueChanging += HorizontalSpaceOnValueChanging;
+
+        CheckBox showBorderAndTitle = new ()
+        {
+            X = Pos.Right (horizontalSpace) + 1,
+            Title = "Border _& Title",
+            CheckedState = CheckState.Checked,
+            BorderStyle = LineStyle.Dotted,
         };
         showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
 
@@ -59,27 +79,25 @@ public sealed class Selectors : Scenario
             BorderStyle = LineStyle.Dotted,
             UsedHotKeys = { label.HotKey },
             AssignHotKeys = true,
-            Labels = ["Option _1 (0)", "Option _2 (1)", "Option _3 (5)", "Option _Quattro (4)"],
+            Labels = ["Option _1 (0)", "Option _2 (1)", "Option _3 (5) 你", "Option _Quattro (4) 你"],
             Values = [0, 1, 5, 4],
-            Styles = SelectorStyles.All
         };
         optionSelectorsFrame.Add (label, optionSelector);
 
         label = new ()
         {
             Y = Pos.Bottom (optionSelector),
-            Title = "<VisualRole>:"
+            Title = "<VisualRole_>:"
         };
 
         OptionSelector<VisualRole> optionSelectorT = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Bottom (optionSelector),
-            Title = "<VisualRole>",
+            Title = "<Vi_sualRole>",
             BorderStyle = LineStyle.Dotted,
-            //UsedHotKeys = optionSelector.UsedHotKeys,
+            UsedHotKeys = optionSelector.UsedHotKeys,
             AssignHotKeys = true,
-            Styles = SelectorStyles.All
         };
 
         optionSelectorsFrame.Add (label, optionSelectorT);
@@ -105,7 +123,6 @@ public sealed class Selectors : Scenario
             UsedHotKeys = optionSelectorT.UsedHotKeys,
             BorderStyle = LineStyle.Dotted,
             Title = "FlagSe_lector (uint)",
-            Styles = SelectorStyles.All,
             AssignHotKeys = true,
             Values =
             [
@@ -138,13 +155,12 @@ public sealed class Selectors : Scenario
             BorderStyle = LineStyle.Dotted,
             Title = "<ViewD_iagnosticFlags>",
             Y = Pos.Bottom (flagSelector),
-            Styles = SelectorStyles.All,
             UsedHotKeys = flagSelector.UsedHotKeys,
             AssignHotKeys = true
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
 
-        appWindow.Add (orientationSelector, showBorderAndTitle, optionSelectorsFrame, flagSelectorsFrame);
+        appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, optionSelectorsFrame, flagSelectorsFrame);
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -157,36 +173,75 @@ public sealed class Selectors : Scenario
 
         void OrientationSelectorOnSelectedItemChanged (object? sender, EventArgs<int?> e)
         {
-            List<OptionSelector> optionSelectors = optionSelectorsFrame.SubViews.OfType<OptionSelector> ().ToList ();
-
-            foreach (OptionSelector selector in optionSelectors)
+            if (sender is not OptionSelector<Orientation> s)
             {
-                selector.Orientation = orientationSelector.Value == 0 ? Orientation.Vertical : Orientation.Horizontal;
+                return;
             }
 
-            List<FlagSelector> flagsSelectors = flagSelectorsFrame.SubViews.OfType<FlagSelector> ().ToList ();
-
-            foreach (FlagSelector selector in flagsSelectors)
+            List<SelectorBase> selectors = GetAllSelectors ();
+            foreach (SelectorBase selector in selectors)
             {
-                selector.Orientation = orientationSelector.Value == 0 ? Orientation.Vertical : Orientation.Horizontal;
+                selector.Orientation = s.Value!.Value;
             }
         }
+
+        void StylesSelectorOnValueChanged (object? sender, EventArgs<int?> e)
+        {
+            if (sender is not FlagSelector<SelectorStyles> s)
+            {
+                return;
+            }
+
+            List<SelectorBase> selectors = GetAllSelectors ();
+
+            foreach (SelectorBase selector in selectors)
+            {
+                selector.Styles = s.Value!.Value;
+            }
+        }
+
+        void HorizontalSpaceOnValueChanging (object? sender, CancelEventArgs<int> e)
+        {
+            if (sender is not NumericUpDown<int> upDown || e.NewValue < 0)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            List<SelectorBase> selectors = GetAllSelectors ();
+
+            foreach (SelectorBase selector in selectors)
+            {
+                selector.HorizontalSpace = e.NewValue;
+            }
+        }
+
 
         void ShowBorderAndTitleOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
         {
-            List<OptionSelector> optionSelectors = optionSelectorsFrame.SubViews.OfType<OptionSelector> ().ToList ();
-
-            foreach (OptionSelector selector in optionSelectors)
+            if (sender is not CheckBox cb)
             {
-                selector.Border.Thickness = e.Value == CheckState.Checked ? new (1) : new Thickness (0);
+                return;
             }
 
-            List<FlagSelector> flagsSelectors = flagSelectorsFrame.SubViews.OfType<FlagSelector> ().ToList ();
+            List<SelectorBase> selectors = GetAllSelectors ();
 
-            foreach (FlagSelector selector in flagsSelectors)
+            foreach (SelectorBase selector in selectors)
             {
-                selector.Border.Thickness = e.Value == CheckState.Checked ? new (1) : new Thickness (0);
+                selector.Border!.Thickness = cb.CheckedState == CheckState.Checked ? new (1) : new Thickness (0);
             }
         }
+
+        List<SelectorBase> GetAllSelectors ()
+        {
+            List<SelectorBase> optionSelectors = [];
+            // ReSharper disable once AccessToModifiedClosure
+            optionSelectors.AddRange (optionSelectorsFrame!.SubViews.OfType<SelectorBase> ());
+            // ReSharper disable once AccessToModifiedClosure
+            optionSelectors.AddRange (flagSelectorsFrame!.SubViews.OfType<FlagSelector> ());
+
+            return optionSelectors;
+        }
     }
+
 }

@@ -297,7 +297,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Mouse_DoubleClick_Accepts ()
+    public void Mouse_DoubleClick_Does_Not_Advance_And_Accepts ()
     {
         var checkBox = new CheckBox { Text = "_Checkbox" };
         Assert.True (checkBox.CanFocus);
@@ -576,7 +576,7 @@ public class CheckBoxTests (ITestOutputHelper output)
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
     [InlineData (CheckState.None)]
-    public void Selected_Handle_Event_Does_Not_Prevent_Change (CheckState initialState)
+    public void Activated_Handle_Event_Prevents_Change (CheckState initialState)
     {
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
@@ -589,7 +589,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         bool? ret = ckb.InvokeCommand (Command.Activate);
         Assert.True (ret);
         Assert.True (checkedInvoked);
-        Assert.NotEqual (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.CheckedState);
 
         return;
 

@@ -599,14 +599,23 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel ()
+        {
+            Width = 10,
+            Height = 10,
+        };
         var me = new MouseEventArgs ();
 
         var button = new Button
         {
+            ShadowStyle = ShadowStyle.None,
             Width = 1,
             Height = 1,
             WantContinuousButtonPressed = true
         };
+        Application.Top.Add (button);
+        Application.LayoutAndDraw();
 
         var activatingCount = 0;
 
@@ -621,23 +630,24 @@ public class ButtonTests (ITestOutputHelper output)
 
         me = new ();
         me.Flags = pressed;
-        button.NewMouseEvent (me);
+        Application.RaiseMouseEvent (me);
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
         me = new ();
         me.Flags = released;
-        button.NewMouseEvent (me);
+        Application.RaiseMouseEvent (me);
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
         me = new ();
         me.Flags = clicked;
-        button.NewMouseEvent (me);
+        Application.RaiseMouseEvent (me);
         Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptedCount);
 
-        button.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Theory]

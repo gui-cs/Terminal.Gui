@@ -54,6 +54,7 @@ public class MouseTests : TestsAllViews
         top.Dispose ();
     }
 
+
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
@@ -106,7 +107,12 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_MouseClick (MouseFlags clicked)
     {
-        var me = new MouseEventArgs ();
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel ()
+        {
+            Width = 10,
+            Height = 10,
+        };
 
         var view = new View
         {
@@ -114,16 +120,21 @@ public class MouseTests : TestsAllViews
             Height = 1,
             WantContinuousButtonPressed = true
         };
+        Application.Top.Add (view);
 
         var clickedCount = 0;
 
         view.MouseClick += (s, e) => clickedCount++;
 
-        me.Flags = clicked;
-        view.NewMouseEvent (me);
+        var me = new MouseEventArgs
+        {
+            Flags = clicked
+        };
+
+        Application.RaiseMouseEvent (me);
         Assert.Equal (1, clickedCount);
 
-        view.Dispose ();
+        Application.Top.Dispose ();
 
         // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
         Application.ResetState (true);
@@ -134,7 +145,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Accepting (MouseFlags clicked)
+    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
     {
         var me = new MouseEventArgs ();
 
@@ -157,6 +168,118 @@ public class MouseTests : TestsAllViews
 
         // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
         Application.ResetState (true);
+    }
+
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Clicked_Releases_Grab (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel ()
+        {
+            Width = 10,
+            Height = 10,
+        };
+        var me = new MouseEventArgs ();
+
+        var view = new View
+        {
+            CanFocus = true,
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+        Application.Top.Add (view);
+
+        var activatingCount = 0;
+
+        view.Activating += (s, e) => activatingCount++;
+
+        me = new ()
+        {
+            Flags = pressed
+        };
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (0, activatingCount);
+
+        me = new ()
+        {
+            Flags = released
+        };
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (0, activatingCount);
+
+        me = new ()
+        {
+            Flags = clicked
+        };
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (1, activatingCount);
+
+        Assert.Null (Application.MouseGrabView);
+
+        me = new ()
+        {
+            Flags = pressed
+        };
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (1, activatingCount);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_ButtonClick_Does_Not_Raise_Accept (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel ()
+        {
+            Width = 10,
+            Height = 10,
+        };
+        var me = new MouseEventArgs ();
+
+        var view = new View
+        {
+            CanFocus = true,
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+        Application.Top.Add (view);
+
+        var acceptingCount = 0;
+
+        view.Accepting += (s, e) => acceptingCount++;
+
+        me = new ();
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (0, acceptingCount);
+
+        me = new ();
+        me.Flags = released;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (0, acceptingCount);
+
+        me = new ();
+        me.Flags = clicked;
+        Application.RaiseMouseEvent (me);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+
+        Assert.Equal (0, acceptingCount);
     }
 
     [Theory]
@@ -251,6 +374,115 @@ public class MouseTests : TestsAllViews
         // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
         Application.ResetState (true);
     }
+
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button_Press_Repeatedly_Raises_Activating_Repeatedly (
+        MouseFlags pressed,
+        MouseFlags released,
+        MouseFlags clicked
+    )
+    {
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel () { Frame = new (0, 0, 10, 10) };
+
+        var me = new MouseEventArgs ();
+
+        var view = new View
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true,
+        };
+        Application.Top.Add (view);
+
+        var activatingCount = 0;
+
+        view.Activating += (s, e) => activatingCount++;
+
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (0, activatingCount);
+        me.Handled = false;
+
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (1, activatingCount);
+        me.Handled = false;
+
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (2, activatingCount);
+        me.Handled = false;
+
+        me.Flags = released;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (2, activatingCount);
+        me.Handled = false;
+
+        view.Dispose ();
+
+        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        Application.ResetState (true);
+    }
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button_Press_Repeatedly_Raises_MouseClick_Repeatedly (
+        MouseFlags pressed,
+        MouseFlags released,
+        MouseFlags clicked
+    )
+    {
+        Application.Init (new FakeDriver ());
+        Application.Top = new Toplevel () { Frame = new (0, 0, 10, 10) };
+
+        var me = new MouseEventArgs ();
+
+        var view = new View
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true,
+        };
+        Application.Top.Add (view);
+
+        var clickedCount = 0;
+
+        view.MouseClick += (s, e) => clickedCount++;
+
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (0, clickedCount);
+        me.Handled = false;
+
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+        me.Handled = false;
+
+        me.Flags = pressed;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (2, clickedCount);
+        me.Handled = false;
+
+        me.Flags = released;
+        Application.RaiseMouseEvent (me);
+        Assert.Equal (2, clickedCount);
+        me.Handled = false;
+
+        view.Dispose ();
+
+        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        Application.ResetState (true);
+    }
+
 
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()

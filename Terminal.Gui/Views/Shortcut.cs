@@ -192,7 +192,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         ShowHide ();
         ForceCalculateNaturalWidth ();
-
+            
         if (Width is DimAuto widthAuto || HelpView!.Margin is null)
         {
             return;

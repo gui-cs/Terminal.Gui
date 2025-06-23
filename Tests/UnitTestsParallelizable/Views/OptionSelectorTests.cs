@@ -11,9 +11,24 @@ public class OptionSelectorTests
         Assert.Equal (Dim.Auto (DimAutoStyle.Content), optionSelector.Width);
         Assert.Equal (Dim.Auto (DimAutoStyle.Content), optionSelector.Height);
         Assert.Equal (Orientation.Vertical, optionSelector.Orientation);
-        Assert.Null (optionSelector.Value);
+        Assert.Equal (0, optionSelector.Value);
         Assert.Null (optionSelector.Labels);
     }
+
+
+    [Fact]
+    public void Initialization_With_Options_Value_Is_First ()
+    {
+        OptionSelector optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2"];
+
+        optionSelector.Labels = options;
+        Assert.Equal(0, optionSelector.Value);
+
+        CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+    }
+
 
     [Fact]
     public void SetOptions_ShouldCreateCheckBoxes ()
@@ -131,6 +146,33 @@ public class OptionSelectorTests
     }
 
     [Fact]
+    public void HotKey_No_SelectedItem_Selects_First ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+
+        var selector = new OptionSelector
+        {
+            Title = "Radio_Group",
+            RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
+        };
+        selector.SelectedItem = -1;
+
+        superView.Add (selector);
+
+        Assert.False (selector.HasFocus);
+        Assert.Equal (-1, selector.SelectedItem);
+
+        selector.NewKeyDownEvent (Key.G.WithAlt);
+
+        Assert.Equal (0, selector.SelectedItem);
+        Assert.True (selector.HasFocus);
+    }
+
+    [Fact]
     public void Accept_Command_Fires_Accept ()
     {
         var optionSelector = new OptionSelector ();
@@ -148,14 +190,17 @@ public class OptionSelectorTests
     }
 
     [Fact]
-    public void Mouse_Click_Activates ()
+    public void Mouse_Click_On_Activated_Does_Nothing ()
     {
         OptionSelector optionSelector = new OptionSelector ();
         List<string> options = ["Option1", "Option2"];
 
         optionSelector.Labels = options;
+        optionSelector.Layout ();
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
         var mouseEvent = new MouseEventArgs
         {
@@ -163,11 +208,83 @@ public class OptionSelectorTests
             Flags = MouseFlags.Button1Clicked
         };
 
-        optionSelector.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouseEvent);
 
+        Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").CheckedState);
     }
 
+
+    [Fact]
+    public void Mouse_Click_On_NotActivated_Activates ()
+    {
+        OptionSelector optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+
+        var mouseEvent = new MouseEventArgs
+        {
+            Position = checkBox.Frame.Location,
+            Flags = MouseFlags.Button1Clicked
+        };
+
+        checkBox.NewMouseEvent (mouseEvent);
+
+        Assert.Equal (1, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
+    }
+
+
+    [Fact]
+    public void Key_Space_On_Activated_Cycles ()
+    {
+        OptionSelector optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+
+        checkBox.NewKeyDownEvent(Key.Space);
+
+        Assert.Equal (1, optionSelector.Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").CheckedState);
+    }
+
+
+    [Fact]
+    public void Key_Space_On_NotActivated_Activates ()
+    {
+        OptionSelector optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+
+        checkBox.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (1, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
+    }
     [Fact]
     public void Values_ShouldUseOptions_WhenValuesIsNull ()
     {
@@ -215,23 +332,26 @@ public class OptionSelectorTests
 
 
     [Fact]
-    public void Item_HotKey_Null_Value_Changes_Value_And_Does_Not_SetFocus ()
+    public void Item_HotKey_Null_Value_Changes_Value_And_SetsFocus ()
     {
         var superView = new View
         {
             CanFocus = true
         };
-        superView.Add (new View { CanFocus = true });
+        superView.Add (new View { Id = "otherView", CanFocus = true });
         var selector = new OptionSelector ();
         selector.Labels = ["_One", "_Two"];
         superView.Add (selector);
+        superView.SetFocus ();
 
         Assert.False (selector.HasFocus);
         Assert.Equal (0, selector.Value);
+        selector.Value = null;
+        Assert.False (selector.HasFocus);
 
         selector.NewKeyDownEvent (Key.T);
 
-        Assert.False (selector.HasFocus);
+        Assert.True (selector.HasFocus);
         Assert.Equal (1, selector.Value);
     }
 }

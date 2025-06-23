@@ -193,6 +193,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
+        Logging.Debug ($"{deepestViewUnderMouse?.Id} - {mouseEvent.Flags}, {mouseEvent.Position}");
         if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
@@ -315,39 +316,42 @@ public static partial class Application // Mouse handling
 
     internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
     {
-        if (MouseGrabView is { })
+        if (MouseGrabView is null)
         {
+            return false;
+        }
+
 #if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
-            {
-                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
-            }
+        if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
+        {
+            throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
+        }
 #endif
 
-            // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
+        // If the mouse is grabbed, send the event to the view that grabbed it.
+        // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+        Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
 
-            var viewRelativeMouseEvent = new MouseEventArgs
-            {
-                Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.ScreenPosition,
-                View = deepestViewUnderMouse ?? MouseGrabView
-            };
+        var viewRelativeMouseEvent = new MouseEventArgs
+        {
+            Position = frameLoc,
+            Flags = mouseEvent.Flags,
+            ScreenPosition = mouseEvent.ScreenPosition,
+            View = deepestViewUnderMouse ?? MouseGrabView
+        };
 
-            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
-            {
-                return true;
-            }
+        //Logging.Debug ($"{deepestViewUnderMouse!.Id};{viewRelativeMouseEvent.Flags};{viewRelativeMouseEvent.Position};{MouseGrabView.Id}");
+        if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true || viewRelativeMouseEvent.IsSingleDoubleOrTripleClicked)
+        {
+            // If the view that grabbed the mouse handled the event OR it was a click we are done.
+            return true;
+        }
 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
-            {
-                // The view that grabbed the mouse has been disposed
-                return true;
-            }
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
+        {
+            // The view that grabbed the mouse has been disposed
+            return true;
         }
 
         return false;

@@ -22,18 +22,8 @@ public abstract class SelectorBase : View, IOrientation
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
-        // Enter key - Accept the currently selected item
-        // DoubleClick - Activate (focus) and Accept the item under the mouse
-        // Space key - Toggle the currently selected item
-        // Click - Activate (focus) and Activate the item under the mouse
-        // Not Focused:
-        //  HotKey - Activate (focus). Do NOT change state.
-        //  Item HotKey - Toggle the item (Do NOT Activate)
-        // Focused:
-        //  HotKey - Toggle the currently selected item
-        //  Item HotKey - Toggle the item.
-        AddCommand (Command.Activate, HandleActivateCommand);
-        AddCommand (Command.HotKey, HandleHotKeyCommand);
+        AddCommand (Command.Accept, HandleAcceptCommand);
+        //AddCommand (Command.HotKey, HandleHotKeyCommand);
 
         //CreateSubViews ();
     }
@@ -54,13 +44,49 @@ public abstract class SelectorBase : View, IOrientation
             }
 
             _styles = value;
-            
+
             CreateSubViews ();
             UpdateChecked ();
         }
     }
 
-    private bool? HandleActivateCommand (ICommandContext? ctx) { return RaiseActivating (ctx); }
+    private bool? HandleAcceptCommand (ICommandContext? ctx)
+    {
+        if (!DoubleClickAccepts
+            && ctx is CommandContext<MouseBinding> mouseCommandContext
+            && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+        {
+            return false;
+        }
+
+        return RaiseAccepting (ctx);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        // If the command did not come from a keyboard event, ignore it
+        if (args.Context is not CommandContext<KeyBinding> keyCommandContext)
+        {
+            return base.OnHandlingHotKey (args);
+        }
+
+        if (HasFocus)
+        {
+            if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
+            {
+                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
+                return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
+            }
+        }
+        return base.OnHandlingHotKey (args);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        return base.OnAccepting (args);
+    }
 
     private bool? HandleHotKeyCommand (ICommandContext? ctx)
     {
@@ -74,9 +100,20 @@ public abstract class SelectorBase : View, IOrientation
         {
             if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
             {
-                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
-                return InvokeCommand (Command.Activate, ctx);
+                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
+                return Focused?.InvokeCommand (Command.Activate, ctx);
             }
+        }
+        else
+        {
+            //if (Value is null)
+            //{
+            //    Value = Values? [0];
+
+            //    return SetFocus ();
+            //}
+
+           // return InvokeCommand (Command.Activate, ctx);
         }
 
         if (RaiseHandlingHotKey (ctx) == true)
@@ -84,10 +121,12 @@ public abstract class SelectorBase : View, IOrientation
             return true;
         }
 
-        // Default Command.Hotkey sets focus
         SetFocus ();
 
-        return false;
+        // Always return true on hotkey, even if SetFocus fails because 
+        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
+
+        return true;
     }
 
     private int? _value;
@@ -97,18 +136,10 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     public virtual int? Value
     {
-        get => _value ?? (Values?.Any () == true ? Values.First () : null);
+        get => _value;
         set
         {
-            if (Values is null || !Values.Any ())
-            {
-                // If Values is null or empty, set _value to null and return
-                _value = null;
-
-                return;
-            }
-
-            if (value is { } && !Values.Contains (value ?? -1))
+            if (value is { } && Values is { } && !Values.Contains (value ?? -1))
             {
                 throw new ArgumentOutOfRangeException (nameof (value), @$"Value must be one of the following: {string.Join (", ", Values)}");
             }
@@ -125,6 +156,7 @@ public abstract class SelectorBase : View, IOrientation
             RaiseValueChanged (previousValue);
         }
     }
+
 
     /// <summary>
     ///     Raised the <see cref="ValueChanged"/> event.
@@ -311,16 +343,12 @@ public abstract class SelectorBase : View, IOrientation
     /// <summary>
     ///     Called before <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
     /// </summary>
-    protected virtual void OnCreatingSubViews ()
-    {
-    }
+    protected virtual void OnCreatingSubViews () { }
 
     /// <summary>
     ///     Called after <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
     /// </summary>
-    protected virtual void OnCreatedSubViews ()
-    {
-    }
+    protected virtual void OnCreatedSubViews () { }
 
     /// <summary>
     ///     INTERNAL: Creates a checkbox subview
@@ -383,28 +411,66 @@ public abstract class SelectorBase : View, IOrientation
         }
     }
 
+    private int _horizontalSpace = 2;
+
+    /// <summary>
+    ///     Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="Orientation"/> is
+    ///     <see cref="Orientation.Horizontal"/>
+    /// </summary>
+    public int HorizontalSpace
+    {
+        get => _horizontalSpace;
+        set
+        {
+            if (_horizontalSpace != value)
+            {
+                _horizontalSpace = value;
+                SetLayout ();
+                // Pos.Align requires extra layout; good practice to call
+                // Layout to ensure Pos.Align gets updated
+                Layout ();
+            }
+        }
+    }
+
     private void SetLayout ()
     {
-        foreach (View sv in SubViews)
+        for (var i = 0; i < SubViews.Count; i++)
         {
             if (Orientation == Orientation.Vertical)
             {
-                sv.X = 0;
-                sv.Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
+                SubViews.ElementAt (i).X = 0;
+                SubViews.ElementAt (i).Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
+                SubViews.ElementAt (i).Margin!.Thickness = new (0);
             }
             else
             {
-                sv.X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
-                sv.Y = 0;
-                sv.Margin!.Thickness = new (0, 0, 1, 0);
+                SubViews.ElementAt (i).X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
+                SubViews.ElementAt (i).Y = 0;
+                SubViews.ElementAt (i).Margin!.Thickness = new (0, 0, (i < SubViews.Count - 1) ? _horizontalSpace : 0, 0);
             }
         }
     }
 
     /// <summary>
+    ///     Called when the checked state of the checkboxes needs to be updated.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     public abstract void UpdateChecked ();
+
+
+    /// <summary>
+    ///     Gets or sets whether double-clicking on an Item will cause the <see cref="View.Accepting"/> event to be
+    ///     raised.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see langword="false"/> and Accept is not handled, the Accept event on the <see cref="View.SuperView"/> will
+    ///         be raised. The default is
+    ///         <see langword="true"/>.
+    ///     </para>
+    /// </remarks>
+    public bool DoubleClickAccepts { get; set; } = true;
 
     #region IOrientation
 
@@ -430,18 +496,13 @@ public abstract class SelectorBase : View, IOrientation
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation) { SetLayout (); }
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+        SetLayout ();
+        // Pos.Align requires extra layout; good practice to call
+        // Layout to ensure Pos.Align gets updated
+        Layout ();
+    }
 
     #endregion IOrientation
-
-    /// <inheritdoc/>
-    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
-    {
-        if (behavior is { } && behavior != TabStop)
-        {
-            return false;
-        }
-
-        return false;
-    }
 }

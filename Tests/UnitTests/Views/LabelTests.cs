@@ -45,7 +45,7 @@ public class LabelTests (ITestOutputHelper output)
         Assert.False (label.HasFocus);
         Assert.False (nextSubView.HasFocus);
 
-        label.InvokeCommand (Command.HotKey);
+        label.InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], label, null));
         Assert.False (label.HasFocus);
         Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }

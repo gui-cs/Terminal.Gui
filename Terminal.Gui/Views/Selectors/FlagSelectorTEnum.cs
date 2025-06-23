@@ -24,13 +24,4 @@ public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : s
         get => base.Value.HasValue ? (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), base.Value.Value) : (TFlagsEnum?)null;
         set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : (int?)null;
     }
-
-    /// <summary>
-    ///     Prevents calling the base Values property setter with arbitrary values.
-    /// </summary>
-    public override IReadOnlyList<int>? Values
-    {
-        get => base.Values;
-        set => throw new InvalidOperationException ("Setting Values directly is not allowed.");
-    }
 }

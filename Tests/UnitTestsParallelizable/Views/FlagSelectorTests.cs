@@ -269,7 +269,7 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void Item_HotKey_Null_Value_Changes_Value_And_Does_Not_SetFocus ()
+    public void Item_HotKey_Null_Value_Changes_Value_And_SetsFocus ()
     {
         var superView = new View
         {
@@ -285,7 +285,7 @@ public class FlagSelectorTests
 
         flagSelector.NewKeyDownEvent (Key.R);
 
-        Assert.False (flagSelector.HasFocus);
+        Assert.True (flagSelector.HasFocus);
         Assert.Equal (1, flagSelector.Value);
     }
 
@@ -344,11 +344,6 @@ public class FlagSelectorTests
 
     #region Mouse Tests
 
-    [Fact]
-    public void Mouse_Click_Activates ()
-    {
-
-    }
 
     [Fact]
     public void Mouse_DoubleClick_Accepts ()
@@ -356,7 +351,114 @@ public class FlagSelectorTests
 
     }
 
+
+
+    [Fact]
+    public void Mouse_Click_On_Activated_NoneFlag_Does_Nothing ()
+    {
+        FlagSelector selector = new ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        List<string> options = ["Flag1", "Flag2"];
+
+        selector.Labels = options;
+        selector.Layout ();
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag1");
+        Assert.Null (selector.Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        selector.Value = 0;
+
+        var mouseEvent = new MouseEventArgs
+        {
+            Position = checkBox.Frame.Location,
+            Flags = MouseFlags.Button1Clicked
+        };
+
+        checkBox.NewMouseEvent (mouseEvent);
+
+        Assert.Equal (0, selector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag2").CheckedState);
+    }
+
+
+    [Fact]
+    public void Mouse_Click_On_NotActivated_NoneFlag_Toggles ()
+    {
+        FlagSelector selector = new ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        List<string> options = ["Flag1", "Flag2"];
+
+        selector.Labels = options;
+        selector.Layout ();
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag1");
+        Assert.Null (selector.Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        selector.Value = 0;
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+
+        var mouseEvent = new MouseEventArgs
+        {
+            Position = checkBox.Frame.Location,
+            Flags = MouseFlags.Button1Clicked
+        };
+
+        checkBox.NewMouseEvent (mouseEvent);
+
+        Assert.Equal (0, selector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag2").CheckedState);
+    }
+
     #endregion Mouse Tests
+
+    [Fact]
+    public void Key_Space_On_Activated_NoneFlag_Does_Nothing ()
+    {
+        FlagSelector selector = new ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        List<string> options = ["Flag1", "Flag2"];
+
+        selector.Labels = options;
+        selector.Layout ();
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag1");
+        Assert.Null (selector.Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        selector.Value = 0;
+        Assert.Equal (0, selector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+
+        checkBox.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (0, selector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag2").CheckedState);
+    }
+
+
+    [Fact]
+    public void Key_Space_On_NotActivated_NoneFlag_Activates ()
+    {
+        FlagSelector selector = new ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+
+        List<string> options = ["Flag1", "Flag2"];
+
+        selector.Labels = options;
+        selector.Layout ();
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag1");
+        Assert.Null (selector.Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+
+        checkBox.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (0, selector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag2").CheckedState);
+    }
 }
 
 
