@@ -49,7 +49,8 @@ public sealed class Generic : Scenario
         Shortcut scNoAction = new ()
         {
             Title = "No action",
-            CanFocus = false
+            CanFocus = false,
+            Key = Key.F2
         };
         statusBar.Add (scNoAction);
 
