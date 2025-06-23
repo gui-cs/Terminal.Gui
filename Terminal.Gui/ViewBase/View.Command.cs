@@ -147,7 +147,20 @@ public partial class View // Command APIs
         //  - bubbled up the SuperView hierarchy.
         if (!args.Handled)
         {
-            if (ctx is not CommandContext<MouseBinding>)
+            CommandContext<KeyBinding>? keyContext = ctx as CommandContext<KeyBinding>?;
+            CommandContext<MouseBinding>? mouseContext = ctx as CommandContext<MouseBinding>?;
+            object? data = null;
+
+            if (keyContext is { })
+            {
+                data = keyContext.Value.Binding.Data;
+            }
+            else if (mouseContext is { })
+            {
+                data = mouseContext.Value.Binding.Data;
+            }
+
+            if (data is null)
             {
                 // If there's an IsDefault peer view in SubViews, try it
                 View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
