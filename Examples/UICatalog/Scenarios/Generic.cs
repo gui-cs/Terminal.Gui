@@ -20,32 +20,20 @@ public sealed class Generic : Scenario
 
         var button = new Button ()
         {
-            CanFocus = true,
             X = Pos.Center (),
             Y = 1,
-            Height = Dim.Auto(),
-            Width = Dim.Auto(),
             Title = "_Button",
-            //Text = "_Button"
+
+            // Comment this out to see how Issue #4170 is about IsDefault not working with Accepting event.
             IsDefault = true
         };
-        //button.MouseClick += (s, e) =>
-        //                     {
-        //                         if (e.Handled)
-        //                         {
-        //                             return;
-        //                         }
-
-        //                         // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
-        //                         e.Handled = button.InvokeCommand<KeyBinding> (Command.Accept, new KeyBinding ([Command.HotKey], button, data: null)) == true;
-        //                     };
 
         button.Accepting += (s, e) =>
                             {
                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 //e.Handled = true;
                                 Logging.Debug($"button.Acccepting");
-                                //MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
+                                MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 
         appWindow.Add (button);
@@ -59,7 +47,7 @@ public sealed class Generic : Scenario
 
         Shortcut shortcut = new ()
         {
-            Title = "_Click here to see bug",
+            Title = "_Click here to reproduce Issue #4170",
             Key = Key.F2,
             CanFocus = false
         };
