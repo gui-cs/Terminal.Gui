@@ -256,13 +256,14 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
-        if (commandContext is CommandContext<KeyBinding>)
-        {
-            CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
+        CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>?;
+        CommandContext<MouseBinding>? mouseCommandContext = commandContext as CommandContext<MouseBinding>?;
 
+        if (keyCommandContext is { })
+        {
             Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
-            if (keyCommandContext?.Binding.Data != this)
+            if (keyCommandContext.Value.Binding.Data != this)
             {
                 // TODO: Optimize this to only do this if CommandView is custom (non View)
                 // Invoke Select on the CommandView to cause it to change state if it wants to
@@ -275,13 +276,11 @@ public class Shortcut : View, IOrientation, IDesignable
             }
         }
 
-        if (commandContext is CommandContext<MouseBinding>)
+        if (mouseCommandContext is { })
         {
-            CommandContext<MouseBinding>? mouseCommandContext = commandContext as CommandContext<MouseBinding>? ?? default (CommandContext<MouseBinding>);
-
             Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
-            if (mouseCommandContext?.Binding.Data != this)
+            if (mouseCommandContext.Value.Binding.Data != this)
             {
                 // TODO: Optimize this to only do this if CommandView is custom (non View)
                 // Invoke Select on the CommandView to cause it to change state if it wants to
@@ -315,7 +314,16 @@ public class Shortcut : View, IOrientation, IDesignable
             commandContext.Source = this;
         }
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
-        cancel = RaiseAccepting (commandContext) is true;
+
+        if (keyCommandContext is { })
+        {
+            cancel = RaiseAccepting (keyCommandContext) is true;
+        }
+
+        if (mouseCommandContext is { })
+        {
+            cancel = RaiseAccepting (mouseCommandContext) is true;
+        }
 
         if (cancel)
         {
@@ -535,7 +543,6 @@ public class Shortcut : View, IOrientation, IDesignable
                 break;
         }
     }
-
 
     private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
     {
