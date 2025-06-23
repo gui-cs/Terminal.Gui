@@ -18,10 +18,18 @@ public sealed class Generic : Scenario
             BorderStyle = LineStyle.None
         };
 
-        var button = new Button ()
+        var textField = new TextField ()
         {
             X = Pos.Center (),
             Y = 1,
+            Width = Dim.Auto (DimAutoStyle.Auto, 80),
+            Caption = "You can type here and press Enter key to accept trigger the default button.",
+        };
+
+        var button = new Button ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (textField) + 1,
             Title = "_Button",
             IsDefault = true, // This button will be the default button
         };
@@ -55,11 +63,16 @@ public sealed class Generic : Scenario
         scWithAction.Accepting += (s, e) =>
                                   {
                                       // This is just to show that the action can be triggered by Accepting event
-                                      scWithAction.Action?.Invoke ();
+                                      // Don't invoke the action here, otherwise will be triggered twice
+                                      // If you want to cancel it just comment out the bellow code
+                                      //e.Handled = true;
                                   };
         statusBar.Add (scWithAction);
 
-        appWindow.Add (button, statusBar);
+        appWindow.Add (textField, button, statusBar);
+
+        // Set focus to button
+        button.SetFocus ();
 
         // Run - Start the application.
         Application.Run (appWindow);
