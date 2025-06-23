@@ -58,16 +58,17 @@ public class Button : View, IDesignable
         CanFocus = true;
 
         AddCommand (Command.HotKey, HandleHotKeyCommand);
+        AddCommand (Command.Accept, HandleHotKeyCommand);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Add (Key.Space, Command.HotKey);
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.Button2Clicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.Button2Clicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.Accept);
 
         TitleChanged += Button_TitleChanged;
 
