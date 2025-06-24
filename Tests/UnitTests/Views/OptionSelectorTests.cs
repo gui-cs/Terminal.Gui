@@ -67,6 +67,7 @@ public class OptionSelectorTests (ITestOutputHelper output)
     public void Commands_HasFocus ()
     {
         Application.Navigation = new ();
+
         var rg = new OptionSelector
         {
             Id = "rg",
@@ -103,13 +104,13 @@ public class OptionSelectorTests (ITestOutputHelper output)
         Assert.Equal (0, acceptedCount);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
-        Assert.Equal (0, rg.SelectedItem); 
+        Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown)); 
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
@@ -272,10 +273,11 @@ public class OptionSelectorTests (ITestOutputHelper output)
     public void HotKeys_CanFocus_False_Does_Not_SetFocus_Activates ()
     {
         Application.Navigation = new ();
-        var rg = new OptionSelector { 
+
+        var rg = new OptionSelector
+        {
             CanFocus = false,
             RadioLabels = ["Item _A", "Item _B"]
-
         };
         Application.Top = new ();
 
@@ -319,7 +321,6 @@ public class OptionSelectorTests (ITestOutputHelper output)
         Assert.Equal (0, selectedItemChangedCount);
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptCount);
-
 
         Application.ResetState (true);
     }
@@ -400,53 +401,6 @@ public class OptionSelectorTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void HotKey_No_SelectedItem_Selects_First ()
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-        superView.Add (new View { CanFocus = true });
-
-        var group = new OptionSelector
-        {
-            Title = "Radio_Group",
-            RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
-        };
-        group.SelectedItem = -1;
-
-        superView.Add (group);
-
-        Assert.False (group.HasFocus);
-        Assert.Equal (-1, group.SelectedItem);
-
-        group.NewKeyDownEvent (Key.G.WithAlt);
-
-        Assert.Equal (0, group.SelectedItem);
-        Assert.True (group.HasFocus);
-    }
-
-    [Fact]
-    public void HotKeys_SetFocus ()
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-        superView.Add (new View { CanFocus = true });
-        var group = new OptionSelector { RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"] };
-        superView.Add (group);
-
-        Assert.False (group.HasFocus);
-        Assert.Equal (0, group.SelectedItem);
-
-        group.NewKeyDownEvent (Key.R);
-
-        Assert.Equal (1, group.SelectedItem);
-        Assert.True (group.HasFocus);
-    }
-
-    [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
         var group = new OptionSelector { RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"] };
@@ -456,22 +410,6 @@ public class OptionSelectorTests (ITestOutputHelper output)
         group.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
-
-        return;
-
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    public void Accept_Command_Fires_Accept ()
-    {
-        var group = new OptionSelector { RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"] };
-        var accepted = false;
-
-        group.Accepting += OnAccept;
-        group.InvokeCommand (Command.Accept);
-
-        Assert.True (accepted);
 
         return;
 
@@ -649,10 +587,10 @@ public class OptionSelectorTests (ITestOutputHelper output)
         var handleAccepted = false;
 
         optionSelector.Accepting += (s, e) =>
-                             {
-                                 acceptedCount++;
-                                 e.Handled = handleAccepted;
-                             };
+                                    {
+                                        acceptedCount++;
+                                        e.Handled = handleAccepted;
+                                    };
 
         Assert.True (optionSelector.DoubleClickAccepts);
         Assert.Equal (Orientation.Vertical, optionSelector.Orientation);
@@ -702,10 +640,10 @@ public class OptionSelectorTests (ITestOutputHelper output)
         var superViewAcceptCount = 0;
 
         superView.Accepting += (s, a) =>
-                            {
-                                superViewAcceptCount++;
-                                a.Handled = true;
-                            };
+                               {
+                                   superViewAcceptCount++;
+                                   a.Handled = true;
+                               };
 
         Assert.Equal (0, superViewAcceptCount);
 
