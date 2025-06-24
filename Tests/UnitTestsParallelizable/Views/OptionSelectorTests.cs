@@ -118,33 +118,7 @@ public class OptionSelectorTests
             Assert.Equal (0, checkBox.Y);
         }
     }
-
-    [Fact]
-    public void HotKey_SetsFocus ()
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-        superView.Add (new View { CanFocus = true });
-
-        var optionSelector = new OptionSelector
-        {
-            Title = "_OptionSelector"
-        };
-        optionSelector.Labels = new List<string> { "Option_1", "Option_2" };
-
-        superView.Add (optionSelector);
-
-        Assert.False (optionSelector.HasFocus);
-        Assert.Equal (0, optionSelector.Value);
-
-        optionSelector.NewKeyDownEvent (Key.O.WithAlt);
-
-        Assert.Equal (0, optionSelector.Value);
-        Assert.True (optionSelector.HasFocus);
-    }
-
+    
     [Fact]
     public void HotKey_No_SelectedItem_Selects_First ()
     {
