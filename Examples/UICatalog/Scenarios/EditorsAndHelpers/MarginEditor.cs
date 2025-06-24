@@ -12,7 +12,7 @@ public class MarginEditor : AdornmentEditor
         AdornmentChanged += MarginEditor_AdornmentChanged;
     }
 
-    private RadioGroup? _rgShadow;
+    private OptionSelector<ShadowStyle>? _optionsShadow;
 
     private FlagSelector? _flagSelectorTransparent;
 
@@ -20,7 +20,7 @@ public class MarginEditor : AdornmentEditor
     {
         if (AdornmentToEdit is { })
         {
-            _rgShadow!.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+            _optionsShadow!.Value = ((Margin)AdornmentToEdit).ShadowStyle;
         }
 
         if (AdornmentToEdit is { })
@@ -31,7 +31,7 @@ public class MarginEditor : AdornmentEditor
 
     private void MarginEditor_Initialized (object? sender, EventArgs e)
     {
-        _rgShadow = new RadioGroup
+        _optionsShadow = new ()
         {
             X = 0,
             Y = Pos.Bottom (SubViews.ElementAt(SubViews.Count-1)),
@@ -39,30 +39,33 @@ public class MarginEditor : AdornmentEditor
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
             BorderStyle = LineStyle.Single,
-            RadioLabels = Enum.GetNames (typeof (ShadowStyle)),
+            AssignHotKeys = true
         };
 
         if (AdornmentToEdit is { })
         {
-            _rgShadow.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+            _optionsShadow.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
         }
 
-        _rgShadow.SelectedItemChanged += (_, args) =>
+        _optionsShadow.SelectedItemChanged += (_, args) =>
                                         {
                                             ((Margin)AdornmentToEdit!).ShadowStyle = (ShadowStyle)args.SelectedItem!;
                                         };
 
-        Add (_rgShadow);
+        Add (_optionsShadow);
 
         _flagSelectorTransparent = new FlagSelector<ViewportSettingsFlags> ()
         {
             X = 0,
-            Y = Pos.Bottom (_rgShadow),
+            Y = Pos.Bottom (_optionsShadow),
 
             SuperViewRendersLineCanvas = true,
             Title = "_ViewportSettings",
             BorderStyle = LineStyle.Single,
         };
+        _flagSelectorTransparent.Values = [(int)ViewportSettingsFlags.Transparent, (int)ViewportSettingsFlags.TransparentMouse];
+        _flagSelectorTransparent.Labels = ["Transparent", "TransparentMouse"];
+        _flagSelectorTransparent.AssignHotKeys = true;
 
         Add (_flagSelectorTransparent);
 
