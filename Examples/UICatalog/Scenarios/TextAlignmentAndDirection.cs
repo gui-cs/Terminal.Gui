@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Terminal.Gui.Input;
 
 namespace UICatalog.Scenarios;
 
@@ -447,7 +448,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        editText.MouseClick += (s, m) =>
+        editText.Activating += (s, m) =>
                                {
                                    foreach (View v in singleLineLabels)
                                    {
@@ -458,6 +459,8 @@ public class TextAlignmentAndDirection : Scenario
                                    {
                                        v.Text = editText.Text;
                                    }
+                                   m.Handled = true;
+
                                };
 
         app.KeyUp += (s, m) =>

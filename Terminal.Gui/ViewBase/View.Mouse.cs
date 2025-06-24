@@ -42,7 +42,7 @@ public partial class View // Mouse APIs
             return null;
         }
 
-        Logging.Debug ($"{mouseEventArgs.Flags};{mouseEventArgs.Position}");
+        //Logging.Debug ($"{mouseEventArgs.Flags};{mouseEventArgs.Position}");
 
         binding.MouseEventArgs = mouseEventArgs;
 
@@ -506,7 +506,7 @@ public partial class View // Mouse APIs
 
         Logging.Debug ($"{args.Flags};{args.Position}");
 
-#if !MOUSE_CLICK
+#if MOUSE_CLICK
         if (OnMouseClick (args) || args.Handled)
         {
             return args.Handled;
@@ -541,6 +541,7 @@ public partial class View // Mouse APIs
 
         clickedArgs.Position = args.Position;
         clickedArgs.ScreenPosition = args.ScreenPosition;
+        clickedArgs.View = args.View;
 
         // By default, this will raise Activating/OnActivating - Subclasses can override this via
         // ReplaceCommand (Command.Activate ...).
@@ -550,8 +551,7 @@ public partial class View // Mouse APIs
     }
 
     // see https://github.com/gui-cs/Terminal.Gui/issues/4167#issuecomment-2997271982
-#if !MOUSE_CLICK
-
+#if MOUSE_CLICK
     /// <summary>
     ///     Low-level conveience API. Called when any mouse button has been clicked. Inspect the event args to determine
     ///     which button was clicked. Note, creating a <see cref="MouseBindings"/> and using to <see cref="OnActivating"/>/
@@ -590,7 +590,11 @@ public partial class View // Mouse APIs
 
     #region Mouse Wheel Events
 
-    /// <summary>Raises the <see cref="OnMouseWheel"/>/<see cref="MouseWheel"/> event.</summary>
+    /// <summary>
+    ///     Low-level API. Raises the <see cref="OnMouseWheel"/>/<see cref="MouseWheel"/> event.
+    ///     Binding to a movement or scolling command (e.g. <see cref="Command.ScrollDown"/>) with
+    ///     <see cref="MouseBindings"/> is recommended instead of using this event directly.
+    /// </summary>
     /// <remarks>
     /// </remarks>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>

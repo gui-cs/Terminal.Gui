@@ -106,9 +106,15 @@ public class CharacterMap : Scenario
 
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
-        // if user clicks the mouse in TableView
-        _categoryList.MouseClick += (s, e) =>
+        // if user clicks the mouse in TableView, change sorting by that column
+        _categoryList.Activating += (s, commandEventArgs) =>
                                     {
+                                        if (commandEventArgs.Context is not CommandContext<MouseBinding> mouseContext)
+                                        {
+                                            return;
+                                        }
+
+                                        MouseEventArgs e = mouseContext.Binding.MouseEventArgs!;
                                         _categoryList.ScreenToCell (e.Position, out int? clickedCol);
 
                                         if (clickedCol != null && e.Flags.HasFlag (MouseFlags.Button1Clicked))

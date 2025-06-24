@@ -302,10 +302,17 @@ public class Mouse : Scenario
                               }
                           };
 
-        win.MouseClick += (sender, a) =>
+        win.Activating += (sender, commandEventArgs) =>
                           {
-                              winLogList.Add ($"MouseClick: ({a.Position}) - {a.Flags} {count++}");
+                              if (commandEventArgs.Context is not CommandContext<MouseBinding> mouseContext)
+                              {
+                                  return;
+                              }
+
+                              MouseEventArgs e = mouseContext.Binding.MouseEventArgs!;
+                              winLogList.Add ($"Activating: ({e.Position}) - {e.Flags} {count++}");
                               winLog.MoveDown ();
+                              commandEventArgs.Handled = true;
                           };
 
         Application.Run (win);

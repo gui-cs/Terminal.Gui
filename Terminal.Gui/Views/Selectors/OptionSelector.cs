@@ -175,7 +175,7 @@ public class OptionSelector : SelectorBase, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the list of labels for each value in <see cref="Values"/>.
+    ///     Gets or sets the list of labels for each value.
     /// </summary>
     public string [] RadioLabels
     {

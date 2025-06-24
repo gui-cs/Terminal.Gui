@@ -3,7 +3,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way.
-///     <see cref="FlagSelector"/> provides a non-type-safe version. <see cref="TFlagsEnum"/> must be a valid enum type with
+///     <see cref="FlagSelector"/> provides a non-type-safe version. <c>TFlagsEnum</c> must be a valid enum type with
 ///     the '[Flags]' attribute.
 /// </summary>
 public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : struct, Enum

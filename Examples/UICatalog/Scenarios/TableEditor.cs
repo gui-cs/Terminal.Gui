@@ -687,8 +687,8 @@ public class TableEditor : Scenario
             Normal = new (Color.Red, Color.BrightBlue)
         };
 
-        // if user clicks the mouse in TableView
-        _tableView.MouseClick += (s, e) =>
+        // if user clicks the mouse in TableView, change sorting
+        _tableView.MouseEvent += (s, e) =>
                                  {
                                      if (_currentTable == null)
                                      {
@@ -709,6 +709,8 @@ public class TableEditor : Scenario
                                              // right click in a header
                                              ShowHeaderContextMenu (clickedCol.Value, e);
                                          }
+
+                                         e.Handled = true;
                                      }
                                  };
 

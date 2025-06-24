@@ -562,8 +562,8 @@ public class TabView : View
             if (maxWidth == 0)
             {
                 tab.Visible = true;
-                tab.MouseClick += Tab_MouseClick!;
-                tab.Border!.MouseClick += Tab_MouseClick!;
+                tab.Activating += TabOnActivating;
+                tab.Border!.Activating += TabOnActivating;
 
                 yield return tab;
 
@@ -593,8 +593,8 @@ public class TabView : View
 
             // there is enough space!
             tab.Visible = true;
-            tab.MouseClick += Tab_MouseClick!;
-            tab.Border!.MouseClick += Tab_MouseClick!;
+            tab.Activating += TabOnActivating;
+            tab.Border!.Activating += TabOnActivating;
 
             yield return tab;
 
@@ -612,6 +612,7 @@ public class TabView : View
             SelectedTab?.View?.SetFocus ();
         }
     }
+
 
     /// <summary>
     ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowTopLine"/>
@@ -635,9 +636,15 @@ public class TabView : View
         return Style.ShowTopLine ? 3 : 2;
     }
 
-    internal void Tab_MouseClick (object sender, MouseEventArgs e)
+    internal void TabOnActivating (object? sender, CommandEventArgs commandEventArgs)
     {
-        e.Handled = _tabsBar.NewMouseEvent (e) == true;
+        if (commandEventArgs.Context is not CommandContext<MouseBinding> mouseContext)
+        {
+            return;
+        }
+
+        MouseEventArgs e = mouseContext.Binding.MouseEventArgs!;
+        commandEventArgs.Handled = _tabsBar.NewMouseEvent (e) == true;
     }
 
     private void UnSetCurrentTabs ()
@@ -651,8 +658,8 @@ public class TabView : View
 
                 if (tab.Visible)
                 {
-                    tab.MouseClick -= Tab_MouseClick!;
-                    tab.Border!.MouseClick -= Tab_MouseClick!;
+                    tab.Activating -= TabOnActivating!;
+                    tab.Border!.Activating -= TabOnActivating!;
                     tab.Visible = false;
                 }
             }
@@ -661,8 +668,8 @@ public class TabView : View
         {
             foreach (Tab tabToRender in _tabLocations)
             {
-                tabToRender.MouseClick -= Tab_MouseClick!;
-                tabToRender.Border!.MouseClick -= Tab_MouseClick!;
+                tabToRender.Activating -= TabOnActivating!;
+                tabToRender.Border!.Activating -= TabOnActivating!;
                 tabToRender.Visible = false;
             }
 
@@ -673,6 +680,4 @@ public class TabView : View
     /// <summary>Raises the <see cref="TabClicked"/> event.</summary>
     /// <param name="tabMouseEventArgs"></param>
     internal virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
-
-
 }
