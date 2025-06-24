@@ -1,5 +1,4 @@
 using System.Globalization;
-using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -100,6 +99,13 @@ public class NumericUpDownTests
     {
         Exception exception = Record.Exception (() => new NumericUpDown<object> ());
         Assert.Null (exception);
+    }
+
+    [Fact]
+    public void WhenCreatedWithValidNumberType_ShouldThrowInvalidOperationException_UnlessTheyAreRegisterAsValid ()
+    {
+        Exception exception = Record.Exception (() => new NumericUpDown<short> ());
+        Assert.NotNull (exception);
     }
 
     [Fact]
