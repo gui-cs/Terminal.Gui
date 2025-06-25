@@ -57,9 +57,6 @@
     <ItemGroup>
         <PackageReference Include="ColorHelper" />
         <PackageReference Include="JetBrains.Annotations" />
-        <PackageReference Include="Microsoft.CodeAnalysis" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Common" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions " />
         <PackageReference Include="System.IO.Abstractions" />
         <PackageReference Include="Wcwidth" />
