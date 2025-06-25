@@ -62,7 +62,6 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="System.IO.Abstractions" />
-        <PackageReference Include="System.Text.Json" />
         <PackageReference Include="Wcwidth" />
     </ItemGroup>
 
