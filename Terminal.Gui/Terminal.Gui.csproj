@@ -64,8 +64,11 @@
         <PackageReference Include="System.IO.Abstractions" />
         <PackageReference Include="System.Text.Json" />
         <PackageReference Include="Wcwidth" />
-        <!-- Enable Nuget Source Link for github -->
-        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Enable Nuget Source Link for github -->
+      <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     </ItemGroup>
     <!-- =================================================================== -->
     <!-- Global Usings and Type Aliases -->
