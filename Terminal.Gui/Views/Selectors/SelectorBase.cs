@@ -31,7 +31,7 @@ public abstract class SelectorBase : View, IOrientation
     /// <inheritdoc />
     protected override bool OnClearingViewport ()
     {
-        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        //SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
         return base.OnClearingViewport ();
     }
 
@@ -328,7 +328,6 @@ public abstract class SelectorBase : View, IOrientation
             Id = label,
             Data = value,
             HighlightStates = MouseState.In,
-            InvertFocusAttribute = true
         };
 
         return checkbox;

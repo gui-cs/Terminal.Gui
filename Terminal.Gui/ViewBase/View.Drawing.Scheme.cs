@@ -109,7 +109,7 @@ public partial class View
     /// </summary>
     public bool? InvertFocusAttribute
     {
-        get => _invertFocusAttribute ?? SuperView?.InvertFocusAttribute;
+        get => _invertFocusAttribute;
         set => CWPPropertyHelper.ChangeProperty<bool?> (
                                                  ref _invertFocusAttribute,
                                                  value,

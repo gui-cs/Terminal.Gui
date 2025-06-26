@@ -126,13 +126,13 @@ public class UICatalogTop : Toplevel
                                           [
                                               new MenuItemv2 (
                                                               "_Documentation",
-                                                              "",
+                                                              "API docs",
                                                               () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
                                                               Key.F1
                                                              ),
                                               new MenuItemv2 (
                                                               "_README",
-                                                              "",
+                                                              "Project readme",
                                                               () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
                                                               Key.F2
                                                              ),
@@ -163,7 +163,8 @@ public class UICatalogTop : Toplevel
             _force16ColorsMenuItemCb = new ()
             {
                 Title = "Force _16 Colors",
-                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked
+                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
             };
 
             _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
@@ -187,7 +188,8 @@ public class UICatalogTop : Toplevel
                 _themesSelector = new ()
                 {
                    // HighlightStates = MouseState.In,
-                   CanFocus = true
+                   CanFocus = true,
+                  // InvertFocusAttribute = true
                 };
 
                 _themesSelector.ValueChanged += (_, args) =>

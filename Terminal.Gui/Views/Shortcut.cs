@@ -492,8 +492,12 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStates = HighlightStates.None;
-        CommandView.InvertFocusAttribute = true;
-        CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+        if (CommandView.InvertFocusAttribute is null)
+        {
+            CommandView.InvertFocusAttribute = CanFocus;
+        }
+
+        //CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
@@ -579,11 +583,11 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
-        HelpView.TextFormatter.WordWrap = false;
+        HelpView.TextFormatter.WordWrap = true;
         HelpView.HighlightStates = ViewBase.MouseState.None;
         HelpView.InvertFocusAttribute = true;
 
-        HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+        //HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     /// <summary>
@@ -705,9 +709,11 @@ public class Shortcut : View, IOrientation, IDesignable
             KeyView.Margin.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
 
+        // KeyView is sized to hold JUST it's text so that only the text is drawn using HotNormal/HotFocus
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
+        KeyView.Y = Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, minimumContentDim: Dim.Func (() => MinimumKeyTextSize));
-        KeyView.Height = Dim.Fill ();
+        KeyView.Height = 1;
 
         KeyView.Visible = true;
 
@@ -716,20 +722,22 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
         KeyView.HighlightStates = ViewBase.MouseState.None;
+        KeyView.InvertFocusAttribute = true;
 
-        KeyView.GettingAttributeForRole += (sender, args) =>
-                                           {
-                                               if (args.Role == VisualRole.Normal)
-                                               {
-                                                   args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
-                                                   args.Handled = true;
-                                               }
-                                           };
-        KeyView.ClearingViewport += (sender, args) =>
-                                          {
-                                              // Do not clear; otherwise spaces will be printed with underlines
-                                              args.Cancel = true;
-                                          };
+        KeyView.DrawingText += (sender, args) =>
+                               {
+                                   var drawRect = new Rectangle (KeyView.ContentToScreen (Point.Empty), KeyView.GetContentSize ());
+
+                                   Region textRegion = KeyView.TextFormatter.GetDrawRegion (drawRect);
+                                   KeyView.TextFormatter?.Draw (
+                                                                drawRect,
+                                                                HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                                                HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                                                Rectangle.Empty
+                                                               );
+
+                                   args.Cancel = true;
+                               };
     }
 
     private void UpdateKeyBindings (Key oldKey)
@@ -764,7 +772,7 @@ public class Shortcut : View, IOrientation, IDesignable
     #endregion Key
 
     #region Focus
-    
+
     /// <inheritdoc />
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
