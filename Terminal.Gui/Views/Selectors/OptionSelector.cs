@@ -36,7 +36,11 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc />
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
-        if (!HasFocus)
+        if (!CanFocus)
+        {
+            Cycle ();
+        }
+        else if (!HasFocus)
         {
             if (Value is null)
             {
@@ -51,7 +55,9 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         if (args.Context?.Source is not CheckBox checkBox)
         {
-            return base.OnActivating (args);
+            Cycle ();
+
+            return true;
         }
 
         if (args.Context is CommandContext<KeyBinding> { } && (int)checkBox.Data! == Value)
@@ -104,6 +110,9 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
+        // Verify at most one is checked
+        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
+
         if (args.Context is CommandContext<MouseBinding> { } && checkbox.CheckedState == CheckState.Checked)
         {
             // If user clicks with mouse and item is already checked, do nothing
@@ -118,14 +127,23 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
+        if (checkbox.CanFocus)
+        {
+            // For Activate, if the view is focusable and SetFocus succeeds, by defition,
+            // the event is handled. So return what SetFocus returns.
+            checkbox.SetFocus ();
+        }
+
         // Activating doesn't normally propogate, so we do it here
-        if (RaiseActivating (args.Context) is true)
+        if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
             args.Handled = true;
-        }
-        args.Handled = true;
 
+            return;
+        }
+
+        args.Handled = true;
     }
 
     private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
@@ -154,6 +172,9 @@ public class OptionSelector : SelectorBase, IDesignable
             valueIndex = Values.IndexOf (v => v == Value);
             SubViews.OfType<CheckBox> ().ToArray () [valueIndex].SetFocus ();
         }
+
+        // Verify at most one is checked
+        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
     }
 
 
@@ -215,6 +236,9 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         int newValue = -1;
         int prevValue = -1;
+
+        // Verify at most one is checked
+        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
 
         if (value is { })
         {

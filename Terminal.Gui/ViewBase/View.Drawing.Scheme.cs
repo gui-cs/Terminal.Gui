@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System.ComponentModel;
-
 namespace Terminal.Gui.ViewBase;
 
 public partial class View
@@ -28,18 +26,18 @@ public partial class View
         set
         {
             bool changed = CWPPropertyHelper.ChangeProperty (
-                _schemeName,
-                value,
-                OnSchemeNameChanging,
-                SchemeNameChanging,
-                OnSchemeNameChanged,
-                SchemeNameChanged,
-                out string? finalValue);
+                                                             ref _schemeName,
+                                                             value,
+                                                             OnSchemeNameChanging,
+                                                             SchemeNameChanging,
+                                                             OnSchemeNameChanged,
+                                                             SchemeNameChanged,
+                                                             out string? finalValue);
 
-            if (changed)
-            {
-                _schemeName = finalValue;
-            }
+            //if (changed)
+            //{
+            //    _schemeName = finalValue;
+            //}
         }
     }
 
@@ -48,18 +46,13 @@ public partial class View
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new scheme name.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnSchemeNameChanging (ValueChangingEventArgs<string?> args)
-    {
-        return false;
-    }
+    protected virtual bool OnSchemeNameChanging (ValueChangingEventArgs<string?> args) { return false; }
 
     /// <summary>
     ///     Called after the <see cref="SchemeName"/> property changes, allowing subclasses to react to the change.
     /// </summary>
     /// <param name="args">The event arguments containing the old and new scheme name.</param>
-    protected virtual void OnSchemeNameChanged (ValueChangedEventArgs<string?> args)
-    {
-    }
+    protected virtual void OnSchemeNameChanged (ValueChangedEventArgs<string?> args) { }
 
     /// <summary>
     ///     Raised before the <see cref="SchemeName"/> property changes, allowing handlers to modify or cancel the change.
@@ -106,7 +99,49 @@ public partial class View
     ///     Gets whether a Scheme has been explicitly set for this View, or if it will inherit the Scheme from its
     ///     <see cref="SuperView"/>.
     /// </summary>
-    public bool HasScheme => _scheme is { };
+    public bool HasScheme => _scheme is { } || !string.IsNullOrEmpty (_schemeName);
+
+    private bool? _invertFocusAttribute;
+
+    /// <summary>
+    ///     Gets or sets whether this View should automatically invert the Normal and Focus attributes.
+    ///     When true, Normal attributes will be displayed as Focus attributes and vice versa.
+    /// </summary>
+    public bool? InvertFocusAttribute
+    {
+        get => _invertFocusAttribute ?? SuperView?.InvertFocusAttribute;
+        set => CWPPropertyHelper.ChangeProperty<bool?> (
+                                                 ref _invertFocusAttribute,
+                                                 value,
+                                                 OnInvertFocusAttributeChanging,
+                                                 InvertFocusAttributeChanging,
+                                                 OnInvertFocusAttributeChanged,
+                                                 InvertFocusAttributeChanged,
+                                                 out bool? _);
+    }
+
+    /// <summary>
+    ///     Called before <see cref="InvertFocusAttribute"/> changes, allowing subclasses to cancel or modify the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the current and proposed new value.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnInvertFocusAttributeChanging (ValueChangingEventArgs<bool?> args) { return false; }
+
+    /// <summary>
+    ///     Called after <see cref="InvertFocusAttribute"/> changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new value.</param>
+    protected virtual void OnInvertFocusAttributeChanged (ValueChangedEventArgs<bool?> args) { SetNeedsDraw (); }
+
+    /// <summary>
+    ///     Raised before <see cref="InvertFocusAttribute"/> changes, allowing handlers to modify or cancel the change.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<bool?>>? InvertFocusAttributeChanging;
+
+    /// <summary>
+    ///     Raised after <see cref="InvertFocusAttribute"/>, notifying handlers of the completed change.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<bool?>>? InvertFocusAttributeChanged;
 
     /// <summary>
     ///     Gets the scheme for the <see cref="View"/>. If the scheme has not been explicitly set
@@ -115,7 +150,8 @@ public partial class View
     /// <returns>The resolved scheme, never null.</returns>
     /// <remarks>
     ///     <para>
-    ///         This method uses the Cancellable Work Pattern (CWP) via <see cref="CWPWorkflowHelper.ExecuteWithResult{TResult}"/>
+    ///         This method uses the Cancellable Work Pattern (CWP) via
+    ///         <see cref="CWPWorkflowHelper.ExecuteWithResult{TResult}"/>
     ///         to allow customization or cancellation of scheme resolution through the <see cref="OnGettingScheme"/> method
     ///         and <see cref="GettingScheme"/> event.
     ///     </para>
@@ -135,13 +171,14 @@ public partial class View
         ResultEventArgs<Scheme?> args = new ();
 
         return CWPWorkflowHelper.ExecuteWithResult (
-                                                    onMethod: args =>
-                                                              {
-                                                                  bool cancelled = OnGettingScheme (out Scheme? newScheme);
-                                                                  args.Result = newScheme;
-                                                                  return cancelled;
-                                                              },
-                                                    eventHandler: GettingScheme,
+                                                    args =>
+                                                    {
+                                                        bool cancelled = OnGettingScheme (out Scheme? newScheme);
+                                                        args.Result = newScheme;
+
+                                                        return cancelled;
+                                                    },
+                                                    GettingScheme,
                                                     args,
                                                     DefaultAction);
 
@@ -157,7 +194,7 @@ public partial class View
                 return SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
             }
 
-            return _scheme!;
+            return _scheme ?? SchemeManager.GetScheme (SchemeName!);
         }
     }
 
@@ -170,6 +207,7 @@ public partial class View
     protected virtual bool OnGettingScheme (out Scheme? scheme)
     {
         scheme = null;
+
         return false;
     }
 
@@ -180,7 +218,6 @@ public partial class View
     /// </summary>
     public event EventHandler<ResultEventArgs<Scheme?>>? GettingScheme;
 
-
     /// <summary>
     ///     Sets the scheme for the <see cref="View"/>, marking it as explicitly set.
     /// </summary>
@@ -190,7 +227,8 @@ public partial class View
     ///     <para>
     ///         This method uses the Cancellable Work Pattern (CWP) via <see cref="CWPPropertyHelper.ChangeProperty{T}"/>
     ///         to allow customization or cancellation of the scheme change through the <see cref="OnSettingScheme"/> method
-    ///         and <see cref="SchemeChanging"/> event. The <see cref="SchemeChanged"/> event is raised after a successful change.
+    ///         and <see cref="SchemeChanging"/> event. The <see cref="SchemeChanged"/> event is raised after a successful
+    ///         change.
     ///     </para>
     ///     <para>
     ///         If set to null, <see cref="HasScheme"/> will be false, and the view will inherit the scheme from its
@@ -217,20 +255,15 @@ public partial class View
     public bool SetScheme (Scheme? scheme)
     {
         bool changed = CWPPropertyHelper.ChangeProperty (
-            _scheme,
-            scheme,
-            OnSettingScheme,
-            SchemeChanging,
-            OnSchemeChanged,
-            SchemeChanged,
-            out Scheme? finalValue);
+                                                         ref _scheme,
+                                                         scheme,
+                                                         OnSettingScheme,
+                                                         SchemeChanging,
+                                                         OnSchemeChanged,
+                                                         SchemeChanged,
+                                                         out Scheme? _);
 
-        if (changed)
-        {
-            _scheme = finalValue;
-            return true;
-        }
-        return false;
+        return changed;
     }
 
     /// <summary>
@@ -238,19 +271,13 @@ public partial class View
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new scheme.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
-    {
-        return false;
-    }
+    protected virtual bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args) { return false; }
 
     /// <summary>
     ///     Called after the scheme is set, allowing subclasses to react to the change.
     /// </summary>
     /// <param name="args">The event arguments containing the old and new scheme.</param>
-    protected virtual void OnSchemeChanged (ValueChangedEventArgs<Scheme?> args)
-    {
-        SetNeedsDraw ();
-    }
+    protected virtual void OnSchemeChanged (ValueChangedEventArgs<Scheme?> args) { SetNeedsDraw (); }
 
     /// <summary>
     ///     Raised before the scheme is set, allowing handlers to modify or cancel the change.
@@ -269,5 +296,4 @@ public partial class View
     ///     <see cref="ValueChangedEventArgs{T}.NewValue"/>, which may be null.
     /// </remarks>
     public event EventHandler<ValueChangedEventArgs<Scheme?>>? SchemeChanged;
-
 }

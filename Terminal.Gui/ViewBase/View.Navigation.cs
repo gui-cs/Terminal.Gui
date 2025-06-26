@@ -91,10 +91,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // Determine if focus should remain in this focus chain, or move to the superview's focus chain
             if (SuperView is { })
             {
-                // If we are TabStop, and we have at least one other focusable peer, move to the SuperView's chain
-                if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetFocusChain (direction, behavior).Length > 1)
+                // If we are TabStop, and there's a focusable view in the hierarchy
+                if (TabStop == TabBehavior.TabStop)
                 {
-                    return false;
+                    View? nextFocusable = FindNextFocusableViewInHierarchy (direction, behavior);
+                    if (nextFocusable != null)
+                    {
+                        // Found a next focusable view in the hierarchy, so we should return false
+                        // to allow navigation to continue to that view
+                        return false;
+                    }
                 }
 
                 // TabGroup is special-cased. 
@@ -169,6 +175,66 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             return false;
         }
+    }
+
+    /// <summary>
+    ///     Finds if there is a focusable view in the superview hierarchy that could receive focus when navigating from this view.
+    /// </summary>
+    /// <param name="direction">The direction of navigation (Forward or Backward).</param>
+    /// <param name="behavior">The tab behavior to consider.</param>
+    /// <returns>The next focusable view in the hierarchy, or <see langword="null"/> if none exists.</returns>
+    internal View? FindNextFocusableViewInHierarchy (NavigationDirection direction, TabBehavior? behavior)
+    {
+        // Start with our immediate superview
+        View? currentView = this;
+        View? superView = currentView.SuperView;
+
+        while (superView != null)
+        {
+            // Get the focus chain for the current superview
+            View [] focusChain = superView.GetFocusChain (direction, behavior);
+
+            if (focusChain.Length > 0)
+            {
+                // Find the current view's position in the focus chain
+                int currentViewIndex = Array.IndexOf (focusChain, currentView);
+
+                // If we're navigating forward, look for the next view after our position
+                if (direction == NavigationDirection.Forward)
+                {
+                    // If we're not in the chain or not at the end
+                    if (currentViewIndex < 0 || currentViewIndex < focusChain.Length - 1)
+                    {
+                        // Return the next view or the first view if we're not in the chain
+                        int nextIndex = currentViewIndex < 0 ? 0 : currentViewIndex + 1;
+                        if (focusChain [nextIndex] != this)
+                        {
+                            return focusChain [nextIndex];
+                        }
+                    }
+                }
+                // If we're navigating backward, look for the previous view before our position
+                else
+                {
+                    // If we're not in the chain or not at the beginning
+                    if (currentViewIndex is < 0 or > 0)
+                    {
+                        // Return the previous view or the last view if we're not in the chain
+                        int prevIndex = currentViewIndex < 0 ? focusChain.Length - 1 : currentViewIndex - 1;
+                        if (focusChain [prevIndex] != this)
+                        {
+                            return focusChain [prevIndex];
+                        }
+                    }
+                }
+            }
+
+            // Move up to the next level in the hierarchy
+            currentView = superView;
+            superView = superView.SuperView;
+        }
+
+        return null;
     }
 
     private bool RaiseAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)

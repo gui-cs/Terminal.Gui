@@ -15,52 +15,32 @@ public sealed class Generic : Scenario
         Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
+            BorderStyle = LineStyle.None,
+            InvertFocusAttribute = true
         };
 
-        TextField tf = new ()
-        {
-            Text = "Type here...",
-            Width = 20
-        };
-        appWindow.Add (tf);
 
-        var button = new Button ()
+
+        var button = new CheckBox ()
         {
             X = Pos.Center (),
             Y = 1,
             Title = "_Button",
 
             // Comment this out to see how Issue #4170 is about IsDefault not working with Accepting event.
-            IsDefault = true
+            // IsDefault = true,
+            //SchemeName = "Error"
         };
 
         button.Accepting += (s, e) =>
                             {
                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 //e.Handled = true;
-                                Logging.Debug($"button.Acccepting");
+                                Logging.Debug ($"button.Acccepting");
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 
         appWindow.Add (button);
-
-        // Create StatusBar
-        StatusBar statusBar = new ()
-        {
-            Visible = true,
-            CanFocus = false
-        };
-
-        Shortcut shortcut = new ()
-        {
-            Title = "_Click here to reproduce Issue #4170",
-            Key = Key.F2,
-            CanFocus = false
-        };
-        statusBar.Add (shortcut);
-
-        appWindow.Add (statusBar);
 
         // Run - Start the application.
         Application.Run (appWindow);

@@ -23,7 +23,7 @@ public class OptionSelectorTests
         List<string> options = ["Option1", "Option2"];
 
         optionSelector.Labels = options;
-        Assert.Equal(0, optionSelector.Value);
+        Assert.Equal (0, optionSelector.Value);
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
@@ -118,7 +118,7 @@ public class OptionSelectorTests
             Assert.Equal (0, checkBox.Y);
         }
     }
-    
+
     [Fact]
     public void HotKey_No_SelectedItem_Selects_First ()
     {
@@ -231,7 +231,7 @@ public class OptionSelectorTests
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        checkBox.NewKeyDownEvent(Key.Space);
+        checkBox.NewKeyDownEvent (Key.Space);
 
         Assert.Equal (1, optionSelector.Value);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);

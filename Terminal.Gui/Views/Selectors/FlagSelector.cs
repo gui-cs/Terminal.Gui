@@ -35,7 +35,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.CheckedStateChanging += OnCheckboxOnCheckedStateChanging;
         checkbox.CheckedStateChanged += OnCheckboxOnCheckedStateChanged;
-      //  checkbox.Activating += OnCheckboxOnActivating;
+        checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
@@ -87,13 +87,21 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        // Activating doesn't normally propogate, so we do it here
-        if (RaiseActivating (args.Context) is true || !HasFocus)
+        if (checkbox.CanFocus)
         {
-            //args.Handled = true;
-
+            // For Activate, if the view is focusable and SetFocus succeeds, by defition,
+            // the event is handled. So return what SetFocus returns.
+            checkbox.SetFocus ();
         }
-        //args.Handled = true;
+
+        // Activating doesn't normally propogate, so we do it here
+        if (InvokeCommand (Command.Activate, args.Context) is true)
+        {
+            // Do not return here; we want to toggle the checkbox state
+            args.Handled = true;
+
+            //return;
+        }
     }
 
     private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)

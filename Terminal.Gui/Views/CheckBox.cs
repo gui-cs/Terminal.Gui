@@ -259,6 +259,13 @@ public class CheckBox : View
         return cancelled;
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        return base.OnClearingViewport ();
+    }
+
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {

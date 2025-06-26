@@ -278,6 +278,7 @@ public partial class View // Keyboard APIs
     /// <returns><see langword="true"/> if the event was handled.</returns>
     public bool NewKeyDownEvent (Key key)
     {
+        Logging.Debug($"{Id} - {key}");
         if (!Enabled)
         {
             return false;

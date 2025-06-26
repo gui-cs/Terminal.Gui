@@ -28,6 +28,13 @@ public abstract class SelectorBase : View, IOrientation
         //CreateSubViews ();
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        return base.OnClearingViewport ();
+    }
+
     private SelectorStyles _styles;
 
     /// <summary>
@@ -71,7 +78,7 @@ public abstract class SelectorBase : View, IOrientation
             return base.OnHandlingHotKey (args);
         }
 
-        if (HasFocus)
+        if (HasFocus || !CanFocus)
         {
             if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
             {
@@ -85,48 +92,7 @@ public abstract class SelectorBase : View, IOrientation
     /// <inheritdoc />
     protected override bool OnActivating (CommandEventArgs args)
     {
-        return base.OnAccepting (args);
-    }
-
-    private bool? HandleHotKeyCommand (ICommandContext? ctx)
-    {
-        // If the command did not come from a keyboard event, ignore it
-        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
-        {
-            return false;
-        }
-
-        if (HasFocus)
-        {
-            if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
-            {
-                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
-                return Focused?.InvokeCommand (Command.Activate, ctx);
-            }
-        }
-        else
-        {
-            //if (Value is null)
-            //{
-            //    Value = Values? [0];
-
-            //    return SetFocus ();
-            //}
-
-           // return InvokeCommand (Command.Activate, ctx);
-        }
-
-        if (RaiseHandlingHotKey (ctx) == true)
-        {
-            return true;
-        }
-
-        SetFocus ();
-
-        // Always return true on hotkey, even if SetFocus fails because 
-        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
-
-        return true;
+        return base.OnActivating (args);
     }
 
     private int? _value;
@@ -360,7 +326,9 @@ public abstract class SelectorBase : View, IOrientation
             CanFocus = true,
             Title = label,
             Id = label,
-            Data = value
+            Data = value,
+            HighlightStates = MouseState.In,
+            InvertFocusAttribute = true
         };
 
         return checkbox;
@@ -435,6 +403,18 @@ public abstract class SelectorBase : View, IOrientation
 
     private void SetLayout ()
     {
+        int maxNaturalCheckBoxWidth = 0;
+        if (Values?.Count > 0 && Orientation == Orientation.Vertical)
+        {
+            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox>().Max (
+                                                             v =>
+                                                             {
+                                                                 v.SetRelativeLayout (Application.Screen.Size);
+                                                                 v.Layout ();
+                                                                 return v.Frame.Width;
+                                                             });
+        } 
+        
         for (var i = 0; i < SubViews.Count; i++)
         {
             if (Orientation == Orientation.Vertical)
@@ -442,12 +422,14 @@ public abstract class SelectorBase : View, IOrientation
                 SubViews.ElementAt (i).X = 0;
                 SubViews.ElementAt (i).Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Margin!.Thickness = new (0);
+                SubViews.ElementAt (i).Width = Dim.Func (() => Math.Max (Viewport.Width, maxNaturalCheckBoxWidth));
             }
             else
             {
                 SubViews.ElementAt (i).X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Y = 0;
                 SubViews.ElementAt (i).Margin!.Thickness = new (0, 0, (i < SubViews.Count - 1) ? _horizontalSpace : 0, 0);
+                SubViews.ElementAt (i).Width = Dim.Auto ();
             }
         }
     }
@@ -458,6 +440,15 @@ public abstract class SelectorBase : View, IOrientation
     /// <exception cref="InvalidOperationException"></exception>
     public abstract void UpdateChecked ();
 
+    /// <inheritdoc />
+    protected override void OnHighlightStatesChanged (ValueChangedEventArgs<MouseState> args)
+    {
+        foreach (CheckBox checkbox in SubViews.OfType<CheckBox> ())
+        {
+         //   checkbox.HighlightStates = HighlightStates;
+        }
+        base.OnHighlightStatesChanged (args);
+    }
 
     /// <summary>
     ///     Gets or sets whether double-clicking on an Item will cause the <see cref="View.Accepting"/> event to be

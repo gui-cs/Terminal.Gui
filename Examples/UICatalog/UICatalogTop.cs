@@ -96,9 +96,9 @@ public class UICatalogTop : Toplevel
 
     private readonly MenuBarv2? _menuBar;
     private CheckBox? _force16ColorsMenuItemCb;
-    private OptionSelector? _themesRg;
-    private OptionSelector? _topSchemeRg;
-    private OptionSelector? _logLevelRg;
+    private OptionSelector? _themesSelector;
+    private OptionSelector? _topSchemesSelector;
+    private OptionSelector? _logLevelSelector;
     private FlagSelector<ViewDiagnosticFlags>? _diagnosticFlagsSelector;
     private CheckBox? _disableMouseCb;
 
@@ -184,12 +184,13 @@ public class UICatalogTop : Toplevel
 
             if (ConfigurationManager.IsEnabled)
             {
-                _themesRg = new ()
+                _themesSelector = new ()
                 {
-                    HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
+                   // HighlightStates = MouseState.In,
+                   CanFocus = true
                 };
 
-                _themesRg.ValueChanged += (_, args) =>
+                _themesSelector.ValueChanged += (_, args) =>
                                                  {
                                                      if (args.Value is null)
                                                      {
@@ -200,7 +201,7 @@ public class UICatalogTop : Toplevel
 
                 var menuItem = new MenuItemv2
                 {
-                    CommandView = _themesRg,
+                    CommandView = _themesSelector,
                     HelpText = "Cycle Through Themes",
                     Key = Key.T.WithCtrl
                 };
@@ -208,12 +209,12 @@ public class UICatalogTop : Toplevel
 
                 menuItems.Add (new Line ());
 
-                _topSchemeRg = new ()
+                _topSchemesSelector = new ()
                 {
-                    HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
+                  //  HighlightStates = MouseState.In,
                 };
 
-                _topSchemeRg.ValueChanged += (_, args) =>
+                _topSchemesSelector.ValueChanged += (_, args) =>
                                                     {
                                                         if (args.Value is null)
                                                         {
@@ -231,7 +232,7 @@ public class UICatalogTop : Toplevel
                                    [
                                        new ()
                                        {
-                                           CommandView = _topSchemeRg,
+                                           CommandView = _topSchemesSelector,
                                            HelpText = "Cycle Through schemes",
                                            Key = Key.S.WithCtrl
                                        }
@@ -259,9 +260,9 @@ public class UICatalogTop : Toplevel
 
             _diagnosticFlagsSelector = new ()
             {
-                CanFocus = true,
                 Styles = SelectorStyles.ShowNoneFlag,
-                HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
+                CanFocus = true
+
             };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
             _diagnosticFlagsSelector.AssignHotKeys = true;
@@ -305,15 +306,15 @@ public class UICatalogTop : Toplevel
 
             LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
 
-            _logLevelRg = new ()
+            _logLevelSelector = new ()
             {
                 AssignHotKeys = true,
                 Labels = Enum.GetNames<LogLevel> (),
                 Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-                HighlightStates = MouseState.In
+               // HighlightStates = MouseState.In,
             };
 
-            _logLevelRg.ValueChanged += (_, args) =>
+            _logLevelSelector.ValueChanged += (_, args) =>
             {
                 UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.Value!.Value])! };
 
@@ -324,7 +325,7 @@ public class UICatalogTop : Toplevel
             menuItems.Add (
                            new MenuItemv2
                            {
-                               CommandView = _logLevelRg,
+                               CommandView = _logLevelSelector,
                                HelpText = "Cycle Through Log Levels",
                                Key = Key.L.WithCtrl
                            });
@@ -346,27 +347,27 @@ public class UICatalogTop : Toplevel
 
     private void UpdateThemesMenu ()
     {
-        if (_themesRg is null)
+        if (_themesSelector is null)
         {
             return;
         }
 
-        _themesRg.Value = null;
-        _themesRg.AssignHotKeys = true;
-        _themesRg.UsedHotKeys.Clear ();
-        _themesRg.Labels = ThemeManager.GetThemeNames ();
-        _themesRg.Value = ThemeManager.GetThemeNames().IndexOf(ThemeManager.GetCurrentThemeName());
+        _themesSelector.Value = null;
+        _themesSelector.AssignHotKeys = true;
+        _themesSelector.UsedHotKeys.Clear ();
+        _themesSelector.Labels = ThemeManager.GetThemeNames ();
+        _themesSelector.Value = ThemeManager.GetThemeNames().IndexOf(ThemeManager.GetCurrentThemeName());
 
-        if (_topSchemeRg is null)
+        if (_topSchemesSelector is null)
         {
             return;
         }
 
-        _topSchemeRg.AssignHotKeys = true;
-        _topSchemeRg.UsedHotKeys.Clear ();
-        int? selectedScheme = _topSchemeRg.Value;
-        _topSchemeRg.Labels = SchemeManager.GetSchemeNames ();
-        _topSchemeRg.Value = selectedScheme;
+        _topSchemesSelector.AssignHotKeys = true;
+        _topSchemesSelector.UsedHotKeys.Clear ();
+        int? selectedScheme = _topSchemesSelector.Value;
+        _topSchemesSelector.Labels = SchemeManager.GetSchemeNames ();
+        _topSchemesSelector.Value = selectedScheme;
 
         if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))
         {
@@ -377,7 +378,7 @@ public class UICatalogTop : Toplevel
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
         {
-            _topSchemeRg.Value = newSelectedItem;
+            _topSchemesSelector.Value = newSelectedItem;
         }
     }
 

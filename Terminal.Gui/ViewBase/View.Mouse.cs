@@ -46,7 +46,7 @@ public partial class View // Mouse APIs
 
         binding.MouseEventArgs = mouseEventArgs;
 
-        return InvokeCommands (binding.Commands, binding);
+        return InvokeCommands<MouseBinding> (binding.Commands, binding);
     }
 
     #region MouseEnterLeave
@@ -526,13 +526,13 @@ public partial class View // Mouse APIs
         {
             // If the mouse is pressed, we want to invoke the related clicked event.
             clickedArgs.Flags = args.Flags switch
-                                {
-                                    MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
-                                    MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
-                                    MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
-                                    MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                                    _ => clickedArgs.Flags
-                                };
+            {
+                MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
+                MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
+                MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
+                MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+                _ => clickedArgs.Flags
+            };
         }
         else
         {
@@ -670,6 +670,8 @@ public partial class View // Mouse APIs
         }
     }
 
+    private MouseState _highlightStates;
+
     /// <summary>
     ///     Gets or sets which <see cref="MouseState"/> changes should cause the View to change its appearance.
     /// </summary>
@@ -692,7 +694,34 @@ public partial class View // Mouse APIs
     ///         <see langword="true"/>, in which case the flag has no effect.
     ///     </para>
     /// </remarks>
-    public MouseState HighlightStates { get; set; }
+    public MouseState HighlightStates
+    {
+        get => _highlightStates;
+        set
+        {
+            CWPPropertyHelper.ChangeProperty (
+                                                             ref _highlightStates,
+                                                             value,
+                                                             null,
+                                                             null,
+                                                             OnHighlightStatesChanged,
+                                                             HighlightStatesChanged,
+                                                             out MouseState finalValue);
+        }
+    }
+
+    /// <summary>
+    ///     Called after the <see cref="HighlightStates"/> property changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new scheme name.</param>
+    protected virtual void OnHighlightStatesChanged (ValueChangedEventArgs<MouseState> args)
+    {
+    }
+
+    /// <summary>
+    ///     Raised after the <see cref="HighlightStates"/> property changes, notifying handlers of the completed change.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<MouseState>>? HighlightStatesChanged;
 
     /// <summary>
     ///     INTERNAL Raises the <see cref="MouseStateChanged"/> event.

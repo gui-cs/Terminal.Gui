@@ -101,6 +101,13 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        return base.OnClearingViewport ();
+    }
+
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto ()
     {
@@ -192,7 +199,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         ShowHide ();
         ForceCalculateNaturalWidth ();
-            
+
         if (Width is DimAuto widthAuto || HelpView!.Margin is null)
         {
             return;
@@ -267,7 +274,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            CommandView.InvokeCommand (Command.Activate, keyCommandContext);
+            if (CommandView.InvokeCommand (Command.Activate, keyCommandContext) is true)
+            {
+                return true;
+            }
         }
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
@@ -462,7 +472,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
                 }
 
-                e.Handled = true;
+                // e.Handled = true;
             }
         }
     }
@@ -482,15 +492,21 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStates = HighlightStates.None;
+        CommandView.InvertFocusAttribute = true;
         CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
     {
+        //if (!HasFocus)
+        {
+            return;
+        }
+
         switch (e.Role)
         {
             case VisualRole.Normal:
-                if (HasFocus)
+                //if (HasFocus)
                 {
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.Focus);
@@ -498,12 +514,29 @@ public class Shortcut : View, IOrientation, IDesignable
                 break;
 
             case VisualRole.HotNormal:
-                if (HasFocus)
+                // if (HasFocus)
                 {
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.HotFocus);
                 }
                 break;
+
+            case VisualRole.Focus:
+                //if (HasFocus)
+                {
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.Normal);
+                }
+                break;
+
+            case VisualRole.HotFocus:
+                // if (HasFocus)
+                {
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.HotNormal);
+                }
+                break;
+
         }
     }
 
@@ -548,6 +581,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
         HelpView.HighlightStates = ViewBase.MouseState.None;
+        HelpView.InvertFocusAttribute = true;
 
         HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -730,29 +764,15 @@ public class Shortcut : View, IOrientation, IDesignable
     #endregion Key
 
     #region Focus
-
-    private bool _forceFocusColors;
-
-    /// <summary>
-    ///     TODO: IS this needed?
-    /// </summary>
-    public bool ForceFocusColors
-    {
-        get => _forceFocusColors;
-        set
-        {
-            _forceFocusColors = value;
-            SetNeedsDraw ();
-        }
-    }
-
+    
     /// <inheritdoc />
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (!HasFocus)
+        //if (!HasFocus)
         {
             return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
+
 
         if (role == VisualRole.Normal)
         {

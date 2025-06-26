@@ -295,7 +295,7 @@ public class ShortcutTests
     [InlineData (true, KeyCode.C, 1, 1)]
     [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 1)]
     [InlineData (true, KeyCode.Enter, 1, 1)]
-    [InlineData (true, KeyCode.Space, 1, 1)]
+    [InlineData (true, KeyCode.Space, 0, 1)]
     [InlineData (true, KeyCode.F1, 0, 0)]
     [InlineData (false, KeyCode.A, 1, 1)]
     [InlineData (false, KeyCode.C, 1, 1)]
@@ -303,7 +303,7 @@ public class ShortcutTests
     [InlineData (false, KeyCode.Enter, 0, 0)]
     [InlineData (false, KeyCode.Space, 0, 0)]
     [InlineData (false, KeyCode.F1, 0, 0)]
-    public void KeyDown_CheckBox_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
+    public void KeyDown_CheckBox_Raises_Accepted_Activated (bool canFocus, KeyCode key, int expectedAccept, int expectedActivate)
     {
         Application.Top = new ();
 
@@ -329,13 +329,13 @@ public class ShortcutTests
                                  e.Handled = true;
                              };
 
-        var selected = 0;
-        shortcut.Activating += (s, e) => selected++;
+        var activated = 0;
+        shortcut.Activating += (s, e) => activated++;
 
         Application.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAccept, accepted);
-        Assert.Equal (expectedSelect, selected);
+        Assert.Equal (expectedActivate, activated);
 
         Application.Top.Dispose ();
         Application.ResetState (true);

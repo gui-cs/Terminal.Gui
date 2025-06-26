@@ -41,7 +41,8 @@ public sealed class Selectors : Scenario
 
         NumericUpDown<int> horizontalSpace = new ()
         {
-            X = Pos.Right (stylesSelector) + 1,
+            X = 0,
+            Y = Pos.Bottom (orientationSelector),
             Width = 11,
             Title = "H_. Space",
             Value = stylesSelector.HorizontalSpace,
@@ -52,20 +53,37 @@ public sealed class Selectors : Scenario
         CheckBox showBorderAndTitle = new ()
         {
             X = Pos.Right (horizontalSpace) + 1,
+            Y = Pos.Top (horizontalSpace),
             Title = "Border _& Title",
             CheckedState = CheckState.Checked,
             BorderStyle = LineStyle.Dotted,
         };
         showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
 
+        CheckBox canFocus = new ()
+        {
+            X = Pos.Right (showBorderAndTitle) + 1,
+            Y = Pos.Top (horizontalSpace),
+            Title = "_CanFocus",
+            CheckedState = CheckState.Checked,
+            BorderStyle = LineStyle.Dotted,
+        };
+        canFocus.CheckedStateChanged += CanFocusOnCheckedStateChanged;
+
         optionSelectorsFrame = new ()
         {
-            Y = Pos.Bottom (orientationSelector),
+            Y = Pos.Bottom (canFocus),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
             Title = "O_ptionSelectors",
-            TabStop = TabBehavior.TabStop
+            TabStop = TabBehavior.TabStop,
+            //InvertFocusAttribute = true
         };
+        optionSelectorsFrame.ClearingViewport += (sender, args) =>
+                                                 {
+                                      //               optionSelectorsFrame.SetAttributeForRole (optionSelectorsFrame.HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                                                 };
+
 
         Label label = new ()
         {
@@ -81,6 +99,7 @@ public sealed class Selectors : Scenario
             AssignHotKeys = true,
             Labels = ["Option _1 (0)", "Option _2 (1)", "Option _3 (5) 你", "Option _Quattro (4) 你"],
             Values = [0, 1, 5, 4],
+            Arrangement = ViewArrangement.Resizable,
         };
         optionSelectorsFrame.Add (label, optionSelector);
 
@@ -160,7 +179,7 @@ public sealed class Selectors : Scenario
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
 
-        appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, optionSelectorsFrame, flagSelectorsFrame);
+        appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, canFocus, optionSelectorsFrame, flagSelectorsFrame);
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -229,6 +248,21 @@ public sealed class Selectors : Scenario
             foreach (SelectorBase selector in selectors)
             {
                 selector.Border!.Thickness = cb.CheckedState == CheckState.Checked ? new (1) : new Thickness (0);
+            }
+        }
+
+        void CanFocusOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
+        {
+            if (sender is not CheckBox cb)
+            {
+                return;
+            }
+
+            List<SelectorBase> selectors = GetAllSelectors ();
+
+            foreach (SelectorBase selector in selectors)
+            {
+                selector.CanFocus = cb.CheckedState == CheckState.Checked;
             }
         }
 
