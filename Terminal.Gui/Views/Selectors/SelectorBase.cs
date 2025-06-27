@@ -395,6 +395,8 @@ public abstract class SelectorBase : View, IOrientation
                 SetLayout ();
                 // Pos.Align requires extra layout; good practice to call
                 // Layout to ensure Pos.Align gets updated
+                // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+                // TODO: negate need for this hack
                 Layout ();
             }
         }
@@ -405,15 +407,17 @@ public abstract class SelectorBase : View, IOrientation
         int maxNaturalCheckBoxWidth = 0;
         if (Values?.Count > 0 && Orientation == Orientation.Vertical)
         {
-            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox>().Max (
+            // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+            // TODO: negate need for this hack
+            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ().Max (
                                                              v =>
                                                              {
                                                                  v.SetRelativeLayout (Application.Screen.Size);
                                                                  v.Layout ();
                                                                  return v.Frame.Width;
                                                              });
-        } 
-        
+        }
+
         for (var i = 0; i < SubViews.Count; i++)
         {
             if (Orientation == Orientation.Vertical)
@@ -444,7 +448,7 @@ public abstract class SelectorBase : View, IOrientation
     {
         foreach (CheckBox checkbox in SubViews.OfType<CheckBox> ())
         {
-         //   checkbox.HighlightStates = HighlightStates;
+            //   checkbox.HighlightStates = HighlightStates;
         }
         base.OnHighlightStatesChanged (args);
     }
@@ -491,6 +495,8 @@ public abstract class SelectorBase : View, IOrientation
         SetLayout ();
         // Pos.Align requires extra layout; good practice to call
         // Layout to ensure Pos.Align gets updated
+        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+        // TODO: negate need for this hack
         Layout ();
     }
 
