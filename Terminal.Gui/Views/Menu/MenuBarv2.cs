@@ -509,17 +509,26 @@ public class MenuBarv2 : Menuv2, IDesignable
         var bordersCb = new CheckBox
         {
             Title = "_Borders",
-            CheckedState = CheckState.Checked
+            CheckedState = CheckState.Checked,
+            // Best practice for CheckBoxes in menus is to disable focus and highlight states
+            CanFocus = false,
+            HighlightStates = MouseState.None
         };
 
         var autoSaveCb = new CheckBox
         {
-            Title = "_Auto Save"
+            Title = "_Auto Save",
+            // Best practice for CheckBoxes in menus is to disable focus and highlight states
+            CanFocus = false,
+            HighlightStates = MouseState.None
         };
 
         var enableOverwriteCb = new CheckBox
         {
-            Title = "Enable _Overwrite"
+            Title = "Enable _Overwrite",
+            // Best practice for CheckBoxes in menus is to disable focus and highlight states
+            CanFocus = false,
+            HighlightStates = MouseState.None
         };
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
@@ -611,7 +620,6 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                            {
                                                                HelpText = "MenuBar BG Color",
                                                                CommandView = menuBgColorCp,
-                                                               Key = Key.F8
                                                            }
                                                        ]
                                                       )
@@ -710,7 +718,10 @@ public class MenuBarv2 : Menuv2, IDesignable
                 Command = Command.Edit,
                 CommandView = new CheckBox
                 {
-                    Title = "E_dit Mode"
+                    Title = "E_dit Mode",
+                    // Best practice for CheckBoxes in menus is to disable focus and highlight states
+                    CanFocus = false,
+                    HighlightStates = MouseState.None
                 }
             };
 

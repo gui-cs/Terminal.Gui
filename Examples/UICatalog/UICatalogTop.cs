@@ -164,6 +164,7 @@ public class UICatalogTop : Toplevel
             {
                 Title = "Force _16 Colors",
                 CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
                 HighlightStates = MouseState.None
             };
@@ -289,6 +290,7 @@ public class UICatalogTop : Toplevel
             {
                 Title = "_Disable Mouse",
                 CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
+                // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
                 HighlightStates = MouseState.None
             };

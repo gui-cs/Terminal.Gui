@@ -314,10 +314,12 @@ public class Bar : View, IOrientation, IDesignable
             Text = "Czech",
             CommandView = new CheckBox ()
             {
-                Title = "_Check"
+                Title = "_Check",
+                // Best practice for CheckBoxes in bars is to disable focus and highlight states
+                CanFocus = false,
+                HighlightStates = MouseState.None
             },
             Key = Key.F9,
-            CanFocus = false
         };
 
         Add (shortcut);
