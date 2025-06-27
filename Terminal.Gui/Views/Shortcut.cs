@@ -39,7 +39,7 @@ namespace Terminal.Gui.Views;
 ///         If the <see cref="Key"/> is <see cref="Key.Empty"/>, the <see cref="Key"/> text is not displayed.
 ///     </para>
 /// </remarks>
-public class Shortcut : View, IOrientation, IDesignable
+public class Shortcut : View, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
@@ -70,10 +70,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-
-        _orientationHelper = new (this);
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         AddCommands ();
 
@@ -330,38 +326,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public Action? Action { get; set; }
 
     #endregion Accept/Select/HotKey Command Handling
-
-    #region IOrientation members
-
-    private readonly OrientationHelper _orientationHelper;
-
-    /// <summary>
-    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
-    ///     <see cref="Orientation.Horizontal"/>.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
-
-    /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
-
-    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
-    /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation)
-    {
-        // TODO: Determine what, if anything, is opinionated about the orientation.
-        SetNeedsLayout ();
-    }
-
-    #endregion
 
     #region Command
 

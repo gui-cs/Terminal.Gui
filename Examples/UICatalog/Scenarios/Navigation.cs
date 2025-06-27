@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;
 
@@ -75,6 +76,8 @@ public class Navigation : Scenario
         testFrame.Add (tiledView3);
 
         View overlappedView1 = CreateOverlappedView (2, 10, Pos.Center ());
+        // Set the button to CanFocus = false to illustrate https://github.com/gui-cs/Terminal.Gui/issues/4179
+        overlappedView1.SubViews.OfType<Button> ().FirstOrDefault ()!.CanFocus = false;
         View tiledSubView = CreateTiledView (4, 0, 2);
         overlappedView1.Add (tiledSubView);
 
@@ -88,24 +91,24 @@ public class Navigation : Scenario
         };
         overlappedView1.Add (progressBar);
 
-        //Timer timer = new (1)
-        //{
-        //    AutoReset = true
-        //};
+        Timer timer = new (1)
+        {
+            AutoReset = true
+        };
 
-        //timer.Elapsed += (o, args) =>
-        //                 {
-        //                     if (progressBar.Fraction == 1.0)
-        //                     {
-        //                         progressBar.Fraction = 0;
-        //                     }
+        timer.Elapsed += (o, args) =>
+                         {
+                             if (progressBar.Fraction == 1.0)
+                             {
+                                 progressBar.Fraction = 0;
+                             }
 
-        //                     progressBar.Fraction += 0.01f;
+                             progressBar.Fraction += 0.01f;
 
-        //                     Application.Invoke (() => progressBar.SetNeedsDraw ());
-        //                    ;
-        //                 };
-        //timer.Start ();
+                             Application.Invoke (() => progressBar.SetNeedsDraw ());
+                             ;
+                         };
+        timer.Start ();
 
         Application.Iteration += (sender, args) =>
                                  {
@@ -126,6 +129,7 @@ public class Navigation : Scenario
         overlappedView2.Add (overlappedInOverlapped1);
 
         View overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
+
         overlappedView2.Add (overlappedInOverlapped2);
 
         StatusBar statusBar = new ();
