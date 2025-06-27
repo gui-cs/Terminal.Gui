@@ -157,7 +157,6 @@ public class Dialogs : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = "Ali_gn",
-            BorderStyle = LineStyle.Dashed,
             Labels = labels,
         };
         frame.Add (alignmentGroup);

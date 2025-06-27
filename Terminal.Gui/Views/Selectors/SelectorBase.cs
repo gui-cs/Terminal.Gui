@@ -495,7 +495,7 @@ public abstract class SelectorBase : View, IOrientation
         SetLayout ();
         // Pos.Align requires extra layout; good practice to call
         // Layout to ensure Pos.Align gets updated
-        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
         // TODO: negate need for this hack
         Layout ();
     }

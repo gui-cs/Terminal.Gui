@@ -30,7 +30,7 @@ public class ContextMenus : Scenario
         appWindow.KeyBindings.Add (_winContextMenuKey, Command.Context);
         appWindow.MouseBindings.Add (MouseFlags.Button3Clicked, Command.Context);
 
-        // View.AddCommand is protected; but we canuse the CommandNotBound event to handle Command.Context
+        // View.AddCommand is protected; but we can use the CommandNotBound event to handle Command.Context
         appWindow.CommandNotBound += (s, e) =>
         {
             if (e.Context!.Command == Command.Context)
@@ -170,7 +170,12 @@ public class ContextMenus : Scenario
         {
             MenuItemv2 culture = new ();
 
-            culture.CommandView = new CheckBox { CanFocus = false };
+            culture.CommandView = new CheckBox
+            {
+                // Best practice for CheckBoxes in menus is to disable focus and highlight states
+                CanFocus = false,
+                HighlightStates = MouseState.None
+            };
 
             if (index == -1)
             {
@@ -186,7 +191,12 @@ public class ContextMenus : Scenario
 
                 index++;
                 culture = new ();
-                culture.CommandView = new CheckBox { CanFocus = false };
+                culture.CommandView = new CheckBox
+                {
+                    // Best practice for CheckBoxes in menus is to disable focus and highlight states
+                    CanFocus = false,
+                    HighlightStates = MouseState.None
+                };
             }
 
             culture.Id = $"_{c.Parent.EnglishName}";

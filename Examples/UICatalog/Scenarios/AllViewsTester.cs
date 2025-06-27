@@ -191,7 +191,6 @@ public class AllViewsTester : Scenario
             Height = Dim.Fill (),
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            //SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
@@ -225,7 +224,7 @@ public class AllViewsTester : Scenario
         if (type.IsGenericType)
         {
             // For each of the <T> arguments
-            List<Type> typeArguments = new ();
+            List<Type> typeArguments = [];
 
             // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())
