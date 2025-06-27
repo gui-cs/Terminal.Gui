@@ -251,10 +251,10 @@ public class OptionSelectorTests (ITestOutputHelper output)
         //    Selected != Cursor - SetFocus
         Assert.True (Application.RaiseKeyDownEvent (rg.HotKey));
         Assert.False (rg.HasFocus);
-        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Value);
         Assert.Equal (0, rg.Cursor);
-        Assert.Equal (0, selectedItemChangedCount);
-        Assert.Equal (0, activatingCount);
+        Assert.Equal (1, selectedItemChangedCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (0, acceptCount);
 
         // Press hotkey again
@@ -262,8 +262,8 @@ public class OptionSelectorTests (ITestOutputHelper output)
         Assert.False (rg.HasFocus);
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
-        Assert.Equal (0, selectedItemChangedCount);
-        Assert.Equal (0, activatingCount);
+        Assert.Equal (2, selectedItemChangedCount);
+        Assert.Equal (2, activatingCount);
         Assert.Equal (0, acceptCount);
 
         Application.ResetState (true);

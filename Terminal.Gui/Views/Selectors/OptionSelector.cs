@@ -36,28 +36,48 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc />
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
+        if (base.OnHandlingHotKey (args) is true)
+        {
+            return true;
+        }
         if (!CanFocus)
         {
-            Cycle ();
+            if (RaiseActivating (args.Context) is true)
+            {
+                return true;
+            }
+//            Cycle ();
+  //          return true;
         }
         else if (!HasFocus)
         {
             if (Value is null)
             {
+                if (RaiseActivating (args.Context) is true)
+                {
+                    return true;
+                }
                 Value = Values? [0];
+                return true;
             }
         }
-        return base.OnHandlingHotKey (args);
+
+        return false;
     }
 
     /// <inheritdoc />
     protected override bool OnActivating (CommandEventArgs args)
     {
-        if (args.Context?.Source is not CheckBox checkBox)
+        if (base.OnActivating (args) is true)
+        {
+            return true;
+        }
+
+        if (!CanFocus || args.Context?.Source is not CheckBox checkBox)
         {
             Cycle ();
 
-            return true;
+            return false;
         }
 
         if (args.Context is CommandContext<KeyBinding> { } && (int)checkBox.Data! == Value)
@@ -65,7 +85,7 @@ public class OptionSelector : SelectorBase, IDesignable
             // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
             Cycle ();
 
-            return base.OnActivating (args);
+            return false;
         }
         else
         {
@@ -81,9 +101,10 @@ public class OptionSelector : SelectorBase, IDesignable
                 UpdateChecked ();
             }
 
-            //return true;
+            return false;
         }
-        return base.OnActivating (args);
+
+        return false;
     }
 
 

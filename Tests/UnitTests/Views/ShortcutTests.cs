@@ -21,7 +21,7 @@ public class ShortcutTests
     [InlineData (7, 1)]
     [InlineData (8, 1)]
     [InlineData (9, 0)]
-    public void MouseClick_Raises_Accepted (int x, int expectedAccepted)
+    public void Button1Clicked_Raises_Activated (int x, int expectedAccepted)
     {
         Application.Top = new ();
 
@@ -34,8 +34,8 @@ public class ShortcutTests
         Application.Top.Add (shortcut);
         Application.Top.Layout ();
 
-        var accepted = 0;
-        shortcut.Accepting += (s, e) => accepted++;
+        var activating = 0;
+        shortcut.Activating += (s, e) => activating++;
 
         Application.RaiseMouseEvent (
                                   new ()
@@ -44,7 +44,7 @@ public class ShortcutTests
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
-        Assert.Equal (expectedAccepted, accepted);
+        Assert.Equal (expectedAccepted, activating);
 
         Application.Top.Dispose ();
         Application.ResetState (true);
@@ -313,7 +313,7 @@ public class ShortcutTests
             Text = "0",
             CommandView = new CheckBox ()
             {
-                Title = "_C"
+                Title = "_C",
             },
             CanFocus = canFocus
         };
@@ -321,6 +321,8 @@ public class ShortcutTests
         shortcut.SetFocus ();
 
         Assert.Equal (canFocus, shortcut.HasFocus);
+        // By default CommandView gets CanFocus set to false, so the CB will never have focus
+        Assert.Equal (shortcut, Application.Top.MostFocused);
 
         var accepted = 0;
         shortcut.Accepting += (s, e) =>

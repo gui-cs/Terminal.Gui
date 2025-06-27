@@ -174,7 +174,32 @@ public class CheckBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Commands_Select ()
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var ckb = new CheckBox ();
+        var acceptInvoked = false;
+
+        ckb.Accepting += ViewOnAccept;
+
+        bool? ret = ckb.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+
+        void ViewOnAccept (object sender, CommandEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Handled = true;
+        }
+    }
+
+
+    #region Keyboard Tests
+
+
+    [Fact]
+    public void KeyDown_Raise_Events_Properly ()
     {
         Application.Navigation = new ();
         Application.Top = new ();
@@ -230,26 +255,55 @@ public class CheckBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    public void Enter_Raises_Accepting ()
     {
-        var ckb = new CheckBox ();
-        var acceptInvoked = false;
+        CheckBox cb = new ();
+        int acceptedCount = 0;
 
-        ckb.Accepting += ViewOnAccept;
+        cb.Accepting += CheckBoxOnAccept;
+        cb.NewKeyDownEvent (Key.Enter);
 
-        bool? ret = ckb.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
+        Assert.Equal (1, acceptedCount);
 
         return;
 
-        void ViewOnAccept (object sender, CommandEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Handled = true;
-        }
+        void CheckBoxOnAccept (object sender, CommandEventArgs e) { acceptedCount++; }
     }
 
+
+    [Fact]
+    public void Accept_Command_Raises_Accepting ()
+    {
+        var cb = new CheckBox ();
+        int acceptedCount = 0;
+
+        cb.Accepting += CheckBoxOnAccept;
+        cb.InvokeCommand (Command.Accept);
+
+        Assert.Equal(1,acceptedCount);
+
+        return;
+
+        void CheckBoxOnAccept (object sender, CommandEventArgs e) { acceptedCount++; }
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Raise_Accepting ()
+    {
+        var cb = new CheckBox ();
+        var accepted = false;
+
+        cb.Accepting += CheckBoxOnAccept;
+        cb.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void CheckBoxOnAccept (object sender, CommandEventArgs e) { accepted = true; }
+    }
+
+    #endregion Keyboard Tests
     #region Mouse Tests
 
     [Fact]
@@ -556,21 +610,6 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
-    public void HotKey_Command_Does_Not_Fire_Accept ()
-    {
-        var cb = new CheckBox ();
-        var accepted = false;
-
-        cb.Accepting += CheckBoxOnAccept;
-        cb.InvokeCommand (Command.HotKey);
-
-        Assert.False (accepted);
-
-        return;
-
-        void CheckBoxOnAccept (object sender, CommandEventArgs e) { accepted = true; }
-    }
 
     [Theory]
     [InlineData (CheckState.Checked)]
