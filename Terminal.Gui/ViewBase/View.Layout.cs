@@ -1272,6 +1272,7 @@ public partial class View // Layout APIs
 
         return viewsUnderLocation;
     }
+
     /// <summary>
     ///     INTERNAL: Gets ALL Views (Subviews and Adornments) in the of <see cref="SuperView"/> hierarchcy that are at
     ///     <paramref name="location"/>,
@@ -1323,6 +1324,11 @@ public partial class View // Layout APIs
         }
 
         return result;
+    }
+
+    internal static View? GetDeepestViewUnderLocation (View? root, in Point location, ViewportSettingsFlags excludeViewportSettingsFlags = ViewportSettingsFlags.None)
+    {
+       return GetViewsUnderLocation (root, location, excludeViewportSettingsFlags).LastOrDefault ();
     }
 
     #endregion Utilities

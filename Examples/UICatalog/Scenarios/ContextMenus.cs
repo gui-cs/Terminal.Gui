@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ContextMenus", "Context Menu Sample.")]
+[ScenarioMetadata ("ContextMenus", "Demonstrates using PopoverMenu as a Context Menu.")]
 [ScenarioCategory ("Menus")]
 public class ContextMenus : Scenario
 {
@@ -24,6 +24,21 @@ public class ContextMenus : Scenario
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
             SchemeName = "Toplevel"
+        };
+
+        // Create keyboard and mouse bindings for the context menu.
+        appWindow.KeyBindings.Add (_winContextMenuKey, Command.Context);
+        appWindow.MouseBindings.Add (MouseFlags.Button3Clicked, Command.Context);
+
+        // View.AddCommand is protected; but we canuse the CommandNotBound event to handle Command.Context
+        appWindow.CommandNotBound += (s, e) =>
+        {
+            if (e.Context!.Command == Command.Context)
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible ();
+                e.Handled = true;
+            }
         };
 
         var text = "Context Menu";
@@ -60,43 +75,16 @@ public class ContextMenus : Scenario
         _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomRight);
 
-        appWindow.KeyDown += OnAppWindowOnKeyDown;
-        appWindow.MouseClick += OnAppWindowOnMouseClick;
-
         CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
         appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
 
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
-        appWindow.KeyDown -= OnAppWindowOnKeyDown;
-        appWindow.MouseClick -= OnAppWindowOnMouseClick;
         _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
-
-        return;
-
-        void OnAppWindowOnMouseClick (object s, MouseEventArgs e)
-        {
-            if (e.Flags == MouseFlags.Button3Clicked)
-            {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible (e.ScreenPosition);
-                e.Handled = true;
-            }
-        }
-
-        void OnAppWindowOnKeyDown (object s, Key e)
-        {
-            if (e == _winContextMenuKey)
-            {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible ();
-                e.Handled = true;
-            }
-        }
     }
 
     private void CreateWinContextMenu ()

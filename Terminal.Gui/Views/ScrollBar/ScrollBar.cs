@@ -515,14 +515,18 @@ public class ScrollBar : View, IOrientation, IDesignable
         return true;
     }
 
-    // TODO: Change this to work OnMouseEvent with continuouse press and grab so it's continous.
-    /// <inheritdoc/>
-    protected override bool OnMouseClick (MouseEventArgs args)
+    // TODO: Ensure contninous button pressed works correctly with the slider.
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        // Check if the mouse click is a single click
-        if (!args.IsSingleClicked)
+        if (args.Context is not CommandContext<MouseBinding> mouseCommandContext)
         {
-            return false;
+            return base.OnActivating (args);
+        }
+        // Check if the mouse click is a single click
+        if (!mouseCommandContext.Binding!.MouseEventArgs!.IsSingleClicked)
+        {
+            return base.OnActivating (args);
         }
 
         int sliderCenter;
@@ -531,12 +535,12 @@ public class ScrollBar : View, IOrientation, IDesignable
         if (Orientation == Orientation.Vertical)
         {
             sliderCenter = 1 + _slider.Frame.Y + _slider.Frame.Height / 2;
-            distanceFromCenter = args.Position.Y - sliderCenter;
+            distanceFromCenter = mouseCommandContext.Binding!.MouseEventArgs.Position.Y - sliderCenter;
         }
         else
         {
             sliderCenter = 1 + _slider.Frame.X + _slider.Frame.Width / 2;
-            distanceFromCenter = args.Position.X - sliderCenter;
+            distanceFromCenter = mouseCommandContext.Binding!.MouseEventArgs.Position.X - sliderCenter;
         }
 
 #if PROPORTIONAL_SCROLL_JUMP

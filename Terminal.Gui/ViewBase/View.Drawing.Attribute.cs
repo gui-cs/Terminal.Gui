@@ -35,15 +35,44 @@ public partial class View
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Drawing.Scheme"/>.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
-        Attribute schemeAttribute = GetScheme ()!.GetAttributeForRole (role);
+        // Get the initial attribute as before
+        Attribute roleAttribute = HasScheme ? GetScheme ()!.GetAttributeForRole (role) : SuperView?.GetAttributeForRole (role) ?? GetScheme ()!.GetAttributeForRole (role);
 
-        if (OnGettingAttributeForRole (role, ref schemeAttribute))
+        // Apply InvertFocusAttribute if needed
+        if (InvertFocusAttribute is true)
         {
-            // The implementation may have changed the attribute
-            return schemeAttribute;
+            if (SuperView?.HasFocus ?? false)
+            {
+                roleAttribute = role switch
+                                {
+                                    VisualRole.Normal => HasScheme
+                                                             ? GetScheme ()!.GetAttributeForRole (VisualRole.Focus)
+                                                             : SuperView?.GetAttributeForRole (VisualRole.Focus)
+                                                               ?? GetScheme ()!.GetAttributeForRole (VisualRole.Focus),
+                                    VisualRole.HotNormal => HasScheme
+                                                                ? GetScheme ()!.GetAttributeForRole (VisualRole.HotFocus)
+                                                                : SuperView?.GetAttributeForRole (VisualRole.HotFocus)
+                                                                  ?? GetScheme ()!.GetAttributeForRole (VisualRole.HotFocus),
+                                    VisualRole.Focus => HasScheme
+                                                            ? GetScheme ()!.GetAttributeForRole (VisualRole.Normal)
+                                                            : SuperView?.GetAttributeForRole (VisualRole.Normal)
+                                                              ?? GetScheme ()!.GetAttributeForRole (VisualRole.Normal),
+                                    VisualRole.HotFocus => HasScheme
+                                                               ? GetScheme ()!.GetAttributeForRole (VisualRole.HotNormal)
+                                                               : SuperView?.GetAttributeForRole (VisualRole.HotNormal)
+                                                                 ?? GetScheme ()!.GetAttributeForRole (VisualRole.HotNormal),
+                                    _ => roleAttribute
+                                };
+            }
         }
 
-        VisualRoleEventArgs args = new (role, result: schemeAttribute);
+        if (OnGettingAttributeForRole (role, ref roleAttribute))
+        {
+            // The implementation may have changed the attribute
+            return roleAttribute;
+        }
+
+        VisualRoleEventArgs args = new (role, result: roleAttribute);
         GettingAttributeForRole?.Invoke (this, args);
 
         if (args is { Handled: true, Result: { } })
@@ -57,13 +86,13 @@ public partial class View
             // The default behavior for HighlightStates of MouseState.Over is to use the Highlight role
             if (((HighlightStates.HasFlag (MouseState.In) && MouseState.HasFlag (MouseState.In))
                  || (HighlightStates.HasFlag (MouseState.Pressed) && MouseState.HasFlag (MouseState.Pressed)))
-                 && role != VisualRole.Highlight && !HasFocus)
+                 && role != VisualRole.Highlight /*&& !HasFocus*/)
             {
-                schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
+                roleAttribute = GetAttributeForRole (VisualRole.Highlight);
             }
         }
 
-        return Enabled || role == VisualRole.Disabled ? schemeAttribute : GetAttributeForRole (VisualRole.Disabled);
+        return Enabled || role == VisualRole.Disabled ? roleAttribute : GetAttributeForRole (VisualRole.Disabled);
     }
 
     /// <summary>

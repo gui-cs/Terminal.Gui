@@ -101,6 +101,13 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        return base.OnClearingViewport ();
+    }
+
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto ()
     {
@@ -230,7 +237,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
 
-    #region Accept/Select/HotKey Command Handling
+    #region Accept/Activate/HotKey Command Handling
 
     private void AddCommands ()
     {
@@ -238,13 +245,13 @@ public class Shortcut : View, IOrientation, IDesignable
         AddCommand (Command.Accept, DispatchCommand);
         // Hotkey -
         AddCommand (Command.HotKey, DispatchCommand);
-        // Select (Space key or click) -
+        // Activate (Space key or click) -
         AddCommand (Command.Activate, DispatchCommand);
     }
 
     /// <summary>
-    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Selected, then Accepting, then invoke the Action, if any).
-    ///     Called when Command.Select, Accept, or HotKey has been invoked on this Shortcut.
+    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Activating, then Accepting, then invoke the Action, if any).
+    ///     Called when Command.Activate, Accept, or HotKey has been invoked on this Shortcut.
     /// </summary>
     /// <param name="commandContext"></param>
     /// <returns>
@@ -261,13 +268,16 @@ public class Shortcut : View, IOrientation, IDesignable
         if (keyCommandContext?.Binding.Data != this)
         {
             // TODO: Optimize this to only do this if CommandView is custom (non View)
-            // Invoke Select on the CommandView to cause it to change state if it wants to
+            // Invoke Activate on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Select on CommandView ({CommandView.GetType ().Name}).");
+            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            CommandView.InvokeCommand (Command.Activate, keyCommandContext);
+            if (CommandView.InvokeCommand (Command.Activate, keyCommandContext) is true)
+            {
+                return true;
+            }
         }
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
@@ -459,10 +469,10 @@ public class Shortcut : View, IOrientation, IDesignable
                     e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
+                    //InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
                 }
 
-                e.Handled = true;
+                // e.Handled = true;
             }
         }
     }
@@ -482,15 +492,25 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStates = HighlightStates.None;
-        CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+        if (CommandView.InvertFocusAttribute is null)
+        {
+            CommandView.InvertFocusAttribute = CanFocus;
+        }
+
+        //CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
     {
+        //if (!HasFocus)
+        {
+            return;
+        }
+
         switch (e.Role)
         {
             case VisualRole.Normal:
-                if (HasFocus)
+                //if (HasFocus)
                 {
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.Focus);
@@ -498,12 +518,29 @@ public class Shortcut : View, IOrientation, IDesignable
                 break;
 
             case VisualRole.HotNormal:
-                if (HasFocus)
+                // if (HasFocus)
                 {
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.HotFocus);
                 }
                 break;
+
+            case VisualRole.Focus:
+                //if (HasFocus)
+                {
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.Normal);
+                }
+                break;
+
+            case VisualRole.HotFocus:
+                // if (HasFocus)
+                {
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.HotNormal);
+                }
+                break;
+
         }
     }
 
@@ -546,10 +583,11 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
-        HelpView.TextFormatter.WordWrap = false;
+        HelpView.TextFormatter.WordWrap = true;
         HelpView.HighlightStates = ViewBase.MouseState.None;
+        HelpView.InvertFocusAttribute = true;
 
-        HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+        //HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     /// <summary>
@@ -671,9 +709,11 @@ public class Shortcut : View, IOrientation, IDesignable
             KeyView.Margin.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
 
+        // KeyView is sized to hold JUST it's text so that only the text is drawn using HotNormal/HotFocus
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
+        KeyView.Y = Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, minimumContentDim: Dim.Func (() => MinimumKeyTextSize));
-        KeyView.Height = Dim.Fill ();
+        KeyView.Height = 1;
 
         KeyView.Visible = true;
 
@@ -682,20 +722,22 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
         KeyView.HighlightStates = ViewBase.MouseState.None;
+        KeyView.InvertFocusAttribute = true;
 
-        KeyView.GettingAttributeForRole += (sender, args) =>
-                                           {
-                                               if (args.Role == VisualRole.Normal)
-                                               {
-                                                   args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
-                                                   args.Handled = true;
-                                               }
-                                           };
-        KeyView.ClearingViewport += (sender, args) =>
-                                          {
-                                              // Do not clear; otherwise spaces will be printed with underlines
-                                              args.Cancel = true;
-                                          };
+        KeyView.DrawingText += (sender, args) =>
+                               {
+                                   var drawRect = new Rectangle (KeyView.ContentToScreen (Point.Empty), KeyView.GetContentSize ());
+
+                                   Region textRegion = KeyView.TextFormatter.GetDrawRegion (drawRect);
+                                   KeyView.TextFormatter?.Draw (
+                                                                drawRect,
+                                                                HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                                                HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                                                Rectangle.Empty
+                                                               );
+
+                                   args.Cancel = true;
+                               };
     }
 
     private void UpdateKeyBindings (Key oldKey)
@@ -731,28 +773,14 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Focus
 
-    private bool _forceFocusColors;
-
-    /// <summary>
-    ///     TODO: IS this needed?
-    /// </summary>
-    public bool ForceFocusColors
-    {
-        get => _forceFocusColors;
-        set
-        {
-            _forceFocusColors = value;
-            SetNeedsDraw ();
-        }
-    }
-
     /// <inheritdoc />
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (!HasFocus)
+        //if (!HasFocus)
         {
             return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
+
 
         if (role == VisualRole.Normal)
         {

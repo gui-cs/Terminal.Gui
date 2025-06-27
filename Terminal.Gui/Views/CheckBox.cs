@@ -28,17 +28,14 @@ public class CheckBox : View
 
         CanFocus = true;
 
-        // Activate (Space key and single-click) - Advance state and raise Accepting event
+        // Activate (Space key and single-click) - Raise Activate event and Advance
         // - DO NOT raise Accept
         // - DO NOT SetFocus
-        AddCommand (Command.Activate, AdvanceAndActivate);
+        AddCommand (Command.Activate, ActivateAndAdvance);
 
-        // Accept (Enter key) - Raise Accept event
+        // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
         // The default Accept handler does that.
-
-        // Enable double-clicking to Accept
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -51,21 +48,25 @@ public class CheckBox : View
         // Invoke Activate on ourselves
         if (InvokeCommand (Command.Activate, args.Context) is true)
         {
+            // Default behavior for View is to set Focus on hotkey. We need to return
+            // true here to indiciate Activate was handled. That will prevent the default
+            // behavior from setting focus, so we do it here.
+            SetFocus ();
             return true;
         }
         return base.OnHandlingHotKey (args);
     }
 
-    private bool? AdvanceAndActivate (ICommandContext? commandContext)
+    private bool? ActivateAndAdvance (ICommandContext? commandContext)
     {
-        bool? cancelled = AdvanceCheckState ();
-
-        if (cancelled is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
 
-        if (RaiseActivating (commandContext) is true)
+        bool? cancelled = AdvanceCheckState ();
+
+        if (cancelled is true)
         {
             return true;
         }
@@ -256,6 +257,13 @@ public class CheckBox : View
         bool? cancelled = ChangeCheckedState (e.Result);
 
         return cancelled;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        return base.OnClearingViewport ();
     }
 
     /// <inheritdoc/>

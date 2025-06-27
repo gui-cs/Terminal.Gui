@@ -36,7 +36,11 @@ public partial class Toplevel : View
         Height = Dim.Fill ();
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
 
-        MouseClick += Toplevel_MouseClick;
+        // TODO: This is commented out because it makes no sense. If it turns out there's a reason
+        // TODO: for Toplevel to invoke Command.HotKey on a mouse click, then it should be
+        // TODO: done via MouseBindings.ReplaceCommands and not via the MouseClick event.
+        // TODO: AND a unit test should be written to ensure this works as expected.
+        //MouseClick += Toplevel_MouseClick;
     }
 
     #region Keyboard & Mouse
@@ -64,7 +68,11 @@ public partial class Toplevel : View
     /// </summary>
     public bool Modal { get; set; }
 
-    private void Toplevel_MouseClick (object? sender, MouseEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
+    // TODO: This is commented out because it makes no sense. If it turns out there's a reason
+    // TODO: for Toplevel to invoke Command.HotKey on a mouse click, then it should be
+    // TODO: done via MouseBindings.ReplaceCommands and not via the MouseClick event.
+    // TODO: AND a unit test should be written to ensure this works as expected.
+    //private void Toplevel_MouseClick (object? sender, MouseEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
 
     #endregion
 

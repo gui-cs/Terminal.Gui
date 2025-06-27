@@ -41,7 +41,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         _tableView = table;
         _tree = tree;
         _tableView.KeyDown += Table_KeyPress;
-        _tableView.MouseClick += Table_MouseClick;
+        _tableView.Activating += Table_Activating;
 
         List<string> colList = subsequentColumns.Keys.ToList ();
         colList.Insert (0, firstColumnName);
@@ -55,7 +55,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     public void Dispose ()
     {
         _tableView.KeyDown -= Table_KeyPress;
-        _tableView.MouseClick -= Table_MouseClick;
+        _tableView.Activating -= Table_Activating;
         _tree.Dispose ();
     }
 
@@ -128,6 +128,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
     private Branch<T> RowToBranch (int row) { return _tree.BuildLineMap ().ElementAt (row); }
 
+    // TODO: Replace this logic with KeyBindings
     private void Table_KeyPress (object sender, Key e)
     {
         if (!IsInTreeColumn (_tableView.SelectedColumn, true))
@@ -167,8 +168,14 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         }
     }
 
-    private void Table_MouseClick (object sender, MouseEventArgs e)
+    private void Table_Activating (object sender, CommandEventArgs commandEventArgs)
     {
+        if (commandEventArgs.Context is not CommandContext<MouseBinding> mouseContext)
+        {
+            return;
+        }
+
+        MouseEventArgs e = mouseContext.Binding.MouseEventArgs!;
         Point? hit = _tableView.ScreenToCell (e.Position.X, e.Position.Y, out int? headerIfAny, out int? offsetX);
 
         if (hit is null || headerIfAny is { } || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)

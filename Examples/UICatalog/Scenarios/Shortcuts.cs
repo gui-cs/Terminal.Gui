@@ -16,9 +16,11 @@ public class Shortcuts : Scenario
 
         app.Loaded += App_Loaded;
 
+        Key originalQuitKey = Application.QuitKey;
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
+        Application.QuitKey = originalQuitKey;
     }
 
     // Setting everything up in Loaded handler because we change the
@@ -135,8 +137,7 @@ public class Shortcuts : Scenario
                                                                                      eventLog.MoveDown ();
 
                                                                                      IEnumerable<View> toAlign =
-                                                                                         Application.Top.SubViews.Where (
-                                                                                          v => v is Shortcut { Width: not DimAbsolute });
+                                                                                         Application.Top.SubViews.OfType<Shortcut> ();//.Where (v => v is { Width: not DimAbsolute });
                                                                                      IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
                                                                                      foreach (View view in enumerable)
@@ -165,7 +166,7 @@ public class Shortcuts : Scenario
             Width = Dim.Fill ()! - Dim.Width (eventLog),
             Key = Key.F4,
             HelpText = "Changes all Command.CanFocus",
-            CommandView = new CheckBox { Text = "_CanFocus" }
+            CommandView = new CheckBox { Text = "_CanFocus" },
         };
 
         ((CheckBox)canFocusShortcut.CommandView).CheckedStateChanging += (s, e) =>
@@ -177,13 +178,7 @@ public class Shortcuts : Scenario
 
                                                                                  //cb.CanFocus = e.NewValue == CheckState.Checked;
 
-                                                                                 foreach (Shortcut peer in Application.Top.SubViews.Where (v => v is Shortcut)!)
-                                                                                 {
-                                                                                     if (peer.CanFocus)
-                                                                                     {
-                                                                                         peer.CommandView.CanFocus = e.Result == CheckState.Checked;
-                                                                                     }
-                                                                                 }
+                                                                                 SetCanFocus (e.Result == CheckState.Checked);
                                                                              }
                                                                          };
         Application.Top.Add (canFocusShortcut);
@@ -222,37 +217,40 @@ public class Shortcuts : Scenario
 
         Application.Top.Add (buttonShortcut);
 
-        var radioGroupShortcut = new Shortcut
+        var optionSelectorShortcut = new Shortcut
         {
-            Id = "radioGroupShortcut",
+            Id = "optionSelectorShortcut",
+            HelpText = "Option Selector",
             X = 0,
             Y = Pos.Bottom (buttonShortcut),
             Key = Key.F2,
             Width = Dim.Fill ()! - Dim.Width (eventLog),
-            CommandView = new RadioGroup
+            CommandView = new OptionSelector ()
             {
                 Orientation = Orientation.Vertical,
-                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"]
-            }
+                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
+                CanFocus = false,
+                HighlightStates = MouseState.None,
+            },
         };
 
-        ((RadioGroup)radioGroupShortcut.CommandView).SelectedItemChanged += (o, args) =>
-                                                                            {
-                                                                                if (o is { })
+        ((OptionSelector)optionSelectorShortcut.CommandView).SelectedItemChanged += (o, args) =>
                                                                                 {
-                                                                                    eventSource.Add (
-                                                                                                     $"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
-                                                                                    eventLog.MoveDown ();
-                                                                                }
-                                                                            };
+                                                                                    if (o is { })
+                                                                                    {
+                                                                                        eventSource.Add (
+                                                                                                         $"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
+                                                                                        eventLog.MoveDown ();
+                                                                                    }
+                                                                                };
 
-        Application.Top.Add (radioGroupShortcut);
+        Application.Top.Add (optionSelectorShortcut);
 
         var sliderShortcut = new Shortcut
         {
             Id = "sliderShortcut",
             X = 0,
-            Y = Pos.Bottom (radioGroupShortcut),
+            Y = Pos.Bottom (optionSelectorShortcut),
             Width = Dim.Fill ()! - Dim.Width (eventLog),
             HelpText = "Sliders work!",
             CommandView = new Slider<string>
@@ -319,9 +317,9 @@ public class Shortcuts : Scenario
             Id = "framedShortcut",
             X = 0,
             Y = Pos.Bottom (noHelpShortcut) + 1,
-            Title = "Framed",
+            Title = "CommandView",
             Key = Key.K.WithCtrl,
-            Text = "Resize frame",
+            Text = "Help: You can resize",
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
@@ -335,9 +333,9 @@ public class Shortcuts : Scenario
 
         if (framedShortcut.CommandView.Margin is { })
         {
-            framedShortcut.CommandView.Margin.SchemeName = framedShortcut.CommandView.SchemeName = "Error";
-            framedShortcut.HelpView.Margin!.SchemeName = framedShortcut.HelpView.SchemeName = "Dialog";
-            framedShortcut.KeyView.Margin!.SchemeName = framedShortcut.KeyView.SchemeName = "Menu";
+            framedShortcut.CommandView.SchemeName = framedShortcut.CommandView.SchemeName = "Error";
+            framedShortcut.HelpView.SchemeName = framedShortcut.HelpView.SchemeName = "Dialog";
+            framedShortcut.KeyView.SchemeName = framedShortcut.KeyView.SchemeName = "Error";
         }
 
         framedShortcut.SchemeName = "TopLevel";
@@ -503,7 +501,7 @@ public class Shortcuts : Scenario
                                                   eventSource.Add (
                                                                    $"{shortcut!.Id}.CommandView.Activating: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                                                   eventLog.MoveDown ();
-                                                  args.Handled = true;
+                                                  //args.Handled = true;
                                               };
 
             shortcut.Accepting += (o, args) =>
@@ -512,7 +510,7 @@ public class Shortcuts : Scenario
                                       eventLog.MoveDown ();
 
                                       // We don't want this to exit the Scenario
-                                      args.Handled = true;
+                                      //args.Handled = true;
                                   };
 
             shortcut.CommandView.Accepting += (o, args) =>
@@ -521,6 +519,19 @@ public class Shortcuts : Scenario
                                                                    $"{shortcut!.Id}.CommandView.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                                                   eventLog.MoveDown ();
                                               };
+        }
+
+        SetCanFocus (false);
+
+        void SetCanFocus (bool canFocus)
+        {
+            foreach (Shortcut peer in Application.Top!.SubViews.OfType<Shortcut> ())
+            {
+                if (peer.CanFocus)
+                {
+                    peer.CommandView.CanFocus = canFocus;
+                }
+            }
         }
     }
 

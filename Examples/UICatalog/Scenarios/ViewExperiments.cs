@@ -86,7 +86,7 @@ public class ViewExperiments : Scenario
             //Application.Popover!.Visible = true;
         }
 
-        testFrame.MouseClick += TestFrameOnMouseClick;
+        testFrame.MouseEvent += TestFrameOnMouseClick;
 
         void TestFrameOnMouseClick (object sender, MouseEventArgs e)
         {
@@ -96,6 +96,7 @@ public class ViewExperiments : Scenario
                 popoverView.Y = e.ScreenPosition.Y;
                 //Application.Popover = popoverView;
                 //Application.Popover!.Visible = true;
+                e.Handled = true;
             }
         }
 

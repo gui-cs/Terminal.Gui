@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Terminal.Gui.Input;
 
 namespace UICatalog.Scenarios;
 
@@ -410,7 +411,7 @@ public class TextAlignmentAndDirection : Scenario
         // Save Alignment in Data
         foreach (View t in multiLineLabels)
         {
-            t.Data = new { h = t.TextAlignment, v = t.VerticalTextAlignment };
+            t.Data = new TextAlignmentData (t.TextAlignment, t.VerticalTextAlignment);
         }
 
         container.Add (txtLabelTL);
@@ -447,7 +448,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        editText.MouseClick += (s, m) =>
+        editText.Activating += (s, m) =>
                                {
                                    foreach (View v in singleLineLabels)
                                    {
@@ -458,6 +459,8 @@ public class TextAlignmentAndDirection : Scenario
                                    {
                                        v.Text = editText.Text;
                                    }
+                                   m.Handled = true;
+
                                };
 
         app.KeyUp += (s, m) =>
@@ -594,8 +597,9 @@ public class TextAlignmentAndDirection : Scenario
 
                 foreach (View t in multiLineLabels)
                 {
-                    t.TextAlignment = (Alignment)((dynamic)t.Data).h;
-                    t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
+                    var data = (TextAlignmentData)t.Data;
+                    t.TextAlignment = data!.h;
+                    t.VerticalTextAlignment = data.v;
                 }
             }
             else
@@ -607,24 +611,23 @@ public class TextAlignmentAndDirection : Scenario
                         justifyOptions.Enabled = true;
                     }
 
+                    var data = (TextAlignmentData)t.Data;
+
                     if (TextFormatter.IsVerticalDirection (t.TextDirection))
                     {
                         switch (justifyOptions.SelectedItem)
                         {
                             case 0:
                                 t.VerticalTextAlignment = Alignment.Fill;
-                                t.TextAlignment = ((dynamic)t.Data).h;
-
+                                t.TextAlignment = data!.h;
                                 break;
                             case 1:
-                                t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
+                                t.VerticalTextAlignment = data!.v;
                                 t.TextAlignment = Alignment.Fill;
-
                                 break;
                             case 2:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = Alignment.Fill;
-
                                 break;
                         }
                     }
@@ -634,23 +637,26 @@ public class TextAlignmentAndDirection : Scenario
                         {
                             case 0:
                                 t.TextAlignment = Alignment.Fill;
-                                t.VerticalTextAlignment = ((dynamic)t.Data).v;
-
+                                t.VerticalTextAlignment = data!.v;
                                 break;
                             case 1:
-                                t.TextAlignment = (Alignment)((dynamic)t.Data).h;
+                                t.TextAlignment = data!.h;
                                 t.VerticalTextAlignment = Alignment.Fill;
-
                                 break;
                             case 2:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = Alignment.Fill;
-
                                 break;
                         }
                     }
                 }
             }
         }
+    }
+
+    private class TextAlignmentData (Alignment h, Alignment v)
+    {
+        public Alignment h { get; } = h;
+        public Alignment v { get; } = v;
     }
 }

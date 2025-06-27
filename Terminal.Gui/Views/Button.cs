@@ -64,8 +64,13 @@ public class Button : View, IDesignable
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button2Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
+
         TitleChanged += Button_TitleChanged;
-        MouseClick += Button_MouseClick;
+        //MouseClick += Button_MouseClick;
 
         base.ShadowStyle = DefaultShadow;
         HighlightStates = DefaultHighlightStates;

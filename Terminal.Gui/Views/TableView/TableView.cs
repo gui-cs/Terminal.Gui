@@ -247,6 +247,11 @@ public class TableView : View, IDesignable
                     Command.Activate, // was Command.ToggleChecked
                     ctx =>
                     {
+                        if (ctx is CommandContext<MouseBinding>)
+                        {
+                            return RaiseActivating (ctx) is true; 
+                        }
+
                         if (ToggleCurrentCellSelection () is true)
                         {
                             return RaiseActivating (ctx) is true;

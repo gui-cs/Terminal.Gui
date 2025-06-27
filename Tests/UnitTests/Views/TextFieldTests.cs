@@ -885,7 +885,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         var tf = new TextField { Width = 10 };
         var clickCounter = 0;
-        tf.MouseClick += (s, m) => { clickCounter++; };
+        tf.Activating += (s, m) => { clickCounter++; };
 
         var top = new Toplevel ();
         top.Add (tf);
