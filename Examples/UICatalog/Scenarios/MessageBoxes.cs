@@ -228,7 +228,7 @@ public class MessageBoxes : Scenario
 
         var showMessageBoxButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefaultAcceptView = true, Text = "_Show MessageBox"
         };
 
         app.Accepting += (s, e) =>

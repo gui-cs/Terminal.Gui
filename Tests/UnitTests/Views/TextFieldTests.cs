@@ -739,7 +739,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var button = new Button
         {
             Id = "button",
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         superView.Add (tf, button);

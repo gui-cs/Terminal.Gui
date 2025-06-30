@@ -132,7 +132,7 @@ public class DefaultFileOperations : IFileOperations
     private bool Prompt (string title, string defaultText, out string result)
     {
         var confirm = false;
-        var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
+        var btnOk = new Button { IsDefaultAcceptView = true, Text = Strings.btnOk };
 
         btnOk.Accepting += (s, e) =>
                          {

@@ -510,7 +510,7 @@ public class MessageBoxTests
         Application.Init (new FakeDriver ());
 
         Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
-        int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
+        int res = MessageBox.Query ("hey", "IsDefaultAcceptView", "Yes", "No");
 
         Assert.Equal (0, res);
 

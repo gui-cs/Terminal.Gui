@@ -1855,7 +1855,7 @@ public class TextViewTests
 
         var button = new Button
         {
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         superView.Add (tv, button);
@@ -1903,7 +1903,7 @@ public class TextViewTests
 
         var button = new Button
         {
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         superView.Add (tv, button);

@@ -32,7 +32,7 @@ public enum Command
     ///     <para>
     ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAccepting"/>. If the event is not handled,
     ///         the command is invoked on:
-    ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefault"/> set to <see langword="true"/>.
+    ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefaultAcceptView"/> set to <see langword="true"/>.
     ///             - The <see cref="View.SuperView"/>. This enables default Accept behavior.
     ///     </para>
     /// </summary>

@@ -67,7 +67,7 @@ public class ExampleWindow : Window
 
             // center the login button horizontally
             X = Pos.Center (),
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         // When login button is clicked display a message popup

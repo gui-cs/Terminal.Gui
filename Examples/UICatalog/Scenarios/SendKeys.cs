@@ -66,7 +66,7 @@ public class SendKeys : Scenario
         var lblShippedControlKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 5 };
         win.Add (lblShippedControlKeys);
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefault = true, Text = "Process keys" };
+        var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefaultAcceptView = true, Text = "Process keys" };
         win.Add (button);
 
         void ProcessInput ()

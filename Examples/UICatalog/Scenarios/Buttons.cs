@@ -20,17 +20,17 @@ public class Buttons : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        // Add a label & text field so we can demo IsDefault
-        var editLabel = new Label { X = 0, Y = 0, Text = "TextField (to demo IsDefault):" };
+        // Add a label & text field so we can demo IsDefaultAcceptView
+        var editLabel = new Label { X = 0, Y = 0, Text = "TextField (to demo IsDefaultAcceptView):" };
         main.Add (editLabel);
 
         // Add a TextField using Absolute layout. 
         var edit = new TextField { X = 31, Width = 15, HotKey = Key.Y.WithAlt };
         main.Add (edit);
 
-        // This is the default button (IsDefault = true); if user presses ENTER in the TextField
+        // This is the default button (IsDefaultAcceptView = true); if user presses ENTER in the TextField
         // the scenario will quit
-        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
+        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefaultAcceptView = true, Text = "_Quit" };
 
         main.Add (defaultButton);
 
@@ -48,14 +48,14 @@ public class Buttons : Scenario
 
         swapButton.Accepting += (s, e) =>
                              {
-                                 e.Handled = !swapButton.IsDefault;
-                                 defaultButton.IsDefault = !defaultButton.IsDefault;
-                                 swapButton.IsDefault = !swapButton.IsDefault;
+                                 e.Handled = !swapButton.IsDefaultAcceptView;
+                                 defaultButton.IsDefaultAcceptView = !defaultButton.IsDefaultAcceptView;
+                                 swapButton.IsDefaultAcceptView = !swapButton.IsDefaultAcceptView;
                              };
 
         defaultButton.Accepting += (s, e) =>
                                 {
-                                    e.Handled = !defaultButton.IsDefault;
+                                    e.Handled = !defaultButton.IsDefaultAcceptView;
 
                                     if (e.Handled)
                                     {

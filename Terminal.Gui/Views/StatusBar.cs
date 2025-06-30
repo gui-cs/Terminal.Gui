@@ -76,7 +76,7 @@ public class StatusBar : Bar, IDesignable
 
             if (barItem is Shortcut shortcut)
             {
-                shortcut.Orientation = Orientation.Horizontal;
+             //   shortcut.Orientation = Orientation.Horizontal;
             }
         }
         base.OnSubViewLayout (args);

@@ -76,7 +76,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
             Y = Pos.AnchorEnd (),
-            IsDefault = true, Text = Style.OkButtonText
+            IsDefaultAcceptView = true, Text = Style.OkButtonText
         };
 
         _btnOk.Accepting += (s, e) =>

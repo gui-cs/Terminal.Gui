@@ -75,7 +75,7 @@ public class Wizard : Dialog
         NextFinishButton = new ()
         {
             Text = Strings.wzFinish,
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         //// Add a horiz separator

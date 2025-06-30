@@ -358,7 +358,7 @@ public static class MessageBox
 
                 if (count == defaultButton)
                 {
-                    b.IsDefault = true;
+                    b.IsDefaultAcceptView = true;
                     b.Accepting += (_, e) =>
                                    {
                                        if (e?.Context?.Source is Button button)

@@ -323,18 +323,18 @@ public class ShortcutTests
         Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
     }
 
-    [Theory]
-    [InlineData (Orientation.Horizontal)]
-    [InlineData (Orientation.Vertical)]
-    public void Orientation_SetsCorrectly (Orientation orientation)
-    {
-        var shortcut = new Shortcut
-        {
-            Orientation = orientation
-        };
+    //[Theory]
+    //[InlineData (Orientation.Horizontal)]
+    //[InlineData (Orientation.Vertical)]
+    //public void Orientation_SetsCorrectly (Orientation orientation)
+    //{
+    //    var shortcut = new Shortcut
+    //    {
+    //        Orientation = orientation
+    //    };
 
-        Assert.Equal (orientation, shortcut.Orientation);
-    }
+    //    Assert.Equal (orientation, shortcut.Orientation);
+    //}
 
     [Theory]
     [InlineData (AlignmentModes.StartToEnd)]

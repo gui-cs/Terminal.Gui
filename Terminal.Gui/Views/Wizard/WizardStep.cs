@@ -10,7 +10,7 @@ namespace Terminal.Gui.Views;
 ///     empty) will fill the wizard step.
 /// </summary>
 /// <remarks>
-///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
+///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefaultAcceptView"/> to true as this will conflict
 ///     with the Next button of the Wizard. Subscribe to the <see cref="View.VisibleChanged"/> event to be notified when
 ///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
 ///     user, set <see cref="View.Enabled"/>.

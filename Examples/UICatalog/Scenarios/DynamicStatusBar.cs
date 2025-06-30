@@ -178,7 +178,7 @@ public class DynamicStatusBar : Scenario
                 EditStatusItem (_statusItem);
             }
 
-            var btnOk = new Button { IsDefault = true, Text = "OK" };
+            var btnOk = new Button { IsDefaultAcceptView = true, Text = "OK" };
 
             btnOk.Accepting += (s, e) =>
                               {

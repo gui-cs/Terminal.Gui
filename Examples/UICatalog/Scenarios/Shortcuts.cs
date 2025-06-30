@@ -324,7 +324,7 @@ public class Shortcuts : Scenario
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
         framedShortcut.Border.Settings = BorderSettings.Title;
-        framedShortcut.Orientation = Orientation.Horizontal;
+        //framedShortcut.Orientation = Orientation.Horizontal;
 
         if (framedShortcut.Padding is { })
         {
