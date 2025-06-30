@@ -50,9 +50,9 @@ The full developer documentation for Terminal.Gui is available at [gui-cs.github
 
 ## Getting Started
 
-- [Getting Started](https://gui-cs.github.io/Terminal.Gui/docs/getting-started.md) - Quick start guide to create your first Terminal.Gui application
-- [Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1.md) - Complete guide for upgrading existing applications
-- [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2.md) - Overview of new features and improvements
+- [Getting Started](https://gui-cs.github.io/Terminal.Gui/docs/getting-started) - Quick start guide to create your first Terminal.Gui application
+- [Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1) - Complete guide for upgrading existing applications
+- [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2) - Overview of new features and improvements
 
 ## API Reference
 
