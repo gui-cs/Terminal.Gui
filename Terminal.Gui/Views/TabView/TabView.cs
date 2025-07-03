@@ -133,7 +133,7 @@ public class TabView : View
                     Command.Up,
                     () =>
                     {
-                        if (_style.TabsOnBottom)
+                        if (_style.TabsSide == TabSide.Bottom)
                         {
                             if (_tabsBar is { HasFocus: true } && _containerView.CanFocus)
                             {
@@ -176,7 +176,7 @@ public class TabView : View
                     Command.Down,
                     () =>
                     {
-                        if (_style.TabsOnBottom)
+                        if (_style.TabsSide == TabSide.Bottom)
                         {
                             if (_containerView is { HasFocus: true })
                             {
@@ -224,8 +224,6 @@ public class TabView : View
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
     }
 
     /// <summary>
