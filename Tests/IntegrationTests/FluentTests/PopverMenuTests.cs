@@ -1,4 +1,4 @@
-using System.Reflection;
+using System.Globalization;
 using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 
@@ -7,9 +7,15 @@ namespace IntegrationTests.FluentTests;
 /// <summary>
 ///     Tests for the PopoverMenu class
 /// </summary>
-public class PopoverMenuTests (ITestOutputHelper outputHelper)
+public class PopoverMenuTests
 {
-    private readonly TextWriter _out = new TestOutputWriter (outputHelper);
+    private readonly TextWriter _out;
+
+    public PopoverMenuTests (ITestOutputHelper outputHelper)
+    {
+        CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+        _out = new TestOutputWriter (outputHelper);
+    }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]

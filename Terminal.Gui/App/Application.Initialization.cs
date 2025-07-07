@@ -40,11 +40,6 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        if (driverName?.StartsWith ("v2") ?? false)
-        {
-            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
-        }
-
         ApplicationImpl.Instance.Init (driver, driverName);
     }
 
@@ -83,12 +78,6 @@ public static partial class Application // Initialization (Init/Shutdown)
             ResetState (ignoreDisposed: true);
         }
 
-        Debug.Assert (Navigation is null);
-        Navigation = new ();
-
-        Debug.Assert(Popover is null);
-        Popover = new ();
-
         // For UnitTests
         if (driver is { })
         {
@@ -104,8 +93,6 @@ public static partial class Application // Initialization (Init/Shutdown)
                 //}
             }
         }
-
-        AddKeyBindings ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))
@@ -130,12 +117,20 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
             else
             {
-                List<Type?> drivers = GetDriverTypes ();
+                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
                 Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
 
                 if (driverType is { })
                 {
                     Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
+                }
+                else if (ForceDriver?.StartsWith ("v2") ?? false)
+                {
+                    ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+                    ApplicationImpl.Instance.Init (driver, ForceDriver);
+                    Debug.Assert (Driver is { });
+
+                    return;
                 }
                 else
                 {
@@ -145,6 +140,14 @@ public static partial class Application // Initialization (Init/Shutdown)
                 }
             }
         }
+
+        Debug.Assert (Navigation is null);
+        Navigation = new ();
+
+        Debug.Assert (Popover is null);
+        Popover = new ();
+
+        AddKeyBindings ();
 
         try
         {
@@ -201,10 +204,10 @@ public static partial class Application // Initialization (Init/Shutdown)
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
-    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types that are available.</summary>
+    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
-    public static List<Type?> GetDriverTypes ()
+    public static (List<Type?>, List<string?>) GetDriverTypes ()
     {
         // use reflection to get the list of drivers
         List<Type?> driverTypes = new ();
@@ -220,7 +223,13 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
         }
 
-        return driverTypes;
+        List<string?> driverTypeNames = driverTypes
+                                        .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
+                                        .Select (d => d!.Name)
+                                        .Union (["v2", "v2win", "v2net"])
+                                        .ToList ()!;
+
+        return (driverTypes, driverTypeNames);
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>

@@ -38,6 +38,12 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
     public WindowsInput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
+
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
 
         GetConsoleMode (_inputHandle, out uint v);
@@ -110,5 +116,13 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
         }
     }
 
-    public override void Dispose () { SetConsoleMode (_inputHandle, _originalConsoleMode); }
+    public override void Dispose ()
+    {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
+        SetConsoleMode (_inputHandle, _originalConsoleMode);
+    }
 }

@@ -100,7 +100,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
                 ViewModel
                     .WhenAnyValue (x => x.IsValid)
                     .Select (valid => valid ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme ("Error"))
-                    .BindTo (validation, x => x.GetScheme ())
+                    .Subscribe (scheme => validation.SetScheme (scheme))
                     .DisposeWith (_disposable);
             })
             .AddControlAfter<Button> ((previous, login) =>

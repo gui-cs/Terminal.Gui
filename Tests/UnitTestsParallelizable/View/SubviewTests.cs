@@ -118,6 +118,40 @@ public class SubViewTests
         Assert.Equal (new (5, 5), view.GetContentSize ());
     }
 
+    [Theory]
+    [InlineData (ViewArrangement.Fixed)]
+    [InlineData (ViewArrangement.Overlapped)]
+    public void MoveSubViewToEnd_ViewArrangement (ViewArrangement arrangement)
+    {
+        View superView = new () { Arrangement = arrangement };
+
+        var subview1 = new View
+        {
+            Id = "subview1"
+        };
+
+        var subview2 = new View
+        {
+            Id = "subview2"
+        };
+
+        var subview3 = new View
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubViewToEnd (subview1);
+        Assert.Equal ([subview2, subview3, subview1], superView.SubViews.ToArray ());
+
+        superView.MoveSubViewToEnd (subview2);
+        Assert.Equal ([subview3, subview1, subview2], superView.SubViews.ToArray ());
+
+        superView.MoveSubViewToEnd (subview3);
+        Assert.Equal ([subview1, subview2, subview3], superView.SubViews.ToArray ());
+    }
+
     [Fact]
     public void MoveSubViewToStart ()
     {
