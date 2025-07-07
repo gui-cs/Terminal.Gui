@@ -61,7 +61,11 @@
         <PackageReference Include="System.IO.Abstractions" />
         <PackageReference Include="Wcwidth" />
     </ItemGroup>
-
+	  <ItemGroup>
+    <ProjectReference Include="..\Terminal.Gui.Analyzers\Terminal.Gui.Analyzers.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
+	  </ItemGroup>
     <ItemGroup>
       <!-- Enable Nuget Source Link for github -->
       <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
@@ -154,6 +158,16 @@
             <UserProperties resources_4config_1json__JsonSchema="../../docfx/schemas/tui-config-schema.json" />
         </VisualStudio>
     </ProjectExtensions>
+
+
+    <Target Name="CopyAnalyzersToPackage" AfterTargets="Build">
+	    <ItemGroup>
+		    <AnalyzerFiles Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" />
+	    </ItemGroup>
+    </Target>
+    <ItemGroup>
+	    <None Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
 
     <!--<Target Name="PreBuildCleanup" BeforeTargets="BeforeBuild" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />

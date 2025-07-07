@@ -5,11 +5,16 @@
   <ItemGroup>
     <!-- Enable Nuget Source Link for github -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="4.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.11.0" />
+    <PackageVersion Include="Microsoft.Net.Compilers.Toolset" Version="4.11.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="[8,9)" />
     <PackageVersion Include="ColorHelper" Version="[1.8.1,2)" />
     <PackageVersion Include="JetBrains.Annotations" Version="[2024.3.0,)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis" Version="[4.11,4.12)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="[4.11,4.12)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
 
     <PackageVersion Include="Microsoft.Net.Compilers.Toolset" Version="4.11.0" />
