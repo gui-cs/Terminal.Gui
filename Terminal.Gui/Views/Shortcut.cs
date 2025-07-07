@@ -238,11 +238,24 @@ public class Shortcut : View, IDesignable
     private void AddCommands ()
     {
         // Accept (Enter key) -
-        AddCommand (Command.Accept, DispatchCommand);
+        //AddCommand (Command.Accept, DispatchCommand);
         // Hotkey -
-        AddCommand (Command.HotKey, DispatchCommand);
+        //AddCommand (Command.HotKey, DispatchCommand);
         // Activate (Space key or click) -
-        AddCommand (Command.Activate, DispatchCommand);
+       // AddCommand (Command.Activate, DispatchCommand);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        return base.OnHandlingHotKey (args);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+
+        return base.OnActivating (args);
     }
 
     /// <summary>
@@ -261,20 +274,20 @@ public class Shortcut : View, IDesignable
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
-        if (keyCommandContext?.Binding.Data != this)
-        {
-            // TODO: Optimize this to only do this if CommandView is custom (non View)
-            // Invoke Activate on the CommandView to cause it to change state if it wants to
-            // If this causes CommandView to raise Accept, we eat it
-            keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
+        //if (keyCommandContext?.Binding.Data != this)
+        //{
+        //    // TODO: Optimize this to only do this if CommandView is custom (non View)
+        //    // Invoke Activate on the CommandView to cause it to change state if it wants to
+        //    // If this causes CommandView to raise Accept, we eat it
+        //    keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+        //    Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            if (CommandView.InvokeCommand (Command.Activate, keyCommandContext) is true)
-            {
-                return true;
-            }
-        }
+        //    if (CommandView.InvokeCommand (Command.Activate, keyCommandContext) is true)
+        //    {
+        //        return true;
+        //    }
+        //}
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
 
@@ -292,17 +305,17 @@ public class Shortcut : View, IDesignable
 
         var cancel = false;
 
-        if (commandContext is { Source: null })
-        {
-            commandContext.Source = this;
-        }
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
-        cancel = RaiseAccepting (commandContext) is true;
+        //if (commandContext is { Source: null })
+        //{
+        //    commandContext.Source = this;
+        //}
+        //Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
+        //cancel = RaiseAccepting (commandContext) is true;
 
-        if (cancel)
-        {
-            return true;
-        }
+        //if (cancel)
+        //{
+        //    return true;
+        //}
 
         if (Action is { })
         {
@@ -398,7 +411,7 @@ public class Shortcut : View, IDesignable
 
             // The default behavior is for CommandView to not get focus. I
             // If you want it to get focus, you need to set it.
-            // _commandView.CanFocus = false;
+            _commandView.CanFocus = false;
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -416,7 +429,7 @@ public class Shortcut : View, IDesignable
             _commandView.Activating += CommandViewOnActivating;
             _commandView.Accepting += CommandViewOnAccepted;
 
-            //ShowHide ();
+            ShowHide ();
             UpdateKeyBindings (Key.Empty);
 
             return;

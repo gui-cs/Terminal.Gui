@@ -414,15 +414,24 @@ public class ShortcutTests
         Assert.False (shortcut.CommandView.CanFocus);
     }
 
+
     [Fact]
-    public void Focus_CanFocus_CommandView_Add_Tracks ()
+    public void Focus_CommandView_Always_CanFocus_False_When_Added ()
     {
         Shortcut shortcut = new ();
         Assert.True (shortcut.CanFocus);
         Assert.False (shortcut.CommandView.CanFocus);
 
         shortcut.CommandView = new () { CanFocus = true };
-        Assert.True (shortcut.CommandView.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
+    }
+
+    [Fact]
+    public void Focus_Set_CanFocus_False_Does_Not_Impact_CommandView ()
+    {
+        Shortcut shortcut = new ();
+        Assert.True (shortcut.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
 
         shortcut.CommandView.CanFocus = true;
         Assert.True (shortcut.CommandView.CanFocus);
@@ -431,12 +440,20 @@ public class ShortcutTests
         Assert.False (shortcut.CanFocus);
         Assert.True (shortcut.CommandView.CanFocus);
 
+        shortcut.CanFocus = true;
+        Assert.True (shortcut.CanFocus);
+        Assert.True (shortcut.CommandView.CanFocus);
+
         shortcut.CommandView.CanFocus = false;
+        Assert.True (shortcut.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
+
+        shortcut.CanFocus = false;
         Assert.False (shortcut.CanFocus);
         Assert.False (shortcut.CommandView.CanFocus);
 
-        shortcut.CommandView.CanFocus = true;
-        Assert.False (shortcut.CanFocus);
-        Assert.True (shortcut.CommandView.CanFocus);
+        shortcut.CanFocus = true;
+        Assert.True (shortcut.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
     }
 }

@@ -164,9 +164,9 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking {ctx!.Command} on SuperView ({SuperView.Title}/{SuperView.Id})...");
 
-                return SuperView?.InvokeCommand (Command.Accept, ctx);
+                return SuperView?.InvokeCommand (ctx!.Command, ctx);
             }
         }
 
@@ -279,6 +279,18 @@ public partial class View // Command APIs
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Activating?.Invoke (this, args);
+
+        // Activate is a special case where if the event is not canceled, the event is
+        //  - propagated up the SuperView hierarchy.
+        if (!args.Handled)
+        {
+            if (SuperView is { })
+            {
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking {ctx!.Command} on SuperView ({SuperView.Title}/{SuperView.Id})...");
+
+                return SuperView?.InvokeCommand (ctx!.Command, ctx);
+            }
+        }
 
         return Activating is null ? null : args.Handled;
     }
