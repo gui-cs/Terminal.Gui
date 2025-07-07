@@ -442,12 +442,12 @@ public class MenuBar : View, IDesignable
 
         if (_isContextMenuLoading)
         {
-            Application.GrabMouse (_openMenu);
+            Application.MouseGrabHandler.GrabMouse (_openMenu);
             _isContextMenuLoading = false;
         }
         else
         {
-            Application.GrabMouse (this);
+            Application.MouseGrabHandler.GrabMouse (this);
         }
     }
 
@@ -524,16 +524,16 @@ public class MenuBar : View, IDesignable
 
         SetNeedsDraw ();
 
-        if (Application.MouseGrabView is { } && Application.MouseGrabView is MenuBar && Application.MouseGrabView != this)
+        if (Application.MouseGrabHandler.MouseGrabView is { } && Application.MouseGrabHandler.MouseGrabView is MenuBar && Application.MouseGrabHandler.MouseGrabView != this)
         {
-            var menuBar = Application.MouseGrabView as MenuBar;
+            var menuBar = Application.MouseGrabHandler.MouseGrabView as MenuBar;
 
             if (menuBar!.IsMenuOpen)
             {
                 menuBar.CleanUp ();
             }
         }
-        Application.UngrabMouse ();
+        Application.MouseGrabHandler.UngrabMouse ();
         _isCleaning = false;
     }
 
@@ -556,7 +556,7 @@ public class MenuBar : View, IDesignable
                 _selected = -1;
             }
 
-            Application.UngrabMouse ();
+            Application.MouseGrabHandler.UngrabMouse ();
         }
 
         if (OpenCurrentMenu is { })
@@ -622,9 +622,9 @@ public class MenuBar : View, IDesignable
                     _previousFocused.SetFocus ();
                 }
 
-                if (Application.MouseGrabView == _openMenu)
+                if (Application.MouseGrabHandler.MouseGrabView == _openMenu)
                 {
-                    Application.UngrabMouse ();
+                    Application.MouseGrabHandler.UngrabMouse ();
                 }
                 _openMenu?.Dispose ();
                 _openMenu = null;
@@ -652,9 +652,9 @@ public class MenuBar : View, IDesignable
                     if (OpenCurrentMenu is { })
                     {
                         SuperView?.Remove (OpenCurrentMenu);
-                        if (Application.MouseGrabView == OpenCurrentMenu)
+                        if (Application.MouseGrabHandler.MouseGrabView == OpenCurrentMenu)
                         {
-                            Application.UngrabMouse ();
+                            Application.MouseGrabHandler.UngrabMouse ();
                         }
                         OpenCurrentMenu.Dispose ();
                         OpenCurrentMenu = null;
@@ -845,9 +845,9 @@ public class MenuBar : View, IDesignable
                 if (_openMenu is { })
                 {
                     SuperView?.Remove (_openMenu);
-                    if (Application.MouseGrabView == _openMenu)
+                    if (Application.MouseGrabHandler.MouseGrabView == _openMenu)
                     {
-                        Application.UngrabMouse ();
+                        Application.MouseGrabHandler.UngrabMouse ();
                     }
                     _openMenu.Dispose ();
                     _openMenu = null;
@@ -935,7 +935,7 @@ public class MenuBar : View, IDesignable
                             Host = this, X = first!.Frame.Left, Y = first.Frame.Top, BarItems = newSubMenu
                         };
                         last!.Visible = false;
-                        Application.GrabMouse (OpenCurrentMenu);
+                        Application.MouseGrabHandler.GrabMouse (OpenCurrentMenu);
                     }
 
                     OpenCurrentMenu._previousSubFocused = last._previousSubFocused;
@@ -1029,9 +1029,9 @@ public class MenuBar : View, IDesignable
             foreach (Menu item in _openSubMenu)
             {
                 SuperView?.Remove (item);
-                if (Application.MouseGrabView == item)
+                if (Application.MouseGrabHandler.MouseGrabView == item)
                 {
-                    Application.UngrabMouse ();
+                    Application.MouseGrabHandler.UngrabMouse ();
                 }
                 item.Dispose ();
             }
@@ -1045,7 +1045,7 @@ public class MenuBar : View, IDesignable
             return false;
         }
 
-        Application.AddIdle (
+        Application.AddTimeout (TimeSpan.Zero,
                                        () =>
                                        {
                                            action ();
@@ -1137,7 +1137,7 @@ public class MenuBar : View, IDesignable
             return false;
         }
 
-        Application.UngrabMouse ();
+        Application.MouseGrabHandler.UngrabMouse ();
         CloseAllMenus ();
         Application.LayoutAndDraw (true);
         _openedByAltKey = true;
@@ -1209,15 +1209,15 @@ public class MenuBar : View, IDesignable
             Point screen = ViewportToScreen (new Point (0, i));
             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
-            if (Application.MouseGrabView == menu)
+            if (Application.MouseGrabHandler.MouseGrabView == menu)
             {
-                Application.UngrabMouse ();
+                Application.MouseGrabHandler.UngrabMouse ();
             }
             menu.Dispose ();
         }
         else
         {
-            Application.GrabMouse (this);
+            Application.MouseGrabHandler.GrabMouse (this);
             _selected = i;
             OpenMenu (i);
 
@@ -1280,9 +1280,9 @@ public class MenuBar : View, IDesignable
                 SuperView!.Remove (menu);
                 _openSubMenu.Remove (menu);
 
-                if (Application.MouseGrabView == menu)
+                if (Application.MouseGrabHandler.MouseGrabView == menu)
                 {
-                    Application.GrabMouse (this);
+                    Application.MouseGrabHandler.GrabMouse (this);
                 }
 
                 menu.Dispose ();
@@ -1458,9 +1458,9 @@ public class MenuBar : View, IDesignable
                             Point screen = ViewportToScreen (new Point (0, i));
                             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
-                            if (Application.MouseGrabView == menu)
+                            if (Application.MouseGrabHandler.MouseGrabView == menu)
                             {
-                                Application.UngrabMouse ();
+                                Application.MouseGrabHandler.UngrabMouse ();
                             }
 
                             menu.Dispose ();
@@ -1535,7 +1535,7 @@ public class MenuBar : View, IDesignable
 
     internal bool HandleGrabView (MouseEventArgs me, View current)
     {
-        if (Application.MouseGrabView is { })
+        if (Application.MouseGrabHandler.MouseGrabView is { })
         {
             if (me.View is MenuBar or Menu)
             {
@@ -1546,7 +1546,7 @@ public class MenuBar : View, IDesignable
                     if (me.Flags == MouseFlags.Button1Clicked)
                     {
                         mbar.CleanUp ();
-                        Application.GrabMouse (me.View);
+                        Application.MouseGrabHandler.GrabMouse (me.View);
                     }
                     else
                     {
@@ -1556,10 +1556,10 @@ public class MenuBar : View, IDesignable
                     }
                 }
 
-                if (Application.MouseGrabView != me.View)
+                if (Application.MouseGrabHandler.MouseGrabView != me.View)
                 {
                     View v = me.View;
-                    Application.GrabMouse (v);
+                    Application.MouseGrabHandler.GrabMouse (v);
 
                     return true;
                 }
@@ -1567,7 +1567,7 @@ public class MenuBar : View, IDesignable
                 if (me.View != current)
                 {
                     View v = me.View;
-                    Application.GrabMouse (v);
+                    Application.MouseGrabHandler.GrabMouse (v);
                     MouseEventArgs nme;
 
                     if (me.Position.Y > -1)
@@ -1599,7 +1599,7 @@ public class MenuBar : View, IDesignable
                      && me.Flags != MouseFlags.ReportMousePosition
                      && me.Flags != 0)
             {
-                Application.UngrabMouse ();
+                Application.MouseGrabHandler.UngrabMouse ();
 
                 if (IsMenuOpen)
                 {
@@ -1625,11 +1625,11 @@ public class MenuBar : View, IDesignable
                                           MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                          )))
         {
-            Application.GrabMouse (current);
+            Application.MouseGrabHandler.GrabMouse (current);
         }
         else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu))
         {
-            Application.GrabMouse (me.View);
+            Application.MouseGrabHandler.GrabMouse (me.View);
         }
         else
         {
@@ -1645,7 +1645,7 @@ public class MenuBar : View, IDesignable
 
     private MenuBar? GetMouseGrabViewInstance (View? view)
     {
-        if (view is null || Application.MouseGrabView is null)
+        if (view is null || Application.MouseGrabHandler.MouseGrabView is null)
         {
             return null;
         }
@@ -1661,7 +1661,7 @@ public class MenuBar : View, IDesignable
             hostView = ((Menu)view).Host;
         }
 
-        View grabView = Application.MouseGrabView;
+        View grabView = Application.MouseGrabHandler.MouseGrabView;
         MenuBar? hostGrabView = null;
 
         if (grabView is MenuBar bar)

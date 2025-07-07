@@ -76,6 +76,11 @@ public class Button : View, IDesignable, IDefaultAcceptView
 
         base.ShadowStyle = DefaultShadow;
         HighlightStates = DefaultHighlightStates;
+
+        if (MouseHeldDown != null)
+        {
+            MouseHeldDown.MouseIsHeldDownTick += (_,_) => RaiseAccepting (null);
+        }
     }
 
     private bool? HandleHotKeyCommand (ICommandContext commandContext)

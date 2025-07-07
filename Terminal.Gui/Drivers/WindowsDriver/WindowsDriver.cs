@@ -895,51 +895,6 @@ internal class WindowsDriver : ConsoleDriver
         //buttonPressedCount = 0;
     }
 
-    private async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
-    {
-        // When a user presses-and-holds, start generating pressed events every `startDelay`
-        // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
-        const int START_DELAY = 500;
-        const int ITERATIONS_UNTIL_FAST = 4;
-        const int FAST_DELAY = 50;
-
-        int iterations = 0;
-        int delay = START_DELAY;
-        while (_isButtonPressed)
-        {
-            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-            View? view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
-            {
-                break;
-            }
-
-            if (iterations++ >= ITERATIONS_UNTIL_FAST)
-            {
-                delay = FAST_DELAY;
-            }
-            await Task.Delay (delay);
-
-            //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
-            if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
-            {
-                Point pointMove = _pointMove;
-                // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-                Application.Invoke (() =>
-                                    {
-                                        var me = new MouseEventArgs
-                                        {
-                                            ScreenPosition = pointMove,
-                                            Position = pointMove,
-                                            Flags = mouseFlag
-                                        };
-                                        OnMouseEvent (me);
-                                    });
-            }
-        }
-    }
-
     private void ResizeScreen ()
     {
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
@@ -990,7 +945,7 @@ internal class WindowsDriver : ConsoleDriver
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-            Application.MainLoop!.AddIdle (
+            Application.MainLoop!.TimedEvents.Add (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -1058,18 +1013,6 @@ internal class WindowsDriver : ConsoleDriver
 
             _lastMouseButtonPressed = mouseEvent.ButtonState;
             _isButtonPressed = true;
-
-            if ((mouseFlag & MouseFlags.ReportMousePosition) == 0)
-            {
-                // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-                Application.MainLoop!.AddIdle (
-                                              () =>
-                                              {
-                                                  Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
-
-                                                  return false;
-                                              });
-            }
         }
         else if (_lastMouseButtonPressed != null
                  && mouseEvent.EventFlags == 0

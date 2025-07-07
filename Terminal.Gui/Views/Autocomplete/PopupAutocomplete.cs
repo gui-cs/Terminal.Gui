@@ -125,7 +125,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             {
                 Visible = true;
                 HostControl?.SetNeedsDraw ();
-                Application.UngrabMouse ();
+                Application.MouseGrabHandler.UngrabMouse ();
 
                 return false;
             }

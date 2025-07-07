@@ -916,7 +916,7 @@ public class TileView : View
                 {
                     dragPosition = mouseEvent.Position;
                     dragOrignalPos = Orientation == Orientation.Horizontal ? Y : X;
-                    Application.GrabMouse (this);
+                    Application.MouseGrabHandler.GrabMouse (this);
 
                     if (Orientation == Orientation.Horizontal)
                     { }
@@ -960,7 +960,7 @@ public class TileView : View
             {
                 // End Drag
 
-                Application.UngrabMouse ();
+                Application.MouseGrabHandler.UngrabMouse ();
 
                 //Driver.UncookMouse ();
                 FinalisePosition (

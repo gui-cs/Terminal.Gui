@@ -71,14 +71,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
-            if (Application.MouseGrabView == this)
+            if (Application.MouseGrabHandler.MouseGrabView == this)
             {
-                Application.UngrabMouse ();
-            }
-
-            if (Application.WantContinuousButtonPressedView == this)
-            {
-                Application.WantContinuousButtonPressedView = null;
+                Application.MouseGrabHandler.UngrabMouse ();
             }
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)

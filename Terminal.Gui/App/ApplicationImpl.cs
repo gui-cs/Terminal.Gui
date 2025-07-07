@@ -18,6 +18,15 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public static IApplication Instance => _lazyInstance.Value;
 
+
+    /// <inheritdoc/>
+    public virtual ITimedEvents? TimedEvents => Application.MainLoop?.TimedEvents;
+
+    /// <summary>
+    /// Handles which <see cref="View"/> (if any) has captured the mouse
+    /// </summary>
+    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+
     /// <summary>
     /// Change the singleton implementation, should not be called except before application
     /// startup. This method lets you provide alternative implementations of core static gateway
@@ -119,7 +128,7 @@ public class ApplicationImpl : IApplication
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>When using <see cref="Run{T}"/> or
@@ -261,7 +270,22 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual void Invoke (Action action)
     {
-        Application.MainLoop?.AddIdle (
+
+        // If we are already on the main UI thread
+        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action ();
+            return;
+        }
+
+        if (Application.MainLoop == null)
+        {
+            Logging.Warning ("Ignored Invoke because MainLoop is not initialized yet");
+            return;
+        }
+
+
+        Application.AddTimeout (TimeSpan.Zero,
                            () =>
                            {
                                action ();
@@ -275,20 +299,6 @@ public class ApplicationImpl : IApplication
     public bool IsLegacy { get; protected set; } = true;
 
     /// <inheritdoc />
-    public virtual void AddIdle (Func<bool> func)
-    {
-        if (Application.MainLoop is null)
-        {
-            throw new NotInitializedException ("Cannot add idle before main loop is initialized");
-        }
-
-        // Yes in this case we cannot go direct via TimedEvents because legacy main loop
-        // has established behaviour to do other stuff too e.g. 'wake up'.
-        Application.MainLoop.AddIdle (func);
-
-    }
-
-    /// <inheritdoc />
     public virtual object AddTimeout (TimeSpan time, Func<bool> callback)
     {
         if (Application.MainLoop is null)
@@ -296,13 +306,13 @@ public class ApplicationImpl : IApplication
             throw new NotInitializedException ("Cannot add timeout before main loop is initialized", null);
         }
 
-        return Application.MainLoop.TimedEvents.AddTimeout (time, callback);
+        return Application.MainLoop.TimedEvents.Add (time, callback);
     }
 
     /// <inheritdoc />
     public virtual bool RemoveTimeout (object token)
     {
-        return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false;
+        return Application.MainLoop?.TimedEvents.Remove (token) ?? false;
     }
 
     /// <inheritdoc />

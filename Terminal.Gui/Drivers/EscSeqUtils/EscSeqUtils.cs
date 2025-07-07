@@ -900,22 +900,8 @@ public static class EscSeqUtils
 
             _point = pos;
 
-            if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0)
-            {
-                Application.MainLoop?.AddIdle (
-                                              () =>
-                                              {
-                                                  // INTENT: What's this trying to do?
-                                                  // The task itself is not awaited.
-                                                  Task.Run (
-                                                            async () => await ProcessContinuousButtonPressedAsync (
-                                                                         buttonState,
-                                                                         continuousButtonPressedHandler));
 
-                                                  return false;
-                                              });
-            }
-            else if (mouseFlags [0].HasFlag (MouseFlags.ReportMousePosition))
+            if (mouseFlags [0].HasFlag (MouseFlags.ReportMousePosition))
             {
                 _point = pos;
 
@@ -945,7 +931,7 @@ public static class EscSeqUtils
             _isButtonClicked = false;
             _isButtonDoubleClicked = true;
 
-            Application.MainLoop?.AddIdle (
+            Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -959,7 +945,7 @@ public static class EscSeqUtils
         //	lastMouseButtonReleased = null;
         //	isButtonReleased = false;
         //	isButtonClicked = true;
-        //	Application.MainLoop.AddIdle (() => {
+        //	Application.MainLoop.AddTimeout (() => {
         //		Task.Run (async () => await ProcessButtonClickedAsync ());
         //		return false;
         //	});
@@ -984,7 +970,7 @@ public static class EscSeqUtils
                 mouseFlags.Add (GetButtonClicked (buttonState));
                 _isButtonClicked = true;
 
-                Application.MainLoop?.AddIdle (
+                Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
                                               () =>
                                               {
                                                   Task.Run (async () => await ProcessButtonClickedAsync ());
@@ -1496,29 +1482,6 @@ public static class EscSeqUtils
     {
         await Task.Delay (300);
         _isButtonDoubleClicked = false;
-    }
-
-    private static async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag, Action<MouseFlags, Point> continuousButtonPressedHandler)
-    {
-        // PERF: Pause and poll in a hot loop.
-        // This should be replaced with event dispatch and a synchronization primitive such as AutoResetEvent.
-        // Will make a massive difference in responsiveness.
-        while (_isButtonPressed)
-        {
-            await Task.Delay (100);
-
-            View view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
-            {
-                break;
-            }
-
-            if (_isButtonPressed && _lastMouseButtonPressed is { } && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
-            {
-                Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, _point ?? Point.Empty));
-            }
-        }
     }
 
     private static MouseFlags SetControlKeyStates (MouseFlags buttonState, MouseFlags mouseFlag)

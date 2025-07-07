@@ -106,6 +106,9 @@ public class SpinnerViewTests (ITestOutputHelper output)
         top.Add (view);
         Application.Begin (top);
 
+        // Required to clear the initial 'Invoke nothing' that Begin does
+        Application.MainLoop.TimedEvents.Timeouts.Clear ();
+
         Assert.Equal (1, view.Frame.Width);
         Assert.Equal (1, view.Frame.Height);
 

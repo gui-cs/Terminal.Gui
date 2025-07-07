@@ -679,14 +679,7 @@ public class EscSeqUtilsTests
         Assert.Equal (new () { MouseFlags.Button1TripleClicked }, _mouseFlags);
         Assert.Equal (new (1, 2), _pos);
         Assert.False (_isResponse);
-
-        var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), WantContinuousButtonPressed = true };
-        var top = new Toplevel ();
-        top.Add (view);
-        Application.Begin (top);
-
-        Application.RaiseMouseEvent (new () { Position = new (0, 0), Flags = 0 });
-
+        
         ClearAll ();
 
         _cki = new ConsoleKeyInfo []
@@ -734,26 +727,8 @@ public class EscSeqUtilsTests
         Assert.Equal (new (1, 2), _pos);
         Assert.False (_isResponse);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     if (_actionStarted)
-                                     {
-                                         // set Application.WantContinuousButtonPressedView to null
-                                         view.WantContinuousButtonPressed = false;
-
-                                         Application.RaiseMouseEvent (new () { Position = new (0, 0), Flags = 0 });
-
-                                         Application.RequestStop ();
-                                     }
-                                 };
-
-        Application.Run (top);
-        top.Dispose ();
-
-        Assert.Null (Application.WantContinuousButtonPressedView);
-
-        Assert.Equal (MouseFlags.Button1Pressed, _arg1);
-        Assert.Equal (new (1, 2), _arg2);
+        Assert.Equal (MouseFlags.None, _arg1);
+        Assert.Equal (new (0, 0), _arg2);
 
         ClearAll ();
 

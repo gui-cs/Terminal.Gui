@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui.App;
 
-/// <summary><see cref="EventArgs"/> for timeout events (e.g. <see cref="TimedEvents.TimeoutAdded"/>)</summary>
+/// <summary><see cref="EventArgs"/> for timeout events (e.g. <see cref="TimedEvents.Added"/>)</summary>
 public class TimeoutEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of the <see cref="TimeoutEventArgs"/> class.</summary>

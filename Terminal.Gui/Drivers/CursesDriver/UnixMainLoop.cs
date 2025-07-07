@@ -104,7 +104,7 @@ internal class UnixMainLoop : IMainLoopDriver
 
         UpdatePollMap ();
 
-        bool checkTimersResult = _mainLoop!.TimedEvents.CheckTimersAndIdleHandlers (out int pollTimeout);
+        bool checkTimersResult = _mainLoop!.TimedEvents.CheckTimers (out int pollTimeout);
 
         int n = poll (_pollMap!, (uint)_pollMap!.Length, pollTimeout);
 

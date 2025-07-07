@@ -7,12 +7,13 @@
 
 namespace Terminal.Gui.App;
 
+
 /// <summary>Provides data for timers running manipulation.</summary>
-public sealed class Timeout
+public class Timeout
 {
     /// <summary>The function that will be invoked.</summary>
     public Func<bool> Callback;
 
     /// <summary>Time to wait before invoke the callback.</summary>
-    public TimeSpan Span;
+    public virtual TimeSpan Span { get; set; }
 }
