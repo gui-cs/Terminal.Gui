@@ -26,7 +26,7 @@ public static partial class Application // Mouse handling
     {
         get => ApplicationImpl.Instance.MouseGrabHandler;
         set => ApplicationImpl.Instance.MouseGrabHandler = value ??
-                                                           throw new ArgumentNullException (nameof (value));
+                                                           throw new ArgumentNullException(nameof(value));
     }
 
     /// <summary>

@@ -62,9 +62,7 @@
         <PackageReference Include="Wcwidth" />
     </ItemGroup>
 	  <ItemGroup>
-    <ProjectReference Include="..\Terminal.Gui.Analyzers\Terminal.Gui.Analyzers.csproj"
-                      ReferenceOutputAssembly="false"
-                      OutputItemType="Analyzer" />
+    <ProjectReference Include="..\Terminal.Gui.Analyzers\Terminal.Gui.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	  </ItemGroup>
     <ItemGroup>
       <!-- Enable Nuget Source Link for github -->

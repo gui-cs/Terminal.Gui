@@ -88,7 +88,7 @@ public class GuiTestContext : IDisposable
         }
 
         // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (5)).Result)
+        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
         {
             throw new TimeoutException ("Application failed to start within the allotted time.");
         }

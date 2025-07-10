@@ -17,7 +17,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents,Application.MouseGrabHandler);
+        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents, Application.MouseGrabHandler);
         MouseBindings = new ();
 
         // In-line with Keyboard:

@@ -7,11 +7,6 @@
 /// </summary>
 public class SmoothAcceleratingTimeout : Timeout
 {
-    private int _stage;
-    private readonly TimeSpan _initialDelay;
-    private readonly TimeSpan _minDelay;
-    private readonly double _decayFactor;
-
     /// <summary>
     ///     Creates a new instance of the smooth acceleration timeout.
     /// </summary>
@@ -21,11 +16,27 @@ public class SmoothAcceleratingTimeout : Timeout
     /// <param name="callback">Method to call when timer ticks</param>
     public SmoothAcceleratingTimeout (TimeSpan initialDelay, TimeSpan minDelay, double decayFactor, Func<bool> callback)
     {
-        this._initialDelay = initialDelay;
-        this._minDelay = minDelay;
-        this._decayFactor = decayFactor;
+        _initialDelay = initialDelay;
+        _minDelay = minDelay;
+        _decayFactor = decayFactor;
         Callback = callback;
     }
+
+    private readonly TimeSpan _initialDelay;
+    private readonly TimeSpan _minDelay;
+    private readonly double _decayFactor;
+    private int _stage;
+
+    /// <summary>
+    ///     Advances the timer stage, this should be called from your timer callback or whenever
+    ///     you want to advance the speed.
+    /// </summary>
+    public void AdvanceStage () { _stage++; }
+
+    /// <summary>
+    ///     Resets the timer to original speed.
+    /// </summary>
+    public void Reset () { _stage = 0; }
 
     /// <inheritdoc/>
     public override TimeSpan Span
@@ -39,15 +50,4 @@ public class SmoothAcceleratingTimeout : Timeout
             return TimeSpan.FromMilliseconds (delayMs);
         }
     }
-
-    /// <summary>
-    ///     Advances the timer stage, this should be called from your timer callback or whenever
-    ///     you want to advance the speed.
-    /// </summary>
-    public void AdvanceStage () { _stage++; }
-
-    /// <summary>
-    ///     Resets the timer to original speed.
-    /// </summary>
-    public void Reset () { _stage = 0; }
 }

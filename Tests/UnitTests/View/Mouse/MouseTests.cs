@@ -14,7 +14,7 @@ public class MouseTests : TestsAllViews
         Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
         Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
 
-        Assert.Equal(2, testView.MouseBindings.GetBindings().Count());
+        Assert.Equal (2, testView.MouseBindings.GetBindings ().Count ());
     }
 
     // Test drag to move

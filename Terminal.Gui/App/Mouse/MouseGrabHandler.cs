@@ -1,31 +1,35 @@
 ﻿#nullable enable
 namespace Terminal.Gui.App;
 
+/// <summary>
+///     INTERNAL: Implements <see cref="IMouseGrabHandler"/> to manage which <see cref="View"/> (if any) has 'grabbed' the mouse,
+///     giving it exclusive priority for mouse events such as movement, button presses, and release.
+///     <para>
+///         Used for scenarios like dragging, scrolling, or any interaction where a view needs to receive all mouse events
+///         until the operation completes (e.g., a scrollbar thumb being dragged).
+///     </para>
+///     <para>
+///         See <see cref="IMouseGrabHandler"/> for usage details.
+///     </para>
+/// </summary>
 internal class MouseGrabHandler : IMouseGrabHandler
 {
-    /// <summary>
-    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
-    ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
-    /// </summary>
+    /// <inheritdoc/>
     public View? MouseGrabView { get; private set; }
 
-    /// <summary>Invoked when a view wants to grab the mouse; can be canceled.</summary>
+    /// <inheritdoc/>
     public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
 
-    /// <summary>Invoked when a view wants un-grab the mouse; can be canceled.</summary>
+    /// <inheritdoc/>
     public event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
 
-    /// <summary>Invoked after a view has grabbed the mouse.</summary>
+    /// <inheritdoc/>
     public event EventHandler<ViewEventArgs>? GrabbedMouse;
 
-    /// <summary>Invoked after a view has un-grabbed the mouse.</summary>
+    /// <inheritdoc/>
     public event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 
-    /// <summary>
-    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/>
-    ///     is called.
-    /// </summary>
-    /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
+    /// <inheritdoc/>
     public void GrabMouse (View? view)
     {
         if (view is null || RaiseGrabbingMouseEvent (view))
@@ -39,7 +43,7 @@ internal class MouseGrabHandler : IMouseGrabHandler
         MouseGrabView = view;
     }
 
-    /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
+    /// <inheritdoc/>
     public void UngrabMouse ()
     {
         if (MouseGrabView is null)
