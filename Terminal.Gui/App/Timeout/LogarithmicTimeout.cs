@@ -3,9 +3,6 @@
 /// <summary>Implements a logarithmic increasing timeout.</summary>
 public class LogarithmicTimeout : Timeout
 {
-    private int _stage;
-    private readonly TimeSpan _baseDelay;
-
     /// <summary>
     ///     Creates a new instance where stages are the logarithm multiplied by the
     ///     <paramref name="baseDelay"/> (starts fast then slows).
@@ -14,9 +11,18 @@ public class LogarithmicTimeout : Timeout
     /// <param name="callback">Method to invoke</param>
     public LogarithmicTimeout (TimeSpan baseDelay, Func<bool> callback)
     {
-        this._baseDelay = baseDelay;
+        _baseDelay = baseDelay;
         Callback = callback;
     }
+
+    private readonly TimeSpan _baseDelay;
+    private int _stage;
+
+    /// <summary>Increments the stage to increase the timeout.</summary>
+    public void AdvanceStage () { _stage++; }
+
+    /// <summary>Resets the stage back to zero.</summary>
+    public void Reset () { _stage = 0; }
 
     /// <summary>Gets the current calculated Span based on the stage.</summary>
     public override TimeSpan Span
@@ -29,10 +35,4 @@ public class LogarithmicTimeout : Timeout
             return TimeSpan.FromMilliseconds (_baseDelay.TotalMilliseconds * multiplier);
         }
     }
-
-    /// <summary>Increments the stage to increase the timeout.</summary>
-    public void AdvanceStage () { _stage++; }
-
-    /// <summary>Resets the stage back to zero.</summary>
-    public void Reset () { _stage = 0; }
 }
