@@ -160,9 +160,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Top = toplevel;
         }
 
-        if ((Top.Modal == false && toplevel.Modal)
-            || (Top.Modal == false && !toplevel.Modal)
-            || (Top.Modal == true && toplevel.Modal))
+        if ((Top?.Modal == false && toplevel.Modal)
+            || (Top?.Modal == false && !toplevel.Modal)
+            || (Top?.Modal == true && toplevel.Modal))
         {
             if (toplevel.Visible)
             {
