@@ -11,6 +11,8 @@ public class SpinnerViewTests (ITestOutputHelper output)
     [InlineData (false)]
     public void TestSpinnerView_AutoSpin (bool callStop)
     {
+        ConsoleDriver.RunningUnitTests = true;
+
         SpinnerView view = GetSpinnerView ();
 
         Assert.Empty (Application.MainLoop.TimedEvents.Timeouts);

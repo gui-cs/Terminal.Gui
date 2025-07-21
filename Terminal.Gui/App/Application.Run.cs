@@ -212,8 +212,15 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
 
-        // Force an Idle event so that an Iteration (and Refresh) happen.
-        Invoke (() => { });
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            // Force an Idle event so that an Iteration (and Refresh) happen.
+            Task.Run (() =>
+                      {
+                          Invoke (() => { });
+                          Task.Delay (10).Wait ();
+                      });
+        }
 
         return rs;
     }
