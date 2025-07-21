@@ -293,6 +293,10 @@ public class ApplicationImpl : IApplication
                                return false;
                            }
                           );
+
+        // Ensure the action is executed in the main loop
+        // Wakeup mainloop if it's waiting for events
+        Application.MainLoop.Wakeup ();
     }
 
     /// <inheritdoc />
