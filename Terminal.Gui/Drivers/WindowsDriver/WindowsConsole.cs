@@ -198,7 +198,7 @@ internal partial class WindowsConsole
                     _redrawTextStyle = attr.Style;
                 }
 
-                if (info.Char != '\x1b')
+                if (info.Char [0] != '\x1b')
                 {
                     if (!info.Empty)
                     {
@@ -791,11 +791,11 @@ internal partial class WindowsConsole
 
     public struct ExtendedCharInfo
     {
-        public char Char { get; set; }
+        public char [] Char { get; set; }
         public Attribute Attribute { get; set; }
         public bool Empty { get; set; } // TODO: Temp hack until virtual terminal sequences
 
-        public ExtendedCharInfo (char character, Attribute attribute)
+        public ExtendedCharInfo (char [] character, Attribute attribute)
         {
             Char = character;
             Attribute = attribute;

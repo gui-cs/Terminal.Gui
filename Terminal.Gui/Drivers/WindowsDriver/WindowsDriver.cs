@@ -337,7 +337,7 @@ internal class WindowsDriver : ConsoleDriver
                 if (Contents [row, col].IsDirty == false)
                 {
                     _outputBuffer [position].Empty = true;
-                    _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    _outputBuffer [position].Char = [(char)Contents [row, col].Rune.Value];
 
                     continue;
                 }
@@ -346,12 +346,12 @@ internal class WindowsDriver : ConsoleDriver
 
                 if (Contents [row, col].Rune.IsBmp)
                 {
-                    _outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
+                    _outputBuffer [position].Char = [(char)Contents [row, col].Rune.Value];
                 }
                 else
                 {
-                    //_outputBuffer [position].Empty = true;
-                    _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    _outputBuffer [position].Char = [(char)Contents [row, col].Rune.ToString () [0],
+                                                        (char)Contents [row, col].Rune.ToString () [1]];
 
                     if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
                     {
@@ -359,7 +359,7 @@ internal class WindowsDriver : ConsoleDriver
                         col++;
                         position = row * Cols + col;
                         _outputBuffer [position].Empty = false;
-                        _outputBuffer [position].Char = ' ';
+                        _outputBuffer [position].Char = ['\0'];
                     }
                 }
             }

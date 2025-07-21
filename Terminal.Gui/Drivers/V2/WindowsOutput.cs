@@ -139,7 +139,7 @@ internal partial class WindowsOutput : IConsoleOutput
                 if (buffer.Contents [row, col].IsDirty == false)
                 {
                     outputBuffer [position].Empty = true;
-                    outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    outputBuffer [position].Char = [(char)buffer.Contents [row, col].Rune.Value];
 
                     continue;
                 }
@@ -148,12 +148,12 @@ internal partial class WindowsOutput : IConsoleOutput
 
                 if (buffer.Contents [row, col].Rune.IsBmp)
                 {
-                    outputBuffer [position].Char = (char)buffer.Contents [row, col].Rune.Value;
+                    outputBuffer [position].Char = [(char)buffer.Contents [row, col].Rune.Value];
                 }
                 else
                 {
-                    //outputBuffer [position].Empty = true;
-                    outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    outputBuffer [position].Char = [(char)buffer.Contents [row, col].Rune.ToString () [0],
+                                                       (char)buffer.Contents [row, col].Rune.ToString () [1]];
 
                     if (buffer.Contents [row, col].Rune.GetColumns () > 1 && col + 1 < buffer.Cols)
                     {
@@ -161,7 +161,7 @@ internal partial class WindowsOutput : IConsoleOutput
                         col++;
                         position = row * buffer.Cols + col;
                         outputBuffer [position].Empty = false;
-                        outputBuffer [position].Char = ' ';
+                        outputBuffer [position].Char = ['\0'];
                     }
                 }
             }
@@ -216,7 +216,7 @@ internal partial class WindowsOutput : IConsoleOutput
             {
                 ci [i++] = new ()
                 {
-                    Char = new () { UnicodeChar = info.Char },
+                    Char = new () { UnicodeChar = info.Char [0] },
                     Attributes =
                         (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
                 };
@@ -246,7 +246,7 @@ internal partial class WindowsOutput : IConsoleOutput
                     _redrawTextStyle = attr.Style;
                 }
 
-                if (info.Char != '\x1b')
+                if (info.Char [0] != '\x1b')
                 {
                     if (!info.Empty)
                     {
