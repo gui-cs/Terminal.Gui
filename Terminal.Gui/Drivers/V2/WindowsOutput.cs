@@ -69,6 +69,11 @@ internal partial class WindowsOutput : IConsoleOutput
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleTextAttribute (
+        nint hConsoleOutput,
+        ushort wAttributes
+    );
+
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern Coord GetLargestConsoleWindowSize (
         nint hConsoleOutput
@@ -249,6 +254,18 @@ internal partial class WindowsOutput : IConsoleOutput
         WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
     }
 
+    private struct Run
+    {
+        public ushort attr;
+        public string text;
+
+        public Run (ushort attr, string text)
+        {
+            this.attr = attr;
+            this.text = text;
+        }
+    }
+
     public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [] charInfoBuffer, WindowsConsole.Coord bufferSize, WindowsConsole.SmallRect window, bool force16Colors)
     {
 
@@ -259,24 +276,124 @@ internal partial class WindowsOutput : IConsoleOutput
         //    ReadFromConsoleOutput (size, bufferSize, ref window);
         //}
 
+        Attribute? prev = null;
         var result = false;
 
         if (force16Colors)
         {
+            StringBuilder stringBuilder = new ();
             var i = 0;
-            WindowsConsole.CharInfo [] ci = new WindowsConsole.CharInfo [charInfoBuffer.Length];
+            List<Run> runs = [];
+            Run? current = null;
+            SetCursorPosition (0, 0);
 
-            foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
+            foreach (ExtendedCharInfo info in charInfoBuffer)
             {
-                ci [i++] = new ()
+                if (IsVirtualTerminal)
                 {
-                    Char = new () { UnicodeChar = info.Char [0] },
-                    Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
-                };
+                    Attribute attr = info.Attribute;
+                    AnsiColorCode fgColor = info.Attribute.Foreground.GetAnsiColorCode ();
+                    AnsiColorCode bgColor = info.Attribute.Background.GetAnsiColorCode ();
+
+                    if (attr != prev)
+                    {
+                        prev = attr;
+                        stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (fgColor));
+                        stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (bgColor));
+
+                        EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
+                        _redrawTextStyle = attr.Style;
+                    }
+
+                    if (info.Char [0] != '\x1b')
+                    {
+                        if (!info.Empty)
+                        {
+                            stringBuilder.Append (info.Char);
+                        }
+                    }
+                    else
+                    {
+                        stringBuilder.Append (' ');
+                    }
+                }
+                else
+                {
+                    if (info.Empty)
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    if (!info.Empty)
+                    {
+                        var attr = (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 ()
+                                            | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4));
+
+                        // Start new run if needed
+                        if (current == null || attr != current.Value.attr)
+                        {
+                            if (current != null)
+                            {
+                                runs.Add (new (current.Value.attr, stringBuilder.ToString ()));
+                            }
+
+                            stringBuilder.Clear ();
+                            current = new Run (attr, "");
+                        }
+
+                        stringBuilder!.Append (info.Char);
+                    }
+
+                    i++;
+
+                    if (i > 0 && i <= charInfoBuffer.Length && i % bufferSize.X == 0)
+                    {
+                        if (i < charInfoBuffer.Length)
+                        {
+                            stringBuilder.AppendLine ();
+                        }
+
+                        runs.Add (new (current!.Value.attr, stringBuilder.ToString ()));
+                        stringBuilder.Clear ();
+                    }
+                }
             }
 
-            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new () { X = window.Left, Y = window.Top }, ref window);
+            if (IsVirtualTerminal)
+            {
+                stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+                stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+
+                // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
+                char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
+                try
+                {
+                    Span<char> writeBuffer = rentedWriteArray.AsSpan (0, stringBuilder.Length);
+                    stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
+
+                    // Supply console with the new content.
+                    result = WriteConsole (_outputHandle, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return (rentedWriteArray);
+                }
+
+                foreach (SixelToRender sixel in Application.Sixel)
+                {
+                    SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
+                    WriteConsole (_outputHandle, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+                }
+            }
+            else
+            {
+                foreach (var run in runs)
+                {
+                    SetConsoleTextAttribute (_screenBuffer, run.attr);
+                    result = WriteConsole (_screenBuffer, run.text, (uint)run.text.Length, out _, nint.Zero);
+                }
+            }
         }
         else
         {
@@ -284,8 +401,6 @@ internal partial class WindowsOutput : IConsoleOutput
 
             stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
             EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
-
-            Attribute? prev = null;
 
             foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
             {
