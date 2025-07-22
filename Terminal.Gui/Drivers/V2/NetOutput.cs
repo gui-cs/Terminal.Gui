@@ -202,7 +202,7 @@ public class NetOutput : IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public Size GetWindowSize (Size? lastSize = null)
+    public Size GetWindowSize ()
     {
         if (ConsoleDriver.RunningUnitTests)
         {
@@ -211,6 +211,12 @@ public class NetOutput : IConsoleOutput
         }
 
         return new (Console.WindowWidth, Console.WindowHeight);
+    }
+
+    /// <inheritdoc />
+    public Size SetWindowSize (Size newSize)
+    {
+        return newSize;
     }
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)

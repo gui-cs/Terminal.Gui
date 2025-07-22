@@ -25,14 +25,21 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
             return false;
         }
 
-        Size size = _consoleOut.GetWindowSize (_lastSize);
+        Size size = _consoleOut.GetWindowSize ();
 
         if (size != _lastSize)
         {
             Logging.Logger.LogInformation ($"Console size changes from '{_lastSize}' to {size}");
-            _outputBuffer.SetWindowSize (size.Width, size.Height);
-            _lastSize = size;
-            SizeChanging?.Invoke (this, new (size));
+            Size newSize = size;
+
+            if (_consoleOut.GetType().Name == "WindowsOutput")
+            {
+                newSize = _consoleOut.SetWindowSize (size);
+            }
+
+            _outputBuffer.SetWindowSize (newSize.Width, newSize.Height);
+            _lastSize = newSize;
+            SizeChanging?.Invoke (this, new (newSize));
 
             return true;
         }

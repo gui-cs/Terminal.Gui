@@ -466,7 +466,7 @@ internal partial class WindowsOutput : IConsoleOutput
         return result;
     }
 
-    public Size GetWindowSize (Size? lastSize = null)
+    public Size GetWindowSize ()
     {
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
@@ -481,17 +481,19 @@ internal partial class WindowsOutput : IConsoleOutput
                        csbi.srWindow.Right - csbi.srWindow.Left + 1,
                        csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
 
-        if (lastSize is { } && sz != lastSize)
-        {
-            Size newSize = SetConsoleWindow ((short)sz.Width, (short)sz.Height);
+        return sz;
+    }
 
-            if (sz != newSize)
-            {
-                return newSize;
-            }
+    public Size SetWindowSize (Size newSize)
+    {
+        Size resSize = SetConsoleWindow ((short)newSize.Width, (short)newSize.Height);
+
+        if (resSize != newSize)
+        {
+            return resSize;
         }
 
-        return sz;
+        return newSize;
     }
 
     private Size SetConsoleWindow (short cols, short rows)
