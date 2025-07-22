@@ -35,7 +35,9 @@ internal partial class WindowsConsole
         newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
         ConsoleMode = newConsoleMode;
 
-        _inputReadyCancellationTokenSource = new (); 
+        IsVirtualTerminal = GetConsoleMode (_outputHandle, out uint mode) && (mode & (uint)ConsoleModes.EnableVirtualTerminalProcessing) != 0;
+
+        _inputReadyCancellationTokenSource = new ();
         Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
     }
 
@@ -150,7 +152,7 @@ internal partial class WindowsConsole
     {
         //Debug.WriteLine ("WriteToConsole");
 
-        if (!IsWindowsTerminal && _screenBuffer == nint.Zero)
+        if (!IsVirtualTerminal && _screenBuffer == nint.Zero)
         {
             ReadFromConsoleOutput (size, bufferSize, ref window);
         }
@@ -229,7 +231,7 @@ internal partial class WindowsConsole
             foreach (var sixel in Application.Sixel)
             {
                 SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
-                WriteConsole (IsWindowsTerminal ? _outputHandle : _screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+                WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
             }
         }
 
@@ -292,7 +294,7 @@ internal partial class WindowsConsole
 
     public bool SetCursorPosition (Coord position)
     {
-        return SetConsoleCursorPosition (IsWindowsTerminal ? _outputHandle : _screenBuffer, position);
+        return SetConsoleCursorPosition (IsVirtualTerminal ? _outputHandle : _screenBuffer, position);
     }
 
     public void SetInitialCursorVisibility ()
@@ -305,14 +307,14 @@ internal partial class WindowsConsole
 
     public bool GetCursorVisibility (out CursorVisibility visibility)
     {
-        if ((IsWindowsTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
+        if ((IsVirtualTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
         {
             visibility = CursorVisibility.Invisible;
 
             return false;
         }
 
-        if (!GetConsoleCursorInfo (IsWindowsTerminal ? _outputHandle : _screenBuffer, out ConsoleCursorInfo info))
+        if (!GetConsoleCursorInfo (IsVirtualTerminal ? _outputHandle : _screenBuffer, out ConsoleCursorInfo info))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -380,7 +382,7 @@ internal partial class WindowsConsole
                 bVisible = ((uint)visibility & 0xFF00) != 0
             };
 
-            if (!SetConsoleCursorInfo (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref info))
+            if (!SetConsoleCursorInfo (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref info))
             {
                 return false;
             }
@@ -430,7 +432,7 @@ internal partial class WindowsConsole
 
     internal Size GetConsoleBufferWindow (out Point position)
     {
-        if ((IsWindowsTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
+        if ((IsVirtualTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
         {
             position = Point.Empty;
 
@@ -440,7 +442,7 @@ internal partial class WindowsConsole
         var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
             position = Point.Empty;
@@ -479,19 +481,19 @@ internal partial class WindowsConsole
         var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        Coord maxWinSize = GetLargestConsoleWindowSize (IsWindowsTerminal ? _outputHandle : _screenBuffer);
+        Coord maxWinSize = GetLargestConsoleWindowSize (IsVirtualTerminal ? _outputHandle : _screenBuffer);
         short newCols = Math.Min (cols, maxWinSize.X);
         short newRows = Math.Min (rows, maxWinSize.Y);
         csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
         csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
         csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
 
-        if (!SetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        if (!SetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
@@ -511,9 +513,9 @@ internal partial class WindowsConsole
 
     private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
     {
-        if ((IsWindowsTerminal
+        if ((IsVirtualTerminal
                 ? _outputHandle
-                : _screenBuffer) != nint.Zero && !SetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+                : _screenBuffer) != nint.Zero && !SetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
@@ -521,7 +523,7 @@ internal partial class WindowsConsole
 
     internal Size SetConsoleOutputWindow (out Point position)
     {
-        if ((IsWindowsTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
+        if ((IsVirtualTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
         {
             position = Point.Empty;
 
@@ -531,7 +533,7 @@ internal partial class WindowsConsole
         var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
@@ -556,7 +558,7 @@ internal partial class WindowsConsole
         return sz;
     }
 
-    internal bool IsWindowsTerminal { get; set; }
+    internal bool IsVirtualTerminal { get; init; }
 
     private uint ConsoleMode
     {
@@ -573,6 +575,7 @@ internal partial class WindowsConsole
     public enum ConsoleModes : uint
     {
         EnableProcessedInput = 1,
+        EnableVirtualTerminalProcessing = 4,
         EnableMouseInput = 16,
         EnableQuickEditMode = 64,
         EnableExtendedFlags = 128

@@ -24,7 +24,7 @@ namespace Terminal.Gui.Drivers;
 
 internal class WindowsDriver : ConsoleDriver
 {
-    private readonly bool _isWindowsTerminal;
+    private readonly bool _isVirtualTerminal;
 
     private WindowsConsole.SmallRect _damageRegion;
     private bool _isButtonDoubleClicked;
@@ -57,18 +57,16 @@ internal class WindowsDriver : ConsoleDriver
         // force 16color mode (.e.g ConEmu which really doesn't work well at all).
         if (!RunningUnitTests)
         {
-            WinConsole!.IsWindowsTerminal = _isWindowsTerminal =
-                                                Environment.GetEnvironmentVariable ("WT_SESSION") is { }
-                                                || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+            _isVirtualTerminal = WinConsole!.IsVirtualTerminal;
         }
 
-        if (!_isWindowsTerminal)
+        if (!_isVirtualTerminal)
         {
             Force16Colors = true;
         }
     }
 
-    public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
+    public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isVirtualTerminal);
 
     public WindowsConsole? WinConsole { get; private set; }
 
@@ -405,7 +403,7 @@ internal class WindowsDriver : ConsoleDriver
         WinConsole?.Cleanup ();
         WinConsole = null;
 
-        if (!RunningUnitTests && _isWindowsTerminal)
+        if (!RunningUnitTests && _isVirtualTerminal)
         {
             // Disable alternative screen buffer.
             Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
@@ -432,7 +430,7 @@ internal class WindowsDriver : ConsoleDriver
 
                 WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
-                if (_isWindowsTerminal)
+                if (_isVirtualTerminal)
                 {
                     Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
                 }

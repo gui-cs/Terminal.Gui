@@ -56,6 +56,12 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
         SetConsoleMode (_inputHandle, newConsoleMode);
     }
 
+    internal bool IsVirtualTerminal ()
+    {
+        nint outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+        return GetConsoleMode (outputHandle, out uint mode) && (mode & (uint)ConsoleModes.EnableVirtualTerminalProcessing) != 0;
+    }
+
     protected override bool Peek ()
     {
         const int bufferSize = 1; // We only need to check if there's at least one event

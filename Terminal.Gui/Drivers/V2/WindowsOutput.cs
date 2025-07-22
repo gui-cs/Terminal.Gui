@@ -59,7 +59,17 @@ internal partial class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool SetConsoleCursorInfo (nint hConsoleOutput, [In] ref WindowsConsole.ConsoleCursorInfo lpConsoleCursorInfo);
 
-    private readonly nint _screenBuffer;
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern nint GetStdHandle (int nStdHandle);
+
+    [DllImport ("kernel32.dll")]
+    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+    private nint _screenBuffer;
+    private nint _outputHandle;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -73,33 +83,61 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        _screenBuffer = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
+        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
 
-        if (_screenBuffer == INVALID_HANDLE_VALUE)
+        if (!GetConsoleMode (_outputHandle, out uint mode))
         {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
+            throw new ApplicationException ($"Failed to get _outputHandle console mode, error code: {Marshal.GetLastWin32Error ()}.");
         }
 
-        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+        IsVirtualTerminal = (mode & (uint)ConsoleModes.EnableVirtualTerminalProcessing) != 0;
+
+        if (!IsVirtualTerminal)
         {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
+            _screenBuffer = CreateConsoleScreenBuffer (
+                                                       DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                                                       ShareMode.FileShareRead | ShareMode.FileShareWrite,
+                                                       nint.Zero,
+                                                       1,
+                                                       nint.Zero
+                                                      );
+
+            if (_screenBuffer == INVALID_HANDLE_VALUE)
+            {
+                int err = Marshal.GetLastWin32Error ();
+
+                if (err != 0)
+                {
+                    throw new Win32Exception (err);
+                }
+            }
+
+            if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+            {
+                throw new Win32Exception (Marshal.GetLastWin32Error ());
+            }
+
+            if (!GetConsoleMode (_screenBuffer, out mode))
+            {
+                throw new ApplicationException ($"Failed to get screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
+            }
+
+            const uint ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002;
+
+            mode &= ~ENABLE_WRAP_AT_EOL_OUTPUT; // Disable wrap
+
+            if (!SetConsoleMode (_screenBuffer, mode))
+            {
+                throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
+            }
         }
     }
 
+    internal bool IsVirtualTerminal { get; init; }
+
     public void Write (ReadOnlySpan<char> str)
     {
-        if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
+        if (!WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
         }
@@ -270,7 +308,7 @@ internal partial class WindowsOutput : IConsoleOutput
                 stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
 
                 // Supply console with the new content.
-                result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
+                result = WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
             }
             finally
             {
@@ -280,7 +318,7 @@ internal partial class WindowsOutput : IConsoleOutput
             foreach (SixelToRender sixel in Application.Sixel)
             {
                 SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
-                WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+                WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
             }
         }
 

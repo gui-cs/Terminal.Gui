@@ -25,7 +25,6 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
     private readonly ITimedEvents _timedEvents;
-    private readonly bool _isWindowsTerminal;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
 
@@ -61,7 +60,6 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         _inputProcessor = inputProcessor;
         _outputFactory = outputFactory;
         _loop = loop;
-        _isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") is { } || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
     }
 
     /// <summary>
@@ -162,7 +160,15 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                            _loop.AnsiRequestScheduler,
                            _loop.WindowSizeMonitor);
 
-            if (!_isWindowsTerminal)
+            if (_facade.SupportsTrueColor)
+            {
+                if (!ConsoleDriver.RunningUnitTests)
+                {
+                    // Enable alternative screen buffer.
+                    Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                }
+            }
+            else
             {
                 Application.Force16Colors = _facade.Force16Colors = true;
             }
@@ -187,6 +193,13 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         _stopCalled = true;
 
         _tokenSource.Cancel ();
+
+        if (!ConsoleDriver.RunningUnitTests && _facade.SupportsTrueColor)
+        {
+            // Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+        }
+
         _output.Dispose ();
 
         // Wait for input infinite loop to exit

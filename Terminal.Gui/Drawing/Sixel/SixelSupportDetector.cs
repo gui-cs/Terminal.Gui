@@ -20,7 +20,7 @@ public class SixelSupportDetector
     public void Detect (Action<SixelSupportResult> resultCallback)
     {
         var result = new SixelSupportResult ();
-        result.SupportsTransparency = IsWindowsTerminal () || IsXtermWithTransparency ();
+        result.SupportsTransparency = IsVirtualTerminal () || IsXtermWithTransparency ();
         IsSixelSupportedByDar (result, resultCallback);
     }
 
@@ -142,7 +142,7 @@ public class SixelSupportDetector
 
     private static bool ResponseIndicatesSupport (string response) { return response.Split (';').Contains ("4"); }
 
-    private static bool IsWindowsTerminal ()
+    private static bool IsVirtualTerminal ()
     {
         return !string.IsNullOrWhiteSpace (Environment.GetEnvironmentVariable ("WT_SESSION"));
 
