@@ -214,11 +214,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (!ConsoleDriver.RunningUnitTests)
         {
-            // Force an Idle event so that an Iteration (and Refresh) happen.
+            // Force an Idle event to be added to timeout outside the Application.MainThreadId,
+            // so that an Iteration (and Refresh) happen in the Application.MainThreadId
             Task.Run (() =>
                       {
                           Invoke (() => { });
-                          Task.Delay (10).Wait ();
+                          Task.Delay (1).Wait ();
                       });
         }
 
