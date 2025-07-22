@@ -202,7 +202,7 @@ public class NetOutput : IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public Size GetWindowSize ()
+    public Size GetWindowSize (Size? lastSize = null)
     {
         if (ConsoleDriver.RunningUnitTests)
         {

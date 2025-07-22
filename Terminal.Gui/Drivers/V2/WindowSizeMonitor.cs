@@ -25,7 +25,7 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
             return false;
         }
 
-        Size size = _consoleOut.GetWindowSize ();
+        Size size = _consoleOut.GetWindowSize (_lastSize);
 
         if (size != _lastSize)
         {

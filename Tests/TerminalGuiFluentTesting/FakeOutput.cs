@@ -17,7 +17,7 @@ internal class FakeOutput : IConsoleOutput
     public void Write (IOutputBuffer buffer) { LastBuffer = buffer; }
 
     /// <inheritdoc/>
-    public Size GetWindowSize () { return Size; }
+    public Size GetWindowSize (Size? lastSize = null) { return Size; }
 
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility) { }

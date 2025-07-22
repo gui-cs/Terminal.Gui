@@ -68,6 +68,22 @@ internal partial class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern Coord GetLargestConsoleWindowSize (
+        nint hConsoleOutput
+    );
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX consoleScreenBufferInfo);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleWindowInfo (
+        nint hConsoleOutput,
+        bool bAbsolute,
+        [In] ref SmallRect lpConsoleWindow
+    );
+
     private nint _screenBuffer;
     private nint _outputHandle;
 
@@ -335,12 +351,12 @@ internal partial class WindowsOutput : IConsoleOutput
         return result;
     }
 
-    public Size GetWindowSize ()
+    public Size GetWindowSize (Size? lastSize = null)
     {
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
             return Size.Empty;
@@ -350,7 +366,62 @@ internal partial class WindowsOutput : IConsoleOutput
                        csbi.srWindow.Right - csbi.srWindow.Left + 1,
                        csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
 
+        if (lastSize is { } && sz != lastSize)
+        {
+            Size newSize = SetConsoleWindow ((short)sz.Width, (short)sz.Height);
+
+            if (sz != newSize)
+            {
+                return newSize;
+            }
+        }
+
         return sz;
+    }
+
+    private Size SetConsoleWindow (short cols, short rows)
+    {
+        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+
+        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+
+        Coord maxWinSize = GetLargestConsoleWindowSize (IsVirtualTerminal ? _outputHandle : _screenBuffer);
+        short newCols = Math.Min (cols, maxWinSize.X);
+        short newRows = Math.Min (rows, maxWinSize.Y);
+        csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
+        csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
+        csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
+
+        if (!SetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+
+        var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
+
+        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
+        {
+            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            return new (cols, rows);
+        }
+
+        SetConsoleOutputWindow (csbi);
+
+        return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
+    }
+
+    private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
+    {
+        if ((IsVirtualTerminal
+                 ? _outputHandle
+                 : _screenBuffer) != nint.Zero && !SetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
     }
 
     /// <inheritdoc/>

@@ -23,8 +23,9 @@ public interface IConsoleOutput : IDisposable
     ///     Returns the current size of the console window in rows/columns (i.e.
     ///     of characters not pixels).
     /// </summary>
+    /// <param name="lastSize"></param>
     /// <returns></returns>
-    public Size GetWindowSize ();
+    public Size GetWindowSize (Size? lastSize = null);
 
     /// <summary>
     ///     Updates the console cursor (the blinking underscore) to be hidden,

@@ -19,7 +19,7 @@ public class WindowSizeMonitorTests
 
         });
 
-        consoleOutput.Setup (m => m.GetWindowSize ())
+        consoleOutput.Setup (m => m.GetWindowSize (null))
                      .Returns (queue.Dequeue);
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
@@ -52,7 +52,7 @@ public class WindowSizeMonitorTests
             new Size (30, 20),
         });
 
-        consoleOutput.Setup (m => m.GetWindowSize ())
+        consoleOutput.Setup (m => m.GetWindowSize (null))
                      .Returns (queue.Dequeue);
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
