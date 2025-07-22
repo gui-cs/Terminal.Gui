@@ -28,13 +28,9 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         _outputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
-        if (InputProcessor is WindowsInputProcessor)
+        if (!ConsoleDriver.RunningUnitTests && InputProcessor is WindowsInputProcessor)
         {
             SupportsTrueColor = new WindowsInput ().IsVirtualTerminal ();
-        }
-        else if (InputProcessor is NetInputProcessor)
-        {
-            SupportsTrueColor = Application.Driver?.SupportsTrueColor == true;
         }
 
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
