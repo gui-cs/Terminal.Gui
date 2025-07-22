@@ -34,7 +34,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         }
         else if (InputProcessor is NetInputProcessor)
         {
-            SupportsTrueColor = Application.Driver.SupportsTrueColor;
+            SupportsTrueColor = Application.Driver?.SupportsTrueColor == true;
         }
 
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
