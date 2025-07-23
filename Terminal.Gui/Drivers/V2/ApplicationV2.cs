@@ -232,6 +232,9 @@ public class ApplicationV2 : ApplicationImpl
         if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
+            // Ensure the action is executed and forces LayoutAndDrawImpl
+            Application.LayoutAndDrawImpl (true);
+
             return;
         }
 
