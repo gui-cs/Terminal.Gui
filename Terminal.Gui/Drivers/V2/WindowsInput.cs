@@ -44,38 +44,16 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
             return;
         }
 
-        try
-        {
-            _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
+        _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
 
-            GetConsoleMode (_inputHandle, out uint v);
-            _originalConsoleMode = v;
+        GetConsoleMode (_inputHandle, out uint v);
+        _originalConsoleMode = v;
 
-            uint newConsoleMode = _originalConsoleMode;
-            newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
-            newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
-            newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-            SetConsoleMode (_inputHandle, newConsoleMode);
-        }
-        catch (Exception ex)
-        {
-            Logging.Logger.LogInformation ($"Exception {nameof (WindowsInput)}");
-        }
-    }
-
-    internal bool IsVirtualTerminal ()
-    {
-        try
-        {
-            nint outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-            return GetConsoleMode (outputHandle, out uint mode) && (mode & (uint)ConsoleModes.EnableVirtualTerminalProcessing) != 0;
-        }
-        catch (Exception e)
-        {
-            Logging.Logger.LogInformation ("Exception IsVirtualTerminal");
-
-            return false;
-        }
+        uint newConsoleMode = _originalConsoleMode;
+        newConsoleMode |= (uint)(WindowsConsole.ConsoleModes.EnableMouseInput | WindowsConsole.ConsoleModes.EnableExtendedFlags);
+        newConsoleMode &= ~(uint)WindowsConsole.ConsoleModes.EnableQuickEditMode;
+        newConsoleMode &= ~(uint)WindowsConsole.ConsoleModes.EnableProcessedInput;
+        SetConsoleMode (_inputHandle, newConsoleMode);
     }
 
     protected override bool Peek ()

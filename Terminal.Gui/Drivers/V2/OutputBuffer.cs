@@ -256,7 +256,7 @@ public class OutputBuffer : IOutputBuffer
                             {
                                 // Invalidate cell to right so that it doesn't get drawn
                                 // TODO: Figure out if it is better to show a replacement character or ' '
-                                Contents [Row, Col + 1].Rune = (Rune)'\0';
+                                Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
                                 Contents [Row, Col + 1].IsDirty = true;
                             }
                         }

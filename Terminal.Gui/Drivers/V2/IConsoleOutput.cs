@@ -27,13 +27,6 @@ public interface IConsoleOutput : IDisposable
     public Size GetWindowSize ();
 
     /// <summary>
-    ///     Sets the current size of the console window in rows/columns
-    /// </summary>
-    /// <param name="newSize"></param>
-    /// /// <returns></returns>
-    public Size SetWindowSize (Size newSize);
-
-    /// <summary>
     ///     Updates the console cursor (the blinking underscore) to be hidden,
     ///     visible etc.
     /// </summary>

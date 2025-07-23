@@ -28,11 +28,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         _outputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
-        if (!ConsoleDriver.RunningUnitTests && InputProcessor is WindowsInputProcessor)
-        {
-            SupportsTrueColor = new WindowsInput ().IsVirtualTerminal ();
-        }
-
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         InputProcessor.MouseEvent += (s, e) =>
@@ -150,7 +145,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     // TODO: Probably not everyone right?
 
     /// <summary>Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.</summary>
-    public bool SupportsTrueColor { get; init; } = true;
+    public bool SupportsTrueColor => true;
 
     // TODO: Currently ignored
     /// <summary>
