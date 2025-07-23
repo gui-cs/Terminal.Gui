@@ -19,9 +19,6 @@ internal class FakeOutput : IConsoleOutput
     /// <inheritdoc/>
     public Size GetWindowSize () { return Size; }
 
-    /// <inheritdoc />
-    public Size SetWindowSize (Size newSize) { return newSize; }
-
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility) { }
 
