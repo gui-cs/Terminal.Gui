@@ -232,20 +232,22 @@ public class ApplicationV2 : ApplicationImpl
         if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
+
             // Ensure the action is executed and forces LayoutAndDrawImpl
             Application.LayoutAndDrawImpl (true);
 
             return;
         }
 
-        _timedEvents.Add (TimeSpan.Zero,
-                              () =>
-                              {
-                                  action ();
+        _timedEvents.Add (
+                          TimeSpan.Zero,
+                          () =>
+                          {
+                              action ();
 
-                                  return false;
-                              }
-                             );
+                              return false;
+                          }
+                         );
     }
 
     /// <inheritdoc/>
