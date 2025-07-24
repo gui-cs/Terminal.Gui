@@ -245,8 +245,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
         }
 
-        // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
-        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951
+        // Force a layout each time a View is initialized
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/4204
         Layout ();
 
         SetNeedsLayout ();
