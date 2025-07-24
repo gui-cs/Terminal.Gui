@@ -401,7 +401,7 @@ public class ApplicationV2Tests
 
         v2.Init ();
 
-        v2.AddIdle (IdleExit);
+        v2.AddTimeout (TimeSpan.Zero, IdleExit);
         Assert.Null (Application.Top);
 
         // Blocks until the timeout call is hit
@@ -448,7 +448,7 @@ public class ApplicationV2Tests
                    Assert.Same (t, a.Toplevel);
                };
 
-        v2.AddIdle (IdleExit);
+        v2.AddTimeout(TimeSpan.Zero, IdleExit);
 
         // Blocks until the timeout call is hit
 

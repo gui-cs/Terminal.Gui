@@ -27,8 +27,8 @@ public sealed class Generic : Scenario
             Y = 1,
             Title = "_Button",
 
-            // Comment this out to see how Issue #4170 is about IsDefault not working with Accepting event.
-            // IsDefault = true,
+            // Comment this out to see how Issue #4170 is about IsDefaultAcceptView not working with Accepting event.
+            // IsDefaultAcceptView = true,
             //SchemeName = "Error"
         };
 

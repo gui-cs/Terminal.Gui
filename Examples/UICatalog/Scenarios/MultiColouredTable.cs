@@ -101,7 +101,7 @@ public class MultiColouredTable : Scenario
     {
         var okPressed = false;
 
-        var ok = new Button { Text = "Ok", IsDefault = true };
+        var ok = new Button { Text = "Ok", IsDefaultAcceptView = true };
 
         ok.Accepting += (s, e) =>
                      {

@@ -201,6 +201,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             Root.BeginInit ();
             Root.EndInit ();
+
+            // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
+            // TODO: negate need for this hack
             Root.Layout ();
         }
 
@@ -382,6 +385,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         // Logging.Debug ($"{Title} - menuItem: {menuItem?.Title}, menu: {menu?.Title}");
 
+        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+        // TODO: negate need for this hack
         menu?.Layout ();
 
         // If there's a visible peer, remove / hide it
@@ -448,6 +453,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             // to set focus to it.
             menu.Visible = true;
 
+            // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+            // TODO: negate need for this hack
             menu.Layout ();
         }
     }

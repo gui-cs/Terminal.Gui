@@ -32,7 +32,7 @@ internal interface IMainLoopDriver
     void Wakeup ();
 }
 
-/// <summary>The MainLoop monitors timers and idle handlers.</summary>
+/// <summary>The main event loop of v1 driver based applications.</summary>
 /// <remarks>
 ///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
 ///     on Windows.
@@ -40,7 +40,7 @@ internal interface IMainLoopDriver
 public class MainLoop : IDisposable
 {
     /// <summary>
-    /// Gets the class responsible for handling idles and timeouts
+    /// Gets the class responsible for handling timeouts
     /// </summary>
     public ITimedEvents TimedEvents { get; } = new TimedEvents();
 
@@ -75,32 +75,6 @@ public class MainLoop : IDisposable
         MainLoopDriver = null;
     }
 
-    /// <summary>
-    ///     Adds specified idle handler function to <see cref="MainLoop"/> processing. The handler function will be called
-    ///     once per iteration of the main loop after other events have been handled.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Remove an idle handler by calling <see cref="TimedEvents.RemoveIdle(Func{bool})"/> with the token this method returns.</para>
-    ///     <para>
-    ///         If the <paramref name="idleHandler"/> returns  <see langword="false"/> it will be removed and not called
-    ///         subsequently.
-    ///     </para>
-    /// </remarks>
-    /// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="TimedEvents.RemoveIdle(Func{bool})"/> .</param>
-    // QUESTION: Why are we re-inventing the event wheel here?
-    // PERF: This is heavy.
-    // CONCURRENCY: Race conditions exist here.
-    // CONCURRENCY: null delegates will hose this.
-    // 
-    internal Func<bool> AddIdle (Func<bool> idleHandler)
-    {
-        TimedEvents.AddIdle (idleHandler);
-
-        MainLoopDriver?.Wakeup ();
-
-        return idleHandler;
-    }
-
 
     /// <summary>Determines whether there are pending events to be processed.</summary>
     /// <remarks>
@@ -127,7 +101,7 @@ public class MainLoop : IDisposable
 
     /// <summary>Runs one iteration of timers and file watches</summary>
     /// <remarks>
-    ///     Use this to process all pending events (timers, idle handlers and file watches).
+    ///     Use this to process all pending events (timers handlers and file watches).
     ///     <code>
     ///     while (main.EventsPending ()) RunIteration ();
     ///   </code>
@@ -138,9 +112,7 @@ public class MainLoop : IDisposable
 
         MainLoopDriver?.Iteration ();
 
-        TimedEvents.LockAndRunTimers ();
-
-        TimedEvents.LockAndRunIdles ();
+        TimedEvents.RunTimers ();
     }
 
     private void RunAnsiScheduler ()

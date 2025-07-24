@@ -2571,11 +2571,11 @@ Edit
 
             if (i is < 0 or > 0)
             {
-                Assert.Equal (menu, Application.MouseGrabView);
+                Assert.Equal (menu, Application.MouseGrabHandler.MouseGrabView);
             }
             else
             {
-                Assert.Equal (menuBar, Application.MouseGrabView);
+                Assert.Equal (menuBar, Application.MouseGrabHandler.MouseGrabView);
             }
 
             Assert.Equal ("_Edit", miCurrent.Parent.Title);

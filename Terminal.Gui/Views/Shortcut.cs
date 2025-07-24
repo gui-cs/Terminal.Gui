@@ -39,7 +39,7 @@ namespace Terminal.Gui.Views;
 ///         If the <see cref="Key"/> is <see cref="Key.Empty"/>, the <see cref="Key"/> text is not displayed.
 ///     </para>
 /// </remarks>
-public class Shortcut : View, IOrientation, IDesignable
+public class Shortcut : View, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
@@ -70,10 +70,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-
-        _orientationHelper = new (this);
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         AddCommands ();
 
@@ -242,11 +238,24 @@ public class Shortcut : View, IOrientation, IDesignable
     private void AddCommands ()
     {
         // Accept (Enter key) -
-        AddCommand (Command.Accept, DispatchCommand);
+        //AddCommand (Command.Accept, DispatchCommand);
         // Hotkey -
-        AddCommand (Command.HotKey, DispatchCommand);
+        //AddCommand (Command.HotKey, DispatchCommand);
         // Activate (Space key or click) -
-        AddCommand (Command.Activate, DispatchCommand);
+       // AddCommand (Command.Activate, DispatchCommand);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        return base.OnHandlingHotKey (args);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+
+        return base.OnActivating (args);
     }
 
     /// <summary>
@@ -265,20 +274,20 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
-        if (keyCommandContext?.Binding.Data != this)
-        {
-            // TODO: Optimize this to only do this if CommandView is custom (non View)
-            // Invoke Activate on the CommandView to cause it to change state if it wants to
-            // If this causes CommandView to raise Accept, we eat it
-            keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
+        //if (keyCommandContext?.Binding.Data != this)
+        //{
+        //    // TODO: Optimize this to only do this if CommandView is custom (non View)
+        //    // Invoke Activate on the CommandView to cause it to change state if it wants to
+        //    // If this causes CommandView to raise Accept, we eat it
+        //    keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+        //    Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            if (CommandView.InvokeCommand (Command.Activate, keyCommandContext) is true)
-            {
-                return true;
-            }
-        }
+        //    if (CommandView.InvokeCommand (Command.Activate, keyCommandContext) is true)
+        //    {
+        //        return true;
+        //    }
+        //}
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
 
@@ -296,17 +305,17 @@ public class Shortcut : View, IOrientation, IDesignable
 
         var cancel = false;
 
-        if (commandContext is { Source: null })
-        {
-            commandContext.Source = this;
-        }
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
-        cancel = RaiseAccepting (commandContext) is true;
+        //if (commandContext is { Source: null })
+        //{
+        //    commandContext.Source = this;
+        //}
+        //Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
+        //cancel = RaiseAccepting (commandContext) is true;
 
-        if (cancel)
-        {
-            return true;
-        }
+        //if (cancel)
+        //{
+        //    return true;
+        //}
 
         if (Action is { })
         {
@@ -330,38 +339,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public Action? Action { get; set; }
 
     #endregion Accept/Select/HotKey Command Handling
-
-    #region IOrientation members
-
-    private readonly OrientationHelper _orientationHelper;
-
-    /// <summary>
-    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
-    ///     <see cref="Orientation.Horizontal"/>.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
-
-    /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
-
-    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
-    /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation)
-    {
-        // TODO: Determine what, if anything, is opinionated about the orientation.
-        SetNeedsLayout ();
-    }
-
-    #endregion
 
     #region Command
 
@@ -434,7 +411,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // The default behavior is for CommandView to not get focus. I
             // If you want it to get focus, you need to set it.
-            // _commandView.CanFocus = false;
+            _commandView.CanFocus = false;
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -452,7 +429,7 @@ public class Shortcut : View, IOrientation, IDesignable
             _commandView.Activating += CommandViewOnActivating;
             _commandView.Accepting += CommandViewOnAccepted;
 
-            //ShowHide ();
+            ShowHide ();
             UpdateKeyBindings (Key.Empty);
 
             return;

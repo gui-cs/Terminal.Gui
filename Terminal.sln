@@ -75,6 +75,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit.Generator", "Tests\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Analyzers", "Terminal.Gui.Analyzers\Terminal.Gui.Analyzers.csproj", "{D1D68BA7-8476-448E-8BA3-927C15933119}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Analyzers.Tests", "Terminal.Gui.Analyzers.Tests\Terminal.Gui.Analyzers.Tests.csproj", "{8C643A64-2A77-4432-987A-2E72BD9708E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +145,14 @@ Global
 		{199F27D8-A905-4DDC-82CA-1FE1A90B1788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{199F27D8-A905-4DDC-82CA-1FE1A90B1788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{199F27D8-A905-4DDC-82CA-1FE1A90B1788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D68BA7-8476-448E-8BA3-927C15933119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D68BA7-8476-448E-8BA3-927C15933119}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D68BA7-8476-448E-8BA3-927C15933119}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D68BA7-8476-448E-8BA3-927C15933119}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

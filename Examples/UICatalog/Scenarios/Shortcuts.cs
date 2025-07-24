@@ -66,47 +66,26 @@ public class Shortcuts : Scenario
             {
                 Text = "_Align Keys",
                 CanFocus = false,
-                HighlightStates = MouseState.None
+                HighlightStates = MouseState.None,
+                CheckedState = CheckState.Checked
             },
             Key = Key.F5.WithCtrl.WithAlt.WithShift
         };
 
-        // ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (_, args) =>
         ((CheckBox)alignKeysShortcut.CommandView).CheckedStateChanging += (s, e) =>
                                                                           {
                                                                               if (alignKeysShortcut.CommandView is CheckBox cb)
                                                                               {
+                                                                                  bool align = e.Result == CheckState.Checked;
                                                                                   eventSource.Add (
                                                                                                    $"{alignKeysShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
                                                                                   eventLog.MoveDown ();
 
-                                                                                  var max = 0;
-
-                                                                                  IEnumerable<View> toAlign =
-                                                                                      Application.Top.SubViews.Where (
-                                                                                       v => v is Shortcut { Width: not DimAbsolute });
-                                                                                  IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
-
-                                                                                  if (e.Result == CheckState.Checked)
-                                                                                  {
-                                                                                      max = (from Shortcut? peer in enumerable
-                                                                                             select peer.Key.ToString ().GetColumns ()).Prepend (max)
-                                                                                          .Max ();
-
-                                                                                      foreach (View view in enumerable)
-                                                                                      {
-                                                                                          var peer = (Shortcut)view;
-                                                                                          max = Math.Max (max, peer.KeyView.Text.GetColumns ());
-                                                                                      }
-                                                                                  }
-
-                                                                                  foreach (View view in enumerable)
-                                                                                  {
-                                                                                      var peer = (Shortcut)view;
-                                                                                      peer.MinimumKeyTextSize = max;
-                                                                                  }
+                                                                                  AlignKeys (align);
                                                                               }
                                                                           };
+
+
         Application.Top.Add (alignKeysShortcut);
 
         var commandFirstShortcut = new Shortcut
@@ -136,8 +115,7 @@ public class Shortcuts : Scenario
                                                                                                       $"{commandFirstShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
                                                                                      eventLog.MoveDown ();
 
-                                                                                     IEnumerable<View> toAlign =
-                                                                                         Application.Top.SubViews.OfType<Shortcut> ();//.Where (v => v is { Width: not DimAbsolute });
+                                                                                     IEnumerable<View> toAlign = Application.Top.SubViews.OfType<Shortcut> ();
                                                                                      IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
                                                                                      foreach (View view in enumerable)
@@ -165,8 +143,8 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (commandFirstShortcut),
             Width = Dim.Fill ()! - Dim.Width (eventLog),
             Key = Key.F4,
-            HelpText = "Changes all Command.CanFocus",
-            CommandView = new CheckBox { Text = "_CanFocus" },
+            HelpText = "Changes all CommandView.CanFocus",
+            CommandView = new CheckBox { Text = "_CommandView.CanFocus" },
         };
 
         ((CheckBox)canFocusShortcut.CommandView).CheckedStateChanging += (s, e) =>
@@ -229,7 +207,6 @@ public class Shortcuts : Scenario
             {
                 Orientation = Orientation.Vertical,
                 RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
-                CanFocus = false,
                 HighlightStates = MouseState.None,
             },
         };
@@ -273,12 +250,34 @@ public class Shortcuts : Scenario
 
         Application.Top.Add (sliderShortcut);
 
+        ListView listView = new ListView ()
+        {
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Title = "ListView",
+            BorderStyle = LineStyle.Single
+        };
+        listView.EnableForDesign ();
+
+        var listViewShortcut = new Shortcut ()
+        {
+            Id = "listViewShortcut",
+            X = 0,
+            Y = Pos.Bottom (sliderShortcut),
+            Width = Dim.Fill ()! - Dim.Width (eventLog),
+            HelpText = "A ListView with Border",
+            CommandView = listView,
+            Key = Key.F5.WithCtrl,
+        };
+
+        Application.Top.Add (listViewShortcut);
+
         var noCommandShortcut = new Shortcut
         {
             Id = "noCommandShortcut",
             X = 0,
-            Y = Pos.Bottom (sliderShortcut),
-            Width = Dim.Width (sliderShortcut),
+            Y = Pos.Bottom (listViewShortcut),
+            Width = Dim.Width (listViewShortcut),
             HelpText = "No Command",
             Key = Key.D0
         };
@@ -317,13 +316,15 @@ public class Shortcuts : Scenario
             Id = "framedShortcut",
             X = 0,
             Y = Pos.Bottom (noHelpShortcut) + 1,
-            Title = "CommandView",
+            Width = Dim.Width (noHelpShortcut),
+            Title = "Framed Shortcut",
             Key = Key.K.WithCtrl,
-            Text = "Help: You can resize",
+            Text = "Help: You can resize this",
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
-        framedShortcut.Orientation = Orientation.Horizontal;
+        framedShortcut.Border.Settings = BorderSettings.Title;
+        //framedShortcut.Orientation = Orientation.Horizontal;
 
         if (framedShortcut.Padding is { })
         {
@@ -333,12 +334,12 @@ public class Shortcuts : Scenario
 
         if (framedShortcut.CommandView.Margin is { })
         {
-            framedShortcut.CommandView.SchemeName = framedShortcut.CommandView.SchemeName = "Error";
-            framedShortcut.HelpView.SchemeName = framedShortcut.HelpView.SchemeName = "Dialog";
-            framedShortcut.KeyView.SchemeName = framedShortcut.KeyView.SchemeName = "Error";
+            framedShortcut.CommandView.SchemeName = framedShortcut.CommandView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            framedShortcut.HelpView.SchemeName = framedShortcut.HelpView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error);
+            framedShortcut.KeyView.SchemeName = framedShortcut.KeyView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        framedShortcut.SchemeName = "TopLevel";
+        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
         Application.Top.Add (framedShortcut);
 
         // Horizontal
@@ -523,6 +524,10 @@ public class Shortcuts : Scenario
 
         SetCanFocus (false);
 
+        AlignKeys (true);
+
+        return;
+
         void SetCanFocus (bool canFocus)
         {
             foreach (Shortcut peer in Application.Top!.SubViews.OfType<Shortcut> ())
@@ -531,6 +536,33 @@ public class Shortcuts : Scenario
                 {
                     peer.CommandView.CanFocus = canFocus;
                 }
+            }
+        }
+
+        void AlignKeys (bool align)
+        {
+            var max = 0;
+
+            IEnumerable<View> toAlign = Application.Top!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _));
+            IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
+
+            if (align)
+            {
+                max = (from Shortcut? peer in enumerable
+                       select peer.Key.ToString ().GetColumns ()).Prepend (max)
+                                                                 .Max ();
+
+                foreach (View view in enumerable)
+                {
+                    var peer = (Shortcut)view;
+                    max = Math.Max (max, peer.KeyView.Text.GetColumns ());
+                }
+            }
+
+            foreach (View view in enumerable)
+            {
+                var peer = (Shortcut)view;
+                peer.MinimumKeyTextSize = max;
             }
         }
     }

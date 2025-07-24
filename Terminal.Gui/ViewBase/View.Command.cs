@@ -116,7 +116,7 @@ public partial class View // Command APIs
     ///     <para>
     ///         If a peer-View raises the Accepting event and the event is not cancelled, the <see cref="Command.Accept"/> will
     ///         be invoked on the
-    ///         first Button in the SuperView that has <see cref="Button.IsDefault"/> set to <see langword="true"/>.
+    ///         first Button in the SuperView that has <see cref="Button.IsDefaultAcceptView"/> set to <see langword="true"/>.
     ///     </para>
     /// </remarks>
     /// <returns>
@@ -143,20 +143,18 @@ public partial class View // Command APIs
         }
 
         // Accept is a special case where if the event is not canceled, the event is
-        //  - Invoked on any peer-View with IsDefault == true
-        //  - bubbled up the SuperView hierarchy.
+        //  - Invoked on any peer-View where IDefaultAcceptView.GetIsDefaultAcceptView() returns true
+        //  - propagated up the SuperView hierarchy.
         if (!args.Handled)
         {
-            // If there's an IsDefault peer view in SubViews, try it
-            View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
+            // If there's a default accept view peer view in SubViews, try it
+            View? defaultAcceptView = SuperView?.InternalSubViews.FirstOrDefault (v => v is IDefaultAcceptView defaultAccept && defaultAccept.GetIsDefaultAcceptView ());
 
-            if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+            if (defaultAcceptView != this && defaultAcceptView is IDefaultAcceptView defaultAccept && defaultAccept.GetIsDefaultAcceptView ())
             {
-                // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
-                // TODO: is generic?
 
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
-                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default Accept View ({defaultAcceptView?.Title})");
+                bool? handled = defaultAcceptView?.InvokeCommand (Command.Accept, ctx);
 
                 if (handled == true)
                 {
@@ -166,13 +164,63 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking {Command.Accept} on SuperView ({SuperView.Title}/{SuperView.Id})...");
 
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
         }
 
         return args.Handled;
+    }
+
+    /// <summary>
+    ///     When a View implements this interface, it will act as the default handler for <see cref="Command.Accept"/>.
+    /// </summary>
+    public interface IDefaultAcceptView
+    {
+        /// <summary>
+        ///     Gets whether the <see cref="View"/> will act as the default handler for <see cref="Command.Accept"/>
+        ///     commands on the <see cref="View.SuperView"/>.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         If <see langword="true"/>:
+        ///     </para>
+        ///     <para>
+        ///         - The View will display an indicator that it is the default View.
+        ///     </para>
+        ///     <para>
+        ///         - If the view does not handle <see cref="Command.Accept"/>, <see cref="Command.Accept"/> will be
+        ///         invoked on the SuperView.
+        ///     </para>
+        ///     <para>
+        ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
+        ///         the first View in the SuperView that returns <see langword="true"/>.
+        ///     </para>
+        /// </remarks>
+        public bool GetIsDefaultAcceptView ();
+
+        /// <summary>
+        ///     Sets whether the <see cref="View"/> will act as the default handler for <see cref="Command.Accept"/>
+        ///     commands on the <see cref="View.SuperView"/>.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         If <see langword="true"/>:
+        ///     </para>
+        ///     <para>
+        ///         - The View will display an indicator that it is the default View.
+        ///     </para>
+        ///     <para>
+        ///         - If the view does not handle <see cref="Command.Accept"/>, <see cref="Command.Accept"/> will be
+        ///         invoked on the SuperView.
+        ///     </para>
+        ///     <para>
+        ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
+        ///         the first View in the SuperView that returns <see langword="true"/>.
+        ///     </para>
+        /// </remarks>
+        public void SetIsDefaultAcceptView (bool value);
     }
 
     /// <summary>
@@ -231,6 +279,18 @@ public partial class View // Command APIs
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Activating?.Invoke (this, args);
+
+        //// Activate is a special case where if the event is not canceled, the event is
+        ////  - propagated up the SuperView hierarchy.
+        //if (!args.Handled)
+        //{
+        //    if (SuperView is { })
+        //    {
+        //        Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking {ctx!.Command} on SuperView ({SuperView.Title}/{SuperView.Id})...");
+
+        //        return SuperView?.InvokeCommand (ctx!.Command, ctx);
+        //    }
+        //}
 
         return Activating is null ? null : args.Handled;
     }

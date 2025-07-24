@@ -21,6 +21,9 @@ public class ApplicationV2 : ApplicationImpl
 
     private readonly ITimedEvents _timedEvents = new TimedEvents ();
 
+    /// <inheritdoc/>
+    public override ITimedEvents TimedEvents => _timedEvents;
+
     /// <summary>
     ///     Creates anew instance of the Application backend. The provided
     ///     factory methods will be used on Init calls to get things booted.
@@ -225,7 +228,14 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override void Invoke (Action action)
     {
-        _timedEvents.AddIdle (
+        // If we are already on the main UI thread
+        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action ();
+            return;
+        }
+
+        _timedEvents.Add (TimeSpan.Zero,
                               () =>
                               {
                                   action ();
@@ -236,20 +246,10 @@ public class ApplicationV2 : ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public override void AddIdle (Func<bool> func) { _timedEvents.AddIdle (func); }
-
-    /// <summary>
-    ///     Removes an idle function added by <see cref="AddIdle"/>
-    /// </summary>
-    /// <param name="fnTrue">Function to remove</param>
-    /// <returns>True if it was found and removed</returns>
-    public bool RemoveIdle (Func<bool> fnTrue) { return _timedEvents.RemoveIdle (fnTrue); }
+    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
 
     /// <inheritdoc/>
-    public override object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.AddTimeout (time, callback); }
-
-    /// <inheritdoc/>
-    public override bool RemoveTimeout (object token) { return _timedEvents.RemoveTimeout (token); }
+    public override bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
     /// <inheritdoc />
     public override void LayoutAndDraw (bool forceDraw)

@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace UICatalog.Scenarios;
+﻿namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Scrolling", "Content scrolling, IScrollBars, etc...")]
 [ScenarioCategory ("Controls")]

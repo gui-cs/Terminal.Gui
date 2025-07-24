@@ -126,7 +126,7 @@ public class FileDialogExamples : Scenario
         _cbFlipButtonOrder = new CheckBox { X = x, Y = y++, Text = "Flip Ord_er" };
         win.Add (_cbFlipButtonOrder);
 
-        var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
+        var btn = new Button { X = 1, Y = 9, IsDefaultAcceptView = true, Text = "Run Dialog" };
 
         win.Accepting += (s, e) =>
                         {

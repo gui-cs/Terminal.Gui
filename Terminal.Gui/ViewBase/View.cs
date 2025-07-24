@@ -71,14 +71,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
-            if (Application.MouseGrabView == this)
+            if (Application.MouseGrabHandler.MouseGrabView == this)
             {
-                Application.UngrabMouse ();
-            }
-
-            if (Application.WantContinuousButtonPressedView == this)
-            {
-                Application.WantContinuousButtonPressedView = null;
+                Application.MouseGrabHandler.UngrabMouse ();
             }
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
@@ -250,11 +245,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
         }
 
-        if (ApplicationImpl.Instance.IsLegacy)
-        {
-            // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
-            Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
-        }
+        // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
+        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951
+        Layout ();
 
         SetNeedsLayout ();
 

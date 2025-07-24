@@ -57,6 +57,7 @@ public class OptionSelector : SelectorBase, IDesignable
                 {
                     return true;
                 }
+                SetFocus ();
                 Value = Values? [0];
                 return true;
             }

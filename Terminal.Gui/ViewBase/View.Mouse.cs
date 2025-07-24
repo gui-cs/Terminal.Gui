@@ -6,11 +6,18 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View // Mouse APIs
 {
+    /// <summary>
+    /// Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
+    /// down in the view and have grabbed the mouse.
+    /// </summary>
+    public IMouseHeldDown? MouseHeldDown { get; set; }
+
     /// <summary>Gets the mouse bindings for this view.</summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
 
     private void SetupMouse ()
     {
+        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents, Application.MouseGrabHandler);
         MouseBindings = new ();
 
         // In-line with Keyboard:
@@ -316,6 +323,19 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
+        // TODO: probably this should be moved elsewhere, please advise
+        if (WantContinuousButtonPressed && MouseHeldDown != null)
+        {
+            if (mouseEvent.IsPressed)
+            {
+                MouseHeldDown.Start ();
+            }
+            else
+            {
+                MouseHeldDown.Stop ();
+            }
+        }
+
         if (OnMouseEvent (mouseEvent) || mouseEvent.Handled)
         {
             return true;
@@ -381,9 +401,9 @@ public partial class View // Mouse APIs
         mouseEvent.Handled = false;
 
         // If the user has just pressed the mouse, grab the mouse and set focus
-        if (Application.MouseGrabView != this)
+        if (Application.MouseGrabHandler.MouseGrabView != this)
         {
-            Application.GrabMouse (this);
+            Application.MouseGrabHandler.GrabMouse (this);
 
             if (!HasFocus && CanFocus)
             {
@@ -420,15 +440,6 @@ public partial class View // Mouse APIs
             }
         }
 
-        if (!mouseEvent.Handled && WantContinuousButtonPressed && Application.MouseGrabView == this)
-        {
-            // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
-            // value indicates whether procssing should stop or not.
-            RaiseMouseClickedAndActivatingEvents (mouseEvent);
-
-            return true;
-        }
-
         return mouseEvent.Handled = true;
     }
 
@@ -441,13 +452,14 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, the mouse  <see langword="false"/> otherwise.</returns>
     internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
-        if (Application.MouseGrabView == this)
+        if (Application.MouseGrabHandler.MouseGrabView == this)
         {
             //Logging.Debug ($"{Id} - {MouseState}");
             MouseState &= ~MouseState.Pressed;
             MouseState &= ~MouseState.PressedOutside;
         }
     }
+
 
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the click events from the driver
@@ -458,7 +470,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if processing should stop; <see langword="false"/> otherwise.</returns>
     internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
     {
-        if (Application.MouseGrabView != this || !mouseEvent.IsSingleClicked)
+        if (Application.MouseGrabHandler.MouseGrabView != this || !mouseEvent.IsSingleClicked)
         {
             return false;
         }
@@ -466,7 +478,7 @@ public partial class View // Mouse APIs
         Logging.Debug ($"{mouseEvent.Flags};{mouseEvent.Position}");
 
         // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
-        Application.UngrabMouse ();
+        Application.MouseGrabHandler.UngrabMouse ();
 
         // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
         // TODO: There may be perf gains if we don't unset these flags here
@@ -583,6 +595,42 @@ public partial class View // Mouse APIs
     ///     </para>
     /// </remarks>
     public event EventHandler<MouseEventArgs>? MouseClick;
+
+    /// <summary>
+    ///     INTERNAL For cases where the view is grabbed and the mouse is clicked, this method handles the click event
+    ///     (typically
+    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    /// </summary>
+    /// <remarks>
+    ///     Marked internal just to support unit tests
+    /// </remarks>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
+    {
+        mouseEvent.Handled = false;
+
+        if (Application.MouseGrabView == this && mouseEvent.IsSingleClicked)
+        {
+            // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
+            Application.UngrabMouse ();
+
+            // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
+            // TODO: There may be perf gains if we don't unset these flags here
+            MouseState &= ~MouseState.Pressed;
+            MouseState &= ~MouseState.PressedOutside;
+
+            // If mouse is still in bounds, generate a click
+            if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
+            {
+                return RaiseMouseClickEvent (mouseEvent);
+            }
+
+            return mouseEvent.Handled = true;
+        }
+
+        return false;
+    }
 
 #endif
 

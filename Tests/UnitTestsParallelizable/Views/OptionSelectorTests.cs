@@ -130,7 +130,7 @@ public class OptionSelectorTests
 
         var selector = new OptionSelector
         {
-            Title = "Radio_Group",
+            HotKey = Key.G.WithAlt,
             RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
         };
         selector.SelectedItem = -1;
@@ -143,7 +143,7 @@ public class OptionSelectorTests
         selector.NewKeyDownEvent (Key.G.WithAlt);
 
         Assert.Equal (0, selector.SelectedItem);
-        Assert.True (selector.HasFocus);
+        Assert.Equal (selector.SubViews.OfType<CheckBox> ().First (), superView.MostFocused);
     }
 
     [Fact]

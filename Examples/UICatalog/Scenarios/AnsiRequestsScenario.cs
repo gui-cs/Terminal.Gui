@@ -149,7 +149,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         var tvTerminator = new TextView { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 4, Height = 4, ReadOnly = true };
         w.Add (label, tvTerminator);
 
-        var btnResponse = new Button { X = Pos.Center (), Y = Pos.Bottom (tvResponse) + 2, Text = "Send Request", IsDefault = true };
+        var btnResponse = new Button { X = Pos.Center (), Y = Pos.Bottom (tvResponse) + 2, Text = "Send Request", IsDefaultAcceptView = true };
 
         var lblSuccess = new Label { X = Pos.Center (), Y = Pos.Bottom (btnResponse) + 1 };
         w.Add (lblSuccess);

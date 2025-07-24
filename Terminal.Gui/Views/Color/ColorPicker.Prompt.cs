@@ -29,7 +29,7 @@ public partial class ColorPicker
             Y = Application.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         btnOk.Accepting += (s, e) =>

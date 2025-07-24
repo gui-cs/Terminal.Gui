@@ -246,26 +246,25 @@ public class ShortcutTests
     }
 
     [Theory]
-    [InlineData (true, KeyCode.A, 1, 1)]
-    [InlineData (true, KeyCode.C, 1, 1)]
-    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 1)]
-    [InlineData (true, KeyCode.Enter, 1, 1)]
-    [InlineData (true, KeyCode.Space, 1, 1)]
-    [InlineData (true, KeyCode.F1, 0, 0)]
-    [InlineData (false, KeyCode.A, 1, 1)]
-    [InlineData (false, KeyCode.C, 1, 1)]
-    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 1)]
-    [InlineData (false, KeyCode.Enter, 0, 0)]
-    [InlineData (false, KeyCode.Space, 0, 0)]
-    [InlineData (false, KeyCode.F1, 0, 0)]
-    public void KeyDown_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
+    [InlineData (true, KeyCode.A, 1, 0)]                    // CanFocus: Shortcut.key should activate and not Accept
+    [InlineData (true, KeyCode.C, 1, 0)]                    // CanFocus: CommandView.HotKey should activate and not Accept
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 0)]  // CanFocus: CommandView.HotKey should activate and not Accept
+    [InlineData (true, KeyCode.Enter, 1, 1)]                // CanFocus: Enter should Activate and Accept
+    [InlineData (true, KeyCode.Space, 1, 0)]                // CanFocus: Space should Activate and not Accept
+    [InlineData (true, KeyCode.F1, 0, 0)]                   // CanFocus: Other key should do nothing
+    [InlineData (false, KeyCode.A, 1, 0)]                   // !CanFocus: Shortcut.key should Activate and not Accept
+    [InlineData (false, KeyCode.C, 1, 0)]                   // !CanFocus: CommandView.HotKey should Activate and not Accept
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 0)] // !CanFocus: CommandView.HotKey should Activate and not Accept
+    [InlineData (false, KeyCode.Enter, 0, 0)]               // !CanFocus: Enter should do nothing
+    [InlineData (false, KeyCode.Space, 0, 0)]               // !CanFocus: Space should do nothing
+    [InlineData (false, KeyCode.F1, 0, 0)]                  // !CanFocus: Other key should do nothing
+    public void KeyDown_Raises_Accepting_And_Activating_Correctly (bool canFocus, KeyCode key, int expectedActivating, int expectedAccepting)
     {
         Application.Top = new ();
 
         var shortcut = new Shortcut
         {
             Key = Key.A,
-            Text = "0",
             Title = "_C",
             CanFocus = canFocus
         };
@@ -273,44 +272,49 @@ public class ShortcutTests
         shortcut.SetFocus ();
 
         Assert.Equal (canFocus, shortcut.HasFocus);
+        // By default CommandView gets CanFocus set to false, so the CB will never have focus
+        Assert.Equal (shortcut, Application.Top.MostFocused);
 
-        var accepted = 0;
-        shortcut.Accepting += (s, e) => accepted++;
+        var accepting = 0;
+        shortcut.Accepting += (s, e) =>
+                              {
+                                  accepting++;
+                                  e.Handled = true;
+                              };
 
-        var selected = 0;
-        shortcut.Activating += (s, e) => selected++;
+        var activating = 0;
+        shortcut.Activating += (s, e) => activating++;
 
         Application.RaiseKeyDownEvent (key);
-
-        Assert.Equal (expectedAccept, accepted);
-        Assert.Equal (expectedSelect, selected);
-
         Application.Top.Dispose ();
         Application.ResetState (true);
+
+        Assert.Equal (expectedActivating, activating);
+        Assert.Equal (expectedAccepting, accepting);
     }
 
 
     [Theory]
-    [InlineData (true, KeyCode.A, 1, 1)]
-    [InlineData (true, KeyCode.C, 1, 1)]
-    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 1)]
-    [InlineData (true, KeyCode.Enter, 1, 1)]
-    [InlineData (true, KeyCode.Space, 0, 1)]
-    [InlineData (true, KeyCode.F1, 0, 0)]
-    [InlineData (false, KeyCode.A, 1, 1)]
-    [InlineData (false, KeyCode.C, 1, 1)]
-    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 1)]
-    [InlineData (false, KeyCode.Enter, 0, 0)]
-    [InlineData (false, KeyCode.Space, 0, 0)]
-    [InlineData (false, KeyCode.F1, 0, 0)]
-    public void KeyDown_CheckBox_Raises_Accepted_Activated (bool canFocus, KeyCode key, int expectedAccept, int expectedActivate)
+    [InlineData (true, KeyCode.A, 1, 0)]                    // CanFocus: Shortcut.key should activate and not Accept
+    [InlineData (true, KeyCode.C, 1, 0)]                    // CanFocus: CommandView.HotKey should activate and not Accept
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 0)]  // CanFocus: CommandView.HotKey should activate and not Accept
+    [InlineData (true, KeyCode.Enter, 1, 1)]                // CanFocus: Enter should Activate and Accept
+    [InlineData (true, KeyCode.Space, 1, 0)]                // CanFocus: Space should Activate and not Accept
+    [InlineData (true, KeyCode.F1, 0, 0)]                   // CanFocus: Other key should do nothing
+    [InlineData (false, KeyCode.A, 1, 0)]                   // !CanFocus: Shortcut.key should Activate and not Accept
+    [InlineData (false, KeyCode.C, 1, 0)]                   // !CanFocus: CommandView.HotKey should Activate and not Accept
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 0)] // !CanFocus: CommandView.HotKey should Activate and not Accept
+    [InlineData (false, KeyCode.Enter, 0, 0)]               // !CanFocus: Enter should do nothing
+    [InlineData (false, KeyCode.Space, 0, 0)]               // !CanFocus: Space should do nothing
+    [InlineData (false, KeyCode.F1, 0, 0)]                  // !CanFocus: Other key should do nothing
+    public void With_NotCanFocusCheckBox_CommandView_KeyDown_Raises_Accepting_And_Activating_Correctly (bool canFocus, KeyCode key, int expectedActivating, int expectedAccepting)
     {
         Application.Top = new ();
 
+        // Shortcut with Key = Key.A and CommandView Hotkey = Key.C
         var shortcut = new Shortcut
         {
             Key = Key.A,
-            Text = "0",
             CommandView = new CheckBox ()
             {
                 Title = "_C",
@@ -324,23 +328,79 @@ public class ShortcutTests
         // By default CommandView gets CanFocus set to false, so the CB will never have focus
         Assert.Equal (shortcut, Application.Top.MostFocused);
 
-        var accepted = 0;
+        var accepting = 0;
         shortcut.Accepting += (s, e) =>
                              {
-                                 accepted++;
+                                 accepting++;
                                  e.Handled = true;
                              };
 
-        var activated = 0;
-        shortcut.Activating += (s, e) => activated++;
+        var activating = 0;
+        shortcut.Activating += (s, e) => activating++;
 
         Application.RaiseKeyDownEvent (key);
-
-        Assert.Equal (expectedAccept, accepted);
-        Assert.Equal (expectedActivate, activated);
-
         Application.Top.Dispose ();
         Application.ResetState (true);
+
+        Assert.Equal (expectedActivating, activating);
+        Assert.Equal (expectedAccepting, accepting);
+
+    }
+
+
+    [Theory]
+    [InlineData (true, KeyCode.A, 1, 0)]                    // CanFocus: Shortcut.key should activate and not Accept
+    [InlineData (true, KeyCode.C, 1, 0)]                    // CanFocus: CommandView.HotKey should activate and not Accept
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 0)]  // CanFocus: CommandView.HotKey should activate and not Accept
+    [InlineData (true, KeyCode.Enter, 1, 1)]                // CanFocus: Enter should Activate and Accept
+    [InlineData (true, KeyCode.Space, 1, 0)]                // CanFocus: Space should Activate and not Accept
+    [InlineData (true, KeyCode.F1, 0, 0)]                   // CanFocus: Other key should do nothing
+    [InlineData (false, KeyCode.A, 1, 0)]                   // !CanFocus: Shortcut.key should Activate and not Accept
+    [InlineData (false, KeyCode.C, 1, 0)]                   // !CanFocus: CommandView.HotKey should Activate and not Accept
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 0)] // !CanFocus: CommandView.HotKey should Activate and not Accept
+    [InlineData (false, KeyCode.Enter, 0, 0)]               // !CanFocus: Enter should do nothing
+    [InlineData (false, KeyCode.Space, 0, 0)]               // !CanFocus: Space should do nothing
+    [InlineData (false, KeyCode.F1, 0, 0)]                  // !CanFocus: Other key should do nothing
+    public void With_CanFocusCheckBox_CommandView_KeyDown_Raises_Accepting_And_Activating_Correctly (bool canFocus, KeyCode key, int expectedActivating, int expectedAccepting)
+    {
+        Application.Top = new ();
+
+        // Shortcut with Key = Key.A and CommandView Hotkey = Key.C
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            HelpText = "0",
+            CommandView = new CheckBox ()
+            {
+                Title = "_C",
+            },
+            CanFocus = canFocus
+        };
+        shortcut.CommandView.CanFocus = true;
+
+        Application.Top.Add (shortcut);
+        shortcut.SetFocus ();
+
+        Assert.Equal (canFocus, shortcut.HasFocus);
+        Assert.Equal (shortcut.CommandView, Application.Top.MostFocused);
+
+        var accepting = 0;
+        shortcut.Accepting += (s, e) =>
+        {
+            accepting++;
+            e.Handled = true;
+        };
+
+        var activating = 0;
+        shortcut.Activating += (s, e) => activating++;
+
+        Application.RaiseKeyDownEvent (key);
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+
+        Assert.Equal (expectedActivating, activating);
+        Assert.Equal (expectedAccepting, accepting);
+
     }
     [Theory]
     [InlineData (KeyCode.A, 1)]
@@ -349,7 +409,7 @@ public class ShortcutTests
     [InlineData (KeyCode.Enter, 1)]
     [InlineData (KeyCode.Space, 1)]
     [InlineData (KeyCode.F1, 0)]
-    public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
+    public void KeyDown_App_Scope_Invokes_Activating (KeyCode key, int expectedActivating)
     {
         Application.Top = new ();
 
@@ -357,21 +417,24 @@ public class ShortcutTests
         {
             Key = Key.A,
             BindKeyToApplication = true,
-            Text = "0",
             Title = "_C"
         };
         Application.Top.Add (shortcut);
         Application.Top.SetFocus ();
 
-        var accepted = 0;
-        shortcut.Accepting += (s, e) => accepted++;
+        var activating = 0;
+        shortcut.Activating += (s, e) => activating++;
+
+        var accepting = 0;
+        shortcut.Accepting += (s, e) => accepting++;
 
         Application.RaiseKeyDownEvent (key);
-
-        Assert.Equal (expectedAccept, accepted);
-
         Application.Top.Dispose ();
         Application.ResetState (true);
+
+        Assert.Equal (expectedActivating, activating);
+        Assert.Equal (0, accepting);
+
     }
 
     [Theory]

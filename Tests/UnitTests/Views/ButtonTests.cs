@@ -159,14 +159,14 @@ public class ButtonTests (ITestOutputHelper output)
         btn.SetRelativeLayout (new (100, 100));
 
         Assert.Equal ($"{Glyphs.LeftBracket}  {Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.False (btn.IsDefault);
+        Assert.False (btn.IsDefaultAcceptView);
         Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
         Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 4, 1), btn.Frame);
         Assert.Equal ($"{Glyphs.LeftBracket}  {Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.False (btn.IsDefault);
+        Assert.False (btn.IsDefaultAcceptView);
         Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
@@ -184,7 +184,7 @@ public class ButtonTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
 
-        btn = new () { Text = "_Test", IsDefault = true };
+        btn = new () { Text = "_Test", IsDefaultAcceptView = true };
         btn.Layout ();
         Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
@@ -198,7 +198,7 @@ public class ButtonTests (ITestOutputHelper output)
                       $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} Test {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}",
                       btn.TextFormatter.Format ()
                      );
-        Assert.True (btn.IsDefault);
+        Assert.True (btn.IsDefaultAcceptView);
         Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.True (btn.CanFocus);
 
@@ -216,7 +216,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         btn.Dispose ();
 
-        btn = new () { X = 1, Y = 2, Text = "_abc", IsDefault = true };
+        btn = new () { X = 1, Y = 2, Text = "_abc", IsDefaultAcceptView = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);
@@ -226,7 +226,7 @@ public class ButtonTests (ITestOutputHelper output)
                       $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} abc {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}",
                       btn.TextFormatter.Format ()
                      );
-        Assert.True (btn.IsDefault);
+        Assert.True (btn.IsDefaultAcceptView);
         Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
@@ -436,16 +436,16 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (clicked);
         clicked = false;
 
-        // IsDefault = false
+        // IsDefaultAcceptView = false
         // Space and Enter should work
-        Assert.False (btn.IsDefault);
+        Assert.False (btn.IsDefaultAcceptView);
         Assert.False (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
-        // IsDefault = true
+        // IsDefaultAcceptView = true
         // Space and Enter should work
-        btn.IsDefault = true;
+        btn.IsDefaultAcceptView = true;
         Assert.False (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;

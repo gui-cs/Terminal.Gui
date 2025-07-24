@@ -182,12 +182,11 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var styleRadioGroup = new RadioGroup
+        var styleRadioGroup = new OptionSelector ()
         {
-            X = Pos.Right (label) + 1, 
-            Y = Pos.Top (label), 
-            RadioLabels = ["_Query", "_Error"],
-            BorderStyle = LineStyle.Double,
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Labels = ["_Query", "_Error"],
             Title = "Sty_le"
         };
         frame.Add (styleRadioGroup);
@@ -229,7 +228,7 @@ public class MessageBoxes : Scenario
 
         var showMessageBoxButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefaultAcceptView = true, Text = "_Show MessageBox"
         };
 
         app.Accepting += (s, e) =>

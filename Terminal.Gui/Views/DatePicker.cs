@@ -227,13 +227,7 @@ public class DatePicker : View
             NoDecorations = true,
             ShadowStyle = ShadowStyle.None
         };
-
-        _previousMonthButton.Accepting += (sender, e) =>
-                                        {
-                                            Date = _date.AddMonths (-1);
-                                            CreateCalendar ();
-                                            _dateField.Date = Date;
-                                        };
+        _previousMonthButton.Accepting += (_, _) => AdjustMonth (-1);
 
         _nextMonthButton = new Button
         {
@@ -248,12 +242,7 @@ public class DatePicker : View
             ShadowStyle = ShadowStyle.None
         };
 
-        _nextMonthButton.Accepting += (sender, e) =>
-                                    {
-                                        Date = _date.AddMonths (1);
-                                        CreateCalendar ();
-                                        _dateField.Date = Date;
-                                    };
+        _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
 
         CreateCalendar ();
         SelectDayOnCalendar (_date.Day);
@@ -285,6 +274,13 @@ public class DatePicker : View
         _dateField.DateChanged += DateField_DateChanged;
 
         Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
+    }
+
+    private void AdjustMonth (int offset)
+    {
+        Date = _date.AddMonths (offset);
+        CreateCalendar ();
+        _dateField.Date = Date;
     }
 
     /// <inheritdoc />

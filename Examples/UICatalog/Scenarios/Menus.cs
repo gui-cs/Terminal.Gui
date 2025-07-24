@@ -358,7 +358,7 @@ public class Menus : Scenario
                                            };
 
             // Add a button to open the contextmenu
-            var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
+            var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefaultAcceptView = true };
 
             openBtn.Accepting += (s, e) =>
                                  {

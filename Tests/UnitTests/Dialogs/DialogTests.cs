@@ -1077,7 +1077,7 @@ public class DialogTests (ITestOutputHelper output)
                               btn2.Accepting += (s, e) =>
                                                 {
                                                     // Don't test MessageBox in Dialog unit tests!
-                                                    var subBtn = new Button { Text = "Ok", IsDefault = true };
+                                                    var subBtn = new Button { Text = "Ok", IsDefaultAcceptView = true };
                                                     var subDlg = new Dialog { Text = "ya", Width = 20, Height = 5, Buttons = [subBtn] };
                                                     subBtn.Accepting += (s, e) => RequestStop (subDlg);
                                                     Run (subDlg);

@@ -391,7 +391,7 @@ public class DynamicMenuBar : Scenario
                 EditMenuBarItem (_menuItem);
             }
 
-            var btnOk = new Button { IsDefault = true, Text = "Ok" };
+            var btnOk = new Button { IsDefaultAcceptView = true, Text = "Ok" };
 
             btnOk.Accepting += (s, e) =>
                             {

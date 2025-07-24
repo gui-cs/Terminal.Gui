@@ -1,4 +1,6 @@
 
+using static Terminal.Gui.ViewBase.View;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace Terminal.Gui.Views;
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
-///         <see cref="IsDefault"/>.
+///         <see cref="IsDefaultAcceptView"/>.
 ///     </para>
 ///     <para>
 ///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
@@ -21,13 +23,13 @@ namespace Terminal.Gui.Views;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View, IDesignable
+public class Button : View, IDesignable, IDefaultAcceptView
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
     private readonly Rune _rightDefault;
-    private bool _isDefault;
+    private bool _isDefaultAcceptView;
 
     /// <summary>
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
@@ -74,11 +76,16 @@ public class Button : View, IDesignable
 
         base.ShadowStyle = DefaultShadow;
         HighlightStates = DefaultHighlightStates;
+
+        if (MouseHeldDown != null)
+        {
+            MouseHeldDown.MouseIsHeldDownTick += (_,_) => RaiseAccepting (null);
+        }
     }
 
     private bool? HandleHotKeyCommand (ICommandContext commandContext)
     {
-        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
+        bool cachedIsDefault = IsDefaultAcceptView; // Supports "Swap Default" in Buttons scenario where IsDefaultAcceptView changes
 
         if (RaiseActivating (commandContext) is true)
         {
@@ -94,7 +101,7 @@ public class Button : View, IDesignable
 
         SetFocus ();
 
-        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
+        // TODO: If `IsDefaultAcceptView` were a property on `View` *any* View could work this way. That's theoretical as
         // TODO: no use-case has been identified for any View other than Button to act like this.
         // If Accept was not handled...
         if (cachedIsDefault && SuperView is { })
@@ -136,47 +143,35 @@ public class Button : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="Button"/> will act as the default handler for <see cref="Command.Accept"/>
-    ///     commands on the <see cref="View.SuperView"/>.
+    ///     Helper for <see cref="GetIsDefaultAcceptView"/> and <see cref="SetIsDefaultAcceptView"/>.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If <see langword="true"/>:
-    ///     </para>
-    ///     <para>
-    ///         - The Button will display an indicator that it is the default Button.
-    ///     </para>
-    ///     <para>
-    ///         - When clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
-    ///         invoked on the SuperView.
-    ///     </para>
-    ///     <para>
-    ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
-    ///         the
-    ///         first Button in the SuperView that has <see cref="IsDefault"/> set to <see langword="true"/>. See
-    ///         <see cref="View.RaiseAccepting"/> for more information.
-    ///     </para>
-    /// </remarks>
-    public bool IsDefault
+    public bool IsDefaultAcceptView
     {
-        get => _isDefault;
-        set
+        get => GetIsDefaultAcceptView ();
+        set => SetIsDefaultAcceptView (value);
+    }
+
+
+    /// <inheritdoc />
+    public bool GetIsDefaultAcceptView () { return _isDefaultAcceptView; }
+
+    /// <inheritdoc />
+    public void SetIsDefaultAcceptView (bool value)
+    {
+        if (_isDefaultAcceptView == value)
         {
-            if (_isDefault == value)
-            {
-                return;
-            }
-
-            _isDefault = value;
-
-            UpdateTextFormatterText ();
-            SetNeedsLayout ();
+            return;
         }
+
+        _isDefaultAcceptView = value;
+
+        UpdateTextFormatterText ();
+        SetNeedsLayout ();
     }
 
     /// <summary>
     ///     Gets or sets whether the Button will show decorations or not. If <see langword="true"/> the glyphs that normally
-    ///     bracket the Button Title and the <see cref="IsDefault"/> indicator will not be shown.
+    ///     bracket the Button Title and the <see cref="IsDefaultAcceptView"/> indicator will not be shown.
     /// </summary>
     public bool NoDecorations { get; set; }
 
@@ -213,7 +208,7 @@ public class Button : View, IDesignable
         {
             TextFormatter.Text = Text;
         }
-        else if (IsDefault)
+        else if (IsDefaultAcceptView)
         {
             TextFormatter.Text = $"{_leftBracket}{_leftDefault} {Text} {_rightDefault}{_rightBracket}";
         }

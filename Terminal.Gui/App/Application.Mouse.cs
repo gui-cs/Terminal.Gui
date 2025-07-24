@@ -19,121 +19,15 @@ public static partial class Application // Mouse handling
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
 
-    /// <summary>Gets <see cref="View"/> that has registered to get continuous mouse button pressed events.</summary>
-    public static View? WantContinuousButtonPressedView { get; internal set; }
-
     /// <summary>
-    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
-    ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
+    /// Static reference to the current <see cref="IApplication"/> <see cref="IMouseGrabHandler"/>.
     /// </summary>
-    public static View? MouseGrabView { get; private set; }
-
-    /// <summary>Invoked when a view wants to grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
-
-    /// <summary>Invoked when a view wants un-grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
-
-    /// <summary>Invoked after a view has grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs>? GrabbedMouse;
-
-    /// <summary>Invoked after a view has un-grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs>? UnGrabbedMouse;
-
-    /// <summary>
-    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/>
-    ///     is called.
-    /// </summary>
-    /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
-    public static void GrabMouse (View? view)
+    public static IMouseGrabHandler MouseGrabHandler
     {
-        if (view is null || RaiseGrabbingMouseEvent (view))
-        {
-            return;
-        }
-
-        RaiseGrabbedMouseEvent (view);
-
-        if (Initialized)
-        {
-            // MouseGrabView is a static; only set if the application is initialized.
-            MouseGrabView = view;
-        }
+        get => ApplicationImpl.Instance.MouseGrabHandler;
+        set => ApplicationImpl.Instance.MouseGrabHandler = value ??
+                                                           throw new ArgumentNullException(nameof(value));
     }
-
-    /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
-    public static void UngrabMouse ()
-    {
-        if (MouseGrabView is null)
-        {
-            return;
-        }
-
-#if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts)
-        {
-            ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
-        }
-#endif
-
-        if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
-        {
-            View view = MouseGrabView;
-            MouseGrabView = null;
-            RaiseUnGrabbedMouseEvent (view);
-        }
-    }
-
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static bool RaiseGrabbingMouseEvent (View? view)
-    {
-        if (view is null)
-        {
-            return false;
-        }
-
-        var evArgs = new GrabMouseEventArgs (view);
-        GrabbingMouse?.Invoke (view, evArgs);
-
-        return evArgs.Cancel;
-    }
-
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static bool RaiseUnGrabbingMouseEvent (View? view)
-    {
-        if (view is null)
-        {
-            return false;
-        }
-
-        var evArgs = new GrabMouseEventArgs (view);
-        UnGrabbingMouse?.Invoke (view, evArgs);
-
-        return evArgs.Cancel;
-    }
-
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static void RaiseGrabbedMouseEvent (View? view)
-    {
-        if (view is null)
-        {
-            return;
-        }
-
-        GrabbedMouse?.Invoke (view, new (view));
-    }
-
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static void RaiseUnGrabbedMouseEvent (View? view)
-    {
-        if (view is null)
-        {
-            return;
-        }
-
-        UnGrabbedMouse?.Invoke (view, new (view));
-    }
-
 
     /// <summary>
     ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
@@ -199,15 +93,6 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (Initialized)
-        {
-            WantContinuousButtonPressedView = deepestViewUnderMouse switch
-            {
-                { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-                _ => null
-            };
-        }
-
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
         if (deepestViewUnderMouse is null)
@@ -259,12 +144,7 @@ public static partial class Application // Mouse handling
 
         RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
 
-        if (Initialized)
-        {
-            WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
-        }
-
-        while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
+        while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabHandler.MouseGrabView is not { })
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
             {
@@ -316,42 +196,39 @@ public static partial class Application // Mouse handling
 
     internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
     {
-        if (MouseGrabView is null)
+        if (MouseGrabHandler.MouseGrabView is { })
         {
-            return false;
-        }
-
 #if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
-        {
-            throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
-        }
+            if (View.EnableDebugIDisposableAsserts && MouseGrabHandler.MouseGrabView.WasDisposed)
+            {
+                throw new ObjectDisposedException (MouseGrabHandler.MouseGrabView.GetType ().FullName);
+            }
 #endif
 
-        // If the mouse is grabbed, send the event to the view that grabbed it.
-        // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-        Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
+            // If the mouse is grabbed, send the event to the view that grabbed it.
+            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            Point frameLoc = MouseGrabHandler.MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
 
-        var viewRelativeMouseEvent = new MouseEventArgs
-        {
-            Position = frameLoc,
-            Flags = mouseEvent.Flags,
-            ScreenPosition = mouseEvent.ScreenPosition,
-            View = deepestViewUnderMouse ?? MouseGrabView
-        };
+            var viewRelativeMouseEvent = new MouseEventArgs
+            {
+                Position = frameLoc,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = mouseEvent.ScreenPosition,
+                View = deepestViewUnderMouse ?? MouseGrabHandler.MouseGrabView
+            };
 
-        //Logging.Debug ($"{deepestViewUnderMouse!.Id};{viewRelativeMouseEvent.Flags};{viewRelativeMouseEvent.Position};{MouseGrabView.Id}");
-        if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true || viewRelativeMouseEvent.IsSingleDoubleOrTripleClicked)
-        {
-            // If the view that grabbed the mouse handled the event OR it was a click we are done.
-            return true;
-        }
+            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+            if (MouseGrabHandler.MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true || viewRelativeMouseEvent.IsSingleDoubleOrTripleClicked)
+            {
+                return true;
+            }
 
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
-        {
-            // The view that grabbed the mouse has been disposed
-            return true;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (MouseGrabHandler.MouseGrabView is null && deepestViewUnderMouse is Adornment)
+            {
+                // The view that grabbed the mouse has been disposed
+                return true;
+            }
         }
 
         return false;

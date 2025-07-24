@@ -89,10 +89,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         //#endif
 
         // Ensure the mouse is ungrabbed.
-        if (MouseGrabView is { })
+        if (MouseGrabHandler.MouseGrabView is { })
         {
-            UngrabMouse ();
-            MouseGrabView = null;
+            MouseGrabHandler.UngrabMouse ();
         }
 
         var rs = new RunState (toplevel);
@@ -366,7 +365,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>

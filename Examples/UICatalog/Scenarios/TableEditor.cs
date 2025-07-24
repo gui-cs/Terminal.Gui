@@ -821,7 +821,7 @@ public class TableEditor : Scenario
         var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
         var okPressed = false;
 
-        var ok = new Button { Text = "Ok", IsDefault = true };
+        var ok = new Button { Text = "Ok", IsDefaultAcceptView = true };
 
         ok.Accepting += (s, e) =>
                         {
@@ -1019,7 +1019,7 @@ public class TableEditor : Scenario
         }
 
         var accepted = false;
-        var ok = new Button { Text = "Ok", IsDefault = true };
+        var ok = new Button { Text = "Ok", IsDefaultAcceptView = true };
 
         ok.Accepting += (s, e) =>
                         {

@@ -11,7 +11,7 @@ public class EnabledTests
     {
         var wasClicked = false;
         var button = new Button { Text = "Click Me" };
-        button.IsDefault = true;
+        button.IsDefaultAcceptView = true;
         button.Accepting += (s, e) => wasClicked = !wasClicked;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);

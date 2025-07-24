@@ -307,8 +307,7 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
-            Assert.Null (Application.MouseGrabView);
-            Assert.Null (Application.WantContinuousButtonPressedView);
+            Assert.Null (Application.MouseGrabHandler.MouseGrabView);
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
@@ -569,8 +568,7 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
-        Assert.Null (Application.MouseGrabView); // public
-        Assert.Null (Application.WantContinuousButtonPressedView); // public
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView); // public
         Application.Top!.Dispose ();
     }
 
@@ -952,7 +950,7 @@ public class ApplicationTests
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
-        Assert.Equal (w.Border, Application.MouseGrabView);
+        Assert.Equal (w.Border, Application.MouseGrabHandler.MouseGrabView);
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.
@@ -1116,6 +1114,8 @@ public class ApplicationTests
 
     private class TestToplevel : Toplevel { }
 
+    private readonly object _forceDriverLock = new ();
+
     [Theory]
     [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
     [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
@@ -1129,20 +1129,29 @@ public class ApplicationTests
 
         var result = false;
 
-        Task.Run (() =>
-                  {
-                      Task.Delay (300).Wait ();
-                  }).ContinueWith (
-                                   (t, _) =>
+        lock (_forceDriverLock)
+        {
+            Task.Run (() =>
+            {
+                while (!Application.Initialized)
+                {
+                    Task.Delay (300).Wait ();
+                }
+            })
+                .ContinueWith (
+                               (t, _) =>
+                               {
+                                   // no longer loading
+                                   Assert.True (Application.Initialized);
+
+                                   Application.Invoke (() =>
                                    {
-                                       // no longer loading
-                                       Application.Invoke (() =>
-                                                           {
-                                                               result = true;
-                                                               Application.RequestStop ();
-                                                           });
-                                   },
-                                   TaskScheduler.FromCurrentSynchronizationContext ());
+                                       result = true;
+                                       Application.RequestStop ();
+                                   });
+                               },
+                               TaskScheduler.FromCurrentSynchronizationContext ());
+        }
 
         Application.ForceDriver = driverName;
         Application.Run<TestToplevel> ();

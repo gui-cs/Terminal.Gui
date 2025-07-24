@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿using Moq;
+using UnitTests;
 
 namespace Terminal.Gui.ViewMouseTests;
 
@@ -13,7 +14,7 @@ public class MouseTests : TestsAllViews
         Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
         Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
 
-        Assert.Equal(2, testView.MouseBindings.GetBindings().Count());
+        Assert.Equal (2, testView.MouseBindings.GetBindings ().Count ());
     }
 
     // Test drag to move
@@ -177,6 +178,123 @@ public class MouseTests : TestsAllViews
     }
 
 
+
+    //[Theory]
+    //[InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    //[InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    //[InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    //[InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    //public void WantContinuousButtonPressed_False_Button_Press_Release_DoesNotClick (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    //{
+    //    var me = new MouseEventArgs ();
+
+    //    var view = new View
+    //    {
+    //        Width = 1,
+    //        Height = 1,
+    //        WantContinuousButtonPressed = false
+    //    };
+
+    //    var clickedCount = 0;
+
+    //    view.MouseClick += (s, e) => clickedCount++;
+
+    //    me.Flags = pressed;
+    //    view.NewMouseEvent (me);
+    //    Assert.Equal (0, clickedCount);
+    //    me.Handled = false;
+
+    //    me.Flags = pressed;
+    //    view.NewMouseEvent (me);
+    //    Assert.Equal (0, clickedCount);
+    //    me.Handled = false;
+
+    //    me.Flags = released;
+    //    view.NewMouseEvent (me);
+    //    Assert.Equal (0, clickedCount);
+    //    me.Handled = false;
+
+    //    me.Flags = clicked;
+    //    view.NewMouseEvent (me);
+    //    Assert.Equal (1, clickedCount);
+
+    //    view.Dispose ();
+
+    // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+    //    Application.ResetState (true);
+    //}
+    //    // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+    //    Application.ResetState (true);
+    //}
+
+    //[Theory]
+    //[InlineData (MouseFlags.Button1Clicked)]
+    //[InlineData (MouseFlags.Button2Clicked)]
+    //[InlineData (MouseFlags.Button3Clicked)]
+    //[InlineData (MouseFlags.Button4Clicked)]
+    //public void WantContinuousButtonPressed_True_Button_Clicked_Raises_MouseClick (MouseFlags clicked)
+    //{
+    //    Application.Init (new FakeDriver ());
+    //    Application.Top = new Toplevel ()
+    //    {
+    //        Width = 10,
+    //        Height = 10,
+    //    };
+
+    //    var view = new View
+    //    {
+    //        Width = 1,
+    //        Height = 1,
+    //        WantContinuousButtonPressed = true
+    //    };
+    //    Application.Top.Add (view);
+
+    //    var clickedCount = 0;
+
+    //    view.MouseClick += (s, e) => clickedCount++;
+
+    //    var me = new MouseEventArgs
+    //    {
+    //        Flags = clicked
+    //    };
+
+    //    Application.RaiseMouseEvent (me);
+    //    Assert.Equal (1, clickedCount);
+
+    //    Application.Top.Dispose ();
+
+    //    // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+    //    Application.ResetState (true);
+    //}
+
+    //[Theory]
+    //[InlineData (MouseFlags.Button1Clicked)]
+    //public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
+    //{
+    //    var me = new MouseEventArgs ();
+
+    //    var view = new View
+    //    {
+    //        Width = 1,
+    //        Height = 1,
+    //        WantContinuousButtonPressed = true
+    //    };
+
+    //    var activatingCount = 0;
+
+    //    view.Activating += (s, e) => activatingCount++;
+
+    //    me.Flags = clicked;
+    //    view.NewMouseEvent (me);
+    //    Assert.Equal (1, activatingCount);
+
+    //    view.Dispose ();
+
+    //    // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+    //    Application.ResetState (true);
+    //}
+
+
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     public void WantContinuousButtonPressed_True_Clicked_Releases_Grab (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
@@ -223,7 +341,7 @@ public class MouseTests : TestsAllViews
         Application.RaiseMouseEvent (me);
         Assert.Equal (1, activatingCount);
 
-        Assert.Null (Application.MouseGrabView);
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
 
         me = new ()
         {
@@ -379,17 +497,70 @@ public class MouseTests : TestsAllViews
     //}
 
 
+    //[Theory]
+    //[InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    //public void WantContinuousButtonPressed_True_Button_Press_Repeatedly_Raises_Activating_Repeatedly (
+    //    MouseFlags pressed,
+    //    MouseFlags released,
+    //    MouseFlags clicked
+    //)
+    //{
+    //    Application.Init (new FakeDriver ());
+    //    Application.Top = new Toplevel () { Frame = new (0, 0, 10, 10) };
+
+    //    var me = new MouseEventArgs ();
+
+    //    var view = new View
+    //    {
+    //        Width = 1,
+    //        Height = 1,
+    //        WantContinuousButtonPressed = true,
+    //    };
+    //    Application.Top.Add (view);
+
+    //    var activatingCount = 0;
+
+    //    view.Activating += (s, e) => activatingCount++;
+
+    //    me.Flags = pressed;
+    //    Application.RaiseMouseEvent (me);
+    //    Assert.Equal (0, activatingCount);
+    //    me.Handled = false;
+
+    //    me.Flags = pressed;
+    //    Application.RaiseMouseEvent (me);
+    //    Assert.Equal (1, activatingCount);
+    //    me.Handled = false;
+
+    //    Assert.NotEmpty(timed.Timeouts);
+    //    Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
+
+    //    me.Flags = pressed;
+    //    Application.RaiseMouseEvent (me);
+    //    Assert.Equal (2, activatingCount);
+    //    me.Handled = false;
+
+    //    me.Flags = released;
+    //    Application.RaiseMouseEvent (me);
+    //    Assert.Equal (2, activatingCount);
+    //    me.Handled = false;
+
+    //    view.Dispose ();
+
+    //    // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+    //    Application.ResetState (true);
+    //}
+
+
+
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Press_Repeatedly_Raises_Activating_Repeatedly (
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Raises_Activating_Repeatedly (
         MouseFlags pressed,
         MouseFlags released,
         MouseFlags clicked
     )
     {
-        Application.Init (new FakeDriver ());
-        Application.Top = new Toplevel () { Frame = new (0, 0, 10, 10) };
-
         var me = new MouseEventArgs ();
 
         var view = new View
@@ -397,38 +568,49 @@ public class MouseTests : TestsAllViews
             Width = 1,
             Height = 1,
             WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
-        Application.Top.Add (view);
 
-        var activatingCount = 0;
+        // Setup components for mouse held down
+        var timed = new TimedEvents ();
+        var grab = new MouseGrabHandler ();
+        view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
-        view.Activating += (s, e) => activatingCount++;
+        // Register callback for what to do when the mouse is held down
+        var clickedCount = 0;
+        view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
-        me.Flags = pressed;
-        Application.RaiseMouseEvent (me);
-        Assert.Equal (0, activatingCount);
-        me.Handled = false;
-
-        me.Flags = pressed;
-        Application.RaiseMouseEvent (me);
-        Assert.Equal (1, activatingCount);
-        me.Handled = false;
+        Assert.Empty (timed.Timeouts);
 
         me.Flags = pressed;
-        Application.RaiseMouseEvent (me);
-        Assert.Equal (2, activatingCount);
+        view.NewMouseEvent (me);
+        Assert.Equal (0, clickedCount);
         me.Handled = false;
+
+        Assert.NotEmpty (timed.Timeouts);
+        Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
+
+        me.Flags = pressed;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+        me.Handled = false;
+
+        Assert.NotEmpty (timed.Timeouts);
 
         me.Flags = released;
-        Application.RaiseMouseEvent (me);
-        Assert.Equal (2, activatingCount);
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
         me.Handled = false;
 
-        view.Dispose ();
+        Assert.Empty (timed.Timeouts);
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
-        Application.ResetState (true);
+        me.Flags = clicked;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+
+        view.Dispose ();
     }
+
 
     //[Theory]
     //[InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
@@ -484,11 +666,9 @@ public class MouseTests : TestsAllViews
     //    Application.ResetState (true);
     //}
 
-
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
-        Application.Init (new FakeDriver ());
         var me = new MouseEventArgs ();
 
         var view = new View
@@ -499,9 +679,14 @@ public class MouseTests : TestsAllViews
             WantMousePositionReports = true
         };
 
-        var clickedCount = 0;
+        // Setup components for mouse held down
+        var timed = new TimedEvents ();
+        var grab = new MouseGrabHandler ();
+        view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
-        view.Activating += (s, e) => clickedCount++;
+        // Register callback for what to do when the mouse is held down
+        var clickedCount = 0;
+        view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
         // Start in Viewport
         me.Flags = MouseFlags.Button1Pressed;
@@ -510,17 +695,30 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, clickedCount);
         me.Handled = false;
 
+        // Mouse is held down so timer should be ticking
+        Assert.NotEmpty (timed.Timeouts);
+        Assert.Equal (clickedCount, 0);
+
+        // Don't wait, just force it to expire
+        Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
+        Assert.Equal (clickedCount, 1);
+
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 1 };
         view.NewMouseEvent (me);
-        Assert.Equal (1, clickedCount);
+
+        Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
+        Assert.Equal (clickedCount, 2);
+
         me.Handled = false;
 
         // Move into Viewport
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
+
+        Assert.NotEmpty (timed.Timeouts);
         Assert.Equal (2, clickedCount);
         me.Handled = false;
 
@@ -528,13 +726,13 @@ public class MouseTests : TestsAllViews
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
+
+        Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
+
         Assert.Equal (3, clickedCount);
         me.Handled = false;
 
         view.Dispose ();
-
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
-        Application.ResetState (true);
     }
 
     //[Theory]
@@ -568,7 +766,7 @@ public class MouseTests : TestsAllViews
 
     //    testView.Dispose ();
 
-    //    // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+    //    // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
     //    Application.ResetState (true);
 
     //}
@@ -633,7 +831,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -695,7 +893,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -758,7 +956,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -822,7 +1020,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
         Application.ResetState (true);
     }
     private class MouseEventTestView : View

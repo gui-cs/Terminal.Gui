@@ -157,7 +157,6 @@ public class Dialogs : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = "Ali_gn",
-            BorderStyle = LineStyle.Dashed,
             Labels = labels,
         };
         frame.Add (alignmentGroup);
@@ -180,7 +179,7 @@ public class Dialogs : Scenario
 
         var showDialogButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefaultAcceptView = true, Text = "_Show Dialog"
         };
 
         app.Accepting += (s, e) =>
@@ -245,12 +244,12 @@ public class Dialogs : Scenario
                     button = new ()
                     {
                         Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
-                        IsDefault = buttonId == 0
+                        IsDefaultAcceptView = buttonId == 0
                     };
                 }
                 else
                 {
-                    button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                    button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefaultAcceptView = buttonId == 0 };
                 }
 
                 button.Accepting += (s, e) =>
@@ -299,12 +298,12 @@ public class Dialogs : Scenario
                                   button = new ()
                                   {
                                       Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
-                                      IsDefault = buttonId == 0
+                                      IsDefaultAcceptView = buttonId == 0
                                   };
                               }
                               else
                               {
-                                  button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                                  button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefaultAcceptView = buttonId == 0 };
                               }
 
                               button.Accepting += (s, e) =>
