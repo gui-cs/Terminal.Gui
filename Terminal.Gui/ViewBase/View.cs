@@ -250,6 +250,8 @@ public partial class View : IDisposable, ISupportInitializeNotification
         // See: https://github.com/gui-cs/Terminal.Gui/issues/4204
         Layout ();
 
+        // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
+        // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
         SetNeedsLayout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);
