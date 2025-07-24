@@ -21,43 +21,73 @@ public class SyncrhonizationContextTests
         Application.Shutdown ();
     }
 
+    private object _lockPost = new ();
+
     [Theory]
     [InlineData (typeof (FakeDriver))]
     [InlineData (typeof (NetDriver))]
     [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver))]
-    public void SynchronizationContext_Post (Type driverType)
+    [InlineData (typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>), "v2win")]
+    [InlineData (typeof (ConsoleDriverFacade<ConsoleKeyInfo>), "v2net")]
+    public void SynchronizationContext_Post (Type driverType, string driverName = null)
     {
-        ConsoleDriver.RunningUnitTests = true;
-        Application.Init (driverName: driverType.Name);
-        SynchronizationContext context = SynchronizationContext.Current;
+        lock (_lockPost)
+        {
+            ConsoleDriver.RunningUnitTests = true;
 
-        var success = false;
+            if (driverType.Name.Contains ("ConsoleDriverFacade"))
+            {
+                Application.Init (driverName: driverName);
+            }
+            else
+            {
+                Application.Init (driverName: driverType.Name);
+            }
 
-        Task.Run (
-                  () =>
-                  {
-                      Thread.Sleep (500);
+            SynchronizationContext context = SynchronizationContext.Current;
 
-                      // non blocking
-                      context.Post (
-                                    delegate
-                                    {
-                                        success = true;
+            var success = false;
 
-                                        // then tell the application to quit
-                                        Application.Invoke (() => Application.RequestStop ());
-                                    },
-                                    null
-                                   );
-                      Assert.False (success);
-                  }
-                 );
+            Task.Run (() =>
+                      {
+                          while (Application.Top is null || Application.Top is { Running: false })
+                          {
+                              Thread.Sleep (500);
+                          }
 
-        // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ().Dispose ();
-        Assert.True (success);
-        Application.Shutdown ();
+                          // non blocking
+                          context.Post (
+                                        delegate
+                                        {
+                                            success = true;
+
+                                            // then tell the application to quit
+                                            Application.Invoke (() => Application.RequestStop ());
+                                        },
+                                        null
+                                       );
+
+                          if (Application.Top is { Running: true })
+                          {
+                              Assert.False (success);
+                          }
+                      }
+                     );
+
+            // blocks here until the RequestStop is processed at the end of the test
+            Application.Run ().Dispose ();
+            Assert.True (success);
+
+            if (ApplicationImpl.Instance is ApplicationV2)
+            {
+                ApplicationImpl.Instance.Shutdown ();
+            }
+            else
+            {
+                Application.Shutdown ();
+            }
+        }
     }
 
     [Fact]
