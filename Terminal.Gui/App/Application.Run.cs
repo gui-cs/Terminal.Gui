@@ -205,14 +205,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.OnLoaded ();
 
+        LayoutAndDraw (true);
+
         if (PositionCursor ())
         {
             Driver?.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
-
-        LayoutAndDraw (true);
 
         return rs;
     }
