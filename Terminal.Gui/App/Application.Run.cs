@@ -212,7 +212,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
 
-        LayoutAndDraw (true);
+        // Force an Idle event so that an Iteration (and Refresh) happen.
+        Invoke (() => { });
 
         return rs;
     }
