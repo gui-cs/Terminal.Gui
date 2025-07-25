@@ -152,6 +152,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
+        superView.Layout ();
 
         Thickness origThickness = view.Margin!.Thickness;
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (0, 0) });

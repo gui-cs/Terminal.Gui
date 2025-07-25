@@ -79,7 +79,7 @@ public class ClipTests (ITestOutputHelper _output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
-        superView.LayoutSubViews ();
+        superView.Layout ();
 
         superView.Draw ();
 
@@ -258,6 +258,7 @@ public class ClipTests (ITestOutputHelper _output)
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
         Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
 
         // Act
@@ -291,6 +292,7 @@ public class ClipTests (ITestOutputHelper _output)
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
         Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 

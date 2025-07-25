@@ -819,6 +819,10 @@ public class TileViewTests (ITestOutputHelper output)
                              Assert.Equal (1, myReusableView.DisposalCount);
                          }
                         );
+
+        Assert.NotNull (Application.Top);
+        Application.Top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Theory]
@@ -848,6 +852,10 @@ public class TileViewTests (ITestOutputHelper output)
                              Assert.True (myReusableView.DisposalCount >= 1);
                          }
                         );
+
+        Assert.NotNull (Application.Top);
+        Application.Top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Fact]

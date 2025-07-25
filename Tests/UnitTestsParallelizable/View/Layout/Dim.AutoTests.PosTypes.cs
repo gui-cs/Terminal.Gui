@@ -263,6 +263,7 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         // subview should be centered in the parent view + 1
         Assert.Equal ((view.Viewport.Width - subview.Frame.Width) / 2 + 1, subview.Frame.X);
@@ -338,6 +339,7 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -392,6 +394,7 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -446,6 +449,7 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -508,6 +512,7 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -572,11 +577,13 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
         Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
     }
+
     [Theory]
     [InlineData (0, 10, 0, 10, 10, 2)]
     [InlineData (0, 5, 0, 5, 5, 3)] // max width of 5 should cause wordwrap at 5 giving a height of 2 + 1

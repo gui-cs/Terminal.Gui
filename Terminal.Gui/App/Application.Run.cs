@@ -189,7 +189,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (!toplevel.IsInitialized)
         {
             toplevel.BeginInit ();
-            toplevel.EndInit (); // Calls Layout
+            toplevel.EndInit (); // Calls SetNeedsLayout
         }
 
         // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
@@ -212,8 +212,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
 
-        // Force an Idle event so that an Iteration (and Refresh) happen.
-        Invoke (() => { });
+        LayoutAndDraw (true);
 
         return rs;
     }

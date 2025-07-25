@@ -1673,6 +1673,7 @@ Les Miśerables",
         var tf = new TextField { Width = 5, Text = "\u001b" };
         tf.BeginInit ();
         tf.EndInit ();
+        tf.Layout ();
         tf.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre ("\u241b", output);

@@ -291,6 +291,7 @@ public class ViewTests
 
         r.BeginInit ();
         r.EndInit ();
+        r.Layout ();
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 1, 13), r.Viewport);

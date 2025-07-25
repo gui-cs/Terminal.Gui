@@ -543,6 +543,7 @@ public class TextFieldTests
         var tf = new TextField { Width = 5 };
         tf.BeginInit ();
         tf.EndInit ();
+        tf.Layout ();
 
         tf.NewKeyDownEvent (new ("📄"));
         Assert.Equal (1, tf.CursorPosition);

@@ -2130,6 +2130,7 @@ wo
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu.IsMenuOpen);
         View.SetClipToScreen ();
+        top.Layout ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 

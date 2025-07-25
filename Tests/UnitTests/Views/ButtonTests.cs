@@ -232,6 +232,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.CanFocus);
 
         Application.Driver?.ClearContents ();
+        btn.Layout ();
         btn.Draw ();
 
         expected = @$"

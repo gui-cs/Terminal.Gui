@@ -514,6 +514,7 @@ public class SliderTests
         view.Add (slider);
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         Size expectedSize = slider.Frame.Size;
 
@@ -547,6 +548,7 @@ public class SliderTests
         view.Add (slider);
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         Size expectedSize = slider.Frame.Size;
 
@@ -580,6 +582,7 @@ public class SliderTests
         view.Add (slider);
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
 
         Size expectedSize = slider.Frame.Size;
 

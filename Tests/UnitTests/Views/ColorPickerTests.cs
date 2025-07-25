@@ -675,7 +675,7 @@ public class ColorPickerTests
         // Switch to HSV
         cp.Style.ColorModel = ColorModel.HSV;
         cp.ApplyStyleChanges ();
-
+        cp.Layout ();
         cp.Draw ();
 
         ColorBar h = GetColorBar (cp, ColorPickerPart.Bar1);

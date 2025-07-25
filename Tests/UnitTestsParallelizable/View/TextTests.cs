@@ -170,6 +170,7 @@ public class TextTests ()
         };
         view.BeginInit ();
         view.EndInit ();
+        view.Layout ();
         Assert.Equal (new (0, 0, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
 
