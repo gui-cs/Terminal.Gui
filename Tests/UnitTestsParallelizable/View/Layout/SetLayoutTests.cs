@@ -597,7 +597,7 @@ public class SetLayoutTests : GlobalTestSetup
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Height);
 
-        v.Height = Dim.Func (() => 10);
+        v.Height = Dim.Func (_ => 10);
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Height);
 
@@ -649,7 +649,7 @@ public class SetLayoutTests : GlobalTestSetup
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Width);
 
-        v.Width = Dim.Func (() => 10);
+        v.Width = Dim.Func (_ => 10);
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Width);
 
@@ -675,7 +675,7 @@ public class SetLayoutTests : GlobalTestSetup
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.X);
 
-        v.X = Pos.Func (() => 10);
+        v.X = Pos.Func (_ => 10);
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.X);
 
@@ -731,7 +731,7 @@ public class SetLayoutTests : GlobalTestSetup
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Y);
 
-        v.Y = Pos.Func (() => 10);
+        v.Y = Pos.Func (_ => 10);
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Y);
 

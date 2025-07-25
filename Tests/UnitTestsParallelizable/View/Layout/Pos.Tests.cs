@@ -21,7 +21,7 @@ public class PosTests
     [Fact]
     public void PosFunc_Calculate_ReturnsExpectedValue ()
     {
-        var posFunc = new PosFunc (() => 5);
+        var posFunc = new PosFunc (_ => 5);
         int result = posFunc.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
@@ -86,7 +86,7 @@ public class PosTests
     public void PosFunction_SetsValue ()
     {
         var text = "Test";
-        Pos pos = Pos.Func (() => text.Length);
+        Pos pos = Pos.Func (_ => text.Length);
         Assert.Equal ("PosFunc(4)", pos.ToString ());
 
         text = "New Test";

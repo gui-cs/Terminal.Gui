@@ -406,7 +406,7 @@ public class UICatalogTop : Toplevel
             Width = Dim.Fill (),
             Height = Dim.Fill (
                                Dim.Func (
-                                         () =>
+                                         _ =>
                                          {
                                              if (_statusBar!.NeedsLayout)
                                              {
@@ -517,7 +517,7 @@ public class UICatalogTop : Toplevel
             Width = Dim.Auto (),
             Height = Dim.Fill (
                                Dim.Func (
-                                         () =>
+                                         _ =>
                                          {
                                              if (_statusBar!.NeedsLayout)
                                              {
@@ -595,8 +595,8 @@ public class UICatalogTop : Toplevel
         // ReSharper disable All
         statusBar.Height = Dim.Auto (
                                      DimAutoStyle.Auto,
-                                     minimumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0),
-                                     maximumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0));
+                                     minimumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0),
+                                     maximumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0));
         // ReSharper restore All
 
         _shQuit = new ()

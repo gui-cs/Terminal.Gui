@@ -220,12 +220,14 @@ public abstract record Pos
     public static Pos Center () { return new PosCenter (); }
 
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that computes the position by executing the provided function. The function
-    ///     will be called every time the position is needed.
+    ///     Creates a <see cref="Pos"/> object that computes the position based on the passed view and by executing the
+    ///     provided function.
+    ///     The function will be called every time the position is needed.
     /// </summary>
     /// <param name="function">The function to be executed.</param>
+    /// <param name="view">The view where the data will be retrieved.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
-    public static Pos Func (Func<int> function) { return new PosFunc (function); }
+    public static Pos Func (Func<View?, int> function, View? view = null) { return new PosFunc (function, view); }
 
     /// <summary>Creates a percentage <see cref="Pos"/> object</summary>
     /// <returns>The percent <see cref="Pos"/> object.</returns>

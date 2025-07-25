@@ -20,7 +20,7 @@ public class EventLog : ListView
         Y = 0;
 
         Width = Dim.Func (
-                          () =>
+                          _ =>
                           {
                               if (!IsInitialized)
                               {

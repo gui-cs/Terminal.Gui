@@ -171,7 +171,7 @@ public class CharacterMap : Scenario
         };
         top.Add (menu);
 
-        _charMap.Width = Dim.Fill (Dim.FuncWithView (v => v!.Frame.Width, _categoryList));
+        _charMap.Width = Dim.Fill (Dim.Func (v => v!.Frame.Width, _categoryList));
 
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();

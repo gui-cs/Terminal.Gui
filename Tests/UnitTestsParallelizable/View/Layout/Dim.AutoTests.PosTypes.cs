@@ -645,7 +645,7 @@ public partial class DimAutoTests
             Width = Dim.Auto (),
             Height = Dim.Auto (),
         };
-        var subview = new View { X = Pos.Func (() => 20), Y = Pos.Func (() => 25) };
+        var subview = new View { X = Pos.Func (_ => 20), Y = Pos.Func (_ => 25) };
         view.Add (subview);
 
         view.SetRelativeLayout (new (100, 100));

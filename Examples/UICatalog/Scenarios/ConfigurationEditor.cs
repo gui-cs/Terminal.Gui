@@ -55,7 +55,7 @@ public class ConfigurationEditor : Scenario
         _tabView = new ()
         {
             Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height))
+            Height = Dim.Fill (Dim.Func (_ => statusBar.Frame.Height))
         };
 
         win.Add (_tabView, statusBar);
