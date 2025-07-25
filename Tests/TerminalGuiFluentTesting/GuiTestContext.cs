@@ -137,6 +137,12 @@ public class GuiTestContext : IDisposable
             throw _ex; // Propagate any exception that happened in the background task
         }
 
+        if (Application.Top is { Running: false })
+        {
+            Application.Top?.Dispose ();
+            Application.Shutdown ();
+        }
+
         return this;
     }
 
