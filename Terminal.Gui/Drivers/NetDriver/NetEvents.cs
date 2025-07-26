@@ -50,7 +50,7 @@ internal class NetEvents : IDisposable
 
     public InputResult? DequeueInput ()
     {
-        while (!_netEventsDisposed.Token.IsCancellationRequested)
+        while (_netEventsDisposed is { Token.IsCancellationRequested: false })
         {
             _winChange.Set ();
 
