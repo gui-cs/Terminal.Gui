@@ -14,7 +14,7 @@ public class ColorPicker16Tests
 
         colorPicker.BeginInit ();
         colorPicker.EndInit ();
-        colorPicker.Layout ();
+        colorPicker.LayoutSubViews ();
         Assert.Equal (new (0, 0, 32, 4), colorPicker.Frame);
     }
 

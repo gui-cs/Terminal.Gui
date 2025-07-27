@@ -1024,7 +1024,6 @@ w ";
         top.Add (frame);
         top.BeginInit ();
         top.EndInit ();
-        top.Layout ();
 
         Assert.Equal (new (0, 0, 20, 1), horizontalView.Frame);
         Assert.Equal (new (0, 3, 1, 20), verticalView.Frame);
@@ -1128,7 +1127,6 @@ w ";
         view = new Label { Text = text };
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
         view.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (text, output);

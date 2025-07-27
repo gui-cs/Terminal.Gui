@@ -263,7 +263,6 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
 
         // subview should be centered in the parent view + 1
         Assert.Equal ((view.Viewport.Width - subview.Frame.Width) / 2 + 1, subview.Frame.X);
@@ -339,7 +338,6 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -394,7 +392,6 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -449,7 +446,6 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -512,7 +508,6 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
@@ -577,7 +572,6 @@ public partial class DimAutoTests
 
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
 
         // subview should be at the end of the view
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);

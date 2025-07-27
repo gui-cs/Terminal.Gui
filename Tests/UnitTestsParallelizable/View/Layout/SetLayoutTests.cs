@@ -376,24 +376,24 @@ public class SetLayoutTests : GlobalTestSetup
         Assert.Equal (0, layoutStartedCount);
         Assert.Equal (0, layoutCompleteCount);
 
-        superView.EndInit (); // Only sets NeedsLayout
-        Assert.Equal (0, borderLayoutStartedCount);
-        Assert.Equal (0, borderLayoutCompleteCount);
-        Assert.Equal (0, layoutStartedCount);
-        Assert.Equal (0, layoutCompleteCount);
+        superView.EndInit ();
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (2, layoutStartedCount);
+        Assert.Equal (2, layoutCompleteCount);
 
         superView.LayoutSubViews ();
-        Assert.Equal (0, borderLayoutStartedCount); // No Border
-        Assert.Equal (0, borderLayoutCompleteCount); // No Border
-        Assert.Equal (1, layoutStartedCount);
-        Assert.Equal (1, layoutCompleteCount);
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (3, layoutStartedCount);
+        Assert.Equal (3, layoutCompleteCount);
 
         superView.SetNeedsLayout ();
         superView.LayoutSubViews ();
-        Assert.Equal (0, borderLayoutStartedCount); // No Border
-        Assert.Equal (0, borderLayoutCompleteCount); // No Border
-        Assert.Equal (2, layoutStartedCount);
-        Assert.Equal (2, layoutCompleteCount);
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (4, layoutStartedCount);
+        Assert.Equal (4, layoutCompleteCount);
 
         superView.Dispose ();
     }
@@ -443,8 +443,8 @@ public class SetLayoutTests : GlobalTestSetup
         superView.BeginInit ();
         superView.EndInit ();
         superView.LayoutSubViews ();
-        Assert.Equal (2, layoutStartedRaised);
-        Assert.Equal (2, layoutCompleteRaised);
+        Assert.Equal (3, layoutStartedRaised);
+        Assert.Equal (3, layoutCompleteRaised);
     }
 
     [Fact]

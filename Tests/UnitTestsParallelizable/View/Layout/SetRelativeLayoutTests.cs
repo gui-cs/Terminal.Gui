@@ -410,7 +410,6 @@ public class SetRelativeLayoutTests
         // BUGBUG: IsInitialized need to be true before calculate
         view.BeginInit ();
         view.EndInit ();
-        view.Layout ();
         view.SetRelativeLayout (screen);
         Assert.Equal (27, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);

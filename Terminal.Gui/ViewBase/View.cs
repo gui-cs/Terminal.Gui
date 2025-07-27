@@ -245,6 +245,13 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
         }
 
+        // Force a layout each time a View is initialized
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/4204
+        Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
+
+        // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
+        // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
         SetNeedsLayout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);

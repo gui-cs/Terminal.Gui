@@ -12,7 +12,7 @@ public class ProgressBarTests
         var pb = new ProgressBar ();
         pb.BeginInit ();
         pb.EndInit ();
-        pb.Layout ();
+
         Assert.False (pb.CanFocus);
         Assert.Equal (0, pb.Fraction);
 
@@ -32,7 +32,7 @@ public class ProgressBarTests
 
         pb.BeginInit ();
         pb.EndInit ();
-        pb.Layout ();
+        pb.LayoutSubViews ();
 
         for (var i = 0; i <= pb.Frame.Width; i++)
         {
@@ -174,7 +174,7 @@ public class ProgressBarTests
 
         pb.BeginInit ();
         pb.EndInit ();
-        pb.Layout ();
+        pb.LayoutSubViews ();
 
         for (var i = 0; i < 38; i++)
         {
@@ -879,7 +879,7 @@ public class ProgressBarTests
 
         pb.BeginInit ();
         pb.EndInit ();
-        pb.Layout ();
+        pb.LayoutSubViews ();
 
         for (var i = 0; i < 38; i++)
         {

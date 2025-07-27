@@ -1053,7 +1053,7 @@ e
         win.Add (label);
         win.BeginInit ();
         win.EndInit ();
-        win.Layout ();
+        win.LayoutSubViews ();
         win.Draw ();
 
         Assert.Equal (5, text.Length);

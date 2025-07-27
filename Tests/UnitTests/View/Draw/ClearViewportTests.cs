@@ -113,7 +113,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
-        superView.Layout ();
+        superView.LayoutSubViews ();
         superView.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -162,7 +162,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
-        superView.Layout ();
+        superView.LayoutSubViews ();
 
         superView.Draw ();
 

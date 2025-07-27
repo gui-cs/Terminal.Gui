@@ -327,7 +327,6 @@ public class GetViewsUnderLocationTests
         Application.Top.Padding.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
-        Application.Top.LayoutSubViews ();
 
         View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
@@ -490,7 +489,6 @@ public class GetViewsUnderLocationTests
         Application.Top.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
-        Application.Top.LayoutSubViews ();
 
         View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
@@ -542,7 +540,6 @@ public class GetViewsUnderLocationTests
         Application.Top.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
-        Application.Top.LayoutSubViews ();
 
         View? found = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 

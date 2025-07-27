@@ -191,7 +191,6 @@ public class MouseTests : TestsAllViews
 
         // When mouse is held down
         me.Flags = pressed;
-        view.Layout ();
         view.NewMouseEvent (me);
         Assert.Equal (0, clickedCount);
         me.Handled = false;
