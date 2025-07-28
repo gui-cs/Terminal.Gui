@@ -703,7 +703,7 @@ public partial class View // Layout APIs
     ///     Override to perform tasks after the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { }
+    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { Debug.Assert (!NeedsLayout); }
 
     /// <summary>Raised after all sub-views have been laid out.</summary>
     /// <remarks>
