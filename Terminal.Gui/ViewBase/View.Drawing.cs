@@ -837,7 +837,12 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling new collection - probably a stop gap
-        List<View> subviews = new (InternalSubViews);
+        List<View> subviews;
+
+        lock (_subviews!)
+        {
+            subviews = new (InternalSubViews);
+        }
 
         foreach (View subview in subviews)
         {
