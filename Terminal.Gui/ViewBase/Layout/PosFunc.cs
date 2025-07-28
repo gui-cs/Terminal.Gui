@@ -25,10 +25,5 @@ public record PosFunc (Func<View?, int> Fn, View? View = null) : Pos
     /// <inheritdoc/>
     public override string ToString () { return $"PosFunc({Fn (View)})"; }
 
-    internal override int GetAnchor (int size)
-    {
-        View?.Layout ();
-
-        return Fn (View);
-    }
+    internal override int GetAnchor (int size) { return Fn (View); }
 }

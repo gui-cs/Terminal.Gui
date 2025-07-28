@@ -26,10 +26,5 @@ public record DimFunc (Func<View?, int> Fn, View? View = null) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"DimFunc({Fn (View)})"; }
 
-    internal override int GetAnchor (int size)
-    {
-        View?.Layout ();
-
-        return Fn (View);
-    }
+    internal override int GetAnchor (int size) { return Fn (View); }
 }
