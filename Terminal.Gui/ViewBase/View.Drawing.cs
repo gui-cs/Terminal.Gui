@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -111,6 +112,26 @@ public partial class View // Drawing APIs
             Border?.AdvanceDrawIndicator ();
 
             ClearNeedsDraw ();
+
+            if (this is not Adornment && SuperView is not Adornment)
+            {
+                // Parent
+                Debug.Assert (Margin!.Parent == this);
+                Debug.Assert (Border!.Parent == this);
+                Debug.Assert (Padding!.Parent == this);
+
+                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (SubViewNeedsDraw == false);
+                Debug.Assert (Margin!.SubViewNeedsDraw == false);
+                Debug.Assert (Border!.SubViewNeedsDraw == false);
+                Debug.Assert (Padding!.SubViewNeedsDraw == false);
+
+                // NeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (NeedsDraw == false);
+                Debug.Assert (Margin!.NeedsDraw == false);
+                Debug.Assert (Border!.NeedsDraw == false);
+                Debug.Assert (Padding!.NeedsDraw == false);
+            }
         }
 
         // ------------------------------------
@@ -131,6 +152,11 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
+        if (Border?.NeedsLayout == true)
+        {
+            Border.Layout ();
+        }
+
         // NOTE: We do not support subviews of Margin?
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
@@ -149,6 +175,11 @@ public partial class View // Drawing APIs
             Region? saved = Border?.AddFrameToClip ();
             Border?.DoDrawSubViews ();
             SetClip (saved);
+        }
+
+        if (Padding?.NeedsLayout == true)
+        {
+            Padding.Layout ();
         }
 
         if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
@@ -720,8 +751,7 @@ public partial class View // Drawing APIs
     /// </remarks>
     public bool NeedsDraw
     {
-        // TODO: Figure out if we can decouple NeedsDraw from NeedsLayout.
-        get => Visible && (NeedsDrawRect != Rectangle.Empty || NeedsLayout);
+        get => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
         set
         {
             if (value)
@@ -807,7 +837,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling ToArray - probably a stop gap
-        foreach (View subview in InternalSubViews)
+        foreach (View subview in InternalSubViews.ToArray ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
@@ -846,17 +876,17 @@ public partial class View // Drawing APIs
         NeedsDrawRect = Rectangle.Empty;
         SubViewNeedsDraw = false;
 
-        if (Margin is { } && Margin.Thickness != Thickness.Empty)
+        if (Margin is { } && (Margin.Thickness != Thickness.Empty || Margin.SubViewNeedsDraw || Margin.NeedsDraw))
         {
             Margin?.ClearNeedsDraw ();
         }
 
-        if (Border is { } && Border.Thickness != Thickness.Empty)
+        if (Border is { } && (Border.Thickness != Thickness.Empty || Border.SubViewNeedsDraw || Border.NeedsDraw))
         {
             Border?.ClearNeedsDraw ();
         }
 
-        if (Padding is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding is { } && (Padding.Thickness != Thickness.Empty || Padding.SubViewNeedsDraw || Padding.NeedsDraw))
         {
             Padding?.ClearNeedsDraw ();
         }
@@ -876,7 +906,6 @@ public partial class View // Drawing APIs
         {
             LineCanvas.Clear ();
         }
-
     }
 
     #endregion NeedsDraw
