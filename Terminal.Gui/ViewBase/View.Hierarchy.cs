@@ -36,6 +36,14 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         private set => SetSuperView (value);
     }
 
+    internal List<View> SnapshotSubviews ()
+    {
+        lock (InternalSubViews)
+        {
+            return [..InternalSubViews];
+        }
+    }
+
     private void SetSuperView (View? value)
     {
         if (_superView == value)
