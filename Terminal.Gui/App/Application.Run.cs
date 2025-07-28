@@ -535,7 +535,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             return firstIteration;
         }
 
-        LayoutAndDraw ();
+        LayoutAndDraw (TopLevels.Any (v => v.NeedsLayout || v.NeedsDraw));
 
         if (PositionCursor ())
         {

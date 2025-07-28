@@ -419,7 +419,10 @@ public partial class View // Layout APIs
         {
             LayoutSubViews ();
 
-            // Debug.Assert(!NeedsLayout);
+            // A layout was performed so a draw is needed
+            // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
+            SetNeedsDraw ();
+
             return true;
         }
 
