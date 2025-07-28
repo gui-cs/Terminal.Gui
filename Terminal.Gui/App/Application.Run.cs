@@ -189,7 +189,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (!toplevel.IsInitialized)
         {
             toplevel.BeginInit ();
-            toplevel.EndInit (); // Calls SetNeedsLayout
+            toplevel.EndInit (); // Calls Layout
         }
 
         // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
