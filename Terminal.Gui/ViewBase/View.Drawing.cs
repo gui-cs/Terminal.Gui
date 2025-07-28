@@ -836,15 +836,10 @@ public partial class View // Drawing APIs
             adornment.Parent?.SetSubViewNeedsDraw ();
         }
 
-        // There was multiple enumeration error here, so calling new collection - probably a stop gap
-        List<View> subviews;
+        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
+        List<View> snapshot = SnapshotSubviews ();
 
-        lock (_subviews!)
-        {
-            subviews = new (InternalSubViews);
-        }
-
-        foreach (View subview in subviews)
+        foreach (View subview in snapshot)
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
@@ -898,7 +893,10 @@ public partial class View // Drawing APIs
             Padding?.ClearNeedsDraw ();
         }
 
-        foreach (View subview in SubViews)
+        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
+        List<View> snapshot = SnapshotSubviews ();
+
+        foreach (View subview in snapshot)
         {
             subview.ClearNeedsDraw ();
         }
