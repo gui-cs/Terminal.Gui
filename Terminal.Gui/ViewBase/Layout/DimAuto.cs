@@ -48,7 +48,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
                 }
 
-                textSize = us.TextFormatter.ConstrainToWidth!.Value;
+                textSize = us.TextFormatter.ConstrainToWidth ?? 0;
             }
             else
             {
