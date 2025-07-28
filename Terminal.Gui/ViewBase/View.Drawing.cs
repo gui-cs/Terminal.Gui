@@ -580,7 +580,7 @@ public partial class View // Drawing APIs
         }
 
         // Draw the subviews in reverse order to leverage clipping.
-        foreach (View view in InternalSubViews.Where (view => view.Visible).Reverse ())
+        foreach (View view in SnapshotSubviews().Where (view => view.Visible).Reverse ())
         {
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
