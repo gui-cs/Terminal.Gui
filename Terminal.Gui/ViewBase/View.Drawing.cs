@@ -837,9 +837,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        List<View> snapshot = SnapshotSubviews ();
-
-        foreach (View subview in snapshot)
+        foreach (View subview in SnapshotSubviews ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
@@ -894,9 +892,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        List<View> snapshot = SnapshotSubviews ();
-
-        foreach (View subview in snapshot)
+        foreach (View subview in SnapshotSubviews ())
         {
             subview.ClearNeedsDraw ();
         }
