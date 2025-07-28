@@ -836,8 +836,10 @@ public partial class View // Drawing APIs
             adornment.Parent?.SetSubViewNeedsDraw ();
         }
 
-        // There was multiple enumeration error here, so calling ToArray - probably a stop gap
-        foreach (View subview in InternalSubViews.ToArray ())
+        // There was multiple enumeration error here, so calling new collection - probably a stop gap
+        List<View> subviews = new (InternalSubViews);
+
+        foreach (View subview in subviews)
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
