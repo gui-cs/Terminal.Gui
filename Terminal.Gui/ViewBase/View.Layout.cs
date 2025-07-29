@@ -638,7 +638,7 @@ public partial class View // Layout APIs
 
         List<View> redo = new ();
 
-        foreach (View v in ordered)
+        foreach (View v in ordered.Snapshot ())
         {
             if (!v.Layout (contentSize))
             {
