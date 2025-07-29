@@ -46,45 +46,65 @@ public class GuiTestContext : IDisposable
         lock (_threadLock)
         {
             // Start the application in a background thread
-            _runTask = Task.Run (
-                                 () =>
+            _runTask = Task.Run (() =>
                                  {
-                                     try
+                                     while (Application.Top is { })
                                      {
-                                         ApplicationImpl.ChangeInstance (v2);
-
-                                         ILogger logger = LoggerFactory.Create (
-                                                                                builder =>
-                                                                                    builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                           .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
-                                                                       .CreateLogger ("Test Logging");
-                                         Logging.Logger = logger;
-
-                                         v2.Init (null, GetDriverName ());
-
-                                         booting.Release ();
-
-                                         Toplevel t = topLevelBuilder ();
-                                         t.Closed += (s, e) => { _finished = true; };
-                                         Application.Run (t); // This will block, but it's on a background thread now
-
-                                         t.Dispose ();
-                                         Application.Shutdown ();
+                                         Task.Delay (300).Wait ();
                                      }
-                                     catch (OperationCanceledException)
-                                     { }
-                                     catch (Exception ex)
-                                     {
-                                         _ex = ex;
-                                     }
-                                     finally
-                                     {
-                                         ApplicationImpl.ChangeInstance (origApp);
-                                         Logging.Logger = origLogger;
-                                         _finished = true;
-                                     }
-                                 },
-                                 _cts.Token);
+                                 })
+                           .ContinueWith (
+                                          (task, _) =>
+                                          {
+                                              try
+                                              {
+                                                  if (task.IsFaulted)
+                                                  {
+                                                      _ex = task.Exception ?? new Exception ("Unknown error in background task");
+                                                  }
+
+                                                  // Ensure we are not running on the main thread
+                                                  if (ApplicationImpl.Instance != origApp)
+                                                  {
+                                                      throw new InvalidOperationException (
+                                                                                           "Application instance is not the original one, this should not happen.");
+                                                  }
+
+                                                  ApplicationImpl.ChangeInstance (v2);
+
+                                                  ILogger logger = LoggerFactory.Create (builder =>
+                                                                                             builder.SetMinimumLevel (LogLevel.Trace)
+                                                                                                    .AddProvider (
+                                                                                                     new TextWriterLoggerProvider (
+                                                                                                      new StringWriter (_logsSb))))
+                                                                                .CreateLogger ("Test Logging");
+                                                  Logging.Logger = logger;
+
+                                                  v2.Init (null, GetDriverName ());
+
+                                                  booting.Release ();
+
+                                                  Toplevel t = topLevelBuilder ();
+                                                  t.Closed += (s, e) => { _finished = true; };
+                                                  Application.Run (t); // This will block, but it's on a background thread now
+
+                                                  t.Dispose ();
+                                                  Application.Shutdown ();
+                                              }
+                                              catch (OperationCanceledException)
+                                              { }
+                                              catch (Exception ex)
+                                              {
+                                                  _ex = ex;
+                                              }
+                                              finally
+                                              {
+                                                  ApplicationImpl.ChangeInstance (origApp);
+                                                  Logging.Logger = origLogger;
+                                                  _finished = true;
+                                              }
+                                          },
+                                          _cts.Token);
         }
 
         // Wait for booting to complete with a timeout to avoid hangs
