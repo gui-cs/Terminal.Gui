@@ -25,75 +25,95 @@ public class GuiTestContext : IDisposable
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
     {
-        IApplication origApp = ApplicationImpl.Instance;
-        ILogger? origLogger = Logging.Logger;
-        _logsSb = new ();
-        _driver = driver;
-
-        _netInput = new (_cts.Token);
-        _winInput = new (_cts.Token);
-
-        _output.Size = new (width, height);
-
-        var v2 = new ApplicationV2 (
-                                    () => _netInput,
-                                    () => _output,
-                                    () => _winInput,
-                                    () => _output);
-
-        var booting = new SemaphoreSlim (0, 1);
-
         lock (_threadLock)
         {
+            IApplication origApp = ApplicationImpl.Instance;
+            ILogger? origLogger = Logging.Logger;
+            _logsSb = new ();
+            _driver = driver;
+
+            _netInput = new (_cts.Token);
+            _winInput = new (_cts.Token);
+
+            _output.Size = new (width, height);
+
+            var v2 = new ApplicationV2 (
+                                        () => _netInput,
+                                        () => _output,
+                                        () => _winInput,
+                                        () => _output);
+
+            var booting = new SemaphoreSlim (0, 1);
+
             // Start the application in a background thread
-            _runTask = Task.Run (
-                                 () =>
+            _runTask = Task.Run (() =>
                                  {
-                                     try
+                                     while (Application.Top is { })
                                      {
-                                         ApplicationImpl.ChangeInstance (v2);
-
-                                         ILogger logger = LoggerFactory.Create (
-                                                                                builder =>
-                                                                                    builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                           .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
-                                                                       .CreateLogger ("Test Logging");
-                                         Logging.Logger = logger;
-
-                                         v2.Init (null, GetDriverName ());
-
-                                         booting.Release ();
-
-                                         Toplevel t = topLevelBuilder ();
-                                         t.Closed += (s, e) => { _finished = true; };
-                                         Application.Run (t); // This will block, but it's on a background thread now
-
-                                         t.Dispose ();
-                                         Application.Shutdown ();
+                                         Task.Delay (300).Wait ();
                                      }
-                                     catch (OperationCanceledException)
-                                     { }
-                                     catch (Exception ex)
-                                     {
-                                         _ex = ex;
-                                     }
-                                     finally
-                                     {
-                                         ApplicationImpl.ChangeInstance (origApp);
-                                         Logging.Logger = origLogger;
-                                         _finished = true;
-                                     }
-                                 },
-                                 _cts.Token);
+                                 })
+                           .ContinueWith (
+                                          (task, _) =>
+                                          {
+                                              try
+                                              {
+                                                  if (task.IsFaulted)
+                                                  {
+                                                      _ex = task.Exception ?? new Exception ("Unknown error in background task");
+                                                  }
+
+                                                  // Ensure we are not running on the main thread
+                                                  if (ApplicationImpl.Instance != origApp)
+                                                  {
+                                                      throw new InvalidOperationException (
+                                                                                           "Application instance is not the original one, this should not happen.");
+                                                  }
+
+                                                  ApplicationImpl.ChangeInstance (v2);
+
+                                                  ILogger logger = LoggerFactory.Create (builder =>
+                                                                                             builder.SetMinimumLevel (LogLevel.Trace)
+                                                                                                    .AddProvider (
+                                                                                                         new TextWriterLoggerProvider (
+                                                                                                              new StringWriter (_logsSb))))
+                                                                                .CreateLogger ("Test Logging");
+                                                  Logging.Logger = logger;
+
+                                                  v2.Init (null, GetDriverName ());
+
+                                                  booting.Release ();
+
+                                                  Toplevel t = topLevelBuilder ();
+                                                  t.Closed += (s, e) => { _finished = true; };
+                                                  Application.Run (t); // This will block, but it's on a background thread now
+
+                                                  t.Dispose ();
+                                                  Application.Shutdown ();
+                                              }
+                                              catch (OperationCanceledException)
+                                              { }
+                                              catch (Exception ex)
+                                              {
+                                                  _ex = ex;
+                                              }
+                                              finally
+                                              {
+                                                  ApplicationImpl.ChangeInstance (origApp);
+                                                  Logging.Logger = origLogger;
+                                                  _finished = true;
+                                              }
+                                          },
+                                          _cts.Token);
+
+            // Wait for booting to complete with a timeout to avoid hangs
+            if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
+            {
+                throw new TimeoutException ("Application failed to start within the allotted time.");
+            }
+
+            WaitIteration ();
         }
-
-        // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
-        {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
-        }
-
-        WaitIteration ();
     }
 
     private string GetDriverName ()

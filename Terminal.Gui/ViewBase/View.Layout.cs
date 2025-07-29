@@ -638,7 +638,7 @@ public partial class View // Layout APIs
 
         List<View> redo = new ();
 
-        foreach (View v in ordered)
+        foreach (View v in ordered.Snapshot ())
         {
             if (!v.Layout (contentSize))
             {
@@ -764,10 +764,12 @@ public partial class View // Layout APIs
 
         // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
         // Use a stack to avoid recursion
-        Stack<View> stack = new (SubViews);
+        Stack<View> stack = new (InternalSubViews.Snapshot ().ToList ());
 
         while (stack.Count > 0)
         {
+            Debug.Assert (stack.Peek () is { });
+
             View current = stack.Pop ();
 
             if (!current.NeedsLayout)

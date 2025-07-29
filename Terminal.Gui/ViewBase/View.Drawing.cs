@@ -13,7 +13,8 @@ public partial class View // Drawing APIs
     /// <param name="force">If <see langword="true"/>, <see cref="View.SetNeedsDraw()"/> will be called on each view to force it to be drawn.</param>
     internal static void Draw (IEnumerable<View> views, bool force)
     {
-        IEnumerable<View> viewsArray = views as View [] ?? views.ToArray ();
+        // **Snapshot once** — every recursion level gets its own frozen array
+        View [] viewsArray = views.Snapshot ();
 
         // The draw context is used to track the region drawn by each view.
         DrawContext context = new DrawContext ();
@@ -580,7 +581,7 @@ public partial class View // Drawing APIs
         }
 
         // Draw the subviews in reverse order to leverage clipping.
-        foreach (View view in SnapshotSubviews().Where (view => view.Visible).Reverse ())
+        foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
         {
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
@@ -837,7 +838,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        foreach (View subview in SnapshotSubviews ())
+        foreach (View subview in InternalSubViews.Snapshot ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
@@ -892,7 +893,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        foreach (View subview in SnapshotSubviews ())
+        foreach (View subview in InternalSubViews.Snapshot ())
         {
             subview.ClearNeedsDraw ();
         }
