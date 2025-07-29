@@ -25,26 +25,26 @@ public class GuiTestContext : IDisposable
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
     {
-        IApplication origApp = ApplicationImpl.Instance;
-        ILogger? origLogger = Logging.Logger;
-        _logsSb = new ();
-        _driver = driver;
-
-        _netInput = new (_cts.Token);
-        _winInput = new (_cts.Token);
-
-        _output.Size = new (width, height);
-
-        var v2 = new ApplicationV2 (
-                                    () => _netInput,
-                                    () => _output,
-                                    () => _winInput,
-                                    () => _output);
-
-        var booting = new SemaphoreSlim (0, 1);
-
         lock (_threadLock)
         {
+            IApplication origApp = ApplicationImpl.Instance;
+            ILogger? origLogger = Logging.Logger;
+            _logsSb = new ();
+            _driver = driver;
+
+            _netInput = new (_cts.Token);
+            _winInput = new (_cts.Token);
+
+            _output.Size = new (width, height);
+
+            var v2 = new ApplicationV2 (
+                                        () => _netInput,
+                                        () => _output,
+                                        () => _winInput,
+                                        () => _output);
+
+            var booting = new SemaphoreSlim (0, 1);
+
             // Start the application in a background thread
             _runTask = Task.Run (() =>
                                  {
@@ -75,8 +75,8 @@ public class GuiTestContext : IDisposable
                                                   ILogger logger = LoggerFactory.Create (builder =>
                                                                                              builder.SetMinimumLevel (LogLevel.Trace)
                                                                                                     .AddProvider (
-                                                                                                     new TextWriterLoggerProvider (
-                                                                                                      new StringWriter (_logsSb))))
+                                                                                                         new TextWriterLoggerProvider (
+                                                                                                              new StringWriter (_logsSb))))
                                                                                 .CreateLogger ("Test Logging");
                                                   Logging.Logger = logger;
 
@@ -105,15 +105,15 @@ public class GuiTestContext : IDisposable
                                               }
                                           },
                                           _cts.Token);
-        }
 
-        // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
-        {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
-        }
+            // Wait for booting to complete with a timeout to avoid hangs
+            if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
+            {
+                throw new TimeoutException ("Application failed to start within the allotted time.");
+            }
 
-        WaitIteration ();
+            WaitIteration ();
+        }
     }
 
     private string GetDriverName ()
