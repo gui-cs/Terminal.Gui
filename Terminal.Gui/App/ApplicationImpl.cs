@@ -275,6 +275,8 @@ public class ApplicationImpl : IApplication
         if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
+            WakeupMainLoop ();
+
             return;
         }
 
@@ -294,9 +296,14 @@ public class ApplicationImpl : IApplication
                            }
                           );
 
-        // Ensure the action is executed in the main loop
-        // Wakeup mainloop if it's waiting for events
-        Application.MainLoop.Wakeup ();
+        WakeupMainLoop ();
+
+        void WakeupMainLoop ()
+        {
+            // Ensure the action is executed in the main loop
+            // Wakeup mainloop if it's waiting for events
+            Application.MainLoop?.Wakeup ();
+        }
     }
 
     /// <inheritdoc />
