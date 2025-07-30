@@ -147,7 +147,7 @@ internal class NetEvents : IDisposable
     {
         void RequestWindowSize ()
         {
-            while (!_netEventsDisposed.IsCancellationRequested)
+            while (_netEventsDisposed is { IsCancellationRequested: false })
             {
                 // Wait for a while then check if screen has changed sizes
                 Task.Delay (500, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
