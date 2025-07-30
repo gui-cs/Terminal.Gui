@@ -420,9 +420,9 @@ internal class WindowsDriver : ConsoleDriver
             {
                 if (WinConsole is { })
                 {
-                    // BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init.
-                    // Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
-                    Size winSize = WinConsole.GetConsoleOutputWindow (out _);
+                    // The results from GetConsoleBufferWindow are correct when called from Init.
+                    // Our thread in WindowsMainLoop.CheckWin will get the resize event. See #if HACK_CHECK_WINCHANGED
+                    Size winSize = WinConsole.GetConsoleBufferWindow (out _);
                     Cols = winSize.Width;
                     Rows = winSize.Height;
                     OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
@@ -602,13 +602,6 @@ internal class WindowsDriver : ConsoleDriver
             return;
         }
 
-        int w = e.Size.Value.Width;
-
-        if (w == Cols - 3 && e.Size.Value.Height < Rows)
-        {
-            w += 3;
-        }
-
         Left = 0;
         Top = 0;
         Cols = e.Size.Value.Width;
@@ -617,7 +610,7 @@ internal class WindowsDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Size newSize = WinConsole.SetConsoleWindow (
-                                                        (short)Math.Max (w, 16),
+                                                        (short)Math.Max (e.Size.Value.Width, 16),
                                                         (short)Math.Max (e.Size.Value.Height, 0));
 
             Cols = newSize.Width;

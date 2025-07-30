@@ -220,6 +220,7 @@ internal class WindowsMainLoop : IMainLoopDriver
     private readonly ManualResetEventSlim _winChange = new (false);
     private bool _winChanged;
     private Size _windowSize;
+    private Size? _lastWindowSizeBeforeMaximized = null;
     private void CheckWinChange ()
     {
         while (_mainLoop is { })
@@ -232,7 +233,22 @@ internal class WindowsMainLoop : IMainLoopDriver
             while (_mainLoop is { })
             {
                 Task.Delay (500).Wait ();
-                _windowSize = _winConsole.GetConsoleBufferWindow (out _);
+                Size largestWindowSize = _winConsole!.GetLargestConsoleWindowSize ();
+                _windowSize = _winConsole!.GetConsoleBufferWindow (out _);
+
+                if (_lastWindowSizeBeforeMaximized is null && _windowSize == largestWindowSize)
+                {
+                    _lastWindowSizeBeforeMaximized = new (_consoleDriver.Cols, _consoleDriver.Rows);
+                }
+                else if (_lastWindowSizeBeforeMaximized is { } && _windowSize != largestWindowSize)
+                {
+                    if (_windowSize != _lastWindowSizeBeforeMaximized)
+                    {
+                        _windowSize = _lastWindowSizeBeforeMaximized.Value;
+                    }
+
+                    _lastWindowSizeBeforeMaximized = null;
+                }
 
                 if (_windowSize != Size.Empty
                     && (_windowSize.Width != _consoleDriver.Cols

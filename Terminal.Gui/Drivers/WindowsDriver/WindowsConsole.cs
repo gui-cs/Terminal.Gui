@@ -632,6 +632,13 @@ internal partial class WindowsConsole
         return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
     }
 
+    internal Size GetLargestConsoleWindowSize ()
+    {
+        Coord maxWinSize = GetLargestConsoleWindowSize (IsVirtualTerminal ? _outputHandle : _screenBuffer);
+
+        return new (maxWinSize.X, maxWinSize.Y);
+    }
+
     private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
     {
         if ((IsVirtualTerminal
