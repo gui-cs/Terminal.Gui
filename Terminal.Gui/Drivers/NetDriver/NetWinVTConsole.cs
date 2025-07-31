@@ -6,28 +6,30 @@ namespace Terminal.Gui.Drivers;
 
 internal class NetWinVTConsole
 {
-    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
-    private const uint ENABLE_ECHO_INPUT = 4;
-    private const uint ENABLE_EXTENDED_FLAGS = 128;
-    private const uint ENABLE_INSERT_MODE = 32;
-    private const uint ENABLE_LINE_INPUT = 2;
-    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
-    private const uint ENABLE_MOUSE_INPUT = 16;
-
     // Input modes.
     private const uint ENABLE_PROCESSED_INPUT = 1;
+    private const uint ENABLE_LINE_INPUT = 2;
+    private const uint ENABLE_ECHO_INPUT = 4;
+    private const uint ENABLE_WINDOW_INPUT = 8;
+    private const uint ENABLE_MOUSE_INPUT = 16;
+    private const uint ENABLE_INSERT_MODE = 32;
+    private const uint ENABLE_QUICK_EDIT_MODE = 64;
+    private const uint ENABLE_EXTENDED_FLAGS = 128;
+    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
 
     // Output modes.
     private const uint ENABLE_PROCESSED_OUTPUT = 1;
-    private const uint ENABLE_QUICK_EDIT_MODE = 64;
-    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
-    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
-    private const uint ENABLE_WINDOW_INPUT = 8;
     private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
+    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
+
+    // Standard handles.
     private const int STD_ERROR_HANDLE = -12;
     private const int STD_INPUT_HANDLE = -10;
     private const int STD_OUTPUT_HANDLE = -11;
 
+    // Handles and original console modes.
     private readonly nint _errorHandle;
     private readonly nint _inputHandle;
     private readonly uint _originalErrorConsoleMode;
