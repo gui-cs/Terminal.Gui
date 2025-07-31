@@ -37,8 +37,65 @@ internal partial class WindowsConsole
 
         IsVirtualTerminal = GetConsoleMode (_outputHandle, out uint mode) && (mode & (uint)ConsoleModes.EnableVirtualTerminalProcessing) != 0;
 
+        if (!IsVirtualTerminal)
+        {
+            CreateConsoleScreenBuffer ();
+            Size bufferSize = GetConsoleBufferWindow (out _);
+            SmallRect window = new ()
+            {
+                Top = 0,
+                Left = 0,
+                Bottom = (short)bufferSize.Height,
+                Right = (short)bufferSize.Width
+            };
+
+            ReadFromConsoleOutput (bufferSize, new ((short)bufferSize.Width, (short)bufferSize.Height), ref window);
+
+            if (!GetConsoleMode (_screenBuffer, out mode))
+            {
+                throw new ApplicationException ($"Failed to get screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
+            }
+
+            const uint ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002;
+
+            mode &= ~ENABLE_WRAP_AT_EOL_OUTPUT; // Disable wrap
+
+            if (!SetConsoleMode (_screenBuffer, mode))
+            {
+                throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
+            }
+        }
+
+        SetInitialCursorVisibility ();
+
         _inputReadyCancellationTokenSource = new ();
         Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
+    }
+
+    private void CreateConsoleScreenBuffer ()
+    {
+        _screenBuffer = CreateConsoleScreenBuffer (
+                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
+                                                   nint.Zero,
+                                                   1,
+                                                   nint.Zero
+                                                  );
+
+        if (_screenBuffer == INVALID_HANDLE_VALUE)
+        {
+            int err = Marshal.GetLastWin32Error ();
+
+            if (err != 0)
+            {
+                throw new Win32Exception (err);
+            }
+        }
+
+        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
     }
 
     public InputRecord? DequeueInput ()
@@ -163,26 +220,6 @@ internal partial class WindowsConsole
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
         //Debug.WriteLine ("WriteToConsole");
-
-        if (!IsVirtualTerminal && _screenBuffer == nint.Zero)
-        {
-            ReadFromConsoleOutput (size, bufferSize, ref window);
-            if (!GetConsoleMode (_screenBuffer, out uint mode))
-            {
-                throw new ApplicationException ($"Failed to get screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
-            }
-
-            const uint ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002;
-
-            mode &= ~ENABLE_WRAP_AT_EOL_OUTPUT; // Disable wrap
-
-            if (!SetConsoleMode (_screenBuffer, mode))
-            {
-                throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
-            }
-        }
-
-        SetInitialCursorVisibility ();
 
         Attribute? prev = null;
         var result = false;
@@ -382,29 +419,6 @@ internal partial class WindowsConsole
 
     public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
     {
-        _screenBuffer = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
-
-        if (_screenBuffer == INVALID_HANDLE_VALUE)
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-        }
-
-        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
         _originalStdOutChars = new CharInfo [size.Height * size.Width];
 
         if (!ReadConsoleOutput (_screenBuffer, _originalStdOutChars, coords, new Coord { X = 0, Y = 0 }, ref window))
