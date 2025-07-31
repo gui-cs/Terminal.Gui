@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
@@ -112,6 +113,85 @@ internal class NetWinVTConsole
         }
     }
 
+    internal Size GetConsoleBufferWindow (out Point position)
+    {
+        if (_outputHandle == nint.Zero)
+        {
+            position = Point.Empty;
+
+            return Size.Empty;
+        }
+
+        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+
+        if (!GetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
+        {
+            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            position = Point.Empty;
+
+            return Size.Empty;
+        }
+
+        Size sz = new (
+                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
+                       csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
+
+        return sz;
+    }
+
+    internal Size SetConsoleWindow (short cols, short rows)
+    {
+        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+
+        if (!GetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+
+        Coord maxWinSize = GetLargestConsoleWindowSize (_outputHandle);
+        short newCols = Math.Min (cols, maxWinSize.X);
+        short newRows = Math.Min (rows, maxWinSize.Y);
+        csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
+        csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
+        csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
+
+        if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+
+        var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
+
+        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
+        {
+            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            return new (cols, rows);
+        }
+
+        SetConsoleOutputWindow (csbi);
+
+        return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
+    }
+
+    private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
+    {
+        if (_outputHandle != nint.Zero && !SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+    }
+
+    internal Size GetLargestConsoleWindowSize ()
+    {
+        Coord maxWinSize = GetLargestConsoleWindowSize (_outputHandle);
+
+        return new (maxWinSize.X, maxWinSize.Y);
+    }
+
+    // --------------Imports-----------------
     [DllImport ("kernel32.dll")]
     private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
 
@@ -123,4 +203,103 @@ internal class NetWinVTConsole
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool GetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern Coord GetLargestConsoleWindowSize (
+        nint hConsoleOutput
+    );
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX consoleScreenBufferInfo);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleWindowInfo (
+        nint hConsoleOutput,
+        bool bAbsolute,
+        [In] ref SmallRect lpConsoleWindow
+    );
+
+    // -----------structs-----------------
+    [StructLayout (LayoutKind.Sequential)]
+    public struct CONSOLE_SCREEN_BUFFER_INFOEX
+    {
+        public uint cbSize;
+        public Coord dwSize;
+        public Coord dwCursorPosition;
+        public ushort wAttributes;
+        public SmallRect srWindow;
+        public Coord dwMaximumWindowSize;
+        public ushort wPopupAttributes;
+        public bool bFullscreenSupported;
+
+        [MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)]
+        public COLORREF [] ColorTable;
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct Coord
+    {
+        public short X;
+        public short Y;
+
+        public Coord (short x, short y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public readonly override string ToString () { return $"({X},{Y})"; }
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct SmallRect
+    {
+        public short Left;
+        public short Top;
+        public short Right;
+        public short Bottom;
+
+        public SmallRect (short left, short top, short right, short bottom)
+        {
+            Left = left;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
+        }
+    }
+
+    [StructLayout (LayoutKind.Explicit, Size = 4)]
+    public struct COLORREF
+    {
+        public COLORREF (byte r, byte g, byte b)
+        {
+            Value = 0;
+            R = r;
+            G = g;
+            B = b;
+        }
+
+        public COLORREF (uint value)
+        {
+            R = 0;
+            G = 0;
+            B = 0;
+            Value = value & 0x00FFFFFF;
+        }
+
+        [FieldOffset (0)]
+        public byte R;
+
+        [FieldOffset (1)]
+        public byte G;
+
+        [FieldOffset (2)]
+        public byte B;
+
+        [FieldOffset (0)]
+        public uint Value;
+    }
 }

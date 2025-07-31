@@ -339,7 +339,37 @@ internal class NetDriver : ConsoleDriver
                 Left = 0;
                 Cols = inputEvent.WindowSizeEvent.Size.Width;
                 Rows = Math.Max (inputEvent.WindowSizeEvent.Size.Height, 0);
-                ;
+
+                if (!RunningUnitTests)
+                {
+                    if (IsWinPlatform)
+                    {
+                        try
+                        {
+                            Size newSize = NetWinConsole!.SetConsoleWindow ((short)Cols, (short)Rows);
+
+                            if (Cols != newSize.Width)
+                            {
+                                Cols = newSize.Width;
+                            }
+
+                            if (Rows != newSize.Height)
+                            {
+                                Rows = newSize.Height;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            // If we can't resize the console, we just log the error.
+                            Console.WriteLine (e);
+                        }
+                    }
+                    else
+                    {
+                        Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
+                    }
+                }
+
                 ResizeScreen ();
                 ClearContents ();
                 _winSizeChanging = false;
@@ -744,49 +774,8 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
-    public virtual void ResizeScreen ()
+    public void ResizeScreen ()
     {
-        // Not supported on Unix.
-        if (IsWinPlatform)
-        {
-            // Can raise an exception while is still resizing.
-            try
-            {
-#pragma warning disable CA1416
-                if (Console.WindowHeight > 0)
-                {
-                    Console.CursorTop = 0;
-                    Console.CursorLeft = 0;
-                    Console.WindowTop = 0;
-                    Console.WindowLeft = 0;
-
-                    if (Console.WindowHeight > Rows)
-                    {
-                        Console.SetWindowSize (Cols, Rows);
-                    }
-
-                    Console.SetBufferSize (Cols, Rows);
-                }
-#pragma warning restore CA1416
-            }
-            // INTENT: Why are these eating the exceptions?
-            // Comments would be good here.
-            catch (IOException)
-            {
-                // CONCURRENCY: Unsynchronized access to Clip is not safe.
-                Clip = new (Screen);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // CONCURRENCY: Unsynchronized access to Clip is not safe.
-                Clip = new (Screen);
-            }
-        }
-        else
-        {
-            Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
-        }
-
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
         Clip = new (Screen);
     }

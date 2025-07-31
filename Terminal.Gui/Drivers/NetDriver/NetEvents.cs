@@ -143,6 +143,8 @@ internal class NetEvents : IDisposable
                             );
     }
 
+    private Size? _lastWindowSizeBeforeMaximized = null;
+
     private void CheckWindowSizeChange ()
     {
         void RequestWindowSize ()
@@ -151,25 +153,50 @@ internal class NetEvents : IDisposable
             {
                 // Wait for a while then check if screen has changed sizes
                 Task.Delay (500, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
-
-                int buffHeight, buffWidth;
+                Size windowSize;
 
                 if (((NetDriver)_consoleDriver).IsWinPlatform)
                 {
-                    buffHeight = Math.Max (Console.BufferHeight, 0);
-                    buffWidth = Math.Max (Console.BufferWidth, 0);
+                    Size largestWindowSize = ((NetDriver)_consoleDriver).NetWinConsole!.GetLargestConsoleWindowSize ();
+                    windowSize = ((NetDriver)_consoleDriver).NetWinConsole!.GetConsoleBufferWindow (out _);
+
+                    if (_lastWindowSizeBeforeMaximized is null && windowSize == largestWindowSize)
+                    {
+                        _lastWindowSizeBeforeMaximized = new (_consoleDriver.Cols, _consoleDriver.Rows);
+                    }
+                    else if (_lastWindowSizeBeforeMaximized is { } && windowSize != largestWindowSize)
+                    {
+                        if (windowSize != _lastWindowSizeBeforeMaximized)
+                        {
+                            windowSize = new (_lastWindowSizeBeforeMaximized.Value.Width, _lastWindowSizeBeforeMaximized.Value.Height);
+
+                            while (Console.WindowWidth != _lastWindowSizeBeforeMaximized.Value.Width
+                                   && Console.WindowHeight != _lastWindowSizeBeforeMaximized.Value.Height)
+                            {
+                                try
+                                {
+                                    windowSize = ((NetDriver)_consoleDriver).NetWinConsole!.SetConsoleWindow (
+                                     (short)_lastWindowSizeBeforeMaximized.Value.Width,
+                                     (short)_lastWindowSizeBeforeMaximized.Value.Height);
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine (e);
+                                }
+                            }
+                        }
+
+                        _lastWindowSizeBeforeMaximized = null;
+                    }
                 }
                 else
                 {
-                    buffHeight = _consoleDriver.Rows;
-                    buffWidth = _consoleDriver.Cols;
+                    windowSize = new (Console.WindowWidth, Console.WindowHeight);
                 }
 
                 if (EnqueueWindowSizeEvent (
-                                            Math.Max (Console.WindowHeight, 0),
-                                            Math.Max (Console.WindowWidth, 0),
-                                            buffHeight,
-                                            buffWidth
+                                            Math.Max (windowSize.Height, 0),
+                                            Math.Max (windowSize.Width, 0)
                                            ))
                 {
                     return;
@@ -198,10 +225,8 @@ internal class NetEvents : IDisposable
     /// <summary>Enqueue a window size event if the window size has changed.</summary>
     /// <param name="winHeight"></param>
     /// <param name="winWidth"></param>
-    /// <param name="buffHeight"></param>
-    /// <param name="buffWidth"></param>
     /// <returns></returns>
-    private bool EnqueueWindowSizeEvent (int winHeight, int winWidth, int buffHeight, int buffWidth)
+    private bool EnqueueWindowSizeEvent (int winHeight, int winWidth)
     {
         if (winWidth == _consoleDriver.Cols && winHeight == _consoleDriver.Rows)
         {
@@ -446,8 +471,6 @@ internal class NetEvents : IDisposable
                 {
                     case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
                         EnqueueWindowSizeEvent (
-                                                Math.Max (int.Parse (values [1]), 0),
-                                                Math.Max (int.Parse (values [2]), 0),
                                                 Math.Max (int.Parse (values [1]), 0),
                                                 Math.Max (int.Parse (values [2]), 0)
                                                );
