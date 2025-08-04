@@ -113,11 +113,11 @@ internal class NetEvents : IDisposable
 
     private void ProcessInputQueue ()
     {
-        while (!_netEventsDisposed.IsCancellationRequested)
+        while (_netEventsDisposed is { IsCancellationRequested: false })
         {
             if (_inputQueue.Count == 0)
             {
-                while (!_netEventsDisposed.IsCancellationRequested)
+                while (_netEventsDisposed is { IsCancellationRequested: false })
                 {
                     ConsoleKeyInfo consoleKeyInfo;
 
