@@ -356,11 +356,6 @@ internal class NetDriver : ConsoleDriver
     }
     public override void End ()
     {
-        if (IsWinPlatform)
-        {
-            NetWinConsole?.Cleanup ();
-        }
-
         StopReportingMouseMoves ();
 
         if (!RunningUnitTests)
@@ -373,6 +368,11 @@ internal class NetDriver : ConsoleDriver
             //Set cursor key to cursor.
             Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
             Console.Out.Close ();
+
+            // Reset the console to its original state
+            // after sending the escape sequences to restore
+            // alternative buffer and cursor visibility.
+            NetWinConsole?.Cleanup ();
         }
     }
 
