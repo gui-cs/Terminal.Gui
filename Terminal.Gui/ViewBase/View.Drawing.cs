@@ -807,7 +807,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling ToArray - probably a stop gap
-        foreach (View subview in SubViews.ToArray ())
+        foreach (View subview in InternalSubViews)
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {

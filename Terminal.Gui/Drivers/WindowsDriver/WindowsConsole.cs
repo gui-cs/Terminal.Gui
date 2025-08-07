@@ -62,7 +62,7 @@ internal partial class WindowsConsole
         InputRecord inputRecord = default;
         uint numberEventsRead = 0;
 
-        while (!_inputReadyCancellationTokenSource!.IsCancellationRequested)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
             try
             {
