@@ -11,7 +11,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class CsiCursorPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(?:1;(\d+))?([A-DHF])$");
+    private readonly Regex _pattern = new (@"^\u001b\[(?:1;(\d+))?([A-DFHPQRS])$");
 
     private readonly Dictionary<char, Key> _cursorMap = new ()
     {
@@ -20,7 +20,13 @@ public class CsiCursorPattern : AnsiKeyboardParserPattern
         { 'C', Key.CursorRight },
         { 'D', Key.CursorLeft },
         { 'H', Key.Home },
-        { 'F', Key.End }
+        { 'F', Key.End },
+
+        // F1–F4 as per xterm VT100-style CSI sequences
+        { 'P', Key.F1 },
+        { 'Q', Key.F2 },
+        { 'R', Key.F3 },
+        { 'S', Key.F4 }
     };
 
     /// <inheritdoc/>
