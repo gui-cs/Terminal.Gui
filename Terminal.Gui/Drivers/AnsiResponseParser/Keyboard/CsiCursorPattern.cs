@@ -7,7 +7,7 @@ namespace Terminal.Gui.Drivers;
 ///     Detects ansi escape sequences in strings that have been read from
 ///     the terminal (see <see cref="IAnsiResponseParser"/>).
 ///     Handles navigation CSI key parsing such as <c>\x1b[A</c> (Cursor up)
-///     and <c>\x1b[1;5A</c> (Cursor up with Ctrl)
+///     and <c>\x1b[1;5A</c> (Cursor/Function with modifier(s))
 /// </summary>
 public class CsiCursorPattern : AnsiKeyboardParserPattern
 {
