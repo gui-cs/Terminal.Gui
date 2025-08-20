@@ -154,15 +154,7 @@ public class ApplicationV2Tests
     private void SetupRunInputMockMethodToBlock (Mock<IWindowsInput> winInput)
     {
         winInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
-                .Callback<CancellationToken> (token =>
-                                              {
-                                                  // Simulate an infinite loop that checks for cancellation
-                                                  while (!token.IsCancellationRequested)
-                                                  {
-                                                      // Perform the action that should repeat in the loop
-                                                      // This could be some mock behavior or just an empty loop depending on the context
-                                                  }
-                                              })
+                .Callback<CancellationToken> (RunLoop)
                 .Verifiable (Times.Once);
     }
 
@@ -508,7 +500,6 @@ public class ApplicationV2Tests
         v2.Init (null, "v2net");
 
 
-        v2.Shutdown ();
         v2.Shutdown ();
         outputMock!.Verify (o => o.Dispose (), Times.Once);
 

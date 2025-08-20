@@ -73,6 +73,13 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 
         _inputTask = Task.Run (RunInput);
 
+        while (_input is null)
+        {
+            // This is a blocking wait, but it is necessary to ensure that the _input is initialized
+            // before the main loop starts.
+            Task.Delay (5).Wait ();
+        }
+
         // Main loop is now booted on same thread as rest of users application
         BootMainLoop ();
 
