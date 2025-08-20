@@ -707,6 +707,22 @@ public abstract class ConsoleDriver : IConsoleDriver
         if (_highSurrogate > 0 && char.IsLowSurrogate ((char)keyCode))
         {
             result = (KeyCode)new Rune (_highSurrogate, (char)keyCode).Value;
+
+            if ((keyCode & KeyCode.AltMask) != 0)
+            {
+                result |= KeyCode.AltMask;
+            }
+
+            if ((keyCode & KeyCode.CtrlMask) != 0)
+            {
+                result |= KeyCode.CtrlMask;
+            }
+
+            if ((keyCode & KeyCode.ShiftMask) != 0)
+            {
+                result |= KeyCode.ShiftMask;
+            }
+
             _highSurrogate = '\0';
 
             return true;

@@ -90,11 +90,15 @@ internal class CursesDriver : ConsoleDriver
         }
         else
         {
-            key = (KeyCode)keyChar;
+            var cKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control));
+            key = EscSeqUtils.MapKey (cKeyInfo);
         }
 
-        OnKeyDown (new (key));
-        OnKeyUp (new (key));
+        if (IsValidInput (key, out key))
+        {
+            OnKeyDown (new (key));
+            OnKeyUp (new (key));
+        }
 
         //OnKeyPressed (new KeyEventArgsEventArgs (key));
     }
