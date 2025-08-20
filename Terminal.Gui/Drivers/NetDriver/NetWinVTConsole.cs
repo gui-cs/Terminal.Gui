@@ -29,9 +29,7 @@ internal class NetWinVTConsole
     private const int STD_OUTPUT_HANDLE = -11;
 
     // Handles and original console modes.
-    private readonly nint _errorHandle;
     private readonly nint _inputHandle;
-    private readonly uint _originalErrorConsoleMode;
     private readonly uint _originalInputConsoleMode;
     private readonly uint _originalOutputConsoleMode;
     private readonly nint _outputHandle;
@@ -75,25 +73,6 @@ internal class NetWinVTConsole
                 throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
             }
         }
-
-        _errorHandle = GetStdHandle (STD_ERROR_HANDLE);
-
-        if (!GetConsoleMode (_errorHandle, out mode))
-        {
-            throw new ApplicationException ($"Failed to get error console mode, error code: {GetLastError ()}.");
-        }
-
-        _originalErrorConsoleMode = mode;
-
-        if ((mode & DISABLE_NEWLINE_AUTO_RETURN) < DISABLE_NEWLINE_AUTO_RETURN)
-        {
-            mode |= DISABLE_NEWLINE_AUTO_RETURN;
-
-            if (!SetConsoleMode (_errorHandle, mode))
-            {
-                throw new ApplicationException ($"Failed to set error console mode, error code: {GetLastError ()}.");
-            }
-        }
     }
 
     public void Cleanup ()
@@ -111,11 +90,6 @@ internal class NetWinVTConsole
         if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
         {
             throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
-        }
-
-        if (!SetConsoleMode (_errorHandle, _originalErrorConsoleMode))
-        {
-            throw new ApplicationException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
         }
     }
 
