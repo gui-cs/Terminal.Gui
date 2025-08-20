@@ -165,19 +165,35 @@ public class ApplicationV2Tests
                                               })
                 .Verifiable (Times.Once);
     }
+
     private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
     {
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
-                .Callback<CancellationToken> (token =>
-                                              {
-                                                  // Simulate an infinite loop that checks for cancellation
-                                                  while (!token.IsCancellationRequested)
-                                                  {
-                                                      // Perform the action that should repeat in the loop
-                                                      // This could be some mock behavior or just an empty loop depending on the context
-                                                  }
-                                              })
+                .Callback<CancellationToken> (RunLoop)
                 .Verifiable (Times.Once);
+    }
+
+    private static async void RunLoop (CancellationToken token)
+    {
+        try
+        {
+            // Simulate an infinite loop that checks for cancellation
+            while (!token.IsCancellationRequested)
+            {
+                // Perform the action that should repeat in the loop
+                // This could be some mock behavior or just an empty loop depending on the context
+                await Task.Delay (5, token);
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception e)
+        {
+            Console.WriteLine (
+                               $"""
+                                RunLoop should not throw exceptions, but it did: {e.Message}.
+                                This is likely a bug in the test setup or the mock behavior.
+                                """);
+        }
     }
 
     [Fact]
@@ -344,7 +360,6 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-
     [Fact]
     public void InitRunShutdown_QuitKey_Quits ()
     {
@@ -389,7 +404,6 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
 
     [Fact]
     public void InitRunShutdown_Generic_IdleForExit ()
