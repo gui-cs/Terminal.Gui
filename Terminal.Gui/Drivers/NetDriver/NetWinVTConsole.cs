@@ -47,7 +47,7 @@ internal class NetWinVTConsole
 
         _originalInputConsoleMode = mode;
 
-        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) < ENABLE_VIRTUAL_TERMINAL_INPUT)
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) == 0)
         {
             mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
@@ -66,9 +66,9 @@ internal class NetWinVTConsole
 
         _originalOutputConsoleMode = mode;
 
-        if ((mode & (ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN)) < DISABLE_NEWLINE_AUTO_RETURN)
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
         {
-            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
             if (!SetConsoleMode (_outputHandle, mode))
             {
