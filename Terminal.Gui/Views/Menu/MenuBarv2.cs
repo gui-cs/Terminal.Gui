@@ -429,7 +429,10 @@ public class MenuBarv2 : Menuv2, IDesignable
         void OnMenuItemAccepted (object? sender, EventArgs args)
         {
             // Logging.Debug ($"{Title} - OnMenuItemAccepted");
-            menuBarItem.PopoverMenu!.VisibleChanged -= OnMenuItemAccepted;
+            if (menuBarItem.PopoverMenu is { })
+            {
+                menuBarItem.PopoverMenu.VisibleChanged -= OnMenuItemAccepted;
+            }
 
             if (Active && menuBarItem.PopoverMenu is { Visible: false })
             {
