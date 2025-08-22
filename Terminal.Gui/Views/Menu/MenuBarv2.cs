@@ -416,14 +416,13 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (menuBarItem.PopoverMenu?.Root is { })
         {
             menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
+            menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
         }
 
         // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
         menuBarItem.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
 
         menuBarItem.Accepting += OnMenuItemAccepted;
-
-        menuBarItem.PopoverMenu!.Root.SchemeName = SchemeName;
 
         return;
 
