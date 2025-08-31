@@ -10,12 +10,6 @@ namespace Terminal.Gui.Drivers;
 public interface IOutputBuffer
 {
     /// <summary>
-    ///     As performance is a concern, we keep track of the dirty lines and only refresh those.
-    ///     This is in addition to the dirty flag on each cell.
-    /// </summary>
-    public bool [] DirtyLines { get; }
-
-    /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when UpdateScreen is called.
     /// </summary>
     Cell [,] Contents { get; set; }
