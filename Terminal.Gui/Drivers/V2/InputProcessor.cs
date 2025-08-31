@@ -162,4 +162,43 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// </summary>
     /// <param name="input"></param>
     protected abstract void ProcessAfterParsing (T input);
+
+    internal char _highSurrogate = '\0';
+
+    internal bool IsValidInput (Key key, out Key result)
+    {
+        result = key;
+
+        if (char.IsHighSurrogate ((char)key))
+        {
+            _highSurrogate = (char)key;
+
+            return false;
+        }
+
+        if (_highSurrogate > 0 && char.IsLowSurrogate ((char)key))
+        {
+            result = (KeyCode)new Rune (_highSurrogate, (char)key).Value;
+            _highSurrogate = '\0';
+
+            return true;
+        }
+
+        if (char.IsSurrogate ((char)key))
+        {
+            return false;
+        }
+
+        if (_highSurrogate > 0)
+        {
+            _highSurrogate = '\0';
+        }
+
+        if (key.KeyCode == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
