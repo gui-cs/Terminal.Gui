@@ -4,7 +4,7 @@ using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
-internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindowsInput
+internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 {
     private readonly nint _inputHandle;
 
@@ -35,6 +35,9 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
 
     private readonly uint _originalConsoleMode;
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
+
     public WindowsInput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
@@ -50,16 +53,16 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
         _originalConsoleMode = v;
 
         uint newConsoleMode = _originalConsoleMode;
-        newConsoleMode |= (uint)(WindowsConsole.ConsoleModes.EnableMouseInput | WindowsConsole.ConsoleModes.EnableExtendedFlags);
-        newConsoleMode &= ~(uint)WindowsConsole.ConsoleModes.EnableQuickEditMode;
-        newConsoleMode &= ~(uint)WindowsConsole.ConsoleModes.EnableProcessedInput;
+        newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
+        newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+        newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
         SetConsoleMode (_inputHandle, newConsoleMode);
     }
 
     protected override bool Peek ()
     {
         const int bufferSize = 1; // We only need to check if there's at least one event
-        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<WindowsConsole.InputRecord> () * bufferSize);
+        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
 
         try
         {
@@ -89,10 +92,10 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
         }
     }
 
-    protected override IEnumerable<WindowsConsole.InputRecord> Read ()
+    protected override IEnumerable<InputRecord> Read ()
     {
         const int bufferSize = 1;
-        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<WindowsConsole.InputRecord> () * bufferSize);
+        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
 
         try
         {
@@ -104,7 +107,7 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
 
             return numberEventsRead == 0
                        ? []
-                       : new [] { Marshal.PtrToStructure<WindowsConsole.InputRecord> (pRecord) };
+                       : new [] { Marshal.PtrToStructure<InputRecord> (pRecord) };
         }
         catch (Exception)
         {
@@ -121,6 +124,11 @@ internal class WindowsInput : ConsoleInput<WindowsConsole.InputRecord>, IWindows
         if (ConsoleDriver.RunningUnitTests)
         {
             return;
+        }
+
+        if (!FlushConsoleInputBuffer (_inputHandle))
+        {
+            throw new ApplicationException ($"Failed to flush input buffer, error code: {Marshal.GetLastWin32Error ()}.");
         }
 
         SetConsoleMode (_inputHandle, _originalConsoleMode);
