@@ -96,6 +96,11 @@ internal class NetWinVTConsole
 
     public void Cleanup ()
     {
+        if (!FlushConsoleInputBuffer (_inputHandle))
+        {
+            throw new ApplicationException ($"Failed to flush input buffer, error code: {GetLastError ()}.");
+        }
+
         if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode))
         {
             throw new ApplicationException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
@@ -123,4 +128,7 @@ internal class NetWinVTConsole
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
 }
