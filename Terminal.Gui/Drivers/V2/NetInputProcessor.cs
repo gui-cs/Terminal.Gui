@@ -41,8 +41,13 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
         var key = KeyConverter.ToKey (input);
-        OnKeyDown (key);
-        OnKeyUp (key);
+
+        // If the key is not valid, we don't want to raise any events.
+        if (IsValidInput (key, out key))
+        {
+            OnKeyDown (key);
+            OnKeyUp (key);
+        }
     }
 
     /* For building test cases */
