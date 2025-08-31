@@ -1,13 +1,12 @@
 ﻿#nullable enable
-using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Extensions.Logging;
-using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsOutput : IConsoleOutput
+internal partial class WindowsOutput : OutputBase, IConsoleOutput
 {
     [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -19,11 +18,15 @@ internal partial class WindowsOutput : IConsoleOutput
         nint lpReserved
     );
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool CloseHandle (nint handle);
+    [LibraryImport ("kernel32.dll", SetLastError = true)]
+    private static partial nint GetStdHandle (int nStdHandle);
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint CreateConsoleScreenBuffer (
+    [LibraryImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool CloseHandle (nint handle);
+
+    [LibraryImport ("kernel32.dll", SetLastError = true)]
+    private static partial nint CreateConsoleScreenBuffer (
         DesiredAccess dwDesiredAccess,
         ShareMode dwShareMode,
         nint secutiryAttributes,
@@ -32,6 +35,7 @@ internal partial class WindowsOutput : IConsoleOutput
     );
 
     [DllImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
     private static extern bool GetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX csbi);
 
     [Flags]
@@ -50,19 +54,52 @@ internal partial class WindowsOutput : IConsoleOutput
 
     internal static nint INVALID_HANDLE_VALUE = new (-1);
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleActiveScreenBuffer (nint handle);
+    [LibraryImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool SetConsoleActiveScreenBuffer (nint handle);
 
-    [DllImport ("kernel32.dll")]
-    private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, WindowsConsole.Coord dwCursorPosition);
+    [LibraryImport ("kernel32.dll")]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool SetConsoleCursorPosition (nint hConsoleOutput, WindowsConsole.Coord dwCursorPosition);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
     private static extern bool SetConsoleCursorInfo (nint hConsoleOutput, [In] ref WindowsConsole.ConsoleCursorInfo lpConsoleCursorInfo);
 
-    private readonly nint _screenBuffer;
+    [LibraryImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    public static partial bool SetConsoleTextAttribute (nint hConsoleOutput, ushort wAttributes);
 
-    // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
-    private TextStyle _redrawTextStyle = TextStyle.None;
+    [LibraryImport ("kernel32.dll")]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+    [LibraryImport ("kernel32.dll")]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+    [LibraryImport ("kernel32.dll", SetLastError = true)]
+    private static partial WindowsConsole.Coord GetLargestConsoleWindowSize (
+        nint hConsoleOutput
+    );
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static extern bool SetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX consoleScreenBufferInfo);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static extern bool SetConsoleWindowInfo (
+        nint hConsoleOutput,
+        bool bAbsolute,
+        [In] ref WindowsConsole.SmallRect lpConsoleWindow
+    );
+
+    private const int STD_OUTPUT_HANDLE = -11;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+    private readonly nint _outputHandle;
+    private nint _screenBuffer;
+    private readonly bool _isVirtualTerminal;
 
     public WindowsOutput ()
     {
@@ -73,13 +110,48 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
+        // Get the standard output handle which is the current screen buffer.
+        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+        GetConsoleMode (_outputHandle, out uint mode);
+        _isVirtualTerminal = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
+
+        if (_isVirtualTerminal)
+        {
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+        }
+        else
+        {
+            CreateScreenBuffer ();
+
+            if (!GetConsoleMode (_screenBuffer, out mode))
+            {
+                throw new ApplicationException ($"Failed to get screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
+            }
+
+            const uint ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002;
+
+            mode &= ~ENABLE_WRAP_AT_EOL_OUTPUT; // Disable wrap
+
+            if (!SetConsoleMode (_screenBuffer, mode))
+            {
+                throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
+            }
+
+            // Force 16 colors if not in virtual terminal mode.
+            Application.Force16Colors = true;
+        }
+    }
+
+    private void CreateScreenBuffer ()
+    {
         _screenBuffer = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
+                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
+                                   nint.Zero,
+                                   1,
+                                   nint.Zero
+                                  );
 
         if (_screenBuffer == INVALID_HANDLE_VALUE)
         {
@@ -99,212 +171,229 @@ internal partial class WindowsOutput : IConsoleOutput
 
     public void Write (ReadOnlySpan<char> str)
     {
-        if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
+        if (!WriteConsole (_isVirtualTerminal ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
         }
     }
 
-    public void Write (IOutputBuffer buffer)
+    public Size ResizeBuffer (Size size)
     {
-        WindowsConsole.ExtendedCharInfo [] outputBuffer = new WindowsConsole.ExtendedCharInfo [buffer.Rows * buffer.Cols];
+        Size newSize = SetConsoleWindow (
+                                 (short)Math.Max (size.Width, 0),
+                                 (short)Math.Max (size.Height, 0));
 
-        // TODO: probably do need this right?
-        /*
-        if (!windowSize.IsEmpty && (windowSize.Width != buffer.Cols || windowSize.Height != buffer.Rows))
-        {
-            return;
-        }*/
-
-        var bufferCoords = new WindowsConsole.Coord
-        {
-            X = (short)buffer.Cols, //Clip.Width,
-            Y = (short)buffer.Rows //Clip.Height
-        };
-
-        for (var row = 0; row < buffer.Rows; row++)
-        {
-            if (!buffer.DirtyLines [row])
-            {
-                continue;
-            }
-
-            buffer.DirtyLines [row] = false;
-
-            for (var col = 0; col < buffer.Cols; col++)
-            {
-                int position = row * buffer.Cols + col;
-                outputBuffer [position].Attribute = buffer.Contents [row, col].Attribute.GetValueOrDefault ();
-
-                if (buffer.Contents [row, col].IsDirty == false)
-                {
-                    outputBuffer [position].Empty = true;
-                    outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-
-                    continue;
-                }
-
-                outputBuffer [position].Empty = false;
-
-                if (buffer.Contents [row, col].Rune.IsBmp)
-                {
-                    outputBuffer [position].Char = (char)buffer.Contents [row, col].Rune.Value;
-                }
-                else
-                {
-                    //outputBuffer [position].Empty = true;
-                    outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-
-                    if (buffer.Contents [row, col].Rune.GetColumns () > 1 && col + 1 < buffer.Cols)
-                    {
-                        // TODO: This is a hack to deal with non-BMP and wide characters.
-                        col++;
-                        position = row * buffer.Cols + col;
-                        outputBuffer [position].Empty = false;
-                        outputBuffer [position].Char = ' ';
-                    }
-                }
-            }
-        }
-
-        var damageRegion = new WindowsConsole.SmallRect
-        {
-            Top = 0,
-            Left = 0,
-            Bottom = (short)buffer.Rows,
-            Right = (short)buffer.Cols
-        };
-
-        //size, ExtendedCharInfo [] charInfoBuffer, Coord , SmallRect window,
-        if (!ConsoleDriver.RunningUnitTests
-            && !WriteToConsole (
-                                new (buffer.Cols, buffer.Rows),
-                                outputBuffer,
-                                bufferCoords,
-                                damageRegion,
-                                Application.Driver!.Force16Colors))
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-        }
-
-        WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+        return newSize;
     }
 
-    public bool WriteToConsole (Size size, WindowsConsole.ExtendedCharInfo [] charInfoBuffer, WindowsConsole.Coord bufferSize, WindowsConsole.SmallRect window, bool force16Colors)
-    {
-
-        //Debug.WriteLine ("WriteToConsole");
-
-        //if (_screenBuffer == nint.Zero)
-        //{
-        //    ReadFromConsoleOutput (size, bufferSize, ref window);
-        //}
-
-        var result = false;
-
-        if (force16Colors)
-        {
-            var i = 0;
-            WindowsConsole.CharInfo [] ci = new WindowsConsole.CharInfo [charInfoBuffer.Length];
-
-            foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
-            {
-                ci [i++] = new ()
-                {
-                    Char = new () { UnicodeChar = info.Char },
-                    Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
-                };
-            }
-
-            result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new () { X = window.Left, Y = window.Top }, ref window);
-        }
-        else
-        {
-            StringBuilder stringBuilder = new();
-
-            stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
-
-            Attribute? prev = null;
-
-            foreach (WindowsConsole.ExtendedCharInfo info in charInfoBuffer)
-            {
-                Attribute attr = info.Attribute;
-
-                if (attr != prev)
-                {
-                    prev = attr;
-                    EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-                    EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
-                    EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.Style);
-                    _redrawTextStyle = attr.Style;
-                }
-
-                if (info.Char != '\x1b')
-                {
-                    if (!info.Empty)
-                    {
-                        stringBuilder.Append (info.Char);
-                    }
-                }
-                else
-                {
-                    stringBuilder.Append (' ');
-                }
-            }
-
-            stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-            stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
-
-            // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
-            char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
-            try
-            {
-                Span<char> writeBuffer = rentedWriteArray.AsSpan(0, stringBuilder.Length);
-                stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
-
-                // Supply console with the new content.
-                result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.Return (rentedWriteArray);
-            }
-
-            foreach (SixelToRender sixel in Application.Sixel)
-            {
-                SetCursorPosition ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y);
-                WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
-            }
-        }
-
-        if (!result)
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-        }
-
-        return result;
-    }
-
-    public Size GetWindowSize ()
+    internal Size SetConsoleWindow (short cols, short rows)
     {
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+
+        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (_isVirtualTerminal ? _outputHandle : _screenBuffer);
+        short newCols = Math.Min (cols, maxWinSize.X);
+        short newRows = Math.Min (rows, maxWinSize.Y);
+        csbi.dwSize = new (newCols, Math.Max (newRows, (short)1));
+        csbi.srWindow = new (0, 0, newCols, newRows);
+        csbi.dwMaximumWindowSize = new (newCols, newRows);
+
+        if (!SetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+
+        var winRect = new WindowsConsole.SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
+
+        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            return new (cols, rows);
+        }
+
+        SetConsoleOutputWindow (csbi);
+
+        return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
+    }
+
+    private void SetConsoleOutputWindow (WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX csbi)
+    {
+        if ((_isVirtualTerminal
+                 ? _outputHandle
+                 : _screenBuffer) != nint.Zero && !SetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+    }
+
+    public override void Write (IOutputBuffer outputBuffer)
+    {
+        _force16Colors = Application.Driver!.Force16Colors;
+        _everythingStringBuilder = new StringBuilder ();
+
+        // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
+        _consoleBuffer = 0;
+        if (_force16Colors)
+        {
+            if (_isVirtualTerminal)
+            {
+                _consoleBuffer = _outputHandle;
+            }
+            else
+            {
+                _consoleBuffer = _screenBuffer;
+            }
+        }
+        else
+        {
+            _consoleBuffer = _outputHandle;
+        }
+
+        base.Write (outputBuffer);
+
+        try
+        {
+            if (_force16Colors && !_isVirtualTerminal)
+            {
+                SetConsoleActiveScreenBuffer (_consoleBuffer);
+            }
+            else
+            {
+                var span = _everythingStringBuilder.ToString ().AsSpan (); // still allocates the string
+
+                var result = WriteConsole (_consoleBuffer, span, (uint)span.Length, out _, nint.Zero);
+                if (!result)
+                {
+                    int err = Marshal.GetLastWin32Error ();
+
+                    if (err != 0)
+                    {
+                        throw new Win32Exception (err);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsOutput)}");
+
+            if (!ConsoleDriver.RunningUnitTests)
+            {
+                throw;
+            }
+        }
+    }
+    /// <inheritdoc />
+    protected override void Write (StringBuilder output)
+    {
+        if (output.Length == 0)
+        {
+            return;
+        }
+
+        var str = output.ToString ();
+
+        if (_force16Colors && !_isVirtualTerminal)
+        {
+            var a = str.ToCharArray ();
+            WriteConsole (_screenBuffer,a ,(uint)a.Length, out _, nint.Zero);
+        }
+        else
+        {
+            _everythingStringBuilder.Append (str);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
+    {
+        var force16Colors = Application.Force16Colors;
+
+        if (force16Colors)
+        {
+            if (_isVirtualTerminal)
+            {
+                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            }
+            else
+            {
+                var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
+                SetConsoleTextAttribute (_screenBuffer, as16ColorInt);
+            }
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
+            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+        }
+    }
+
+
+    private Size? _lastSize;
+    private Size? _lastWindowSizeBeforeMaximized;
+    private bool _lockResize;
+
+    public Size GetWindowSize ()
+    {
+        if (_lockResize)
+        {
+            return _lastSize!.Value;
+        }
+
+        var newSize = GetWindowSize (out _);
+        Size largestWindowSize = GetLargestConsoleWindowSize ();
+
+        if (_lastWindowSizeBeforeMaximized is null && newSize == largestWindowSize)
+        {
+            _lastWindowSizeBeforeMaximized = _lastSize;
+        }
+        else if (_lastWindowSizeBeforeMaximized is { } && newSize != largestWindowSize)
+        {
+            if (newSize != _lastWindowSizeBeforeMaximized)
+            {
+                newSize = _lastWindowSizeBeforeMaximized.Value;
+            }
+
+            _lastWindowSizeBeforeMaximized = null;
+        }
+
+        if (_lastSize == null || _lastSize != newSize)
+        {
+            // User is resizing the screen, they can only ever resize the active
+            // buffer since. We now however have issue because background offscreen
+            // buffer will be wrong size, recreate it to ensure it doesn't result in
+            // differing active and back buffer sizes (which causes flickering of window size)
+            Size? bufSize = null;
+            while (bufSize != newSize)
+            {
+                _lockResize = true;
+                bufSize = ResizeBuffer (newSize);
+            }
+
+            _lockResize = false;
+            _lastSize = newSize;
+        }
+
+        return newSize;
+    }
+
+    public Size GetWindowSize (out WindowsConsole.Coord cursorPosition)
+    {
+        var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+
+        if (!GetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            cursorPosition = default;
             return Size.Empty;
         }
 
@@ -312,18 +401,45 @@ internal partial class WindowsOutput : IConsoleOutput
                        csbi.srWindow.Right - csbi.srWindow.Left + 1,
                        csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
 
+        cursorPosition = csbi.dwCursorPosition;
         return sz;
     }
 
+    private Size GetLargestConsoleWindowSize ()
+    {
+        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (_isVirtualTerminal ? _outputHandle : _screenBuffer);
+
+        return new (maxWinSize.X, maxWinSize.Y);
+    }
+
+    /// <inheritdoc />
+    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
+    {
+        if (_force16Colors && !_isVirtualTerminal)
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
+        }
+        else
+        {
+            // CSI codes are 1 indexed
+            _everythingStringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+            EscSeqUtils.CSI_AppendCursorPosition (_everythingStringBuilder, screenPositionY + 1, screenPositionX + 1);
+        }
+
+        _lastCursorPosition = new (screenPositionX, screenPositionY);
+
+        return true;
+    }
+
     /// <inheritdoc/>
-    public void SetCursorVisibility (CursorVisibility visibility)
+    public override void SetCursorVisibility (CursorVisibility visibility)
     {
         if (ConsoleDriver.RunningUnitTests)
         {
             return;
         }
 
-        if (Application.Driver!.Force16Colors)
+        if (!_isVirtualTerminal)
         {
             var info = new WindowsConsole.ConsoleCursorInfo
             {
@@ -342,22 +458,34 @@ internal partial class WindowsOutput : IConsoleOutput
         }
     }
 
-    private Point _lastCursorPosition;
+    private Point? _lastCursorPosition;
 
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row)
     {
-        if (_lastCursorPosition.X == col && _lastCursorPosition.Y == row)
+        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
         {
             return;
         }
 
         _lastCursorPosition = new (col, row);
 
-        SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
+        if (_isVirtualTerminal)
+        {
+            var sb = new StringBuilder ();
+            EscSeqUtils.CSI_AppendCursorPosition (sb, row + 1, col + 1);
+            Write (sb.ToString ());
+        }
+        else
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
+        }
     }
 
     private bool _isDisposed;
+    private bool _force16Colors;
+    private nint _consoleBuffer;
+    private StringBuilder _everythingStringBuilder;
 
     /// <inheritdoc/>
     public void Dispose ()
@@ -367,16 +495,19 @@ internal partial class WindowsOutput : IConsoleOutput
             return;
         }
 
-        if (_screenBuffer != nint.Zero)
+        if (_isVirtualTerminal)
         {
-            try
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+        }
+        else
+        {
+            if (_screenBuffer != nint.Zero)
             {
                 CloseHandle (_screenBuffer);
             }
-            catch (Exception e)
-            {
-                Logging.Logger.LogError (e, "Error trying to close screen buffer handle in WindowsOutput via interop method");
-            }
+
+            _screenBuffer = nint.Zero;
         }
 
         _isDisposed = true;

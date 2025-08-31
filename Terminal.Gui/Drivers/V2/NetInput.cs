@@ -40,6 +40,12 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
             }
         }
 
+        //Enable alternative screen buffer.
+        Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+        //Set cursor key to application.
+        Console.Out.Write (EscSeqUtils.CSI_HideCursor);
+
         Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
         Console.TreatControlCAsInput = true;
     }
@@ -68,8 +74,14 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     public override void Dispose ()
     {
         base.Dispose ();
-        _adjustConsole?.Cleanup ();
-
         Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+        //Disable alternative screen buffer.
+        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+        //Set cursor key to cursor.
+        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+        _adjustConsole?.Cleanup ();
     }
 }

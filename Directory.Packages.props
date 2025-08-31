@@ -6,7 +6,6 @@
     <!-- Enable Nuget Source Link for github -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.11.0" />
     <PackageVersion Include="Microsoft.Net.Compilers.Toolset" Version="4.11.0" />
@@ -25,7 +24,7 @@
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="[3.1.7,4)" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="[3.1.11,4)" />
     <PackageVersion Include="CsvHelper" Version="[33.0.1,34)" />
     <PackageVersion Include="Microsoft.DotNet.PlatformAbstractions" Version="[3.1.6,4)" />
     <PackageVersion Include="System.CommandLine" Version="[2.0.0-beta4.22272.1,3)" />
