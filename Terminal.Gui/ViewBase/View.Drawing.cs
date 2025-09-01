@@ -173,11 +173,6 @@ public partial class View // Drawing APIs
             SetClip (saved);
         }
 
-        if (Padding?.NeedsLayout == true)
-        {
-            Padding.Layout ();
-        }
-
         if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
         {
             foreach (View subview in Padding.SubViews)
