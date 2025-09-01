@@ -278,9 +278,29 @@ public static class DeepCloner
 
         // Determine dictionary type and comparer
         Type [] genericArgs = type.GetGenericArguments ();
-        Type dictType = genericArgs.Length == 2
-            ? typeof (Dictionary<,>).MakeGenericType (genericArgs)
-            : typeof (Dictionary<object, object>);
+        Type dictType;
+
+        if (genericArgs.Length == 2)
+        {
+            if (type.GetGenericTypeDefinition () == typeof (Dictionary<,>))
+            {
+                dictType = typeof (Dictionary<,>).MakeGenericType (genericArgs);
+            }
+            else if (type.GetGenericTypeDefinition () == typeof (ConcurrentDictionary<,>))
+            {
+                dictType = typeof (ConcurrentDictionary<,>).MakeGenericType (genericArgs);
+            }
+            else
+            {
+                throw new InvalidOperationException (
+                                                     $"Unsupported dictionary type: {type}. Only Dictionary<,> and ConcurrentDictionary<,> are supported.");
+            }
+        }
+        else
+        {
+            dictType = typeof (Dictionary<object, object>);
+        }
+
         object? comparer = type.GetProperty ("Comparer")?.GetValue (source);
 
         // Create a temporary dictionary to hold cloned key-value pairs
