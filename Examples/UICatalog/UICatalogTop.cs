@@ -412,20 +412,7 @@ public class UICatalogTop : Toplevel
             X = Pos.Right (_categoryList!) - 1,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Fill (),
-            Height = Dim.Fill (
-                               Dim.Func (
-                                         () =>
-                                         {
-                                             if (_statusBar!.NeedsLayout)
-                                             {
-                                                 throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
-
-                                                 //_statusBar.Layout ();
-                                             }
-
-                                             return _statusBar.Frame.Height;
-                                         })),
-
+            Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
             //AllowsMarking = false,
             CanFocus = true,
             Title = "_Scenarios",
@@ -523,19 +510,7 @@ public class UICatalogTop : Toplevel
             X = 0,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Auto (),
-            Height = Dim.Fill (
-                               Dim.Func (
-                                         () =>
-                                         {
-                                             if (_statusBar!.NeedsLayout)
-                                             {
-                                                 throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
-
-                                                 //_statusBar.Layout ();
-                                             }
-
-                                             return _statusBar.Frame.Height;
-                                         })),
+            Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
             AllowsMarking = false,
             CanFocus = true,
             Title = "_Categories",
@@ -603,8 +578,8 @@ public class UICatalogTop : Toplevel
         // ReSharper disable All
         statusBar.Height = Dim.Auto (
                                      DimAutoStyle.Auto,
-                                     minimumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0),
-                                     maximumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0));
+                                     minimumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0),
+                                     maximumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0));
         // ReSharper restore All
 
         _shQuit = new ()

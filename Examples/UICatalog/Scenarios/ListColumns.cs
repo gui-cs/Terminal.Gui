@@ -249,7 +249,7 @@ public class ListColumns : Scenario
 
         top.Add (menu, appWindow, statusBar);
         appWindow.Y = 1;
-        appWindow.Height = Dim.Fill(Dim.Func (() => statusBar.Frame.Height));
+        appWindow.Height = Dim.Fill(Dim.Func (_ => statusBar.Frame.Height));
 
         // Run - Start the application.
         Application.Run (top);
