@@ -527,7 +527,7 @@ internal sealed class Menu : View
 
     private void Application_UnGrabbedMouse (object? sender, ViewEventArgs a)
     {
-        if (_host.IsMenuOpen)
+        if (_host is { IsMenuOpen: true })
         {
             _host.CloseAllMenus ();
         }

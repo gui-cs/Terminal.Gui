@@ -62,7 +62,7 @@ public class NumericUpDown<T> : View where T : notnull
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).GetColumns())),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns())),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true,

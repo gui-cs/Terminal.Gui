@@ -48,7 +48,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
                 }
 
-                textSize = us.TextFormatter.ConstrainToWidth!.Value;
+                textSize = us.TextFormatter.ConstrainToWidth ?? 0;
             }
             else
             {
@@ -81,7 +81,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 // TOOD: All the below is a naive implementation. It may be possible to optimize this.
 
-                List<View> includedSubViews = us.InternalSubViews.ToList ();
+                List<View> includedSubViews = us.SubViews.Snapshot ().ToList ();
 
                 // If [x] it can cause `us.ContentSize` to change.
                 // If [ ] it doesn't need special processing for us to determine `us.ContentSize`.

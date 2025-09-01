@@ -577,6 +577,7 @@ public partial class DimAutoTests
         Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
         Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
     }
+
     [Theory]
     [InlineData (0, 10, 0, 10, 10, 2)]
     [InlineData (0, 5, 0, 5, 5, 3)] // max width of 5 should cause wordwrap at 5 giving a height of 2 + 1
@@ -638,7 +639,7 @@ public partial class DimAutoTests
             Width = Dim.Auto (),
             Height = Dim.Auto (),
         };
-        var subview = new View { X = Pos.Func (() => 20), Y = Pos.Func (() => 25) };
+        var subview = new View { X = Pos.Func (_ => 20), Y = Pos.Func (_ => 25) };
         view.Add (subview);
 
         view.SetRelativeLayout (new (100, 100));

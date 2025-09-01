@@ -39,7 +39,6 @@ public class CharacterMap : Scenario
         {
             X = 0,
             Y = 1,
-            Width = Dim.Fill (Dim.Func (() => _categoryList!.Frame.Width)),
             Height = Dim.Fill (),
            // SchemeName = "Base"
 
@@ -171,6 +170,8 @@ public class CharacterMap : Scenario
             ]
         };
         top.Add (menu);
+
+        _charMap.Width = Dim.Fill (Dim.Func (v => v!.Frame.Width, _categoryList));
 
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();

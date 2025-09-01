@@ -43,14 +43,14 @@ public class Shortcuts : Scenario
         };
 
         eventLog.Width = Dim.Func (
-                                   () => Math.Min (
-                                                   Application.Top.Viewport.Width / 2,
-                                                   eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
+                                   _ => Math.Min (
+                                                  Application.Top.Viewport.Width / 2,
+                                                  eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
 
         eventLog.Width = Dim.Func (
-                                   () => Math.Min (
-                                                   eventLog.SuperView!.Viewport.Width / 2,
-                                                   eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
+                                   _ => Math.Min (
+                                                  eventLog.SuperView!.Viewport.Width / 2,
+                                                  eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
         Application.Top.Add (eventLog);
 
         var alignKeysShortcut = new Shortcut
@@ -193,7 +193,7 @@ public class Shortcuts : Scenario
             Id = "appShortcut",
             X = 0,
             Y = Pos.Bottom (canFocusShortcut),
-            Width = Dim.Fill (Dim.Func (() => eventLog.Frame.Width)),
+            Width = Dim.Fill (Dim.Func (_ => eventLog.Frame.Width)),
             Title = "A_pp Shortcut",
             Key = Key.F1,
             Text = "Width is DimFill",
