@@ -73,7 +73,7 @@ public partial class View
 
         scrollBar.Height = Dim.Fill (
                                      Dim.Func (
-                                               () =>
+                                               _ =>
                                                {
                                                    if (_horizontalScrollBar.IsValueCreated)
                                                    {
@@ -98,7 +98,7 @@ public partial class View
 
         scrollBar.Width = Dim.Fill (
                                     Dim.Func (
-                                              () =>
+                                              _ =>
                                               {
                                                   if (_verticalScrollBar.IsValueCreated)
                                                   {

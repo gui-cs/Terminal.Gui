@@ -83,7 +83,7 @@ public class SingleBackgroundWorker : Scenario
             workerLogTop.Add (_listLog);
 
             workerLogTop.Y = 1;
-            workerLogTop.Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height));
+            workerLogTop.Height = Dim.Fill (Dim.Func (_ => statusBar.Frame.Height));
 
             Add (menu, workerLogTop, statusBar);
             Title = "MainApp";

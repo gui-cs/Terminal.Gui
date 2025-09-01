@@ -101,7 +101,7 @@ public class AllViewsTester : Scenario
         {
             Title = "Arrangement [_3]",
             X = Pos.Right (_classListView) - 1,
-            Y = Pos.Bottom (_adornmentsEditor) - Pos.Func (() => _adornmentsEditor.Frame.Height == 1 ? 0 : 1),
+            Y = Pos.Bottom (_adornmentsEditor) - Pos.Func (_ => _adornmentsEditor.Frame.Height == 1 ? 0 : 1),
             Width = Dim.Width (_adornmentsEditor),
             Height = Dim.Fill (),
             AutoSelectViewToEdit = false,
@@ -134,7 +134,7 @@ public class AllViewsTester : Scenario
         {
             Title = "ViewportSettings [_5]",
             X = Pos.Right (_arrangementEditor) - 1,
-            Y = Pos.Bottom (_layoutEditor) - Pos.Func (() => _layoutEditor.Frame.Height == 1 ? 0 : 1),
+            Y = Pos.Bottom (_layoutEditor) - Pos.Func (_ => _layoutEditor.Frame.Height == 1 ? 0 : 1),
             Width = Dim.Width (_layoutEditor),
             Height = Dim.Auto (),
             CanFocus = true,
@@ -148,7 +148,7 @@ public class AllViewsTester : Scenario
         {
             Title = "View Properties [_6]",
             X = Pos.Right (_adornmentsEditor) - 1,
-            Y = Pos.Bottom (_viewportSettingsEditor) - Pos.Func (() => _viewportSettingsEditor.Frame.Height == 1 ? 0 : 1),
+            Y = Pos.Bottom (_viewportSettingsEditor) - Pos.Func (_ => _viewportSettingsEditor.Frame.Height == 1 ? 0 : 1),
             Width = Dim.Width (_layoutEditor),
             Height = Dim.Auto (),
             CanFocus = true,
@@ -171,7 +171,7 @@ public class AllViewsTester : Scenario
 
         _layoutEditor.Width = Dim.Fill (
                                         Dim.Func (
-                                                  () =>
+                                                  _ =>
                                                   {
                                                       if (_eventLog.NeedsLayout)
                                                       {

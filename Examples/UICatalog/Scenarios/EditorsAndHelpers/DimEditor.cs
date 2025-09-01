@@ -68,7 +68,7 @@ public class DimEditor : EditorBase
                 break;
             case DimFunc func:
                 _valueEdit.Enabled = true;
-                _value = func.Fn ();
+                _value = func.Fn (null);
                 _valueEdit!.Text = _value.ToString ();
                 break;
             case DimPercent percent:
@@ -98,7 +98,7 @@ public class DimEditor : EditorBase
         {
             X = Pos.Right (label) + 1,
             Y = 0,
-            Width = Dim.Func (() => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
+            Width = Dim.Func (_ => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
             Text = $"{_value}"
         };
 
@@ -141,7 +141,7 @@ public class DimEditor : EditorBase
                 0 => Dim.Absolute (_value),
                 1 => Dim.Auto (),
                 2 => Dim.Fill (_value),
-                3 => Dim.Func (() => _value),
+                3 => Dim.Func (_ => _value),
                 4 => Dim.Percent (_value),
                 _ => Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height
             };

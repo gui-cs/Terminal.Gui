@@ -117,7 +117,7 @@ public record PosAlign : Pos
         }
         else
         {
-            groupViews = us.SuperView!.SubViews.Where (v => HasGroupId (v, dimension, GroupId)).ToList ();
+            groupViews = us.SuperView!.SubViews.Snapshot ().Where (v => HasGroupId (v, dimension, GroupId)).ToList ();
         }
 
         AlignAndUpdateGroup (GroupId, groupViews, dimension, superviewDimension);
