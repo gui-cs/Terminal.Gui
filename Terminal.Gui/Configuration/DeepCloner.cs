@@ -307,8 +307,8 @@ public static class DeepCloner
         IDictionary tempDict = CreateDictionaryInstance (dictType, comparer);
         visited.TryAdd (source, tempDict);
 
-
         object? lastKey = null;
+
         try
         {
             // Clone all key-value pairs
@@ -331,7 +331,9 @@ public static class DeepCloner
         catch (InvalidOperationException ex)
         {
             // Handle cases where the dictionary is modified during enumeration
-            throw new InvalidOperationException ($"Error cloning dictionary ({source}) (last key was \"{lastKey}\"). Ensure the source dictionary is not modified during cloning.", ex);
+            throw new InvalidOperationException (
+                                                 $"Error cloning dictionary ({source}) (last key was \"{lastKey}\"). Ensure the source dictionary is not modified during cloning.",
+                                                 ex);
         }
 
         // If the original dictionary type has a parameterless constructor, create a new instance
