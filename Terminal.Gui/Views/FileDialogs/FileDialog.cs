@@ -154,7 +154,7 @@ public class FileDialog : Dialog, IDesignable
             X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (() => IsInitialized ? _btnOk.Frame.Height : 1))
+            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1))
         };
 
         Initialized += (s, e) =>
@@ -754,7 +754,7 @@ public class FileDialog : Dialog, IDesignable
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
 
-    private int CalculateOkButtonPosX ()
+    private int CalculateOkButtonPosX (View? _)
     {
         if (!IsInitialized || !_btnOk.IsInitialized || !_btnCancel.IsInitialized)
         {

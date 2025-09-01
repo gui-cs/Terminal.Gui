@@ -66,7 +66,7 @@ public class Arrangement : Scenario
         View tiledView3 = CreateTiledView (2, Pos.Right (tiledView2) - 1, Pos.Top (tiledView2));
         tiledView3.Height = Dim.Height (tiledView1);
         View tiledView4 = CreateTiledView (3, Pos.Left (tiledView1), Pos.Bottom (tiledView1) - 1);
-        tiledView4.Width = Dim.Func (() => tiledView3.Frame.Width + tiledView2.Frame.Width + tiledView1.Frame.Width - 2);
+        tiledView4.Width = Dim.Func (_ => tiledView3.Frame.Width + tiledView2.Frame.Width + tiledView1.Frame.Width - 2);
 
         View movableSizeableWithProgress = CreateOverlappedView (2, 10, 8);
         movableSizeableWithProgress.Title = "Movable _& Sizable";

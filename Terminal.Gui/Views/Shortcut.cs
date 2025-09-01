@@ -106,8 +106,8 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         return Dim.Auto (
                          DimAutoStyle.Content,
-                         minimumContentDim: Dim.Func (() => _minimumNaturalWidth ?? 0),
-                         maximumContentDim: Dim.Func (() => _minimumNaturalWidth ?? 0))!;
+                         minimumContentDim: Dim.Func (_ => _minimumNaturalWidth ?? 0),
+                         maximumContentDim: Dim.Func (_ => _minimumNaturalWidth ?? 0))!;
     }
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
@@ -540,7 +540,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
         _maxHelpWidth = HelpView.Text.GetColumns ();
-        HelpView.Width = Dim.Auto (DimAutoStyle.Text, maximumContentDim: Dim.Func ((() => _maxHelpWidth)));
+        HelpView.Width = Dim.Auto (DimAutoStyle.Text, maximumContentDim: Dim.Func ((_ => _maxHelpWidth)));
         HelpView.Height = Dim.Fill ();
 
         HelpView.Visible = true;
@@ -672,7 +672,7 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
-        KeyView.Width = Dim.Auto (DimAutoStyle.Text, minimumContentDim: Dim.Func (() => MinimumKeyTextSize));
+        KeyView.Width = Dim.Auto (DimAutoStyle.Text, minimumContentDim: Dim.Func (_ => MinimumKeyTextSize));
         KeyView.Height = Dim.Fill ();
 
         KeyView.Visible = true;

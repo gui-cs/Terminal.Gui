@@ -109,7 +109,7 @@ public class Mouse : Scenario
                                    X = 0,
                                    Y = 0,
                                    Width = Dim.Fill (),
-                                   Height = Dim.Func (() => demo.Padding.Thickness.Top),
+                                   Height = Dim.Func (_ => demo.Padding.Thickness.Top),
                                    Title = "inPadding",
                                    Id = "inPadding"
                                });

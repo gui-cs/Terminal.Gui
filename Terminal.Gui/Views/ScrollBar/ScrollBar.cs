@@ -40,11 +40,11 @@ public class ScrollBar : View, IOrientation, IDesignable
         // Set the default width and height based on the orientation - fill Viewport
         Width = Dim.Auto (
                           DimAutoStyle.Content,
-                          Dim.Func (() => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
+                          Dim.Func (_ => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
 
         Height = Dim.Auto (
                            DimAutoStyle.Content,
-                           Dim.Func (() => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
+                           Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
         _decreaseButton = new ()
         {
