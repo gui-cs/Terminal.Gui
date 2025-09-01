@@ -419,7 +419,10 @@ public partial class View // Layout APIs
         {
             LayoutSubViews ();
 
-            // Debug.Assert(!NeedsLayout);
+            // A layout was performed so a draw is needed
+            // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
+            SetNeedsDraw ();
+
             return true;
         }
 
@@ -635,7 +638,7 @@ public partial class View // Layout APIs
 
         List<View> redo = new ();
 
-        foreach (View v in ordered)
+        foreach (View v in ordered.Snapshot ())
         {
             if (!v.Layout (contentSize))
             {
@@ -700,7 +703,7 @@ public partial class View // Layout APIs
     ///     Override to perform tasks after the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { }
+    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { Debug.Assert (!NeedsLayout); }
 
     /// <summary>Raised after all sub-views have been laid out.</summary>
     /// <remarks>
@@ -761,10 +764,12 @@ public partial class View // Layout APIs
 
         // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
         // Use a stack to avoid recursion
-        Stack<View> stack = new (SubViews);
+        Stack<View> stack = new (InternalSubViews.Snapshot ().ToList ());
 
         while (stack.Count > 0)
         {
+            Debug.Assert (stack.Peek () is { });
+
             View current = stack.Pop ();
 
             if (!current.NeedsLayout)

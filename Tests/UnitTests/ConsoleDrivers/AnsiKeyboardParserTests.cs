@@ -100,11 +100,10 @@ public class AnsiKeyboardParserTests
         yield return new object [] { "\u001b[24~", Key.F12 };
 
         // Function keys with modifiers
-        /*  Not currently supported
         yield return new object [] { "\u001b[1;2P", Key.F1.WithShift };
         yield return new object [] { "\u001b[1;3Q", Key.F2.WithAlt };
         yield return new object [] { "\u001b[1;5R", Key.F3.WithCtrl };
-        */
+        
     }
 
     // Consolidated test for all keyboard events (e.g., arrow keys)

@@ -94,7 +94,7 @@ public class LabelTests (ITestOutputHelper output)
     public void Text_Set_With_AnchorEnd_Works ()
     {
         var label = new Label { Y = Pos.Center (), Text = "Say Hello 你" };
-        label.X = Pos.AnchorEnd (0) - Pos.Func (() => label.TextFormatter.Text.GetColumns ());
+        label.X = Pos.AnchorEnd (0) - Pos.Func (_ => label.TextFormatter.Text.GetColumns ());
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);

@@ -394,12 +394,12 @@ public static class MessageBox
         };
 
         d.Width = Dim.Auto (DimAutoStyle.Auto,
-                            minimumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
-                            maximumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
+                            minimumContentDim: Dim.Func (_ => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
+                            maximumContentDim: Dim.Func (_ => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
 
         d.Height = Dim.Auto (DimAutoStyle.Auto,
-                             minimumContentDim: Dim.Func (() => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
-                             maximumContentDim: Dim.Func (() => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
+                             minimumContentDim: Dim.Func (_ => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
+                             maximumContentDim: Dim.Func (_ => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
 
 
         if (width != 0)

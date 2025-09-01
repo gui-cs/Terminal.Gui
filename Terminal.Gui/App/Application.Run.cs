@@ -205,15 +205,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.OnLoaded ();
 
+        LayoutAndDraw (true);
+
         if (PositionCursor ())
         {
             Driver?.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
-
-        // Force an Idle event so that an Iteration (and Refresh) happen.
-        Invoke (() => { });
 
         return rs;
     }
@@ -535,7 +534,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             return firstIteration;
         }
 
-        LayoutAndDraw ();
+        LayoutAndDraw (TopLevels.Any (v => v.NeedsLayout || v.NeedsDraw));
 
         if (PositionCursor ())
         {

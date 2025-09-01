@@ -141,12 +141,14 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     public static Dim? Fill (Dim margin) { return new DimFill (margin); }
 
     /// <summary>
-    ///     Creates a function <see cref="Dim"/> object that computes the dimension by executing the provided function.
+    ///     Creates a function <see cref="Dim"/> object that computes the dimension based on the passed view and by executing
+    ///     the provided function.
     ///     The function will be called every time the dimension is needed.
     /// </summary>
     /// <param name="function">The function to be executed.</param>
-    /// <returns>The <see cref="Dim"/> returned from the function.</returns>
-    public static Dim Func (Func<int> function) { return new DimFunc (function); }
+    /// <param name="view">The view where the data will be retrieved.</param>
+    /// <returns>The <see cref="Dim"/> returned from the function based on the passed view.</returns>
+    public static Dim Func (Func<View?, int> function, View? view = null) { return new DimFunc (function, view); }
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>

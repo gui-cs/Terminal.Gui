@@ -490,7 +490,7 @@ public class Wizard : Dialog
 
             step.Height = Dim.Fill (
                                     Dim.Func (
-                                              () => IsInitialized
+                                              v => IsInitialized
                                                         ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
                                                         : 1)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
@@ -502,9 +502,9 @@ public class Wizard : Dialog
 
             step.Height = Dim.Fill (
                                     Dim.Func (
-                                              () => IsInitialized
-                                                        ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
-                                                        : 2)); // for button frame (+1 for lineView)
+                                              v => IsInitialized
+                                                       ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
+                                                       : 2)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
     }

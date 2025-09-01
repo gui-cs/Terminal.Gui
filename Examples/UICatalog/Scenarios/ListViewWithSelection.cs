@@ -76,7 +76,7 @@ public class ListViewWithSelection : Scenario
             Title = "_ListView",
             X = 0,
             Y = Pos.Bottom (_allowMarkingCb),
-            Width = Dim.Func (() => _listView?.MaxLength ?? 10),
+            Width = Dim.Func (_ => _listView?.MaxLength ?? 10),
             Height = Dim.Fill (),
             AllowsMarking = false,
             AllowsMultipleSelection = false,
