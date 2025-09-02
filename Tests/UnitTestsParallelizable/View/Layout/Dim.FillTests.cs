@@ -123,12 +123,12 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_Margin_Is_Dim_SetsValue ()
     {
-        Dim testMargin = Dim.Func (() => 0);
+        Dim testMargin = Dim.Func (_ => 0);
         Dim dim = Dim.Fill (testMargin);
         Assert.Equal (0, dim!.GetAnchor (0));
 
 
-        testMargin = Dim.Func (() => 5);
+        testMargin = Dim.Func (_ => 5);
         dim = Dim.Fill (testMargin);
         Assert.Equal (-5, dim!.GetAnchor (0));
     }

@@ -122,7 +122,7 @@ public class AdornmentsEditor : EditorBase
         PaddingEditor.Border!.Thickness = PaddingEditor.Border.Thickness with { Bottom = 0 };
         Add (PaddingEditor);
 
-        Width = Dim.Auto (maximumContentDim: Dim.Func (() => MarginEditor.Frame.Width - 2));
+        Width = Dim.Auto (maximumContentDim: Dim.Func (_ => MarginEditor.Frame.Width - 2));
 
         MarginEditor.ExpanderButton!.Collapsed = true;
         BorderEditor.ExpanderButton!.Collapsed = true;

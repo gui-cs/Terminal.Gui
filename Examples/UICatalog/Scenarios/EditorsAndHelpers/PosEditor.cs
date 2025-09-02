@@ -70,7 +70,7 @@ public class PosEditor : EditorBase
                 break;
             case PosFunc func:
                 _valueEdit.Enabled = true;
-                _value = func.Fn ();
+                _value = func.Fn (null);
                 _valueEdit!.Text = _value.ToString ();
 
                 break;
@@ -98,7 +98,7 @@ public class PosEditor : EditorBase
         {
             X = Pos.Right (label) + 1,
             Y = 0,
-            Width = Dim.Func (() => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
+            Width = Dim.Func (_ => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
             Text = $"{_value}"
         };
 
@@ -142,7 +142,7 @@ public class PosEditor : EditorBase
                            1 => Pos.Align (Alignment.Start),
                            2 => new PosAnchorEnd (),
                            3 => Pos.Center (),
-                           4 => Pos.Func (() => _value),
+                           4 => Pos.Func (_ => _value),
                            5 => Pos.Percent (_value),
                            _ => Dimension == Dimension.Width ? ViewToEdit.X : ViewToEdit.Y
                        };

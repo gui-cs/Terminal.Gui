@@ -100,7 +100,7 @@ public class AdornmentEditor : EditorBase
 
         _leftEdit = new ()
         {
-            X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Text.Length) - 2, Y = Pos.Bottom (_topEdit),
+            X = Pos.Left (_topEdit) - Pos.Func (_ => _topEdit.Text.Length) - 2, Y = Pos.Bottom (_topEdit),
             Format = _topEdit.Format
         };
 

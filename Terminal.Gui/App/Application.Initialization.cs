@@ -212,14 +212,15 @@ public static partial class Application // Initialization (Init/Shutdown)
         // use reflection to get the list of drivers
         List<Type?> driverTypes = new ();
 
-        foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies ())
+        // Only inspect the IConsoleDriver assembly
+        var asm = typeof (IConsoleDriver).Assembly;
+
+        foreach (Type? type in asm.GetTypes ())
         {
-            foreach (Type? type in asm.GetTypes ())
+            if (typeof (IConsoleDriver).IsAssignableFrom (type) &&
+                type is { IsAbstract: false, IsClass: true })
             {
-                if (typeof (IConsoleDriver).IsAssignableFrom (type) && !type.IsAbstract && type.IsClass)
-                {
-                    driverTypes.Add (type);
-                }
+                driverTypes.Add (type);
             }
         }
 

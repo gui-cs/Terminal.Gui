@@ -179,7 +179,7 @@ public partial class DimAutoTests
     public void With_SubView_Using_DimFunc ()
     {
         var view = new View ();
-        var subview = new View { Width = Dim.Func (() => 20), Height = Dim.Func (() => 25) };
+        var subview = new View { Width = Dim.Func (_ => 20), Height = Dim.Func (_ => 25) };
         view.Add (subview);
 
         subview.SetRelativeLayout (new (100, 100));

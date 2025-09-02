@@ -61,10 +61,10 @@ public class FrameTests
         Assert.Equal (view.Height, frame.Height);
 
         // Set back to original state
-        view.X = Pos.Func (() => 10);
-        view.Y = Pos.Func (() => 20);
-        view.Width = Dim.Func (() => 30);
-        view.Height = Dim.Func (() => 40);
+        view.X = Pos.Func (_ => 10);
+        view.Y = Pos.Func (_ => 20);
+        view.Width = Dim.Func (_ => 30);
+        view.Height = Dim.Func (_ => 40);
         Assert.True (view.NeedsLayout);
 
         view.Layout ();
@@ -281,10 +281,10 @@ public class FrameTests
     {
         public FrameTestView ()
         {
-            X = Pos.Func (() => 10);
-            Y = Pos.Func (() => 20);
-            Width = Dim.Func (() => 30);
-            Height = Dim.Func (() => 40);
+            X = Pos.Func (_ => 10);
+            Y = Pos.Func (_ => 20);
+            Width = Dim.Func (_ => 30);
+            Height = Dim.Func (_ => 40);
         }
     }
 
