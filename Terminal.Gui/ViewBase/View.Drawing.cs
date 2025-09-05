@@ -153,11 +153,6 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
-        if (Border?.NeedsLayout == true)
-        {
-            Border.Layout ();
-        }
-
         // NOTE: We do not support subviews of Margin?
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
@@ -176,11 +171,6 @@ public partial class View // Drawing APIs
             Region? saved = Border?.AddFrameToClip ();
             Border?.DoDrawSubViews ();
             SetClip (saved);
-        }
-
-        if (Padding?.NeedsLayout == true)
-        {
-            Padding.Layout ();
         }
 
         if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
