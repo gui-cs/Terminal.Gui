@@ -249,8 +249,7 @@ internal class UnixMainLoop : IMainLoopDriver
 
     private class Watch
     {
-        // BUGBUG: Fix this nullable issue.
-        public Func<MainLoop, bool> Callback;
+        public Func<MainLoop, bool>? Callback;
         public Condition Condition;
         public int File;
     }
