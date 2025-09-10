@@ -223,7 +223,7 @@ internal class NetDriver : ConsoleDriver
 
     // BUGBUG: Fix this nullable issue.
     /// <inheritdoc />
-    internal override IAnsiResponseParser GetParser () => _mainLoopDriver._netEvents.Parser;
+    internal override IAnsiResponseParser GetParser () => _mainLoopDriver!._netEvents!.Parser;
     internal NetMainLoop? _mainLoopDriver;
 
     /// <inheritdoc />

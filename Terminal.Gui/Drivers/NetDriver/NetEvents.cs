@@ -80,7 +80,7 @@ internal class NetEvents : IDisposable
             return Console.ReadKey (intercept);
         }
 
-        while (!_netEventsDisposed.IsCancellationRequested)
+        while (!_netEventsDisposed!.IsCancellationRequested)
         {
             Task.Delay (100, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
 

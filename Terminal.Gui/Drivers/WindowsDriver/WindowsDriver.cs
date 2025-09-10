@@ -394,7 +394,7 @@ internal class WindowsDriver : ConsoleDriver
         {
 #if HACK_CHECK_WINCHANGED
 
-            _mainLoopDriver.WinChanged -= ChangeWin;
+            _mainLoopDriver.WinChanged -= ChangeWin!;
 #endif
         }
 
@@ -461,7 +461,7 @@ internal class WindowsDriver : ConsoleDriver
         ClearContents ();
 
 #if HACK_CHECK_WINCHANGED
-        _mainLoopDriver.WinChanged = ChangeWin;
+        _mainLoopDriver.WinChanged = ChangeWin!;
 #endif
 
         if (!RunningUnitTests)
@@ -609,9 +609,9 @@ internal class WindowsDriver : ConsoleDriver
 
         if (!RunningUnitTests)
         {
-            Size newSize = WinConsole.SetConsoleWindow (
-                                                        (short)Math.Max (e.Size.Value.Width, 16),
-                                                        (short)Math.Max (e.Size.Value.Height, 0));
+            Size newSize = WinConsole!.SetConsoleWindow (
+                                                         (short)Math.Max (e.Size.Value.Width, 16),
+                                                         (short)Math.Max (e.Size.Value.Height, 0));
 
             Cols = newSize.Width;
             Rows = newSize.Height;
