@@ -278,17 +278,37 @@ public static class DeepCloner
 
         // Determine dictionary type and comparer
         Type [] genericArgs = type.GetGenericArguments ();
-        Type dictType = genericArgs.Length == 2
-            ? typeof (Dictionary<,>).MakeGenericType (genericArgs)
-            : typeof (Dictionary<object, object>);
+        Type dictType;
+
+        if (genericArgs.Length == 2)
+        {
+            if (type.GetGenericTypeDefinition () == typeof (Dictionary<,>))
+            {
+                dictType = typeof (Dictionary<,>).MakeGenericType (genericArgs);
+            }
+            else if (type.GetGenericTypeDefinition () == typeof (ConcurrentDictionary<,>))
+            {
+                dictType = typeof (ConcurrentDictionary<,>).MakeGenericType (genericArgs);
+            }
+            else
+            {
+                throw new InvalidOperationException (
+                                                     $"Unsupported dictionary type: {type}. Only Dictionary<,> and ConcurrentDictionary<,> are supported.");
+            }
+        }
+        else
+        {
+            dictType = typeof (Dictionary<object, object>);
+        }
+
         object? comparer = type.GetProperty ("Comparer")?.GetValue (source);
 
         // Create a temporary dictionary to hold cloned key-value pairs
         IDictionary tempDict = CreateDictionaryInstance (dictType, comparer);
         visited.TryAdd (source, tempDict);
 
-
         object? lastKey = null;
+
         try
         {
             // Clone all key-value pairs
@@ -311,7 +331,9 @@ public static class DeepCloner
         catch (InvalidOperationException ex)
         {
             // Handle cases where the dictionary is modified during enumeration
-            throw new InvalidOperationException ($"Error cloning dictionary ({source}) (last key was \"{lastKey}\"). Ensure the source dictionary is not modified during cloning.", ex);
+            throw new InvalidOperationException (
+                                                 $"Error cloning dictionary ({source}) (last key was \"{lastKey}\"). Ensure the source dictionary is not modified during cloning.",
+                                                 ex);
         }
 
         // If the original dictionary type has a parameterless constructor, create a new instance

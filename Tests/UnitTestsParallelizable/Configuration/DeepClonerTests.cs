@@ -551,4 +551,91 @@ public class DeepClonerTests
         Assert.True (stopwatch.ElapsedMilliseconds < 1000); // Ensure it completes within 1 second
     }
 
+    [Fact]
+    public void CloneDictionary_ShouldClone_NormalDictionary ()
+    {
+        // Arrange: A supported generic dictionary
+        var original = new Dictionary<string, int>
+        {
+            ["one"] = 1,
+            ["two"] = 2,
+            ["three"] = 3
+        };
+
+        // Act
+        var cloned = DeepCloner.DeepClone (original);
+
+        // Assert
+        Assert.NotNull (cloned);
+        Assert.NotSame (original, cloned); // must be a new instance
+        Assert.Equal (original, cloned);   // must have same contents
+        Assert.Equal (original.Count, cloned.Count);
+        Assert.Equal (original ["one"], cloned ["one"]);
+        Assert.Equal (original ["two"], cloned ["two"]);
+        Assert.Equal (original ["three"], cloned ["three"]);
+    }
+
+    [Fact]
+    public void CloneDictionary_ShouldClone_ConcurrentDictionary ()
+    {
+        // Arrange
+        var original = new ConcurrentDictionary<string, string>
+        {
+            ["a"] = "alpha",
+            ["b"] = "beta"
+        };
+
+        // Act
+        var cloned = DeepCloner.DeepClone (original);
+
+        // Assert
+        Assert.NotSame (original, cloned);
+        Assert.Equal (original, cloned);
+    }
+
+    [Fact]
+    public void CloneDictionary_Empty_Dictionary_ShouldWork ()
+    {
+        // Arrange
+        var original = new Dictionary<int, string> ();
+
+        // Act
+        var cloned = DeepCloner.DeepClone (original);
+
+        // Assert
+        Assert.NotSame (original, cloned);
+        Assert.Empty (cloned!);
+    }
+
+    [Fact]
+    public void CloneDictionary_Empty_ConcurrentDictionary_ShouldWork ()
+    {
+        // Arrange
+        var original = new ConcurrentDictionary<int, string> ();
+
+        // Act
+        var cloned = DeepCloner.DeepClone (original);
+
+        // Assert
+        Assert.NotSame (original, cloned);
+        Assert.Empty (cloned!);
+    }
+
+    [Fact]
+    public void CloneDictionary_With_Unsupported_Dictionary_Throws ()
+    {
+        // Arrange: A generic dictionary type (SortedDictionary for example)
+        var unsupportedDict = new SortedDictionary<int, string>
+        {
+            { 1, "A" },
+            { 2, "B" }
+        };
+
+        // Act & Assert: DeepCloner should throw
+        Assert.ThrowsAny<InvalidOperationException> (() =>
+                                                     {
+                                                         // This should throw, because DeepCloner does not support SortedDictionary
+                                                         _ = DeepCloner.DeepClone (unsupportedDict);
+                                                     });
+    }
 }
