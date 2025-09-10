@@ -460,7 +460,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
-
+    
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
     internal static MainLoop? MainLoop { get; set; }
@@ -617,5 +617,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         runState.Dispose ();
 
         LayoutAndDraw (true);
+    }
+    internal static void RaiseIteration ()
+    {
+        Iteration?.Invoke (null, new ());
     }
 }

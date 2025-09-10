@@ -83,7 +83,14 @@ public class MainLoop<T> : IMainLoop<T>
     /// <param name="inputBuffer"></param>
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
-    public void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput)
+    /// <param name="componentFactory"></param>
+    public void Initialize (
+        ITimedEvents timedEvents,
+        ConcurrentQueue<T> inputBuffer,
+        IInputProcessor inputProcessor,
+        IConsoleOutput consoleOutput,
+        IComponentFactory<T> componentFactory
+    )
     {
         InputBuffer = inputBuffer;
         Out = consoleOutput;
@@ -92,18 +99,22 @@ public class MainLoop<T> : IMainLoop<T>
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
-        WindowSizeMonitor = new WindowSizeMonitor (Out, OutputBuffer);
+        WindowSizeMonitor = componentFactory.CreateWindowSizeMonitor (Out, OutputBuffer);
     }
 
     /// <inheritdoc/>
     public void Iteration ()
     {
+
+        Application.RaiseIteration ();
+
         DateTime dt = Now ();
+        int timeAllowed = 1000 / Math.Max(1,(int)Application.MaximumIterationsPerSecond);
 
         IterationImpl ();
 
         TimeSpan took = Now () - dt;
-        TimeSpan sleepFor = TimeSpan.FromMilliseconds (50) - took;
+        TimeSpan sleepFor = TimeSpan.FromMilliseconds (timeAllowed) - took;
 
         Logging.TotalIterationMetric.Record (took.Milliseconds);
 
@@ -123,7 +134,8 @@ public class MainLoop<T> : IMainLoop<T>
         if (Application.Top != null)
         {
             bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (Application.Top);
+                                     || AnySubViewsNeedDrawn (Application.Top)
+                                     || (Application.MouseGrabHandler.MouseGrabView != null && AnySubViewsNeedDrawn (Application.MouseGrabHandler.MouseGrabView));
 
             bool sizeChanged = WindowSizeMonitor.Poll ();
 

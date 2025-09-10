@@ -141,6 +141,8 @@ public class OutputBuffer : IOutputBuffer
             return;
         }
 
+        Clip ??= new Region (Screen);
+
         Rectangle clipRect = Clip!.GetBounds ();
 
         if (validLocation)

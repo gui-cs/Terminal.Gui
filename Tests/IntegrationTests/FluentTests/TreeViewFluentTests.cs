@@ -42,7 +42,7 @@ public class TreeViewFluentTests
                 .WaitIteration ()
                 .ScreenShot ("Before expanding", _out)
                 .AssertEqual (root, tv.GetObjectOnRow (0))
-                .Then (() => Assert.Null (tv.GetObjectOnRow (1)))
+                .AssertNull (tv.GetObjectOnRow (1))
                 .Right ()
                 .ScreenShot ("After expanding", _out)
                 .AssertMultiple (

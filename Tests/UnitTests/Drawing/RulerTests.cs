@@ -30,7 +30,7 @@ public class RulerTests
     [AutoInitShutdown]
     public void Draw_Default ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (25, 25);
+        AutoInitShutdownAttribute.FakeResize(new Size(25, 25));
 
         var r = new Ruler ();
         r.Draw (Point.Empty);

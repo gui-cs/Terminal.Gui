@@ -109,12 +109,6 @@ public class Dialog : Window
     {
         get
         {
-#if DEBUG_IDISPOSABLE
-            if (EnableDebugIDisposableAsserts && WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
             return _canceled;
         }
         set

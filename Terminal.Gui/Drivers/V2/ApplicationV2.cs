@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
@@ -12,10 +13,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class ApplicationV2 : ApplicationImpl
 {
-    private readonly Func<INetInput> _netInputFactory;
-    private readonly Func<IConsoleOutput> _netOutputFactory;
-    private readonly Func<IWindowsInput> _winInputFactory;
-    private readonly Func<IConsoleOutput> _winOutputFactory;
+    private readonly IComponentFactory? _componentFactory;
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
 
@@ -24,29 +22,20 @@ public class ApplicationV2 : ApplicationImpl
     /// <inheritdoc/>
     public override ITimedEvents TimedEvents => _timedEvents;
 
+    internal IMainLoopCoordinator? Coordinator => _coordinator;
+
     /// <summary>
     ///     Creates anew instance of the Application backend. The provided
     ///     factory methods will be used on Init calls to get things booted.
     /// </summary>
-    public ApplicationV2 () : this (
-                                    () => new NetInput (),
-                                    () => new NetOutput (),
-                                    () => new WindowsInput (),
-                                    () => new WindowsOutput ()
-                                   )
-    { }
-
-    internal ApplicationV2 (
-        Func<INetInput> netInputFactory,
-        Func<IConsoleOutput> netOutputFactory,
-        Func<IWindowsInput> winInputFactory,
-        Func<IConsoleOutput> winOutputFactory
-    )
+    public ApplicationV2 ()
     {
-        _netInputFactory = netInputFactory;
-        _netOutputFactory = netOutputFactory;
-        _winInputFactory = winInputFactory;
-        _winOutputFactory = winOutputFactory;
+        IsLegacy = false;
+    }
+
+    internal ApplicationV2 (IComponentFactory componentFactory)
+    {
+        _componentFactory = componentFactory;
         IsLegacy = false;
     }
 
@@ -92,8 +81,8 @@ public class ApplicationV2 : ApplicationImpl
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        bool definetlyWin = driverName?.Contains ("win") ?? false;
-        bool definetlyNet = driverName?.Contains ("net") ?? false;
+        bool definetlyWin = (driverName?.Contains ("win") ?? false )|| _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool definetlyNet = (driverName?.Contains ("net") ?? false ) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
 
         if (definetlyWin)
         {
@@ -125,13 +114,21 @@ public class ApplicationV2 : ApplicationImpl
         ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ();
         MainLoop<WindowsConsole.InputRecord> loop = new ();
 
-        return new MainLoopCoordinator<WindowsConsole.InputRecord> (
-                                                                    _timedEvents,
-                                                                    _winInputFactory,
+        IComponentFactory<WindowsConsole.InputRecord> cf;
+
+        if (_componentFactory != null)
+        {
+            cf = (IComponentFactory<WindowsConsole.InputRecord>)_componentFactory;
+        }
+        else
+        {
+            cf = new WindowsComponentFactory ();
+        }
+
+        return new MainLoopCoordinator<WindowsConsole.InputRecord> (_timedEvents,
                                                                     inputBuffer,
-                                                                    new WindowsInputProcessor (inputBuffer),
-                                                                    _winOutputFactory,
-                                                                    loop);
+                                                                    loop,
+                                                                    cf);
     }
 
     private IMainLoopCoordinator CreateNetSubcomponents ()
@@ -139,13 +136,22 @@ public class ApplicationV2 : ApplicationImpl
         ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ();
         MainLoop<ConsoleKeyInfo> loop = new ();
 
+        IComponentFactory<ConsoleKeyInfo> cf;
+
+        if (_componentFactory != null)
+        {
+            cf = (IComponentFactory<ConsoleKeyInfo>)_componentFactory;
+        }
+        else
+        {
+            cf = new NetComponentFactory ();
+        }
+
         return new MainLoopCoordinator<ConsoleKeyInfo> (
                                                         _timedEvents,
-                                                        _netInputFactory,
                                                         inputBuffer,
-                                                        new NetInputProcessor (inputBuffer),
-                                                        _netOutputFactory,
-                                                        loop);
+                                                        loop,
+                                                        cf);
     }
 
     /// <inheritdoc/>
@@ -169,6 +175,12 @@ public class ApplicationV2 : ApplicationImpl
         if (!Application.Initialized)
         {
             throw new NotInitializedException (nameof (Run));
+        }
+
+        if (Application.Driver == null)
+        {
+            // See Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws
+            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
         Application.Top = view;
