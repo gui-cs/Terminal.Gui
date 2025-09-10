@@ -540,6 +540,8 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
+    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
+
     /// <inheritdoc/>
     public override bool SetCursorVisibility (CursorVisibility visibility)
     {
@@ -551,17 +553,19 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
+            Curses.leaveok (_window!.Handle, !Force16Colors);
         }
 
         if (visibility != CursorVisibility.Invisible)
         {
-            _mainLoopDriver?.WriteRaw (
-                                       EscSeqUtils.CSI_SetCursorStyle (
-                                                                       (EscSeqUtils.DECSCUSR_Style)
-                                                                       (((int)visibility >> 24)
-                                                                        & 0xFF)
-                                                                      )
-                                      );
+            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            {
+                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+
+                _mainLoopDriver?.WriteRaw (
+                                           EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle)
+                                          );
+            }
         }
 
         _currentCursorVisibility = visibility;
