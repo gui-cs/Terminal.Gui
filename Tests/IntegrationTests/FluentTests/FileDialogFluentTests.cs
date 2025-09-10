@@ -41,15 +41,28 @@ public class FileDialogFluentTests
         return mockFileSystem;
     }
 
+    private Toplevel NewSaveDialog (out SaveDialog sd, bool modal = true)
+    {
+        return NewSaveDialog (out sd, out _, modal);
+    }
+
+    private Toplevel NewSaveDialog (out SaveDialog sd, out MockFileSystem fs,bool modal = true)
+    {
+        fs = CreateExampleFileSystem ();
+        sd = new SaveDialog (fs) { Modal = modal };
+        return sd;
+    }
+
+
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingEscape (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ());
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        using var c = With.A (()=>NewSaveDialog(out sd), 100, 20, d)
             .ScreenShot ("Save dialog", _out)
             .Escape ()
-            .Then (() => Assert.True (sd.Canceled))
+            .AssertTrue (sd!.Canceled)
             .Stop ();
     }
 
@@ -57,11 +70,11 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingCancelButton_TabThenEnter (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        using var c = With.A (() => NewSaveDialog (out sd,modal:false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Focus<Button> (b => b.Text == "_Cancel")
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Enter ()
                           .Stop ();
     }
@@ -70,25 +83,24 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingCancelButton_LeftClickButton (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ());
-
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Cancel")
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Stop ();
     }
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingCancelButton_AltC (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ());
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Send (Key.C.WithAlt)
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Stop ();
     }
 
@@ -96,14 +108,15 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_UsingOkButton_Enter (V2TestDriver d)
     {
-        var fs = CreateExampleFileSystem ();
-        var sd = new SaveDialog (fs);
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd,out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
+                          .WaitIteration ()
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.False (sd.Canceled))
-                          .Then (() => AssertIsFileSystemRoot (fs, sd))
+                          .AssertFalse(sd.Canceled)
+                          .AssertEqual (GetFileSystemRoot (fs), sd.FileName)
                           .Stop ();
     }
 
@@ -111,14 +124,14 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_UsingOkButton_AltS (V2TestDriver d)
     {
-        var fs = CreateExampleFileSystem ();
-        var sd = new SaveDialog (fs);
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Send (Key.S.WithAlt)
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.False (sd.Canceled))
-                          .Then (() => AssertIsFileSystemRoot (fs, sd))
+                          .AssertFalse (sd.Canceled)
+                          .AssertEqual (GetFileSystemRoot (fs), sd.FileName)
                           .Stop ();
 
     }
@@ -127,42 +140,39 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_UsingOkButton_TabEnter (V2TestDriver d)
     {
-        var fs = CreateExampleFileSystem ();
-        var sd = new SaveDialog (fs) { Modal = false };
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs,modal:false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Focus<Button> (b => b.Text == "_Save")
                           .Enter ()
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.False (sd.Canceled))
-                          .Then (() => AssertIsFileSystemRoot (fs, sd))
+                          .AssertFalse(sd.Canceled)
+                          .AssertEqual (GetFileSystemRoot(fs), sd.FileName)
                           .Stop ();
     }
 
-    private void AssertIsFileSystemRoot (IFileSystem fs, SaveDialog sd)
+    private string GetFileSystemRoot (IFileSystem fs)
     {
-        var expectedPath =
-            RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ?
+        return RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ?
                 $@"C:{fs.Path.DirectorySeparatorChar}" :
                 "/";
-
-        Assert.Equal (expectedPath, sd.FileName);
-
     }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs,modal:false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Focus<Button> (b => b.Text == "►►")
                           .Enter ()
                           .ScreenShot ("After pop tree", _out)
                           .WriteOutLogs (_out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Stop ();
 
     }
@@ -171,11 +181,11 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PopTree_AndNavigate (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
-
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .LeftClick<Button> (b => b.Text == "►►")
                           .ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
@@ -185,7 +195,7 @@ public class FileDialogFluentTests
                           .ScreenShot ("After navigate down in tree", _out)
                           .Enter ()
                           .WaitIteration ()
-                          .Then (() => Assert.False (sd.Canceled))
+                          .AssertFalse (sd.Canceled)
                           .AssertContains ("empty-dir", sd.FileName)
                           .WriteOutLogs (_out)
                           .Stop ();
@@ -195,12 +205,12 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_True (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
-        sd.Style.PreserveFilenameOnDirectoryChanges = true;
-
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
+                          .Then (()=>sd.Style.PreserveFilenameOnDirectoryChanges=true)
                           .ScreenShot ("Save dialog", _out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Focus<TextField> (_=>true)
                           // Clear selection by pressing right in 'file path' text box
                           .RaiseKeyDownEvent (Key.CursorRight)
@@ -228,7 +238,7 @@ public class FileDialogFluentTests
                           .AssertEndsWith ("hello", sd.Path)
                           .Enter ()
                           .WaitIteration ()
-                          .Then (() => Assert.False (sd.Canceled))
+                          .AssertFalse (sd.Canceled)
                           .AssertContains ("empty-dir", sd.FileName)
                           .WriteOutLogs (_out)
                           .Stop ();
@@ -238,12 +248,12 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_False (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
-        sd.Style.PreserveFilenameOnDirectoryChanges = false;
-
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
+                          .Then (()=> sd.Style.PreserveFilenameOnDirectoryChanges = false)
                           .ScreenShot ("Save dialog", _out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Focus<TextField> (_ => true)
                           // Clear selection by pressing right in 'file path' text box
                           .RaiseKeyDownEvent (Key.CursorRight)
@@ -269,7 +279,7 @@ public class FileDialogFluentTests
                           .AssertDoesNotContain ("hello", sd.Path)
                           .Enter ()
                           .WaitIteration ()
-                          .Then (() => Assert.False (sd.Canceled))
+                          .AssertFalse (sd.Canceled)
                           .AssertContains ("empty-dir", sd.FileName)
                           .WriteOutLogs (_out)
                           .Stop ();
@@ -279,12 +289,12 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers_WithTrueFalseParameter))]
     public void SaveFileDialog_TableView_UpDown_PreserveFilenameOnDirectoryChanges_True (V2TestDriver d, bool preserve)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
-        sd.Style.PreserveFilenameOnDirectoryChanges = preserve;
-
-        using var c = With.A (sd, 100, 20, d)
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
+                          .Then (() => sd.Style.PreserveFilenameOnDirectoryChanges = preserve)
                           .ScreenShot ("Save dialog", _out)
-                          .Then (() => Assert.True (sd.Canceled))
+                          .AssertTrue (sd.Canceled)
                           .Focus<TextField> (_ => true)
                           // Clear selection by pressing right in 'file path' text box
                           .RaiseKeyDownEvent (Key.CursorRight)
@@ -344,6 +354,7 @@ public class FileDialogFluentTests
         }
 
         c.LeftClick<Button> (b => b.Text == "_Save");
+        c.WaitIteration ();
         c.AssertFalse (sd.Canceled);
 
         if (preserve)
@@ -357,7 +368,8 @@ public class FileDialogFluentTests
              .AssertDoesNotContain ("hello", sd.Path);
         }
 
-        c.WriteOutLogs (_out)
-         .Stop ();
+        c.WriteOutLogs (_out);
+        c.WaitIteration ();
+        c.Stop ();
     }
 }

@@ -825,7 +825,7 @@ public class TextFieldTests (ITestOutputHelper output)
         _textField.CursorPosition = 0;
         _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (4, _textField.CursorPosition);
 
         //                                             TAB to jump between text fields.

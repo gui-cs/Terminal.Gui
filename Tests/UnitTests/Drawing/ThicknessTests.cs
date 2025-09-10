@@ -10,7 +10,7 @@ public class ThicknessTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void DrawTests ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (60, 60);
+        AutoInitShutdownAttribute.FakeResize(new Size(60, 60));
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (5, 5, 40, 15);
 
@@ -125,10 +125,11 @@ public class ThicknessTests (ITestOutputHelper output)
         top.Add (f);
         RunState rs = Application.Begin (top);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (45, 20);
+        AutoInitShutdownAttribute.FakeResize(new Size(45, 20));
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (2, 2, 40, 15);
-        Application.RunIteration (ref rs);
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
@@ -160,7 +161,7 @@ public class ThicknessTests (ITestOutputHelper output)
         t = new (1, 1, 1, 1);
         r = new (1, 1, 40, 15);
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsAre (
@@ -191,7 +192,7 @@ public class ThicknessTests (ITestOutputHelper output)
         t = new (1, 2, 3, 4);
         r = new (2, 2, 40, 15);
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -222,7 +223,7 @@ public class ThicknessTests (ITestOutputHelper output)
         t = new (-1, 1, 1, 1);
         r = new (5, 5, 40, 15);
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (

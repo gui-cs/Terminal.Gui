@@ -647,7 +647,7 @@ public class TextViewTests
         var top = new Toplevel ();
         top.Add (tv);
         RunState rs = Application.Begin (top);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -663,7 +663,7 @@ This is the second line.
         tv.CursorPosition = new (3, 0);
         Assert.Equal (new (3, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (2, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -677,7 +677,7 @@ This is the second line.
         tv.CursorPosition = new (0, 1);
         Assert.Equal (new (0, 1), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (22, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -688,7 +688,7 @@ Ths is the first line.This is the second line.
                                                       );
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 1), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -704,7 +704,7 @@ This is the second line.
             Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new (3, 0), tv.CursorPosition);
         Assert.False (tv.IsDirty);
@@ -721,7 +721,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (tv);
         RunState rs = Application.Begin (top);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -737,7 +737,7 @@ This is the second line.
         tv.CursorPosition = new (3, 0);
         Assert.Equal (new (3, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (2, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -751,7 +751,7 @@ This is the second line.
         tv.CursorPosition = new (0, 1);
         Assert.Equal (new (0, 1), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (22, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -762,7 +762,7 @@ Ths is the first line.This is the second line.
                                                       );
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 1), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -778,7 +778,7 @@ This is the second line.
             Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new (3, 0), tv.CursorPosition);
@@ -796,7 +796,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (tv);
         RunState rs = Application.Begin (top);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -812,7 +812,7 @@ This is the second line.
         tv.CursorPosition = new (2, 0);
         Assert.Equal (new (2, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (2, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -826,7 +826,7 @@ This is the second line.
         tv.CursorPosition = new (22, 0);
         Assert.Equal (new (22, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (22, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -837,7 +837,7 @@ Ths is the first line.This is the second line.
                                                       );
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 1), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -869,7 +869,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (tv);
         RunState rs = Application.Begin (top);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -885,7 +885,7 @@ This is the second line.
         tv.CursorPosition = new (2, 0);
         Assert.Equal (new (2, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (2, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -899,7 +899,7 @@ This is the second line.
         tv.CursorPosition = new (22, 0);
         Assert.Equal (new (22, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (22, 0), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -910,7 +910,7 @@ Ths is the first line.This is the second line.
                                                       );
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 1), tv.CursorPosition);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -926,7 +926,7 @@ This is the second line.
             Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new (2, 0), tv.CursorPosition);
@@ -5177,7 +5177,7 @@ This is the second line.
         Assert.True (_textView.Multiline);
         _textView.NewKeyDownEvent (Key.Tab);
         Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -5186,7 +5186,7 @@ TAB to jump between text field",
                                                       );
 
         _textView.TabWidth = 4;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -5197,7 +5197,7 @@ TAB to jump between text field",
         _textView.NewKeyDownEvent (Key.Tab.WithShift);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         Assert.True (_textView.NeedsDraw);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -5262,8 +5262,8 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.FakeResize(new Size(15, 15));
+        AutoInitShutdownAttribute.RunIteration ();
 
         //this passes
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (
@@ -5292,7 +5292,7 @@ TAB to jump between text field",
         tv.Used = false;
         tv.CursorPosition = Point.Empty;
         tv.InsertText ("\r\naaa\r\nbbb");
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -5340,8 +5340,8 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.FakeResize(new Size (15, 15));
+        AutoInitShutdownAttribute.RunIteration ();
 
         //this passes
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (
@@ -5370,7 +5370,7 @@ TAB to jump between text field",
         tv.Used = false;
         tv.CursorPosition = Point.Empty;
         tv.InsertText ("\naaa\nbbb");
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -5425,7 +5425,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (tv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -5453,7 +5453,7 @@ This is the second line.
                                                        _output
                                                       );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (6, 25);
+        AutoInitShutdownAttribute.FakeResize(new Size (6, 25));
         tv.SetRelativeLayout (Application.Screen.Size);
         tv.Draw ();
         Assert.Equal (new (4, 2), tv.CursorPosition);
@@ -6630,7 +6630,7 @@ line.
         var top = new Toplevel ();
         top.Add (tv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.LeftColumn);
@@ -6644,7 +6644,7 @@ aaaa
 
         tv.CursorPosition = new (5, 0);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, tv.LeftColumn);
 
         DriverAssert.AssertDriverContentsAre (
@@ -6655,7 +6655,7 @@ aaa
                                              );
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, tv.LeftColumn);
 
         DriverAssert.AssertDriverContentsAre (
@@ -6666,7 +6666,7 @@ aa
                                              );
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, tv.LeftColumn);
 
         DriverAssert.AssertDriverContentsAre (
@@ -6677,7 +6677,7 @@ a
                                              );
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, tv.LeftColumn);
 
         DriverAssert.AssertDriverContentsAre (
@@ -6688,7 +6688,7 @@ a
                                              );
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, tv.LeftColumn);
 
         DriverAssert.AssertDriverContentsAre (
@@ -6710,7 +6710,7 @@ a
         _textView.Text = "Line 1.\nLine 2.";
         _textView.WordWrap = true;
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (_textView.WordWrap);
 
@@ -6725,12 +6725,12 @@ Line 2.",
         Assert.Equal ("Line 1.", _textView.SelectedText);
 
         Assert.True (_textView.NewKeyDownEvent (new (del)));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
         Assert.True (_textView.NewKeyDownEvent (Key.H.WithShift));
         Assert.NotEqual (Rectangle.Empty, _textView.NeedsDrawRect);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -7019,7 +7019,7 @@ line.
         var top = new Toplevel ();
         top.Add (tv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -7031,7 +7031,7 @@ This is the second line.",
         tv.Width = 10;
         tv.Height = 25;
         tv.WordWrap = true;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -7075,7 +7075,7 @@ line.  ",
         var top = new Toplevel ();
         top.Add (tv);
         RunState rs = Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (tv.InheritsPreviousAttribute);
 
@@ -7117,7 +7117,7 @@ Error   ";
         DriverAssert.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.WordWrap = true;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
         DriverAssert.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
@@ -7129,7 +7129,7 @@ Error   ";
         tv.IsSelecting = false;
         tv.CursorPosition = new (2, 4);
         tv.Paste ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expectedText = @"
 TopLevel  
@@ -7164,7 +7164,7 @@ Dialogror ";
         tv.IsSelecting = false;
         tv.CursorPosition = new (2, 4);
         tv.Paste ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expectedText = @"
 TopLevel  

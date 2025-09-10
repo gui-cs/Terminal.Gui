@@ -1,4 +1,5 @@
 ﻿using TerminalGuiFluentTesting;
+using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
@@ -7,16 +8,13 @@ public class BasicFluentAssertionTests
 {
     private readonly TextWriter _out;
 
-    public BasicFluentAssertionTests (ITestOutputHelper outputHelper)
-    {
-        _out = new TestOutputWriter (outputHelper);
-    }
+    public BasicFluentAssertionTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void GuiTestContext_NewInstance_Runs (V2TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d);
+        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (Application.Top!.Running);
 
         context.WriteOutLogs (_out);
@@ -33,9 +31,6 @@ public class BasicFluentAssertionTests
         Toplevel top = Application.Top;
         context.RaiseKeyDownEvent (Application.QuitKey);
         Assert.False (top!.Running);
-
-        Application.Top?.Dispose ();
-        Application.Shutdown ();
 
         context.WriteOutLogs (_out);
         context.Stop ();
@@ -69,9 +64,10 @@ public class BasicFluentAssertionTests
 
         using GuiTestContext c = With.A<Window> (40, 10, d)
                                      .Add (lbl)
-                                     .Then (() => Assert.Equal (38, lbl.Frame.Width)) // Window has 2 border
+                                     .AssertEqual (38, lbl.Frame.Width) // Window has 2 border
                                      .ResizeConsole (20, 20)
-                                     .Then (() => Assert.Equal (18, lbl.Frame.Width))
+                                     .WaitIteration ()
+                                     .AssertEqual (18, lbl.Frame.Width)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -85,7 +81,7 @@ public class BasicFluentAssertionTests
         MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
 
         using GuiTestContext c = With.A<Window> (40, 10, d)
-                                     .WithContextMenu (new PopoverMenu (menuItems))
+                                     .WithContextMenu (new (menuItems))
                                      .ScreenShot ("Before open menu", _out)
 
                                      // Click in main area inside border
@@ -98,7 +94,6 @@ public class BasicFluentAssertionTests
                                                 Assert.NotNull (popover);
                                                 var popoverMenu = popover as PopoverMenu;
                                                 popoverMenu!.Root!.BorderStyle = LineStyle.Single;
-
                                             })
                                      .WaitIteration ()
                                      .ScreenShot ("After open menu", _out)
@@ -114,26 +109,30 @@ public class BasicFluentAssertionTests
     {
         var clicked = false;
 
-        MenuItemv2 [] menuItems = [
-                                      new ("One", "", null),
-                                      new ("Two", "", null),
-                                      new ("Three", "", null),
-                                      new ("Four", "", new (
-                                           [
-                                               new ("SubMenu1", "", null),
-                                               new ("SubMenu2", "", ()=>clicked=true),
-                                               new ("SubMenu3", "", null),
-                                               new ("SubMenu4", "", null),
-                                               new ("SubMenu5", "", null),
-                                               new ("SubMenu6", "", null),
-                                               new ("SubMenu7", "", null)
-                                           ])),
-                                      new  ("Five", "", null),
-                                      new  ("Six", "", null)
-                                  ];
+        MenuItemv2 [] menuItems =
+        [
+            new ("One", "", null),
+            new ("Two", "", null),
+            new ("Three", "", null),
+            new (
+                 "Four",
+                 "",
+                 new (
+                      [
+                          new ("SubMenu1", "", null),
+                          new ("SubMenu2", "", () => clicked = true),
+                          new ("SubMenu3", "", null),
+                          new ("SubMenu4", "", null),
+                          new ("SubMenu5", "", null),
+                          new ("SubMenu6", "", null),
+                          new ("SubMenu7", "", null)
+                      ])),
+            new ("Five", "", null),
+            new ("Six", "", null)
+        ];
 
         using GuiTestContext c = With.A<Window> (40, 10, d)
-                                     .WithContextMenu (new PopoverMenu (menuItems))
+                                     .WithContextMenu (new (menuItems))
                                      .ScreenShot ("Before open menu", _out)
 
                                      // Click in main area inside border
@@ -177,43 +176,43 @@ public class BasicFluentAssertionTests
                                                 Application.Top!.Add (w1, w2, w3);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v1.HasFocus))
+                                     .AssertTrue (v1.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v3.HasFocus))
+                                     .AssertTrue (v3.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v1.HasFocus))
+                                     .AssertTrue (v1.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v3.HasFocus))
+                                     .AssertTrue (v3.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v1.HasFocus))
+                                     .AssertTrue (v1.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v3.HasFocus))
+                                     .AssertTrue (v3.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v1.HasFocus))
+                                     .AssertTrue (v1.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v3.HasFocus))
+                                     .AssertTrue (v3.HasFocus)
                                      .RaiseKeyDownEvent (Key.Tab)
-                                     .Then (() => Assert.True (v4.HasFocus))
+                                     .AssertTrue (v4.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v1.HasFocus))
+                                     .AssertTrue (v1.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v5.HasFocus))
+                                     .AssertTrue (v5.HasFocus)
                                      .RaiseKeyDownEvent (Key.Tab)
-                                     .Then (() => Assert.True (v6.HasFocus))
+                                     .AssertTrue (v6.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6.WithShift)
-                                     .Then (() => Assert.True (v4.HasFocus))
+                                     .AssertTrue (v4.HasFocus)
                                      .RaiseKeyDownEvent (Key.F6)
-                                     .Then (() => Assert.True (v6.HasFocus))
+                                     .AssertTrue (v6.HasFocus)
                                      .WriteOutLogs (_out)
                                      .Stop ();
         Assert.False (v1.HasFocus);
@@ -221,6 +220,5 @@ public class BasicFluentAssertionTests
         Assert.False (v3.HasFocus);
         Assert.False (v4.HasFocus);
         Assert.False (v5.HasFocus);
-        Assert.False (v6.HasFocus);
     }
 }

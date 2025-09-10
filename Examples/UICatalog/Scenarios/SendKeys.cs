@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Text;
 
 namespace UICatalog.Scenarios;
 
@@ -39,7 +39,7 @@ public class SendKeys : Scenario
 
         txtResult.KeyDown += (s, e) =>
                              {
-                                 rKeys += (char)e.KeyCode;
+                                 rKeys += e.ToString ();
 
                                  if (!IsShift && e.IsShift)
                                  {
@@ -81,17 +81,15 @@ public class SendKeys : Scenario
 
             foreach (char r in txtInput.Text)
             {
-                ConsoleKey ck = char.IsLetter (r)
-                                    ? (ConsoleKey)char.ToUpper (r)
-                                    : (ConsoleKey)r;
+                ConsoleKeyInfo consoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new (r, ConsoleKey.None, false, false, false));
 
                 Application.Driver?.SendKeys (
-                                             r,
-                                             ck,
-                                             ckbShift.CheckedState == CheckState.Checked,
-                                             ckbAlt.CheckedState == CheckState.Checked,
-                                             ckbControl.CheckedState == CheckState.Checked
-                                            );
+                                              r,
+                                              consoleKeyInfo.Key,
+                                              ckbShift.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                              ckbAlt.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                              ckbControl.CheckedState == CheckState.Checked || (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0
+                                             );
             }
 
             lblShippedKeys.Text = rKeys;

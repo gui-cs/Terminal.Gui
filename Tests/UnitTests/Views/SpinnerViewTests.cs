@@ -15,33 +15,33 @@ public class SpinnerViewTests (ITestOutputHelper output)
 
         SpinnerView view = GetSpinnerView ();
 
-        Assert.Empty (Application.MainLoop.TimedEvents.Timeouts);
+        Assert.Empty (Application.TimedEvents.Timeouts);
         view.AutoSpin = true;
-        Assert.NotEmpty (Application.MainLoop.TimedEvents.Timeouts);
+        Assert.NotEmpty (Application.TimedEvents.Timeouts);
         Assert.True (view.AutoSpin);
 
         //More calls to AutoSpin do not add more timeouts
-        Assert.Single (Application.MainLoop.TimedEvents.Timeouts);
+        Assert.Single (Application.TimedEvents.Timeouts);
         view.AutoSpin = true;
         view.AutoSpin = true;
         view.AutoSpin = true;
         Assert.True (view.AutoSpin);
-        Assert.Single (Application.MainLoop.TimedEvents.Timeouts);
+        Assert.Single (Application.TimedEvents.Timeouts);
 
         if (callStop)
         {
             view.AutoSpin = false;
-            Assert.Empty (Application.MainLoop.TimedEvents.Timeouts);
+            Assert.Empty (Application.TimedEvents.Timeouts);
             Assert.False (view.AutoSpin);
         }
         else
         {
-            Assert.NotEmpty (Application.MainLoop.TimedEvents.Timeouts);
+            Assert.NotEmpty (Application.TimedEvents.Timeouts);
         }
 
         // Dispose clears timeout
         view.Dispose ();
-        Assert.Empty (Application.MainLoop.TimedEvents.Timeouts);
+        Assert.Empty (Application.TimedEvents.Timeouts);
         Application.Top.Dispose ();
     }
 
@@ -109,7 +109,7 @@ public class SpinnerViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Required to clear the initial 'Invoke nothing' that Begin does
-        Application.MainLoop.TimedEvents.Timeouts.Clear ();
+        Application.TimedEvents.Timeouts.Clear ();
 
         Assert.Equal (1, view.Frame.Width);
         Assert.Equal (1, view.Frame.Height);

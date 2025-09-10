@@ -459,7 +459,7 @@ public class TableViewTests (ITestOutputHelper output)
         // is to specify a MinAcceptableWidth for the column
         style.MaxWidth = 10;
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -478,7 +478,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         style.RepresentationGetter = s => { return s.ToString ().Length < 15 ? s.ToString () : s.ToString ().Substring (0, 13) + "..."; };
         tableView.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -505,7 +505,7 @@ public class TableViewTests (ITestOutputHelper output)
         style.MinAcceptableWidth = 5;
         tableView.SetNeedsDraw ();
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -518,11 +518,11 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Now test making the width too small for the MinAcceptableWidth
         // the Column won't fit so should not be rendered
-        var driver = (FakeDriver)Application.Driver;
+        var driver = Application.Driver;
         driver.ClearContents ();
 
         tableView.Viewport = new (0, 0, 9, 5);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -538,7 +538,7 @@ public class TableViewTests (ITestOutputHelper output)
         // meet MinAcceptableWidth of 5.  Column width includes terminator line
         // symbol (e.g. ┤ or │)
         tableView.Viewport = new (0, 0, 10, 5);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -559,7 +559,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.MaxCellWidth = 10;
         tableView.MinCellWidth = 3;
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -575,7 +575,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.MinCellWidth = 10;
         tableView.SetNeedsDraw ();
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -1066,7 +1066,7 @@ public class TableViewTests (ITestOutputHelper output)
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = $@"
 ┌─┬─┐
@@ -1099,7 +1099,7 @@ public class TableViewTests (ITestOutputHelper output)
         dt.Rows [0] [1] = 5;
 
         tv.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = $@"
 ┌─┬─┐
@@ -1194,7 +1194,7 @@ public class TableViewTests (ITestOutputHelper output)
         dt.Rows [0] [1] = 5;
 
         tv.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = $@"
 ┌─┬─┐
@@ -2206,7 +2206,7 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
         var tv = new TableView ();
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 6);

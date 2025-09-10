@@ -52,7 +52,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         tv.Tiles.ElementAt (0).MinSize = int.MaxValue;
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -84,7 +84,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -104,7 +104,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         tv.Tiles.ElementAt (0).MinSize = int.MaxValue;
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -136,7 +136,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -158,7 +158,7 @@ public class TileViewTests (ITestOutputHelper output)
         tv.Tiles.ElementAt (1).MinSize = 2;
         tv.Tiles.ElementAt (2).MinSize = 3;
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -179,7 +179,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -221,7 +221,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         tv.Tiles.ElementAt (1).MinSize = 2;
         tv.Tiles.ElementAt (2).MinSize = 3;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -242,7 +242,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -265,7 +265,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"  
@@ -287,7 +287,7 @@ public class TileViewTests (ITestOutputHelper output)
         tv.Tiles.ElementAt (3).MinSize = 2;
         tv.Tiles.ElementAt (4).MinSize = 1;
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -308,7 +308,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -330,7 +330,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -351,7 +351,7 @@ public class TileViewTests (ITestOutputHelper output)
         tv.Tiles.ElementAt (3).MinSize = 2;
         tv.Tiles.ElementAt (4).MinSize = 1;
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -372,7 +372,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"   
@@ -393,7 +393,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -411,7 +411,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tv = Get5x1TilesView ();
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -429,7 +429,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         Assert.False (tv.SetSplitterPos (0, 0));
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -452,7 +452,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -470,7 +470,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tv = Get5x1TilesView (false);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -486,7 +486,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -509,7 +509,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -528,7 +528,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tv = Get5x1TilesView ();
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -549,7 +549,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -570,7 +570,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -588,7 +588,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tv = Get5x1TilesView (false);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -609,7 +609,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -631,7 +631,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -649,7 +649,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tv = Get5x1TilesView ();
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -670,7 +670,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -691,7 +691,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -709,7 +709,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tv = Get5x1TilesView (false);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"   
@@ -730,7 +730,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"  
@@ -752,7 +752,7 @@ public class TileViewTests (ITestOutputHelper output)
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -973,7 +973,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tileView = GetNestedContainer3Right1Down (true);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -994,7 +994,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1013,7 +1013,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1033,7 +1033,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1053,7 +1053,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1073,7 +1073,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1093,7 +1093,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1115,7 +1115,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1138,7 +1138,7 @@ public class TileViewTests (ITestOutputHelper output)
     public void TestNestedContainer3RightAnd1Down_TileVisibility_WithoutBorder ()
     {
         TileView tileView = GetNestedContainer3Right1Down (false);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1158,7 +1158,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1178,7 +1178,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1198,7 +1198,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1218,7 +1218,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1238,7 +1238,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1258,7 +1258,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1280,7 +1280,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1294,7 +1294,7 @@ public class TileViewTests (ITestOutputHelper output)
     public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill ()
     {
         TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1324,7 +1324,7 @@ public class TileViewTests (ITestOutputHelper output)
             .Tiles.ElementAt (1)
             .Title = new ('y', 100);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1348,7 +1348,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tileView = GetNestedContainer3Right1Down (true);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1368,7 +1368,7 @@ public class TileViewTests (ITestOutputHelper output)
         Tile removed = tileView.RemoveTile (1);
         Assert.Same (toRemove, removed);
         Assert.DoesNotContain (removed, tileView.Tiles);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1387,7 +1387,7 @@ public class TileViewTests (ITestOutputHelper output)
         // cannot remove at this index because there is only one horizontal tile left
         Assert.Null (tileView.RemoveTile (2));
         tileView.RemoveTile (0);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1404,7 +1404,7 @@ public class TileViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         Assert.NotNull (tileView.RemoveTile (0));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1429,7 +1429,7 @@ public class TileViewTests (ITestOutputHelper output)
     public void TestNestedContainer3RightAnd1Down_WithBorder_RendersNicely ()
     {
         TileView tileView = GetNestedContainer3Right1Down (true);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1660,7 +1660,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
         Assert.True (line.HasFocus);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"    
@@ -1672,7 +1672,7 @@ public class TileViewTests (ITestOutputHelper output)
         // Now move splitter line down
         tileView.NewKeyDownEvent (Key.CursorDown);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"    
@@ -1683,10 +1683,10 @@ public class TileViewTests (ITestOutputHelper output)
 
         // And 2 up
         line.NewKeyDownEvent (Key.CursorUp);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         line.NewKeyDownEvent (Key.CursorUp);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"    
@@ -1711,7 +1711,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // position should remain where it was, at 50%
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"    
@@ -1722,7 +1722,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Now move splitter line down (allowed
         line.NewKeyDownEvent (Key.CursorDown);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"    
@@ -1736,7 +1736,7 @@ public class TileViewTests (ITestOutputHelper output)
         line.NewKeyDownEvent (Key.CursorUp);
 
         tileView.SetNeedsDraw ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"    
@@ -1875,7 +1875,7 @@ public class TileViewTests (ITestOutputHelper output)
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1886,7 +1886,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Now while focused move the splitter 1 unit right
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1899,7 +1899,7 @@ public class TileViewTests (ITestOutputHelper output)
         line.NewKeyDownEvent (Key.CursorLeft);
         tileView.Layout ();
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1917,7 +1917,7 @@ public class TileViewTests (ITestOutputHelper output)
         tileView.SetSplitterPos (0, Pos.Percent (50));
         Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1928,7 +1928,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Now while focused move the splitter 1 unit right
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1944,7 +1944,7 @@ public class TileViewTests (ITestOutputHelper output)
         line.NewKeyDownEvent (Key.CursorLeft);
         tileView.Layout ();
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1963,7 +1963,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tileView = Get11By3TileView (out LineView line, true);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -1974,7 +1974,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Now while focused move the splitter 1 unit right
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -1987,7 +1987,7 @@ public class TileViewTests (ITestOutputHelper output)
         line.NewKeyDownEvent (Key.CursorLeft);
         tileView.Layout ();
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -2010,7 +2010,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Should stay where it was originally at (50%)
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // so should ignore the 2 distance and stick to 6
         var looksLike =
@@ -2023,13 +2023,13 @@ public class TileViewTests (ITestOutputHelper output)
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter right if we want
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -2053,7 +2053,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Should stay where it was originally at (50%)
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // so should ignore the 2 distance and stick to 5
         var looksLike =
@@ -2066,13 +2066,13 @@ public class TileViewTests (ITestOutputHelper output)
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter right if we want
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -2090,7 +2090,7 @@ public class TileViewTests (ITestOutputHelper output)
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (1).MinSize = 6;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // distance leaves too little space for view2 (less than 6 would remain)
         Assert.False (tileView.SetSplitterPos (0, 8));
@@ -2098,7 +2098,7 @@ public class TileViewTests (ITestOutputHelper output)
         //  Should stay where it was originally at (50%)
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // so should ignore the 2 distance and stick to 6
         var looksLike =
@@ -2111,13 +2111,13 @@ public class TileViewTests (ITestOutputHelper output)
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter left if we want
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -2138,12 +2138,12 @@ public class TileViewTests (ITestOutputHelper output)
 
         // distance leaves too little space for view2 (less than 5 would remain)
         Assert.False (tileView.SetSplitterPos (0, 8));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         //  Should stay where it was originally at (50%)
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // so should ignore the 2 distance and stick to 6
         var looksLike =
@@ -2156,13 +2156,13 @@ public class TileViewTests (ITestOutputHelper output)
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter left if we want
         line.NewKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         looksLike =
             @"
@@ -2179,7 +2179,7 @@ public class TileViewTests (ITestOutputHelper output)
     {
         TileView tileView = Get11By3TileView (out LineView line, true);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var looksLike =
             @"
@@ -2190,7 +2190,7 @@ public class TileViewTests (ITestOutputHelper output)
 
         // Keyboard movement on splitter should have no effect if it is not focused
         tileView.NewKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
@@ -2261,6 +2261,8 @@ public class TileViewTests (ITestOutputHelper output)
         Application.Top.Add (tv);
 
         Application.Begin (Application.Top);
+
+        Application.Top.SetNeedsDraw();
 
         return tv;
     }

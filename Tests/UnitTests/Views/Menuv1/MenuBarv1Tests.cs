@@ -30,12 +30,14 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.Begin (top);
 
         top.NewKeyDownEvent (Key.N.WithAlt);
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
+
         Assert.True (menuBar.IsMenuOpen);
         Assert.Equal ("", action);
 
         top.NewKeyDownEvent (Key.I);
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
+
         Assert.False (menuBar.IsMenuOpen);
         Assert.Equal ("I", action);
 
@@ -75,7 +77,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.False (mi.Checked);
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (mi.Checked);
 
         Assert.True (
@@ -89,13 +91,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                                    new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                   )
                     );
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.False (mi.Checked);
 
         mi.AllowNullChecked = true;
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (mi.Checked);
 
         Assert.True (
@@ -103,7 +105,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                          new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed, View = menu }
                                         )
                     );
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @$"
@@ -119,11 +121,11 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                                    new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                   )
                     );
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (mi.Checked);
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.False (mi.Checked);
 
         Assert.True (
@@ -137,7 +139,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
                                                    new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked, View = menu._openMenu }
                                                   )
                     );
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (mi.Checked);
 
         mi.AllowNullChecked = false;
@@ -220,7 +222,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         Assert.True (top.NewKeyDownEvent (Key.F.WithAlt));
         Assert.True (top.NewKeyDownEvent (Key.N.WithAlt));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.NotNull (win);
         Assert.False (CanExecuteNew ());
         Assert.True (CanExecuteClose ());
@@ -468,7 +470,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 15))    ;
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
 
@@ -656,7 +658,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
         menu.OpenMenu ();
         Application.RunIteration (ref rsDialog);
 
@@ -779,7 +781,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         }
 
         RunState rs = Application.Begin (dialog);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
 
@@ -794,7 +796,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         Assert.Equal ("File", menu.Menus [0].Title);
         menu.OpenMenu ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -815,7 +817,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         // Need to fool MainLoop into thinking it's running
         Application.MainLoop.Running = true;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -833,13 +835,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
             Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
-            Application.RunIteration (ref rs);
+            AutoInitShutdownAttribute.RunIteration ();
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
         menu.OpenMenu ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -880,7 +882,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Toplevel top = new ();
         Application.Begin (top);
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ──────┐
@@ -895,7 +897,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         menu.CloseAllMenus ();
         menu.Frame = new (-1, -2, menu.Frame.Width, menu.Frame.Height);
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
  One  │
@@ -908,9 +910,9 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (7, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(7, 5));
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 ┌──────
@@ -924,9 +926,9 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (7, 3);
+        AutoInitShutdownAttribute.FakeResize(new Size(7, 3));
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 ┌──────
@@ -960,7 +962,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Toplevel top = new ();
         Application.Begin (top);
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ne
@@ -972,7 +974,7 @@ wo
         menu.CloseAllMenus ();
         menu.Frame = new (-2, -2, menu.Frame.Width, menu.Frame.Height);
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 wo
@@ -982,9 +984,9 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (3, 2);
+        AutoInitShutdownAttribute.FakeResize(new Size(3, 2));
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
  On
@@ -995,9 +997,9 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver!).SetBufferSize (3, 1);
+        AutoInitShutdownAttribute.FakeResize(new Size(3, 1));
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
  On
@@ -1024,7 +1026,7 @@ wo
         Toplevel top = new ();
         Application.Begin (top);
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ┌──────┐
@@ -1056,7 +1058,7 @@ wo
         Toplevel top = new ();
         Application.Begin (top);
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
  One
@@ -1115,13 +1117,13 @@ wo
         Assert.Equal (new (1, 0, 11, 1), pos);
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.False (newAction); // not yet, hot keys don't work if the item is not visible
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.F)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (newAction);
         Application.Top.Draw ();
 
@@ -1144,7 +1146,7 @@ wo
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.C)));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (copyAction);
 #endif
         top.Dispose ();
@@ -1216,7 +1218,7 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.N));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (newAction);
 
         Assert.True (menu.NewKeyDownEvent (Key.E.WithAlt));
@@ -1225,7 +1227,7 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.C));
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.True (copyAction);
         top.Dispose ();
     }
@@ -1385,7 +1387,7 @@ wo
         foreach (Key key in keys)
         {
             top.NewKeyDownEvent (key);
-            Application.MainLoop.RunIteration ();
+            AutoInitShutdownAttribute.RunIteration ();
         }
 
         Assert.Equal (expectedBarTitle, mbiCurrent != null ? mbiCurrent.Title : "Closed");
@@ -1440,7 +1442,7 @@ wo
         foreach (KeyCode key in keys)
         {
             Assert.True (top.NewKeyDownEvent (new (key)));
-            Application.MainLoop!.RunIteration ();
+            AutoInitShutdownAttribute.RunIteration ();
         }
 
         Assert.Equal (expectedAction, miAction);
@@ -1479,7 +1481,7 @@ wo
         Application.Begin (top);
 
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1527,7 +1529,7 @@ wo
         Application.Begin (top);
 
         menu.OpenMenu ();
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1629,7 +1631,7 @@ wo
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1661,7 +1663,7 @@ wo
                                                      );
 
         Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1739,12 +1741,12 @@ wo
         Toplevel top = new ();
         top.Add (win);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        Application.AddTimeout (TimeSpan.Zero, () =>
+                                                       {
+                                                           AutoInitShutdownAttribute.FakeResize(new Size (40, 8));
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │                                      │
@@ -1753,14 +1755,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (win.NewKeyDownEvent (menu.Key));
-                                     top.Draw ();
+                                                           Assert.True (win.NewKeyDownEvent (menu.Key));
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -1769,14 +1771,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
-                                     Application.LayoutAndDraw ();
+                                                           Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
+                                                           AutoInitShutdownAttribute.RunIteration ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -1785,14 +1787,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-                                     top.Draw ();
+                                                           Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -1801,15 +1803,15 @@ wo
 │                 │ Selected  │        │
 │                 └───────────┘        │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-                                     View.SetClipToScreen ();
-                                     top.Draw ();
+                                                           Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
+                                                           View.SetClipToScreen ();
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -1818,11 +1820,13 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Application.RequestStop ();
-                                 };
+                                                           Application.RequestStop ();
+
+                                                           return false;
+                                                       });
 
         Application.Run (top);
         top.Dispose ();
@@ -1853,9 +1857,9 @@ wo
             ]
         };
         win.Add (menu);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
         RunState rs = Application.Begin (win);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1871,7 +1875,7 @@ wo
                                                      );
 
         Assert.True (win.NewKeyDownEvent (menu.Key));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1887,7 +1891,7 @@ wo
                                                      );
 
         Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1903,7 +1907,7 @@ wo
                                                      );
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1919,7 +1923,7 @@ wo
                                                      );
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1940,15 +1944,16 @@ wo
     [AutoInitShutdown]
     public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Toplevel top = Application.Top;
-                                     Application.LayoutAndDraw ();
+        Application.AddTimeout (TimeSpan.Zero, () =>
+                                                       {
+                                                           Toplevel top = Application.Top;
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           AutoInitShutdownAttribute.RunIteration ();
+
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │                                      │
@@ -1957,14 +1962,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (top.NewKeyDownEvent (Key.F9));
-                                     top.Draw ();
+                                                           Assert.True (top.NewKeyDownEvent (Key.F9));
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -1973,14 +1978,14 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (top.SubViews.ElementAt (0).NewKeyDownEvent (Key.CursorRight));
-                                     Application.LayoutAndDraw ();
+                                                           Assert.True (top.SubViews.ElementAt (0).NewKeyDownEvent (Key.CursorRight));
+                                                           AutoInitShutdownAttribute.RunIteration ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -1989,16 +1994,16 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (
-                                                  ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
-                                                 );
-                                     top.Draw ();
+                                                           Assert.True (
+                                                                        ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
+                                                                       );
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │      ┌─────────┐                     │
@@ -2007,17 +2012,17 @@ wo
 │                 │ Selected  │        │
 │                 └───────────┘        │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Assert.True (
-                                                  ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
-                                                 );
-                                     View.SetClipToScreen ();
-                                     top.Draw ();
+                                                           Assert.True (
+                                                                        ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
+                                                                       );
+                                                           View.SetClipToScreen ();
+                                                           top.Draw ();
 
-                                     DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                   @"
+                                                           DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
 │┌──────┐                              │
@@ -2026,11 +2031,13 @@ wo
 │                                      │
 │                                      │
 └──────────────────────────────────────┘",
-                                                                                   output
-                                                                                  );
+                                                                output
+                                                               );
 
-                                     Application.RequestStop ();
-                                 };
+                                                           Application.RequestStop ();
+
+                                                           return false;
+                                                       });
 
         Application.Run<CustomWindow> ().Dispose ();
     }
@@ -2881,8 +2888,8 @@ Edit
         RunState rs = Application.Begin (top);
 
         menu.OpenMenu ();
-        var firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -2893,9 +2900,9 @@ Edit
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
-        firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -2968,7 +2975,7 @@ Edit
         Application.Begin (top);
 
         Application.RaiseKeyDownEvent (Key.S.WithCtrl);
-        Application.MainLoop.RunIteration ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (saveAction);
         top.Dispose ();
@@ -3306,7 +3313,6 @@ Edit
     //  New    Copy
     public class ExpectedMenuBar : MenuBar
     {
-        private FakeDriver _d = (FakeDriver)Application.Driver;
 
         // The expected strings when the menu is closed
         public string ClosedMenuText => MenuBarText + "\n";

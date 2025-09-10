@@ -533,7 +533,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
 
         Assert.Equal (Orientation.Vertical, rg.Orientation);
         Assert.Equal (2, rg.RadioLabels.Length);
@@ -554,7 +554,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.Orientation = Orientation.Horizontal;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (Orientation.Horizontal, rg.Orientation);
         Assert.Equal (2, rg.HorizontalSpace);
@@ -575,7 +575,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.HorizontalSpace = 4;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (Orientation.Horizontal, rg.Orientation);
         Assert.Equal (4, rg.HorizontalSpace);

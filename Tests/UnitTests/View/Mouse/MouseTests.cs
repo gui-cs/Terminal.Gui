@@ -49,7 +49,7 @@ public class MouseTests : TestsAllViews
         Application.RaiseMouseEvent (new () { ScreenPosition = new (xy, xy), Flags = MouseFlags.Button1Pressed });
 
         Application.RaiseMouseEvent (new () { ScreenPosition = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
         top.Dispose ();

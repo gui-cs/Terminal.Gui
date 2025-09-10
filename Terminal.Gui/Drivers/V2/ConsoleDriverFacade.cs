@@ -14,6 +14,10 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
+    public IOutputBuffer OutputBuffer => _outputBuffer;
+
+    public IWindowSizeMonitor WindowSizeMonitor { get; }
+
 
     public ConsoleDriverFacade (
         IInputProcessor inputProcessor,
@@ -36,7 +40,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                          MouseEvent?.Invoke (s, e);
                                      };
 
-        windowSizeMonitor.SizeChanging += (_, e) => SizeChanged?.Invoke (this, e);
+        WindowSizeMonitor = windowSizeMonitor;
+        windowSizeMonitor.SizeChanging += (_,e) => SizeChanged?.Invoke (this, e);
 
         CreateClipboard ();
     }
@@ -68,7 +73,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         get
         {
-            if (ConsoleDriver.RunningUnitTests)
+            if (ConsoleDriver.RunningUnitTests && _output is WindowsOutput or NetOutput)
             {
                 // In unit tests, we don't have a real output, so we return an empty rectangle.
                 return Rectangle.Empty;
@@ -384,7 +389,15 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl)
     {
-        // TODO: implement
+        ConsoleKeyInfo consoleKeyInfo = new (keyChar, key, shift, alt, ctrl);
+
+        Key k = EscSeqUtils.MapKey (consoleKeyInfo);
+
+        if (InputProcessor.IsValidInput (k, out k))
+        {
+            InputProcessor.OnKeyDown (k);
+            InputProcessor.OnKeyUp (k);
+        }
     }
 
     /// <summary>

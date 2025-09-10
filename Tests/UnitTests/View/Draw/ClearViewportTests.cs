@@ -209,7 +209,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
 
         var expected = @"
 ┌──────────────────┐
@@ -274,7 +274,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
 
         var expected = @"
 ┌──────────────────┐
