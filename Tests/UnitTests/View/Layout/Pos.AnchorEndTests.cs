@@ -26,6 +26,8 @@ public class PosAnchorEndTests ()
         top.Add (win);
         RunState rs = Application.Begin (top);
 
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
         Assert.Equal (new (0, 0, 80, 25), win.Frame);
         Assert.Equal (new (68, 22, 10, 1), tv.Frame);

@@ -123,9 +123,9 @@ public class TheGenerator : IIncrementalGenerator
                                {
                                    Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
                                }
-                               catch(Exception)
+                               catch(Exception ex)
                                {
-                                   context.HardStop ();
+                                   context.HardStop (ex);
                                    
                                
                                    throw;

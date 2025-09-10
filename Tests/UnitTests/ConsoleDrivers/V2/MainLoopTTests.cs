@@ -18,10 +18,20 @@ public class MainLoopTTests
         Assert.Throws<NotInitializedException> (() => m.AnsiRequestScheduler);
         Assert.Throws<NotInitializedException> (() => m.WindowSizeMonitor);
 
+        var componentFactory = new Mock<IComponentFactory<int>> ();
+
+        componentFactory.Setup (
+                                c => c.CreateWindowSizeMonitor (
+                                                                It.IsAny<IConsoleOutput> (),
+                                                                It.IsAny<IOutputBuffer> ()))
+                        .Returns (Mock.Of <IWindowSizeMonitor>());
+
         m.Initialize (new TimedEvents (),
                       new ConcurrentQueue<int> (),
                       Mock.Of <IInputProcessor>(),
-                      Mock.Of<IConsoleOutput>());
+                      Mock.Of<IConsoleOutput>(),
+                      componentFactory.Object
+                     );
 
         Assert.NotNull (m.TimedEvents);
         Assert.NotNull (m.InputBuffer);

@@ -165,7 +165,8 @@ public abstract class InputProcessor<T> : IInputProcessor
 
     internal char _highSurrogate = '\0';
 
-    internal bool IsValidInput (Key key, out Key result)
+    /// <inheritdoc />
+    public bool IsValidInput (Key key, out Key result)
     {
         result = key;
 
@@ -179,6 +180,22 @@ public abstract class InputProcessor<T> : IInputProcessor
         if (_highSurrogate > 0 && char.IsLowSurrogate ((char)key))
         {
             result = (KeyCode)new Rune (_highSurrogate, (char)key).Value;
+
+            if (key.IsAlt)
+            {
+                result = result.WithAlt;
+            }
+
+            if (key.IsCtrl)
+            {
+                result = result.WithCtrl;
+            }
+
+            if (key.IsShift)
+            {
+                result = result.WithShift;
+            }
+
             _highSurrogate = '\0';
 
             return true;

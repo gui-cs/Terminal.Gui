@@ -431,7 +431,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         if (ConsoleDriver.RunningUnitTests)

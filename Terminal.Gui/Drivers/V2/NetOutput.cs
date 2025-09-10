@@ -28,7 +28,11 @@ public class NetOutput : OutputBase, IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text) { Console.Out.Write (text); }
+    public void Write (ReadOnlySpan<char> text)
+    {
+        Console.Out.Write (text);
+    }
+
 
     /// <inheritdoc/>
     public Size GetWindowSize ()
@@ -67,9 +71,14 @@ public class NetOutput : OutputBase, IConsoleOutput
         EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
     }
 
-    /// <inheritdoc/>
-    protected override void Write (StringBuilder output) { Console.Out.Write (output); }
 
+    /// <inheritdoc />
+    protected override void Write (StringBuilder output)
+    {
+        Console.Out.Write (output);
+    }
+
+    /// <inheritdoc />
     protected override bool SetCursorPositionImpl (int col, int row)
     {
         if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
@@ -102,9 +111,12 @@ public class NetOutput : OutputBase, IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public void Dispose () { }
+    public void Dispose ()
+    {
+    }
 
-    /// <inheritdoc/>
+
+    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);

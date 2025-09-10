@@ -39,7 +39,7 @@ public class SendKeys : Scenario
 
         txtResult.KeyDown += (s, e) =>
                              {
-                                 rKeys += new Rune ((uint)(e.KeyCode & ~KeyCode.AltMask & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask));
+                                 rKeys += e.ToString ();
 
                                  if (!IsShift && e.IsShift)
                                  {

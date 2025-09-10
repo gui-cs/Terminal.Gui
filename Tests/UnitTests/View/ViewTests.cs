@@ -453,10 +453,10 @@ public class ViewTests
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -471,8 +471,7 @@ public class ViewTests
 
         view.Visible = false;
 
-        var firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

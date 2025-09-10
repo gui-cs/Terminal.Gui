@@ -52,6 +52,20 @@ public static partial class Application
     public static ITimedEvents? TimedEvents => ApplicationImpl.Instance?.TimedEvents;
 
     /// <summary>
+    /// Maximum number of iterations of the main loop (and hence draws)
+    /// to allow to occur per second. Defaults to <see cref="DefaultMaximumIterationsPerSecond"/>> which is a 40ms sleep
+    /// after iteration (factoring in how long iteration took to run).
+    /// <remarks>Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
+    /// Only affects v2 drivers.</remarks>
+    /// </summary>
+    public static ushort MaximumIterationsPerSecond = DefaultMaximumIterationsPerSecond;
+
+    /// <summary>
+    /// Default value for <see cref="MaximumIterationsPerSecond"/>
+    /// </summary>
+    public const ushort DefaultMaximumIterationsPerSecond = 25;
+
+    /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
     /// </summary>
     /// <returns>A string representation of the Application </returns>

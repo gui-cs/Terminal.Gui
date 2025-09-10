@@ -51,7 +51,7 @@ public class WindowTests (ITestOutputHelper output)
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -68,7 +68,7 @@ public class WindowTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 20));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -95,7 +95,7 @@ public class WindowTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"

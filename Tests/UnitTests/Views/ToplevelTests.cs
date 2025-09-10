@@ -285,7 +285,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver!).SetBufferSize (15, 7);
+                                         AutoInitShutdownAttribute.FakeResize(new Size(15, 7));
 
                                          // Don't use MessageBox here; it's too complicated for this unit test; just use Window
                                          testWindow = new ()
@@ -324,7 +324,7 @@ public class ToplevelTests
                                                                           ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Pressed
                                                                               | MouseFlags.ReportMousePosition
                                                                       });
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.Equal (Application.Top.Border, Application.MouseGrabHandler.MouseGrabView);
                                          Assert.Equal (new (1, 2, 10, 3), Application.Top.Frame);
@@ -347,7 +347,7 @@ public class ToplevelTests
                                                                           ScreenPosition = new (2, 1),
                                                                           Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                                                       });
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.Equal (Application.Top!.Border, Application.MouseGrabHandler.MouseGrabView);
                                          Assert.Equal (new (1, 1, 10, 3), Application.Top.Frame);
@@ -366,7 +366,7 @@ public class ToplevelTests
 
                                          // Ungrab the mouse
                                          Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Released });
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.Null (Application.MouseGrabHandler.MouseGrabView);
                                      }
@@ -405,7 +405,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver!).SetBufferSize (30, 10);
+                                         AutoInitShutdownAttribute.FakeResize(new Size(30, 10));
                                      }
                                      else if (iterations == 1)
                                      {
@@ -507,10 +507,10 @@ public class ToplevelTests
         top.BeginInit ();
         top.EndInit ();
 
-        Exception exception = Record.Exception (() => ((FakeDriver)Application.Driver!).SetBufferSize (0, 10));
+        Exception exception = Record.Exception (() => ((IFakeDriverV2)Application.Driver!).SetBufferSize (0, 10));
         Assert.Null (exception);
 
-        exception = Record.Exception (() => ((FakeDriver)Application.Driver!).SetBufferSize (10, 0));
+        exception = Record.Exception (() => ((IFakeDriverV2)Application.Driver!).SetBufferSize (10, 0));
         Assert.Null (exception);
     }
 
@@ -596,9 +596,9 @@ public class ToplevelTests
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable };
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(40, 10));
         RunState rsWindow = Application.Begin (window);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
 
@@ -614,12 +614,12 @@ public class ToplevelTests
                                          ScreenPosition = new (-11, -4), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (-11, -4, 20, 3), window.Frame);
 
         // Changes Top size to same size as Dialog more menu and scroll bar
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 3);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 3));
 
         Application.RaiseMouseEvent (
                                      new ()
@@ -627,12 +627,12 @@ public class ToplevelTests
                                          ScreenPosition = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 20, 3), top.Frame);
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
         // Changes Top size smaller than Dialog size
-        ((FakeDriver)Application.Driver!).SetBufferSize (19, 2);
+        AutoInitShutdownAttribute.FakeResize(new Size(19, 2));
 
         Application.RaiseMouseEvent (
                                      new ()
@@ -640,7 +640,7 @@ public class ToplevelTests
                                          ScreenPosition = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
@@ -650,7 +650,7 @@ public class ToplevelTests
                                          ScreenPosition = new (18, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (18, 1, 20, 3), window.Frame);
 
@@ -661,7 +661,7 @@ public class ToplevelTests
                                          ScreenPosition = new (19, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (19, 2, 20, 3), window.Frame);
 
@@ -700,7 +700,7 @@ public class ToplevelTests
         Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (window.Border, Application.MouseGrabHandler.MouseGrabView);
 
         Assert.Equal (new (0, 0, 10, 3), window.Frame);
@@ -712,7 +712,7 @@ public class ToplevelTests
                                      });
 
         firstIteration = false;
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (window.Border, Application.MouseGrabHandler.MouseGrabView);
         Assert.Equal (new (1, 1, 10, 3), window.Frame);
 

@@ -20,6 +20,9 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
         {
             top.OnReady ();
             _readiedTopLevels.Add (top);
+
+            // Views can be closed and opened and run again multiple times, see End_Does_Not_Dispose
+            top.Closed += (s, e) => _readiedTopLevels.Remove (top);
         }
     }
 
