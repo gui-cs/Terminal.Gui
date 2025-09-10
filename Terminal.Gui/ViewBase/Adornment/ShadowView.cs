@@ -151,6 +151,13 @@ internal class ShadowView : View
             return Attribute.Default;
         }
 
+        if (Driver?.Contents == null ||
+            location.Y < 0 || location.Y >= Driver.Contents.GetLength (0) ||
+            location.X < 0 || location.X >= Driver.Contents.GetLength (1))
+        {
+            return Attribute.Default;
+        }
+
         Attribute attr = Driver!.Contents! [location.Y, location.X].Attribute!.Value;
 
         var newAttribute =

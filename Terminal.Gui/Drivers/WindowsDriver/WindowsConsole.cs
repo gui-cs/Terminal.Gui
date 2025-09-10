@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsConsole
+public partial class WindowsConsole
 {
     private CancellationTokenSource? _inputReadyCancellationTokenSource;
     private readonly BlockingCollection<InputRecord> _inputQueue = new (new ConcurrentQueue<InputRecord> ());

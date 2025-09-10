@@ -14,15 +14,15 @@ public class MainLoopCoordinatorTests
         var beforeLogger = Logging.Logger;
         Logging.Logger = mockLogger.Object;
 
-        var c = new MainLoopCoordinator<char> (new TimedEvents (),
-                                               // Runs on a separate thread (input thread)
-                                               () => throw new Exception ("Crash on boot"),
+        var m = new Mock<IComponentFactory<char>> ();
+        // Runs on a separate thread (input thread)
+        m.Setup (f => f.CreateInput ()).Throws (new Exception ("Crash on boot"));
 
+        var c = new MainLoopCoordinator<char> (new TimedEvents (),
                                                // Rest runs on main thread
                                                new ConcurrentQueue<char> (),
-                                               Mock.Of <IInputProcessor>(),
-                                               ()=>Mock.Of<IConsoleOutput>(),
-                                               Mock.Of<IMainLoop<char>>());
+                                               Mock.Of<IMainLoop<char>>(),
+                                               m.Object);
 
         // StartAsync boots the main loop and the input thread. But if the input class bombs
         // on startup it is important that the exception surface at the call site and not lost

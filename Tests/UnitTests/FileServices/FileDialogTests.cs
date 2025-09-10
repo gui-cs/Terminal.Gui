@@ -28,9 +28,11 @@ public class FileDialogTests ()
         dlg.Dispose ();
     }
 
-    [Fact]
+    [Theory]
+    [InlineData ("Bob", "csv")]
+    [InlineData ("𝔹ob", "CSV")]
     [AutoInitShutdown]
-    public void DirectTyping_Allowed ()
+    public void DirectTyping_Allowed (string path, string extension)
     {
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
@@ -46,15 +48,15 @@ public class FileDialogTests ()
                      );
 
         // continue typing the rest of the path
-        Send ("BOB");
+        Send (path);
         Send ('.', ConsoleKey.OemPeriod);
-        Send ("CSV");
+        Send (extension);
 
         Assert.True (dlg.Canceled);
 
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
-        Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
+        Assert.Equal ($"{path}.{extension}", Path.GetFileName (dlg.Path));
         dlg.Dispose ();
     }
 
@@ -72,7 +74,7 @@ public class FileDialogTests ()
 
         dlg.Path = openIn + Path.DirectorySeparatorChar;
 
-        Send ("X");
+        Send ("x");
 
         // nothing selected yet
         Assert.True (dlg.Canceled);
@@ -375,7 +377,7 @@ public class FileDialogTests ()
         Send ('>', ConsoleKey.LeftArrow);
         Send ('>', ConsoleKey.RightArrow);
 
-        Send ("SUBFOLDER");
+        Send ("subfolder");
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
@@ -772,7 +774,14 @@ public class FileDialogTests ()
     {
         foreach (char ch in chars)
         {
-            Application.Driver?.SendKeys (ch, ConsoleKey.NoName, false, false, false);
+            ConsoleKeyInfo consoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new (ch, ConsoleKey.None, false, false, false));
+
+            Application.Driver?.SendKeys (
+                                          ch,
+                                          consoleKeyInfo.Key,
+                                          (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                          (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                          (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
         }
     }
 

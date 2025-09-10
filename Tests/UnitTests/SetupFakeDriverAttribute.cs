@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using TerminalGuiFluentTesting;
 using Xunit.Sdk;
 
 namespace UnitTests;
@@ -34,7 +35,13 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         Application.ResetState (true);
         Assert.Null (Application.Driver);
-        Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+
+        var ff = new FakeDriverFactory ();
+        var driver = ff.Create ();
+
+        Application.Driver = driver;
+        driver.SetBufferSize (25, 25);
+
         Assert.Equal (new (0, 0, 25, 25), Application.Screen);
         // Ensures subscribing events, at least for the SizeChanged event
         Application.SubscribeDriverEvents ();

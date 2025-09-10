@@ -9,7 +9,7 @@ public class MarginTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Margin_Is_Transparent ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
         view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
@@ -44,7 +44,7 @@ public class MarginTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
         view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;

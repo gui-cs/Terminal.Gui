@@ -48,7 +48,14 @@ public interface IMainLoop<T> : IDisposable
     /// <param name="inputBuffer"></param>
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
-    void Initialize (ITimedEvents timedEvents, ConcurrentQueue<T> inputBuffer, IInputProcessor inputProcessor, IConsoleOutput consoleOutput);
+    /// <param name="componentFactory"></param>
+    void Initialize (
+        ITimedEvents timedEvents,
+        ConcurrentQueue<T> inputBuffer,
+        IInputProcessor inputProcessor,
+        IConsoleOutput consoleOutput,
+        IComponentFactory<T> componentFactory
+    );
 
     /// <summary>
     ///     Perform a single iteration of the main loop then blocks for a fixed length

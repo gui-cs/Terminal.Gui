@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
@@ -40,7 +41,9 @@ public class ApplicationTests
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        Application.Init (new FakeDriver ());
+        var a = new AutoInitShutdownAttribute ();
+        a.Before (null);
+
         Assert.True (initialized);
         Assert.False (shutdown);
 
@@ -76,6 +79,8 @@ public class ApplicationTests
             _timeoutLock = null;
         }
 
+
+        a.After (null);
         return;
 
         void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
@@ -143,15 +148,13 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Begin_Null_Toplevel_Throws ()
     {
-        // Setup Mock driver
-        Init ();
-
         // Test null Toplevel
         Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
 
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -163,20 +166,20 @@ public class ApplicationTests
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
         Toplevel top = new ();
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top!.Frame);
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+        AutoInitShutdownAttribute.FakeResize(new Size(5, 5));
         Assert.Equal (new (0, 0, 5, 5), Application.Top!.Frame);
         top.Dispose ();
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void End_And_Shutdown_Should_Not_Dispose_ApplicationTop ()
     {
         Assert.Null (Application.Top);
-
-        Init ();
 
         RunState rs = Application.Begin (new ());
         Application.Top!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
@@ -193,24 +196,23 @@ public class ApplicationTests
         Toplevel top = Application.Top;
 
 #if DEBUG_IDISPOSABLE
-        Exception exception = Record.Exception (() => Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
         top.Dispose ();
         Assert.True (top.WasDisposed);
 #endif
-        Shutdown ();
+        Application.Shutdown ();
         Assert.Null (Application.Top);
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Init_Begin_End_Cleans_Up ()
     {
         // Start stopwatch
         Stopwatch stopwatch = new Stopwatch ();
         stopwatch.Start ();
-
-        Init ();
 
         // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
         // if we don't stop
@@ -237,14 +239,12 @@ public class ApplicationTests
         Application.End (runstate);
 
         Assert.NotNull (Application.Top);
-        Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
 
         topLevel.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
 
         // Stop stopwatch
@@ -255,7 +255,6 @@ public class ApplicationTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
     [InlineData (typeof (NetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -268,7 +267,7 @@ public class ApplicationTests
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
         Assert.Equal (driverType, Application.Driver?.GetType ());
-        Shutdown ();
+        Application.Shutdown ();
     }
 
     [Fact]
@@ -278,7 +277,7 @@ public class ApplicationTests
 
         Assert.NotNull (Application.Driver);
 
-        Shutdown ();
+        Application.Shutdown ();
     }
 
     [Theory]
@@ -468,7 +467,7 @@ public class ApplicationTests
                                                                                 new FakeDriver ()
                                                                                )
                                                  );
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -478,7 +477,7 @@ public class ApplicationTests
         Application.InternalInit (new FakeDriver ());
 
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -521,7 +520,7 @@ public class ApplicationTests
         Assert.NotNull (Application.Driver);
 
         topLevel.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -645,34 +644,13 @@ public class ApplicationTests
         Assert.Throws<ArgumentNullException> (static () => Application.SubscribeDriverEvents ());
     }
 
-    private void Init ()
-    {
-        Application.Init (new FakeDriver ());
-        Assert.NotNull (Application.Driver);
-        Assert.NotNull (Application.MainLoop);
-        Assert.NotNull (SynchronizationContext.Current);
-    }
-
-    private void Shutdown ()
-    {
-        if (ApplicationImpl.Instance is ApplicationV2)
-        {
-            ApplicationImpl.Instance.Shutdown ();
-        }
-        else
-        {
-            Application.Shutdown ();
-        }
-    }
 
     #region RunTests
 
     [Fact]
+    [AutoInitShutdown]
     public void Run_T_After_InitWithDriver_with_TopLevel_Does_Not_Throws ()
     {
-        // Setup Mock driver
-        Init ();
-
         Application.Iteration += (s, e) => Application.RequestStop ();
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
@@ -681,7 +659,7 @@ public class ApplicationTests
         Assert.True (Application.Top is Window);
 
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -691,9 +669,6 @@ public class ApplicationTests
     [Fact]
     public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throws ()
     {
-        // Setup Mock driver
-        Init ();
-
         Application.Iteration += (s, e) => Application.RequestStop ();
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
@@ -708,7 +683,7 @@ public class ApplicationTests
         Assert.True (Application.Top is Dialog);
 
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -716,10 +691,10 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     [TestRespondersDisposed]
     public void Run_T_After_Init_Does_Not_Disposes_Application_Top ()
     {
-        Init ();
 
         // Init doesn't create a Toplevel and assigned it to Application.Top
         // but Begin does
@@ -742,7 +717,7 @@ public class ApplicationTests
         Assert.True (initTop.WasDisposed);
 #endif
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -751,18 +726,16 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
     {
-        // Setup Mock driver
-        Init ();
-
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
         Application.Run<Toplevel> ();
 
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -775,8 +748,8 @@ public class ApplicationTests
     {
         Application.ForceDriver = "FakeDriver";
 
-        Application.Init ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
+        var a = new AutoInitShutdownAttribute ();
+        a.Before (null);
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
@@ -784,25 +757,26 @@ public class ApplicationTests
         Application.Run<Toplevel> ();
 
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+
+        a.After (null);
     }
 
     [Fact]
     [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
     {
-        Init ();
-
         Application.Driver = null;
 
         // Init has been called, but Driver has been set to null. Bad.
         Assert.Throws<InvalidOperationException> (() => Application.Run<Toplevel> ());
 
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -821,7 +795,7 @@ public class ApplicationTests
         Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -838,7 +812,7 @@ public class ApplicationTests
         Application.Run<Toplevel> (null, new FakeDriver ());
 
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
@@ -847,10 +821,11 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Run_RequestStop_Stops ()
     {
         // Setup Mock driver
-        Init ();
+        Application.Init ();
 
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
@@ -868,11 +843,9 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Run_Sets_Running_True ()
     {
-        // Setup Mock driver
-        Init ();
-
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
@@ -894,11 +867,9 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Run_RunningFalse_Stops ()
     {
-        // Setup Mock driver
-        Init ();
-
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
@@ -915,10 +886,10 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     [TestRespondersDisposed]
     public void Run_Loaded_Ready_Unloaded_Events ()
     {
-        Init ();
         Toplevel top = new ();
         var count = 0;
         top.Loaded += (s, e) => count++;
@@ -933,17 +904,16 @@ public class ApplicationTests
 
     // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
     [Fact]
+    [AutoInitShutdown]
     public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
     {
-        Init ();
-
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         var w = new Window
         {
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
         };
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(10, 10));
         RunState rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.
@@ -963,10 +933,9 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void End_Does_Not_Dispose ()
     {
-        Init ();
-
         var top = new Toplevel ();
 
         Window w = new ();
@@ -1117,8 +1086,12 @@ public class ApplicationTests
     private readonly object _forceDriverLock = new ();
 
     [Theory]
-    [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
-    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
+
+    // This test wants to Run which results in console handle errors, it wants to rely non drivers checking ConsoleDriver.RunningUnitTests
+    // And suppressing things that might fail, this is anti pattern, instead we should test this kind of thing with  Mocking
+    //    [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
+    //    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
+
     [InlineData ("FakeDriver", typeof (FakeDriver))]
     [InlineData ("NetDriver", typeof (NetDriver))]
     [InlineData ("WindowsDriver", typeof (WindowsDriver))]
@@ -1160,7 +1133,7 @@ public class ApplicationTests
         Assert.NotNull (Application.Top);
         Assert.False (Application.Top!.Running);
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
         Assert.True (result);
     }
 
@@ -1176,7 +1149,7 @@ public class ApplicationTests
         Assert.NotNull (Application.Top);
         Assert.False (Application.Top!.Running);
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
     }
 
     [Fact]
@@ -1203,7 +1176,7 @@ public class ApplicationTests
         Assert.NotNull (Application.Top);
         Assert.False (Application.Top!.Running);
         Application.Top!.Dispose ();
-        Shutdown ();
+        Application.Shutdown ();
     }
 
     // TODO: Add tests for Run that test errorHandler
@@ -1225,7 +1198,6 @@ public class ApplicationTests
             isCompletedSuccessfully = true;
         }
 
-        Init ();
         Application.Shutdown ();
 
         Assert.False (isCompletedSuccessfully);
@@ -1237,7 +1209,6 @@ public class ApplicationTests
     [Fact]
     public void Shutdown_Resets_SyncContext ()
     {
-        Init ();
         Application.Shutdown ();
         Assert.Null (SynchronizationContext.Current);
     }

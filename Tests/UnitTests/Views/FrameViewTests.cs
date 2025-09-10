@@ -38,7 +38,7 @@ public class FrameViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_Defaults ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(10, 10));
         var fv = new FrameView () { BorderStyle = LineStyle.Single };
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);
@@ -51,7 +51,7 @@ public class FrameViewTests (ITestOutputHelper output)
         fv.Height = 5;
         fv.Width = 5;
         Assert.Equal (new (0, 0, 5, 5), fv.Frame);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -66,7 +66,7 @@ public class FrameViewTests (ITestOutputHelper output)
         fv.X = 1;
         fv.Y = 2;
         Assert.Equal (new (1, 2, 5, 5), fv.Frame);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -81,7 +81,7 @@ public class FrameViewTests (ITestOutputHelper output)
         fv.X = -1;
         fv.Y = -2;
         Assert.Equal (new (-1, -2, 5, 5), fv.Frame);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -94,7 +94,7 @@ public class FrameViewTests (ITestOutputHelper output)
         fv.X = 7;
         fv.Y = 8;
         Assert.Equal (new (7, 8, 5, 5), fv.Frame);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
