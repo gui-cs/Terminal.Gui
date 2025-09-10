@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable IDE1006// Naming rule violation: Prefix '_' is not expected
 
 namespace Terminal.Gui.Drivers;
 

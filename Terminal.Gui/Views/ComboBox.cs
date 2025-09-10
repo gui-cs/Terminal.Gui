@@ -111,7 +111,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme> args)
     {
         _listview.SetScheme(args.NewValue);
         return base.OnSettingScheme (args);

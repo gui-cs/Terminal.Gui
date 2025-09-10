@@ -485,7 +485,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private bool _isDisposed;
     private bool _force16Colors;
     private nint _consoleBuffer;
-    private StringBuilder _everythingStringBuilder;
+    private StringBuilder? _everythingStringBuilder;
 
     /// <inheritdoc/>
     public void Dispose ()

@@ -605,7 +605,7 @@ public class FileDialog : Dialog, IDesignable
         bool addCurrentStateToHistory,
         bool setPathText = true,
         bool clearForward = true,
-        string pathText = null
+        string? pathText = null
     )
     {
         // no change of state
@@ -1109,7 +1109,7 @@ public class FileDialog : Dialog, IDesignable
         bool addCurrentStateToHistory,
         bool setPathText = true,
         bool clearForward = true,
-        string pathText = null
+        string? pathText = null
     )
     {
         if (State is SearchState search)
