@@ -48,6 +48,30 @@
       "commandLineArgs": "dotnet UICatalog.dll --driver v2net",
       "distributionName": ""
     },
+    "WSL-Gnome: UICatalog": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll; exec bash\"'",
+      "distributionName": ""
+    },
+    "WSL-Gnome: UICatalog --driver NetDriver": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver NetDriver; exec bash\"'",
+      "distributionName": ""
+    },
+    "WSL-Gnome: UICatalog --driver v2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2; exec bash\"'",
+      "distributionName": ""
+    },
+    "WSL-Gnome: UICatalog --driver v2net": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2net; exec bash\"'",
+      "distributionName": ""
+    },
     "Benchmark All": {
       "commandName": "Project",
       "commandLineArgs": "--benchmark"

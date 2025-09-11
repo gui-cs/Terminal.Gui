@@ -115,7 +115,7 @@ public class FileDialog : Dialog, IDesignable
         _btnUp.Text = GetUpButtonText ();
         _btnUp.Accepting += (s, e) =>
                             {
-                                _history.Up ();
+                                _history?.Up ();
                                 e.Handled = true;
                             };
 
@@ -123,7 +123,7 @@ public class FileDialog : Dialog, IDesignable
         _btnBack.Text = GetBackButtonText ();
         _btnBack.Accepting += (s, e) =>
                               {
-                                  _history.Back ();
+                                  _history?.Back ();
                                   e.Handled = true;
                               };
 
@@ -131,7 +131,7 @@ public class FileDialog : Dialog, IDesignable
         _btnForward.Text = GetForwardButtonText ();
         _btnForward.Accepting += (s, e) =>
                                  {
-                                     _history.Forward ();
+                                     _history?.Forward ();
                                      e.Handled = true;
                                  };
 
@@ -605,7 +605,7 @@ public class FileDialog : Dialog, IDesignable
         bool addCurrentStateToHistory,
         bool setPathText = true,
         bool clearForward = true,
-        string pathText = null
+        string? pathText = null
     )
     {
         // no change of state
@@ -1109,7 +1109,7 @@ public class FileDialog : Dialog, IDesignable
         bool addCurrentStateToHistory,
         bool setPathText = true,
         bool clearForward = true,
-        string pathText = null
+        string? pathText = null
     )
     {
         if (State is SearchState search)

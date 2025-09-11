@@ -264,28 +264,28 @@ public class NumericUpDown<T> : View where T : notnull
     protected override bool OnDrawingText () { return true; }
 
     /// <summary>
-    ///     Attempts to convert the specified <paramref name="value"/> to type <typeparamref name="T"/>.
+    ///     Attempts to convert the specified <paramref name="value"/> to type <typeparamref name="TValue"/>.
     /// </summary>
-    /// <typeparam name="T">The type to which the value should be converted.</typeparam>
+    /// <typeparam name="TValue">The type to which the value should be converted.</typeparam>
     /// <param name="value">The value to convert.</param>
     /// <param name="result">
     ///     When this method returns, contains the converted value if the conversion succeeded,
-    ///     or the default value of <typeparamref name="T"/> if the conversion failed.
+    ///     or the default value of <typeparamref name="TValue"/> if the conversion failed.
     /// </param>
     /// <returns>
     ///     <c>true</c> if the conversion was successful; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryConvert<T> (object value, out T? result)
+    public static bool TryConvert<TValue> (object value, out TValue? result)
     {
         try
         {
-            result = (T)Convert.ChangeType (value, typeof (T));
+            result = (TValue)Convert.ChangeType (value, typeof (TValue));
 
             return true;
         }
         catch
         {
-            result = default (T);
+            result = default (TValue);
 
             return false;
         }
