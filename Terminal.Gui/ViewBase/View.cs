@@ -520,6 +520,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     #endregion
 
 #if DEBUG_IDISPOSABLE
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Gets or sets whether failure to appropriately call Dispose() on a View will result in an Assert.
     ///     The default is <see langword="true"/>.
@@ -529,15 +530,16 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// </summary>
     public static bool EnableDebugIDisposableAsserts { get; set; } = true;
 
+
     /// <summary>
-    ///     Gets whether <see cref="Dispose"/> was called on this view or not.
+    ///     Gets whether <see cref="View.Dispose"/> was called on this view or not.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public bool WasDisposed { get; private set; }
 
     /// <summary>
-    ///     Gets the number of times <see cref="Dispose"/> was called on this view.
+    ///     Gets the number of times <see cref="View.Dispose"/> was called on this view.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
@@ -550,5 +552,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public static ConcurrentBag<View> Instances { get; private set; } = [];
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
 #endif
 }

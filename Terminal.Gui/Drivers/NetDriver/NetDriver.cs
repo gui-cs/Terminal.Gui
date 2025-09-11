@@ -223,7 +223,7 @@ internal class NetDriver : ConsoleDriver
 
     // BUGBUG: Fix this nullable issue.
     /// <inheritdoc />
-    internal override IAnsiResponseParser GetParser () => _mainLoopDriver._netEvents.Parser;
+    internal override IAnsiResponseParser GetParser () => _mainLoopDriver!._netEvents!.Parser;
     internal NetMainLoop? _mainLoopDriver;
 
     /// <inheritdoc />
@@ -356,11 +356,6 @@ internal class NetDriver : ConsoleDriver
     }
     public override void End ()
     {
-        if (IsWinPlatform)
-        {
-            NetWinConsole?.Cleanup ();
-        }
-
         StopReportingMouseMoves ();
 
         if (!RunningUnitTests)
@@ -373,6 +368,11 @@ internal class NetDriver : ConsoleDriver
             //Set cursor key to cursor.
             Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
             Console.Out.Close ();
+
+            // Reset the console to its original state
+            // after sending the escape sequences to restore
+            // alternative buffer and cursor visibility.
+            NetWinConsole?.Cleanup ();
         }
     }
 
@@ -746,47 +746,6 @@ internal class NetDriver : ConsoleDriver
 
     public virtual void ResizeScreen ()
     {
-        // Not supported on Unix.
-        if (IsWinPlatform)
-        {
-            // Can raise an exception while is still resizing.
-            try
-            {
-#pragma warning disable CA1416
-                if (Console.WindowHeight > 0)
-                {
-                    Console.CursorTop = 0;
-                    Console.CursorLeft = 0;
-                    Console.WindowTop = 0;
-                    Console.WindowLeft = 0;
-
-                    if (Console.WindowHeight > Rows)
-                    {
-                        Console.SetWindowSize (Cols, Rows);
-                    }
-
-                    Console.SetBufferSize (Cols, Rows);
-                }
-#pragma warning restore CA1416
-            }
-            // INTENT: Why are these eating the exceptions?
-            // Comments would be good here.
-            catch (IOException)
-            {
-                // CONCURRENCY: Unsynchronized access to Clip is not safe.
-                Clip = new (Screen);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // CONCURRENCY: Unsynchronized access to Clip is not safe.
-                Clip = new (Screen);
-            }
-        }
-        else
-        {
-            Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
-        }
-
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
         Clip = new (Screen);
     }

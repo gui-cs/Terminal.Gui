@@ -5,31 +5,31 @@ namespace Terminal.Gui.Drivers;
 
 internal class NetWinVTConsole
 {
-    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
-    private const uint ENABLE_ECHO_INPUT = 4;
-    private const uint ENABLE_EXTENDED_FLAGS = 128;
-    private const uint ENABLE_INSERT_MODE = 32;
-    private const uint ENABLE_LINE_INPUT = 2;
-    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
-    private const uint ENABLE_MOUSE_INPUT = 16;
-
     // Input modes.
     private const uint ENABLE_PROCESSED_INPUT = 1;
+    private const uint ENABLE_LINE_INPUT = 2;
+    private const uint ENABLE_ECHO_INPUT = 4;
+    private const uint ENABLE_WINDOW_INPUT = 8;
+    private const uint ENABLE_MOUSE_INPUT = 16;
+    private const uint ENABLE_INSERT_MODE = 32;
+    private const uint ENABLE_QUICK_EDIT_MODE = 64;
+    private const uint ENABLE_EXTENDED_FLAGS = 128;
+    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
 
     // Output modes.
     private const uint ENABLE_PROCESSED_OUTPUT = 1;
-    private const uint ENABLE_QUICK_EDIT_MODE = 64;
-    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
-    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
-    private const uint ENABLE_WINDOW_INPUT = 8;
     private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
+    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
+
+    // Standard handles.
     private const int STD_ERROR_HANDLE = -12;
     private const int STD_INPUT_HANDLE = -10;
     private const int STD_OUTPUT_HANDLE = -11;
 
-    private readonly nint _errorHandle;
+    // Handles and original console modes.
     private readonly nint _inputHandle;
-    private readonly uint _originalErrorConsoleMode;
     private readonly uint _originalInputConsoleMode;
     private readonly uint _originalOutputConsoleMode;
     private readonly nint _outputHandle;
@@ -45,7 +45,7 @@ internal class NetWinVTConsole
 
         _originalInputConsoleMode = mode;
 
-        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) < ENABLE_VIRTUAL_TERMINAL_INPUT)
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) == 0)
         {
             mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
@@ -64,32 +64,13 @@ internal class NetWinVTConsole
 
         _originalOutputConsoleMode = mode;
 
-        if ((mode & (ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN)) < DISABLE_NEWLINE_AUTO_RETURN)
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
         {
-            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
             if (!SetConsoleMode (_outputHandle, mode))
             {
                 throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
-            }
-        }
-
-        _errorHandle = GetStdHandle (STD_ERROR_HANDLE);
-
-        if (!GetConsoleMode (_errorHandle, out mode))
-        {
-            throw new ApplicationException ($"Failed to get error console mode, error code: {GetLastError ()}.");
-        }
-
-        _originalErrorConsoleMode = mode;
-
-        if ((mode & DISABLE_NEWLINE_AUTO_RETURN) < DISABLE_NEWLINE_AUTO_RETURN)
-        {
-            mode |= DISABLE_NEWLINE_AUTO_RETURN;
-
-            if (!SetConsoleMode (_errorHandle, mode))
-            {
-                throw new ApplicationException ($"Failed to set error console mode, error code: {GetLastError ()}.");
             }
         }
     }
@@ -109,11 +90,6 @@ internal class NetWinVTConsole
         if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
         {
             throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
-        }
-
-        if (!SetConsoleMode (_errorHandle, _originalErrorConsoleMode))
-        {
-            throw new ApplicationException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
         }
     }
 

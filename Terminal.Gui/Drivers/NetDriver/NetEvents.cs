@@ -80,7 +80,7 @@ internal class NetEvents : IDisposable
             return Console.ReadKey (intercept);
         }
 
-        while (!_netEventsDisposed.IsCancellationRequested)
+        while (!_netEventsDisposed!.IsCancellationRequested)
         {
             Task.Delay (100, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
 
@@ -113,11 +113,11 @@ internal class NetEvents : IDisposable
 
     private void ProcessInputQueue ()
     {
-        while (!_netEventsDisposed.IsCancellationRequested)
+        while (_netEventsDisposed is { IsCancellationRequested: false })
         {
             if (_inputQueue.Count == 0)
             {
-                while (!_netEventsDisposed.IsCancellationRequested)
+                while (_netEventsDisposed is { IsCancellationRequested: false })
                 {
                     ConsoleKeyInfo consoleKeyInfo;
 
@@ -147,7 +147,7 @@ internal class NetEvents : IDisposable
     {
         void RequestWindowSize ()
         {
-            while (!_netEventsDisposed.IsCancellationRequested)
+            while (_netEventsDisposed is { IsCancellationRequested: false })
             {
                 // Wait for a while then check if screen has changed sizes
                 Task.Delay (500, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
@@ -179,7 +179,7 @@ internal class NetEvents : IDisposable
             _netEventsDisposed.Token.ThrowIfCancellationRequested ();
         }
 
-        while (!_netEventsDisposed.IsCancellationRequested)
+        while (!_netEventsDisposed!.IsCancellationRequested)
         {
             try
             {
@@ -434,10 +434,6 @@ internal class NetEvents : IDisposable
                                          new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
                                         );
                 }
-                else
-                {
-                    return;
-                }
 
                 break;
 
@@ -563,15 +559,15 @@ internal class NetEvents : IDisposable
 
         public readonly override string ToString ()
         {
-            return EventType switch
-            {
-                EventType.Key => ToString (ConsoleKeyInfo),
-                EventType.Mouse => MouseEvent.ToString (),
+            return (EventType switch
+                    {
+                        EventType.Key => ToString (ConsoleKeyInfo),
+                        EventType.Mouse => MouseEvent.ToString (),
 
-                //EventType.WindowSize => WindowSize.ToString (),
-                //EventType.RequestResponse => RequestResponse.ToString (),
-                _ => "Unknown event type: " + EventType
-            };
+                        //EventType.WindowSize => WindowSize.ToString (),
+                        //EventType.RequestResponse => RequestResponse.ToString (),
+                        _ => "Unknown event type: " + EventType
+                    })!;
         }
 
         /// <summary>Prints a ConsoleKeyInfoEx structure</summary>

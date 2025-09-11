@@ -234,7 +234,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     public override void Write (IOutputBuffer outputBuffer)
     {
         _force16Colors = Application.Driver!.Force16Colors;
-        _everythingStringBuilder = new StringBuilder ();
+        _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
         _consoleBuffer = 0;
@@ -485,7 +485,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private bool _isDisposed;
     private bool _force16Colors;
     private nint _consoleBuffer;
-    private StringBuilder _everythingStringBuilder;
+    private StringBuilder _everythingStringBuilder = new ();
 
     /// <inheritdoc/>
     public void Dispose ()

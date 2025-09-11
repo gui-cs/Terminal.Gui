@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing;
 using TerminalGuiFluentTesting;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace Terminal.Gui.Drivers;
 
@@ -15,26 +16,26 @@ public class FakeApplicationFactory
     {
         var cts = new CancellationTokenSource ();
         var fakeInput = new FakeNetInput (cts.Token);
-        FakeOutput _output = new ();
-        _output.Size = new (25, 25);
+        FakeOutput output = new ();
+        output.Size = new (25, 25);
 
 
         IApplication origApp = ApplicationImpl.Instance;
 
         var sizeMonitor = new FakeSizeMonitor ();
 
-        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, _output, sizeMonitor));
+        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (v2);
         v2.Init (null,"v2net");
 
-        var d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver;
+        var d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver!;
         sizeMonitor.SizeChanging += (_, e) =>
                                            {
                                                if (e.Size != null)
                                                {
                                                    var s = e.Size.Value;
-                                                   _output.Size = s;
+                                                   output.Size = s;
                                                    d.OutputBuffer.SetWindowSize (s.Width, s.Height);
                                                }
                                            };
@@ -95,7 +96,7 @@ class FakeDriverV2 : ConsoleDriverFacade<ConsoleKeyInfo>, IFakeDriverV2
 {
     public ConcurrentQueue<ConsoleKeyInfo> InputBuffer { get; }
     public FakeSizeMonitor SizeMonitor { get; }
-    public OutputBuffer OutputBuffer { get; }
+    public new OutputBuffer OutputBuffer { get; }
 
     public IConsoleOutput ConsoleOutput { get; }
 
