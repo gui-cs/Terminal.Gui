@@ -269,7 +269,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                         if (Contents [Row, Col - 1].Rune.GetColumns () > 1)
                         {
                             // Invalidate cell to left
-                            Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
+                            Contents [Row, Col - 1].Rune = (Rune)'\0';
                             Contents [Row, Col - 1].IsDirty = true;
                         }
                     }
@@ -308,7 +308,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                             {
                                 // Invalidate cell to right so that it doesn't get drawn
                                 // TODO: Figure out if it is better to show a replacement character or ' '
-                                Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
+                                Contents [Row, Col + 1].Rune = (Rune)'\0';
                                 Contents [Row, Col + 1].IsDirty = true;
                             }
                         }

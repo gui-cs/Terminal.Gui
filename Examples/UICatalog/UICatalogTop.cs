@@ -166,13 +166,23 @@ public class UICatalogTop : Toplevel
                 CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked
             };
 
-            _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
-            {
-                Application.Force16Colors = args.Value == CheckState.Checked;
+            _force16ColorsMenuItemCb.CheckedStateChanging += (sender, args) =>
+                                                             {
+                                                                 if (Application.Force16Colors
+                                                                     && args.Result == CheckState.UnChecked
+                                                                     && !Application.Driver!.SupportsTrueColor)
+                                                                 {
+                                                                     args.Handled = true;
+                                                                 }
+                                                             };
 
-                _force16ColorsShortcutCb!.CheckedState = args.Value;
-                Application.LayoutAndDraw ();
-            };
+            _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
+                                                            {
+                                                                Application.Force16Colors = args.Value == CheckState.Checked;
+
+                                                                _force16ColorsShortcutCb!.CheckedState = args.Value;
+                                                                Application.LayoutAndDraw ();
+                                                            };
 
             menuItems.Add (
                            new MenuItemv2
@@ -608,11 +618,22 @@ public class UICatalogTop : Toplevel
         };
 
         _force16ColorsShortcutCb.CheckedStateChanging += (sender, args) =>
-        {
-            Application.Force16Colors = args.Result == CheckState.Checked;
-            _force16ColorsMenuItemCb!.CheckedState = args.Result;
-            Application.LayoutAndDraw ();
-        };
+                                                         {
+                                                             if (Application.Force16Colors
+                                                                 && args.Result == CheckState.UnChecked
+                                                                 && !Application.Driver!.SupportsTrueColor)
+                                                             {
+                                                                 // If the driver does not support TrueColor, we cannot disable 16 colors
+                                                                 args.Handled = true;
+                                                             }
+                                                         };
+
+        _force16ColorsShortcutCb.CheckedStateChanged += (sender, args) =>
+                                                         {
+                                                             Application.Force16Colors = args.Value == CheckState.Checked;
+                                                             _force16ColorsMenuItemCb!.CheckedState = args.Value;
+                                                             Application.LayoutAndDraw ();
+                                                         };
 
         statusBar.Add (
                        _shQuit,
