@@ -326,7 +326,36 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <inheritdoc/>
-    public void Suspend () { }
+    public void Suspend ()
+    {
+        if (Environment.OSVersion.Platform != PlatformID.Unix)
+        {
+            return;
+        }
+
+        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            Console.ResetColor ();
+            Console.Clear ();
+
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+            Platform.Suspend ();
+
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+            Application.LayoutAndDraw ();
+        }
+
+        Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+    }
 
     /// <summary>
     ///     Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and
