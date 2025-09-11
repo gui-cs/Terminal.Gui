@@ -44,15 +44,16 @@ public class RunState : IDisposable
     }
 
 #if DEBUG_IDISPOSABLE
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
-    ///     Gets whether <see cref="Dispose"/> was called on this RunState or not.
+    ///     Gets whether <see cref="RunState.Dispose"/> was called on this RunState or not.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public bool WasDisposed { get; private set; }
 
     /// <summary>
-    ///     Gets the number of times <see cref="Dispose"/> was called on this object.
+    ///     Gets the number of times <see cref="RunState.Dispose"/> was called on this object.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
@@ -71,5 +72,6 @@ public class RunState : IDisposable
     {
         Instances.Add (this);
     }
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
 #endif
 }

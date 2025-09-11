@@ -681,14 +681,20 @@ public class CharMap : View, IDesignable
                                    {
                                        CopyGlyph ();
                                        dlg!.RequestStop ();
+                                       a.Handled = true;
                                    };
 
             copyCodepoint.Accepting += (s, a) =>
                                        {
                                            CopyCodePoint ();
                                            dlg!.RequestStop ();
+                                           a.Handled = true;
                                        };
-            cancel.Accepting += (s, a) => dlg!.RequestStop ();
+            cancel.Accepting += (s, a) =>
+                                {
+                                    dlg!.RequestStop ();
+                                    a.Handled = true;
+                                };
 
             var rune = (Rune)SelectedCodePoint;
             var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
@@ -765,9 +771,6 @@ public class CharMap : View, IDesignable
                                    Strings.btnOk
                                   );
         }
-
-        // BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
-        Application.MouseGrabHandler.GrabMouse (this);
     }
 
     #endregion Details Dialog
