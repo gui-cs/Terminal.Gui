@@ -48,6 +48,13 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     private void CreateClipboard ()
     {
+        if (FakeDriver.FakeBehaviors.UseFakeClipboard)
+        {
+            Clipboard = new FakeDriver.FakeClipboard ();
+
+            return;
+        }
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
