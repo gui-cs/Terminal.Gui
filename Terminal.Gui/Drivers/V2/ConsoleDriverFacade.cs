@@ -417,25 +417,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
-    /// <summary>Simulates a key press.</summary>
-    /// <param name="keyChar">The key character.</param>
-    /// <param name="key">The key.</param>
-    /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-    /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-    /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    public void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl)
-    {
-        ConsoleKeyInfo consoleKeyInfo = new (keyChar, key, shift, alt, ctrl);
-
-        Key k = EscSeqUtils.MapKey (consoleKeyInfo);
-
-        if (InputProcessor.IsValidInput (k, out k))
-        {
-            InputProcessor.OnKeyDown (k);
-            InputProcessor.OnKeyUp (k);
-        }
-    }
-
     /// <summary>
     ///     Provide proper writing to send escape sequence recognized by the <see cref="ConsoleDriver"/>.
     /// </summary>

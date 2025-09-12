@@ -685,21 +685,6 @@ internal class NetDriver : ConsoleDriver
 
     #region Keyboard Handling
 
-    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
-    {
-        var input = new InputResult
-        {
-            EventType = EventType.Key, ConsoleKeyInfo = new (keyChar, key, shift, alt, control)
-        };
-
-        try
-        {
-            ProcessInput (input);
-        }
-        catch (OverflowException)
-        { }
-    }
-
     //private ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
     //{
     //    if (consoleKeyInfo.Key != ConsoleKey.Packet)

@@ -397,11 +397,6 @@ public class FakeDriver : ConsoleDriver
         return FakeConsole.CursorVisible;
     }
 
-    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
-    {
-        MockKeyPressedHandler (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
-    }
-
     private AnsiResponseParser _parser = new ();
 
     /// <inheritdoc />

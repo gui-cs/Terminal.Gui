@@ -61,48 +61,6 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
-    {
-        KeyCode key;
-
-        if (consoleKey == ConsoleKey.Packet)
-        {
-            //var mod = new ConsoleModifiers ();
-
-            //if (shift)
-            //{
-            //    mod |= ConsoleModifiers.Shift;
-            //}
-
-            //if (alt)
-            //{
-            //    mod |= ConsoleModifiers.Alt;
-            //}
-
-            //if (control)
-            //{
-            //    mod |= ConsoleModifiers.Control;
-            //}
-
-            var cKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
-            cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
-            key = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (cKeyInfo);
-        }
-        else
-        {
-            var cKeyInfo = EscSeqUtils.MapConsoleKeyInfo (new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control));
-            key = EscSeqUtils.MapKey (cKeyInfo);
-        }
-
-        if (IsValidInput (key, out key))
-        {
-            OnKeyDown (new (key));
-            OnKeyUp (new (key));
-        }
-
-        //OnKeyPressed (new KeyEventArgsEventArgs (key));
-    }
-
     public void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
