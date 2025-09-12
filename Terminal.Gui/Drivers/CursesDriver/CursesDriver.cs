@@ -642,8 +642,7 @@ internal class CursesDriver : ConsoleDriver
 
                 while (wch2 == Curses.KeyMouse)
                 {
-                    // BUGBUG: Fix this nullable issue.
-                    Key kea = null;
+                    Key? kea = null;
 
                     ConsoleKeyInfo [] cki =
                     {
@@ -652,8 +651,7 @@ internal class CursesDriver : ConsoleDriver
                         new ('<', 0, false, false, false)
                     };
                     code = 0;
-                    // BUGBUG: Fix this nullable issue.
-                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea, ref cki);
+                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea!, ref cki!);
                 }
 
                 return;
@@ -714,8 +712,7 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.AltMask | MapCursesKey (wch);
             }
 
-            // BUGBUG: Fix this nullable issue.
-            Key key = null;
+            Key? key = null;
 
             if (code == 0)
             {
@@ -745,8 +742,7 @@ internal class CursesDriver : ConsoleDriver
                     [
                         new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
                     ];
-                    // BUGBUG: Fix this nullable issue.
-                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
+                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref key!, ref cki!);
 
                     return;
                 }
@@ -879,7 +875,7 @@ internal class CursesDriver : ConsoleDriver
         ref KeyCode k,
         ref int wch2,
         ref Key keyEventArgs,
-        ref ConsoleKeyInfo [] cki
+        ref ConsoleKeyInfo []? cki
     )
     {
         ConsoleKey ck = 0;
@@ -903,11 +899,10 @@ internal class CursesDriver : ConsoleDriver
                 // the given terminator (e.g. mouse) or did not understand format somehow.
                 // Carry on with the older code for processing curses escape codes
 
-                // BUGBUG: Fix this nullable issue.
                 EscSeqUtils.DecodeEscSeq (
                                           ref consoleKeyInfo,
                                           ref ck,
-                                          cki,
+                                          cki!,
                                           ref mod,
                                           out _,
                                           out _,
@@ -927,7 +922,6 @@ internal class CursesDriver : ConsoleDriver
                         OnMouseEvent (new () { Flags = mf, Position = pos });
                     }
 
-                    // BUGBUG: Fix this nullable issue.
                     cki = null;
 
                     if (wch2 == 27)
