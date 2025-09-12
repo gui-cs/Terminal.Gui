@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
+﻿#nullable enable
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
@@ -11,7 +11,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
     /// <summary>The event fired when the terminal is resized.</summary>
-    public event EventHandler<SizeChangedEventArgs> SizeChanged;
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
     public IOutputBuffer OutputBuffer => _outputBuffer;
@@ -48,6 +48,13 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     private void CreateClipboard ()
     {
+        if (FakeDriver.FakeBehaviors.UseFakeClipboard)
+        {
+            Clipboard = new FakeDriver.FakeClipboard ();
+
+            return;
+        }
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
@@ -88,7 +95,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     ///     to.
     /// </summary>
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
-    public Region Clip
+    public Region? Clip
     {
         get => _outputBuffer.Clip;
         set => _outputBuffer.Clip = value;
@@ -114,7 +121,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     ///     The contents of the application output. The driver outputs this buffer to the terminal.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    public Cell [,] Contents
+    public Cell [,]? Contents
     {
         get => _outputBuffer.Contents;
         set => _outputBuffer.Contents = value;
@@ -229,7 +236,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <summary>
     ///     Raised each time <see cref="ConsoleDriver.ClearContents"/> is called. For benchmarking.
     /// </summary>
-    public event EventHandler<EventArgs> ClearedContents;
+    public event EventHandler<EventArgs>? ClearedContents;
 
     /// <summary>
     ///     Fills the specified rectangle with the specified rune, using <see cref="ConsoleDriver.CurrentAttribute"/>
@@ -397,7 +404,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
-    public event EventHandler<Key> KeyDown;
+    public event EventHandler<Key>? KeyDown;
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
@@ -405,10 +412,10 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     ///     processing is
     ///     complete.
     /// </remarks>
-    public event EventHandler<Key> KeyUp;
+    public event EventHandler<Key>? KeyUp;
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEventArgs> MouseEvent;
+    public event EventHandler<MouseEventArgs>? MouseEvent;
 
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>

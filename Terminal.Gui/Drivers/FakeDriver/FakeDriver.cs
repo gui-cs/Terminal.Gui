@@ -1,4 +1,5 @@
-﻿//
+﻿#nullable enable
+//
 // FakeDriver.cs: A fake IConsoleDriver for unit tests. 
 //
 
@@ -36,7 +37,7 @@ public class FakeDriver : ConsoleDriver
         public bool UseFakeClipboard { get; internal set; }
     }
 
-    public static Behaviors FakeBehaviors = new ();
+    public static Behaviors FakeBehaviors { get; } = new ();
     public override bool SupportsTrueColor => false;
 
     /// <inheritdoc />
@@ -47,8 +48,8 @@ public class FakeDriver : ConsoleDriver
 
     public FakeDriver ()
     {
-        Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
-        Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
+        base.Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+        base.Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 
         if (FakeBehaviors.UseFakeClipboard)
         {
@@ -87,7 +88,7 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
     }
 
-    private FakeMainLoop _mainLoopDriver;
+    private FakeMainLoop? _mainLoopDriver;
 
     public override MainLoop Init ()
     {
@@ -124,7 +125,7 @@ public class FakeDriver : ConsoleDriver
 
         for (int row = top; row < rows; row++)
         {
-            if (!_dirtyLines [row])
+            if (!_dirtyLines! [row])
             {
                 continue;
             }
@@ -144,7 +145,7 @@ public class FakeDriver : ConsoleDriver
 
                 for (; col < cols; col++)
                 {
-                    if (!Contents [row, col].IsDirty)
+                    if (!Contents! [row, col].IsDirty)
                     {
                         if (output.Length > 0)
                         {
@@ -168,7 +169,7 @@ public class FakeDriver : ConsoleDriver
                         lastCol = col;
                     }
 
-                    Attribute attr = Contents [row, col].Attribute.Value;
+                    Attribute attr = Contents [row, col].Attribute!.Value;
 
                     // Performance: Only send the escape sequence if the attribute has changed.
                     if (attr != redrawAttr)
@@ -209,18 +210,18 @@ public class FakeDriver : ConsoleDriver
 
         //SetCursorVisibility (savedVisibility);
 
-        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+        void WriteToConsole (StringBuilder outputSb, ref int lastColumn, int row, ref int outputWidth)
         {
             FakeConsole.CursorTop = row;
-            FakeConsole.CursorLeft = lastCol;
+            FakeConsole.CursorLeft = lastColumn;
 
-            foreach (char c in output.ToString ())
+            foreach (char c in outputSb.ToString ())
             {
                 FakeConsole.Write (c);
             }
 
-            output.Clear ();
-            lastCol += outputWidth;
+            outputSb.Clear ();
+            lastColumn += outputWidth;
             outputWidth = 0;
         }
 
@@ -506,7 +507,7 @@ public class FakeDriver : ConsoleDriver
 
     public class FakeClipboard : ClipboardBase
     {
-        public Exception FakeException;
+        public Exception? FakeException { get; set; }
 
         private readonly bool _isSupportedAlwaysFalse;
         private string _contents = string.Empty;
@@ -536,19 +537,14 @@ public class FakeDriver : ConsoleDriver
             return _contents;
         }
 
-        protected override void SetClipboardDataImpl (string text)
+        protected override void SetClipboardDataImpl (string? text)
         {
-            if (text is null)
-            {
-                throw new ArgumentNullException (nameof (text));
-            }
-
             if (FakeException is { })
             {
                 throw FakeException;
             }
 
-            _contents = text;
+            _contents = text ?? throw new ArgumentNullException (nameof (text));
         }
     }
 
