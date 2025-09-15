@@ -1030,6 +1030,16 @@ public static class EscSeqUtils
     }
 
     /// <summary>
+    /// Helper to set the Control key states based on the char.
+    /// </summary>
+    /// <param name="ch">The char value.</param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo MapChar (char ch)
+    {
+        return MapConsoleKeyInfo (new (ch, ConsoleKey.None, false, false, false));
+    }
+
+    /// <summary>
     ///     Ensures a console key is mapped to one that works correctly with ANSI escape sequences.
     /// </summary>
     /// <param name="consoleKeyInfo">The <see cref="ConsoleKeyInfo"/>.</param>
