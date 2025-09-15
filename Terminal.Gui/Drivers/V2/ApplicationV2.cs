@@ -83,6 +83,7 @@ public class ApplicationV2 : ApplicationImpl
 
         bool definetlyWin = (driverName?.Contains ("win") ?? false )|| _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
         bool definetlyNet = (driverName?.Contains ("net") ?? false ) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool definetlyUnix = (driverName?.Contains ("unix") ?? false ) || _componentFactory is IComponentFactory<char>;
 
         if (definetlyWin)
         {
@@ -92,13 +93,17 @@ public class ApplicationV2 : ApplicationImpl
         {
             _coordinator = CreateNetSubcomponents ();
         }
+        else if (definetlyUnix)
+        {
+            _coordinator = CreateUnixSubcomponents ();
+        }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             _coordinator = CreateWindowsSubcomponents ();
         }
         else
         {
-            _coordinator = CreateNetSubcomponents ();
+            _coordinator = CreateUnixSubcomponents ();
         }
 
         _coordinator.StartAsync ().Wait ();
@@ -152,6 +157,29 @@ public class ApplicationV2 : ApplicationImpl
                                                         inputBuffer,
                                                         loop,
                                                         cf);
+    }
+
+    private IMainLoopCoordinator CreateUnixSubcomponents ()
+    {
+        ConcurrentQueue<char> inputBuffer = new ();
+        MainLoop<char> loop = new ();
+
+        IComponentFactory<char> cf;
+
+        if (_componentFactory != null)
+        {
+            cf = (IComponentFactory<char>)_componentFactory;
+        }
+        else
+        {
+            cf = new UnixComponentFactory ();
+        }
+
+        return new MainLoopCoordinator<char> (
+                                              _timedEvents,
+                                              inputBuffer,
+                                              loop,
+                                              cf);
     }
 
     /// <inheritdoc/>
