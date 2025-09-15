@@ -72,9 +72,12 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
 
     private void FlushConsoleInput ()
     {
-        while (Console.KeyAvailable)
+        if (!ConsoleDriver.RunningUnitTests)
         {
-            Console.ReadKey (intercept: true);
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey (intercept: true);
+            }
         }
     }
 
