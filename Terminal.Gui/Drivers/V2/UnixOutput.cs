@@ -140,10 +140,26 @@ internal class UnixOutput : OutputBase, IConsoleOutput
         return Size.Empty; // fallback
     }
 
+    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
+
     /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        if (visibility != CursorVisibility.Invisible)
+        {
+            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            {
+                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+
+                Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+            }
+
+            Write (EscSeqUtils.CSI_ShowCursor);
+        }
+        else
+        {
+            Write (EscSeqUtils.CSI_HideCursor);
+        }
     }
 
     /// <inheritdoc />
