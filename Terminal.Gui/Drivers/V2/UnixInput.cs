@@ -194,9 +194,12 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
     }
     private void WriteRaw (string text)
     {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text);
-        // Write to stdout (fd 1)
-        write (STDOUT_FILENO, utf8, utf8.Length);
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            byte [] utf8 = Encoding.UTF8.GetBytes (text);
+            // Write to stdout (fd 1)
+            write (STDOUT_FILENO, utf8, utf8.Length);
+        }
     }
 
     /// <inheritdoc/>
@@ -239,22 +242,25 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
     {
         base.Dispose ();
 
-        // Disable mouse events first
-        WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            // Disable mouse events first
+            WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);
 
-        // Drain any pending input already queued by the terminal
-        FlushConsoleInput ();
+            // Drain any pending input already queued by the terminal
+            FlushConsoleInput ();
 
-        // Flush kernel input buffer
-        tcflush (STDIN_FILENO, TCIFLUSH);
+            // Flush kernel input buffer
+            tcflush (STDIN_FILENO, TCIFLUSH);
 
-        //Disable alternative screen buffer.
-        WriteRaw (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            //Disable alternative screen buffer.
+            WriteRaw (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 
-        //Set cursor key to cursor.
-        WriteRaw (EscSeqUtils.CSI_ShowCursor);
+            //Set cursor key to cursor.
+            WriteRaw (EscSeqUtils.CSI_ShowCursor);
 
-        // Restore terminal to original state
-        tcsetattr (STDIN_FILENO, TCSANOW, ref _original);
+            // Restore terminal to original state
+            tcsetattr (STDIN_FILENO, TCSANOW, ref _original);
+        }
     }
 }

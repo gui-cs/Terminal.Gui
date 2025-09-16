@@ -112,9 +112,12 @@ internal class UnixOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     public void Write (ReadOnlySpan<char> text)
     {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
-        // Write to stdout (fd 1)
-        write (STDOUT_FILENO, utf8, utf8.Length);
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+            // Write to stdout (fd 1)
+            write (STDOUT_FILENO, utf8, utf8.Length);
+        }
     }
 
     /// <inheritdoc />
