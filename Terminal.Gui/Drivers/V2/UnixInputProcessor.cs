@@ -8,10 +8,7 @@ namespace Terminal.Gui.Drivers;
 internal class UnixInputProcessor : InputProcessor<char>
 {
     /// <inheritdoc />
-    public UnixInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter ())
-    {
-        DriverName = "unix";
-    }
+    public UnixInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter (), "unix") { }
 
     /// <inheritdoc />
     protected override void Process (char input)
