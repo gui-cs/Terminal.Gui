@@ -1420,6 +1420,7 @@ public static class EscSeqUtils
                         && keyInfo.Key != ConsoleKey.OemComma
                         && keyInfo.Key != ConsoleKey.OemPlus
                         && keyInfo.Key != ConsoleKey.OemMinus
+                        && keyInfo.Key != ConsoleKey.Oem1
                         && keyInfo.Key != ConsoleKey.Oem2
                         && keyInfo.Key != ConsoleKey.Oem3
                         && keyInfo.Key != ConsoleKey.Oem4
