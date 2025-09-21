@@ -89,9 +89,6 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
         // Disable mouse events first
         Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
-        // Flush any pending input so no stray events appear
-        FlushConsoleInput ();
-
         //Disable alternative screen buffer.
         Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 
@@ -99,5 +96,8 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
         Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
 
         _adjustConsole?.Cleanup ();
+
+        // Flush any pending input so no stray events appear
+        FlushConsoleInput ();
     }
 }
