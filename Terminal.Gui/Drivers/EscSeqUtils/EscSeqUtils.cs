@@ -1142,6 +1142,17 @@ public static class EscSeqUtils
                 }
 
                 break;
+            case uint n when n is >= 28  and <= 31:
+                key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + 24);
+
+                newConsoleKeyInfo = new (
+                                         (char)key,
+                                         key,
+                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                         true);
+
+                break;
             case 127: // DEL
                 key = ConsoleKey.Backspace;
 
