@@ -112,6 +112,9 @@ public class AnsiKeyboardParserTests
         // Keys with Ctrl and Alt modifiers
         yield return new object [] { "\u001b\u0001", Key.A.WithCtrl.WithAlt, true };
         yield return new object [] { "\u001b\u001a", Key.Z.WithCtrl.WithAlt, true };
+
+        // Keys with Ctrl, Shift and Alt modifiers
+        yield return new object [] { "\u001b\u001f", Key.D7.WithCtrl.WithShift.WithAlt, true };
     }
 
     // Consolidated test for all keyboard events (e.g., arrow keys)
