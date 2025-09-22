@@ -1142,7 +1142,7 @@ public static class EscSeqUtils
                 }
 
                 break;
-            case uint n when n is >= 28  and <= 31:
+            case uint n when n is >= '\u001c'  and <= '\u001f':
                 key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + 24);
 
                 newConsoleKeyInfo = new (
