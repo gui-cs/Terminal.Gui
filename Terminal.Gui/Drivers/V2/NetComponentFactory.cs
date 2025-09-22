@@ -24,9 +24,6 @@ public class NetComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc />
     public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
     {
-        return new NetInputProcessor (inputBuffer)
-        {
-            DriverName = "net"
-        };
+        return new NetInputProcessor (inputBuffer);
     }
 }

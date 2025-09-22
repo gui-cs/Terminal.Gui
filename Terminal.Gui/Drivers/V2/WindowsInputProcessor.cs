@@ -13,7 +13,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     private readonly bool [] _lastWasPressed = new bool[4];
 
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ()) { }
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter (), "win") { }
 
     /// <inheritdoc/>
     protected override void Process (InputRecord inputEvent)
