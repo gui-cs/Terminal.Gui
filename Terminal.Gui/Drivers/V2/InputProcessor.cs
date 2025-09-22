@@ -31,7 +31,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     public ConcurrentQueue<T> InputBuffer { get; }
 
     /// <inheritdoc />
-    public string DriverName { get; init; }
+    public required string DriverName { get; init; }
 
     /// <inheritdoc/>
     public IAnsiResponseParser GetParser () { return Parser; }
@@ -99,8 +99,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     ///     Key converter for translating driver specific
     ///     <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.
     /// </param>
-    /// <param name="driverName"></param>
-    protected InputProcessor (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter, string driverName)
+    protected InputProcessor (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
     {
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
@@ -124,7 +123,6 @@ public abstract class InputProcessor<T> : IInputProcessor
                                                return true;
                                            };
         KeyConverter = keyConverter;
-        DriverName = driverName;
     }
 
     /// <summary>

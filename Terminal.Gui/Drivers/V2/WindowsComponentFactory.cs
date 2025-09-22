@@ -18,7 +18,10 @@ public class WindowsComponentFactory : ComponentFactory<WindowsConsole.InputReco
     /// <inheritdoc />
     public override IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
     {
-        return new WindowsInputProcessor (inputBuffer);
+        return new WindowsInputProcessor (inputBuffer)
+        {
+            DriverName = "win"
+        };
     }
 
     /// <inheritdoc />

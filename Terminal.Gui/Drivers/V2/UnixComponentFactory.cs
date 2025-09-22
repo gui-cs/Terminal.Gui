@@ -18,7 +18,10 @@ public class UnixComponentFactory : ComponentFactory<char>
     /// <inheritdoc />
     public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer)
     {
-        return new UnixInputProcessor (inputBuffer);
+        return new UnixInputProcessor (inputBuffer)
+        {
+            DriverName = "unix"
+        };
     }
 
     /// <inheritdoc />
