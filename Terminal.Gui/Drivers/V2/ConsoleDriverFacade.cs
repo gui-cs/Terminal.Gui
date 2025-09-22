@@ -260,7 +260,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
     {
-        var type = InputProcessor.DriverName;
+        string type = InputProcessor.DriverName ?? throw new ArgumentNullException (nameof (InputProcessor.DriverName));
 
         return "v2" + type;
     }
