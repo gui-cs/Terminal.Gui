@@ -131,7 +131,7 @@ public class MultiColouredTable : Scenario
 
     private class TableViewColors : TableView
     {
-        protected override void RenderCell (Attribute cellColor, string render, bool isPrimaryCell)
+        protected override void RenderCell (Attribute cellColor, string render, bool isPrimaryCell, int row, int rowToRender, int columnToRender)
         {
             int unicorns = render.IndexOf ("unicorns", StringComparison.CurrentCultureIgnoreCase);
             int rainbows = render.IndexOf ("rainbows", StringComparison.CurrentCultureIgnoreCase);

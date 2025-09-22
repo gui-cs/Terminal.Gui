@@ -1299,7 +1299,10 @@ public class TableView : View, IDesignable
     /// <param name="cellAttribute"></param>
     /// <param name="render"></param>
     /// <param name="isPrimaryCell"></param>
-    protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell)
+    /// <param name="row"></param>
+    /// <param name="rowToRender"></param>
+    /// <param name="columnToRender"></param>
+    protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell, int row, int rowToRender, int columnToRender)
     {
         // If the cell is the selected col/row then draw the first rune in inverted colors
         // this allows the user to track which cell is the active one during a multi cell
@@ -2003,7 +2006,7 @@ public class TableView : View, IDesignable
 
             if (cellColor.HasValue)
             {
-                RenderCell (cellColor.Value, render, isPrimaryCell);
+                RenderCell (cellColor.Value, render, isPrimaryCell, row, rowToRender, current.Column);
             }
 
             // Reset scheme to normal for drawing separators if we drew text with custom scheme
