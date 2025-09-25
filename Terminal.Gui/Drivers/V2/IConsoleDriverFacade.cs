@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿#nullable enable
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Interface for v2 driver abstraction layer

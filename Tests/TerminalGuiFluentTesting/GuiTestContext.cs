@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace TerminalGuiFluentTesting;
 
@@ -386,16 +387,16 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
 
-                _winInput.InputBuffer.Enqueue (
-                                               new ()
-                                               {
-                                                   EventType = WindowsConsole.EventType.Mouse,
-                                                   MouseEvent = new ()
-                                                   {
-                                                       ButtonState = btn,
-                                                       MousePosition = new ((short)screenX, (short)screenY)
-                                                   }
-                                               });
+                _winInput.InputBuffer!.Enqueue (
+                                                new ()
+                                                {
+                                                    EventType = WindowsConsole.EventType.Mouse,
+                                                    MouseEvent = new ()
+                                                    {
+                                                        ButtonState = btn,
+                                                        MousePosition = new ((short)screenX, (short)screenY)
+                                                    }
+                                                });
 
                 _winInput.InputBuffer.Enqueue (
                                                new ()
@@ -410,7 +411,6 @@ public class GuiTestContext : IDisposable
 
                 return WaitUntil (() => _winInput.InputBuffer.IsEmpty);
 
-                break;
             case V2TestDriver.V2Net:
 
                 int netButton = btn switch
@@ -471,8 +471,6 @@ public class GuiTestContext : IDisposable
         }
 
         return WaitIteration ();
-
-        ;
     }
 
     /// <summary>
@@ -699,12 +697,12 @@ public class GuiTestContext : IDisposable
         down.bKeyDown = true;
         up.bKeyDown = false;
 
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = down
-                                       });
+        _winInput.InputBuffer!.Enqueue (
+                                        new ()
+                                        {
+                                            EventType = WindowsConsole.EventType.Key,
+                                            KeyEvent = down
+                                        });
 
         _winInput.InputBuffer.Enqueue (
                                        new ()
@@ -718,7 +716,7 @@ public class GuiTestContext : IDisposable
 
     private void SendNetKey (ConsoleKeyInfo consoleKeyInfo, bool wait = true)
     {
-        _netInput.InputBuffer.Enqueue (consoleKeyInfo);
+        _netInput.InputBuffer!.Enqueue (consoleKeyInfo);
 
         if (wait)
         {
@@ -732,20 +730,20 @@ public class GuiTestContext : IDisposable
     /// <param name="specialKey"></param>
     private void SendWindowsKey (ConsoleKeyMapping.VK specialKey)
     {
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new ()
-                                           {
-                                               bKeyDown = true,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = specialKey,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
+        _winInput.InputBuffer!.Enqueue (
+                                        new ()
+                                        {
+                                            EventType = WindowsConsole.EventType.Key,
+                                            KeyEvent = new ()
+                                            {
+                                                bKeyDown = true,
+                                                wRepeatCount = 0,
+                                                wVirtualKeyCode = specialKey,
+                                                wVirtualScanCode = 0,
+                                                UnicodeChar = '\0',
+                                                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
+                                            }
+                                        });
 
         _winInput.InputBuffer.Enqueue (
                                        new ()

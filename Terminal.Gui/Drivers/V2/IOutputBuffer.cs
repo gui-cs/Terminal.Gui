@@ -12,7 +12,7 @@ public interface IOutputBuffer
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when UpdateScreen is called.
     /// </summary>
-    Cell [,] Contents { get; set; }
+    Cell [,]? Contents { get; set; }
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
