@@ -610,6 +610,8 @@ public class CharMap : View, IDesignable
 
                     break;
 
+                // Format character that affects the layout of text or the operation of text processes, but is not normally rendered. 
+                // These report width of 0 and don't render on their own.
                 case UnicodeCategory.Format:
                     SetAttributeForRole (VisualRole.Highlight);
                     AddRune ('F');
@@ -617,9 +619,12 @@ public class CharMap : View, IDesignable
 
                     break;
 
+                // Nonspacing character that indicates modifications of a base character.
                 case UnicodeCategory.NonSpacingMark:
-                case UnicodeCategory.EnclosingMark:
+                // Spacing character that indicates modifications of a base character and affects the width of the glyph for that base character. 
                 case UnicodeCategory.SpacingCombiningMark:
+                // Enclosing mark character, which is a nonspacing combining character that surrounds all previous characters up to and including a base character.
+                case UnicodeCategory.EnclosingMark:
                     if (width > 0)
                     {
                         AddRune (rune);
@@ -656,6 +661,7 @@ public class CharMap : View, IDesignable
 
                     break;
 
+                // These report width of 0, but render as 1
                 case UnicodeCategory.Control:
                 case UnicodeCategory.LineSeparator:
                 case UnicodeCategory.ParagraphSeparator:
