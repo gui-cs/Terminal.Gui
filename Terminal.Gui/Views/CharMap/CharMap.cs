@@ -293,11 +293,6 @@ public class CharMap : View, IDesignable
                 name = nameElement.GetString ();
             }
 
-            //// Navigate to a nested property and output its value
-            //if (root.TryGetProperty ("property3", out JsonElement property3Element)
-            //&& property3Element.TryGetProperty ("nestedProperty", out JsonElement nestedPropertyElement)) {
-            //	Console.WriteLine (nestedPropertyElement.GetString ());
-            //}
             decResponse = JsonSerializer.Serialize (
                                                     document.RootElement,
                                                     new
@@ -679,7 +674,7 @@ public class CharMap : View, IDesignable
                     }
                     else
                     {
-                        throw new InvalidOperationException ($"The Rune \"{rune}\" (U+{rune.Value / 16:x6}) has zero width and no special-case UnicodeCategory logic applies.");
+                        throw new InvalidOperationException ($"The Rune \"{rune}\" (U+{rune.Value:x4}) has zero width and no special-case UnicodeCategory logic applies.");
                     }
 
                     break;
