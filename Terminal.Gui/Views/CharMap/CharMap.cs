@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
@@ -15,7 +16,9 @@ public class CharMap : View, IDesignable
 {
     private const int COLUMN_WIDTH = 3; // Width of each column of glyphs
     private const int HEADER_HEIGHT = 1; // Height of the header
-    private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
+
+    // ReSharper disable once InconsistentNaming
+    private static readonly int MAX_CODE_POINT = UnicodeRange.Ranges.Max (r => r.End);
 
     /// <summary>
     ///     Initializes a new instance.
@@ -102,87 +105,7 @@ public class CharMap : View, IDesignable
         Padding!.GettingAttributeForRole += PaddingOnGettingAttributeForRole;
     }
 
-    private void PaddingOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
-    {
-        if (e.Role != VisualRole.Focus && e.Role != VisualRole.Active)
-        {
-            e.Result = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-        }
-
-        e.Handled = true;
-    }
-
-    private bool? Move (ICommandContext? commandContext, int cpOffset)
-    {
-        if (RaiseSelecting (commandContext) is true)
-        {
-            return true;
-        }
-
-        SelectedCodePoint += cpOffset;
-
-        return true;
-    }
-
-    private void ScrollToMakeCursorVisible (Point offsetToNewCursor)
-    {
-        // Adjust vertical scrolling
-        if (offsetToNewCursor.Y < 1) // Header is at Y = 0
-        {
-            ScrollVertical (offsetToNewCursor.Y - HEADER_HEIGHT);
-        }
-        else if (offsetToNewCursor.Y >= Viewport.Height)
-        {
-            ScrollVertical (offsetToNewCursor.Y - Viewport.Height + HEADER_HEIGHT);
-        }
-
-        // Adjust horizontal scrolling
-        if (offsetToNewCursor.X < RowLabelWidth + 1)
-        {
-            ScrollHorizontal (offsetToNewCursor.X - (RowLabelWidth + 1));
-        }
-        else if (offsetToNewCursor.X >= Viewport.Width)
-        {
-            ScrollHorizontal (offsetToNewCursor.X - Viewport.Width + 1);
-        }
-    }
-
-    #region Cursor
-
-    private Point GetCursor (int codePoint)
-    {
-        // + 1 for padding between label and first column
-        int x = codePoint % 16 * COLUMN_WIDTH + RowLabelWidth + 1 - Viewport.X;
-        int y = codePoint / 16 * _rowHeight + HEADER_HEIGHT - Viewport.Y;
-
-        return new (x, y);
-    }
-
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        Point cursor = GetCursor (SelectedCodePoint);
-
-        if (HasFocus
-            && cursor.X >= RowLabelWidth
-            && cursor.X < Viewport.Width
-            && cursor.Y > 0
-            && cursor.Y < Viewport.Height)
-        {
-            Move (cursor.X, cursor.Y);
-        }
-        else
-        {
-            return null;
-        }
-
-        return cursor;
-    }
-
-    #endregion Cursor
-
-    // ReSharper disable once InconsistentNaming
-    private static readonly int MAX_CODE_POINT = UnicodeRange.Ranges.Max (r => r.End);
+    private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
     private int _selectedCodepoint; // Currently selected codepoint
     private int _startCodepoint; // The codepoint that will be displayed at the top of the Viewport
 
@@ -220,6 +143,19 @@ public class CharMap : View, IDesignable
     public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
 
     /// <summary>
+    ///     Gets or sets whether the number of columns each glyph is displayed.
+    /// </summary>
+    public bool ShowGlyphWidths
+    {
+        get => _rowHeight == 2;
+        set
+        {
+            _rowHeight = value ? 2 : 1;
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>
     ///     Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing
     ///     characters.
     /// </summary>
@@ -233,21 +169,290 @@ public class CharMap : View, IDesignable
         }
     }
 
-    /// <summary>
-    ///     Gets or sets whether the number of columns each glyph is displayed.
-    /// </summary>
-    public bool ShowGlyphWidths
+    private void CopyCodePoint () { Clipboard.Contents = $"U+{SelectedCodePoint:x5}"; }
+    private void CopyGlyph () { Clipboard.Contents = $"{new Rune (SelectedCodePoint)}"; }
+
+    private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
-        get => _rowHeight == 2;
-        set
+        if (RaiseSelecting (commandContext) is true)
         {
-            _rowHeight = value ? 2 : 1;
-            SetNeedsDraw ();
+            return true;
+        }
+
+        SelectedCodePoint += cpOffset;
+
+        return true;
+    }
+
+    private void PaddingOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
+    {
+        if (e.Role != VisualRole.Focus && e.Role != VisualRole.Active)
+        {
+            e.Result = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        }
+
+        e.Handled = true;
+    }
+
+    private void ScrollToMakeCursorVisible (Point offsetToNewCursor)
+    {
+        // Adjust vertical scrolling
+        if (offsetToNewCursor.Y < 1) // Header is at Y = 0
+        {
+            ScrollVertical (offsetToNewCursor.Y - HEADER_HEIGHT);
+        }
+        else if (offsetToNewCursor.Y >= Viewport.Height)
+        {
+            ScrollVertical (offsetToNewCursor.Y - Viewport.Height + HEADER_HEIGHT);
+        }
+
+        // Adjust horizontal scrolling
+        if (offsetToNewCursor.X < RowLabelWidth + 1)
+        {
+            ScrollHorizontal (offsetToNewCursor.X - (RowLabelWidth + 1));
+        }
+        else if (offsetToNewCursor.X >= Viewport.Width)
+        {
+            ScrollHorizontal (offsetToNewCursor.X - Viewport.Width + 1);
         }
     }
 
-    private void CopyCodePoint () { Clipboard.Contents = $"U+{SelectedCodePoint:x5}"; }
-    private void CopyGlyph () { Clipboard.Contents = $"{new Rune (SelectedCodePoint)}"; }
+    #region Details Dialog
+
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    private void ShowDetails ()
+    {
+        if (!Application.Initialized)
+        {
+            // Some unit tests invoke Accept without Init
+            return;
+        }
+
+        UcdApiClient? client = new ();
+        var decResponse = string.Empty;
+        var getCodePointError = string.Empty;
+
+        Dialog? waitIndicator = new ()
+        {
+            Title = Strings.charMapCPInfoDlgTitle,
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 40,
+            Height = 10,
+            Buttons = [new () { Text = Strings.btnCancel }]
+        };
+
+        var errorLabel = new Label
+        {
+            Text = UcdApiClient.BaseUrl,
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (3),
+            TextAlignment = Alignment.Center
+        };
+
+        var spinner = new SpinnerView
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (errorLabel),
+            Style = new SpinnerStyle.Aesthetic ()
+        };
+        spinner.AutoSpin = true;
+        waitIndicator.Add (errorLabel);
+        waitIndicator.Add (spinner);
+
+        waitIndicator.Ready += async (s, a) =>
+                               {
+                                   try
+                                   {
+                                       decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
+                                       Application.Invoke (() => waitIndicator.RequestStop ());
+                                   }
+                                   catch (HttpRequestException e)
+                                   {
+                                       getCodePointError = errorLabel.Text = e.Message;
+                                       Application.Invoke (() => waitIndicator.RequestStop ());
+                                   }
+                               };
+        Application.Run (waitIndicator);
+        waitIndicator.Dispose ();
+
+        var name = string.Empty;
+
+        if (!string.IsNullOrEmpty (decResponse))
+        {
+            using JsonDocument document = JsonDocument.Parse (decResponse);
+
+            JsonElement root = document.RootElement;
+
+            // Get a property by name and output its value
+            if (root.TryGetProperty ("name", out JsonElement nameElement))
+            {
+                name = nameElement.GetString ();
+            }
+
+            //// Navigate to a nested property and output its value
+            //if (root.TryGetProperty ("property3", out JsonElement property3Element)
+            //&& property3Element.TryGetProperty ("nestedProperty", out JsonElement nestedPropertyElement)) {
+            //	Console.WriteLine (nestedPropertyElement.GetString ());
+            //}
+            decResponse = JsonSerializer.Serialize (
+                                                    document.RootElement,
+                                                    new
+                                                        JsonSerializerOptions
+                                                    { WriteIndented = true }
+                                                   );
+        }
+        else
+        {
+            decResponse = getCodePointError;
+        }
+
+        var title = $"{ToCamelCase (name!)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
+
+        Button? copyGlyph = new () { Text = Strings.charMapCopyGlyph };
+        Button? copyCodepoint = new () { Text = Strings.charMapCopyCP };
+        Button? cancel = new () { Text = Strings.btnCancel };
+
+        var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCodepoint, cancel] };
+
+        copyGlyph.Accepting += (s, a) =>
+                               {
+                                   CopyGlyph ();
+                                   dlg!.RequestStop ();
+                                   a.Handled = true;
+                               };
+
+        copyCodepoint.Accepting += (s, a) =>
+                                   {
+                                       CopyCodePoint ();
+                                       dlg!.RequestStop ();
+                                       a.Handled = true;
+                                   };
+
+        cancel.Accepting += (s, a) =>
+                            {
+                                dlg!.RequestStop ();
+                                a.Handled = true;
+                            };
+
+        var rune = (Rune)SelectedCodePoint;
+        var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new () { Text = "Category: ", X = 0, Y = Pos.Bottom (label) };
+        dlg.Add (label);
+        Span<char> utf16 = stackalloc char [2];
+        int charCount = rune.EncodeToUtf16 (utf16);
+
+        // Get the bidi class for the first code unit
+        // For most bidi characters, the first code unit is sufficient
+        UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
+
+        label = new () { Text = $"{category}", X = Pos.Right (label), Y = Pos.Top (label) };
+        dlg.Add (label);
+
+        label = new ()
+        {
+            Text =
+                $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
+            X = 0,
+            Y = Pos.Bottom (label)
+        };
+        dlg.Add (label);
+
+        var json = new TextView
+        {
+            X = 0,
+            Y = Pos.Bottom (label),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (2),
+            ReadOnly = true,
+            Text = decResponse
+        };
+
+        dlg.Add (json);
+
+        Application.Run (dlg);
+        dlg.Dispose ();
+    }
+
+    #endregion Details Dialog
+
+    #region Cursor
+
+    private Point GetCursor (int codePoint)
+    {
+        // + 1 for padding between label and first column
+        int x = codePoint % 16 * COLUMN_WIDTH + RowLabelWidth + 1 - Viewport.X;
+        int y = codePoint / 16 * _rowHeight + HEADER_HEIGHT - Viewport.Y;
+
+        return new (x, y);
+    }
+
+    /// <inheritdoc/>
+    public override Point? PositionCursor ()
+    {
+        Point cursor = GetCursor (SelectedCodePoint);
+
+        if (HasFocus
+            && cursor.X >= RowLabelWidth
+            && cursor.X < Viewport.Width
+            && cursor.Y > 0
+            && cursor.Y < Viewport.Height)
+        {
+            Move (cursor.X, cursor.Y);
+        }
+        else
+        {
+            return null;
+        }
+
+        return cursor;
+    }
+
+    #endregion Cursor
 
     #region Drawing
 
@@ -366,7 +571,55 @@ public class CharMap : View, IDesignable
 
                 if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
                 {
-                    // Draw the rune
+                    RenderRune (rune, width);
+                }
+                else
+                {
+                    // Draw the width of the rune faint
+                    Attribute attr = GetAttributeForRole (VisualRole.Normal);
+                    SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
+                    AddStr ($"{width}");
+                }
+
+                // If we're at the cursor position, and we don't have focus
+                if (row == selectedRow && col == selectedCol)
+                {
+                    SetAttributeForRole (VisualRole.Normal);
+                }
+            }
+        }
+
+        return true;
+
+        void RenderRune (Rune rune, int width)
+        {
+            // Get the UnicodeCategory
+            Span<char> utf16 = new char [2];
+            int charCount = rune.EncodeToUtf16 (utf16);
+
+            // Get the bidi class for the first code unit
+            // For most bidi characters, the first code unit is sufficient
+            UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
+
+            switch (category)
+            {
+                case UnicodeCategory.OtherNotAssigned:
+                    SetAttributeForRole (VisualRole.Highlight);
+                    AddRune (Rune.ReplacementChar);
+                    SetAttributeForRole (VisualRole.Normal);
+
+                    break;
+
+                case UnicodeCategory.Format:
+                    SetAttributeForRole (VisualRole.Highlight);
+                    AddRune ('F');
+                    SetAttributeForRole (VisualRole.Normal);
+
+                    break;
+
+                case UnicodeCategory.NonSpacingMark:
+                case UnicodeCategory.EnclosingMark:
+                case UnicodeCategory.SpacingCombiningMark:
                     if (width > 0)
                     {
                         AddRune (rune);
@@ -394,28 +647,38 @@ public class CharMap : View, IDesignable
                             }
                             else
                             {
-                                AddRune (Rune.ReplacementChar);
+                                SetAttributeForRole (VisualRole.Highlight);
+                                AddRune ('M');
+                                SetAttributeForRole (VisualRole.Normal);
                             }
                         }
                     }
-                }
-                else
-                {
-                    // Draw the width of the rune faint
-                    Attribute attr = GetAttributeForRole (VisualRole.Normal);
-                    SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
-                    AddStr ($"{width}");
-                }
 
-                // If we're at the cursor position, and we don't have focus
-                if (row == selectedRow && col == selectedCol)
-                {
-                    SetAttributeForRole (VisualRole.Normal);
-                }
+                    break;
+
+                case UnicodeCategory.Control:
+                case UnicodeCategory.LineSeparator:
+                case UnicodeCategory.ParagraphSeparator:
+                case UnicodeCategory.Surrogate:
+                    AddRune (rune);
+
+                    break;
+
+                default:
+
+                    // Draw the rune
+                    if (width > 0)
+                    {
+                        AddRune (rune);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException ($"The Rune \"{rune}\" (U+{rune.Value / 16:x6}) has zero width and no special-case UnicodeCategory logic applies.");
+                    }
+
+                    break;
             }
         }
-
-        return true;
     }
 
     /// <summary>
@@ -579,199 +842,4 @@ public class CharMap : View, IDesignable
     }
 
     #endregion Mouse Handling
-
-    #region Details Dialog
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    private void ShowDetails ()
-    {
-        if (!Application.Initialized)
-        {
-            // Some unit tests invoke Accept without Init
-            return;
-        }
-
-        UcdApiClient? client = new ();
-        var decResponse = string.Empty;
-        var getCodePointError = string.Empty;
-
-        Dialog? waitIndicator = new ()
-        {
-            Title = Strings.charMapCPInfoDlgTitle,
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Width = 40,
-            Height = 10,
-            Buttons = [new () { Text = Strings.btnCancel }]
-        };
-
-        var errorLabel = new Label
-        {
-            Text = UcdApiClient.BaseUrl,
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (3),
-            TextAlignment = Alignment.Center
-        };
-
-        var spinner = new SpinnerView
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (errorLabel),
-            Style = new SpinnerStyle.Aesthetic ()
-        };
-        spinner.AutoSpin = true;
-        waitIndicator.Add (errorLabel);
-        waitIndicator.Add (spinner);
-
-        waitIndicator.Ready += async (s, a) =>
-                               {
-                                   try
-                                   {
-                                       decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
-                                       Application.Invoke (() => waitIndicator.RequestStop ());
-                                   }
-                                   catch (HttpRequestException e)
-                                   {
-                                       getCodePointError = errorLabel.Text = e.Message;
-                                       Application.Invoke (() => waitIndicator.RequestStop ());
-                                   }
-                               };
-        Application.Run (waitIndicator);
-        waitIndicator.Dispose ();
-
-        if (!string.IsNullOrEmpty (decResponse))
-        {
-            var name = string.Empty;
-
-            using (JsonDocument document = JsonDocument.Parse (decResponse))
-            {
-                JsonElement root = document.RootElement;
-
-                // Get a property by name and output its value
-                if (root.TryGetProperty ("name", out JsonElement nameElement))
-                {
-                    name = nameElement.GetString ();
-                }
-
-                //// Navigate to a nested property and output its value
-                //if (root.TryGetProperty ("property3", out JsonElement property3Element)
-                //&& property3Element.TryGetProperty ("nestedProperty", out JsonElement nestedPropertyElement)) {
-                //	Console.WriteLine (nestedPropertyElement.GetString ());
-                //}
-                decResponse = JsonSerializer.Serialize (
-                                                        document.RootElement,
-                                                        new
-                                                            JsonSerializerOptions
-                                                            { WriteIndented = true }
-                                                       );
-            }
-
-            var title = $"{ToCamelCase (name!)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
-
-            Button? copyGlyph = new () { Text = Strings.charMapCopyGlyph };
-            Button? copyCodepoint = new () { Text = Strings.charMapCopyCP };
-            Button? cancel = new () { Text = Strings.btnCancel };
-
-            var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCodepoint, cancel] };
-
-            copyGlyph.Accepting += (s, a) =>
-                                   {
-                                       CopyGlyph ();
-                                       dlg!.RequestStop ();
-                                       a.Handled = true;
-                                   };
-
-            copyCodepoint.Accepting += (s, a) =>
-                                       {
-                                           CopyCodePoint ();
-                                           dlg!.RequestStop ();
-                                           a.Handled = true;
-                                       };
-            cancel.Accepting += (s, a) =>
-                                {
-                                    dlg!.RequestStop ();
-                                    a.Handled = true;
-                                };
-
-            var rune = (Rune)SelectedCodePoint;
-            var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new () { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
-            dlg.Add (label);
-
-            label = new ()
-            {
-                Text =
-                    $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
-                X = 0,
-                Y = Pos.Bottom (label)
-            };
-            dlg.Add (label);
-
-            var json = new TextView
-            {
-                X = 0,
-                Y = Pos.Bottom (label),
-                Width = Dim.Fill (),
-                Height = Dim.Fill (2),
-                ReadOnly = true,
-                Text = decResponse
-            };
-
-            dlg.Add (json);
-
-            Application.Run (dlg);
-            dlg.Dispose ();
-        }
-        else
-        {
-            MessageBox.ErrorQuery (
-                                   Strings.error,
-                                   $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} {Strings.failedGetting}{Environment.NewLine}{new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.",
-                                   Strings.btnOk
-                                  );
-        }
-    }
-
-    #endregion Details Dialog
 }
