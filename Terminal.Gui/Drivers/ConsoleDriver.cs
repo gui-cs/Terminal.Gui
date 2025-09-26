@@ -681,16 +681,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="a"></param>
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
-    // TODO: Remove this API - it was needed when we didn't have a reliable way to simulate key presses.
-    // TODO: We now do: Application.RaiseKeyDown and Application.RaiseKeyUp
-    /// <summary>Simulates a key press.</summary>
-    /// <param name="keyChar">The key character.</param>
-    /// <param name="key">The key.</param>
-    /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-    /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-    /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
     internal char _highSurrogate = '\0';
 
     internal bool IsValidInput (KeyCode keyCode, out KeyCode result)
@@ -707,6 +697,22 @@ public abstract class ConsoleDriver : IConsoleDriver
         if (_highSurrogate > 0 && char.IsLowSurrogate ((char)keyCode))
         {
             result = (KeyCode)new Rune (_highSurrogate, (char)keyCode).Value;
+
+            if ((keyCode & KeyCode.AltMask) != 0)
+            {
+                result |= KeyCode.AltMask;
+            }
+
+            if ((keyCode & KeyCode.CtrlMask) != 0)
+            {
+                result |= KeyCode.CtrlMask;
+            }
+
+            if ((keyCode & KeyCode.ShiftMask) != 0)
+            {
+                result |= KeyCode.ShiftMask;
+            }
+
             _highSurrogate = '\0';
 
             return true;
