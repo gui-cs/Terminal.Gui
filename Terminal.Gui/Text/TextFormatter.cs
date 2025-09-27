@@ -34,7 +34,7 @@ public class TextFormatter
     ///     When true, the Draw method will use the new separated formatter/renderer architecture.
     ///     This provides better performance and addresses Format/Draw coupling issues.
     /// </summary>
-    public bool UseNewArchitecture { get; set; } = false;
+    public bool UseNewArchitecture { get; set; } = true;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextFormatter"/> class.

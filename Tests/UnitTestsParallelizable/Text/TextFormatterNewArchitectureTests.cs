@@ -150,23 +150,26 @@ public class TextFormatterNewArchitectureTests
     }
 
     [Fact]
-    public void TextFormatter_UseNewArchitecture_Flag_Works()
+    public void TextFormatter_UseNewArchitecture_Flag_DefaultsToTrue()
     {
         Application.Init(new FakeDriver());
 
         var tf = new TextFormatter
         {
-            Text = "Hello World",
-            UseNewArchitecture = true // Enable new architecture
+            Text = "Hello World"
+            // UseNewArchitecture defaults to true now
         };
 
-        // This should now use the new architecture via the Draw method
+        // This should use the new architecture by default
         tf.Draw(new Rectangle(0, 0, 10, 1), Attribute.Default, Attribute.Default);
         
         // Test that the new architecture produces results
         Size size = tf.GetFormattedSizeWithNewArchitecture();
         Assert.True(size.Width > 0);
         Assert.True(size.Height > 0);
+        
+        // Verify default is true
+        Assert.True(tf.UseNewArchitecture);
         
         Application.Shutdown();
     }
