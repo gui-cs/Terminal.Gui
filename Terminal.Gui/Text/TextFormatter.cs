@@ -8,6 +8,16 @@ namespace Terminal.Gui.Text;
 ///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal and vertical alignment, text direction,
 ///     multiple lines, and word-based line wrap.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <strong>NOTE:</strong> This class has known architectural issues that are planned to be addressed in a future rewrite.
+///         See https://github.com/gui-cs/Terminal.Gui/issues/[ISSUE_NUMBER] for details.
+///     </para>
+///     <para>
+///         Known issues include: Format/Draw decoupling problems, performance issues with repeated formatting,
+///         complex alignment implementation, and poor extensibility for advanced text features.
+///     </para>
+/// </remarks>
 public class TextFormatter
 {
     // Utilized in CRLF related helper methods for faster newline char index search.
@@ -86,7 +96,9 @@ public class TextFormatter
 
         if (driver is { })
         {
-            // INTENT: What, exactly, is the intent of this?
+            // INTENT: Calculate the effective drawing area by intersecting screen bounds with maximum container bounds.
+            // This ensures text doesn't draw outside the maximum allowed area.
+            // TODO: This logic is complex and could benefit from clearer naming and documentation.
             maxScreen = maximum == default (Rectangle)
                             ? screen
                             : new (
@@ -493,6 +505,9 @@ public class TextFormatter
         }
 
         // HACK: Fill normally will fill the entire constraint size, but we need to know the actual size of the text.
+        // This is a core architectural problem - formatting and drawing logic are coupled.
+        // This hack temporarily changes alignment to get accurate measurements, then restores it.
+        // TODO: Address this in the planned TextFormatter rewrite by separating formatting from drawing.
         Alignment prevAlignment = Alignment;
 
         if (Alignment == Alignment.Fill)
