@@ -16,8 +16,6 @@ public class CombiningMarks : Scenario
             Application.ClearScreenNextIteration = true;
 
             var i = -1;
-            top.Move (0, ++i);
-            top.AddStr("[\u0600]<-\"[\\u0600]\" using AddStr.");
             top.AddStr ("Terminal.Gui only supports combining marks that normalize. See Issue #2616.");
             top.Move (0, ++i);
             top.AddStr ("\u0301<- \"\\u0301\" using AddStr.");
