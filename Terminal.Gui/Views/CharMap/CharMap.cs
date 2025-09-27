@@ -67,7 +67,8 @@ public class CharMap : View, IDesignable
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
         MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
 
-        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, MAX_CODE_POINT / 16 * _rowHeight + HEADER_HEIGHT));
+        // Initial content size; height will be corrected by RebuildVisibleRows()
+        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
 
         // Set up the horizontal scrollbar. Turn off AutoShow since we do it manually.
         HorizontalScrollBar.AutoShow = false;
@@ -103,6 +104,79 @@ public class CharMap : View, IDesignable
         // The scrollbars are in the Padding. VisualRole.Focus/Active are used to draw the
         // CharMap headers. Override Padding to force it to draw to match.
         Padding!.GettingAttributeForRole += PaddingOnGettingAttributeForRole;
+
+        // Build initial visible rows (all rows with at least one valid codepoint)
+        RebuildVisibleRows ();
+    }
+
+    // Visible rows management: each entry is the starting code point of a 16-wide row
+    private readonly List<int> _visibleRowStarts = new ();
+    private readonly Dictionary<int, int> _rowStartToVisibleIndex = new ();
+
+    private void RebuildVisibleRows ()
+    {
+        _visibleRowStarts.Clear ();
+        _rowStartToVisibleIndex.Clear ();
+
+        int maxRow = MAX_CODE_POINT / 16;
+
+        for (var row = 0; row <= maxRow; row++)
+        {
+            int start = row * 16;
+            bool anyValid = false;
+            bool anyVisible = false;
+
+            for (var col = 0; col < 16; col++)
+            {
+                int cp = start + col;
+                if (cp > RuneExtensions.MaxUnicodeCodePoint)
+                {
+                    break;
+                }
+
+                if (!Rune.IsValid (cp))
+                {
+                    continue;
+                }
+
+                anyValid = true;
+
+                if (!ShowUnicodeCategory.HasValue)
+                {
+                    // With no filter, a row is displayed if it has any valid codepoint
+                    anyVisible = true;
+                    break;
+                }
+
+                var rune = new Rune (cp);
+                Span<char> utf16 = new char [2];
+                rune.EncodeToUtf16 (utf16);
+                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
+                if (cat == ShowUnicodeCategory.Value)
+                {
+                    anyVisible = true;
+                    break;
+                }
+            }
+
+            if (anyValid && (!ShowUnicodeCategory.HasValue ? anyValid : anyVisible))
+            {
+                _rowStartToVisibleIndex [start] = _visibleRowStarts.Count;
+                _visibleRowStarts.Add (start);
+            }
+        }
+
+        // Update content size to match visible rows
+        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
+
+        // Keep vertical scrollbar aligned with new content size
+        VerticalScrollBar.ScrollableContentSize = GetContentSize ().Height;
+    }
+
+    private int VisibleRowIndexForCodePoint (int codePoint)
+    {
+        int start = (codePoint / 16) * 16;
+        return _rowStartToVisibleIndex.GetValueOrDefault (start, -1);
     }
 
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
@@ -151,6 +225,8 @@ public class CharMap : View, IDesignable
         set
         {
             _rowHeight = value ? 2 : 1;
+            // height changed => content height depends on row height
+            RebuildVisibleRows ();
             SetNeedsDraw ();
         }
     }
@@ -166,6 +242,46 @@ public class CharMap : View, IDesignable
         {
             _startCodepoint = value;
             SelectedCodePoint = value;
+        }
+    }
+
+
+    private UnicodeCategory? _showUnicodeCategory;
+
+    /// <summary>
+    ///     When set, only glyphs whose UnicodeCategory matches the value are rendered. If <see langword="null"/> (default),
+    ///     all glyphs are rendered.
+    /// </summary>
+    public UnicodeCategory? ShowUnicodeCategory
+    {
+        get => _showUnicodeCategory;
+        set
+        {
+            if (_showUnicodeCategory == value)
+            {
+                return;
+            }
+
+            _showUnicodeCategory = value;
+            RebuildVisibleRows ();
+
+            // Ensure selection is on a visible row
+            int desiredRowStart = (SelectedCodePoint / 16) * 16;
+            if (!_rowStartToVisibleIndex.ContainsKey (desiredRowStart))
+            {
+                // Find nearest visible row (prefer next; fallback to last)
+                int idx = _visibleRowStarts.FindIndex (s => s >= desiredRowStart);
+                if (idx < 0 && _visibleRowStarts.Count > 0)
+                {
+                    idx = _visibleRowStarts.Count - 1;
+                }
+                if (idx >= 0)
+                {
+                    SelectedCodePoint = _visibleRowStarts [idx];
+                }
+            }
+
+            SetNeedsDraw ();
         }
     }
 
@@ -421,7 +537,16 @@ public class CharMap : View, IDesignable
     {
         // + 1 for padding between label and first column
         int x = codePoint % 16 * COLUMN_WIDTH + RowLabelWidth + 1 - Viewport.X;
-        int y = codePoint / 16 * _rowHeight + HEADER_HEIGHT - Viewport.Y;
+
+        int visibleRowIndex = VisibleRowIndexForCodePoint (codePoint);
+        if (visibleRowIndex < 0)
+        {
+            // If filtered out, stick to current Y to avoid jumping; caller will clamp
+            int fallbackY = HEADER_HEIGHT - Viewport.Y;
+            return new (x, fallbackY);
+        }
+
+        int y = visibleRowIndex * _rowHeight + HEADER_HEIGHT - Viewport.Y;
 
         return new (x, y);
     }
@@ -462,7 +587,7 @@ public class CharMap : View, IDesignable
         }
 
         int selectedCol = SelectedCodePoint % 16;
-        int selectedRow = SelectedCodePoint / 16;
+        int selectedRowIndex = VisibleRowIndexForCodePoint (SelectedCodePoint);
 
         // Headers
 
@@ -502,32 +627,33 @@ public class CharMap : View, IDesignable
         // Start at 1 because Header.
         for (var y = 1; y < Viewport.Height; y++)
         {
-            // What row is this?
-            int row = (y + Viewport.Y - 1) / _rowHeight;
-            int val = row * 16;
+            // Which visible row is this?
+            int visibleRow = (y + Viewport.Y - 1) / _rowHeight;
+
+            if (visibleRow < 0 || visibleRow >= _visibleRowStarts.Count)
+            {
+                // No row at this y; clear label area and continue
+                Move (0, y);
+                AddStr (new (' ', Viewport.Width));
+
+                continue;
+            }
+
+            int rowStart = _visibleRowStarts [visibleRow];
 
             // Draw the row label (U+XXXX_)
             SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
             Move (0, y);
 
             // Swap Active/Focus so the selected row is highlighted
-            if (y + Viewport.Y - 1 == selectedRow)
+            if (visibleRow == selectedRowIndex)
             {
                 SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
             }
 
-            if (val > MAX_CODE_POINT)
-            {
-                // No row
-                Move (0, y);
-                AddStr (new (' ', RowLabelWidth));
-
-                continue;
-            }
-
             if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
             {
-                AddStr ($"U+{val / 16:x5}_");
+                AddStr ($"U+{rowStart / 16:x5}_");
             }
             else
             {
@@ -549,12 +675,24 @@ public class CharMap : View, IDesignable
                 Move (x, y);
 
                 // If we're at the cursor position highlight the cell
-                if (row == selectedRow && col == selectedCol)
+                if (visibleRow == selectedRowIndex && col == selectedCol)
                 {
                     SetAttributeForRole (VisualRole.Active);
                 }
 
-                int scalar = val + col;
+                int scalar = rowStart + col;
+
+                // Don't render out-of-range scalars
+                if (scalar > MAX_CODE_POINT)
+                {
+                    AddRune (' ');
+                    if (visibleRow == selectedRowIndex && col == selectedCol)
+                    {
+                        SetAttributeForRole (VisualRole.Normal);
+                    }
+                    continue;
+                }
+
                 var rune = (Rune)'?';
 
                 if (Rune.IsValid (scalar))
@@ -564,20 +702,46 @@ public class CharMap : View, IDesignable
 
                 int width = rune.GetColumns ();
 
+                // Compute visibility based on ShowUnicodeCategory
+                bool isVisible = Rune.IsValid (scalar);
+                if (isVisible && ShowUnicodeCategory.HasValue)
+                {
+                    Span<char> filterUtf16 = new char [2];
+                    rune.EncodeToUtf16 (filterUtf16);
+                    UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (filterUtf16 [0]);
+                    isVisible = cat == ShowUnicodeCategory.Value;
+                }
+
                 if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
                 {
-                    RenderRune (rune, width);
+                    // Glyph row
+                    if (isVisible)
+                    {
+                        RenderRune (rune, width);
+                    }
+                    else
+                    {
+                        AddRune (' ');
+                    }
                 }
                 else
                 {
-                    // Draw the width of the rune faint
-                    Attribute attr = GetAttributeForRole (VisualRole.Normal);
-                    SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
-                    AddStr ($"{width}");
+                    // Width row (ShowGlyphWidths)
+                    if (isVisible)
+                    {
+                        // Draw the width of the rune faint
+                        Attribute attr = GetAttributeForRole (VisualRole.Normal);
+                        SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
+                        AddStr ($"{width}");
+                    }
+                    else
+                    {
+                        AddRune (' ');
+                    }
                 }
 
                 // If we're at the cursor position, and we don't have focus
-                if (row == selectedRow && col == selectedCol)
+                if (visibleRow == selectedRowIndex && col == selectedCol)
                 {
                     SetAttributeForRole (VisualRole.Normal);
                 }
@@ -824,7 +988,14 @@ public class CharMap : View, IDesignable
             return false;
         }
 
-        int row = (position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
+        int visibleRow = (position.Y - 1 - -Viewport.Y) / _rowHeight;
+
+        if (visibleRow < 0 || visibleRow >= _visibleRowStarts.Count)
+        {
+            codePoint = 0;
+            return false;
+        }
+
         int col = (position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 
         if (col > 15)
@@ -832,7 +1003,7 @@ public class CharMap : View, IDesignable
             col = 15;
         }
 
-        codePoint = row * 16 + col;
+        codePoint = _visibleRowStarts [visibleRow] + col;
 
         if (codePoint > MAX_CODE_POINT)
         {

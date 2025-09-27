@@ -1,9 +1,6 @@
 ﻿#nullable enable
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -24,6 +21,33 @@ public class CharacterMap : Scenario
     private Label? _errorLabel;
     private TableView? _categoryList;
     private CharMap? _charMap;
+    private OptionSelector? _unicodeCategorySelector;
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        List<Key> keys = new ();
+
+        for (var i = 0; i < 200; i++)
+        {
+            keys.Add (Key.CursorDown);
+        }
+
+        // Category table
+        keys.Add (Key.Tab.WithShift);
+
+        // Block elements
+        keys.Add (Key.B);
+        keys.Add (Key.L);
+
+        keys.Add (Key.Tab);
+
+        for (var i = 0; i < 200; i++)
+        {
+            keys.Add (Key.CursorLeft);
+        }
+
+        return keys;
+    }
 
     // Don't create a Window, just return the top-level view
     public override void Main ()
@@ -39,9 +63,9 @@ public class CharacterMap : Scenario
         {
             X = 0,
             Y = 1,
-            Height = Dim.Fill (),
-           // SchemeName = "Base"
+            Height = Dim.Fill ()
 
+            // SchemeName = "Base"
         };
         top.Add (_charMap);
 
@@ -50,7 +74,8 @@ public class CharacterMap : Scenario
             X = Pos.Right (_charMap) + 1,
             Y = Pos.Y (_charMap),
             HotKeySpecifier = (Rune)'_',
-            Text = "_Jump To:",
+            Text = "_Jump To:"
+
             //SchemeName = "Dialog"
         };
         top.Add (jumpLabel);
@@ -60,7 +85,8 @@ public class CharacterMap : Scenario
             X = Pos.Right (jumpLabel) + 1,
             Y = Pos.Y (_charMap),
             Width = 17,
-            Caption = "e.g. 01BE3 or ✈",
+            Caption = "e.g. 01BE3 or ✈"
+
             //SchemeName = "Dialog"
         };
         top.Add (jumpEdit);
@@ -89,10 +115,12 @@ public class CharacterMap : Scenario
 
         jumpEdit.Accepting += JumpEditOnAccept;
 
-        _categoryList = new () { 
-            X = Pos.Right (_charMap), 
-            Y = Pos.Bottom (jumpLabel), 
-            Height = Dim.Fill (),
+        _categoryList = new ()
+        {
+            X = Pos.Right (_charMap),
+            Y = Pos.Bottom (jumpLabel),
+            Height = Dim.Fill ()
+
             //SchemeName = "Dialog"
         };
         _categoryList.FullRowSelect = true;
@@ -165,7 +193,7 @@ public class CharacterMap : Scenario
                     ),
                 new (
                      "_Options",
-                     new MenuItemv2 [] { CreateMenuShowWidth () }
+                     [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()]
                     )
             ]
         };
@@ -317,6 +345,7 @@ public class CharacterMap : Scenario
             CheckedState = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
         };
         var item = new MenuItemv2 { CommandView = cb };
+
         item.Action += () =>
                        {
                            if (_charMap is { })
@@ -328,29 +357,48 @@ public class CharacterMap : Scenario
         return item;
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    private MenuItemv2 CreateMenuUnicodeCategorySelector ()
     {
-        List<Key> keys = new ();
+        // First option is "All" (no filter), followed by all UnicodeCategory names
+        string [] allCategoryNames = Enum.GetNames<UnicodeCategory> ();
+        var options = new string [allCategoryNames.Length + 1];
+        options [0] = "All";
+        Array.Copy (allCategoryNames, 0, options, 1, allCategoryNames.Length);
 
-        for (var i = 0; i < 200; i++)
+        // TODO: When #4126 is merged update this to use OptionSelector<UnicodeCategory?>
+        var selector = new OptionSelector
         {
-            keys.Add (Key.CursorDown);
-        }
+            AssignHotKeysToCheckBoxes = true,
+            Options = options
+        };
 
-        // Category table
-        keys.Add (Key.Tab.WithShift);
+        _unicodeCategorySelector = selector;
 
-        // Block elements
-        keys.Add (Key.B);
-        keys.Add (Key.L);
+        // Default to "All"
+        selector.SelectedItem = 0;
+        _charMap!.ShowUnicodeCategory = null;
 
-        keys.Add (Key.Tab);
+        selector.SelectedItemChanged += (s, e) =>
+                                        {
+                                            int? idx = selector.SelectedItem;
 
-        for (var i = 0; i < 200; i++)
-        {
-            keys.Add (Key.CursorLeft);
-        }
+                                            if (idx is null)
+                                            {
+                                                return;
+                                            }
 
-        return keys;
+                                            if (idx.Value == 0)
+                                            {
+                                                _charMap.ShowUnicodeCategory = null;
+                                            }
+                                            else
+                                            {
+                                                // Map index to UnicodeCategory (offset by 1 because 0 is "All")
+                                                UnicodeCategory cat = Enum.GetValues<UnicodeCategory> () [idx.Value - 1];
+                                                _charMap.ShowUnicodeCategory = cat;
+                                            }
+                                        };
+
+        return new() { CommandView = selector };
     }
 }
