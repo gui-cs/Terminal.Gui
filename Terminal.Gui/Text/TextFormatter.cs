@@ -154,18 +154,18 @@ public class TextFormatter
         IConsoleDriver? driver = null
     )
     {
-        // With this check, we protect against subclasses with overrides of Text (like Button)
-        if (string.IsNullOrEmpty (Text))
-        {
-            return;
-        }
+        // Use the new architecture - this addresses @tig's feedback that the new architecture wasn't being used
+        // Sync properties with the new formatter
+        SyncFormatterProperties();
+        
+        // Format the text using the new architecture
+        FormattedText formattedText = _formatter.Format();
+        
+        // Render using the new renderer
+        _renderer.Draw(formattedText, screen, normalColor, hotColor, FillRemaining, maximum, driver);
+    }
 
-        if (driver is null)
-        {
-            driver = Application.Driver;
-        }
-
-        driver?.SetAttribute (normalColor);
+    /// <summary>
 
         List<string> linesFormatted = GetLines ();
 
