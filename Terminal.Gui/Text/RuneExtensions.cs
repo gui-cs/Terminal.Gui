@@ -115,10 +115,8 @@ public static class RuneExtensions
     {
         int value = rune.Value;
 
-        // HACK: This is a workaround for the fact that WT treats these glyphs as 2 columns wide
-        // HACK: when, unicode (and wcwidth) say they are 1.
-        // HACK: See https://github.com/gui-cs/Terminal.Gui/pull/4255 for more.
-        // Check I Ching symbol ranges (hardcoded for reliability)
+        // TODO: Remove this code when #4259 is fixed
+        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4259
         if (value is >= 0x2630 and <= 0x2637 ||  // Trigrams
             value is >= 0x268A and <= 0x268F ||  // Monograms/Digrams
             value is >= 0x4DC0 and <= 0x4DFF)    // Hexagrams
