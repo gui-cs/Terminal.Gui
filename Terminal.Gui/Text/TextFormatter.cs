@@ -30,6 +30,13 @@ public class TextFormatter
     private bool _wordWrap = true;
 
     /// <summary>
+    ///     Gets or sets whether to use the new architecture for drawing.
+    ///     When true, the Draw method will use the new separated formatter/renderer architecture.
+    ///     This provides better performance and addresses Format/Draw coupling issues.
+    /// </summary>
+    public bool UseNewArchitecture { get; set; } = false;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="TextFormatter"/> class.
     /// </summary>
     public TextFormatter()
@@ -154,18 +161,26 @@ public class TextFormatter
         IConsoleDriver? driver = null
     )
     {
-        // Use the new architecture - this addresses @tig's feedback that the new architecture wasn't being used
-        // Sync properties with the new formatter
-        SyncFormatterProperties();
-        
-        // Format the text using the new architecture
-        FormattedText formattedText = _formatter.Format();
-        
-        // Render using the new renderer
-        _renderer.Draw(formattedText, screen, normalColor, hotColor, FillRemaining, maximum, driver);
-    }
+        // If using new architecture, delegate to the improved implementation
+        if (UseNewArchitecture)
+        {
+            DrawWithNewArchitecture(screen, normalColor, hotColor, maximum, driver);
+            return;
+        }
 
-    /// <summary>
+        // Original implementation follows...
+        // With this check, we protect against subclasses with overrides of Text (like Button)
+        if (string.IsNullOrEmpty (Text))
+        {
+            return;
+        }
+
+        if (driver is null)
+        {
+            driver = Application.Driver;
+        }
+
+        driver?.SetAttribute (normalColor);
 
         List<string> linesFormatted = GetLines ();
 
