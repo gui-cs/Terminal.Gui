@@ -515,7 +515,7 @@ public class TextView : View, IDesignable
                     Command.Context,
                     () =>
                     {
-                        ShowContextMenu (true);
+                        ShowContextMenu (null);
 
                         return true;
                     }
@@ -1745,13 +1745,7 @@ public class TextView : View, IDesignable
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu!.X = ev.ScreenPosition.X;
-            ContextMenu!.Y = ev.ScreenPosition.Y;
-
-            ShowContextMenu (false);
-
-            //ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
-            //ShowContextMenu ();
+            ShowContextMenu (ev.ScreenPosition);
         }
 
         OnUnwrappedCursorPosition ();
@@ -4574,14 +4568,18 @@ public class TextView : View, IDesignable
         }
     }
 
-    private void ShowContextMenu (bool keyboard)
+    private void ShowContextMenu (Point? mousePosition)
     {
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        ContextMenu?.MakeVisible (ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y)));
+        if (mousePosition is null)
+        {
+            mousePosition = ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y));
+        }
+        ContextMenu?.MakeVisible (mousePosition);
     }
 
     private void StartSelecting ()

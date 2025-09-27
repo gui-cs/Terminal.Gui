@@ -182,6 +182,7 @@ public class ApplicationV2Tests
                                               })
                 .Verifiable (Times.Once);
     }
+
     private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
     {
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
@@ -361,7 +362,6 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-
     [Fact]
     public void InitRunShutdown_QuitKey_Quits ()
     {
@@ -406,7 +406,6 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
 
     [Fact]
     public void InitRunShutdown_Generic_IdleForExit ()
@@ -511,7 +510,6 @@ public class ApplicationV2Tests
         v2.Init (null, "v2net");
 
 
-        v2.Shutdown ();
         v2.Shutdown ();
         outputMock!.Verify (o => o.Dispose (), Times.Once);
 

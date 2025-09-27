@@ -251,14 +251,6 @@ public interface IConsoleDriver
     /// </remarks>
     event EventHandler<Key>? KeyUp;
 
-    /// <summary>Simulates a key press.</summary>
-    /// <param name="keyChar">The key character.</param>
-    /// <param name="key">The key.</param>
-    /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-    /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-    /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution
     /// </summary>

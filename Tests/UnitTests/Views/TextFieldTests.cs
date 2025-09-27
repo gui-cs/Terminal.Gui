@@ -146,7 +146,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Caption has no effect when focused
         tf.Caption = caption;
-        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
@@ -166,7 +166,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         tf.Caption = caption;
-        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
@@ -186,7 +186,7 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("", output);
 
         tf.Caption = "Enter txt";
-        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.RaiseKeyDownEvent ('\t');
 
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
@@ -218,7 +218,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
-        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.RaiseKeyDownEvent ('\t');
 
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
