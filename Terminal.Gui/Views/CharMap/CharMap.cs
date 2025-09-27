@@ -838,7 +838,7 @@ public class CharMap : View, IDesignable
                     }
                     else
                     {
-                        throw new InvalidOperationException ($"The Rune \"{rune}\" (U+{rune.Value:x4}) has zero width and no special-case UnicodeCategory logic applies.");
+                        throw new InvalidOperationException ($"The Rune \"{rune}\" (U+{rune.Value:x6}) has zero width and no special-case UnicodeCategory logic applies.");
                     }
 
                     break;
