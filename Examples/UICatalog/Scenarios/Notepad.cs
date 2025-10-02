@@ -59,12 +59,13 @@ public class Notepad : Scenario
         _tabView.Style.ShowBorder = true;
         _tabView.ApplyStyleChanges ();
 
-        // Start with only a single view but support splitting to show side by side
-        var split = new TileView (1) { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
-        split.Tiles.ElementAt (0).ContentView.Add (_tabView);
-        split.LineStyle = LineStyle.None;
-
-        top.Add (split);
+        // Simple container for the tabview
+        top.Add (_tabView);
+        _tabView.X = 0;
+        _tabView.Y = 1;
+        _tabView.Width = Dim.Fill ();
+        _tabView.Height = Dim.Fill (1);
+        
         LenShortcut = new (Key.Empty, "Len: ", null);
 
         var statusBar = new StatusBar (new [] {
@@ -198,40 +199,6 @@ public class Notepad : Scenario
         tv.RemoveTab (tab);
         tab.View.Dispose ();
         _focusedTabView = tv;
-
-        if (tv.Tabs.Count == 0)
-        {
-            var split = (TileView)tv.SuperView.SuperView;
-
-            // if it is the last TabView on screen don't drop it or we will
-            // be unable to open new docs!
-            if (split.IsRootTileView () && split.Tiles.Count == 1)
-            {
-                return;
-            }
-
-            int tileIndex = split.IndexOf (tv);
-            split.RemoveTile (tileIndex);
-
-            if (split.Tiles.Count == 0)
-            {
-                TileView parent = split.GetParentTileView ();
-
-                if (parent == null)
-                {
-                    return;
-                }
-
-                int idx = parent.IndexOf (split);
-
-                if (idx == -1)
-                {
-                    return;
-                }
-
-                parent.RemoveTile (idx);
-            }
-        }
     }
 
     private TabView CreateNewTabView ()
@@ -286,36 +253,7 @@ public class Notepad : Scenario
 
     private void Quit () { Application.RequestStop (); }
 
-    private void Split (int offset, Orientation orientation, TabView sender, OpenedFile tab)
-    {
-        var split = (TileView)sender.SuperView.SuperView;
-        int tileIndex = split.IndexOf (sender);
-
-        if (tileIndex == -1)
-        {
-            return;
-        }
-
-        if (orientation != split.Orientation)
-        {
-            split.TrySplitTile (tileIndex, 1, out split);
-            split.Orientation = orientation;
-            tileIndex = 0;
-        }
-
-        Tile newTile = split.InsertTile (tileIndex + offset);
-        TabView newTabView = CreateNewTabView ();
-        tab.CloneTo (newTabView);
-        newTile.ContentView.Add (newTabView);
-
-        newTabView.FocusDeepest (NavigationDirection.Forward, null);
-        newTabView.AdvanceFocus (NavigationDirection.Forward, null);
-    }
-
-    private void SplitDown (TabView sender, OpenedFile tab) { Split (1, Orientation.Horizontal, sender, tab); }
-    private void SplitLeft (TabView sender, OpenedFile tab) { Split (0, Orientation.Vertical, sender, tab); }
-    private void SplitRight (TabView sender, OpenedFile tab) { Split (1, Orientation.Vertical, sender, tab); }
-    private void SplitUp (TabView sender, OpenedFile tab) { Split (0, Orientation.Horizontal, sender, tab); }
+    // Split functionality removed - TileView is deprecated in favor of View.Arrangement
 
     private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
     {
@@ -346,12 +284,8 @@ public class Notepad : Scenario
             items =
             [
                 new MenuItemv2 ("Save", "", () => Save (_focusedTabView, e.Tab)),
-                new MenuItemv2 ("Close", "", () => Close (tv, e.Tab)),
-                new Line (),
-                new MenuItemv2 ("Split Up", "", () => SplitUp (tv, t)),
-                new MenuItemv2 ("Split Down", "", () => SplitDown (tv, t)),
-                new MenuItemv2 ("Split Right", "", () => SplitRight (tv, t)),
-                new MenuItemv2 ("Split Left", "", () => SplitLeft (tv, t))
+                new MenuItemv2 ("Close", "", () => Close (tv, e.Tab))
+                // Split menu items removed - TileView is deprecated in favor of View.Arrangement
             ];
 
             PopoverMenu? contextMenu = new (items);

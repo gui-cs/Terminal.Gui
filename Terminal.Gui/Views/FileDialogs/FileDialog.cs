@@ -39,7 +39,8 @@ public class FileDialog : Dialog, IDesignable
     private readonly IFileSystem _fileSystem;
     private readonly FileDialogHistory _history;
     private readonly SpinnerView _spinnerView;
-    private readonly TileView _splitContainer;
+    private readonly View _leftPanel;
+    private readonly View _rightPanel;
     private readonly TableView _tableView;
     private readonly TextField _tbFind;
     private readonly TextField _tbPath;
@@ -149,19 +150,31 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        _splitContainer = new ()
+        // Left panel for tree view
+        _leftPanel = new ()
         {
+            Id = "leftPanel",
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1))
+            Width = 30,
+            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
+            Visible = false,
+            CanFocus = false,
+            TabStop = TabBehavior.NoStop,
+            Arrangement = ViewArrangement.Resizable
         };
 
-        Initialized += (s, e) =>
-                       {
-                           _splitContainer.SetSplitterPos (0, 30);
-                           _splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
-                       };
+        // Right panel for table view  
+        _rightPanel = new ()
+        {
+            Id = "rightPanel",
+            X = Pos.Right (_leftPanel),
+            Y = Pos.Bottom (_btnBack),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
+            CanFocus = false,
+            TabStop = TabBehavior.NoStop
+        };
 
         // this.splitContainer.Border.BorderStyle = BorderStyle.None;
 
@@ -202,8 +215,8 @@ public class FileDialog : Dialog, IDesignable
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
 
-        _splitContainer.Tiles.ElementAt (0).ContentView.Add (_treeView);
-        _splitContainer.Tiles.ElementAt (1).ContentView.Add (_tableView);
+        _leftPanel.Add (_treeView);
+        _rightPanel.Add (_tableView);
 
         _btnToggleSplitterCollapse = new ()
         {
@@ -215,10 +228,9 @@ public class FileDialog : Dialog, IDesignable
                                                 {
                                                     // Required otherwise the Save button clicks itself
                                                     e.Handled = true;
-                                                    Tile tile = _splitContainer.Tiles.ElementAt (0);
 
-                                                    bool newState = !tile.ContentView.Visible;
-                                                    tile.ContentView.Visible = newState;
+                                                    bool newState = !_leftPanel.Visible;
+                                                    _leftPanel.Visible = newState;
                                                     _btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
                                                     SetNeedsLayout ();
                                                 };
@@ -282,7 +294,8 @@ public class FileDialog : Dialog, IDesignable
         Add (_btnUp);
         Add (_btnBack);
         Add (_btnForward);
-        Add (_splitContainer);
+        Add (_leftPanel);
+        Add (_rightPanel);
         Add (_btnToggleSplitterCollapse);
         Add (_tbFind);
         Add (_spinnerView);

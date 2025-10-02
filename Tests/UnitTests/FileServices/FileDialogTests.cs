@@ -798,8 +798,14 @@ public class FileDialogTests ()
 
     private TableView GetTableView (FileDialog dlg)
     {
-        var tile = dlg.SubViews.OfType<TileView> ().Single ();
-        return (TableView)tile.Tiles.ElementAt (1).ContentView.SubViews.ElementAt(0);
+        // The TableView is now directly in _rightPanel
+        var rightPanel = dlg.SubViews.FirstOrDefault(v => v.Id == "rightPanel");
+        if (rightPanel != null)
+        {
+            return (TableView)rightPanel.SubViews.First(s => s is TableView);
+        }
+        // Fallback - shouldn't reach here
+        throw new InvalidOperationException("Could not find rightPanel in FileDialog");
     }
 
     private enum FileDialogPart
