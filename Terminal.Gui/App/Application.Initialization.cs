@@ -82,16 +82,6 @@ public static partial class Application // Initialization (Init/Shutdown)
         if (driver is { })
         {
             Driver = driver;
-
-            if (driver is FakeDriver)
-            {
-                //// We're running unit tests. Disable loading config files other than default
-                //if (Locations == ConfigLocations.All)
-                //{
-                //    Locations = ConfigLocations.Default;
-                //    ResetAllSettings ();
-                //}
-            }
         }
 
         // Ignore Configuration for ForceDriver if driverName is specified
