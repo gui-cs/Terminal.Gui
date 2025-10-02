@@ -119,14 +119,13 @@ public class Line : View, IOrientation
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        LineCanvas?.AddLine (
+        SuperView?.LineCanvas?.AddLine (
                     pos,
                     length,
                     Orientation,
                     BorderStyle
                    );
 
-        //SuperView?.SetNeedsDraw ();
         return true;
     }
 }
