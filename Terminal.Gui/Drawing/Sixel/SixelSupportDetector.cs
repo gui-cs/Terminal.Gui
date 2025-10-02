@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Uses Ansi escape sequences to detect whether sixel is supported

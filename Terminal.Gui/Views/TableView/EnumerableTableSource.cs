@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="ITableSource"/> implementation that wraps arbitrary data.</summary>
 /// <typeparam name="T"></typeparam>

@@ -1,12 +1,13 @@
 ﻿#nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Event arguments for <see cref="Command"/> events.
+///     Event arguments for <see cref="Command"/> events. Set <see cref="HandledEventArgs.Handled"/> to
+///     <see langword="true"/> to indicate a command was handled.
 /// </summary>
-public class CommandEventArgs : CancelEventArgs
+public class CommandEventArgs : HandledEventArgs
 {
     /// <summary>
     ///     The context for the command, if any.

@@ -4,7 +4,7 @@
 // libsixel (C/C++) - https://github.com/saitoha/libsixel
 // Copyright (c) 2014-2016 Hayaki Saito @license MIT
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Encodes a images into the sixel console image output format.

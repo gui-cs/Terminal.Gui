@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿using System.Text;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -129,6 +130,70 @@ public class KeyBindingsTests ()
         top.Dispose ();
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void HotKey_Enabled_False_Does_Not_Invoke ()
+    {
+        var view = new ScopedKeyBindingView ();
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Application.RaiseKeyDownEvent (Key.Z);
+        Assert.False (keyWasHandled);
+        Assert.False (view.HotKeyCommand);
+
+        keyWasHandled = false;
+        view.Enabled = false;
+        Application.RaiseKeyDownEvent (Key.F);
+        Assert.False (view.HotKeyCommand);
+        top.Dispose ();
+    }
+
+
+    [Fact]
+    public void HotKey_Raises_HotKeyCommand ()
+    {
+        var hotKeyRaised = false;
+        var acceptRaised = false;
+        var selectRaised = false;
+        Application.Top = new Toplevel ();
+        var view = new View
+        {
+            CanFocus = true,
+            HotKeySpecifier = new Rune ('_'),
+            Title = "_Test"
+        };
+        Application.Top.Add (view);
+        view.HandlingHotKey += (s, e) => hotKeyRaised = true;
+        view.Accepting += (s, e) => acceptRaised = true;
+        view.Selecting += (s, e) => selectRaised = true;
+
+        Assert.Equal (KeyCode.T, view.HotKey);
+        Assert.True (Application.RaiseKeyDownEvent (Key.T));
+        Assert.True (hotKeyRaised);
+        Assert.False (acceptRaised);
+        Assert.False (selectRaised);
+
+        hotKeyRaised = false;
+        Assert.True (Application.RaiseKeyDownEvent (Key.T.WithAlt));
+        Assert.True (hotKeyRaised);
+        Assert.False (acceptRaised);
+        Assert.False (selectRaised);
+
+        hotKeyRaised = false;
+        view.HotKey = KeyCode.E;
+        Assert.True (Application.RaiseKeyDownEvent (Key.E.WithAlt));
+        Assert.True (hotKeyRaised);
+        Assert.False (acceptRaised);
+        Assert.False (selectRaised);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+    }
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
 
     public class ScopedKeyBindingView : View

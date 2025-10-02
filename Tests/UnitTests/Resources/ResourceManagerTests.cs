@@ -3,16 +3,12 @@
 using System.Collections;
 using System.Globalization;
 using System.Resources;
-using Terminal.Gui.Resources;
+using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui.ResourcesTests;
 
 public class ResourceManagerTests
 {
-    private const string DODGER_BLUE_COLOR_KEY = "DodgerBlue";
-    private const string DODGER_BLUE_COLOR_NAME = "DodgerBlue";
-    private const string NO_NAMED_COLOR_KEY = "#1E80FF";
-    private const string NO_NAMED_COLOR_NAME = "#1E80FF";
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";
     private const string NO_EXISTENT_KEY = "blabla";
@@ -20,10 +16,20 @@ public class ResourceManagerTests
     private const string NO_TRANSLATED_VALUE = "Delete {0}";
     private const string TRANSLATED_KEY = "ctxSelectAll";
     private const string TRANSLATED_VALUE = "_Selecionar Tudo";
-    private static readonly string _stringsNoTranslatedKey = Strings.fdDeleteTitle;
-    private static readonly string _stringsTranslatedKey = Strings.ctxSelectAll;
-    private static readonly CultureInfo _savedCulture = CultureInfo.CurrentCulture;
-    private static readonly CultureInfo _savedUICulture = CultureInfo.CurrentUICulture;
+
+
+    [ModuleInitializer]
+    internal static void SaveOriginalCultureInfo ()
+    {
+        _savedCulture = CultureInfo.CurrentCulture;
+        _savedUICulture = CultureInfo.CurrentUICulture;
+    }
+
+    private static CultureInfo? _savedCulture;
+    private static CultureInfo? _savedUICulture;
+    private static string? _stringsNoTranslatedKey;
+    // ReSharper disable once NotAccessedField.Local
+    private static string? _stringsTranslatedKey;
 
     [Fact]
     public void GetObject_Does_Not_Overflows_If_Key_Does_Not_Exist () { Assert.Null (GlobalResources.GetObject (NO_EXISTENT_KEY, CultureInfo.CurrentCulture)); }
@@ -36,7 +42,7 @@ public class ResourceManagerTests
 
         Assert.Equal (NO_TRANSLATED_VALUE, GlobalResources.GetObject (NO_TRANSLATED_KEY, CultureInfo.CurrentCulture));
 
-        RestoreCurrentCultures ();
+        ResetCultureInfo ();
     }
 
     [Fact]
@@ -47,52 +53,7 @@ public class ResourceManagerTests
 
         Assert.Equal (NO_TRANSLATED_VALUE, GlobalResources.GetObject (NO_TRANSLATED_KEY, CultureInfo.CurrentCulture));
 
-        RestoreCurrentCultures ();
-    }
-
-    [Fact]
-    public void GetResourceSet_FallBack_To_Default_For_No_Existent_Culture_File ()
-    {
-        CultureInfo.CurrentCulture = new (NO_EXISTENT_CULTURE);
-        CultureInfo.CurrentUICulture = new (NO_EXISTENT_CULTURE);
-
-        // W3CColors.GetColorNames also calls ColorStrings.GetW3CColorNames
-        string [] colorNames = new W3CColors ().GetColorNames ().ToArray ();
-        Assert.Contains (DODGER_BLUE_COLOR_NAME, colorNames);
-        Assert.DoesNotContain (NO_TRANSLATED_VALUE, colorNames);
-
-        RestoreCurrentCultures ();
-    }
-
-    [Fact]
-    public void GetResourceSet_FallBack_To_Default_For_Not_Translated_Existent_Culture_File ()
-    {
-        CultureInfo.CurrentCulture = new (EXISTENT_CULTURE);
-        CultureInfo.CurrentUICulture = new (EXISTENT_CULTURE);
-
-        // These aren't already translated
-        // ColorStrings.GetW3CColorNames method uses GetResourceSet method to retrieve color names
-        IEnumerable<string> colorNames = ColorStrings.GetW3CColorNames ();
-        Assert.NotEmpty (colorNames);
-
-        // W3CColors.GetColorNames also calls ColorStrings.GetW3CColorNames
-        colorNames = new W3CColors ().GetColorNames ().ToArray ();
-        Assert.Contains (DODGER_BLUE_COLOR_NAME, colorNames);
-        Assert.DoesNotContain (NO_TRANSLATED_VALUE, colorNames);
-
-        // ColorStrings.TryParseW3CColorName method uses GetResourceSet method to retrieve a color value
-        Assert.True (ColorStrings.TryParseW3CColorName (DODGER_BLUE_COLOR_NAME, out Color color));
-        Assert.Equal (DODGER_BLUE_COLOR_KEY, color.ToString ());
-
-        // W3CColors.GetColorNames also calls ColorStrings.GetW3CColorNames for no-named colors
-        colorNames = new W3CColors ().GetColorNames ().ToArray ();
-        Assert.DoesNotContain (NO_NAMED_COLOR_NAME, colorNames);
-
-        // ColorStrings.TryParseW3CColorName method uses GetResourceSet method to retrieve a color value for no-named colors
-        Assert.True (ColorStrings.TryParseW3CColorName (NO_NAMED_COLOR_NAME, out color));
-        Assert.Equal (NO_NAMED_COLOR_KEY, color.ToString ());
-
-        RestoreCurrentCultures ();
+        ResetCultureInfo ();
     }
 
     [Fact]
@@ -112,7 +73,10 @@ public class ResourceManagerTests
     }
 
     [Fact]
-    public void GetString_Does_Not_Overflows_If_Key_Does_Not_Exist () { Assert.Null (GlobalResources.GetString (NO_EXISTENT_KEY, CultureInfo.CurrentCulture)); }
+    public void GetString_Does_Not_Overflows_If_Key_Does_Not_Exist ()
+    {
+        Assert.Null (GlobalResources.GetString (NO_EXISTENT_KEY, CultureInfo.CurrentCulture));
+    }
 
     [Fact]
     public void GetString_FallBack_To_Default_For_No_Existent_Culture_File ()
@@ -122,7 +86,7 @@ public class ResourceManagerTests
 
         Assert.Equal (NO_TRANSLATED_VALUE, GlobalResources.GetString (NO_TRANSLATED_KEY, CultureInfo.CurrentCulture));
 
-        RestoreCurrentCultures ();
+        ResetCultureInfo ();
     }
 
     [Fact]
@@ -138,7 +102,7 @@ public class ResourceManagerTests
         // Calling Strings.fdDeleteBody return always the invariant culture
         Assert.Equal (NO_TRANSLATED_VALUE, GlobalResources.GetString (NO_TRANSLATED_KEY, CultureInfo.CurrentCulture));
 
-        RestoreCurrentCultures ();
+        ResetCultureInfo ();
     }
 
     [Fact]
@@ -149,27 +113,32 @@ public class ResourceManagerTests
 
         Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
 
-        RestoreCurrentCultures ();
+        ResetCultureInfo ();
     }
 
     [Fact]
     public void Strings_Always_FallBack_To_Default_For_Not_Translated_Existent_Culture_File ()
     {
+        ResetCultureInfo ();
+
         CultureInfo.CurrentCulture = new (EXISTENT_CULTURE);
         CultureInfo.CurrentUICulture = new (EXISTENT_CULTURE);
 
         // This is really already translated
-        Assert.Equal (TRANSLATED_VALUE, _stringsTranslatedKey);
+        Assert.Equal (TRANSLATED_VALUE, Strings.ctxSelectAll);
 
         // This isn't already translated
         Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
 
-        RestoreCurrentCultures ();
+        ResetCultureInfo ();
     }
 
-    private void RestoreCurrentCultures ()
+    private void ResetCultureInfo ()
     {
-        CultureInfo.CurrentCulture = _savedCulture;
-        CultureInfo.CurrentUICulture = _savedUICulture;
+        CultureInfo.CurrentCulture = _savedCulture!;
+        CultureInfo.CurrentUICulture = _savedUICulture!;
+
+        _stringsNoTranslatedKey = Strings.fdDeleteTitle;
+        _stringsTranslatedKey = Strings.ctxSelectAll;
     }
 }

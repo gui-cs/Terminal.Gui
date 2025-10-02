@@ -3,9 +3,8 @@
 // and code to be used in this library under the MIT license.
 
 using System.Collections.ObjectModel;
-using static Terminal.Gui.SpinnerStyle;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface for all non-generic members of <see cref="TreeView{T}"/>.
@@ -41,7 +40,6 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
         AspectGetter = o => o is null ? "Null" : o.Text ?? o?.ToString () ?? "Unnamed Node";
     }
 
-
     bool IDesignable.EnableForDesign ()
     {
         var root1 = new TreeNode ("Root1");
@@ -56,6 +54,7 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
         AddObject (root2);
 
         ExpandAll ();
+
         return true;
     }
 }
@@ -338,10 +337,10 @@ public class TreeView<T> : View, ITreeView where T : class
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
-    ///     Delegate for multi-colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
+    ///     Delegate for multi-colored tree views. Return the <see cref="Scheme"/> to use for each passed object or
     ///     null to use the default.
     /// </summary>
-    public Func<T, ColorScheme> ColorGetter { get; set; }
+    public Func<T, Scheme> ColorGetter { get; set; }
 
     /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
     public int ContentHeight => BuildLineMap ().Count ();
@@ -350,7 +349,7 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
     ///     types.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator ();
 
     /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
     public int MaxDepth { get; set; } = 100;
@@ -429,7 +428,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
             if (!ReferenceEquals (oldValue, value))
             {
-                OnSelectionChanged (new SelectionChangedEventArgs<T> (this, oldValue, value));
+                OnSelectionChanged (new (this, oldValue, value));
             }
         }
     }
@@ -452,7 +451,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         SelectedObject = default (T);
         multiSelectedRegions.Clear ();
-        roots = new Dictionary<T, Branch<T>> ();
+        roots = new ();
         InvalidateLineMap ();
         SetNeedsDraw ();
     }
@@ -477,8 +476,10 @@ public class TreeView<T> : View, ITreeView where T : class
             // TODO: Should this be cancelable?
             ObjectActivatedEventArgs<T> e = new (this, o);
             OnObjectActivated (e);
+
             return true;
         }
+
         return false;
     }
 
@@ -488,7 +489,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         if (!roots.ContainsKey (o))
         {
-            roots.Add (o, new Branch<T> (this, null, o));
+            roots.Add (o, new (this, null, o));
             InvalidateLineMap ();
             SetNeedsDraw ();
         }
@@ -505,7 +506,7 @@ public class TreeView<T> : View, ITreeView where T : class
         {
             if (!roots.ContainsKey (o))
             {
-                roots.Add (o, new Branch<T> (this, null, o));
+                roots.Add (o, new (this, null, o));
                 objectsAdded = true;
             }
         }
@@ -566,12 +567,12 @@ public class TreeView<T> : View, ITreeView where T : class
                     {
                         // expand the existing head selection
                         TreeSelection<T> head = multiSelectedRegions.Pop ();
-                        multiSelectedRegions.Push (new TreeSelection<T> (head.Origin, newIdx, map));
+                        multiSelectedRegions.Push (new (head.Origin, newIdx, map));
                     }
                     else
                     {
                         // or start a new multi selection region
-                        multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt (idx), newIdx, map));
+                        multiSelectedRegions.Push (new (map.ElementAt (idx), newIdx, map));
                     }
                 }
 
@@ -847,7 +848,7 @@ public class TreeView<T> : View, ITreeView where T : class
             return new T [0];
         }
 
-        return branch.ChildBranches?.Values?.Select (b => b.Model)?.ToArray () ?? new T [0];
+        return branch.ChildBranches?.Select (b => b.Model)?.ToArray () ?? new T [0];
     }
 
     /// <summary>Returns the maximum width line in the tree including prefix and expansion symbols.</summary>
@@ -879,10 +880,10 @@ public class TreeView<T> : View, ITreeView where T : class
                 return 0;
             }
 
-            return map.Skip (ScrollOffsetVertical).Take (Viewport.Height).Max (b => b.GetWidth (Driver));
+            return map.Skip (ScrollOffsetVertical).Take (Viewport.Height).Max (b => b.GetWidth ());
         }
 
-        return map.Max (b => b.GetWidth (Driver));
+        return map.Max (b => b.GetWidth ());
     }
 
     /// <summary>
@@ -1120,7 +1121,7 @@ public class TreeView<T> : View, ITreeView where T : class
             SetNeedsDraw ();
 
             // trigger activation event
-            OnObjectActivated (new ObjectActivatedEventArgs<T> (this, clickedBranch.Model));
+            OnObjectActivated (new (this, clickedBranch.Model));
 
             // mouse event is handled.
             return true;
@@ -1171,14 +1172,14 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idxToRender < map.Count)
             {
                 // Render the line
-                map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, Viewport.Width);
+                map.ElementAt (idxToRender).Draw (line, Viewport.Width);
             }
             else
             {
                 // Else clear the line to prevent stale symbols due to scrolling etc
                 Move (0, line);
-                SetAttribute (GetNormalColor ());
-                Driver?.AddStr (new string (' ', Viewport.Width));
+                SetAttribute (GetAttributeForRole (VisualRole.Normal));
+                Driver?.AddStr (new (' ', Viewport.Width));
             }
         }
 
@@ -1206,8 +1207,15 @@ public class TreeView<T> : View, ITreeView where T : class
             return false;
         }
 
+        // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        if (KeyBindings.TryGet (key, out _))
+        {
+            return false;
+        }
+
         // If not a keybinding, is the key a searchable key press?
-        if (CollectionNavigatorBase.IsCompatibleKey (key) && AllowLetterBasedNavigation)
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key) && AllowLetterBasedNavigation)
         {
             // If there has been a call to InvalidateMap since the last time
             // we need a new one to reflect the new exposed tree state
@@ -1246,6 +1254,7 @@ public class TreeView<T> : View, ITreeView where T : class
                 return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null;
             }
         }
+
         return base.PositionCursor ();
     }
 
@@ -1343,10 +1352,10 @@ public class TreeView<T> : View, ITreeView where T : class
             return;
         }
 
-        multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt (0), map.Count, map));
+        multiSelectedRegions.Push (new (map.ElementAt (0), map.Count, map));
         SetNeedsDraw ();
 
-        OnSelectionChanged (new SelectionChangedEventArgs<T> (this, SelectedObject, SelectedObject));
+        OnSelectionChanged (new (this, SelectedObject, SelectedObject));
     }
 
     /// <summary>Called when the <see cref="SelectedObject"/> changes.</summary>
@@ -1488,7 +1497,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
         if (currentBranch.IsExpanded)
         {
-            foreach (Branch<T> subBranch in currentBranch.ChildBranches.Values)
+            foreach (Branch<T> subBranch in currentBranch.ChildBranches)
             {
                 foreach (Branch<T> sub in AddToLineMap (subBranch, weMatch, out bool childMatch))
                 {
@@ -1614,5 +1623,4 @@ internal class TreeSelection<T> where T : class
 
     public Branch<T> Origin { get; }
     public bool Contains (T model) { return included.Contains (model); }
-
 }

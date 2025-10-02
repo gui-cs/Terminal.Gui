@@ -4146,7 +4146,7 @@ Nice       Work")]
     {
         TextFormatter tf = new ()
         {
-            Text = UICatalogApp.GetAboutBoxMessage (),
+            Text = UICatalog.UICatalogTop.GetAboutBoxMessage (),
             Alignment = Alignment.Center,
             VerticalAlignment = Alignment.Start,
             WordWrap = false,

@@ -1,5 +1,6 @@
 #nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up)
@@ -33,7 +34,8 @@ public partial class Toplevel : View
         Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        base.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
+
         MouseClick += Toplevel_MouseClick;
     }
 

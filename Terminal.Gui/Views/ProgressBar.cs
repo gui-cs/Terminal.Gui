@@ -1,5 +1,6 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
 public enum ProgressBarStyle
@@ -78,7 +79,7 @@ public class ProgressBar : View, IDesignable
     /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
     public ProgressBarFormat ProgressBarFormat { get; set; } = ProgressBarFormat.Simple;
 
-    /// <summary>Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/></summary>
+    /// <summary>Gets/Sets the progress bar style based on the <see cref="Views.ProgressBarStyle"/></summary>
     public ProgressBarStyle ProgressBarStyle
     {
         get => _progressBarStyle;
@@ -133,7 +134,7 @@ public class ProgressBar : View, IDesignable
     ///<inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        SetAttribute (GetHotNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Active));
 
         Move (0, 0);
 
@@ -170,17 +171,24 @@ public class ProgressBar : View, IDesignable
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
             var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
-            var attr = new Attribute (ColorScheme!.HotNormal.Foreground, ColorScheme.HotNormal.Background);
+
+            var attr = new Attribute (
+                                      GetAttributeForRole (VisualRole.Active).Foreground,
+                                      GetAttributeForRole (VisualRole.Active).Background,
+                                      GetAttributeForRole (VisualRole.Active).Style);
 
             if (_fraction > .5)
             {
-                attr = new (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
+                attr = new (
+                            GetAttributeForRole (VisualRole.Active).Background,
+                            GetAttributeForRole (VisualRole.Active).Foreground,
+                            GetAttributeForRole (VisualRole.Active).Style);
             }
 
-            tf.Draw (
+            tf.Draw (   
                      ViewportToScreen (Viewport),
                      attr,
-                     ColorScheme.Normal,
+                     GetAttributeForRole (VisualRole.Normal),
                      SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
                     );
         }

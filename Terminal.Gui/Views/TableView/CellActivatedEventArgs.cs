@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+﻿namespace Terminal.Gui.Views;
 
 // TOOD: SHould support Handled
 /// <summary>Defines the event arguments for <see cref="TableView.CellActivated"/> event</summary>

@@ -1,6 +1,6 @@
 using System.IO.Abstractions;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.FileServices;
 
 /// <summary>
 ///     Interface for defining how to handle file/directory deletion, rename and newing attempts in

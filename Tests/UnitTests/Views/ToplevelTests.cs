@@ -4,19 +4,12 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ToplevelTests
 {
-    public ToplevelTests ()
-    {
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
-    }
-
     [Fact]
     public void Constructor_Default ()
     {
         var top = new Toplevel ();
 
-        Assert.Equal (Colors.ColorSchemes ["TopLevel"], top.ColorScheme);
+        Assert.Equal ("Toplevel", top.SchemeName);
         Assert.Equal ("Fill(Absolute(0))", top.Width.ToString ());
         Assert.Equal ("Fill(Absolute(0))", top.Height.ToString ());
         Assert.False (top.Running);
@@ -575,7 +568,7 @@ public class ToplevelTests
 
         void ViewLayoutStarted (object sender, LayoutEventArgs e)
         {
-            Assert.Equal (new (0, 0, 20, 10), view._needsDrawRect);
+            Assert.Equal (new (0, 0, 20, 10), view.NeedsDrawRect);
             view.SubViewLayout -= ViewLayoutStarted;
         }
 
@@ -587,12 +580,12 @@ public class ToplevelTests
 
         view.Frame = new (1, 3, 10, 5);
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new (0, 0, 10, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 5), view.NeedsDrawRect);
 
         view.Frame = new (1, 3, 10, 5);
         top.Layout ();
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
-        Assert.Equal (new (0, 0, 10, 5), view._needsDrawRect);
+        Assert.Equal (new (0, 0, 10, 5), view.NeedsDrawRect);
         top.Dispose ();
     }
 
@@ -729,25 +722,6 @@ public class ToplevelTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Begin_With_Window_Sets_Size_Correctly ()
-    {
-        Toplevel top = new ();
-        RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
-
-        var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
-        Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
-
-        RunState rsTestWindow = Application.Begin (testWindow);
-        Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
-
-        Application.End (rsTestWindow);
-        Application.End (rsTop);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
     {
         var menu = new MenuBar
@@ -769,7 +743,6 @@ public class ToplevelTests
     }
 
     [Fact]
-    [TestRespondersDisposed]
     public void Multi_Thread_Toplevels ()
     {
         Application.Init (new FakeDriver ());

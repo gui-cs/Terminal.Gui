@@ -19,7 +19,7 @@ public class StatusBarTests
         Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
         Assert.Equal ("Save", sb.SubViews.ElementAt (1).Title);
         Assert.Equal ("Close", sb.SubViews.ElementAt (2).Title);
-        Assert.Equal ("Quit", sb.SubViews.ToArray() [^1].Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray () [^1].Title);
 
         Assert.Equal ("Save", sb.RemoveShortcut (1).Title);
 
@@ -130,10 +130,10 @@ public class StatusBarTests
     public void StatusBar_Constructor_Default ()
     {
         var sb = new StatusBar ();
-        
+
         Assert.Empty (sb.SubViews);
         Assert.True (sb.CanFocus);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], sb.ColorScheme);
+        Assert.Equal ("Menu", sb.SchemeName);
         Assert.Equal (0, sb.X);
         Assert.Equal ("AnchorEnd", sb.Y.ToString ());
         Assert.Equal (Dim.Fill (), sb.Width);

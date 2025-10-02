@@ -1,10 +1,10 @@
 #nullable enable
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Enables the user to increase or decrease a value with the mouse or keyboard.
+///     Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 /// </summary>
 /// <remarks>
 ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
@@ -148,13 +148,13 @@ public class NumericUpDown<T> : View where T : notnull
         void OnDownButtonOnAccept (object? s, CommandEventArgs e)
         {
             InvokeCommand (Command.Down);
-            e.Cancel = true;
+            e.Handled = true;
         }
 
         void OnUpButtonOnAccept (object? s, CommandEventArgs e)
         {
             InvokeCommand (Command.Up);
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -167,7 +167,7 @@ public class NumericUpDown<T> : View where T : notnull
     ///     <para>
     ///         <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events are raised when the value changes.
     ///         The <see cref="ValueChanging"/> event can be canceled the change setting
-    ///         <see cref="CancelEventArgs{T}"/><c>.Cancel</c> to <see langword="true"/>.
+    ///         <see cref="HandledEventArgs"/><c>.Handled</c> to <see langword="true"/>.
     ///     </para>
     /// </remarks>
     public T Value

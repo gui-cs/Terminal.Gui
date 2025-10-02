@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Terminal.Gui;
 using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;
@@ -11,7 +10,7 @@ public class ScenariosStressTests : TestsAllViews
     public ScenariosStressTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
         View.Instances.Clear ();
 #endif
         _output = output;
@@ -34,9 +33,7 @@ public class ScenariosStressTests : TestsAllViews
         Assert.Null (_timeoutLock);
         _timeoutLock = new ();
 
-        // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Disable();
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -89,15 +86,11 @@ public class ScenariosStressTests : TestsAllViews
         _output.WriteLine ($"  added {addedCount} views.");
         _output.WriteLine ($"  called View.LayoutComplete {laidOutCount} times.");
 
-        // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
-
         return;
 
         void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
-            if (a.CurrentValue)
+            if (a.Value)
             {
                 lock (_timeoutLock)
                 {
@@ -113,7 +106,7 @@ public class ScenariosStressTests : TestsAllViews
                                      {
                                          refreshedCount++;
 
-                                         if (args.CurrentValue)
+                                         if (args.Value)
                                          {
                                              updatedCount++;
                                          }
@@ -131,7 +124,7 @@ public class ScenariosStressTests : TestsAllViews
                 stopwatch!.Stop ();
             }
 
-            _output.WriteLine ($"Initialized == {a.CurrentValue}");
+            _output.WriteLine ($"Initialized == {a.Value}");
         }
 
         void OnApplicationOnIteration (object? s, IterationEventArgs a)

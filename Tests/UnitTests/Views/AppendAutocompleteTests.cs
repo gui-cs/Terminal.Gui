@@ -10,10 +10,12 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
     public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
     {
         TextField tf = GetTextFieldsInViewSuggesting ("fish");
-        View.SetClipToScreen ();
+
         // f is typed and suggestion is "fish"
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
+        View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -22,8 +24,8 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('e', ConsoleKey.Escape, false, false, false);
 
         // Suggestion should disappear
-        View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         DriverAssert.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f", tf.Text);
 
@@ -46,6 +48,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -54,16 +57,16 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('\0', ConsoleKey.Escape, false, false, false);
 
         // Suggestion should disappear
-        View.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f", tf.Text);
 
         // Should reappear when you press next letter
         Application.Driver?.SendKeys ('i', ConsoleKey.I, false, false, false);
-        tf.PositionCursor ();
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
+        tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("fi", tf.Text);
         Application.Top.Dispose ();
@@ -81,6 +84,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -90,6 +94,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("friend", output);
         Assert.Equal ("f", tf.Text);
@@ -98,6 +103,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys (' ', cycleKey, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -114,6 +120,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -139,6 +146,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -160,10 +168,11 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new List<string> { "FISH" };
+        generator.AllSuggestions = new() { "FISH" };
 
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("", output);
         tf.NewKeyDownEvent (Key.M);
@@ -175,6 +184,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         // Even though there is no match on case we should still get the suggestion
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("my fISH", output);
         Assert.Equal ("my f", tf.Text);
@@ -196,17 +206,19 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new List<string> { "fish" };
+        generator.AllSuggestions = new() { "fish" };
 
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
-        tf.NewKeyDownEvent (new Key ('f'));
+        tf.NewKeyDownEvent (new ('f'));
 
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
@@ -240,6 +252,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
+        View.SetClipToScreen ();
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre (expectRender, output);
         Assert.Equal ("f", tf.Text);

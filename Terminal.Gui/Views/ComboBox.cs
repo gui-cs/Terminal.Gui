@@ -8,7 +8,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
 public class ComboBox : View, IDesignable
@@ -39,7 +39,7 @@ public class ComboBox : View, IDesignable
         _listview.Accepting += (sender, args) =>
                               {
                                   // This prevents Accepted from bubbling up to the combobox
-                                  args.Cancel = true;
+                                  args.Handled = true;
 
                                   // But OpenSelectedItem won't be fired because of that. So do it here.
                                   SelectText ();
@@ -80,11 +80,7 @@ public class ComboBox : View, IDesignable
         // Things this view knows how to do
         AddCommand (Command.Accept, (ctx) =>
                                     {
-                                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
-                                        {
-                                            return false;
-                                        }
-                                        if (keyCommandContext.Binding.Data == _search)
+                                        if (ctx?.Source == _search)
                                         {
                                             return null;
                                         }
@@ -93,8 +89,8 @@ public class ComboBox : View, IDesignable
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
-        AddCommand (Command.Down, () => MoveDown ());
-        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, MoveDown);
+        AddCommand (Command.Up, MoveUp);
         AddCommand (Command.PageDown, () => PageDown ());
         AddCommand (Command.PageUp, () => PageUp ());
         AddCommand (Command.Start, () => MoveHome ());
@@ -114,16 +110,11 @@ public class ComboBox : View, IDesignable
         KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
     }
 
-    /// <inheritdoc/>
-    public new ColorScheme ColorScheme
+    /// <inheritdoc />
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
     {
-        get => base.ColorScheme;
-        set
-        {
-            _listview.ColorScheme = value;
-            base.ColorScheme = value;
-            SetNeedsDraw ();
-        }
+        _listview.SetScheme(args.NewValue);
+        return base.OnSettingScheme (args);
     }
 
     /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>
@@ -140,18 +131,15 @@ public class ComboBox : View, IDesignable
     public bool ReadOnly
     {
         get => _search.ReadOnly;
-        set
-        {
-            _search.ReadOnly = value;
+        set => _search.ReadOnly = value;
 
-            if (_search.ReadOnly)
-            {
-                if (_search.ColorScheme is { })
-                {
-                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
-                }
-            }
-        }
+        //if (_search.ReadOnly)
+        //{
+        //    if (_search.Scheme is { })
+        //    {
+        //        _search.Scheme = new Scheme (_search.Scheme) { Normal = _search.Scheme.Focus };
+        //    }
+        //}
     }
 
     /// <summary>Current search text</summary>
@@ -306,10 +294,7 @@ public class ComboBox : View, IDesignable
             return true;
         }
 
-        if (ColorScheme != null)
-        {
-            SetAttribute (ColorScheme.Focus);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Focus : VisualRole.Disabled);
         AddRune (Viewport.Right - 1, 0, Glyphs.DownArrow);
 
         return true;
@@ -511,7 +496,7 @@ public class ComboBox : View, IDesignable
         }
 
         Reset (true);
-        _listview.ClearViewport ();
+        _listview.ClearViewport (null);
         _listview.TabStop = TabBehavior.NoStop;
         SuperView?.MoveSubViewToStart (this);
 
@@ -812,7 +797,7 @@ public class ComboBox : View, IDesignable
         _listview.SetSource (_searchSet);
         _listview.ResumeSuspendCollectionChangedEvent ();
 
-        _listview.ClearViewport ();
+        _listview.ClearViewport (null);
         _listview.Height = CalculateHeight ();
         SuperView?.MoveSubViewToStart (this);
     }
@@ -894,7 +879,7 @@ public class ComboBox : View, IDesignable
 
         protected override bool OnDrawingContent ()
         {
-            Attribute current = ColorScheme?.Focus ?? Attribute.Default;
+            Attribute current = GetAttributeForRole (VisualRole.Focus);
             SetAttribute (current);
             Move (0, 0);
             Rectangle f = Frame;
@@ -912,15 +897,15 @@ public class ComboBox : View, IDesignable
 
                 if (isHighlighted || (isSelected && !_hideDropdownListOnClick))
                 {
-                    newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
+                    newcolor = focused ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else if (isSelected && _hideDropdownListOnClick)
                 {
-                    newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+                    newcolor = focused ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else
                 {
-                    newcolor = focused ? GetNormalColor () : GetNormalColor ();
+                    newcolor = GetAttributeForRole (VisualRole.Normal);
                 }
 
                 if (newcolor != current)

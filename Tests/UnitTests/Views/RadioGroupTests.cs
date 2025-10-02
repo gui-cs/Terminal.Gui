@@ -600,8 +600,8 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void SelectedItemChanged_Event ()
     {
-        int previousSelectedItem = -1;
-        int selectedItem = -1;
+        int? previousSelectedItem = -1;
+        int? selectedItem = -1;
         var rg = new RadioGroup { RadioLabels = ["Test", "New Test"] };
 
         rg.SelectedItemChanged += (s, e) =>
@@ -689,7 +689,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.Accepting += (s, e) =>
                              {
                                  acceptedCount++;
-                                 e.Cancel = handleAccepted;
+                                 e.Handled = handleAccepted;
                              };
 
         Assert.True (radioGroup.DoubleClickAccepts);
@@ -742,7 +742,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         superView.Accepting += (s, a) =>
                             {
                                 superViewAcceptCount++;
-                                a.Cancel = true;
+                                a.Handled = true;
                             };
 
         Assert.Equal (0, superViewAcceptCount);

@@ -628,7 +628,7 @@ public class ToScreenTests ()
         {
             Width = 10,
             Height = 10,
-            ViewportSettings = ViewportSettings.AllowNegativeLocation
+            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation
         };
         view.Layout ();
 

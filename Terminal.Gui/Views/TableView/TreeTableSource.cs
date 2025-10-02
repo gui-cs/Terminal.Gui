@@ -1,4 +1,5 @@
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>
 /// <typeparam name="T"></typeparam>
@@ -87,8 +88,8 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         Branch<T> branch = RowToBranch (row);
 
         // Everything on line before the expansion run and branch text
-        Rune [] prefix = branch.GetLinePrefix (Application.Driver).ToArray ();
-        Rune expansion = branch.GetExpandableSymbol (Application.Driver);
+        Rune [] prefix = branch.GetLinePrefix ().ToArray ();
+        Rune expansion = branch.GetExpandableSymbol ();
         string lineBody = _tree.AspectGetter (branch.Model) ?? "";
 
         var sb = new StringBuilder ();

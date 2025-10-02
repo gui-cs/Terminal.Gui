@@ -1,7 +1,8 @@
 ﻿// These classes use a keybinding system based on the design implemented in Scintilla.Net which is an
 // MIT licensed open source project https://github.com/jacobslusser/ScintillaNET/blob/master/src/ScintillaNET/Command.cs
 
-namespace Terminal.Gui;
+
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Actions which can be performed by a <see cref="View"/>.
@@ -10,10 +11,20 @@ namespace Terminal.Gui;
 /// <seealso cref="View.MouseBindings"/>
 /// <seealso cref="Application.KeyBindings"/>
 /// <remarks>
-///     <see cref="Application"/> supports a subset of these commands by default, which can be overriden via <see cref="Application.KeyBindings"/>.
+///     <para>
+///         <see cref="Application"/> supports a subset of these commands by default, which can be overriden via <see cref="Application.KeyBindings"/>.
+///     </para>
+///     <para>
+///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/command.html"/>.
+///     </para>
 /// </remarks>
 public enum Command
 {
+    /// <summary>
+    ///     Indicates the command is not bound or invalid. Will call <see cref="View.RaiseCommandNotBound"/>.
+    /// </summary>
+    NotBound = 0,
+
     #region Base View Commands
 
     /// <summary>
@@ -269,6 +280,9 @@ public enum Command
 
     /// <summary>Tabs back to the previous item.</summary>
     BackTab,
+
+    /// <summary>Enables arrange mode.</summary>
+    Arrange,
 
     #endregion
 

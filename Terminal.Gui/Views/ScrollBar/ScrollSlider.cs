@@ -2,18 +2,13 @@
 
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     The ScrollSlider can be dragged with the mouse, constrained by the size of the Viewport of it's superview. The
-///     ScrollSlider can be
+///     Represents the proportion of the visible content to the Viewport in a <see cref="ScrollBar"/>.
+///     Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be
 ///     oriented either vertically or horizontally.
 /// </summary>
-/// <remarks>
-///     <para>
-///         Used to represent the proportion of the visible content to the Viewport in a <see cref="Scrolled"/>.
-///     </para>
-/// </remarks>
 public class ScrollSlider : View, IOrientation, IDesignable
 {
     /// <summary>
@@ -31,7 +26,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
         OnOrientationChanged (Orientation);
 
-        HighlightStyle = HighlightStyle.Hover;
+        HighlightStates = ViewBase.MouseState.In;
     }
 
     #region IOrientation members
@@ -241,7 +236,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
         OnScrolled (distance);
         Scrolled?.Invoke (this, new (in distance));
 
-        RaiseSelecting (new CommandContext<KeyBinding> (Command.Select, new KeyBinding ([Command.Select], null, distance)));
+        RaiseSelecting (new CommandContext<KeyBinding> (Command.Select, this, new KeyBinding ([Command.Select], null, distance)));
     }
 
     /// <summary>
@@ -267,10 +262,19 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     public event EventHandler<EventArgs<int>>? Scrolled;
 
-    /// <inheritdoc/>
-    public override Attribute GetNormalColor () { return base.GetHotNormalColor (); }
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (role == VisualRole.Normal)
+        {
+            currentAttribute = GetAttributeForRole (VisualRole.HotNormal);
 
-    ///// <inheritdoc/>
+            return true;
+        }
+
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+    }
+
     private int _lastLocation = -1;
 
     /// <summary>

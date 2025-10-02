@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an
+///     Provides a scrollable list of data where each item can be activated to perform an
 ///     action.
 /// </summary>
 /// <remarks>
@@ -234,7 +234,7 @@ public class ListView : View, IDesignable
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
     ///     user types.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator();
 
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>
@@ -723,8 +723,7 @@ public class ListView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        Attribute current = ColorScheme?.Focus ?? Attribute.Default;
-        SetAttribute (current);
+        Attribute current = Attribute.Default;
         Move (0, 0);
         Rectangle f = Viewport;
         int item = Viewport.Y;
@@ -736,13 +735,13 @@ public class ListView : View, IDesignable
         {
             bool isSelected = item == _selected;
 
-            Attribute newcolor = focused ? isSelected ? ColorScheme.Focus : GetNormalColor () :
-                                 isSelected ? ColorScheme.HotNormal : GetNormalColor ();
+            Attribute newAttribute = focused ? isSelected ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal) :
+                                 isSelected ? GetAttributeForRole (VisualRole.Active) : GetAttributeForRole (VisualRole.Normal);
 
-            if (newcolor != current)
+            if (newAttribute != current)
             {
-                SetAttribute (newcolor);
-                current = newcolor;
+                SetAttribute (newAttribute);
+                current = newAttribute;
             }
 
             Move (0, row);
@@ -807,34 +806,21 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnKeyDown (Key a)
+    protected override bool OnKeyDown (Key key)
     {
-        // If marking is enabled and the user presses the space key don't let CollectionNavigator
-        // at it
-        if (AllowsMarking)
+        // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        if (KeyBindings.TryGet (key, out _))
         {
-            var keys = KeyBindings.GetAllFromCommands (Command.Select);
-
-            if (keys.Contains (a))
-            {
-                return false;
-            }
-
-            keys = KeyBindings.GetAllFromCommands ([Command.Select, Command.Down]);
-
-            if (keys.Contains (a))
-            {
-                return false;
-            }
-
+            return false;
         }
 
         // Enable user to find & select an item by typing text
-        if (CollectionNavigatorBase.IsCompatibleKey (a))
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key))
         {
-            int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a);
+            int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)key);
 
-            if (newItem is int && newItem != -1)
+            if (newItem is { } && newItem != -1)
             {
                 SelectedItem = (int)newItem;
                 EnsureSelectedItemVisible ();
@@ -869,23 +855,8 @@ public class ListView : View, IDesignable
         return false;
     }
 
-    /// <summary>This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.</summary>
+    /// <summary>This event is raised when the user Double-Clicks on an item or presses ENTER to open the selected item.</summary>
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
-
-    ///// <inheritdoc/>
-    //public override Point? PositionCursor ()
-    //{
-    //    int x = 0;
-    //    int y = _selected - Viewport.Y;
-    //    if (!_allowsMarking)
-    //    {
-    //        x = Viewport.Width - 1;
-    //    }
-
-    //    Move (x, y);
-
-    //    return null; // Don't show the cursor
-    //}
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs> RowRender;

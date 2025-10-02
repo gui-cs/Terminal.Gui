@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Provides a collection of <see cref="MouseFlags"/> bound to <see cref="Command"/>s.
@@ -24,6 +24,9 @@ public record struct MouseBinding : IInputBinding
 
     /// <summary>The commands this binding will invoke.</summary>
     public Command [] Commands { get; set; }
+
+    /// <inheritdoc />
+    public object? Data { get; set; }
 
     /// <summary>
     ///     The mouse event arguments.

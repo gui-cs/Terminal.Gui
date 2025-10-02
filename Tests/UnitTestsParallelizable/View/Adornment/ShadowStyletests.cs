@@ -1,5 +1,7 @@
 ﻿namespace Terminal.Gui.ViewTests;
 
+[Collection ("Global Test Setup")]
+
 public class ShadowStyleTests
 {
     [Fact]
@@ -42,7 +44,7 @@ public class ShadowStyleTests
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             Text = "0123",
-            HighlightStyle = HighlightStyle.Pressed,
+            HighlightStates = MouseState.Pressed,
             ShadowStyle = style,
             CanFocus = true
         };

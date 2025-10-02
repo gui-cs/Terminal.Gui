@@ -4,7 +4,7 @@ This control supports viewing and editing tabular data. It provides a view of a 
 
 System.DataTable is a core class of .net standard and can be created very easily
 
-[TableView API Reference](~/api/Terminal.Gui.TableView.yml)
+[TableView API Reference](~/api/Terminal.Gui.Views.TableView.yml)
 
 ## Csv Example
 
@@ -78,7 +78,7 @@ TableView supports any size of table. You can have thousands of columns and/or m
 Horizontal and vertical scrolling can be done using the mouse or keyboard.
 
 TableView uses `ColumnOffset` and `RowOffset` to determine the first visible cell of the `System.DataTable`.
-Rendering then continues until the avaialble console space is exhausted. Updating the `ColumnOffset` and 
+Rendering then continues until the available console space is exhausted. Updating the `ColumnOffset` and 
 `RowOffset` changes which part of the table is rendered (scrolls the viewport).
 
 This approach ensures that no matter how big the table, only a small number of columns/rows need to be

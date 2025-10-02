@@ -37,7 +37,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
     ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
-    /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
@@ -45,7 +44,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigLocations configLocation = ConfigLocations.Default, // DefaultOnly is the default for tests
         bool verifyShutdown = false
     )
     {
@@ -53,11 +51,9 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         _driverType = consoleDriverType ?? typeof (FakeDriver);
         FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-        ConfigurationManager.Locations = configLocation;
         _verifyShutdown = verifyShutdown;
     }
 
@@ -105,22 +101,25 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
         }
 
-        // Reset to defaults
-        ConfigurationManager.Locations = ConfigLocations.Default;
-        ConfigurationManager.Reset ();
+        Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
 
-        // Enable subsequent tests that call Init to get all config files (the default).
-        //Locations = ConfigLocations.All;
+        // Force the ConfigurationManager to reset to its hardcoded defaults
+        CM.Disable(true);
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
+        // Disable & force the ConfigurationManager to reset to its hardcoded defaults
+        CM.Disable (true);
+
+        //Debug.Assert(!CM.IsEnabled, "Some other test left ConfigurationManager enabled.");
+
         if (AutoInit)
         {
 #if DEBUG_IDISPOSABLE
-            View.DebugIDisposable = true;
+            View.EnableDebugIDisposableAsserts = true;
 
             // Clear out any lingering Responder instances from previous tests
             if (View.Instances.Count == 0)

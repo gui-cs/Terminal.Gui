@@ -205,7 +205,7 @@ public class ShortcutTests
         var checkboxSelected = 0;
         shortcut.CommandView.Selecting += (s, e) =>
                                          {
-                                             if (e.Cancel)
+                                             if (e.Handled)
                                              {
                                                  return;
                                              }
@@ -226,7 +226,7 @@ public class ShortcutTests
         shortcut.Accepting += (s, e) =>
                              {
                                  accepted++;
-                                 e.Cancel = true;
+                                 e.Handled = true;
                              };
 
         Application.RaiseMouseEvent (
@@ -326,7 +326,7 @@ public class ShortcutTests
         shortcut.Accepting += (s, e) =>
                              {
                                  accepted++;
-                                 e.Cancel = true;
+                                 e.Handled = true;
                              };
 
         var selected = 0;
@@ -454,19 +454,21 @@ public class ShortcutTests
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3664
     [Fact]
-    public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
+    public void Scheme_SetScheme_Does_Not_Fault_3664 ()
     {
         Application.Top = new ();
         Application.Navigation = new ();
         var shortcut = new Shortcut ();
 
-        Application.Top.ColorScheme = null;
+        Application.Top.SetScheme (null);
 
-        Assert.Null (shortcut.ColorScheme);
+        Assert.False (shortcut.HasScheme);
+        Assert.NotNull (shortcut.GetScheme ());
 
         shortcut.HasFocus = true;
 
-        Assert.NotNull (shortcut.ColorScheme);
+        Assert.False (shortcut.HasScheme);
+        Assert.NotNull (shortcut.GetScheme ());
 
         Application.Top.Dispose ();
         Application.ResetState ();

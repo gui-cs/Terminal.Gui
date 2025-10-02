@@ -20,11 +20,13 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
+
+        Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
+
         base.After (methodUnderTest);
 
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-
+        Assert.True (View.EnableDebugIDisposableAsserts);
         Assert.Empty (View.Instances);
 #endif
     }
@@ -35,7 +37,7 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
 
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
         // Clear out any lingering Responder instances from previous tests
         View.Instances.Clear ();
         Assert.Empty (View.Instances);

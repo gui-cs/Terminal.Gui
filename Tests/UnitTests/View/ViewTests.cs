@@ -10,9 +10,6 @@ public class ViewTests
     public ViewTests (ITestOutputHelper output)
     {
         _output = output;
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
     }
 
     // Generic lifetime (IDisposable) tests
@@ -212,7 +209,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.ColorScheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemesForCurrentTheme () ["Base"]);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
         Assert.Equal (0, r.X);
@@ -236,7 +235,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.ColorScheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemesForCurrentTheme () ["Base"]);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
         Assert.Equal (0, r.X);
@@ -260,7 +261,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 3, 4), r.Viewport);
         Assert.Equal (new (1, 2, 3, 4), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.ColorScheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemesForCurrentTheme () ["Base"]);
         Assert.Equal (3, r.Width);
         Assert.Equal (4, r.Height);
         Assert.Equal (1, r.X);
@@ -293,13 +296,11 @@ public class ViewTests
         Assert.Equal (new (0, 0, 1, 13), r.Viewport);
         Assert.Equal (new (0, 0, 1, 13), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.ColorScheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemesForCurrentTheme () ["Base"]);
         Assert.False (r.IsCurrentTop);
-#if DEBUG
-        Assert.Equal ("Vertical View", r.Id);
-#else
         Assert.Equal (string.Empty, r.Id);
-#endif
         Assert.Empty (r.SubViews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
@@ -330,7 +331,7 @@ public class ViewTests
     [AutoInitShutdown]
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
-        var v = new View { Width = 11, Height = 3, ColorScheme = new () };
+        var v = new View { Width = 11, Height = 3 };
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };

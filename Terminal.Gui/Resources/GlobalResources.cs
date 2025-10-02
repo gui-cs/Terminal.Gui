@@ -4,7 +4,7 @@ using System.Collections;
 using System.Globalization;
 using System.Resources;
 
-namespace Terminal.Gui.Resources;
+namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Provide static access to the ResourceManagerWrapper
@@ -66,5 +66,5 @@ public static class GlobalResources
     /// <param name="name"></param>
     /// <param name="culture"></param>
     /// <returns>Null if the resource was not found in the current culture or the invariant culture.</returns>
-    public static string GetString (string name, CultureInfo? culture = null!) { return _resourceManagerWrapper.GetString (name, culture); }
+    public static string? GetString (string name, CultureInfo? culture = null!) { return _resourceManagerWrapper.GetString (name, culture); }
 }

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>A straight line control either horizontal or vertical</summary>
 public class LineView : View
@@ -57,7 +58,7 @@ public class LineView : View
     protected override bool OnDrawingContent ()
     {
         Move (0, 0);
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         int hLineWidth = Math.Max (1, Glyphs.HLine.GetColumns ());
 

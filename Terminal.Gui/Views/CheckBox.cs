@@ -1,14 +1,20 @@
 ﻿#nullable enable
-namespace Terminal.Gui;
 
-/// <summary>Shows a check box that can be cycled between two or three states.</summary>
+namespace Terminal.Gui.Views;
+
+/// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
+/// <remarks>
+///     <para>
+///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
+///     </para>
+/// </remarks>
 public class CheckBox : View
 {
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed | HighlightStyle.Hover;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static MouseState DefaultHighlightStates { get; set; } = MouseState.PressedOutside | MouseState.Pressed | MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
@@ -40,7 +46,7 @@ public class CheckBox : View
 
         TitleChanged += Checkbox_TitleChanged;
 
-        HighlightStyle = DefaultHighlightStyle;
+        HighlightStates = DefaultHighlightStates;
     }
 
     private bool? AdvanceAndSelect (ICommandContext? commandContext)
@@ -62,7 +68,7 @@ public class CheckBox : View
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
     {
-        base.Text = e.CurrentValue;
+        base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -146,7 +152,7 @@ public class CheckBox : View
             return null;
         }
 
-        CancelEventArgs<CheckState> e = new (in _checkedState, ref value);
+        ResultEventArgs<CheckState> e = new (value);
 
         if (OnCheckedStateChanging (e))
         {
@@ -155,9 +161,9 @@ public class CheckBox : View
 
         CheckedStateChanging?.Invoke (this, e);
 
-        if (e.Cancel)
+        if (e.Handled)
         {
-            return e.Cancel;
+            return e.Handled;
         }
 
         _checkedState = value;
@@ -175,10 +181,10 @@ public class CheckBox : View
     /// <summary>Called when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
     ///     <para>
-    ///         The state cahnge can be cancelled by setting the args.Cancel to <see langword="true"/>.
+    ///         The state change can be cancelled by setting the args.Cancel to <see langword="true"/>.
     ///     </para>
     /// </remarks>
-    protected virtual bool OnCheckedStateChanging (CancelEventArgs<CheckState> args) { return false; }
+    protected virtual bool OnCheckedStateChanging (ResultEventArgs<CheckState> args) { return false; }
 
     /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
@@ -186,7 +192,7 @@ public class CheckBox : View
     ///         This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
     ///     </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs<CheckState>>? CheckedStateChanging;
+    public event EventHandler<ResultEventArgs<CheckState>>? CheckedStateChanging;
 
     /// <summary>Called when the <see cref="CheckBox"/> state has changed.</summary>
     protected virtual void OnCheckedStateChanged (EventArgs<CheckState> args) { }
@@ -215,32 +221,32 @@ public class CheckBox : View
     public bool? AdvanceCheckState ()
     {
         CheckState oldValue = CheckedState;
-        CancelEventArgs<CheckState> e = new (in _checkedState, ref oldValue);
+        ResultEventArgs<CheckState> e = new (oldValue);
 
         switch (CheckedState)
         {
             case CheckState.None:
-                e.NewValue = CheckState.Checked;
+                e.Result = CheckState.Checked;
 
                 break;
             case CheckState.Checked:
-                e.NewValue = CheckState.UnChecked;
+                e.Result = CheckState.UnChecked;
 
                 break;
             case CheckState.UnChecked:
                 if (AllowCheckStateNone)
                 {
-                    e.NewValue = CheckState.None;
+                    e.Result = CheckState.None;
                 }
                 else
                 {
-                    e.NewValue = CheckState.Checked;
+                    e.Result = CheckState.Checked;
                 }
 
                 break;
         }
 
-        bool? cancelled = ChangeCheckedState (e.NewValue);
+        bool? cancelled = ChangeCheckedState (e.Result);
 
         return cancelled;
     }
@@ -250,22 +256,23 @@ public class CheckBox : View
     {
         base.UpdateTextFormatterText ();
 
+        Rune glyph = RadioStyle ? GetRadioGlyph () : GetCheckGlyph ();
         switch (TextAlignment)
         {
             case Alignment.Start:
             case Alignment.Center:
             case Alignment.Fill:
-                TextFormatter.Text = $"{GetCheckedGlyph ()} {Text}";
+                TextFormatter.Text = $"{glyph} {Text}";
 
                 break;
             case Alignment.End:
-                TextFormatter.Text = $"{Text} {GetCheckedGlyph ()}";
+                TextFormatter.Text = $"{Text} {glyph}";
 
                 break;
         }
     }
 
-    private Rune GetCheckedGlyph ()
+    private Rune GetCheckGlyph ()
     {
         return CheckedState switch
         {
@@ -274,5 +281,22 @@ public class CheckBox : View
             CheckState.None => Glyphs.CheckStateNone,
             _ => throw new ArgumentOutOfRangeException ()
         };
+    }
+
+    /// <summary>
+    ///     If <see langword="true"/>, the <see cref="CheckBox"/> will display radio button style glyphs (●) instead of
+    ///     checkbox style glyphs (☑).
+    /// </summary>
+    public bool RadioStyle { get; set; }
+
+    private Rune GetRadioGlyph ()
+    {
+        return CheckedState switch
+               {
+                   CheckState.Checked => Glyphs.Selected,
+                   CheckState.UnChecked => Glyphs.UnSelected,
+                   CheckState.None => Glyphs.Dot,
+                   _ => throw new ArgumentOutOfRangeException ()
+               };
     }
 }

@@ -597,7 +597,7 @@ public class MainLoopTests
         Assert.Empty (mainloop.TimedEvents.IdleHandlers);
 
         Assert.NotNull (
-                        new Timeout { Span = new (), Callback = () => true }
+                        new App.Timeout { Span = new (), Callback = () => true }
                        );
     }
 

@@ -2,6 +2,8 @@
 
 namespace Terminal.Gui.ViewsTests;
 
+[Collection ("Global Test Setup")]
+
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
 {
@@ -420,7 +422,7 @@ public class ShortcutTests
         Assert.False (shortcut.CommandView.CanFocus);
 
         shortcut.CommandView = new () { CanFocus = true };
-        Assert.False (shortcut.CommandView.CanFocus);
+        Assert.True (shortcut.CommandView.CanFocus);
 
         shortcut.CommandView.CanFocus = true;
         Assert.True (shortcut.CommandView.CanFocus);
@@ -437,18 +439,4 @@ public class ShortcutTests
         Assert.False (shortcut.CanFocus);
         Assert.True (shortcut.CommandView.CanFocus);
     }
-
-    [Fact]
-    public void ColorScheme_SetsAndGetsCorrectly ()
-    {
-        var colorScheme = new ColorScheme ();
-
-        var shortcut = new Shortcut
-        {
-            ColorScheme = colorScheme
-        };
-
-        Assert.Same (colorScheme, shortcut.ColorScheme);
-    }
-
 }

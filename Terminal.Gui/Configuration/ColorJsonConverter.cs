@@ -1,8 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ColorHelper;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 /// Json converter for the <see cref="Color"/> class.
@@ -40,11 +39,9 @@ internal class ColorJsonConverter : JsonConverter<Color>
             // Get the color string
             ReadOnlySpan<char> colorString = reader.GetString ();
 
-            // Check if the color string is a color name
-            if (ColorStrings.TryParseW3CColorName (colorString.ToString (), out Color color1))
+            if (ColorStrings.TryParseNamedColor (colorString, out Color namedColor))
             {
-                // Return the parsed color
-                return new (color1);
+                return namedColor;
             }
 
             if (Color.TryParse (colorString, null, out Color parsedColor))

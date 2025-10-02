@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -487,7 +488,7 @@ Item 6",
         void Accepted (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 

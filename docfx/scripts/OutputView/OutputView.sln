@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.35906.104 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputView", "OutputView.csproj", "{DE15A308-8649-94BA-072D-8F2D35DAA789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui", "..\..\..\Terminal.Gui\Terminal.Gui.csproj", "{4DB1A280-EA90-4E91-80BE-D17A627AEC65}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE15A308-8649-94BA-072D-8F2D35DAA789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE15A308-8649-94BA-072D-8F2D35DAA789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE15A308-8649-94BA-072D-8F2D35DAA789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE15A308-8649-94BA-072D-8F2D35DAA789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DB1A280-EA90-4E91-80BE-D17A627AEC65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DB1A280-EA90-4E91-80BE-D17A627AEC65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DB1A280-EA90-4E91-80BE-D17A627AEC65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DB1A280-EA90-4E91-80BE-D17A627AEC65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6EAC099-6A1E-462C-9D34-C8C4D21CD91C}
+	EndGlobalSection
+EndGlobal

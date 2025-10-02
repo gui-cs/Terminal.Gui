@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.EnumExtensions;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.InputTests;
 

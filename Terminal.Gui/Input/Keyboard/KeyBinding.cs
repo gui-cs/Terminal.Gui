@@ -1,15 +1,16 @@
 ﻿#nullable enable
 
+
 // These classes use a key binding system based on the design implemented in Scintilla.Net which is an
 // MIT licensed open source project https://github.com/jacobslusser/ScintillaNET/blob/master/src/ScintillaNET/Command.cs
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 /// Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>.
 /// </summary>
-/// <seealso cref="Application.KeyBindings"/>
-/// <seealso cref="View.KeyBindings"/>
+/// <seealso cref="KeyBindings"/>
+/// <seealso cref="KeyBindings"/>
 /// <seealso cref="Command"/>
 public record struct KeyBinding : IInputBinding
 {
@@ -36,6 +37,9 @@ public record struct KeyBinding : IInputBinding
     /// <summary>The commands this key binding will invoke.</summary>
     public Command [] Commands { get; set; }
 
+    /// <inheritdoc />
+    public object? Data { get; set; }
+
     /// <summary>
     ///     The Key that is bound to the <see cref="Commands"/>.
     /// </summary>
@@ -43,9 +47,4 @@ public record struct KeyBinding : IInputBinding
 
     /// <summary>The view the key binding is bound to.</summary>
     public View? Target { get; set; }
-
-    /// <summary>
-    ///     Arbitrary context that can be associated with this key binding.
-    /// </summary>
-    public object? Data { get; set; }
 }

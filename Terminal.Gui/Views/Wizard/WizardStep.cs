@@ -1,5 +1,6 @@
-﻿#nullable enable 
-namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is
@@ -163,10 +164,12 @@ public class WizardStep : View
 
     /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
-    public override void RemoveAll ()
+    public override IReadOnlyCollection<View> RemoveAll ()
     {
-        _contentView.RemoveAll ();
+        IReadOnlyCollection<View> removed = _contentView.RemoveAll ();
         ShowHide ();
+
+        return removed;
     }
 
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>

@@ -1,0 +1,93 @@
+{
+  "profiles": {
+    "UICatalog": {
+      "commandName": "Project",
+      "commandLineArgs": "--debug-log-level Debug"
+    },
+    "UICatalog --driver NetDriver": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver NetDriver"
+    },
+    "UICatalog --driver WindowsDriver": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver WindowsDriver"
+    },
+    "UICatalog --driver v2": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2 -dl Trace"
+    },
+    "UICatalog --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2win -dl Trace"
+    },
+    "UICatalog --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net -dl Trace"
+    },
+    "WSL: UICatalog": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll",
+      "distributionName": ""
+    },
+    "WSL: UICatalog --driver NetDriver": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver NetDriver",
+      "distributionName": ""
+    },
+    "WSL: UICatalog --driver v2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2",
+      "distributionName": ""
+    },
+    "WSL: UICatalog --driver v2net": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2net",
+      "distributionName": ""
+    },
+    "Benchmark All": {
+      "commandName": "Project",
+      "commandLineArgs": "--benchmark"
+    },
+    "Benchmark All --driver NetDriver": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver NetDriver --benchmark"
+    },
+    "Benchmark All --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2win --benchmark"
+    },
+    "Benchmark All --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net --benchmark"
+    },
+    "WSL: Benchmark All": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --benchmark",
+      "distributionName": ""
+    },
+    "Docker": {
+      "commandName": "Docker"
+    },
+    "All Views Tester": {
+      "commandName": "Project",
+      "commandLineArgs": "\"All Views Tester\" -b -t 5000"
+    },
+    "UICatalog --disable-cm": {
+      "commandName": "Project",
+      "commandLineArgs": "--disable-cm\r\n"
+    },
+    "UICatalog --disable-cm --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--disable-cm --driver v2win"
+    },
+    "Themes": {
+      "commandName": "Project",
+      "commandLineArgs": "Themes"
+    }
+  }
+}

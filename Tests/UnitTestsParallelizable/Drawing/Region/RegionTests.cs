@@ -783,6 +783,46 @@ public class RegionTests
         Assert.True (region1.Contains (40, 40));
     }
 
+    [Fact]
+    public void Union_Third_Rect_Covering_Two_Disjoint_Merges ()
+    {
+        var origRegion = new Region ();
+
+        var region1 = new Region (new (0, 0, 1, 1));
+        var region2 = new Region (new (1, 0, 1, 1));
+
+        origRegion.Union (region1);
+        origRegion.Union (region2);
+
+        Assert.Equal (new Rectangle (0, 0, 2, 1), origRegion.GetBounds ());
+        Assert.Equal (2, origRegion.GetRectangles ().Length);
+
+        origRegion.Union (new Region (new (0, 0, 4, 1)));
+
+        Assert.Equal (new Rectangle (0, 0, 4, 1), origRegion.GetBounds ());
+        Assert.Equal (3, origRegion.GetRectangles ().Length);
+    }
+
+    [Fact]
+    public void MinimalUnion_Third_Rect_Covering_Two_Disjoint_Merges ()
+    {
+        var origRegion = new Region ();
+
+        var region1 = new Region (new (0, 0, 1, 1));
+        var region2 = new Region (new (1, 0, 1, 1));
+
+        origRegion.Union (region1);
+        origRegion.Union (region2);
+
+        Assert.Equal (new Rectangle (0, 0, 2, 1), origRegion.GetBounds ());
+        Assert.Equal (2, origRegion.GetRectangles ().Length);
+
+        origRegion.MinimalUnion (new Region (new (0, 0, 4, 1)));
+
+        Assert.Equal (new Rectangle (0, 0, 4, 1), origRegion.GetBounds ());
+        Assert.Single (origRegion.GetRectangles ());
+    }
+
     /// <summary>
     ///     Proves MergeRegion does not overly combine regions.
     /// </summary>
@@ -888,6 +928,180 @@ public class RegionTests
         Assert.Contains (new (2, 0, 0, 1), result);
     }
 
+    [Fact]
+    public void MergeRectangles_Sort_Handles_Coincident_Events_Without_Crashing ()
+    {
+        // Arrange: Create rectangles designed to produce coincident start/end events
+        // Rect1 ends at x=10. Rect2 and Rect3 start at x=10.
+        // Rect4 ends at x=15. Rect5 starts at x=15.
+        var rect1 = new Rectangle (0, 0, 10, 10); // Ends at x=10
+        var rect2 = new Rectangle (10, 0, 10, 5); // Starts at x=10
+        var rect3 = new Rectangle (10, 5, 10, 5); // Starts at x=10, adjacent to rect2 vertically
+        var rect4 = new Rectangle (5, 10, 10, 5); // Ends at x=15
+        var rect5 = new Rectangle (15, 10, 5, 5); // Starts at x=15
 
+        var combinedList = new List<Rectangle> { rect1, rect2, rect3, rect4, rect5 };
+
+        // Act & Assert:
+        // The core assertion is that calling MergeRectangles with this list
+        // does *not* throw the ArgumentException related to sorting.
+        var exception = Record.Exception (() => Region.MergeRectangles (combinedList, false));
+
+        // Assert
+        Assert.Null (exception);
+
+        // Optional secondary assertion: Check if the merge produced a reasonable number of rectangles
+        // This isn't strictly necessary for proving the sort fix, but can be useful.
+        // var merged = Region.MergeRectangles(combinedList, false);
+        // Assert.True(merged.Count > 0 && merged.Count <= combinedList.Count);
+    }
+
+    [Fact]
+    public void MergeRectangles_Sort_Handles_Multiple_Coincident_Starts ()
+    {
+        // Arrange: Multiple rectangles starting at the same X
+        var rect1 = new Rectangle (5, 0, 10, 5);
+        var rect2 = new Rectangle (5, 5, 10, 5);
+        var rect3 = new Rectangle (5, 10, 10, 5);
+        var combinedList = new List<Rectangle> { rect1, rect2, rect3 };
+
+        // Act & Assert: Ensure no sorting exception
+        var exception = Record.Exception (() => Region.MergeRectangles (combinedList, false));
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    public void MergeRectangles_Sort_Handles_Multiple_Coincident_Ends ()
+    {
+        // Arrange: Multiple rectangles ending at the same X
+        var rect1 = new Rectangle (0, 0, 10, 5);
+        var rect2 = new Rectangle (0, 5, 10, 5);
+        var rect3 = new Rectangle (0, 10, 10, 5);
+        var combinedList = new List<Rectangle> { rect1, rect2, rect3 };
+
+        // Act & Assert: Ensure no sorting exception
+        var exception = Record.Exception (() => Region.MergeRectangles (combinedList, false));
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    public void MergeRectangles_Sort_Handles_Coincident_Mixed_Events_Without_Crashing ()
+    {
+        // Arrange: Create rectangles specifically designed to produce multiple
+        // Start AND End events at the same x-coordinate (e.g., x=10),
+        // mimicking the pattern observed in the crash log.
+        var rectA = new Rectangle (0, 0, 10, 5);  // Ends at x=10, y=[0, 5)
+        var rectB = new Rectangle (0, 10, 10, 5); // Ends at x=10, y=[10, 15)
+        var rectC = new Rectangle (10, 0, 10, 5); // Starts at x=10, y=[0, 5)
+        var rectD = new Rectangle (10, 10, 10, 5); // Starts at x=10, y=[10, 15)
+
+        // Add another set at a different X to increase complexity
+        var rectE = new Rectangle (5, 20, 10, 5); // Ends at x=15, y=[20, 25)
+        var rectF = new Rectangle (5, 30, 10, 5); // Ends at x=15, y=[30, 35)
+        var rectG = new Rectangle (15, 20, 10, 5); // Starts at x=15, y=[20, 25)
+        var rectH = new Rectangle (15, 30, 10, 5); // Starts at x=15, y=[30, 35)
+
+        // Add some unrelated rectangles
+        var rectI = new Rectangle (0, 40, 5, 5);
+        var rectJ = new Rectangle (100, 100, 5, 5);
+
+
+        var combinedList = new List<Rectangle> {
+            rectA, rectB, rectC, rectD,
+            rectE, rectF, rectG, rectH,
+            rectI, rectJ
+        };
+
+        // Act & Assert:
+        // Call MergeRectangles with the current code.
+        // This test *should* fail by throwing ArgumentException due to unstable sort.
+        var exception = Record.Exception (() => Region.MergeRectangles (combinedList, false));
+
+        // Assert that no exception was thrown (this assertion will fail with the current code)
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    public void MergeRectangles_Sort_Reproduces_UICatalog_Crash_Pattern_Directly ()
+    {
+        // Arrange: Rectangles derived *directly* from the events list that caused the crash at x=67
+        // This aims to replicate the exact problematic pattern.
+        var rect_End_67_7_30 = new Rectangle (60, 7, 7, 23);  // Ends at x=67, y=[7, 30) -> Event [33]
+        var rect_Start_67_2_30 = new Rectangle (67, 2, 10, 28); // Starts at x=67, y=[2, 30) -> Event [34]
+        var rect_Start_67_1_1 = new Rectangle (67, 1, 10, 0);  // Starts at x=67, y=[1, 1) -> Event [49] (Height 0)
+        var rect_End_67_1_1 = new Rectangle (60, 1, 7, 0);   // Ends at x=67, y=[1, 1) -> Event [64] (Height 0)
+
+        // Add rectangles for x=94/95 pattern
+        var rect_End_94_1_30 = new Rectangle (90, 1, 4, 29); // Ends at x=94, y=[1, 30) -> Event [55]
+        var rect_Start_94_1_1 = new Rectangle (94, 1, 10, 0); // Starts at x=94, y=[1, 1) -> Event [56]
+        var rect_Start_94_7_30 = new Rectangle (94, 7, 10, 23); // Starts at x=94, y=[7, 30) -> Event [58]
+
+        var rect_End_95_1_1 = new Rectangle (90, 1, 5, 0); // Ends at x=95, y=[1, 1) -> Event [57]
+        var rect_End_95_7_30 = new Rectangle (90, 7, 5, 23); // Ends at x=95, y=[7, 30) -> Event [59]
+        var rect_Start_95_0_30 = new Rectangle (95, 0, 10, 30); // Starts at x=95, y=[0, 30) -> Event [60]
+
+
+        var combinedList = new List<Rectangle> {
+            rect_End_67_7_30, rect_Start_67_2_30, rect_Start_67_1_1, rect_End_67_1_1,
+            rect_End_94_1_30, rect_Start_94_1_1, rect_Start_94_7_30,
+            rect_End_95_1_1, rect_End_95_7_30, rect_Start_95_0_30
+        };
+
+        // Act & Assert:
+        // Call MergeRectangles. This test is specifically designed to fail with the current code.
+        var exception = Record.Exception (() => Region.MergeRectangles (combinedList, false));
+
+        // Assert that no exception was thrown (this assertion *should* fail with the current code)
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    public void MergeRectangles_Sort_Reproduces_UICatalog_Crash_From_Captured_Data ()
+    {
+        // Arrange: The exact list of rectangles captured during the UICatalog crash
+        var rectanglesFromCrash = new List<Rectangle> {
+            new Rectangle(38, 7, 1, 11),
+            new Rectangle(39, 7, 5, 23),
+            new Rectangle(44, 7, 1, 23),
+            new Rectangle(45, 7, 6, 23),
+            new Rectangle(51, 7, 1, 23),
+            new Rectangle(52, 7, 1, 23),
+            new Rectangle(53, 7, 1, 23),
+            new Rectangle(54, 7, 1, 23),
+            new Rectangle(55, 7, 1, 23),
+            new Rectangle(56, 7, 1, 23),
+            new Rectangle(57, 7, 1, 23),
+            new Rectangle(58, 7, 1, 23),
+            new Rectangle(59, 7, 1, 23),
+            new Rectangle(60, 7, 1, 23),
+            new Rectangle(61, 7, 3, 23),
+            new Rectangle(64, 7, 1, 23),
+            new Rectangle(65, 7, 2, 23),
+            new Rectangle(67, 2, 2, 28),
+            new Rectangle(69, 2, 3, 28),
+            new Rectangle(72, 2, 3, 28),
+            new Rectangle(75, 2, 1, 28),
+            new Rectangle(76, 2, 2, 28),
+            new Rectangle(78, 2, 2, 28),
+            new Rectangle(80, 7, 1, 23),
+            new Rectangle(81, 1, 7, 29),
+            new Rectangle(88, 1, 1, 29),
+            new Rectangle(89, 1, 2, 29),
+            new Rectangle(91, 1, 3, 29),
+            new Rectangle(94, 1, 1, 0),   // Note: Zero height
+            new Rectangle(94, 7, 1, 23),
+            new Rectangle(95, 0, 1, 30),
+            new Rectangle(96, 0, 23, 30),
+            new Rectangle(67, 1, 0, 0)    // Note: Zero width and height
+        };
+
+        // Act & Assert:
+        // Call MergeRectangles with the current code.
+        // This test *should* fail by throwing ArgumentException due to unstable sort.
+        var exception = Record.Exception (() => Region.MergeRectangles (rectanglesFromCrash, false));
+
+        // Assert that no exception was thrown (this assertion will fail with the current code)
+        Assert.Null (exception);
+    }
 
 }

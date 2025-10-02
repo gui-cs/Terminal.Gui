@@ -45,7 +45,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
-		<ProjectReference Include="..\..\UICatalog\UICatalog.csproj" />
+		<ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="xunit.runner.json">
@@ -58,7 +58,6 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Input\Keyboard\" />
 		<Folder Include="Input\Mouse\" />
 	</ItemGroup>
 	<PropertyGroup Label="FineCodeCoverage">

@@ -1,7 +1,7 @@
-- name: Conceptual Docs & Deep Dives
+- name: Documentation
   href: docs/
 
-- name: API
+- name: API Reference
   href: api/
 
 - name: Source

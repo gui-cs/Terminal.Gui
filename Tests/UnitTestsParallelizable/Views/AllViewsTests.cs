@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
+[Collection ("Global Test Setup")]
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
@@ -25,6 +26,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
                 {
                     Assert.True (type.FullName == view.GetType ().FullName);
                 }
+
+                view?.Dispose ();
             }
 
             return true;
@@ -72,11 +75,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             Assert.Equal (1, selectingCount);
             Assert.Equal (0, acceptedCount);
         }
+        view?.Dispose ();
     }
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_Accept_Raises_Accepted (Type viewType)
+    public void AllViews_Command_Accept_Raises_Accepting (Type viewType)
     {
         var view = CreateInstanceIfNotGeneric (viewType);
 
@@ -95,14 +99,15 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         var selectingCount = 0;
         view.Selecting += (s, e) => selectingCount++;
 
-        var acceptedCount = 0;
-        view.Accepting += (s, e) => { acceptedCount++; };
+        var acceptingCount = 0;
+        view.Accepting += (s, e) => { acceptingCount++; };
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
             Assert.Equal (0, selectingCount);
-            Assert.Equal (1, acceptedCount);
+            Assert.Equal (1, acceptingCount);
         }
+        view?.Dispose ();
     }
 
     [Theory]
@@ -138,5 +143,40 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             Assert.Equal (1, handlingHotKeyCount);
             Assert.Equal (0, acceptedCount);
         }
+        view?.Dispose ();
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
+    {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        var mockDriver = new MockConsoleDriver ();
+        mockDriver.AttributeSet += (_, args) =>
+                                   {
+                                       if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
+                                       {
+                                           Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
+                                       }
+                                   };
+        view.Driver = mockDriver;
+        view.Enabled = false;
+        view.SetNeedsDraw ();
+        view.Draw ();
+
+        view?.Dispose ();
     }
 }

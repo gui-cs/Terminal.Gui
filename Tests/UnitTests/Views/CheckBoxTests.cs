@@ -169,6 +169,8 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         checkBox.AllowCheckStateNone = false;
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+
+        Application.ResetState();
     }
 
     [Fact]
@@ -244,7 +246,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         void ViewOnAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -311,7 +313,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.Accepting += (s, e) =>
                               {
                                   acceptCount++;
-                                  e.Cancel = true;
+                                  e.Handled = true;
                               };
 
         checkBox.HasFocus = true;
@@ -594,7 +596,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         void OnSelecting (object sender, CommandEventArgs e)
         {
             checkedInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -621,10 +623,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void OnCheckedStateChanging (object sender, CancelEventArgs e)
+        void OnCheckedStateChanging (object sender, ResultEventArgs<CheckState> e)
         {
             checkedInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 }

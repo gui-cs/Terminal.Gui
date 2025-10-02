@@ -1,5 +1,6 @@
 ﻿namespace Terminal.Gui.ViewTests;
 
+[Collection ("Global Test Setup")]
 public class SubViewTests
 {
     [Fact]
@@ -115,6 +116,40 @@ public class SubViewTests
 
         view.Remove (subview);
         Assert.Equal (new (5, 5), view.GetContentSize ());
+    }
+
+    [Theory]
+    [InlineData (ViewArrangement.Fixed)]
+    [InlineData (ViewArrangement.Overlapped)]
+    public void MoveSubViewToEnd_ViewArrangement (ViewArrangement arrangement)
+    {
+        View superView = new () { Arrangement = arrangement };
+
+        var subview1 = new View
+        {
+            Id = "subview1"
+        };
+
+        var subview2 = new View
+        {
+            Id = "subview2"
+        };
+
+        var subview3 = new View
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubViewToEnd (subview1);
+        Assert.Equal ([subview2, subview3, subview1], superView.SubViews.ToArray ());
+
+        superView.MoveSubViewToEnd (subview2);
+        Assert.Equal ([subview3, subview1, subview2], superView.SubViews.ToArray ());
+
+        superView.MoveSubViewToEnd (subview3);
+        Assert.Equal ([subview1, subview2, subview3], superView.SubViews.ToArray ());
     }
 
     [Fact]
@@ -590,5 +625,71 @@ public class SubViewTests
         Assert.False (isAdded);
         Assert.NotEqual (superView, subView.SuperView);
         Assert.Empty (superView.SubViews);
+    }
+
+    [Fact]
+    public void RemoveAll_Removes_All_SubViews ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView1 = new View ();
+        var subView2 = new View ();
+        var subView3 = new View ();
+
+        superView.Add (subView1, subView2, subView3);
+
+        // Act
+        var removedViews = superView.RemoveAll ();
+
+        // Assert
+        Assert.Empty (superView.SubViews);
+        Assert.Equal (3, removedViews.Count);
+        Assert.Contains (subView1, removedViews);
+        Assert.Contains (subView2, removedViews);
+        Assert.Contains (subView3, removedViews);
+    }
+
+    [Fact]
+    public void RemoveAllTView_Removes_All_SubViews_Of_Specific_Type ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView1 = new View ();
+        var subView2 = new View ();
+        var subView3 = new View ();
+        var subView4 = new Button ();
+
+        superView.Add (subView1, subView2, subView3, subView4);
+
+        // Act
+        var removedViews = superView.RemoveAll<Button> ();
+
+        // Assert
+        Assert.Equal (3, superView.SubViews.Count);
+        Assert.DoesNotContain (subView4, superView.SubViews);
+        Assert.Single (removedViews);
+        Assert.Contains (subView4, removedViews);
+    }
+
+    [Fact]
+    public void RemoveAllTView_Does_Not_Remove_Other_Types ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView1 = new View ();
+        var subView2 = new Button ();
+        var subView3 = new Label ();
+
+        superView.Add (subView1, subView2, subView3);
+
+        // Act
+        var removedViews = superView.RemoveAll<Button> ();
+
+        // Assert
+        Assert.Equal (2, superView.SubViews.Count);
+        Assert.Contains (subView1, superView.SubViews);
+        Assert.Contains (subView3, superView.SubViews);
+        Assert.Single (removedViews);
+        Assert.Contains (subView2, removedViews);
     }
 }
