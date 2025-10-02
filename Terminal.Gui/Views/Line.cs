@@ -7,8 +7,8 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         <see cref="Line"/> is a <see cref="View"/> that renders a single horizontal or vertical line
-///         using the <see cref="LineCanvas"/> system. Unlike <see cref="LineView"/>, which directly renders
-///         runes, <see cref="Line"/> integrates with the LineCanvas to enable proper box-drawing character
+///         using the <see cref="Border"/> adornment. Unlike <see cref="LineView"/>, which directly renders
+///         runes, <see cref="Line"/> uses the Border's LineCanvas integration to enable proper box-drawing character
 ///         selection and line intersection handling.
 ///     </para>
 ///     <para>
@@ -16,14 +16,8 @@ namespace Terminal.Gui.Views;
 ///         various line styles including Single, Double, Heavy, Rounded, Dashed, and Dotted.
 ///     </para>
 ///     <para>
-///         When multiple <see cref="Line"/> instances or other LineCanvas-aware views (like <see cref="Border"/>)
-///         intersect, the LineCanvas automatically selects the appropriate box-drawing characters for corners,
-///         T-junctions, and crosses.
-///     </para>
-///     <para>
-///         <see cref="Line"/> sets <see cref="View.SuperViewRendersLineCanvas"/> to <see langword="true"/>,
-///         meaning its parent view is responsible for rendering the line. This allows for proper intersection
-///         handling when multiple views contribute lines to the same canvas.
+///         When multiple <see cref="Line"/> instances or other Border-based views intersect, the LineCanvas 
+///         automatically selects the appropriate box-drawing characters for corners, T-junctions, and crosses.
 ///     </para>
 /// </remarks>
 /// <example>
@@ -52,8 +46,6 @@ public class Line : View, IOrientation
     public Line ()
     {
         CanFocus = false;
-
-        base.SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Single;
 
         _orientationHelper = new (this);
@@ -64,12 +56,18 @@ public class Line : View, IOrientation
 
     #region IOrientation members
     /// <summary>
-    ///     The direction of the line. Changing this property automatically adjusts the Width and Height
+    ///     The direction of the line. Changing this property automatically adjusts the Width, Height, and Border.Thickness
     ///     to appropriate values for the new orientation.
     /// </summary>
     /// <remarks>
-    ///     When set to <see cref="Orientation.Horizontal"/>, Width is set to <see cref="Dim.Fill()"/> and Height to 1.
-    ///     When set to <see cref="Orientation.Vertical"/>, Width is set to 1 and Height to <see cref="Dim.Fill()"/>.
+    ///     <para>
+    ///         When set to <see cref="Orientation.Horizontal"/>, Width is set to <see cref="Dim.Fill()"/> and Height to 1,
+    ///         with Border.Thickness set to (0, 1, 0, 0) to draw only the top border.
+    ///     </para>
+    ///     <para>
+    ///         When set to <see cref="Orientation.Vertical"/>, Width is set to 1 and Height to <see cref="Dim.Fill()"/>,
+    ///         with Border.Thickness set to (1, 0, 0, 0) to draw only the left border.
+    ///     </para>
     /// </remarks>
     public Orientation Orientation
     {
@@ -86,46 +84,27 @@ public class Line : View, IOrientation
 #pragma warning restore CS0067 // The event is never used
 
     /// <summary>
-    ///     Called when <see cref="Orientation"/> has changed. Updates the Width and Height based on the new orientation.
+    ///     Called when <see cref="Orientation"/> has changed. Updates the Width, Height, and Border.Thickness 
+    ///     based on the new orientation.
     /// </summary>
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-
         switch (newOrientation)
         {
             case Orientation.Horizontal:
                 Height = 1;
                 Width = Dim.Fill ();
+                Border.Thickness = new Thickness (0, 1, 0, 0);
 
                 break;
             case Orientation.Vertical:
                 Width = 1;
                 Height = Dim.Fill ();
+                Border.Thickness = new Thickness (1, 0, 0, 0);
 
                 break;
-
         }
     }
     #endregion
-
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     This method adds the line to the parent view's <see cref="View.LineCanvas"/> for rendering.
-    ///     The actual rendering is performed by the parent view through <see cref="View.RenderLineCanvas"/>.
-    /// </remarks>
-    protected override bool OnDrawingContent ()
-    {
-        Point pos = ViewportToScreen (Viewport).Location;
-        int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
-
-        SuperView?.LineCanvas?.AddLine (
-                    pos,
-                    length,
-                    Orientation,
-                    BorderStyle
-                   );
-
-        return true;
-    }
 }

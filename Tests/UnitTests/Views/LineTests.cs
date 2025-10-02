@@ -14,7 +14,7 @@ public class LineTests (ITestOutputHelper output)
         Assert.Equal (Orientation.Horizontal, line.Orientation);
         Assert.Equal (Dim.Fill (), line.Width);
         Assert.Equal (LineStyle.Single, line.BorderStyle);
-        Assert.True (line.SuperViewRendersLineCanvas);
+        Assert.Equal (new Thickness (0, 1, 0, 0), line.Border.Thickness);
         Assert.False (line.CanFocus);
 
         line.Layout ();
@@ -187,11 +187,17 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_SuperViewRendersLineCanvas_IsTrue ()
+    public void Line_UsesBorder_ForRendering ()
     {
         var line = new Line ();
 
-        Assert.True (line.SuperViewRendersLineCanvas);
+        // Line uses Border with appropriate Thickness
+        Assert.NotNull (line.Border);
+        Assert.Equal (new Thickness (0, 1, 0, 0), line.Border.Thickness); // Horizontal uses top border
+        
+        // Vertical should use left border
+        line.Orientation = Orientation.Vertical;
+        Assert.Equal (new Thickness (1, 0, 0, 0), line.Border.Thickness);
     }
 
     [Fact]
