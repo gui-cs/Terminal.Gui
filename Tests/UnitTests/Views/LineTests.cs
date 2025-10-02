@@ -13,8 +13,8 @@ public class LineTests (ITestOutputHelper output)
 
         Assert.Equal (Orientation.Horizontal, line.Orientation);
         Assert.Equal (Dim.Fill (), line.Width);
-        Assert.Equal (LineStyle.Single, line.BorderStyle);
-        Assert.Equal (new Thickness (0, 1, 0, 0), line.Border.Thickness);
+        Assert.Equal (LineStyle.Single, line.Style);
+        Assert.True (line.SuperViewRendersLineCanvas);
         Assert.False (line.CanFocus);
 
         line.Layout ();
@@ -71,11 +71,11 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_BorderStyle_CanBeSet ()
+    public void Line_Style_CanBeSet ()
     {
-        var line = new Line { BorderStyle = LineStyle.Double };
+        var line = new Line { Style = LineStyle.Double };
 
-        Assert.Equal (LineStyle.Double, line.BorderStyle);
+        Assert.Equal (LineStyle.Double, line.Style);
     }
 
     [Theory]
@@ -88,9 +88,9 @@ public class LineTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Line_SupportsDifferentLineStyles (LineStyle style)
     {
-        var line = new Line { BorderStyle = style };
+        var line = new Line { Style = style };
 
-        Assert.Equal (style, line.BorderStyle);
+        Assert.Equal (style, line.Style);
     }
 
     [Fact]
@@ -136,10 +136,10 @@ public class LineTests (ITestOutputHelper output)
         var app = new Window { Width = 30, Height = 15 };
 
         // Create intersecting lines
-        var hLine = new Line { X = 5, Y = 5, Width = 15, BorderStyle = LineStyle.Single };
+        var hLine = new Line { X = 5, Y = 5, Width = 15, Style = LineStyle.Single };
         var vLine = new Line
         {
-            X = 12, Y = 2, Height = 8, Orientation = Orientation.Vertical, BorderStyle = LineStyle.Single
+            X = 12, Y = 2, Height = 8, Orientation = Orientation.Vertical, Style = LineStyle.Single
         };
 
         app.Add (hLine, vLine);
@@ -187,17 +187,11 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_UsesBorder_ForRendering ()
+    public void Line_SuperViewRendersLineCanvas_IsTrue ()
     {
         var line = new Line ();
 
-        // Line uses Border with appropriate Thickness
-        Assert.NotNull (line.Border);
-        Assert.Equal (new Thickness (0, 1, 0, 0), line.Border.Thickness); // Horizontal uses top border
-        
-        // Vertical should use left border
-        line.Orientation = Orientation.Vertical;
-        Assert.Equal (new Thickness (1, 0, 0, 0), line.Border.Thickness);
+        Assert.True (line.SuperViewRendersLineCanvas);
     }
 
     [Fact]
@@ -226,7 +220,7 @@ public class LineTests (ITestOutputHelper output)
         var win = new Window { Width = 10, Height = 5, BorderStyle = LineStyle.None };
         top.Add (win);
 
-        var line = new Line { X = 1, Y = 1, Width = 5, BorderStyle = LineStyle.Single };
+        var line = new Line { X = 1, Y = 1, Width = 5, Style = LineStyle.Single };
         win.Add (line);
 
         RunState rs = Application.Begin (top);
@@ -249,7 +243,7 @@ public class LineTests (ITestOutputHelper output)
 
         var line = new Line
         {
-            X = 2, Y = 1, Height = 4, Orientation = Orientation.Vertical, BorderStyle = LineStyle.Single
+            X = 2, Y = 1, Height = 4, Orientation = Orientation.Vertical, Style = LineStyle.Single
         };
         win.Add (line);
 
@@ -271,7 +265,7 @@ public class LineTests (ITestOutputHelper output)
         var win = new Window { Width = 10, Height = 5, BorderStyle = LineStyle.None };
         top.Add (win);
 
-        var line = new Line { X = 1, Y = 1, Width = 5, BorderStyle = LineStyle.Double };
+        var line = new Line { X = 1, Y = 1, Width = 5, Style = LineStyle.Double };
         win.Add (line);
 
         RunState rs = Application.Begin (top);
@@ -293,11 +287,11 @@ public class LineTests (ITestOutputHelper output)
         top.Add (win);
 
         // Horizontal line
-        var hLine = new Line { X = 1, Y = 2, Width = 5, BorderStyle = LineStyle.Single };
+        var hLine = new Line { X = 1, Y = 2, Width = 5, Style = LineStyle.Single };
         // Vertical line intersecting the horizontal
         var vLine = new Line
         {
-            X = 3, Y = 1, Height = 3, Orientation = Orientation.Vertical, BorderStyle = LineStyle.Single
+            X = 3, Y = 1, Height = 3, Orientation = Orientation.Vertical, Style = LineStyle.Single
         };
 
         win.Add (hLine, vLine);

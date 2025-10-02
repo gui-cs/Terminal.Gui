@@ -68,7 +68,7 @@ public class LineExample : Scenario
         foreach ((LineStyle style, string name) in styles)
         {
             app.Add (new Label { X = 0, Y = yPos, Width = 15, Text = name + ":" });
-            app.Add (new Line { X = 16, Y = yPos, Width = 14, BorderStyle = style });
+            app.Add (new Line { X = 16, Y = yPos, Width = 14, Style = style });
             yPos++;
         }
 
@@ -93,7 +93,7 @@ public class LineExample : Scenario
                 X = gridX,
                 Y = gridY + i * 2,
                 Width = 20,
-                BorderStyle = LineStyle.Single
+                Style = LineStyle.Single
             });
         }
 
@@ -106,7 +106,7 @@ public class LineExample : Scenario
                 Y = gridY,
                 Height = 9,
                 Orientation = Orientation.Vertical,
-                BorderStyle = LineStyle.Single
+                Style = LineStyle.Single
             });
         }
 
@@ -125,7 +125,7 @@ public class LineExample : Scenario
             X = 60,
             Y = 5,
             Width = 20,
-            BorderStyle = LineStyle.Double
+            Style = LineStyle.Double
         });
 
         // Single vertical through double horizontal
@@ -135,7 +135,7 @@ public class LineExample : Scenario
             Y = 4,
             Height = 3,
             Orientation = Orientation.Vertical,
-            BorderStyle = LineStyle.Single
+            Style = LineStyle.Single
         });
 
         // Heavy horizontal
@@ -144,7 +144,7 @@ public class LineExample : Scenario
             X = 60,
             Y = 8,
             Width = 20,
-            BorderStyle = LineStyle.Heavy
+            Style = LineStyle.Heavy
         });
 
         // Single vertical through heavy horizontal
@@ -154,7 +154,7 @@ public class LineExample : Scenario
             Y = 7,
             Height = 3,
             Orientation = Orientation.Vertical,
-            BorderStyle = LineStyle.Single
+            Style = LineStyle.Single
         });
 
         // Section 5: Box Example (showing borders and lines working together)
@@ -182,7 +182,7 @@ public class LineExample : Scenario
             X = 0,
             Y = 3,
             Width = Dim.Fill (),
-            BorderStyle = LineStyle.Single
+            Style = LineStyle.Single
         });
 
         framedView.Add (new Line
@@ -191,7 +191,7 @@ public class LineExample : Scenario
             Y = 0,
             Height = Dim.Fill (),
             Orientation = Orientation.Vertical,
-            BorderStyle = LineStyle.Single
+            Style = LineStyle.Single
         });
 
         app.Add (framedView);
@@ -206,7 +206,7 @@ public class LineExample : Scenario
         app.Add (comparisonLabel);
 
         app.Add (new Label { X = 35, Y = 16, Text = "Line (uses LineCanvas):" });
-        app.Add (new Line { X = 35, Y = 17, Width = 20, BorderStyle = LineStyle.Single });
+        app.Add (new Line { X = 35, Y = 17, Width = 20, Style = LineStyle.Single });
 
         app.Add (new Label { X = 35, Y = 18, Text = "LineView (direct render):" });
         app.Add (new LineView { X = 35, Y = 19, Width = 20 });
