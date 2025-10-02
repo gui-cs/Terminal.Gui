@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using Terminal.Gui.App;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -309,26 +310,77 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="HeightChanging"/> event
+    ///         is raised before the change, and <see cref="HeightChanged"/> is raised after.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="HeightChanging"/> event
+    ///         is raised before the change, and <see cref="HeightChanged"/> is raised after.
+    ///     </para>
     ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
+    /// <seealso cref="HeightChanging"/>
+    /// <seealso cref="HeightChanged"/>
     public Dim Height
     {
         get => VerifyIsInitialized (_height, nameof (Height));
         set
         {
-            if (Equals (_height, value))
+            bool changed = CWPPropertyHelper.ChangeProperty (
+                _height,
+                value,
+                OnHeightChanging,
+                HeightChanging,
+                OnHeightChanged,
+                HeightChanged,
+                out Dim finalValue);
+
+            if (changed)
             {
-                return;
+                _height = finalValue;
+
+                // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                TextFormatter.ConstrainToHeight = null;
+
+                PosDimSet ();
             }
-
-            _height = value;
-
-            // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-            TextFormatter.ConstrainToHeight = null;
-
-            PosDimSet ();
         }
     }
+
+    /// <summary>
+    ///     Called before the <see cref="Height"/> property changes, allowing subclasses to cancel or modify the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the current and proposed new height.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnHeightChanging (ValueChangingEventArgs<Dim> args)
+    {
+        return false;
+    }
+
+    /// <summary>
+    ///     Called after the <see cref="Height"/> property changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new height.</param>
+    protected virtual void OnHeightChanged (ValueChangedEventArgs<Dim> args)
+    {
+    }
+
+    /// <summary>
+    ///     Raised before the <see cref="Height"/> property changes, allowing handlers to modify or cancel the change.
+    /// </summary>
+    /// <remarks>
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
+    ///     <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
+    /// </remarks>
+    public event EventHandler<ValueChangingEventArgs<Dim>>? HeightChanging;
+
+    /// <summary>
+    ///     Raised after the <see cref="Height"/> property changes, allowing handlers to react to the change.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<Dim>>? HeightChanged;
 
     private Dim _width = Dim.Absolute (0);
 
@@ -356,25 +408,76 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="WidthChanging"/> event
+    ///         is raised before the change, and <see cref="WidthChanged"/> is raised after.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="WidthChanging"/> event
+    ///         is raised before the change, and <see cref="WidthChanged"/> is raised after.
+    ///     </para>
     ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
+    /// <seealso cref="WidthChanging"/>
+    /// <seealso cref="WidthChanged"/>
     public Dim Width
     {
         get => VerifyIsInitialized (_width, nameof (Width));
         set
         {
-            if (Equals (_width, value))
+            bool changed = CWPPropertyHelper.ChangeProperty (
+                _width,
+                value,
+                OnWidthChanging,
+                WidthChanging,
+                OnWidthChanged,
+                WidthChanged,
+                out Dim finalValue);
+
+            if (changed)
             {
-                return;
+                _width = finalValue;
+
+                // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                TextFormatter.ConstrainToWidth = null;
+                PosDimSet ();
             }
-
-            _width = value;
-
-            // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-            TextFormatter.ConstrainToWidth = null;
-            PosDimSet ();
         }
     }
+
+    /// <summary>
+    ///     Called before the <see cref="Width"/> property changes, allowing subclasses to cancel or modify the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the current and proposed new width.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnWidthChanging (ValueChangingEventArgs<Dim> args)
+    {
+        return false;
+    }
+
+    /// <summary>
+    ///     Called after the <see cref="Width"/> property changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new width.</param>
+    protected virtual void OnWidthChanged (ValueChangedEventArgs<Dim> args)
+    {
+    }
+
+    /// <summary>
+    ///     Raised before the <see cref="Width"/> property changes, allowing handlers to modify or cancel the change.
+    /// </summary>
+    /// <remarks>
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
+    ///     <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
+    /// </remarks>
+    public event EventHandler<ValueChangingEventArgs<Dim>>? WidthChanging;
+
+    /// <summary>
+    ///     Raised after the <see cref="Width"/> property changes, allowing handlers to react to the change.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<Dim>>? WidthChanged;
 
     #endregion Frame/Position/Dimension
 

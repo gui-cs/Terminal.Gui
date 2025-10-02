@@ -1,4 +1,6 @@
-﻿#nullable enable
+
+#nullable enable
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -42,8 +44,9 @@ public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
     private LineStyle _style = LineStyle.Single;
-    private Dim? _userSetWidth;
-    private Dim? _userSetHeight;
+    private bool _widthSetByUser;
+    private bool _heightSetByUser;
+    private bool _settingFromOrientation;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -62,28 +65,24 @@ public class Line : View, IOrientation
         OnOrientationChanged (Orientation);
     }
 
-    /// <summary>
-    ///     Sets the width of the line. Once set, it will not be changed by <see cref="Orientation"/> changes.
-    /// </summary>
-    /// <param name="width">The width dimension.</param>
-    /// <returns>The Line instance for fluent API.</returns>
-    public new Line SetWidth (Dim width)
+    /// <inheritdoc/>
+    protected override bool OnWidthChanging (App.ValueChangingEventArgs<Dim?> args)
     {
-        _userSetWidth = width;
-        base.Width = width;
-        return this;
+        if (!_settingFromOrientation)
+        {
+            _widthSetByUser = true;
+        }
+        return base.OnWidthChanging (args);
     }
 
-    /// <summary>
-    ///     Sets the height of the line. Once set, it will not be changed by <see cref="Orientation"/> changes.
-    /// </summary>
-    /// <param name="height">The height dimension.</param>
-    /// <returns>The Line instance for fluent API.</returns>
-    public new Line SetHeight (Dim height)
+    /// <inheritdoc/>
+    protected override bool OnHeightChanging (App.ValueChangingEventArgs<Dim?> args)
     {
-        _userSetHeight = height;
-        base.Height = height;
-        return this;
+        if (!_settingFromOrientation)
+        {
+            _heightSetByUser = true;
+        }
+        return base.OnHeightChanging (args);
     }
 
     /// <summary>
@@ -109,20 +108,19 @@ public class Line : View, IOrientation
     #region IOrientation members
     /// <summary>
     ///     The direction of the line. Changing this property adjusts the Width and Height
-    ///     to appropriate values for the new orientation, unless they have been explicitly set using
-    ///     <see cref="SetWidth"/> or <see cref="SetHeight"/>.
+    ///     to appropriate values for the new orientation, unless they have been explicitly set by the user.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         When set to <see cref="Orientation.Horizontal"/>, Width is set to <see cref="Dim.Fill()"/> and Height to 1,
-    ///         unless they have been explicitly set using SetWidth or SetHeight.
+    ///         unless they have been explicitly set by the user.
     ///     </para>
     ///     <para>
     ///         When set to <see cref="Orientation.Vertical"/>, Width is set to 1 and Height to <see cref="Dim.Fill()"/>,
-    ///         unless they have been explicitly set using SetWidth or SetHeight.
+    ///         unless they have been explicitly set by the user.
     ///     </para>
     ///     <para>
-    ///         To set Width or Height before Orientation and have them preserved, use <see cref="SetWidth"/> or <see cref="SetHeight"/>.
+    ///         If you set Width or Height before setting Orientation, those values will be preserved.
     ///     </para>
     /// </remarks>
     public Orientation Orientation
@@ -141,40 +139,48 @@ public class Line : View, IOrientation
 
     /// <summary>
     ///     Called when <see cref="Orientation"/> has changed. Updates the Width and Height based on the new orientation,
-    ///     but only if they haven't been explicitly set using <see cref="SetWidth"/> or <see cref="SetHeight"/>.
+    ///     but only if they haven't been explicitly set by the user.
     /// </summary>
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        switch (newOrientation)
+        _settingFromOrientation = true;
+        try
         {
-            case Orientation.Horizontal:
-                if (_userSetHeight is null)
-                {
-                    Height = 1;
-                }
-                if (_userSetWidth is null)
-                {
-                    Width = Dim.Fill ();
-                }
-                break;
-            case Orientation.Vertical:
-                if (_userSetWidth is null)
-                {
-                    Width = 1;
-                }
-                if (_userSetHeight is null)
-                {
-                    Height = Dim.Fill ();
-                }
-                break;
+            switch (newOrientation)
+            {
+                case Orientation.Horizontal:
+                    if (!_heightSetByUser)
+                    {
+                        Height = 1;
+                    }
+                    if (!_widthSetByUser)
+                    {
+                        Width = Dim.Fill ();
+                    }
+                    break;
+                case Orientation.Vertical:
+                    if (!_widthSetByUser)
+                    {
+                        Width = 1;
+                    }
+                    if (!_heightSetByUser)
+                    {
+                        Height = Dim.Fill ();
+                    }
+                    break;
+            }
+        }
+        finally
+        {
+            _settingFromOrientation = false;
         }
     }
     #endregion
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     This method adds the line to the parent view's <see cref="View.LineCanvas"/> for rendering.
+    ///     This method adds the line to the LineCanvas for rendering.
     ///     The actual rendering is performed by the parent view through <see cref="View.RenderLineCanvas"/>.
     /// </remarks>
     protected override bool OnDrawingContent ()
@@ -182,7 +188,7 @@ public class Line : View, IOrientation
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        LineCanvas?.AddLine (
+        LineCanvas.AddLine (
                     pos,
                     length,
                     Orientation,
