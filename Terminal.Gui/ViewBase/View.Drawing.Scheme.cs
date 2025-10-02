@@ -27,19 +27,15 @@ public partial class View
         get => _schemeName;
         set
         {
-            bool changed = CWPPropertyHelper.ChangeProperty (
+            CWPPropertyHelper.ChangeProperty (
                 _schemeName,
                 value,
                 OnSchemeNameChanging,
                 SchemeNameChanging,
+                newValue => _schemeName = newValue,
                 OnSchemeNameChanged,
                 SchemeNameChanged,
-                out string? finalValue);
-
-            if (changed)
-            {
-                _schemeName = finalValue;
-            }
+                out string? _);
         }
     }
 
@@ -216,21 +212,15 @@ public partial class View
     /// </example>
     public bool SetScheme (Scheme? scheme)
     {
-        bool changed = CWPPropertyHelper.ChangeProperty (
+        return CWPPropertyHelper.ChangeProperty (
             _scheme,
             scheme,
             OnSettingScheme,
             SchemeChanging,
+            newValue => _scheme = newValue,
             OnSchemeChanged,
             SchemeChanged,
-            out Scheme? finalValue);
-
-        if (changed)
-        {
-            _scheme = finalValue;
-            return true;
-        }
-        return false;
+            out Scheme? _);
     }
 
     /// <summary>
