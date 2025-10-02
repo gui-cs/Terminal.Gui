@@ -284,7 +284,7 @@ public partial class View // Layout APIs
         }
     }
 
-    private Dim? _height = Dim.Absolute (0);
+    private Dim _height = Dim.Absolute (0);
 
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
@@ -311,7 +311,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
-    public Dim? Height
+    public Dim Height
     {
         get => VerifyIsInitialized (_height, nameof (Height));
         set
@@ -321,13 +321,7 @@ public partial class View // Layout APIs
                 return;
             }
 
-            // See Issue # (Width/Height are Dim?, but X/Y are not nullable)
             _height = value;
-
-            //if (_height is null)
-            //{
-            //    throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
-            //}
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
             TextFormatter.ConstrainToHeight = null;
@@ -336,7 +330,7 @@ public partial class View // Layout APIs
         }
     }
 
-    private Dim? _width = Dim.Absolute (0);
+    private Dim _width = Dim.Absolute (0);
 
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
@@ -364,7 +358,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
-    public Dim? Width
+    public Dim Width
     {
         get => VerifyIsInitialized (_width, nameof (Width));
         set
@@ -374,13 +368,7 @@ public partial class View // Layout APIs
                 return;
             }
 
-            // See Issue # (Width/Height are Dim?, but X/Y are not nullable)
             _width = value;
-
-            //if (_width is null)
-            //{
-            //    throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
-            //}
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
             TextFormatter.ConstrainToWidth = null;
@@ -505,7 +493,7 @@ public partial class View // Layout APIs
         {
             // Calculate the new X, Y, Width, and Height
             // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
-            if (_width is { } && _width.Has<DimAuto> (out _))
+            if (_width.Has<DimAuto> (out _))
             {
                 newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
                 newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
@@ -522,7 +510,7 @@ public partial class View // Layout APIs
                 newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
             }
 
-            if (_height is { } && _height.Has<DimAuto> (out _))
+            if (_height.Has<DimAuto> (out _))
             {
                 newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
                 newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
@@ -536,7 +524,7 @@ public partial class View // Layout APIs
             else
             {
                 newY = _y.Calculate (superviewContentSize.Height, _height!, this, Dimension.Height);
-                newH = _height?.Calculate (newY, superviewContentSize.Height, this, Dimension.Height) ?? 0;
+                newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
             }
         }
         catch (LayoutException)
@@ -1372,7 +1360,7 @@ public partial class View // Layout APIs
     }
 
     // Diagnostics to highlight when Width or Height is read before the view has been initialized
-    private Dim? VerifyIsInitialized (Dim? dim, string member)
+    private Dim VerifyIsInitialized (Dim dim, string member)
     {
         //#if DEBUG
         //        if (dim.ReferencesOtherViews () && !IsInitialized)
