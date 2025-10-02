@@ -1,13 +1,10 @@
-using UnitTests;
-using Xunit;
-using Xunit.Abstractions;
+using UnitTests.Parallelizable;
 
-namespace Terminal.Gui.ViewsTests;
+namespace Terminal.Gui.ViewLayoutEventTests;
 
-public class ViewLayoutEventTests (ITestOutputHelper output)
+public class ViewLayoutEventTests : GlobalTestSetup
 {
     [Fact]
-    [AutoInitShutdown]
     public void View_WidthChanging_Event_Fires ()
     {
         var view = new View ();
@@ -30,7 +27,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_WidthChanged_Event_Fires ()
     {
         var view = new View ();
@@ -53,7 +49,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_WidthChanging_CanCancel ()
     {
         var view = new View ();
@@ -71,7 +66,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_WidthChanging_CanModify ()
     {
         var view = new View ();
@@ -92,7 +86,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_HeightChanging_Event_Fires ()
     {
         var view = new View ();
@@ -115,7 +108,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_HeightChanged_Event_Fires ()
     {
         var view = new View ();
@@ -138,7 +130,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_HeightChanging_CanCancel ()
     {
         var view = new View ();
@@ -156,7 +147,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_HeightChanging_CanModify ()
     {
         var view = new View ();
@@ -177,7 +167,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_OnWidthChanging_CanCancel ()
     {
         var testView = new TestView ();
@@ -191,7 +180,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_OnHeightChanging_CanCancel ()
     {
         var testView = new TestView ();
@@ -205,7 +193,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_WidthChanged_BackingFieldSetBeforeEvent ()
     {
         var view = new View ();
@@ -227,7 +214,6 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void View_HeightChanged_BackingFieldSetBeforeEvent ()
     {
         var view = new View ();
