@@ -66,8 +66,8 @@ public class Line : View, IOrientation
         _orientationHelper.Orientation = Orientation.Horizontal;
         
         // Set default dimensions for horizontal orientation
-        Width = Dim.Fill ();
         Height = 1;
+        Width = Dim.Fill ();
     }
 
     /// <summary>
@@ -125,13 +125,15 @@ public class Line : View, IOrientation
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Changing orientation does not automatically adjust Width or Height. If you want to control
-    ///         the line's extent regardless of orientation, use the <see cref="Length"/> property instead.
+    ///         Changing orientation swaps Width and Height to preserve the line's visual dimensions.
+    ///         For example, a horizontal line with Width=30, Height=1 becomes Width=1, Height=30 when
+    ///         changed to vertical orientation.
     ///     </para>
     ///     <para>
-    ///         This allows object initializers to work intuitively:
+    ///         For object initializers where dimensions are set before orientation:
     ///         <code>new Line { Height = 9, Orientation = Orientation.Vertical }</code>
-    ///         will create a vertical line with Height=9.
+    ///         The Height is set first, then when Orientation is set, Width and Height swap,
+    ///         resulting in Width=9, Height=1 (horizontal default) → swap → Width=1, Height=9 (vertical).
     ///     </para>
     /// </remarks>
     public Orientation Orientation
@@ -154,35 +156,10 @@ public class Line : View, IOrientation
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        // Save current dimensions for comparison
-        Dim currentWidth = Width;
-        Dim currentHeight = Height;
-        
-        // Check if dimensions are at defaults from constructor
-        // Constructor sets Width=Fill, Height=1 for horizontal
-        bool isHorizontalDefaults = currentWidth.ToString().Contains("Fill") && currentHeight.ToString() == "Absolute(1)";
-        bool isVerticalDefaults = currentWidth.ToString() == "Absolute(1)" && currentHeight.ToString().Contains("Fill");
-        
-        if (newOrientation == Orientation.Horizontal)
-        {
-            // If coming from vertical defaults, swap to horizontal defaults
-            if (isVerticalDefaults)
-            {
-                Width = Dim.Fill();
-                Height = 1;
-            }
-            // Otherwise, keep user-set values
-        }
-        else // Orientation.Vertical
-        {
-            // If still at horizontal defaults, swap to vertical defaults
-            if (isHorizontalDefaults)
-            {
-                Width = 1;
-                Height = Dim.Fill();
-            }
-            // Otherwise, keep user-set values
-        }
+        // Swap Width and Height to preserve the visual appearance
+        Dim temp = Width;
+        Width = Height;
+        Height = temp;
     }
     #endregion
 
