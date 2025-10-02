@@ -49,6 +49,7 @@ public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
     private LineStyle _style = LineStyle.Single;
+    private Dim _length = Dim.Fill ();
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -66,8 +67,11 @@ public class Line : View, IOrientation
         _orientationHelper.Orientation = Orientation.Horizontal;
         
         // Set default dimensions for horizontal orientation
+        // Set Height first (this will update _length, but we'll override it next)
         Height = 1;
-        Width = Dim.Fill ();
+        // Now set Width and _length to Fill
+        _length = Dim.Fill ();
+        Width = _length;
     }
 
     /// <summary>
@@ -75,8 +79,14 @@ public class Line : View, IOrientation
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         For a horizontal line, this sets/gets the Width.
-    ///         For a vertical line, this sets/gets the Height.
+    ///         This is the "source of truth" for the line's primary dimension.
+    ///         For a horizontal line, Length controls Width.
+    ///         For a vertical line, Length controls Height.
+    ///     </para>
+    ///     <para>
+    ///         When Width or Height is set directly, Length is updated to match the primary dimension.
+    ///         When Orientation changes, the appropriate dimension is set to Length and the perpendicular
+    ///         dimension is set to 1.
     ///     </para>
     ///     <para>
     ///         This property provides a cleaner API for controlling the line's extent
@@ -85,16 +95,19 @@ public class Line : View, IOrientation
     /// </remarks>
     public Dim Length
     {
-        get => Orientation == Orientation.Horizontal ? Width : Height;
+        get => _length;
         set
         {
+            _length = value;
+            
+            // Update the appropriate dimension based on current orientation
             if (Orientation == Orientation.Horizontal)
             {
-                Width = value;
+                Width = _length;
             }
             else
             {
-                Height = value;
+                Height = _length;
             }
         }
     }
@@ -125,15 +138,15 @@ public class Line : View, IOrientation
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Changing orientation swaps Width and Height to preserve the line's visual dimensions.
-    ///         For example, a horizontal line with Width=30, Height=1 becomes Width=1, Height=30 when
-    ///         changed to vertical orientation.
+    ///         When orientation changes, the appropriate dimension is set to <see cref="Length"/>
+    ///         and the perpendicular dimension is set to 1.
     ///     </para>
     ///     <para>
     ///         For object initializers where dimensions are set before orientation:
     ///         <code>new Line { Height = 9, Orientation = Orientation.Vertical }</code>
-    ///         The Height is set first, then when Orientation is set, Width and Height swap,
-    ///         resulting in Width=9, Height=1 (horizontal default) → swap → Width=1, Height=9 (vertical).
+    ///         Setting Height=9 updates Length to 9 (since default orientation is Horizontal and Height is perpendicular).
+    ///         Then when Orientation is set to Vertical, Height is set to Length (9) and Width is set to 1,
+    ///         resulting in the expected Width=1, Height=9.
     ///     </para>
     /// </remarks>
     public Orientation Orientation
@@ -156,10 +169,52 @@ public class Line : View, IOrientation
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        // Swap Width and Height to preserve the visual appearance
-        Dim temp = Width;
-        Width = Height;
-        Height = temp;
+        // Set dimensions based on new orientation:
+        // - Primary dimension (along orientation) = Length
+        // - Perpendicular dimension = 1
+        if (newOrientation == Orientation.Horizontal)
+        {
+            Width = _length;
+            Height = 1;
+        }
+        else
+        {
+            Height = _length;
+            Width = 1;
+        }
+    }
+    
+    /// <inheritdoc/>
+    protected override void OnWidthChanged (ValueChangedEventArgs<Dim> e)
+    {
+        base.OnWidthChanged (e);
+        
+        // Update Length when Width changes for horizontal lines
+        if (Orientation == Orientation.Horizontal)
+        {
+            _length = e.NewValue;
+        }
+    }
+    
+    /// <inheritdoc/>
+    protected override void OnHeightChanged (ValueChangedEventArgs<Dim> e)
+    {
+        base.OnHeightChanged (e);
+        
+        // Update Length when Height changes for vertical lines
+        // OR when Height is set to anything for horizontal lines
+        // (this handles: new Line { Height = 9, Orientation = Orientation.Vertical })
+        if (Orientation == Orientation.Vertical)
+        {
+            _length = e.NewValue;
+        }
+        else
+        {
+            // For horizontal lines, treat Height changes as potential length updates
+            // This allows: new Line { Height = 9, Orientation = Orientation.Vertical }
+            // where Height=9 is set first, then becomes the vertical length
+            _length = e.NewValue;
+        }
     }
     #endregion
 

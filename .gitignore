@@ -68,3 +68,4 @@ BenchmarkDotNet.Artifacts/
 *.log.*
 
 log.*
+/local_packages/

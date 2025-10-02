@@ -277,6 +277,38 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
+    public void Line_ObjectInitializer_HeightThenOrientation ()
+    {
+        // Test the specific case: new Line { Height = 9, Orientation = Orientation.Vertical }
+        // Expected: Width=1, Height=9
+        var line = new Line { Height = 9, Orientation = Orientation.Vertical };
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+        container.Layout ();
+        
+        Assert.Equal (1, line.Frame.Width);
+        Assert.Equal (9, line.Frame.Height);
+        Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
+    }
+    
+    [Fact]
+    [AutoInitShutdown]
+    public void Line_ObjectInitializer_WidthThenOrientation ()
+    {
+        // Test: new Line { Width = 15, Orientation = Orientation.Horizontal }
+        // Expected: Width=15, Height=1
+        var line = new Line { Width = 15, Orientation = Orientation.Horizontal };
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+        container.Layout ();
+        
+        Assert.Equal (15, line.Frame.Width);
+        Assert.Equal (1, line.Frame.Height);
+        Assert.Equal (line.Length, line.Width); // Length should be Width for horizontal
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void Line_Draw_DoesNotThrow ()
     {
         var top = new Toplevel ();
