@@ -26,6 +26,11 @@ public interface IInputProcessor
     event EventHandler<MouseEventArgs>? MouseEvent;
 
     /// <summary>
+    /// Gets the name of the driver associated with this input processor.
+    /// </summary>
+    string DriverName { get; init; }
+
+    /// <summary>
     ///     Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to
     ///     <see cref="OnKeyUp"/>.
     /// </summary>
