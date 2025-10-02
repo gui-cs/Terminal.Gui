@@ -196,7 +196,7 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
     {
         var testView = new TestView ();
         testView.CancelHeightChange = true;
-        Dim? originalHeight = testView.Height;
+        Dim originalHeight = testView.Height;
 
         testView.Height = 10;
 
@@ -204,17 +204,61 @@ public class ViewLayoutEventTests (ITestOutputHelper output)
         Assert.Equal (originalHeight, testView.Height);
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void View_WidthChanged_BackingFieldSetBeforeEvent ()
+    {
+        var view = new View ();
+        Dim? widthInChangedEvent = null;
+
+        view.WidthChanged += (sender, args) =>
+        {
+            // The backing field should already be set when Changed event fires
+            widthInChangedEvent = view.Width;
+        };
+
+        view.Width = 25;
+
+        // The width seen in the Changed event should be the new value
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (view);
+        container.Layout ();
+        Assert.Equal (25, view.Frame.Width);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void View_HeightChanged_BackingFieldSetBeforeEvent ()
+    {
+        var view = new View ();
+        Dim? heightInChangedEvent = null;
+
+        view.HeightChanged += (sender, args) =>
+        {
+            // The backing field should already be set when Changed event fires
+            heightInChangedEvent = view.Height;
+        };
+
+        view.Height = 30;
+
+        // The height seen in the Changed event should be the new value
+        var container = new View { Width = 50, Height = 40 };
+        container.Add (view);
+        container.Layout ();
+        Assert.Equal (30, view.Frame.Height);
+    }
+
     private class TestView : View
     {
         public bool CancelWidthChange { get; set; }
         public bool CancelHeightChange { get; set; }
 
-        protected override bool OnWidthChanging (App.ValueChangingEventArgs<Dim?> args)
+        protected override bool OnWidthChanging (App.ValueChangingEventArgs<Dim> args)
         {
             return CancelWidthChange;
         }
 
-        protected override bool OnHeightChanging (App.ValueChangingEventArgs<Dim?> args)
+        protected override bool OnHeightChanging (App.ValueChangingEventArgs<Dim> args)
         {
             return CancelHeightChange;
         }

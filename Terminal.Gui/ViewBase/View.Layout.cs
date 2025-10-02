@@ -329,24 +329,21 @@ public partial class View // Layout APIs
         get => VerifyIsInitialized (_height, nameof (Height));
         set
         {
-            bool changed = CWPPropertyHelper.ChangeProperty (
+            CWPPropertyHelper.ChangeProperty (
                 _height,
                 value,
                 OnHeightChanging,
                 HeightChanging,
+                newValue =>
+                {
+                    _height = newValue;
+                    // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                    TextFormatter.ConstrainToHeight = null;
+                    PosDimSet ();
+                },
                 OnHeightChanged,
                 HeightChanged,
-                out Dim finalValue);
-
-            if (changed)
-            {
-                _height = finalValue;
-
-                // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-                TextFormatter.ConstrainToHeight = null;
-
-                PosDimSet ();
-            }
+                out Dim _);
         }
     }
 
@@ -427,23 +424,21 @@ public partial class View // Layout APIs
         get => VerifyIsInitialized (_width, nameof (Width));
         set
         {
-            bool changed = CWPPropertyHelper.ChangeProperty (
+            CWPPropertyHelper.ChangeProperty (
                 _width,
                 value,
                 OnWidthChanging,
                 WidthChanging,
+                newValue =>
+                {
+                    _width = newValue;
+                    // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                    TextFormatter.ConstrainToWidth = null;
+                    PosDimSet ();
+                },
                 OnWidthChanged,
                 WidthChanged,
-                out Dim finalValue);
-
-            if (changed)
-            {
-                _width = finalValue;
-
-                // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-                TextFormatter.ConstrainToWidth = null;
-                PosDimSet ();
-            }
+                out Dim _);
         }
     }
 
