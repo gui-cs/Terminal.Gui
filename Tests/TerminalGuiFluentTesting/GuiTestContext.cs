@@ -1,6 +1,8 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace TerminalGuiFluentTesting;
 
@@ -13,17 +15,22 @@ public class GuiTestContext : IDisposable
     private readonly CancellationTokenSource _cts = new ();
     private readonly CancellationTokenSource _hardStop = new (With.Timeout);
     private readonly Task _runTask;
-    private Exception _ex;
+    private Exception? _ex;
     private readonly FakeOutput _output = new ();
     private readonly FakeWindowsInput _winInput;
     private readonly FakeNetInput _netInput;
     private View? _lastView;
+    private readonly object _logsLock = new ();
     private readonly StringBuilder _logsSb;
     private readonly V2TestDriver _driver;
     private bool _finished;
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver, TextWriter? logWriter = null)
     {
+        // Remove frame limit
+        Application.MaximumIterationsPerSecond = ushort.MaxValue;
+
         IApplication origApp = ApplicationImpl.Instance;
         ILogger? origLogger = Logging.Logger;
         _logsSb = new ();
@@ -33,12 +40,13 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
+        _fakeSizeMonitor = new ();
 
-        var v2 = new ApplicationV2 (
-                                    () => _netInput,
-                                    () => _output,
-                                    () => _winInput,
-                                    () => _output);
+        IComponentFactory cf = driver == V2TestDriver.V2Net
+                                   ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
+                                   : (IComponentFactory)new FakeWindowsComponentFactory (_winInput, _output, _fakeSizeMonitor);
+
+        var v2 = new ApplicationV2 (cf);
 
         var booting = new SemaphoreSlim (0, 1);
 
@@ -53,7 +61,9 @@ public class GuiTestContext : IDisposable
                                      ILogger logger = LoggerFactory.Create (
                                                                             builder =>
                                                                                 builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                       .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
+                                                                                       .AddProvider (
+                                                                                                     new TextWriterLoggerProvider (
+                                                                                                      new ThreadSafeStringWriter (_logsSb, _logsLock))))
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
@@ -67,29 +77,44 @@ public class GuiTestContext : IDisposable
 
                                      t.Dispose ();
                                      Application.Shutdown ();
+                                     _cts.Cancel ();
                                  }
                                  catch (OperationCanceledException)
                                  { }
                                  catch (Exception ex)
                                  {
                                      _ex = ex;
+
+                                     if (logWriter != null)
+                                     {
+                                         WriteOutLogs (logWriter);
+                                     }
+
+                                     _hardStop.Cancel ();
                                  }
                                  finally
                                  {
                                      ApplicationImpl.ChangeInstance (origApp);
                                      Logging.Logger = origLogger;
                                      _finished = true;
+
+                                     Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
                                  }
                              },
                              _cts.Token);
 
         // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (5)).Result)
+        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
         {
             throw new TimeoutException ("Application failed to start within the allotted time.");
         }
 
-        WaitIteration ();
+        ResizeConsole (width, height);
+
+        if (_ex != null)
+        {
+            throw new ("Application crashed", _ex);
+        }
     }
 
     private string GetDriverName ()
@@ -113,7 +138,7 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
-        Application.Invoke (() => { Application.RequestStop (); });
+        WaitIteration (() => { Application.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
@@ -123,7 +148,19 @@ public class GuiTestContext : IDisposable
             // Timeout occurred, force the task to stop
             _hardStop.Cancel ();
 
-            throw new TimeoutException ("Application failed to stop within the allotted time.");
+            // App is having trouble shutting down, try sending some more shutdown stuff from this thread.
+            // If this doesn't work there will be test cascade failures as the main loop continues to run during next test.
+            try
+            {
+                Application.RequestStop ();
+                Application.Shutdown ();
+            }
+            catch (Exception)
+            {
+                throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
+            }
+
+            throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
         }
 
         _cts.Cancel ();
@@ -139,8 +176,13 @@ public class GuiTestContext : IDisposable
     /// <summary>
     ///     Hard stops the application and waits for the background thread to exit.
     /// </summary>
-    public void HardStop ()
+    public void HardStop (Exception? ex = null)
     {
+        if (ex != null)
+        {
+            _ex = ex;
+        }
+
         _hardStop.Cancel ();
         Stop ();
     }
@@ -155,7 +197,8 @@ public class GuiTestContext : IDisposable
         if (_hardStop.IsCancellationRequested)
         {
             throw new (
-                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test");
+                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test",
+                       _ex);
         }
 
         _hardStop.Cancel ();
@@ -189,19 +232,27 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext ResizeConsole (int width, int height)
     {
-        _output.Size = new (width, height);
+        return WaitIteration (
+                              () =>
+                              {
+                                  _output.Size = new (width, height);
+                                  _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
 
-        return WaitIteration ();
+                                  var d = (IConsoleDriverFacade)Application.Driver!;
+                                  d.OutputBuffer.SetWindowSize (width, height);
+                              });
     }
 
     public GuiTestContext ScreenShot (string title, TextWriter writer)
     {
-        writer.WriteLine (title + ":");
-        var text = Application.ToString ();
+        return WaitIteration (
+                              () =>
+                              {
+                                  writer.WriteLine (title + ":");
+                                  var text = Application.ToString ();
 
-        writer.WriteLine (text);
-
-        return this; //WaitIteration();
+                                  writer.WriteLine (text);
+                              });
     }
 
     /// <summary>
@@ -211,7 +262,10 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext WriteOutLogs (TextWriter writer)
     {
-        writer.WriteLine (_logsSb.ToString ());
+        lock (_logsLock)
+        {
+            writer.WriteLine (_logsSb.ToString ());
+        }
 
         return this; //WaitIteration();
     }
@@ -230,14 +284,27 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
+        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
+        {
+            throw new NotSupportedException ("Cannot WaitIteration during Invoke");
+        }
+
         a ??= () => { };
         var ctsLocal = new CancellationTokenSource ();
 
         Application.Invoke (
                             () =>
                             {
-                                a ();
-                                ctsLocal.Cancel ();
+                                try
+                                {
+                                    a ();
+                                    ctsLocal.Cancel ();
+                                }
+                                catch (Exception e)
+                                {
+                                    _ex = e;
+                                    _hardStop.Cancel ();
+                                }
                             });
 
         // Blocks until either the token or the hardStopToken is cancelled.
@@ -262,10 +329,11 @@ public class GuiTestContext : IDisposable
     {
         try
         {
-            doAction ();
+            WaitIteration (doAction);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _ex = ex;
             HardStop ();
 
             throw;
@@ -298,10 +366,19 @@ public class GuiTestContext : IDisposable
 
     private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T : View
     {
-        T v = Find (evaluator);
-        Point screen = v.ViewportToScreen (new Point (0, 0));
+        T v;
+        var screen = Point.Empty;
 
-        return Click (btn, screen.X, screen.Y);
+        GuiTestContext ctx = WaitIteration (
+                                            () =>
+                                            {
+                                                v = Find (evaluator);
+                                                screen = v.ViewportToScreen (new Point (0, 0));
+                                            });
+
+        Click (btn, screen.X, screen.Y);
+
+        return ctx;
     }
 
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
@@ -310,16 +387,16 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
 
-                _winInput.InputBuffer.Enqueue (
-                                               new ()
-                                               {
-                                                   EventType = WindowsConsole.EventType.Mouse,
-                                                   MouseEvent = new ()
-                                                   {
-                                                       ButtonState = btn,
-                                                       MousePosition = new ((short)screenX, (short)screenY)
-                                                   }
-                                               });
+                _winInput.InputBuffer!.Enqueue (
+                                                new ()
+                                                {
+                                                    EventType = WindowsConsole.EventType.Mouse,
+                                                    MouseEvent = new ()
+                                                    {
+                                                        ButtonState = btn,
+                                                        MousePosition = new ((short)screenX, (short)screenY)
+                                                    }
+                                                });
 
                 _winInput.InputBuffer.Enqueue (
                                                new ()
@@ -332,7 +409,8 @@ public class GuiTestContext : IDisposable
                                                    }
                                                });
 
-                break;
+                return WaitUntil (() => _winInput.InputBuffer.IsEmpty);
+
             case V2TestDriver.V2Net:
 
                 int netButton = btn switch
@@ -346,17 +424,31 @@ public class GuiTestContext : IDisposable
 
                 foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
                 {
-                    SendNetKey (k);
+                    SendNetKey (k, false);
                 }
 
-                break;
+                return WaitIteration ();
             default:
                 throw new ArgumentOutOfRangeException ();
         }
+    }
 
-        return WaitIteration ();
+    private GuiTestContext WaitUntil (Func<bool> condition)
+    {
+        GuiTestContext? c = null;
+        var sw = Stopwatch.StartNew ();
 
-        ;
+        while (!condition ())
+        {
+            if (sw.Elapsed > With.Timeout)
+            {
+                throw new TimeoutException ("Failed to reach condition within the time limit");
+            }
+
+            c = WaitIteration ();
+        }
+
+        return c ?? this;
     }
 
     public GuiTestContext Down ()
@@ -379,8 +471,6 @@ public class GuiTestContext : IDisposable
         }
 
         return WaitIteration ();
-
-        ;
     }
 
     /// <summary>
@@ -607,12 +697,12 @@ public class GuiTestContext : IDisposable
         down.bKeyDown = true;
         up.bKeyDown = false;
 
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = down
-                                       });
+        _winInput.InputBuffer!.Enqueue (
+                                        new ()
+                                        {
+                                            EventType = WindowsConsole.EventType.Key,
+                                            KeyEvent = down
+                                        });
 
         _winInput.InputBuffer.Enqueue (
                                        new ()
@@ -624,7 +714,15 @@ public class GuiTestContext : IDisposable
         WaitIteration ();
     }
 
-    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo) { _netInput.InputBuffer.Enqueue (consoleKeyInfo); }
+    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo, bool wait = true)
+    {
+        _netInput.InputBuffer!.Enqueue (consoleKeyInfo);
+
+        if (wait)
+        {
+            WaitUntil (() => _netInput.InputBuffer.IsEmpty);
+        }
+    }
 
     /// <summary>
     ///     Sends a special key e.g. cursor key that does not map to a specific character
@@ -632,20 +730,20 @@ public class GuiTestContext : IDisposable
     /// <param name="specialKey"></param>
     private void SendWindowsKey (ConsoleKeyMapping.VK specialKey)
     {
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new ()
-                                           {
-                                               bKeyDown = true,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = specialKey,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
+        _winInput.InputBuffer!.Enqueue (
+                                        new ()
+                                        {
+                                            EventType = WindowsConsole.EventType.Key,
+                                            KeyEvent = new ()
+                                            {
+                                                bKeyDown = true,
+                                                wRepeatCount = 0,
+                                                wVirtualKeyCode = specialKey,
+                                                wVirtualScanCode = 0,
+                                                UnicodeChar = '\0',
+                                                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
+                                            }
+                                        });
 
         _winInput.InputBuffer.Enqueue (
                                        new ()
@@ -673,7 +771,7 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext RaiseKeyDownEvent (Key key)
     {
-        Application.RaiseKeyDownEvent (key);
+        WaitIteration (() => Application.RaiseKeyDownEvent (key));
 
         return this; //WaitIteration();
     }
@@ -704,9 +802,11 @@ public class GuiTestContext : IDisposable
     ///     is found (of Type T) or all views are looped through (back to the beginning)
     ///     in which case triggers hard stop and Exception
     /// </summary>
-    /// <param name="evaluator">Delegate that returns true if the passed View is the one
-    /// you are trying to focus. Leave <see langword="null"/> to focus the first view of type
-    /// <typeparamref name="T"/></param>
+    /// <param name="evaluator">
+    ///     Delegate that returns true if the passed View is the one
+    ///     you are trying to focus. Leave <see langword="null"/> to focus the first view of type
+    ///     <typeparamref name="T"/>
+    /// </param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
@@ -736,11 +836,14 @@ public class GuiTestContext : IDisposable
             // No, try tab to the next (or first)
             Tab ();
             WaitIteration ();
+
             next = t.MostFocused;
 
             if (next is null)
             {
-                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null");
+                Fail (
+                      "Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null"
+                      + DescribeSeenViews (seen));
 
                 return this;
             }
@@ -749,13 +852,17 @@ public class GuiTestContext : IDisposable
             // We have looped around to the start again if it was already there
             if (!seen.Add (next))
             {
-                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View");
+                Fail (
+                      "Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View"
+                      + DescribeSeenViews (seen));
 
                 return this;
             }
         }
         while (true);
     }
+
+    private string DescribeSeenViews (HashSet<View> seen) { return Environment.NewLine + string.Join (Environment.NewLine, seen); }
 
     private T Find<T> (Func<T, bool> evaluator) where T : View
     {
@@ -806,25 +913,70 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext Send (Key key)
     {
-        if (Application.Driver is IConsoleDriverFacade facade)
-        {
-            facade.InputProcessor.OnKeyDown (key);
-            facade.InputProcessor.OnKeyUp (key);
-        }
-        else
-        {
-            Fail ("Expected Application.Driver to be IConsoleDriverFacade");
-        }
-
-        return this;
+        return WaitIteration (
+                              () =>
+                              {
+                                  if (Application.Driver is IConsoleDriverFacade facade)
+                                  {
+                                      facade.InputProcessor.OnKeyDown (key);
+                                      facade.InputProcessor.OnKeyUp (key);
+                                  }
+                                  else
+                                  {
+                                      Fail ("Expected Application.Driver to be IConsoleDriverFacade");
+                                  }
+                              });
     }
 
     /// <summary>
-    /// Returns the last set position of the cursor.
+    ///     Returns the last set position of the cursor.
     /// </summary>
     /// <returns></returns>
-    public Point GetCursorPosition ()
+    public Point GetCursorPosition () { return _output.CursorPosition; }
+}
+
+internal class FakeWindowsComponentFactory : WindowsComponentFactory
+{
+    private readonly FakeWindowsInput _winInput;
+    private readonly FakeOutput _output;
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
+
+    public FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
     {
-        return _output.CursorPosition;
+        _winInput = winInput;
+        _output = output;
+        _fakeSizeMonitor = fakeSizeMonitor;
     }
+
+    /// <inheritdoc/>
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return _winInput; }
+
+    /// <inheritdoc/>
+    public override IConsoleOutput CreateOutput () { return _output; }
+
+    /// <inheritdoc/>
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
+}
+
+internal class FakeNetComponentFactory : NetComponentFactory
+{
+    private readonly FakeNetInput _netInput;
+    private readonly FakeOutput _output;
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
+
+    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
+    {
+        _netInput = netInput;
+        _output = output;
+        _fakeSizeMonitor = fakeSizeMonitor;
+    }
+
+    /// <inheritdoc/>
+    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return _netInput; }
+
+    /// <inheritdoc/>
+    public override IConsoleOutput CreateOutput () { return _output; }
+
+    /// <inheritdoc/>
+    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }

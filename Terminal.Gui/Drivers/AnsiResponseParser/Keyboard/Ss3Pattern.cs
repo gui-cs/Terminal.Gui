@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 public class Ss3Pattern : AnsiKeyboardParserPattern
 {
 #pragma warning disable IDE1006 // Naming Styles
-    private static readonly Regex _pattern = new (@"^\u001bO([PQRStDCAB])$");
+    private static readonly Regex _pattern = new (@"^\u001bO([PQRStDCABOHFwqysu])$");
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <inheritdoc/>
@@ -41,6 +41,13 @@ public class Ss3Pattern : AnsiKeyboardParserPattern
                    'C' => Key.CursorRight,
                    'A' => Key.CursorUp,
                    'B' => Key.CursorDown,
+                   'H' => Key.Home,
+                   'F' => Key.End,
+                   'w' => Key.Home,
+                   'q' => Key.End,
+                   'y' => Key.PageUp,
+                   's' => Key.PageDown,
+                   'u' => Key.Clear,
                    _ => null
                };
     }

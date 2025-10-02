@@ -56,8 +56,8 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (12, 12);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.FakeResize(new Size(12, 12));
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -79,7 +79,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.ScrollVertical (10));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (-1, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -100,7 +100,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.MoveDown ());
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -121,7 +121,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.MoveEnd ());
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (19, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -142,7 +142,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.ScrollVertical (-20));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (19, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -163,7 +163,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.MoveDown ());
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (19, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -184,7 +184,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.ScrollVertical (-20));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (19, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -205,7 +205,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.MoveDown ());
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (19, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -226,7 +226,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.MoveHome ());
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -247,7 +247,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.ScrollVertical (20));
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -268,7 +268,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.MoveUp ());
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (0, lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -305,7 +305,7 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -319,7 +319,7 @@ Item 4",
 
         // EnsureSelectedItemVisible is auto enabled on the OnSelectedChanged
         lv.SelectedItem = 6;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -343,7 +343,7 @@ Item 6",
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal ("Second ", GetContents (0));
         Assert.Equal (new (' ', 7), GetContents (1));
@@ -724,7 +724,7 @@ Item 6",
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (1), lv.Border.Thickness);
         Assert.Equal (-1, lv.SelectedItem);
@@ -798,7 +798,7 @@ Item 6",
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -811,7 +811,7 @@ Item 6",
 
         lv.LeftItem = 1;
         lv.TopItem = 1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"

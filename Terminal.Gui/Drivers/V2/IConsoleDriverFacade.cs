@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿#nullable enable
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Interface for v2 driver abstraction layer
@@ -10,5 +11,16 @@ public interface IConsoleDriverFacade
     ///     e.g. <see cref="ConsoleKeyInfo"/> into <see cref="Key"/> events
     ///     and detecting and processing ansi escape sequences.
     /// </summary>
-    public IInputProcessor InputProcessor { get; }
+    IInputProcessor InputProcessor { get; }
+
+    /// <summary>
+    ///     Describes the desired screen state. Data source for <see cref="IConsoleOutput"/>.
+    /// </summary>
+    IOutputBuffer OutputBuffer { get; }
+
+    /// <summary>
+    ///     Interface for classes responsible for reporting the current
+    ///     size of the terminal window.
+    /// </summary>
+    IWindowSizeMonitor WindowSizeMonitor { get; }
 }

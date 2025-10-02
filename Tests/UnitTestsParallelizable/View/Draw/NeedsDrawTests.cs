@@ -10,7 +10,7 @@ public class NeedsDrawTests
         View view = new () { Width = 0, Height = 0 };
         view.BeginInit ();
         view.EndInit ();
-        Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsDraw);
 
         //Assert.False (view.SubViewNeedsDraw);
     }
@@ -70,14 +70,16 @@ public class NeedsDrawTests
         view.NeedsDraw = false;
 
         view.BeginInit ();
-        Assert.True (view.NeedsDraw); // Because layout is still needed
+        Assert.False (view.NeedsDraw); // Because layout is still needed
 
         view.Layout ();
-        Assert.False (view.NeedsDraw);
+        // NeedsDraw is true after layout and NeedsLayout is false if SubViewsLaidOut doesn't call SetNeedsLayout
+        Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
     }
 
     [Fact]
-    public void NeedsDraw_False_After_EndInit ()
+    public void NeedsDraw_True_After_EndInit_Where_Call_Layout ()
     {
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         Assert.True (view.NeedsDraw);
@@ -96,7 +98,7 @@ public class NeedsDrawTests
     }
 
     [Fact]
-    public void NeedsDraw_After_SetLayoutNeeded ()
+    public void NeedsDraw_After_SetLayoutNeeded_And_Layout ()
     {
         var view = new View { Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
@@ -107,8 +109,12 @@ public class NeedsDrawTests
         Assert.False (view.NeedsLayout);
 
         view.SetNeedsLayout ();
-        Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsDraw);
         Assert.True (view.NeedsLayout);
+
+        view.Layout ();
+        Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
     }
 
     [Fact]
@@ -121,21 +127,27 @@ public class NeedsDrawTests
         Assert.False (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
 
-        // SRL won't change anything since the view is Absolute
+        // SRL won't change anything since the view frame wasn't changed
         view.SetRelativeLayout (Application.Screen.Size);
         Assert.False (view.NeedsDraw);
 
         view.SetNeedsLayout ();
 
-        // SRL won't change anything since the view is Absolute
+        // SRL won't change anything since the view frame wasn't changed
+        // SRL doesn't depend on NeedsLayout, but LayoutSubViews does
         view.SetRelativeLayout (Application.Screen.Size);
+        Assert.False (view.NeedsDraw);
+        Assert.True (view.NeedsLayout);
+
+        view.Layout ();
         Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
 
         view.NeedsDraw = false;
 
-        // SRL won't change anything since the view is Absolute. However, Layout has not been called
+        // SRL won't change anything since the view frame wasn't changed. However, Layout has not been called
         view.SetRelativeLayout (new (10, 10));
-        Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsDraw);
     }
 
     [Fact]
@@ -149,17 +161,20 @@ public class NeedsDrawTests
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
-        Assert.True (superView.NeedsDraw);
+
+        // A layout wasn't called yet, so NeedsDraw is still empty
+        Assert.False (superView.NeedsDraw);
 
         superView.Add (view);
-        Assert.True (view.NeedsDraw);
-        Assert.True (superView.NeedsDraw);
+        // A layout wasn't called yet, so NeedsDraw is still empty
+        Assert.False (view.NeedsDraw);
+        Assert.False (superView.NeedsDraw);
 
         superView.BeginInit ();
-        Assert.True (view.NeedsDraw);
-        Assert.True (superView.NeedsDraw);
+        Assert.False (view.NeedsDraw);
+        Assert.False (superView.NeedsDraw);
 
-        superView.EndInit ();
+        superView.EndInit (); // Call Layout
         Assert.True (view.NeedsDraw);
         Assert.True (superView.NeedsDraw);
 
@@ -177,9 +192,10 @@ public class NeedsDrawTests
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
-        Assert.True (superView.NeedsDraw);
+        Assert.False (superView.NeedsDraw);
 
         superView.Layout ();
+        Assert.True (superView.NeedsDraw);
 
         superView.NeedsDraw = false;
         superView.SetRelativeLayout (new (10, 10));

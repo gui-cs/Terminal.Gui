@@ -20,7 +20,10 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
 #pragma warning restore CA2211
 
     /// <inheritdoc/>
-    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ()) { }
+    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ())
+    {
+        DriverName = "net";
+    }
 
     /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo consoleKeyInfo)
@@ -41,8 +44,13 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     protected override void ProcessAfterParsing (ConsoleKeyInfo input)
     {
         var key = KeyConverter.ToKey (input);
-        OnKeyDown (key);
-        OnKeyUp (key);
+
+        // If the key is not valid, we don't want to raise any events.
+        if (IsValidInput (key, out key))
+        {
+            OnKeyDown (key);
+            OnKeyUp (key);
+        }
     }
 
     /* For building test cases */

@@ -49,7 +49,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     {
         AutoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-        _driverType = consoleDriverType ?? typeof (FakeDriver);
+        _driverType = consoleDriverType;
         FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
@@ -59,13 +59,16 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
     private readonly bool _verifyShutdown;
     private readonly Type _driverType;
+    private IDisposable _v2Cleanup;
 
     public override void After (MethodInfo methodUnderTest)
     {
-        Debug.WriteLine ($"After: {methodUnderTest.Name}");
+        Debug.WriteLine ($"After: {methodUnderTest?.Name ?? "Unknown Test"}");
 
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
+
+        _v2Cleanup?.Dispose ();
 
         if (AutoInit)
         {
@@ -109,7 +112,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
     public override void Before (MethodInfo methodUnderTest)
     {
-        Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+        Debug.WriteLine ($"Before: {methodUnderTest?.Name ?? "Unknown Test"}");
 
         // Disable & force the ConfigurationManager to reset to its hardcoded defaults
         CM.Disable (true);
@@ -131,9 +134,43 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+            if (_driverType == null)
+            {
+                Application.Top = null;
+                Application.TopLevels.Clear ();
+
+                var fa = new FakeApplicationFactory ();
+                _v2Cleanup = fa.SetupFakeApplication ();
+                AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+            }
+            else
+            {
+                Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+            }
         }
     }
 
     private bool AutoInit { get; }
+
+    /// <summary>
+    /// 'Resizes' the application and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
+    /// </summary>
+    /// <param name="size"></param>
+    public static void FakeResize (Size size)
+    {
+        var d = (IConsoleDriverFacade)Application.Driver!;
+        d.OutputBuffer.SetWindowSize (size.Width, size.Height);
+        ((FakeSizeMonitor)d.WindowSizeMonitor).RaiseSizeChanging (size);
+
+        Application.LayoutAndDrawImpl ();
+    }
+
+    /// <summary>
+    /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
+    /// </summary>
+    public static void RunIteration ()
+    {
+        var a = (ApplicationV2)ApplicationImpl.Instance;
+        a.Coordinator?.RunIteration ();
+    }
 }

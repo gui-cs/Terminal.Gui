@@ -5,7 +5,7 @@
 /// </summary>
 /// <remarks>
 ///     See the Layout Deep Dive for more information:
-///     <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+///     <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
 /// </remarks>
 [Flags]
 public enum ViewportSettingsFlags

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using TerminalGuiFluentTesting;
+using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
@@ -167,15 +168,15 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.IsNotType<MenuItemv2> (Application.Navigation!.GetFocused ()))
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
                                      .WaitIteration ()
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .WriteOutLogs (_out)
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Title))
-                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.True (menuBar?.IsOpen ()))
+                                     .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
+                                     .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertTrue (menuBar?.IsOpen ())
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -205,14 +206,14 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.IsNotType<MenuItemv2>(Application.Navigation!.GetFocused()))
+                                     .AssertIsNotType<MenuItemv2>(Application.Navigation!.GetFocused())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Title))
+                                     .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
-                                     .Then (() => Assert.IsNotType<MenuItemv2>(Application.Navigation!.GetFocused()))
+                                     .AssertIsNotType<MenuItemv2>(Application.Navigation!.GetFocused())
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -328,24 +329,24 @@ public class MenuBarv2Tests
                                      .WaitIteration ()
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
-                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.True (menuBar?.IsOpen ()))
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertTrue (menuBar?.IsOpen ())
+                                     .AssertEqual ("_New file", Application.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .Right ()
-                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
                                      .ScreenShot ("After right arrow", _out)
-                                     .Then (() => Assert.Equal ("Cu_t", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertEqual ("Cu_t", Application.Navigation?.GetFocused ()!.Title)
                                      .Right ()
                                      .ScreenShot ("After second right arrow", _out)
-                                     .Then (() => Assert.Equal ("_Online Help...", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertEqual ("_Online Help...", Application.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ("After third right arrow", _out)
                                      .Right ()
                                      .ScreenShot ("After fourth right arrow", _out)
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertEqual ("_New file", Application.Navigation?.GetFocused ()!.Title)
                                      .Left ()
                                      .ScreenShot ("After left arrow", _out)
-                                     .Then (() => Assert.Equal ("_Online Help...", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertEqual ("_Online Help...", Application.Navigation?.GetFocused ()!.Title)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -375,17 +376,17 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.IsNotType<MenuItemv2>(Application.Navigation!.GetFocused()))
+                                     .AssertIsNotType<MenuItemv2>(Application.Navigation!.GetFocused())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Title))
-                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.True (menuBar?.IsOpen ()))
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
+                                     .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertTrue (menuBar?.IsOpen ())
+                                     .AssertEqual ("_New file", Application.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .RaiseKeyDownEvent (Application.QuitKey)
-                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.IsNotType<MenuItemv2> (Application.Navigation!.GetFocused ()))
+                                     .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -414,19 +415,19 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.IsNotType<MenuItemv2> (Application.Navigation!.GetFocused ()))
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
                                      .RaiseKeyDownEvent (Key.CursorRight)
-                                     .Then (() => Assert.Equal ("Cu_t", Application.Navigation!.GetFocused ()!.Title))
-                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.True (menuBar?.IsOpen ()))
-                                     .Then (() => Assert.Equal ("Cu_t", Application.Navigation?.GetFocused ()!.Title))
+                                     .AssertEqual ("Cu_t", Application.Navigation!.GetFocused ()!.Title)
+                                     .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertTrue (menuBar?.IsOpen ())
+                                     .AssertEqual ("Cu_t", Application.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .RaiseKeyDownEvent (Application.QuitKey)
                                      .WriteOutLogs (_out)
-                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.IsNotType<MenuItemv2> (Application.Navigation!.GetFocused ()))
+                                     .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .Stop ();
     }
 
@@ -454,15 +455,15 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.IsNotType<MenuItemv2> (Application.Navigation!.GetFocused ()))
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Title))
-                                     .Then (() => Assert.True (Application.Top!.Running))
+                                     .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
+                                     .AssertTrue (Application.Top!.Running)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .RaiseKeyDownEvent (Application.QuitKey)
-                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.True (Application.Top!.Running))
+                                     .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertTrue (Application.Top!.Running)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -496,14 +497,14 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .Then (() => Assert.IsNotType<MenuItemv2> (Application.Navigation!.GetFocused ()))
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .RaiseKeyDownEvent (MenuBarv2.DefaultKey)
-                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Title))
+                                     .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .RaiseKeyDownEvent (Application.QuitKey)
-                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
-                                     .Then (() => Assert.True (Application.Top!.Running))
+                                     .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                     .AssertTrue (Application.Top!.Running)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -540,7 +541,7 @@ public class MenuBarv2Tests
                                      .WaitIteration ()
                                      .Focus (testView)
                                      .RaiseKeyDownEvent (Key.Space)
-                                     .Then (() => Assert.Equal (1, spaceKeyDownCount))
+                                     .AssertEqual (1, spaceKeyDownCount)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
@@ -577,7 +578,7 @@ public class MenuBarv2Tests
                                      .WaitIteration ()
                                      .Focus (testView)
                                      .RaiseKeyDownEvent (Key.Enter)
-                                     .Then (() => Assert.Equal (1, enterKeyDownCount))
+                                     .AssertEqual (1, enterKeyDownCount)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }

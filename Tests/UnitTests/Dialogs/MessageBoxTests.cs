@@ -155,7 +155,7 @@ public class MessageBoxTests
     {
         int iterations = -1;
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
+        AutoInitShutdownAttribute.FakeResize(new Size(15, 15)); // 15 x 15 gives us enough room for a button with one char (9x1)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
@@ -189,7 +189,7 @@ public class MessageBoxTests
         int iterations = -1;
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
 
         var btn =
             $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} btn {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
@@ -217,9 +217,8 @@ public class MessageBoxTests
 
                                          Application.RequestStop ();
                                      }
-                                     else if (iterations == 1)
+                                     else if (iterations == 2)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -234,9 +233,8 @@ public class MessageBoxTests
                                          // Really long text
                                          MessageBox.Query (string.Empty, new ('f', 500), 0, false, "btn");
                                      }
-                                     else if (iterations == 2)
+                                     else if (iterations == 4)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -261,7 +259,7 @@ public class MessageBoxTests
         int iterations = -1;
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
 
         var btn =
             $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} btn {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
@@ -289,9 +287,8 @@ public class MessageBoxTests
 
                                          Application.RequestStop ();
                                      }
-                                     else if (iterations == 1)
+                                     else if (iterations == 2)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -309,9 +306,8 @@ public class MessageBoxTests
                                          // Really long text
                                          MessageBox.Query (string.Empty, new ('f', 500), 0, true, "btn");
                                      }
-                                     else if (iterations == 2)
+                                     else if (iterations == 4)
                                      {
-                                         Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                         @"
@@ -347,7 +343,7 @@ public class MessageBoxTests
     public void Size_Not_Default_Message (int height, int width, string message)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
+        AutoInitShutdownAttribute.FakeResize(new Size(100, 100));
 
         Application.Iteration += (s, a) =>
                                  {
@@ -361,7 +357,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -384,7 +380,7 @@ public class MessageBoxTests
     public void Size_Not_Default_Message_Button (int height, int width, string message)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
+        AutoInitShutdownAttribute.FakeResize(new Size(100, 100));
 
         Application.Iteration += (s, a) =>
                                  {
@@ -398,7 +394,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -417,7 +413,7 @@ public class MessageBoxTests
     public void Size_Not_Default_No_Message (int height, int width)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
+        AutoInitShutdownAttribute.FakeResize(new Size(100, 100));
 
         Application.Iteration += (s, a) =>
                                  {
@@ -431,7 +427,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.LayoutAndDraw ();
+                                         AutoInitShutdownAttribute.RunIteration ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -446,7 +442,7 @@ public class MessageBoxTests
     public void UICatalog_AboutBox ()
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (70, 15);
+        AutoInitShutdownAttribute.FakeResize (new Size (70, 15));
 
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
@@ -469,10 +465,8 @@ public class MessageBoxTests
 
                                          Application.RequestStop ();
                                      }
-                                     else if (iterations == 1)
+                                     else if (iterations == 2)
                                      {
-                                         Application.LayoutAndDraw ();
-
                                          var expectedText = """
                                                             ┌────────────────────────────────────────────────────────────────────┐
                                                             │   ╔═══════════════════════════════════════════════════════════╗    │
@@ -505,16 +499,13 @@ public class MessageBoxTests
 
     [Theory]
     [MemberData (nameof (AcceptingKeys))]
+    [AutoInitShutdown]
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
-        Application.Init (new FakeDriver ());
-
         Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
         int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
 
         Assert.Equal (0, res);
-
-        Application.Shutdown ();
     }
 
     public static IEnumerable<object []> AcceptingKeys ()

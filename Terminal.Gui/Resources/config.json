@@ -10,7 +10,7 @@
   // note that not all values here will be recreated (e.g. the Light and Dark themes and any property initialized
   // null).
   //
-  "$schema": "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
+  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
 
   // Set this to true in a .config file to be loaded to cause JSON parsing errors
   // to throw exceptions. 

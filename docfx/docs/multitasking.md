@@ -119,44 +119,6 @@ public class ClockView : View
 - **Keep timer callbacks fast** - they run on the main thread
 - **Use appropriate intervals** - too frequent updates can impact performance
 
-## Idle Processing
-
-Idle handlers run when the application has no events to process, useful for background maintenance:
-
-```csharp
-public class AutoSaveView : View
-{
-    private object idleToken;
-    private DateTime lastSave = DateTime.Now;
-    
-    public AutoSaveView()
-    {
-        idleToken = Application.MainLoop.AddIdle(CheckAutoSave);
-    }
-    
-    private bool CheckAutoSave()
-    {
-        if (DateTime.Now - lastSave > TimeSpan.FromMinutes(5))
-        {
-            if (HasUnsavedChanges())
-            {
-                SaveDocument();
-                lastSave = DateTime.Now;
-            }
-        }
-        return true; // Continue idle processing
-    }
-    
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && idleToken != null)
-        {
-            Application.MainLoop.RemoveIdle(idleToken);
-        }
-        base.Dispose(disposing);
-    }
-}
-```
 
 ## Common Patterns
 

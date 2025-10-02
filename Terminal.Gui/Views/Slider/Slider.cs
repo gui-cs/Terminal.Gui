@@ -1311,7 +1311,7 @@ public class Slider<T> : View, IOrientation
             {
                 _dragPosition = mouseEvent.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
-                Application.GrabMouse (this);
+                Application.MouseGrabHandler.GrabMouse (this);
             }
 
             SetNeedsDraw ();
@@ -1357,7 +1357,7 @@ public class Slider<T> : View, IOrientation
             || mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             // End Drag
-            Application.UngrabMouse ();
+            Application.MouseGrabHandler.UngrabMouse ();
             _dragPosition = null;
             _moveRenderPosition = null;
 

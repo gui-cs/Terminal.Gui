@@ -515,7 +515,7 @@ public class TextView : View, IDesignable
                     Command.Context,
                     () =>
                     {
-                        ShowContextMenu (true);
+                        ShowContextMenu (null);
 
                         return true;
                     }
@@ -1677,15 +1677,15 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
-            if (Application.MouseGrabView is null)
+            if (Application.MouseGrabHandler.MouseGrabView is null)
             {
-                Application.GrabMouse (this);
+                Application.MouseGrabHandler.GrabMouse (this);
             }
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1Released))
         {
             _isButtonReleased = true;
-            Application.UngrabMouse ();
+            Application.MouseGrabHandler.UngrabMouse ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
@@ -1745,13 +1745,7 @@ public class TextView : View, IDesignable
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu!.X = ev.ScreenPosition.X;
-            ContextMenu!.Y = ev.ScreenPosition.Y;
-
-            ShowContextMenu (false);
-
-            //ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
-            //ShowContextMenu ();
+            ShowContextMenu (ev.ScreenPosition);
         }
 
         OnUnwrappedCursorPosition ();
@@ -1893,9 +1887,9 @@ public class TextView : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
+        if (Application.MouseGrabHandler.MouseGrabView is { } && Application.MouseGrabHandler.MouseGrabView == this)
         {
-            Application.UngrabMouse ();
+            Application.MouseGrabHandler.UngrabMouse ();
         }
     }
 
@@ -2039,7 +2033,7 @@ public class TextView : View, IDesignable
             return null;
         }
 
-        if (Application.MouseGrabView == this && IsSelecting)
+        if (Application.MouseGrabHandler.MouseGrabView == this && IsSelecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
@@ -4574,14 +4568,18 @@ public class TextView : View, IDesignable
         }
     }
 
-    private void ShowContextMenu (bool keyboard)
+    private void ShowContextMenu (Point? mousePosition)
     {
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        ContextMenu?.MakeVisible (ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y)));
+        if (mousePosition is null)
+        {
+            mousePosition = ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y));
+        }
+        ContextMenu?.MakeVisible (mousePosition);
     }
 
     private void StartSelecting ()

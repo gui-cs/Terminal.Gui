@@ -5,11 +5,18 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View // Mouse APIs
 {
+    /// <summary>
+    /// Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
+    /// down in the view and have grabbed the mouse.
+    /// </summary>
+    public IMouseHeldDown? MouseHeldDown { get; set; }
+
     /// <summary>Gets the mouse bindings for this view.</summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
 
     private void SetupMouse ()
     {
+        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents,Application.MouseGrabHandler);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
@@ -307,6 +314,19 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
+        // TODO: probably this should be moved elsewhere, please advise
+        if (WantContinuousButtonPressed && MouseHeldDown != null)
+        {
+            if (mouseEvent.IsPressed)
+            {
+                MouseHeldDown.Start ();
+            }
+            else
+            {
+                MouseHeldDown.Stop ();
+            }
+        }
+
         if (OnMouseEvent (mouseEvent) || mouseEvent.Handled)
         {
             return true;
@@ -355,7 +375,7 @@ public partial class View // Mouse APIs
 
         if (mouseEvent.IsReleased)
         {
-            if (Application.MouseGrabView == this)
+            if (Application.MouseGrabHandler.MouseGrabView == this)
             {
                 //Logging.Debug ($"{Id} - {MouseState}");
                 MouseState &= ~MouseState.Pressed;
@@ -387,9 +407,9 @@ public partial class View // Mouse APIs
         if (mouseEvent.IsPressed)
         {
             // The first time we get pressed event, grab the mouse and set focus
-            if (Application.MouseGrabView != this)
+            if (Application.MouseGrabHandler.MouseGrabView != this)
             {
-                Application.GrabMouse (this);
+                Application.MouseGrabHandler.GrabMouse (this);
 
                 if (!HasFocus && CanFocus)
                 {
@@ -423,11 +443,6 @@ public partial class View // Mouse APIs
                 {
                     MouseState |= MouseState.PressedOutside;
                 }
-            }
-
-            if (WantContinuousButtonPressed && Application.MouseGrabView == this)
-            {
-                return RaiseMouseClickEvent (mouseEvent);
             }
 
             return mouseEvent.Handled = true;
@@ -526,10 +541,10 @@ public partial class View // Mouse APIs
     {
         mouseEvent.Handled = false;
 
-        if (Application.MouseGrabView == this && mouseEvent.IsSingleClicked)
+        if (Application.MouseGrabHandler.MouseGrabView == this && mouseEvent.IsSingleClicked)
         {
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
-            Application.UngrabMouse ();
+            Application.MouseGrabHandler.UngrabMouse ();
 
             // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
             // TODO: There may be perf gains if we don't unset these flags here

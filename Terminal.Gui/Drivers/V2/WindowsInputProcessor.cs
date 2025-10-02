@@ -13,7 +13,10 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     private readonly bool [] _lastWasPressed = new bool[4];
 
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ()) { }
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ())
+    {
+        DriverName = "win";
+    }
 
     /// <inheritdoc/>
     protected override void Process (InputRecord inputEvent)
@@ -71,7 +74,8 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     {
         var key = KeyConverter.ToKey (input);
 
-        if (key != (Key)0)
+        // If the key is not valid, we don't want to raise any events.
+        if (IsValidInput (key, out key))
         {
             OnKeyDown (key!);
             OnKeyUp (key!);
@@ -82,10 +86,29 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
     {
         var mouseFlags = MouseFlags.None;
 
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, WindowsConsole.ButtonState.Button1Pressed, MouseFlags.Button1Pressed, MouseFlags.Button1Released, 0);
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, WindowsConsole.ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
-        mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, WindowsConsole.ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
+        mouseFlags = UpdateMouseFlags (
+                                       mouseFlags,
+                                       e.ButtonState,
+                                       WindowsConsole.ButtonState.Button1Pressed,
+                                       MouseFlags.Button1Pressed,
+                                       MouseFlags.Button1Released,
+                                       0);
 
+        mouseFlags = UpdateMouseFlags (
+                                       mouseFlags,
+                                       e.ButtonState,
+                                       WindowsConsole.ButtonState.Button2Pressed,
+                                       MouseFlags.Button2Pressed,
+                                       MouseFlags.Button2Released,
+                                       1);
+
+        mouseFlags = UpdateMouseFlags (
+                                       mouseFlags,
+                                       e.ButtonState,
+                                       WindowsConsole.ButtonState.Button4Pressed,
+                                       MouseFlags.Button4Pressed,
+                                       MouseFlags.Button4Released,
+                                       3);
 
         // Deal with button 3 separately because it is considered same as 'rightmost button'
         if (e.ButtonState.HasFlag (WindowsConsole.ButtonState.Button3Pressed) || e.ButtonState.HasFlag (WindowsConsole.ButtonState.RightmostButtonPressed))

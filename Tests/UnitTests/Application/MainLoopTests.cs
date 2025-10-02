@@ -29,61 +29,38 @@ public class MainLoopTests
 
     // Idle Handler tests
     [Fact]
-    public void AddIdle_Adds_And_Removes ()
+    public void AddTimeout_Adds_And_Removes ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
 
         Func<bool> fnTrue = () => true;
         Func<bool> fnFalse = () => false;
 
-        ml.AddIdle (fnTrue);
-        ml.AddIdle (fnFalse);
+        var a = ml.TimedEvents.Add (TimeSpan.Zero, fnTrue);
+        var b = ml.TimedEvents.Add (TimeSpan.Zero, fnFalse);
 
-        Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
-        Assert.NotEqual (fnFalse, ml.TimedEvents.IdleHandlers [0]);
+        Assert.Equal (2, ml.TimedEvents.Timeouts.Count);
+        Assert.Equal (fnTrue, ml.TimedEvents.Timeouts.ElementAt (0).Value.Callback);
+        Assert.NotEqual (fnFalse, ml.TimedEvents.Timeouts.ElementAt (0).Value.Callback);
 
-        Assert.True (ml.TimedEvents.RemoveIdle (fnTrue));
-        Assert.Single (ml.TimedEvents.IdleHandlers);
+        Assert.True (ml.TimedEvents.Remove (a));
+        Assert.Single (ml.TimedEvents.Timeouts);
 
         // BUGBUG: This doesn't throw or indicate an error. Ideally RemoveIdle would either 
         // throw an exception in this case, or return an error.
         // No. Only need to return a boolean.
-        Assert.False (ml.TimedEvents.RemoveIdle (fnTrue));
+        Assert.False (ml.TimedEvents.Remove (a));
 
-        Assert.True (ml.TimedEvents.RemoveIdle (fnFalse));
-
-        // BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
-        // throw an exception in this case, or return an error.
-        // No. Only need to return a boolean.
-        Assert.False (ml.TimedEvents.RemoveIdle (fnFalse));
-
-        // Add again, but with dupe
-        ml.AddIdle (fnTrue);
-        ml.AddIdle (fnTrue);
-
-        Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
-        Assert.True (ml.TimedEvents.IdleHandlers [0] ());
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [1]);
-        Assert.True (ml.TimedEvents.IdleHandlers [1] ());
-
-        Assert.True (ml.TimedEvents.RemoveIdle (fnTrue));
-        Assert.Single (ml.TimedEvents.IdleHandlers);
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
-        Assert.NotEqual (fnFalse, ml.TimedEvents.IdleHandlers [0]);
-
-        Assert.True (ml.TimedEvents.RemoveIdle (fnTrue));
-        Assert.Empty (ml.TimedEvents.IdleHandlers);
+        Assert.True (ml.TimedEvents.Remove (b));
 
         // BUGBUG: This doesn't throw an exception or indicate an error. Ideally RemoveIdle would either 
         // throw an exception in this case, or return an error.
         // No. Only need to return a boolean.
-        Assert.False (ml.TimedEvents.RemoveIdle (fnTrue));
+        Assert.False (ml.TimedEvents.Remove(b));
     }
 
     [Fact]
-    public void AddIdle_Function_GetsCalled_OnIteration ()
+    public void AddTimeout_Function_GetsCalled_OnIteration ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
 
@@ -96,13 +73,13 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
+        ml.TimedEvents.Add (TimeSpan.Zero, fn);
         ml.RunIteration ();
         Assert.Equal (1, functionCalled);
     }
 
     [Fact]
-    public void AddIdle_Twice_Returns_False_Called_Twice ()
+    public void AddTimeout_Twice_Returns_False_Called_Twice ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
 
@@ -130,19 +107,21 @@ public class MainLoopTests
                                 return true;
                             };
 
-        ml.AddIdle (fnStop);
-        ml.AddIdle (fn1);
-        ml.AddIdle (fn1);
+        var a = ml.TimedEvents.Add (TimeSpan.Zero, fnStop);
+        var b = ml.TimedEvents.Add (TimeSpan.Zero, fn1);
         ml.Run ();
-        Assert.True (ml.TimedEvents.RemoveIdle (fnStop));
-        Assert.False (ml.TimedEvents.RemoveIdle (fn1));
-        Assert.False (ml.TimedEvents.RemoveIdle (fn1));
 
-        Assert.Equal (2, functionCalled);
+        Assert.True (ml.TimedEvents.Remove(a));
+        Assert.False (ml.TimedEvents.Remove (a));
+
+        // Cannot remove b because it returned false i.e. auto removes itself
+        Assert.False (ml.TimedEvents.Remove (b));
+
+        Assert.Equal (1, functionCalled);
     }
 
     [Fact]
-    public void AddIdleTwice_Function_CalledTwice ()
+    public void AddTimeoutTwice_Function_CalledTwice ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
 
@@ -155,24 +134,24 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
-        ml.AddIdle (fn);
+        var a = ml.TimedEvents.Add (TimeSpan.Zero, fn);
+        var b = ml.TimedEvents.Add (TimeSpan.Zero, fn);
         ml.RunIteration ();
         Assert.Equal (2, functionCalled);
-        Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
+        Assert.Equal (2, ml.TimedEvents.Timeouts.Count);
 
         functionCalled = 0;
-        Assert.True (ml.TimedEvents.RemoveIdle (fn));
-        Assert.Single (ml.TimedEvents.IdleHandlers);
+        Assert.True (ml.TimedEvents.Remove (a));
+        Assert.Single (ml.TimedEvents.Timeouts);
         ml.RunIteration ();
         Assert.Equal (1, functionCalled);
 
         functionCalled = 0;
-        Assert.True (ml.TimedEvents.RemoveIdle (fn));
-        Assert.Empty (ml.TimedEvents.IdleHandlers);
+        Assert.True (ml.TimedEvents.Remove (b));
+        Assert.Empty (ml.TimedEvents.Timeouts);
         ml.RunIteration ();
         Assert.Equal (0, functionCalled);
-        Assert.False (ml.TimedEvents.RemoveIdle (fn));
+        Assert.False (ml.TimedEvents.Remove (b));
     }
 
     [Fact]
@@ -189,8 +168,8 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
-        Assert.True (ml.TimedEvents.RemoveIdle (fn));
+        var a = ml.TimedEvents.Add (TimeSpan.Zero, fn);
+        Assert.True (ml.TimedEvents.Remove (a));
         ml.RunIteration ();
         Assert.Equal (0, functionCalled);
     }
@@ -211,13 +190,13 @@ public class MainLoopTests
                                   return true;
                               };
 
-        object token = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
+        object token = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback);
 
-        Assert.True (ml.TimedEvents.RemoveTimeout (token));
+        Assert.True (ml.TimedEvents.Remove (token));
 
         // BUGBUG: This should probably fault?
         // Must return a boolean.
-        Assert.False (ml.TimedEvents.RemoveTimeout (token));
+        Assert.False (ml.TimedEvents.Remove (token));
     }
 
     [Fact]
@@ -241,8 +220,8 @@ public class MainLoopTests
                                   return true;
                               };
 
-        var task1 = new Task (() => token1 = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback));
-        var task2 = new Task (() => token2 = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback));
+        var task1 = new Task (() => token1 = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback));
+        var task2 = new Task (() => token2 = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback));
         Assert.Null (token1);
         Assert.Null (token2);
         task1.Start ();
@@ -251,8 +230,8 @@ public class MainLoopTests
         Assert.NotNull (token1);
         Assert.NotNull (token2);
         await Task.WhenAll (task1, task2);
-        Assert.True (ml.TimedEvents.RemoveTimeout (token1));
-        Assert.True (ml.TimedEvents.RemoveTimeout (token2));
+        Assert.True (ml.TimedEvents.Remove (token1));
+        Assert.True (ml.TimedEvents.Remove (token2));
 
         Assert.Equal (2, callbackCount);
     }
@@ -278,13 +257,13 @@ public class MainLoopTests
         object sender = null;
         TimeoutEventArgs args = null;
 
-        ml.TimedEvents.TimeoutAdded += (s, e) =>
+        ml.TimedEvents.Added += (s, e) =>
                                        {
                                            sender = s;
                                            args = e;
                                        };
 
-        object token = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
+        object token = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback);
 
         Assert.Same (ml.TimedEvents, sender);
         Assert.NotNull (args.Timeout);
@@ -313,14 +292,14 @@ public class MainLoopTests
                               };
 
         Parallel.Invoke (
-                         () => token1 = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback),
-                         () => token2 = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback)
+                         () => token1 = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback),
+                         () => token2 = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback)
                         );
         ml.Run ();
         Assert.NotNull (token1);
         Assert.NotNull (token2);
-        Assert.True (ml.TimedEvents.RemoveTimeout (token1));
-        Assert.True (ml.TimedEvents.RemoveTimeout (token2));
+        Assert.True (ml.TimedEvents.Remove (token1));
+        Assert.True (ml.TimedEvents.Remove (token2));
 
         Assert.Equal (2, callbackCount);
     }
@@ -345,7 +324,7 @@ public class MainLoopTests
 
                                 return true;
                             };
-        ml.AddIdle (fnStop);
+        ml.TimedEvents.Add (TimeSpan.Zero, fnStop);
 
         var callbackCount = 0;
 
@@ -356,8 +335,8 @@ public class MainLoopTests
                                   return true;
                               };
 
-        object token = ml.TimedEvents.AddTimeout (ms, callback);
-        Assert.True (ml.TimedEvents.RemoveTimeout (token));
+        object token = ml.TimedEvents.Add (ms, callback);
+        Assert.True (ml.TimedEvents.Remove (token));
         ml.Run ();
         Assert.Equal (0, callbackCount);
     }
@@ -383,7 +362,7 @@ public class MainLoopTests
 
                                 return true;
                             };
-        ml.AddIdle (fnStop);
+        ml.TimedEvents.Add (TimeSpan.Zero, fnStop);
 
         var callbackCount = 0;
 
@@ -394,11 +373,11 @@ public class MainLoopTests
                                   return false;
                               };
 
-        object token = ml.TimedEvents.AddTimeout (ms, callback);
+        object token = ml.TimedEvents.Add (ms, callback);
         ml.Run ();
         Assert.Equal (1, callbackCount);
         Assert.Equal (10, stopCount);
-        Assert.False (ml.TimedEvents.RemoveTimeout (token));
+        Assert.False (ml.TimedEvents.Remove (token));
     }
 
     [Fact]
@@ -417,9 +396,9 @@ public class MainLoopTests
                                   return true;
                               };
 
-        object token = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
+        object token = ml.TimedEvents.Add (TimeSpan.FromMilliseconds (ms), callback);
         ml.Run ();
-        Assert.True (ml.TimedEvents.RemoveTimeout (token));
+        Assert.True (ml.TimedEvents.Remove (token));
 
         Assert.Equal (1, callbackCount);
     }
@@ -442,7 +421,7 @@ public class MainLoopTests
                                   return true;
                               };
 
-        object token = ml.TimedEvents.AddTimeout (ms, callback);
+        object token = ml.TimedEvents.Add (ms, callback);
         watch.Start ();
         ml.Run ();
 
@@ -450,7 +429,7 @@ public class MainLoopTests
         // https://github.com/xunit/assert.xunit/pull/25
         Assert.Equal (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
-        Assert.True (ml.TimedEvents.RemoveTimeout (token));
+        Assert.True (ml.TimedEvents.Remove (token));
         Assert.Equal (1, callbackCount);
     }
 
@@ -476,7 +455,7 @@ public class MainLoopTests
                                   return true;
                               };
 
-        object token = ml.TimedEvents.AddTimeout (ms, callback);
+        object token = ml.TimedEvents.Add (ms, callback);
         watch.Start ();
         ml.Run ();
 
@@ -484,7 +463,7 @@ public class MainLoopTests
         // https://github.com/xunit/assert.xunit/pull/25
         Assert.Equal (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
-        Assert.True (ml.TimedEvents.RemoveTimeout (token));
+        Assert.True (ml.TimedEvents.Remove (token));
         Assert.Equal (2, callbackCount);
     }
 
@@ -492,7 +471,7 @@ public class MainLoopTests
     public void CheckTimersAndIdleHandlers_NoTimers_Returns_False ()
     {
         var ml = new MainLoop (new FakeMainLoop ());
-        bool retVal = ml.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeOut);
+        bool retVal = ml.TimedEvents.CheckTimers(out int waitTimeOut);
         Assert.False (retVal);
         Assert.Equal (-1, waitTimeOut);
     }
@@ -503,10 +482,10 @@ public class MainLoopTests
         var ml = new MainLoop (new FakeMainLoop ());
         Func<bool> fnTrue = () => true;
 
-        ml.AddIdle (fnTrue);
-        bool retVal = ml.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeOut);
+        ml.TimedEvents.Add (TimeSpan.Zero, fnTrue);
+        bool retVal = ml.TimedEvents.CheckTimers(out int waitTimeOut);
         Assert.True (retVal);
-        Assert.Equal (-1, waitTimeOut);
+        Assert.Equal (0, waitTimeOut);
     }
 
     [Fact]
@@ -517,8 +496,8 @@ public class MainLoopTests
 
         static bool Callback () { return false; }
 
-        _ = ml.TimedEvents.AddTimeout (ms, Callback);
-        bool retVal = ml.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeOut);
+        _ = ml.TimedEvents.Add (ms, Callback);
+        bool retVal = ml.TimedEvents.CheckTimers (out int waitTimeOut);
 
         Assert.True (retVal);
 
@@ -534,9 +513,9 @@ public class MainLoopTests
 
         static bool Callback () { return false; }
 
-        _ = ml.TimedEvents.AddTimeout (ms, Callback);
-        _ = ml.TimedEvents.AddTimeout (ms, Callback);
-        bool retVal = ml.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeOut);
+        _ = ml.TimedEvents.Add (ms, Callback);
+        _ = ml.TimedEvents.Add (ms, Callback);
+        bool retVal = ml.TimedEvents.CheckTimers (out int waitTimeOut);
 
         Assert.True (retVal);
 
@@ -578,11 +557,11 @@ public class MainLoopTests
                                 return true;
                             };
 
-        ml.AddIdle (fnStop);
-        ml.AddIdle (fn1);
+        var a = ml.TimedEvents.Add (TimeSpan.Zero, fnStop);
+        var b = ml.TimedEvents.Add (TimeSpan.Zero, fn1);
         ml.Run ();
-        Assert.True (ml.TimedEvents.RemoveIdle (fnStop));
-        Assert.False (ml.TimedEvents.RemoveIdle (fn1));
+        Assert.True (ml.TimedEvents.Remove (a));
+        Assert.False (ml.TimedEvents.Remove (a));
 
         Assert.Equal (10, functionCalled);
         Assert.Equal (20, stopCount);
@@ -594,7 +573,6 @@ public class MainLoopTests
         var testMainloop = new TestMainloop ();
         var mainloop = new MainLoop (testMainloop);
         Assert.Empty (mainloop.TimedEvents.Timeouts);
-        Assert.Empty (mainloop.TimedEvents.IdleHandlers);
 
         Assert.NotNull (
                         new App.Timeout { Span = new (), Callback = () => true }
@@ -602,8 +580,8 @@ public class MainLoopTests
     }
 
     [Theory]
-    [MemberData (nameof (TestAddIdle))]
-    public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (
+    [MemberData (nameof (TestAddTimeout))]
+    public void Mainloop_Invoke_Or_AddTimeout_Can_Be_Used_For_Events_Or_Actions (
         Action action,
         string pclickMe,
         string pcancel,
@@ -683,7 +661,7 @@ public class MainLoopTests
 
         Application.Shutdown ();
     }
-
+    
     [Fact]
     public void RemoveIdle_Function_NotCalled ()
     {
@@ -698,7 +676,7 @@ public class MainLoopTests
                             return true;
                         };
 
-        Assert.False (ml.TimedEvents.RemoveIdle (fn));
+        Assert.False (ml.TimedEvents.Remove ("flibble"));
         ml.RunIteration ();
         Assert.Equal (0, functionCalled);
     }
@@ -722,14 +700,14 @@ public class MainLoopTests
                             return true;
                         };
 
-        ml.AddIdle (fn);
+        var a = ml.TimedEvents.Add (TimeSpan.Zero, fn);
         ml.Run ();
-        Assert.True (ml.TimedEvents.RemoveIdle (fn));
+        Assert.True (ml.TimedEvents.Remove (a));
 
         Assert.Equal (10, functionCalled);
     }
 
-    public static IEnumerable<object []> TestAddIdle
+    public static IEnumerable<object []> TestAddTimeout
     {
         get
         {

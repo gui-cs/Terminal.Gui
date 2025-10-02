@@ -115,7 +115,7 @@ public class FileDialog : Dialog, IDesignable
         _btnUp.Text = GetUpButtonText ();
         _btnUp.Accepting += (s, e) =>
                             {
-                                _history.Up ();
+                                _history?.Up ();
                                 e.Handled = true;
                             };
 
@@ -123,7 +123,7 @@ public class FileDialog : Dialog, IDesignable
         _btnBack.Text = GetBackButtonText ();
         _btnBack.Accepting += (s, e) =>
                               {
-                                  _history.Back ();
+                                  _history?.Back ();
                                   e.Handled = true;
                               };
 
@@ -131,7 +131,7 @@ public class FileDialog : Dialog, IDesignable
         _btnForward.Text = GetForwardButtonText ();
         _btnForward.Accepting += (s, e) =>
                                  {
-                                     _history.Forward ();
+                                     _history?.Forward ();
                                      e.Handled = true;
                                  };
 
@@ -154,7 +154,7 @@ public class FileDialog : Dialog, IDesignable
             X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (() => IsInitialized ? _btnOk.Frame.Height : 1))
+            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1))
         };
 
         Initialized += (s, e) =>
@@ -605,7 +605,7 @@ public class FileDialog : Dialog, IDesignable
         bool addCurrentStateToHistory,
         bool setPathText = true,
         bool clearForward = true,
-        string pathText = null
+        string? pathText = null
     )
     {
         // no change of state
@@ -754,7 +754,7 @@ public class FileDialog : Dialog, IDesignable
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
 
-    private int CalculateOkButtonPosX ()
+    private int CalculateOkButtonPosX (View? _)
     {
         if (!IsInitialized || !_btnOk.IsInitialized || !_btnCancel.IsInitialized)
         {
@@ -1109,7 +1109,7 @@ public class FileDialog : Dialog, IDesignable
         bool addCurrentStateToHistory,
         bool setPathText = true,
         bool clearForward = true,
-        string pathText = null
+        string? pathText = null
     )
     {
         if (State is SearchState search)

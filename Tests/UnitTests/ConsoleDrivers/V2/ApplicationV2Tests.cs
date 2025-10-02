@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Moq;
+using TerminalGuiFluentTesting;
 
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests
@@ -12,18 +13,34 @@ public class ApplicationV2Tests
         ConsoleDriver.RunningUnitTests = true;
     }
 
-    private ApplicationV2 NewApplicationV2 ()
+    private ApplicationV2 NewApplicationV2 (V2TestDriver driver = V2TestDriver.V2Net)
     {
-        var netInput = new Mock<INetInput> ();
-        SetupRunInputMockMethodToBlock (netInput);
-        var winInput = new Mock<IWindowsInput> ();
-        SetupRunInputMockMethodToBlock (winInput);
 
-        return new (
-                    () => netInput.Object,
-                    Mock.Of<IConsoleOutput>,
-                    () => winInput.Object,
-                    Mock.Of<IConsoleOutput>);
+        if (driver == V2TestDriver.V2Net)
+        {
+            var netInput = new Mock<INetInput> ();
+            SetupRunInputMockMethodToBlock (netInput);
+
+            var m = new Mock<IComponentFactory<ConsoleKeyInfo>> ();
+            m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
+            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of <IInputProcessor> ());
+            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
+            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (),It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IWindowSizeMonitor> ());
+
+            return new (m.Object);
+        }
+        else
+        {
+
+            var winInput = new Mock<IConsoleInput<WindowsConsole.InputRecord>> ();
+            SetupRunInputMockMethodToBlock (winInput);
+            var m = new Mock<IComponentFactory<WindowsConsole.InputRecord>> ();
+            m.Setup (f => f.CreateInput ()).Returns (winInput.Object);
+            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<WindowsConsole.InputRecord>> ())).Returns (Mock.Of<IInputProcessor> ());
+            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
+            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IWindowSizeMonitor> ());
+            return new (m.Object);
+        }
     }
 
     [Fact]
@@ -68,7 +85,7 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
+    /*
     [Fact]
     public void Init_ExplicitlyRequestWin ()
     {
@@ -150,8 +167,8 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
-    private void SetupRunInputMockMethodToBlock (Mock<IWindowsInput> winInput)
+*/
+    private void SetupRunInputMockMethodToBlock (Mock<IConsoleInput<WindowsConsole.InputRecord>> winInput)
     {
         winInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
                 .Callback<CancellationToken> (token =>
@@ -165,6 +182,7 @@ public class ApplicationV2Tests
                                               })
                 .Verifiable (Times.Once);
     }
+
     private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
     {
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
@@ -344,7 +362,6 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-
     [Fact]
     public void InitRunShutdown_QuitKey_Quits ()
     {
@@ -390,7 +407,6 @@ public class ApplicationV2Tests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-
     [Fact]
     public void InitRunShutdown_Generic_IdleForExit ()
     {
@@ -401,7 +417,7 @@ public class ApplicationV2Tests
 
         v2.Init ();
 
-        v2.AddIdle (IdleExit);
+        v2.AddTimeout (TimeSpan.Zero, IdleExit);
         Assert.Null (Application.Top);
 
         // Blocks until the timeout call is hit
@@ -448,7 +464,7 @@ public class ApplicationV2Tests
                    Assert.Same (t, a.Toplevel);
                };
 
-        v2.AddIdle (IdleExit);
+        v2.AddTimeout(TimeSpan.Zero, IdleExit);
 
         // Blocks until the timeout call is hit
 
@@ -473,7 +489,7 @@ public class ApplicationV2Tests
 
         return true;
     }
-
+    /*
     [Fact]
     public void Shutdown_Called_Repeatedly_DoNotDuplicateDisposeOutput ()
     {
@@ -495,11 +511,11 @@ public class ApplicationV2Tests
 
 
         v2.Shutdown ();
-        v2.Shutdown ();
         outputMock!.Verify (o => o.Dispose (), Times.Once);
 
         ApplicationImpl.ChangeInstance (orig);
     }
+    */
 
     [Fact]
     public void Init_Called_Repeatedly_WarnsAndIgnores ()

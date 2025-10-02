@@ -900,22 +900,8 @@ public static class EscSeqUtils
 
             _point = pos;
 
-            if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0)
-            {
-                Application.MainLoop?.AddIdle (
-                                              () =>
-                                              {
-                                                  // INTENT: What's this trying to do?
-                                                  // The task itself is not awaited.
-                                                  Task.Run (
-                                                            async () => await ProcessContinuousButtonPressedAsync (
-                                                                         buttonState,
-                                                                         continuousButtonPressedHandler));
 
-                                                  return false;
-                                              });
-            }
-            else if (mouseFlags [0].HasFlag (MouseFlags.ReportMousePosition))
+            if (mouseFlags [0].HasFlag (MouseFlags.ReportMousePosition))
             {
                 _point = pos;
 
@@ -945,7 +931,7 @@ public static class EscSeqUtils
             _isButtonClicked = false;
             _isButtonDoubleClicked = true;
 
-            Application.MainLoop?.AddIdle (
+            Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -959,7 +945,7 @@ public static class EscSeqUtils
         //	lastMouseButtonReleased = null;
         //	isButtonReleased = false;
         //	isButtonClicked = true;
-        //	Application.MainLoop.AddIdle (() => {
+        //	Application.MainLoop.AddTimeout (() => {
         //		Task.Run (async () => await ProcessButtonClickedAsync ());
         //		return false;
         //	});
@@ -984,7 +970,7 @@ public static class EscSeqUtils
                 mouseFlags.Add (GetButtonClicked (buttonState));
                 _isButtonClicked = true;
 
-                Application.MainLoop?.AddIdle (
+                Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
                                               () =>
                                               {
                                                   Task.Run (async () => await ProcessButtonClickedAsync ());
@@ -1041,6 +1027,16 @@ public static class EscSeqUtils
         //foreach (var mf in mouseFlags) {
         //	System.Diagnostics.Debug.WriteLine ($"mouseFlags: {mf} X: {pos.X} Y: {pos.Y}");
         //}
+    }
+
+    /// <summary>
+    /// Helper to set the Control key states based on the char.
+    /// </summary>
+    /// <param name="ch">The char value.</param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo MapChar (char ch)
+    {
+        return MapConsoleKeyInfo (new (ch, ConsoleKey.None, false, false, false));
     }
 
     /// <summary>
@@ -1144,6 +1140,17 @@ public static class EscSeqUtils
                                              (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
                                              true);
                 }
+
+                break;
+            case uint n when n is >= '\u001c'  and <= '\u001f':
+                key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + 24);
+
+                newConsoleKeyInfo = new (
+                                         (char)key,
+                                         key,
+                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                         true);
 
                 break;
             case 127: // DEL
@@ -1389,6 +1396,12 @@ public static class EscSeqUtils
     {
         switch (keyInfo.Key)
         {
+            case ConsoleKey.Multiply:
+            case ConsoleKey.Add:
+            case ConsoleKey.Separator:
+            case ConsoleKey.Subtract:
+            case ConsoleKey.Decimal:
+            case ConsoleKey.Divide:
             case ConsoleKey.OemPeriod:
             case ConsoleKey.OemComma:
             case ConsoleKey.OemPlus:
@@ -1405,8 +1418,31 @@ public static class EscSeqUtils
             case ConsoleKey.Oem102:
                 if (keyInfo.KeyChar == 0)
                 {
-                    // If the keyChar is 0, keyInfo.Key value is not a printable character.
-                    System.Diagnostics.Debug.Assert (keyInfo.Key == 0);
+                    // All Oem* produce a valid KeyChar and is not guaranteed to be printable ASCII, but it’s never just '\0' (null).
+                    // If that happens it's because Console.ReadKey is misreporting for AltGr + non-character keys
+                    // or if it's a combine key waiting for the next input which will determine the respective KeyChar.
+                    // This behavior only happens on Windows and not on Unix-like systems.
+                    if (keyInfo.Key != ConsoleKey.Multiply
+                        && keyInfo.Key != ConsoleKey.Add
+                        && keyInfo.Key != ConsoleKey.Decimal
+                        && keyInfo.Key != ConsoleKey.Subtract
+                        && keyInfo.Key != ConsoleKey.Divide
+                        && keyInfo.Key != ConsoleKey.OemPeriod
+                        && keyInfo.Key != ConsoleKey.OemComma
+                        && keyInfo.Key != ConsoleKey.OemPlus
+                        && keyInfo.Key != ConsoleKey.OemMinus
+                        && keyInfo.Key != ConsoleKey.Oem1
+                        && keyInfo.Key != ConsoleKey.Oem2
+                        && keyInfo.Key != ConsoleKey.Oem3
+                        && keyInfo.Key != ConsoleKey.Oem4
+                        && keyInfo.Key != ConsoleKey.Oem5
+                        && keyInfo.Key != ConsoleKey.Oem6
+                        && keyInfo.Key != ConsoleKey.Oem7
+                        && keyInfo.Key != ConsoleKey.Oem102)
+                    {
+                        // If the keyChar is 0, keyInfo.Key value is not a printable character.
+                        System.Diagnostics.Debug.Assert (keyInfo.Key == 0);
+                    }
 
                     return KeyCode.Null; // MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode)keyInfo.Key);
                 }
@@ -1425,7 +1461,7 @@ public static class EscSeqUtils
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
         if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            if (keyInfo is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.I })
             {
                 return KeyCode.Tab;
             }
@@ -1496,29 +1532,6 @@ public static class EscSeqUtils
     {
         await Task.Delay (300);
         _isButtonDoubleClicked = false;
-    }
-
-    private static async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag, Action<MouseFlags, Point> continuousButtonPressedHandler)
-    {
-        // PERF: Pause and poll in a hot loop.
-        // This should be replaced with event dispatch and a synchronization primitive such as AutoResetEvent.
-        // Will make a massive difference in responsiveness.
-        while (_isButtonPressed)
-        {
-            await Task.Delay (100);
-
-            View view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
-            {
-                break;
-            }
-
-            if (_isButtonPressed && _lastMouseButtonPressed is { } && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
-            {
-                Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, _point ?? Point.Empty));
-            }
-        }
     }
 
     private static MouseFlags SetControlKeyStates (MouseFlags buttonState, MouseFlags mouseFlag)

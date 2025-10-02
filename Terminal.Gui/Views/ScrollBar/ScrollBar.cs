@@ -14,7 +14,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         See the <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/scrolling.html">Scrolling Deep Dive</see>.
+///         See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/scrolling.html">Scrolling Deep Dive</see>.
 ///     </para>
 ///     <para>
 ///         By default, the built-in View scrollbars (<see cref="View.VerticalScrollBar"/>/
@@ -40,11 +40,11 @@ public class ScrollBar : View, IOrientation, IDesignable
         // Set the default width and height based on the orientation - fill Viewport
         Width = Dim.Auto (
                           DimAutoStyle.Content,
-                          Dim.Func (() => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
+                          Dim.Func (_ => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
 
         Height = Dim.Auto (
                            DimAutoStyle.Content,
-                           Dim.Func (() => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
+                           Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
         _decreaseButton = new ()
         {

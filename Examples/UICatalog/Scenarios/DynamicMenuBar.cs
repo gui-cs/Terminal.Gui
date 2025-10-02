@@ -598,7 +598,7 @@ public class DynamicMenuBar : Scenario
                 X = Pos.Right (btnPrevious) + 1,
                 Y = Pos.Top (btnPrevious),
 
-                Width = Dim.Fill () - Dim.Func (() => btnAdd.Frame.Width + 1),
+                Width = Dim.Fill () - Dim.Func (_ => btnAdd.Frame.Width + 1),
                 Height = 1
             };
 

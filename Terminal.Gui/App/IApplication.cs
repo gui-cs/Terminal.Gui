@@ -9,6 +9,17 @@ namespace Terminal.Gui.App;
 /// </summary>
 public interface IApplication
 {
+    /// <summary>
+    /// Handles recurring events. These are invoked on the main UI thread - allowing for
+    /// safe updates to <see cref="View"/> instances.
+    /// </summary>
+    ITimedEvents? TimedEvents { get; }
+
+    /// <summary>
+    /// Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
+    /// </summary>
+    IMouseGrabHandler MouseGrabHandler { get; set; }
+
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
@@ -106,7 +117,7 @@ public interface IApplication
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>When using <see cref="Run{T}"/> or
@@ -156,13 +167,7 @@ public interface IApplication
     /// is cutting edge.
     /// </summary>
     bool IsLegacy { get; }
-
-    /// <summary>
-    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
-    ///     once per iteration of the main loop after other events have been handled.
-    /// </summary>
-    void AddIdle (Func<bool> func);
-
+    
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
     ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be

@@ -326,14 +326,13 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void Navigation_With_Null_Focused_View ()
     {
         // Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
 
-        Application.Init (new FakeDriver ());
 
-        var top = new Toplevel ();
+        using var top = new Toplevel ();
         top.Ready += (s, e) => { Assert.Null (top.Focused); };
 
         // Keyboard navigation with tab

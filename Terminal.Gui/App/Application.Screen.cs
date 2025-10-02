@@ -4,6 +4,7 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Screen related stuff
 {
+    private static readonly object _lockScreen = new ();
     private static Rectangle? _screen;
 
     /// <summary>
@@ -18,11 +19,15 @@ public static partial class Application // Screen related stuff
     {
         get
         {
-            if (_screen == null)
+            lock (_lockScreen)
             {
-                _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
+                if (_screen == null)
+                {
+                    _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
+                }
+
+                return _screen.Value;
             }
-            return _screen.Value;
         }
         set
         {
@@ -30,7 +35,11 @@ public static partial class Application // Screen related stuff
             {
                 throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
             }
-            _screen = value;
+
+            lock (_lockScreen)
+            {
+                _screen = value;
+            }
         }
     }
 

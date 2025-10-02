@@ -19,6 +19,16 @@ public class Threading : Scenario
     private ListView _logJob;
     private Action _sync;
 
+    private LogarithmicTimeout _logarithmicTimeout;
+    private NumericUpDown _numberLog;
+    private Button _btnLogarithmic;
+    private object _timeoutObj;
+
+    private SmoothAcceleratingTimeout _smoothTimeout;
+    private NumericUpDown _numberSmooth;
+    private Button _btnSmooth;
+    private object _timeoutObjSmooth;
+
     public override void Main ()
     {
         Application.Init ();
@@ -82,6 +92,35 @@ public class Threading : Scenario
 
         var text = new TextField { X = 1, Y = 3, Width = 100, Text = "Type anything after press the button" };
 
+        _btnLogarithmic = new Button ()
+        {
+            X = 50,
+            Y = 4,
+            Text = "Start Log Counter"
+        };
+        _btnLogarithmic.Accepting += StartStopLogTimeout;
+
+        _numberLog = new NumericUpDown ()
+        {
+            X = Pos.Right (_btnLogarithmic),
+            Y = 4,
+        };
+
+        _btnSmooth = new Button ()
+        {
+            X = Pos.Right (_numberLog),
+            Y = 4,
+            Text = "Start Smooth Counter"
+        };
+        _btnSmooth.Accepting += StartStopSmoothTimeout;
+
+        _numberSmooth = new NumericUpDown ()
+        {
+            X = Pos.Right (_btnSmooth),
+            Y = 4,
+        };
+
+
         var btnAction = new Button { X = 80, Y = 10, Text = "Load Data Action" };
         btnAction.Accepting += (s, e) => _action.Invoke ();
         var btnLambda = new Button { X = 80, Y = 12, Text = "Load Data Lambda" };
@@ -107,6 +146,10 @@ public class Threading : Scenario
                  _btnActionCancel,
                  _logJob,
                  text,
+                 _btnLogarithmic,
+                 _numberLog,
+                 _btnSmooth,
+                 _numberSmooth,
                  btnAction,
                  btnLambda,
                  btnHandler,
@@ -127,6 +170,51 @@ public class Threading : Scenario
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
+    }
+
+    private bool LogTimeout ()
+    {
+        _numberLog.Value++;
+        _logarithmicTimeout.AdvanceStage ();
+        return true;
+    }
+    private bool SmoothTimeout ()
+    {
+        _numberSmooth.Value++;
+        _smoothTimeout.AdvanceStage ();
+        return true;
+    }
+
+    private void StartStopLogTimeout (object sender, CommandEventArgs e)
+    {
+        if (_timeoutObj != null)
+        {
+            _btnLogarithmic.Text = "Start Log Counter";
+            Application.TimedEvents.Remove (_timeoutObj);
+            _timeoutObj = null;
+        }
+        else
+        {
+            _btnLogarithmic.Text = "Stop Log Counter";
+            _logarithmicTimeout = new LogarithmicTimeout (TimeSpan.FromMilliseconds (500), LogTimeout);
+            _timeoutObj = Application.TimedEvents.Add (_logarithmicTimeout);
+        }
+    }
+
+    private void StartStopSmoothTimeout (object sender, CommandEventArgs e)
+    {
+        if (_timeoutObjSmooth != null)
+        {
+            _btnSmooth.Text = "Start Smooth Counter";
+            Application.TimedEvents.Remove (_timeoutObjSmooth);
+            _timeoutObjSmooth = null;
+        }
+        else
+        {
+            _btnSmooth.Text = "Stop Smooth Counter";
+            _smoothTimeout = new SmoothAcceleratingTimeout (TimeSpan.FromMilliseconds (500), TimeSpan.FromMilliseconds (50), 0.5, SmoothTimeout);
+            _timeoutObjSmooth = Application.TimedEvents.Add (_smoothTimeout);
+        }
     }
 
     private async void CallLoadItemsAsync ()

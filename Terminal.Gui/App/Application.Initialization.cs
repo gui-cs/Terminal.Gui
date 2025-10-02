@@ -82,16 +82,6 @@ public static partial class Application // Initialization (Init/Shutdown)
         if (driver is { })
         {
             Driver = driver;
-
-            if (driver is FakeDriver)
-            {
-                //// We're running unit tests. Disable loading config files other than default
-                //if (Locations == ConfigLocations.All)
-                //{
-                //    Locations = ConfigLocations.Default;
-                //    ResetAllSettings ();
-                //}
-            }
         }
 
         // Ignore Configuration for ForceDriver if driverName is specified
@@ -212,21 +202,22 @@ public static partial class Application // Initialization (Init/Shutdown)
         // use reflection to get the list of drivers
         List<Type?> driverTypes = new ();
 
-        foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies ())
+        // Only inspect the IConsoleDriver assembly
+        var asm = typeof (IConsoleDriver).Assembly;
+
+        foreach (Type? type in asm.GetTypes ())
         {
-            foreach (Type? type in asm.GetTypes ())
+            if (typeof (IConsoleDriver).IsAssignableFrom (type) &&
+                type is { IsAbstract: false, IsClass: true })
             {
-                if (typeof (IConsoleDriver).IsAssignableFrom (type) && !type.IsAbstract && type.IsClass)
-                {
-                    driverTypes.Add (type);
-                }
+                driverTypes.Add (type);
             }
         }
 
         List<string?> driverTypeNames = driverTypes
                                         .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
                                         .Select (d => d!.Name)
-                                        .Union (["v2", "v2win", "v2net"])
+                                        .Union (["v2", "v2win", "v2net", "v2unix"])
                                         .ToList ()!;
 
         return (driverTypes, driverTypeNames);

@@ -24,7 +24,7 @@ namespace Terminal.Gui.Drivers;
 
 internal class WindowsDriver : ConsoleDriver
 {
-    private readonly bool _isWindowsTerminal;
+    private readonly bool _isVirtualTerminal;
 
     private WindowsConsole.SmallRect _damageRegion;
     private bool _isButtonDoubleClicked;
@@ -57,18 +57,16 @@ internal class WindowsDriver : ConsoleDriver
         // force 16color mode (.e.g ConEmu which really doesn't work well at all).
         if (!RunningUnitTests)
         {
-            WinConsole!.IsWindowsTerminal = _isWindowsTerminal =
-                                                Environment.GetEnvironmentVariable ("WT_SESSION") is { }
-                                                || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+            _isVirtualTerminal = WinConsole!.IsVirtualTerminal;
         }
 
-        if (!_isWindowsTerminal)
+        if (!_isVirtualTerminal)
         {
             Force16Colors = true;
         }
     }
 
-    public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
+    public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isVirtualTerminal);
 
     public WindowsConsole? WinConsole { get; private set; }
 
@@ -119,76 +117,6 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     public override bool IsRuneSupported (Rune rune) { return base.IsRuneSupported (rune) && rune.IsBmp; }
-
-    public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
-    {
-        var input = new WindowsConsole.InputRecord
-        {
-            EventType = WindowsConsole.EventType.Key
-        };
-
-        var keyEvent = new WindowsConsole.KeyEventRecord
-        {
-            bKeyDown = true
-        };
-        var controlKey = new WindowsConsole.ControlKeyState ();
-
-        if (shift)
-        {
-            controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
-            keyEvent.UnicodeChar = '\0';
-            keyEvent.wVirtualKeyCode = ConsoleKeyMapping.VK.SHIFT;
-        }
-
-        if (alt)
-        {
-            controlKey |= WindowsConsole.ControlKeyState.LeftAltPressed;
-            controlKey |= WindowsConsole.ControlKeyState.RightAltPressed;
-            keyEvent.UnicodeChar = '\0';
-            keyEvent.wVirtualKeyCode = ConsoleKeyMapping.VK.MENU;
-        }
-
-        if (control)
-        {
-            controlKey |= WindowsConsole.ControlKeyState.LeftControlPressed;
-            controlKey |= WindowsConsole.ControlKeyState.RightControlPressed;
-            keyEvent.UnicodeChar = '\0';
-            keyEvent.wVirtualKeyCode = ConsoleKeyMapping.VK.CONTROL;
-        }
-
-        keyEvent.dwControlKeyState = controlKey;
-
-        input.KeyEvent = keyEvent;
-
-        if (shift || alt || control)
-        {
-            ProcessInput (input);
-        }
-
-        keyEvent.UnicodeChar = keyChar;
-
-        //if ((uint)key < 255) {
-        //	keyEvent.wVirtualKeyCode = (ushort)key;
-        //} else {
-        //	keyEvent.wVirtualKeyCode = '\0';
-        //}
-        keyEvent.wVirtualKeyCode = (ConsoleKeyMapping.VK)key;
-
-        input.KeyEvent = keyEvent;
-
-        try
-        {
-            ProcessInput (input);
-        }
-        catch (OverflowException)
-        { }
-        finally
-        {
-            keyEvent.bKeyDown = false;
-            input.KeyEvent = keyEvent;
-            ProcessInput (input);
-        }
-    }
 
     /// <inheritdoc />
     internal override IAnsiResponseParser GetParser () => _parser;
@@ -337,7 +265,7 @@ internal class WindowsDriver : ConsoleDriver
                 if (Contents [row, col].IsDirty == false)
                 {
                     _outputBuffer [position].Empty = true;
-                    _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    _outputBuffer [position].Char = [(char)Contents [row, col].Rune.Value];
 
                     continue;
                 }
@@ -346,12 +274,12 @@ internal class WindowsDriver : ConsoleDriver
 
                 if (Contents [row, col].Rune.IsBmp)
                 {
-                    _outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
+                    _outputBuffer [position].Char = [(char)Contents [row, col].Rune.Value];
                 }
                 else
                 {
-                    //_outputBuffer [position].Empty = true;
-                    _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    _outputBuffer [position].Char = [(char)Contents [row, col].Rune.ToString () [0],
+                                                        (char)Contents [row, col].Rune.ToString () [1]];
 
                     if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
                     {
@@ -359,7 +287,7 @@ internal class WindowsDriver : ConsoleDriver
                         col++;
                         position = row * Cols + col;
                         _outputBuffer [position].Empty = false;
-                        _outputBuffer [position].Char = ' ';
+                        _outputBuffer [position].Char = ['\0'];
                     }
                 }
             }
@@ -396,7 +324,7 @@ internal class WindowsDriver : ConsoleDriver
         {
 #if HACK_CHECK_WINCHANGED
 
-            _mainLoopDriver.WinChanged -= ChangeWin;
+            _mainLoopDriver.WinChanged -= ChangeWin!;
 #endif
         }
 
@@ -405,7 +333,7 @@ internal class WindowsDriver : ConsoleDriver
         WinConsole?.Cleanup ();
         WinConsole = null;
 
-        if (!RunningUnitTests && _isWindowsTerminal)
+        if (!RunningUnitTests && _isVirtualTerminal)
         {
             // Disable alternative screen buffer.
             Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
@@ -422,9 +350,9 @@ internal class WindowsDriver : ConsoleDriver
             {
                 if (WinConsole is { })
                 {
-                    // BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init.
-                    // Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
-                    Size winSize = WinConsole.GetConsoleOutputWindow (out _);
+                    // The results from GetConsoleBufferWindow are correct when called from Init.
+                    // Our thread in WindowsMainLoop.CheckWin will get the resize event. See #if HACK_CHECK_WINCHANGED
+                    Size winSize = WinConsole.GetConsoleBufferWindow (out _);
                     Cols = winSize.Width;
                     Rows = winSize.Height;
                     OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
@@ -432,7 +360,7 @@ internal class WindowsDriver : ConsoleDriver
 
                 WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
-                if (_isWindowsTerminal)
+                if (_isVirtualTerminal)
                 {
                     Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
                 }
@@ -463,7 +391,7 @@ internal class WindowsDriver : ConsoleDriver
         ClearContents ();
 
 #if HACK_CHECK_WINCHANGED
-        _mainLoopDriver.WinChanged = ChangeWin;
+        _mainLoopDriver.WinChanged = ChangeWin!;
 #endif
 
         if (!RunningUnitTests)
@@ -604,13 +532,6 @@ internal class WindowsDriver : ConsoleDriver
             return;
         }
 
-        int w = e.Size.Value.Width;
-
-        if (w == Cols - 3 && e.Size.Value.Height < Rows)
-        {
-            w += 3;
-        }
-
         Left = 0;
         Top = 0;
         Cols = e.Size.Value.Width;
@@ -618,9 +539,9 @@ internal class WindowsDriver : ConsoleDriver
 
         if (!RunningUnitTests)
         {
-            Size newSize = WinConsole.SetConsoleWindow (
-                                                        (short)Math.Max (w, 16),
-                                                        (short)Math.Max (e.Size.Value.Height, 0));
+            Size newSize = WinConsole!.SetConsoleWindow (
+                                                         (short)Math.Max (e.Size.Value.Width, 16),
+                                                         (short)Math.Max (e.Size.Value.Height, 0));
 
             Cols = newSize.Width;
             Rows = newSize.Height;
@@ -895,51 +816,6 @@ internal class WindowsDriver : ConsoleDriver
         //buttonPressedCount = 0;
     }
 
-    private async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
-    {
-        // When a user presses-and-holds, start generating pressed events every `startDelay`
-        // After `iterationsUntilFast` iterations, speed them up to `fastDelay` ms
-        const int START_DELAY = 500;
-        const int ITERATIONS_UNTIL_FAST = 4;
-        const int FAST_DELAY = 50;
-
-        int iterations = 0;
-        int delay = START_DELAY;
-        while (_isButtonPressed)
-        {
-            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-            View? view = Application.WantContinuousButtonPressedView;
-
-            if (view is null)
-            {
-                break;
-            }
-
-            if (iterations++ >= ITERATIONS_UNTIL_FAST)
-            {
-                delay = FAST_DELAY;
-            }
-            await Task.Delay (delay);
-
-            //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
-            if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
-            {
-                Point pointMove = _pointMove;
-                // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-                Application.Invoke (() =>
-                                    {
-                                        var me = new MouseEventArgs
-                                        {
-                                            ScreenPosition = pointMove,
-                                            Position = pointMove,
-                                            Flags = mouseFlag
-                                        };
-                                        OnMouseEvent (me);
-                                    });
-            }
-        }
-    }
-
     private void ResizeScreen ()
     {
         _outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
@@ -990,7 +866,7 @@ internal class WindowsDriver : ConsoleDriver
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-            Application.MainLoop!.AddIdle (
+            Application.MainLoop!.TimedEvents.Add (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -1058,18 +934,6 @@ internal class WindowsDriver : ConsoleDriver
 
             _lastMouseButtonPressed = mouseEvent.ButtonState;
             _isButtonPressed = true;
-
-            if ((mouseFlag & MouseFlags.ReportMousePosition) == 0)
-            {
-                // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
-                Application.MainLoop!.AddIdle (
-                                              () =>
-                                              {
-                                                  Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
-
-                                                  return false;
-                                              });
-            }
         }
         else if (_lastMouseButtonPressed != null
                  && mouseEvent.EventFlags == 0

@@ -89,10 +89,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         //#endif
 
         // Ensure the mouse is ungrabbed.
-        if (MouseGrabView is { })
+        if (MouseGrabHandler.MouseGrabView is { })
         {
-            UngrabMouse ();
-            MouseGrabView = null;
+            MouseGrabHandler.UngrabMouse ();
         }
 
         var rs = new RunState (toplevel);
@@ -206,15 +205,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.OnLoaded ();
 
+        LayoutAndDraw (true);
+
         if (PositionCursor ())
         {
             Driver?.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
-
-        // Force an Idle event so that an Iteration (and Refresh) happen.
-        Invoke (() => { });
 
         return rs;
     }
@@ -366,7 +364,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
+    ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
     ///         return control immediately.
     ///     </para>
     ///     <para>
@@ -462,7 +460,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
-
+    
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
     internal static MainLoop? MainLoop { get; set; }
@@ -536,7 +534,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             return firstIteration;
         }
 
-        LayoutAndDraw ();
+        LayoutAndDraw (TopLevels.Any (v => v.NeedsLayout || v.NeedsDraw));
 
         if (PositionCursor ())
         {
@@ -619,5 +617,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         runState.Dispose ();
 
         LayoutAndDraw (true);
+    }
+    internal static void RaiseIteration ()
+    {
+        Iteration?.Invoke (null, new ());
     }
 }

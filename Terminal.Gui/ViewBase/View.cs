@@ -71,14 +71,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
-            if (Application.MouseGrabView == this)
+            if (Application.MouseGrabHandler.MouseGrabView == this)
             {
-                Application.UngrabMouse ();
-            }
-
-            if (Application.WantContinuousButtonPressedView == this)
-            {
-                Application.WantContinuousButtonPressedView = null;
+                Application.MouseGrabHandler.UngrabMouse ();
             }
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
@@ -250,12 +245,13 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
         }
 
-        if (ApplicationImpl.Instance.IsLegacy)
-        {
-            // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
-            Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
-        }
+        // Force a layout each time a View is initialized
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/4204
+        Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
 
+        // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
+        // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
         SetNeedsLayout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);
@@ -524,6 +520,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     #endregion
 
 #if DEBUG_IDISPOSABLE
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Gets or sets whether failure to appropriately call Dispose() on a View will result in an Assert.
     ///     The default is <see langword="true"/>.
@@ -533,15 +530,16 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// </summary>
     public static bool EnableDebugIDisposableAsserts { get; set; } = true;
 
+
     /// <summary>
-    ///     Gets whether <see cref="Dispose"/> was called on this view or not.
+    ///     Gets whether <see cref="View.Dispose"/> was called on this view or not.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public bool WasDisposed { get; private set; }
 
     /// <summary>
-    ///     Gets the number of times <see cref="Dispose"/> was called on this view.
+    ///     Gets the number of times <see cref="View.Dispose"/> was called on this view.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
@@ -554,5 +552,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public static ConcurrentBag<View> Instances { get; private set; } = [];
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
 #endif
 }

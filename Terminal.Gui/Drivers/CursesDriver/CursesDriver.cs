@@ -61,44 +61,6 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
-    {
-        KeyCode key;
-
-        if (consoleKey == ConsoleKey.Packet)
-        {
-            //var mod = new ConsoleModifiers ();
-
-            //if (shift)
-            //{
-            //    mod |= ConsoleModifiers.Shift;
-            //}
-
-            //if (alt)
-            //{
-            //    mod |= ConsoleModifiers.Alt;
-            //}
-
-            //if (control)
-            //{
-            //    mod |= ConsoleModifiers.Control;
-            //}
-
-            var cKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
-            cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
-            key = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (cKeyInfo);
-        }
-        else
-        {
-            key = (KeyCode)keyChar;
-        }
-
-        OnKeyDown (new (key));
-        OnKeyUp (new (key));
-
-        //OnKeyPressed (new KeyEventArgsEventArgs (key));
-    }
-
     public void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
@@ -123,12 +85,6 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Platform.Suspend ();
-
-            if (Force16Colors)
-            {
-                Curses.Window.Standard.redrawwin ();
-                Curses.refresh ();
-            }
         }
 
         StartReportingMouseMoves ();
@@ -140,164 +96,98 @@ internal class CursesDriver : ConsoleDriver
 
         if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
         {
-            if (Force16Colors)
-            {
-                Curses.move (Row, Col);
-
-                Curses.raw ();
-                Curses.noecho ();
-                Curses.refresh ();
-            }
-            else
-            {
-                _mainLoopDriver?.WriteRaw (EscSeqUtils.CSI_SetCursorPosition (Row + 1, Col + 1));
-            }
+            _mainLoopDriver?.WriteRaw (EscSeqUtils.CSI_SetCursorPosition (Row + 1, Col + 1));
         }
     }
 
     public override bool UpdateScreen ()
     {
         bool updated = false;
-        if (Force16Colors)
+        if (RunningUnitTests
+            || Console.WindowHeight < 1
+            || Contents?.Length != Rows * Cols
+            || Rows != Console.WindowHeight)
         {
-            for (var row = 0; row < Rows; row++)
-            {
-                if (!_dirtyLines! [row])
-                {
-                    continue;
-                }
-
-                _dirtyLines [row] = false;
-
-                for (var col = 0; col < Cols; col++)
-                {
-                    if (Contents! [row, col].IsDirty == false)
-                    {
-                        continue;
-                    }
-
-                    if (RunningUnitTests)
-                    {
-                        // In unit tests, we don't want to actually write to the screen.
-                        continue;
-                    }
-
-                    Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
-
-                    Rune rune = Contents [row, col].Rune;
-
-                    if (rune.IsBmp)
-                    {
-                        // BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
-                        if (rune.GetColumns () < 2)
-                        {
-                            Curses.mvaddch (row, col, rune.Value);
-                        }
-                        else /*if (col + 1 < Cols)*/
-                        {
-                            Curses.mvaddwstr (row, col, rune.ToString ());
-                        }
-                    }
-                    else
-                    {
-                        Curses.mvaddwstr (row, col, rune.ToString ());
-
-                        if (rune.GetColumns () > 1 && col + 1 < Cols)
-                        {
-                            // TODO: This is a hack to deal with non-BMP and wide characters.
-                            //col++;
-                            Curses.mvaddch (row, ++col, '*');
-                        }
-                    }
-                }
-            }
-
-            if (!RunningUnitTests)
-            {
-                Curses.move (Row, Col);
-                _window?.wrefresh ();
-            }
+            return updated;
         }
-        else
+
+        var top = 0;
+        var left = 0;
+        int rows = Rows;
+        int cols = Cols;
+        var output = new StringBuilder ();
+        Attribute? redrawAttr = null;
+        int lastCol = -1;
+
+        CursorVisibility? savedVisibility = _currentCursorVisibility;
+        SetCursorVisibility (CursorVisibility.Invisible);
+
+        for (int row = top; row < rows; row++)
         {
-            if (RunningUnitTests
-                || Console.WindowHeight < 1
-                || Contents!.Length != Rows * Cols
-                || Rows != Console.WindowHeight)
+            if (Console.WindowHeight < 1)
             {
                 return updated;
             }
 
-            var top = 0;
-            var left = 0;
-            int rows = Rows;
-            int cols = Cols;
-            var output = new StringBuilder ();
-            Attribute? redrawAttr = null;
-            int lastCol = -1;
-
-            CursorVisibility? savedVisibility = _currentCursorVisibility;
-            SetCursorVisibility (CursorVisibility.Invisible);
-
-            for (int row = top; row < rows; row++)
+            if (!_dirtyLines! [row])
             {
-                if (Console.WindowHeight < 1)
+                continue;
+            }
+
+            if (!SetCursorPosition (0, row))
+            {
+                return updated;
+            }
+
+            updated = true;
+            _dirtyLines [row] = false;
+            output.Clear ();
+
+            for (int col = left; col < cols; col++)
+            {
+                lastCol = -1;
+                var outputWidth = 0;
+
+                for (; col < cols; col++)
                 {
-                    return updated;
-                }
-
-                if (!_dirtyLines! [row])
-                {
-                    continue;
-                }
-
-                if (!SetCursorPosition (0, row))
-                {
-                    return updated;
-                }
-
-                _dirtyLines [row] = false;
-                output.Clear ();
-
-                for (int col = left; col < cols; col++)
-                {
-                    lastCol = -1;
-                    var outputWidth = 0;
-
-                    for (; col < cols; col++)
+                    if (!Contents [row, col].IsDirty)
                     {
-                        updated = true;
-                        if (!Contents [row, col].IsDirty)
+                        if (output.Length > 0)
                         {
-                            if (output.Length > 0)
-                            {
-                                WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                            }
-                            else if (lastCol == -1)
-                            {
-                                lastCol = col;
-                            }
-
-                            if (lastCol + 1 < cols)
-                            {
-                                lastCol++;
-                            }
-
-                            continue;
+                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
                         }
-
-                        if (lastCol == -1)
+                        else if (lastCol == -1)
                         {
                             lastCol = col;
                         }
 
-                        Attribute attr = Contents [row, col].Attribute!.Value;
-
-                        // Performance: Only send the escape sequence if the attribute has changed.
-                        if (attr != redrawAttr)
+                        if (lastCol + 1 < cols)
                         {
-                            redrawAttr = attr;
+                            lastCol++;
+                        }
 
+                        continue;
+                    }
+
+                    if (lastCol == -1)
+                    {
+                        lastCol = col;
+                    }
+
+                    Attribute attr = Contents [row, col].Attribute!.Value;
+
+                    // Performance: Only send the escape sequence if the attribute has changed.
+                    if (attr != redrawAttr)
+                    {
+                        redrawAttr = attr;
+
+                        if (Force16Colors)
+                        {
+                            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+                            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+                        }
+                        else
+                        {
                             output.Append (
                                            EscSeqUtils.CSI_SetForegroundColorRGB (
                                                                                   attr.Foreground.R,
@@ -314,60 +204,62 @@ internal class CursesDriver : ConsoleDriver
                                                                                  )
                                           );
                         }
-
-                        outputWidth++;
-                        Rune rune = Contents [row, col].Rune;
-                        output.Append (rune);
-
-                        if (Contents [row, col].CombiningMarks.Count > 0)
-                        {
-                            // AtlasEngine does not support NON-NORMALIZED combining marks in a way
-                            // compatible with the driver architecture. Any CMs (except in the first col)
-                            // are correctly combined with the base char, but are ALSO treated as 1 column
-                            // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-                            // 
-                            // For now, we just ignore the list of CMs.
-                            //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                            //	output.Append (combMark);
-                            //}
-                            // WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        }
-                        else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
-                        {
-                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                            SetCursorPosition (col - 1, row);
-                        }
-
-                        Contents [row, col].IsDirty = false;
                     }
-                }
 
-                if (output.Length > 0)
-                {
-                    SetCursorPosition (lastCol, row);
-                    Console.Write (output);
+                    outputWidth++;
+                    Rune rune = Contents [row, col].Rune;
+                    output.Append (rune);
+
+                    if (Contents [row, col].CombiningMarks.Count > 0)
+                    {
+                        // AtlasEngine does not support NON-NORMALIZED combining marks in a way
+                        // compatible with the driver architecture. Any CMs (except in the first col)
+                        // are correctly combined with the base char, but are ALSO treated as 1 column
+                        // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+                        // 
+                        // For now, we just ignore the list of CMs.
+                        //foreach (var combMark in Contents [row, col].CombiningMarks) {
+                        //	output.Append (combMark);
+                        //}
+                        // WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                    }
+                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
+                    {
+                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                        SetCursorPosition (col - 1, row);
+                    }
+
+                    Contents [row, col].IsDirty = false;
                 }
             }
 
-            // SIXELS
-            foreach (SixelToRender s in Application.Sixel)
-            {
-                SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Write (s.SixelData);
-            }
-
-            SetCursorPosition (0, 0);
-
-            _currentCursorVisibility = savedVisibility;
-
-            void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+            if (output.Length > 0)
             {
                 SetCursorPosition (lastCol, row);
                 Console.Write (output);
-                output.Clear ();
-                lastCol += outputWidth;
-                outputWidth = 0;
             }
+
+            foreach (var s in Application.Sixel)
+            {
+                if (!string.IsNullOrWhiteSpace (s.SixelData))
+                {
+                    SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
+                    Console.Write (s.SixelData);
+                }
+            }
+        }
+
+        SetCursorPosition (0, 0);
+
+        _currentCursorVisibility = savedVisibility;
+
+        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+        {
+            SetCursorPosition (lastCol, row);
+            Console.Write (output);
+            output.Clear ();
+            lastCol += outputWidth;
+            outputWidth = 0;
         }
 
         return updated;
@@ -393,29 +285,6 @@ internal class CursesDriver : ConsoleDriver
                     Curses.ColorPair (v),
                     CursesColorNumberToColorName16 (foreground),
                     CursesColorNumberToColorName16 (background)
-                   );
-    }
-
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     In the CursesDriver, colors are encoded as an int. The foreground color is stored in the most significant 4
-    ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
-    ///     converted to curses color encoding before being encoded.
-    /// </remarks>
-    public override Attribute MakeColor (in Color foreground, in Color background)
-    {
-        if (!RunningUnitTests && Force16Colors)
-        {
-            return MakeColor (
-                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor16 ()),
-                              ColorNameToCursesColorNumber (background.GetClosestNamedColor16 ())
-                             );
-        }
-
-        return new (
-                    0,
-                    foreground,
-                    background
                    );
     }
 
@@ -536,6 +405,8 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
+    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
+
     /// <inheritdoc/>
     public override bool SetCursorVisibility (CursorVisibility visibility)
     {
@@ -547,17 +418,19 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
+            Curses.leaveok (_window!.Handle, !Force16Colors);
         }
 
         if (visibility != CursorVisibility.Invisible)
         {
-            _mainLoopDriver?.WriteRaw (
-                                       EscSeqUtils.CSI_SetCursorStyle (
-                                                                       (EscSeqUtils.DECSCUSR_Style)
-                                                                       (((int)visibility >> 24)
-                                                                        & 0xFF)
-                                                                      )
-                                      );
+            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            {
+                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+
+                _mainLoopDriver?.WriteRaw (
+                                           EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle)
+                                          );
+            }
         }
 
         _currentCursorVisibility = visibility;
@@ -727,8 +600,7 @@ internal class CursesDriver : ConsoleDriver
 
                 while (wch2 == Curses.KeyMouse)
                 {
-                    // BUGBUG: Fix this nullable issue.
-                    Key kea = null;
+                    Key? kea = null;
 
                     ConsoleKeyInfo [] cki =
                     {
@@ -737,8 +609,7 @@ internal class CursesDriver : ConsoleDriver
                         new ('<', 0, false, false, false)
                     };
                     code = 0;
-                    // BUGBUG: Fix this nullable issue.
-                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea, ref cki);
+                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea!, ref cki!);
                 }
 
                 return;
@@ -799,8 +670,7 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.AltMask | MapCursesKey (wch);
             }
 
-            // BUGBUG: Fix this nullable issue.
-            Key key = null;
+            Key? key = null;
 
             if (code == 0)
             {
@@ -830,8 +700,7 @@ internal class CursesDriver : ConsoleDriver
                     [
                         new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
                     ];
-                    // BUGBUG: Fix this nullable issue.
-                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
+                    HandleEscSeqResponse (ref code, ref k, ref wch2, ref key!, ref cki!);
 
                     return;
                 }
@@ -964,7 +833,7 @@ internal class CursesDriver : ConsoleDriver
         ref KeyCode k,
         ref int wch2,
         ref Key keyEventArgs,
-        ref ConsoleKeyInfo [] cki
+        ref ConsoleKeyInfo []? cki
     )
     {
         ConsoleKey ck = 0;
@@ -988,11 +857,10 @@ internal class CursesDriver : ConsoleDriver
                 // the given terminator (e.g. mouse) or did not understand format somehow.
                 // Carry on with the older code for processing curses escape codes
 
-                // BUGBUG: Fix this nullable issue.
                 EscSeqUtils.DecodeEscSeq (
                                           ref consoleKeyInfo,
                                           ref ck,
-                                          cki,
+                                          cki!,
                                           ref mod,
                                           out _,
                                           out _,
@@ -1012,7 +880,6 @@ internal class CursesDriver : ConsoleDriver
                         OnMouseEvent (new () { Flags = mf, Position = pos });
                     }
 
-                    // BUGBUG: Fix this nullable issue.
                     cki = null;
 
                     if (wch2 == 27)
@@ -1170,85 +1037,4 @@ internal class CursesDriver : ConsoleDriver
 
     /// <inheritdoc/>
     public override void WriteRaw (string ansi) { _mainLoopDriver?.WriteRaw (ansi); }
-}
-
-// TODO: One type per file - move to another file
-internal static class Platform
-{
-    private static int _suspendSignal;
-
-    /// <summary>Suspends the process by sending SIGTSTP to itself</summary>
-    /// <returns>True if the suspension was successful.</returns>
-    public static bool Suspend ()
-    {
-        int signal = GetSuspendSignal ();
-
-        if (signal == -1)
-        {
-            return false;
-        }
-
-        killpg (0, signal);
-
-        return true;
-    }
-
-    private static int GetSuspendSignal ()
-    {
-        if (_suspendSignal != 0)
-        {
-            return _suspendSignal;
-        }
-
-        nint buf = Marshal.AllocHGlobal (8192);
-
-        if (uname (buf) != 0)
-        {
-            Marshal.FreeHGlobal (buf);
-            _suspendSignal = -1;
-
-            return _suspendSignal;
-        }
-
-        try
-        {
-            switch (Marshal.PtrToStringAnsi (buf))
-            {
-                case "Darwin":
-                case "DragonFly":
-                case "FreeBSD":
-                case "NetBSD":
-                case "OpenBSD":
-                    _suspendSignal = 18;
-
-                    break;
-                case "Linux":
-                    // TODO: should fetch the machine name and
-                    // if it is MIPS return 24
-                    _suspendSignal = 20;
-
-                    break;
-                case "Solaris":
-                    _suspendSignal = 24;
-
-                    break;
-                default:
-                    _suspendSignal = -1;
-
-                    break;
-            }
-
-            return _suspendSignal;
-        }
-        finally
-        {
-            Marshal.FreeHGlobal (buf);
-        }
-    }
-
-    [DllImport ("libc")]
-    private static extern int killpg (int pgrp, int pid);
-
-    [DllImport ("libc")]
-    private static extern int uname (nint buf);
 }

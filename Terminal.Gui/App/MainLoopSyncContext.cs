@@ -10,14 +10,23 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
 
     public override void Post (SendOrPostCallback d, object state)
     {
-        Application.MainLoop?.AddIdle (
-                                       () =>
-                                       {
-                                           d (state);
+        // Queue the task
+        if (ApplicationImpl.Instance.IsLegacy)
+        {
+            Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
+                                                   () =>
+                                                   {
+                                                       d (state);
 
-                                           return false;
-                                       }
-                                      );
+                                                       return false;
+                                                   }
+                                                  );
+            Application.MainLoop?.Wakeup ();
+        }
+        else
+        {
+            ApplicationImpl.Instance.Invoke (() => { d (state); });
+        }
     }
 
     //_mainLoop.Driver.Wakeup ();

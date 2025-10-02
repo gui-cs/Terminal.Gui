@@ -111,7 +111,22 @@ public static class RuneExtensions
     ///     The number of columns required to fit the rune, 0 if the argument is the null character, or -1 if the value is
     ///     not printable, otherwise the number of columns that the rune occupies.
     /// </returns>
-    public static int GetColumns (this Rune rune) { return UnicodeCalculator.GetWidth (rune); }
+    public static int GetColumns (this Rune rune)
+    {
+        int value = rune.Value;
+
+        // TODO: Remove this code when #4259 is fixed
+        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4259
+        if (value is >= 0x2630 and <= 0x2637 ||  // Trigrams
+            value is >= 0x268A and <= 0x268F ||  // Monograms/Digrams
+            value is >= 0x4DC0 and <= 0x4DFF)    // Hexagrams
+        {
+            return 2; // Assume double-width due to Windows Terminal font rendering
+        }
+
+        // Fallback to original GetWidth for other code points
+        return UnicodeCalculator.GetWidth (rune);
+    }
 
     /// <summary>Get number of bytes required to encode the rune, based on the provided encoding.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>

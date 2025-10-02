@@ -30,7 +30,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
         Color fg = Color.Red;
         Color bg = Color.Green;
 
@@ -100,7 +100,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Visual_Test (ShadowStyle style, string expected)
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
 
         var superView = new Toplevel
         {
@@ -160,7 +160,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
         Application.ResetState (true);
     }
 }

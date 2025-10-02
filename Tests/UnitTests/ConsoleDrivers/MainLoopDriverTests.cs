@@ -15,7 +15,7 @@ public class MainLoopDriverTests
     [InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
-    public void MainLoop_AddIdle_ValidIdleHandler_ReturnsToken (Type driverType, Type mainLoopDriverType)
+    public void MainLoop_AddTimeout_ValidIdleHandler_ReturnsToken (Type driverType, Type mainLoopDriverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
@@ -29,7 +29,7 @@ public class MainLoopDriverTests
             return false;
         }
 
-        Func<bool> token = mainLoop.AddIdle (IdleHandler);
+        var token = mainLoop.TimedEvents.Add(TimeSpan.Zero, IdleHandler);
 
         Assert.NotNull (token);
         Assert.False (idleHandlerInvoked); // Idle handler should not be invoked immediately
@@ -52,7 +52,7 @@ public class MainLoopDriverTests
         var mainLoop = new MainLoop (mainLoopDriver);
         var callbackInvoked = false;
 
-        object token = mainLoop.TimedEvents.AddTimeout (
+        object token = mainLoop.TimedEvents.Add (
                                             TimeSpan.FromMilliseconds (100),
                                             () =>
                                             {
@@ -87,11 +87,11 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        mainLoop.AddIdle (() => false);
-        bool result = mainLoop.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeout);
+        mainLoop.TimedEvents.Add (TimeSpan.Zero, () => false);
+        bool result = mainLoop.TimedEvents.CheckTimers (out int waitTimeout);
 
         Assert.True (result);
-        Assert.Equal (-1, waitTimeout);
+        Assert.Equal (0, waitTimeout);
         mainLoop.Dispose ();
     }
 
@@ -102,7 +102,7 @@ public class MainLoopDriverTests
     [InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
-    public void MainLoop_CheckTimersAndIdleHandlers_NoTimersOrIdleHandlers_ReturnsFalse (
+    public void MainLoop_CheckTimers_NoTimersOrIdleHandlers_ReturnsFalse (
         Type driverType,
         Type mainLoopDriverType
     )
@@ -111,7 +111,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        bool result = mainLoop.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeout);
+        bool result = mainLoop.TimedEvents.CheckTimers (out int waitTimeout);
 
         Assert.False (result);
         Assert.Equal (-1, waitTimeout);
@@ -134,8 +134,8 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        mainLoop.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
-        bool result = mainLoop.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeout);
+        mainLoop.TimedEvents.Add (TimeSpan.FromMilliseconds (100), () => false);
+        bool result = mainLoop.TimedEvents.CheckTimers(out int waitTimeout);
 
         Assert.True (result);
         Assert.True (waitTimeout >= 0);
@@ -158,7 +158,6 @@ public class MainLoopDriverTests
         // Check default values
         Assert.NotNull (mainLoop);
         Assert.Equal (mainLoopDriver, mainLoop.MainLoopDriver);
-        Assert.Empty (mainLoop.TimedEvents.IdleHandlers);
         Assert.Empty (mainLoop.TimedEvents.Timeouts);
         Assert.False (mainLoop.Running);
 
@@ -168,7 +167,6 @@ public class MainLoopDriverTests
         // TODO: It'd be nice if we could really verify IMainLoopDriver.TearDown was called
         // and that it was actually cleaned up.
         Assert.Null (mainLoop.MainLoopDriver);
-        Assert.Empty (mainLoop.TimedEvents.IdleHandlers);
         Assert.Empty (mainLoop.TimedEvents.Timeouts);
         Assert.False (mainLoop.Running);
     }
@@ -186,7 +184,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        bool result = mainLoop.TimedEvents.RemoveIdle (() => false);
+        bool result = mainLoop.TimedEvents.Remove("flibble");
 
         Assert.False (result);
         mainLoop.Dispose ();
@@ -207,8 +205,9 @@ public class MainLoopDriverTests
 
         bool IdleHandler () { return false; }
 
-        Func<bool> token = mainLoop.AddIdle (IdleHandler);
-        bool result = mainLoop.TimedEvents.RemoveIdle (token);
+
+        var token = mainLoop.TimedEvents.Add (TimeSpan.Zero, IdleHandler);
+        bool result = mainLoop.TimedEvents.Remove (token);
 
         Assert.True (result);
         mainLoop.Dispose ();
@@ -227,7 +226,7 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        bool result = mainLoop.TimedEvents.RemoveTimeout (new object ());
+        bool result = mainLoop.TimedEvents.Remove (new object ());
 
         Assert.False (result);
     }
@@ -245,8 +244,8 @@ public class MainLoopDriverTests
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
-        object token = mainLoop.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
-        bool result = mainLoop.TimedEvents.RemoveTimeout (token);
+        object token = mainLoop.TimedEvents.Add (TimeSpan.FromMilliseconds (100), () => false);
+        bool result = mainLoop.TimedEvents.Remove (token);
 
         Assert.True (result);
         mainLoop.Dispose ();
@@ -273,7 +272,7 @@ public class MainLoopDriverTests
                                      return false;
                                  };
 
-        mainLoop.AddIdle (idleHandler);
+        mainLoop.TimedEvents.Add (TimeSpan.Zero, idleHandler);
         mainLoop.RunIteration (); // Run an iteration to process the idle handler
 
         Assert.True (idleHandlerInvoked);

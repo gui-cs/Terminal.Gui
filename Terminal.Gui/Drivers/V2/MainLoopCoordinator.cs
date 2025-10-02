@@ -13,19 +13,17 @@ namespace Terminal.Gui.Drivers;
 /// <typeparam name="T"></typeparam>
 internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 {
-    private readonly Func<IConsoleInput<T>> _inputFactory;
     private readonly ConcurrentQueue<T> _inputBuffer;
     private readonly IInputProcessor _inputProcessor;
     private readonly IMainLoop<T> _loop;
+    private readonly IComponentFactory<T> _componentFactory;
     private readonly CancellationTokenSource _tokenSource = new ();
-    private readonly Func<IConsoleOutput> _outputFactory;
     private IConsoleInput<T> _input;
     private IConsoleOutput _output;
     private readonly object _oLockInitialization = new ();
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
     private readonly ITimedEvents _timedEvents;
-    private readonly bool _isWindowsTerminal;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
 
@@ -33,35 +31,22 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     ///     Creates a new coordinator
     /// </summary>
     /// <param name="timedEvents"></param>
-    /// <param name="inputFactory">
-    ///     Function to create a new input. This must call <see langword="new"/>
-    ///     explicitly and cannot return an existing instance. This requirement arises because Windows
-    ///     console screen buffer APIs are thread-specific for certain operations.
-    /// </param>
     /// <param name="inputBuffer"></param>
-    /// <param name="inputProcessor"></param>
-    /// <param name="outputFactory">
-    ///     Function to create a new output. This must call <see langword="new"/>
-    ///     explicitly and cannot return an existing instance. This requirement arises because Windows
-    ///     console screen buffer APIs are thread-specific for certain operations.
-    /// </param>
     /// <param name="loop"></param>
+    /// <param name="componentFactory">Factory for creating driver components
+    /// (<see cref="IConsoleOutput"/>, <see cref="IConsoleInput{T}"/> etc)</param>
     public MainLoopCoordinator (
         ITimedEvents timedEvents,
-        Func<IConsoleInput<T>> inputFactory,
         ConcurrentQueue<T> inputBuffer,
-        IInputProcessor inputProcessor,
-        Func<IConsoleOutput> outputFactory,
-        IMainLoop<T> loop
+        IMainLoop<T> loop,
+        IComponentFactory<T> componentFactory
     )
     {
         _timedEvents = timedEvents;
-        _inputFactory = inputFactory;
         _inputBuffer = inputBuffer;
-        _inputProcessor = inputProcessor;
-        _outputFactory = outputFactory;
+        _inputProcessor = componentFactory.CreateInputProcessor (_inputBuffer);
         _loop = loop;
-        _isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") is { } || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+        _componentFactory = componentFactory;
     }
 
     /// <summary>
@@ -91,7 +76,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                 throw _inputTask.Exception;
             }
 
-            throw new ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Logger.LogCritical("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
         Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
@@ -104,7 +89,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
             lock (_oLockInitialization)
             {
                 // Instance must be constructed on the thread in which it is used.
-                _input = _inputFactory.Invoke ();
+                _input = _componentFactory.CreateInput ();
                 _input.Initialize (_inputBuffer);
 
                 BuildFacadeIfPossible ();
@@ -144,8 +129,8 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         lock (_oLockInitialization)
         {
             // Instance must be constructed on the thread in which it is used.
-            _output = _outputFactory.Invoke ();
-            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output);
+            _output = _componentFactory.CreateOutput ();
+            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output,_componentFactory);
 
             BuildFacadeIfPossible ();
         }
@@ -161,11 +146,6 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                            _output,
                            _loop.AnsiRequestScheduler,
                            _loop.WindowSizeMonitor);
-
-            if (!_isWindowsTerminal)
-            {
-                Application.Force16Colors = _facade.Force16Colors = true;
-            }
 
             Application.Driver = _facade;
 

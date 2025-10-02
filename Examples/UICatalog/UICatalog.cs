@@ -428,11 +428,6 @@ public class UICatalog
 
         Application.Init (driverName: _forceDriver);
 
-        if (benchmark)
-        {
-            Application.Screen = new (0, 0, 120, 40);
-        }
-
         scenario.Main ();
 
         BenchmarkResults? results = null;
