@@ -1,4 +1,4 @@
-﻿
+﻿#nullable enable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -55,11 +55,11 @@ public class Line : View, IOrientation
     public Line ()
     {
         CanFocus = false;
-        SuperViewRendersLineCanvas = true;
+        base.SuperViewRendersLineCanvas = true;
 
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
-        OnOrientationChanged(Orientation);
+        OnOrientationChanged (Orientation);
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public class Line : View, IOrientation
             if (_style != value)
             {
                 _style = value;
-                SetNeedsDraw();
+                SetNeedsDraw ();
             }
         }
     }
@@ -133,10 +133,10 @@ public class Line : View, IOrientation
 
 #pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 #pragma warning restore CS0067 // The event is never used
 
     /// <summary>
@@ -149,21 +149,21 @@ public class Line : View, IOrientation
         switch (newOrientation)
         {
             case Orientation.Horizontal:
-                if (_userSetHeight == null)
+                if (_userSetHeight is null)
                 {
                     Height = 1;
                 }
-                if (_userSetWidth == null)
+                if (_userSetWidth is null)
                 {
                     Width = Dim.Fill ();
                 }
                 break;
             case Orientation.Vertical:
-                if (_userSetWidth == null)
+                if (_userSetWidth is null)
                 {
                     Width = 1;
                 }
-                if (_userSetHeight == null)
+                if (_userSetHeight is null)
                 {
                     Height = Dim.Fill ();
                 }
@@ -182,7 +182,7 @@ public class Line : View, IOrientation
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        SuperView?.LineCanvas?.AddLine (
+        LineCanvas?.AddLine (
                     pos,
                     length,
                     Orientation,

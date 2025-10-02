@@ -56,6 +56,11 @@ public partial class View // Layout APIs
             // This will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
             if (SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) }))
             {
+                // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
+                // BUGBUG: other logic in the property setters does not get executed.  Specifically:
+                // BUGBUG: - Reset TextFormatter
+                // BUGBUG: - SetLayoutNeeded (not an issue as we explictly call Layout below)
+                // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
                 // If Frame gets set, set all Pos/Dim to Absolute values.
                 _x = _frame!.Value.X;
                 _y = _frame!.Value.Y;
@@ -304,7 +309,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
-    ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
+    ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
     public Dim? Height
     {
@@ -316,7 +321,13 @@ public partial class View // Layout APIs
                 return;
             }
 
-            _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
+            // See Issue # (Width/Height are Dim?, but X/Y are not nullable)
+            _height = value;
+
+            //if (_height is null)
+            //{
+            //    throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
+            //}
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
             TextFormatter.ConstrainToHeight = null;
@@ -351,7 +362,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
-    ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
+    ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
     public Dim? Width
     {
@@ -363,7 +374,13 @@ public partial class View // Layout APIs
                 return;
             }
 
-            _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
+            // See Issue # (Width/Height are Dim?, but X/Y are not nullable)
+            _width = value;
+
+            //if (_width is null)
+            //{
+            //    throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
+            //}
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
             TextFormatter.ConstrainToWidth = null;
@@ -474,8 +491,8 @@ public partial class View // Layout APIs
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
-        Debug.Assert (_width is { });
-        Debug.Assert (_height is { });
+        //Debug.Assert (_width is { });
+        //Debug.Assert (_height is { });
 
         CheckDimAuto ();
 
@@ -488,7 +505,7 @@ public partial class View // Layout APIs
         {
             // Calculate the new X, Y, Width, and Height
             // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
-            if (_width.Has<DimAuto> (out _))
+            if (_width is { } && _width.Has<DimAuto> (out _))
             {
                 newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
                 newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
@@ -505,7 +522,7 @@ public partial class View // Layout APIs
                 newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
             }
 
-            if (_height.Has<DimAuto> (out _))
+            if (_height is { } && _height.Has<DimAuto> (out _))
             {
                 newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
                 newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
@@ -518,8 +535,8 @@ public partial class View // Layout APIs
             }
             else
             {
-                newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
-                newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+                newY = _y.Calculate (superviewContentSize.Height, _height!, this, Dimension.Height);
+                newH = _height?.Calculate (newY, superviewContentSize.Height, this, Dimension.Height) ?? 0;
             }
         }
         catch (LayoutException)
@@ -532,10 +549,15 @@ public partial class View // Layout APIs
 
         if (Frame != newFrame)
         {
-            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height
-            // This will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
+            // Set the frame. Do NOT use `Frame = newFrame` as it overwrites X, Y, Width, and Height
+            // SetFrame will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
             SetFrame (newFrame);
 
+            // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
+            // BUGBUG: other logic in the property setters does not get executed.  Specifically:
+            // BUGBUG: - Reset TextFormatter
+            // BUGBUG: - SetLayoutNeeded (not an issue as we explicitly call Layout below)
+            // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
             if (_x is PosAbsolute)
             {
                 _x = Frame.X;
