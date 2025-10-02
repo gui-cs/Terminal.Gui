@@ -214,6 +214,67 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
+    public void Line_SetHeight_PreservesOnOrientationChange ()
+    {
+        var line = new Line ();
+        
+        // Set height before changing orientation
+        line.SetHeight(5);
+        
+        // Change orientation - height should be preserved
+        line.Orientation = Orientation.Vertical;
+        
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+        container.Layout ();
+        
+        Assert.Equal (5, line.Frame.Height);
+        Assert.Equal (1, line.Frame.Width); // Width should still be set to 1 for vertical
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Line_SetWidth_PreservesOnOrientationChange ()
+    {
+        var line = new Line ();
+        
+        // Set width before changing orientation
+        line.SetWidth(10);
+        
+        // Change orientation - width should be preserved
+        line.Orientation = Orientation.Horizontal;
+        
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+        container.Layout ();
+        
+        Assert.Equal (10, line.Frame.Width);
+        Assert.Equal (1, line.Frame.Height); // Height should still be set to 1 for horizontal
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Line_SetWidthAndHeight_BothPreservedOnOrientationChange ()
+    {
+        var line = new Line ();
+        
+        // Set both width and height
+        line.SetWidth(15);
+        line.SetHeight(8);
+        
+        // Change orientation - both should be preserved
+        line.Orientation = Orientation.Vertical;
+        
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+        container.Layout ();
+        
+        Assert.Equal (15, line.Frame.Width);
+        Assert.Equal (8, line.Frame.Height);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void Line_Draw_DoesNotThrow ()
     {
         var top = new Toplevel ();

@@ -42,6 +42,8 @@ public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
     private LineStyle _style = LineStyle.Single;
+    private Dim? _userSetWidth;
+    private Dim? _userSetHeight;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -58,6 +60,30 @@ public class Line : View, IOrientation
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
         OnOrientationChanged(Orientation);
+    }
+
+    /// <summary>
+    ///     Sets the width of the line. Once set, it will not be changed by <see cref="Orientation"/> changes.
+    /// </summary>
+    /// <param name="width">The width dimension.</param>
+    /// <returns>The Line instance for fluent API.</returns>
+    public new Line SetWidth (Dim width)
+    {
+        _userSetWidth = width;
+        base.Width = width;
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the height of the line. Once set, it will not be changed by <see cref="Orientation"/> changes.
+    /// </summary>
+    /// <param name="height">The height dimension.</param>
+    /// <returns>The Line instance for fluent API.</returns>
+    public new Line SetHeight (Dim height)
+    {
+        _userSetHeight = height;
+        base.Height = height;
+        return this;
     }
 
     /// <summary>
@@ -82,12 +108,22 @@ public class Line : View, IOrientation
 
     #region IOrientation members
     /// <summary>
-    ///     The direction of the line. Changing this property automatically adjusts the Width and Height
-    ///     to appropriate values for the new orientation.
+    ///     The direction of the line. Changing this property adjusts the Width and Height
+    ///     to appropriate values for the new orientation, unless they have been explicitly set using
+    ///     <see cref="SetWidth"/> or <see cref="SetHeight"/>.
     /// </summary>
     /// <remarks>
-    ///     When set to <see cref="Orientation.Horizontal"/>, Width is set to <see cref="Dim.Fill()"/> and Height to 1.
-    ///     When set to <see cref="Orientation.Vertical"/>, Width is set to 1 and Height to <see cref="Dim.Fill()"/>.
+    ///     <para>
+    ///         When set to <see cref="Orientation.Horizontal"/>, Width is set to <see cref="Dim.Fill()"/> and Height to 1,
+    ///         unless they have been explicitly set using SetWidth or SetHeight.
+    ///     </para>
+    ///     <para>
+    ///         When set to <see cref="Orientation.Vertical"/>, Width is set to 1 and Height to <see cref="Dim.Fill()"/>,
+    ///         unless they have been explicitly set using SetWidth or SetHeight.
+    ///     </para>
+    ///     <para>
+    ///         To set Width or Height before Orientation and have them preserved, use <see cref="SetWidth"/> or <see cref="SetHeight"/>.
+    ///     </para>
     /// </remarks>
     public Orientation Orientation
     {
@@ -104,7 +140,8 @@ public class Line : View, IOrientation
 #pragma warning restore CS0067 // The event is never used
 
     /// <summary>
-    ///     Called when <see cref="Orientation"/> has changed. Updates the Width and Height based on the new orientation.
+    ///     Called when <see cref="Orientation"/> has changed. Updates the Width and Height based on the new orientation,
+    ///     but only if they haven't been explicitly set using <see cref="SetWidth"/> or <see cref="SetHeight"/>.
     /// </summary>
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
@@ -112,12 +149,24 @@ public class Line : View, IOrientation
         switch (newOrientation)
         {
             case Orientation.Horizontal:
-                Height = 1;
-                Width = Dim.Fill ();
+                if (_userSetHeight == null)
+                {
+                    Height = 1;
+                }
+                if (_userSetWidth == null)
+                {
+                    Width = Dim.Fill ();
+                }
                 break;
             case Orientation.Vertical:
-                Width = 1;
-                Height = Dim.Fill ();
+                if (_userSetWidth == null)
+                {
+                    Width = 1;
+                }
+                if (_userSetHeight == null)
+                {
+                    Height = Dim.Fill ();
+                }
                 break;
         }
     }
