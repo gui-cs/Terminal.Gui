@@ -214,12 +214,12 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_SetHeight_PreservesOnOrientationChange ()
+    public void Line_Height_PreservesOnOrientationChange ()
     {
         var line = new Line ();
         
         // Set height before changing orientation
-        line.SetHeight(5);
+        line.Height = 5;
         
         // Change orientation - height should be preserved
         line.Orientation = Orientation.Vertical;
@@ -234,12 +234,12 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_SetWidth_PreservesOnOrientationChange ()
+    public void Line_Width_PreservesOnOrientationChange ()
     {
         var line = new Line ();
         
         // Set width before changing orientation
-        line.SetWidth(10);
+        line.Width = 10;
         
         // Change orientation - width should be preserved
         line.Orientation = Orientation.Horizontal;
@@ -254,13 +254,13 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_SetWidthAndHeight_BothPreservedOnOrientationChange ()
+    public void Line_WidthAndHeight_BothPreservedOnOrientationChange ()
     {
         var line = new Line ();
         
         // Set both width and height
-        line.SetWidth(15);
-        line.SetHeight(8);
+        line.Width = 15;
+        line.Height = 8;
         
         // Change orientation - both should be preserved
         line.Orientation = Orientation.Vertical;
