@@ -64,7 +64,10 @@ public class Line : View, IOrientation
 
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
-        OnOrientationChanged (Orientation);
+        
+        // Set default dimensions for horizontal orientation
+        Height = 1;
+        Width = Dim.Fill ();
     }
 
     /// <summary>
@@ -118,17 +121,19 @@ public class Line : View, IOrientation
 
     #region IOrientation members
     /// <summary>
-    ///     The direction of the line. Changing this property swaps Width and Height to preserve
-    ///     the line's dimensions in the new orientation.
+    ///     The direction of the line.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When orientation changes, the Width and Height values are swapped so that the line
-    ///         maintains its visual dimensions. For example, a horizontal line with Width=10, Height=1
-    ///         becomes Width=1, Height=10 when changed to vertical.
+    ///         Changing orientation swaps Width and Height to preserve the line's visual dimensions.
+    ///         For example, a horizontal line with Width=30, Height=1 becomes Width=1, Height=30 when
+    ///         changed to vertical orientation.
     ///     </para>
     ///     <para>
-    ///         Use the <see cref="Length"/> property to control the extent of the line regardless of orientation.
+    ///         For object initializers where dimensions are set before orientation:
+    ///         <code>new Line { Height = 9, Orientation = Orientation.Vertical }</code>
+    ///         The Height is set first, then when Orientation is set, Width and Height swap,
+    ///         resulting in Width=9, Height=1 (horizontal default) → swap → Width=1, Height=9 (vertical).
     ///     </para>
     /// </remarks>
     public Orientation Orientation
@@ -146,68 +151,15 @@ public class Line : View, IOrientation
 #pragma warning restore CS0067 // The event is never used
 
     /// <summary>
-    ///     Called when <see cref="Orientation"/> has changed. Swaps Width and Height to preserve
-    ///     the line's dimensions in the new orientation.
+    ///     Called when <see cref="Orientation"/> has changed.
     /// </summary>
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        // Get current dimensions before we change anything
-        Dim currentWidth = Width;
-        Dim currentHeight = Height;
-        
-        // Check if we're in a default state (just constructed)
-        bool isDefaultWidth = currentWidth.ToString () == "Absolute(0)";
-        bool isDefaultHeight = currentHeight.ToString () == "Absolute(0)";
-        
-        switch (newOrientation)
-        {
-            case Orientation.Horizontal:
-                // Set perpendicular dimension first
-                Height = 1;
-                
-                // Set the length dimension
-                if (isDefaultWidth && isDefaultHeight)
-                {
-                    // Just constructed, use default
-                    Width = Dim.Fill ();
-                }
-                else if (currentHeight != 1 && !isDefaultHeight)
-                {
-                    // Swap - height becomes width (preserve the "length")
-                    Width = currentHeight;
-                }
-                else if (currentWidth == 1)
-                {
-                    // Width was perpendicular, default to Fill
-                    Width = Dim.Fill ();
-                }
-                // else keep current width
-                break;
-                
-            case Orientation.Vertical:
-                // Set perpendicular dimension first
-                Width = 1;
-                
-                // Set the length dimension
-                if (isDefaultWidth && isDefaultHeight)
-                {
-                    // Just constructed, use default
-                    Height = Dim.Fill ();
-                }
-                else if (currentWidth != 1 && !isDefaultWidth)
-                {
-                    // Swap - width becomes height (preserve the "length")
-                    Height = currentWidth;
-                }
-                else if (currentHeight == 1)
-                {
-                    // Height was perpendicular, default to Fill
-                    Height = Dim.Fill ();
-                }
-                // else keep current height
-                break;
-        }
+        // Swap Width and Height to preserve the visual appearance
+        Dim temp = Width;
+        Width = Height;
+        Height = temp;
     }
     #endregion
 
