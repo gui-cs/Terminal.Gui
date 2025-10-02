@@ -18,6 +18,11 @@ namespace Terminal.Gui.Views;
 ///         various line styles including Single, Double, Heavy, Rounded, Dashed, and Dotted.
 ///     </para>
 ///     <para>
+///         Use the <see cref="Length"/> property to control the extent of the line regardless of its
+///         <see cref="Orientation"/>. For horizontal lines, Length controls Width; for vertical lines,
+///         it controls Height. The perpendicular dimension is always 1.
+///     </para>
+///     <para>
 ///         When multiple <see cref="Line"/> instances or other LineCanvas-aware views (like <see cref="Border"/>)
 ///         intersect, the LineCanvas automatically selects the appropriate box-drawing characters for corners,
 ///         T-junctions, and crosses.
@@ -33,8 +38,8 @@ namespace Terminal.Gui.Views;
 ///         // Create a horizontal line
 ///         var hLine = new Line { Y = 5 };
 ///         
-///         // Create a vertical line
-///         var vLine = new Line { X = 10, Orientation = Orientation.Vertical };
+///         // Create a vertical line with specific length
+///         var vLine = new Line { X = 10, Orientation = Orientation.Vertical, Length = 15 };
 ///         
 ///         // Create a double-line style horizontal line
 ///         var doubleLine = new Line { Y = 10, Style = LineStyle.Double };
@@ -44,9 +49,6 @@ public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
     private LineStyle _style = LineStyle.Single;
-    private bool _widthSetByUser;
-    private bool _heightSetByUser;
-    private bool _settingFromOrientation;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -65,24 +67,33 @@ public class Line : View, IOrientation
         OnOrientationChanged (Orientation);
     }
 
-    /// <inheritdoc/>
-    protected override bool OnWidthChanging (App.ValueChangingEventArgs<Dim?> args)
+    /// <summary>
+    ///     Gets or sets the length of the line along its orientation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         For a horizontal line, this sets/gets the Width.
+    ///         For a vertical line, this sets/gets the Height.
+    ///     </para>
+    ///     <para>
+    ///         This property provides a cleaner API for controlling the line's extent
+    ///         without needing to know whether to use Width or Height.
+    ///     </para>
+    /// </remarks>
+    public Dim Length
     {
-        if (!_settingFromOrientation)
+        get => Orientation == Orientation.Horizontal ? Width : Height;
+        set
         {
-            _widthSetByUser = true;
+            if (Orientation == Orientation.Horizontal)
+            {
+                Width = value;
+            }
+            else
+            {
+                Height = value;
+            }
         }
-        return base.OnWidthChanging (args);
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnHeightChanging (App.ValueChangingEventArgs<Dim?> args)
-    {
-        if (!_settingFromOrientation)
-        {
-            _heightSetByUser = true;
-        }
-        return base.OnHeightChanging (args);
     }
 
     /// <summary>
@@ -107,20 +118,17 @@ public class Line : View, IOrientation
 
     #region IOrientation members
     /// <summary>
-    ///     The direction of the line. Changing this property adjusts the Width and Height
-    ///     to appropriate values for the new orientation, unless they have been explicitly set by the user.
+    ///     The direction of the line. Changing this property swaps Width and Height to preserve
+    ///     the line's dimensions in the new orientation.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When set to <see cref="Orientation.Horizontal"/>, Width is set to <see cref="Dim.Fill()"/> and Height to 1,
-    ///         unless they have been explicitly set by the user.
+    ///         When orientation changes, the Width and Height values are swapped so that the line
+    ///         maintains its visual dimensions. For example, a horizontal line with Width=10, Height=1
+    ///         becomes Width=1, Height=10 when changed to vertical.
     ///     </para>
     ///     <para>
-    ///         When set to <see cref="Orientation.Vertical"/>, Width is set to 1 and Height to <see cref="Dim.Fill()"/>,
-    ///         unless they have been explicitly set by the user.
-    ///     </para>
-    ///     <para>
-    ///         If you set Width or Height before setting Orientation, those values will be preserved.
+    ///         Use the <see cref="Length"/> property to control the extent of the line regardless of orientation.
     ///     </para>
     /// </remarks>
     public Orientation Orientation
@@ -138,42 +146,67 @@ public class Line : View, IOrientation
 #pragma warning restore CS0067 // The event is never used
 
     /// <summary>
-    ///     Called when <see cref="Orientation"/> has changed. Updates the Width and Height based on the new orientation,
-    ///     but only if they haven't been explicitly set by the user.
+    ///     Called when <see cref="Orientation"/> has changed. Swaps Width and Height to preserve
+    ///     the line's dimensions in the new orientation.
     /// </summary>
     /// <param name="newOrientation">The new orientation value.</param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        _settingFromOrientation = true;
-        try
+        // Get current dimensions before we change anything
+        Dim currentWidth = Width;
+        Dim currentHeight = Height;
+        
+        // Check if we're in a default state (just constructed)
+        bool isDefaultWidth = currentWidth.ToString () == "Absolute(0)";
+        bool isDefaultHeight = currentHeight.ToString () == "Absolute(0)";
+        
+        switch (newOrientation)
         {
-            switch (newOrientation)
-            {
-                case Orientation.Horizontal:
-                    if (!_heightSetByUser)
-                    {
-                        Height = 1;
-                    }
-                    if (!_widthSetByUser)
-                    {
-                        Width = Dim.Fill ();
-                    }
-                    break;
-                case Orientation.Vertical:
-                    if (!_widthSetByUser)
-                    {
-                        Width = 1;
-                    }
-                    if (!_heightSetByUser)
-                    {
-                        Height = Dim.Fill ();
-                    }
-                    break;
-            }
-        }
-        finally
-        {
-            _settingFromOrientation = false;
+            case Orientation.Horizontal:
+                // Set perpendicular dimension first
+                Height = 1;
+                
+                // Set the length dimension
+                if (isDefaultWidth && isDefaultHeight)
+                {
+                    // Just constructed, use default
+                    Width = Dim.Fill ();
+                }
+                else if (currentHeight != 1 && !isDefaultHeight)
+                {
+                    // Swap - height becomes width (preserve the "length")
+                    Width = currentHeight;
+                }
+                else if (currentWidth == 1)
+                {
+                    // Width was perpendicular, default to Fill
+                    Width = Dim.Fill ();
+                }
+                // else keep current width
+                break;
+                
+            case Orientation.Vertical:
+                // Set perpendicular dimension first
+                Width = 1;
+                
+                // Set the length dimension
+                if (isDefaultWidth && isDefaultHeight)
+                {
+                    // Just constructed, use default
+                    Height = Dim.Fill ();
+                }
+                else if (currentWidth != 1 && !isDefaultWidth)
+                {
+                    // Swap - width becomes height (preserve the "length")
+                    Height = currentWidth;
+                }
+                else if (currentHeight == 1)
+                {
+                    // Height was perpendicular, default to Fill
+                    Height = Dim.Fill ();
+                }
+                // else keep current height
+                break;
         }
     }
     #endregion

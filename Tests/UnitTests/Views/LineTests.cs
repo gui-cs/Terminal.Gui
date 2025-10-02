@@ -214,63 +214,65 @@ public class LineTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_Height_PreservesOnOrientationChange ()
+    public void Line_Length_Get_ReturnsCorrectDimension ()
     {
-        var line = new Line ();
+        var line = new Line { Width = 20, Height = 1 };
         
-        // Set height before changing orientation
-        line.Height = 5;
-        
-        // Change orientation - height should be preserved
-        line.Orientation = Orientation.Vertical;
-        
-        var container = new View { Width = 50, Height = 20 };
-        container.Add (line);
-        container.Layout ();
-        
-        Assert.Equal (5, line.Frame.Height);
-        Assert.Equal (1, line.Frame.Width); // Width should still be set to 1 for vertical
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Line_Width_PreservesOnOrientationChange ()
-    {
-        var line = new Line ();
-        
-        // Set width before changing orientation
-        line.Width = 10;
-        
-        // Change orientation - width should be preserved
+        // For horizontal, Length should be Width
         line.Orientation = Orientation.Horizontal;
+        Assert.Equal (line.Width, line.Length);
         
-        var container = new View { Width = 50, Height = 20 };
-        container.Add (line);
-        container.Layout ();
-        
-        Assert.Equal (10, line.Frame.Width);
-        Assert.Equal (1, line.Frame.Height); // Height should still be set to 1 for horizontal
+        // For vertical, Length should be Height
+        line.Orientation = Orientation.Vertical;
+        Assert.Equal (line.Height, line.Length);
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Line_WidthAndHeight_BothPreservedOnOrientationChange ()
+    public void Line_Length_Set_UpdatesCorrectDimension ()
     {
         var line = new Line ();
-        
-        // Set both width and height
-        line.Width = 15;
-        line.Height = 8;
-        
-        // Change orientation - both should be preserved
-        line.Orientation = Orientation.Vertical;
-        
         var container = new View { Width = 50, Height = 20 };
         container.Add (line);
+        
+        // Set length for horizontal line
+        line.Orientation = Orientation.Horizontal;
+        line.Length = 30;
+        container.Layout ();
+        Assert.Equal (30, line.Frame.Width);
+        Assert.Equal (1, line.Frame.Height);
+        
+        // Set length for vertical line
+        line.Orientation = Orientation.Vertical;
+        line.Length = 15;
+        container.Layout ();
+        Assert.Equal (1, line.Frame.Width);
+        Assert.Equal (15, line.Frame.Height);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Line_OrientationChange_SwapsDimensions ()
+    {
+        var line = new Line ();
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+        
+        // Start horizontal with custom dimensions
+        line.Orientation = Orientation.Horizontal;
+        line.Width = 30;
+        line.Height = 1;
         container.Layout ();
         
-        Assert.Equal (15, line.Frame.Width);
-        Assert.Equal (8, line.Frame.Height);
+        Assert.Equal (30, line.Frame.Width);
+        Assert.Equal (1, line.Frame.Height);
+        
+        // Change to vertical - dimensions should swap
+        line.Orientation = Orientation.Vertical;
+        container.Layout ();
+        
+        Assert.Equal (1, line.Frame.Width);
+        Assert.Equal (30, line.Frame.Height); // Width became Height
     }
 
     [Fact]
