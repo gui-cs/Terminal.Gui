@@ -160,7 +160,6 @@ public class FileDialog : Dialog, IDesignable
             Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
             Visible = false,
             CanFocus = true,
-            TabStop = TabBehavior.NoStop,
             Arrangement = ViewArrangement.Resizable
         };
 
@@ -172,8 +171,7 @@ public class FileDialog : Dialog, IDesignable
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
             Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
-            CanFocus = true,
-            TabStop = TabBehavior.NoStop
+            CanFocus = true
         };
 
         // this.splitContainer.Border.BorderStyle = BorderStyle.None;
