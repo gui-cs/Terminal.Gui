@@ -70,10 +70,23 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
         }
     }
 
+    private void FlushConsoleInput ()
+    {
+        if (!ConsoleDriver.RunningUnitTests)
+        {
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey (intercept: true);
+            }
+        }
+    }
+
     /// <inheritdoc/>
     public override void Dispose ()
     {
         base.Dispose ();
+
+        // Disable mouse events first
         Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
         //Disable alternative screen buffer.
@@ -83,5 +96,8 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
         Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
 
         _adjustConsole?.Cleanup ();
+
+        // Flush any pending input so no stray events appear
+        FlushConsoleInput ();
     }
 }

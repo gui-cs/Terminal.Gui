@@ -1461,7 +1461,7 @@ public static class EscSeqUtils
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
         if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            if (keyInfo is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.I })
             {
                 return KeyCode.Tab;
             }

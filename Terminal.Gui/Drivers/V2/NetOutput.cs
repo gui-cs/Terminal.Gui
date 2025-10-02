@@ -54,23 +54,30 @@ public class NetOutput : OutputBase, IConsoleOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        EscSeqUtils.CSI_AppendForegroundColorRGB (
-                                                  output,
-                                                  attr.Foreground.R,
-                                                  attr.Foreground.G,
-                                                  attr.Foreground.B
-                                                 );
+        if (Application.Force16Colors)
+        {
+            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (
+                                                      output,
+                                                      attr.Foreground.R,
+                                                      attr.Foreground.G,
+                                                      attr.Foreground.B
+                                                     );
 
-        EscSeqUtils.CSI_AppendBackgroundColorRGB (
-                                                  output,
-                                                  attr.Background.R,
-                                                  attr.Background.G,
-                                                  attr.Background.B
-                                                 );
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (
+                                                      output,
+                                                      attr.Background.R,
+                                                      attr.Background.G,
+                                                      attr.Background.B
+                                                     );
+        }
 
         EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
     }
-
 
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
@@ -116,9 +123,25 @@ public class NetOutput : OutputBase, IConsoleOutput
     }
 
 
+    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
+
     /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        if (visibility != CursorVisibility.Invisible)
+        {
+            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            {
+                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+
+                Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+            }
+
+            Write (EscSeqUtils.CSI_ShowCursor);
+        }
+        else
+        {
+            Write (EscSeqUtils.CSI_HideCursor);
+        }
     }
 }
