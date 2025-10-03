@@ -601,7 +601,7 @@ public partial class View // Layout APIs
             }
             else
             {
-                newY = _y.Calculate (superviewContentSize.Height, _height!, this, Dimension.Height);
+                newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
                 newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
             }
         }
