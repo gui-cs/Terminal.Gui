@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using Terminal.Gui.App;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -330,20 +329,21 @@ public partial class View // Layout APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
-                _height,
-                value,
-                OnHeightChanging,
-                HeightChanging,
-                newValue =>
-                {
-                    _height = newValue;
-                    // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-                    TextFormatter.ConstrainToHeight = null;
-                    PosDimSet ();
-                },
-                OnHeightChanged,
-                HeightChanged,
-                out Dim _);
+                                              _height,
+                                              value,
+                                              OnHeightChanging,
+                                              HeightChanging,
+                                              newValue =>
+                                              {
+                                                  _height = newValue;
+
+                                                  // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                                                  TextFormatter.ConstrainToHeight = null;
+                                                  PosDimSet ();
+                                              },
+                                              OnHeightChanged,
+                                              HeightChanged,
+                                              out Dim _);
         }
     }
 
@@ -352,18 +352,13 @@ public partial class View // Layout APIs
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new height.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnHeightChanging (ValueChangingEventArgs<Dim> args)
-    {
-        return false;
-    }
+    protected virtual bool OnHeightChanging (ValueChangingEventArgs<Dim> args) { return false; }
 
     /// <summary>
     ///     Called after the <see cref="Height"/> property changes, allowing subclasses to react to the change.
     /// </summary>
     /// <param name="args">The event arguments containing the old and new height.</param>
-    protected virtual void OnHeightChanged (ValueChangedEventArgs<Dim> args)
-    {
-    }
+    protected virtual void OnHeightChanged (ValueChangedEventArgs<Dim> args) { }
 
     /// <summary>
     ///     Raised before the <see cref="Height"/> property changes, allowing handlers to modify or cancel the change.
@@ -425,20 +420,21 @@ public partial class View // Layout APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
-                _width,
-                value,
-                OnWidthChanging,
-                WidthChanging,
-                newValue =>
-                {
-                    _width = newValue;
-                    // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-                    TextFormatter.ConstrainToWidth = null;
-                    PosDimSet ();
-                },
-                OnWidthChanged,
-                WidthChanged,
-                out Dim _);
+                                              _width,
+                                              value,
+                                              OnWidthChanging,
+                                              WidthChanging,
+                                              newValue =>
+                                              {
+                                                  _width = newValue;
+
+                                                  // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                                                  TextFormatter.ConstrainToWidth = null;
+                                                  PosDimSet ();
+                                              },
+                                              OnWidthChanged,
+                                              WidthChanged,
+                                              out Dim _);
         }
     }
 
@@ -447,18 +443,13 @@ public partial class View // Layout APIs
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new width.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnWidthChanging (ValueChangingEventArgs<Dim> args)
-    {
-        return false;
-    }
+    protected virtual bool OnWidthChanging (ValueChangingEventArgs<Dim> args) { return false; }
 
     /// <summary>
     ///     Called after the <see cref="Width"/> property changes, allowing subclasses to react to the change.
     /// </summary>
     /// <param name="args">The event arguments containing the old and new width.</param>
-    protected virtual void OnWidthChanged (ValueChangedEventArgs<Dim> args)
-    {
-    }
+    protected virtual void OnWidthChanged (ValueChangedEventArgs<Dim> args) { }
 
     /// <summary>
     ///     Raised before the <see cref="Width"/> property changes, allowing handlers to modify or cancel the change.
@@ -577,6 +568,7 @@ public partial class View // Layout APIs
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
+
         //Debug.Assert (_width is { });
         //Debug.Assert (_height is { });
 
@@ -1260,13 +1252,15 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by
+    ///     depth. The
     ///     deepest
     ///     View is at the end of the list (the top most View is at element 0).
     /// </summary>
     /// <param name="screenLocation">Screen-relative location.</param>
     /// <param name="excludeViewportSettingsFlags">
-    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
     public static List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
@@ -1327,21 +1321,24 @@ public partial class View // Layout APIs
 
     /// <summary>
     ///     INTERNAL: Helper for GetViewsUnderLocation that starts from a given root view.
-    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by
+    ///     depth. The
     ///     deepest
     ///     View is at the end of the list (the topmost View is at element 0).
     /// </summary>
     /// <param name="root"></param>
     /// <param name="screenLocation">Screen-relative location.</param>
     /// <param name="excludeViewportSettingsFlags">
-    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
     internal static List<View?> GetViewsUnderLocation (View root, in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
     {
         List<View?> viewsUnderLocation = GetViewsAtLocation (root, screenLocation);
 
-        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.Transparent) && !excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.Transparent)
+            && !excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.TransparentMouse))
         {
             // Only filter views if we are excluding transparent views.
             return viewsUnderLocation;
@@ -1349,8 +1346,7 @@ public partial class View // Layout APIs
 
         // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
         // because the point was in their adornment, and if the adornment is transparent, they should be removed.
-        viewsUnderLocation.RemoveAll (
-                                      v =>
+        viewsUnderLocation.RemoveAll (v =>
                                       {
                                           if (v is null or Adornment)
                                           {
@@ -1385,6 +1381,7 @@ public partial class View // Layout APIs
 
         return viewsUnderLocation;
     }
+
     /// <summary>
     ///     INTERNAL: Gets ALL Views (Subviews and Adornments) in the of <see cref="SuperView"/> hierarchcy that are at
     ///     <paramref name="location"/>,
@@ -1428,6 +1425,7 @@ public partial class View // Layout APIs
             for (int i = currentView.InternalSubViews.Count - 1; i >= 0; i--)
             {
                 View subview = currentView.InternalSubViews [i];
+
                 if (subview.Visible && subview.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (subview);

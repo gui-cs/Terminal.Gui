@@ -1,5 +1,3 @@
-using Terminal.Gui.Views;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Line", "Demonstrates the Line view with LineCanvas integration.")]
@@ -54,7 +52,7 @@ public class LineExample : Scenario
         };
         app.Add (stylesLabel);
 
-        var styles = new[]
+        (LineStyle, string) [] styles = new []
         {
             (LineStyle.Single, "Single"),
             (LineStyle.Double, "Double"),
@@ -65,6 +63,7 @@ public class LineExample : Scenario
         };
 
         var yPos = 4;
+
         foreach ((LineStyle style, string name) in styles)
         {
             app.Add (new Label { X = 0, Y = yPos, Width = 15, Text = name + ":" });
@@ -88,26 +87,28 @@ public class LineExample : Scenario
         // Horizontal lines in the grid
         for (var i = 0; i < 5; i++)
         {
-            app.Add (new Line
-            {
-                X = gridX,
-                Y = gridY + i * 2,
-                Width = 21,
-                Style = LineStyle.Single
-            });
+            app.Add (
+                     new Line
+                     {
+                         X = gridX,
+                         Y = gridY + i * 2,
+                         Width = 21,
+                         Style = LineStyle.Single
+                     });
         }
 
         // Vertical lines in the grid
         for (var i = 0; i < 5; i++)
         {
-            app.Add (new Line
-            {
-                X = gridX + i * 5,
-                Y = gridY,
-                Height = 9,
-                Orientation = Orientation.Vertical,
-                Style = LineStyle.Single
-            });
+            app.Add (
+                     new Line
+                     {
+                         X = gridX + i * 5,
+                         Y = gridY,
+                         Height = 9,
+                         Orientation = Orientation.Vertical,
+                         Style = LineStyle.Single
+                     });
         }
 
         // Section 4: Mixed Styles (shows how LineCanvas handles different line styles)
@@ -120,42 +121,46 @@ public class LineExample : Scenario
         app.Add (mixedLabel);
 
         // Double horizontal
-        app.Add (new Line
-        {
-            X = 60,
-            Y = 5,
-            Width = 20,
-            Style = LineStyle.Double
-        });
+        app.Add (
+                 new Line
+                 {
+                     X = 60,
+                     Y = 5,
+                     Width = 20,
+                     Style = LineStyle.Double
+                 });
 
         // Single vertical through double horizontal
-        app.Add (new Line
-        {
-            X = 70,
-            Y = 4,
-            Height = 3,
-            Orientation = Orientation.Vertical,
-            Style = LineStyle.Single
-        });
+        app.Add (
+                 new Line
+                 {
+                     X = 70,
+                     Y = 4,
+                     Height = 3,
+                     Orientation = Orientation.Vertical,
+                     Style = LineStyle.Single
+                 });
 
         // Heavy horizontal
-        app.Add (new Line
-        {
-            X = 60,
-            Y = 8,
-            Width = 20,
-            Style = LineStyle.Heavy
-        });
+        app.Add (
+                 new Line
+                 {
+                     X = 60,
+                     Y = 8,
+                     Width = 20,
+                     Style = LineStyle.Heavy
+                 });
 
         // Single vertical through heavy horizontal
-        app.Add (new Line
-        {
-            X = 70,
-            Y = 7,
-            Height = 3,
-            Orientation = Orientation.Vertical,
-            Style = LineStyle.Single
-        });
+        app.Add (
+                 new Line
+                 {
+                     X = 70,
+                     Y = 7,
+                     Height = 3,
+                     Orientation = Orientation.Vertical,
+                     Style = LineStyle.Single
+                 });
 
         // Section 5: Box Example (showing borders and lines working together)
         var boxLabel = new Label
@@ -177,22 +182,24 @@ public class LineExample : Scenario
         };
 
         // Add a cross inside the frame
-        framedView.Add (new Line
-        {
-            X = 0,
-            Y = 3,
-            Width = Dim.Fill (),
-            Style = LineStyle.Single
-        });
+        framedView.Add (
+                        new Line
+                        {
+                            X = 0,
+                            Y = 3,
+                            Width = Dim.Fill (),
+                            Style = LineStyle.Single
+                        });
 
-        framedView.Add (new Line
-        {
-            X = 14,
-            Y = 0,
-            Height = Dim.Fill (),
-            Orientation = Orientation.Vertical,
-            Style = LineStyle.Single
-        });
+        framedView.Add (
+                        new Line
+                        {
+                            X = 14,
+                            Y = 0,
+                            Height = Dim.Fill (),
+                            Orientation = Orientation.Vertical,
+                            Style = LineStyle.Single
+                        });
 
         app.Add (framedView);
 

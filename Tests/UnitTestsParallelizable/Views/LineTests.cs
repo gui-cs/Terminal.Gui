@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.ViewsTests;
 
 public class LineTests
@@ -95,9 +94,9 @@ public class LineTests
         app.BeginInit ();
         app.EndInit ();
         app.Layout ();
-        
+
         // Just verify the line can be drawn without errors
-        var exception = Record.Exception(() => app.Draw ());
+        Exception exception = Record.Exception (() => app.Draw ());
         Assert.Null (exception);
     }
 
@@ -113,9 +112,9 @@ public class LineTests
         app.BeginInit ();
         app.EndInit ();
         app.Layout ();
-        
+
         // Just verify the line and border can be drawn together without errors
-        var exception = Record.Exception(() => app.Draw ());
+        Exception exception = Record.Exception (() => app.Draw ());
         Assert.Null (exception);
     }
 
@@ -126,6 +125,7 @@ public class LineTests
 
         // Create intersecting lines
         var hLine = new Line { X = 5, Y = 5, Width = 15, Style = LineStyle.Single };
+
         var vLine = new Line
         {
             X = 12, Y = 2, Height = 8, Orientation = Orientation.Vertical, Style = LineStyle.Single
@@ -136,9 +136,9 @@ public class LineTests
         app.BeginInit ();
         app.EndInit ();
         app.Layout ();
-        
+
         // Just verify multiple intersecting lines can be drawn without errors
-        var exception = Record.Exception(() => app.Draw ());
+        Exception exception = Record.Exception (() => app.Draw ());
         Assert.Null (exception);
     }
 
@@ -159,10 +159,11 @@ public class LineTests
     public void Line_VerticalWithExplicitHeight_RespectValues ()
     {
         var line = new Line { Orientation = Orientation.Vertical };
+
         // Set height AFTER orientation to avoid it being reset
         line.Width = 1;
         line.Height = 8;
-        
+
         var container = new View { Width = 50, Height = 20 };
         container.Add (line);
 
@@ -200,12 +201,12 @@ public class LineTests
     public void Line_Length_Get_ReturnsCorrectDimension ()
     {
         var line = new Line { Width = 20, Height = 1 };
-        
+
         // For horizontal, Length should be Width
         line.Orientation = Orientation.Horizontal;
         Assert.Equal (line.Width, line.Length);
         Assert.Equal (1, line.Height.GetAnchor (0));
-        
+
         // For vertical, Length should be Height
         line.Orientation = Orientation.Vertical;
         Assert.Equal (line.Height, line.Length);
@@ -218,20 +219,20 @@ public class LineTests
         var line = new Line ();
         var container = new View { Width = 50, Height = 20 };
         container.Add (line);
-        
+
         // Start horizontal with custom dimensions
         line.Orientation = Orientation.Horizontal;
         line.Width = 30;
         line.Height = 1;
         container.Layout ();
-        
+
         Assert.Equal (30, line.Frame.Width);
         Assert.Equal (1, line.Frame.Height);
-        
+
         // Change to vertical - dimensions should swap
         line.Orientation = Orientation.Vertical;
         container.Layout ();
-        
+
         Assert.Equal (1, line.Frame.Width);
         Assert.Equal (30, line.Frame.Height); // Width became Height
     }
@@ -248,7 +249,7 @@ public class LineTests
         Assert.Equal (1, line.Height.GetAnchor (0));
         Assert.Equal (line.Length, line.Width); // Length should be Width for horizontal
 
-        line = new Line ();
+        line = new ();
         line.Width = 15;
         line.Orientation = Orientation.Horizontal;
         Assert.Equal (15, line.Width.GetAnchor (0));
@@ -257,21 +258,17 @@ public class LineTests
 
         // Test: new Line { Height = 9, Orientation = Orientation.Vertical }
         // Expected: Width=1, Height=9
-        line = new Line { Height = 9, Orientation = Orientation.Vertical };
-        
+        line = new() { Height = 9, Orientation = Orientation.Vertical };
+
         Assert.Equal (1, line.Width.GetAnchor (0));
         Assert.Equal (9, line.Height.GetAnchor (0));
         Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
 
-        line = new Line ();
+        line = new ();
         line.Height = 9;
         line.Orientation = Orientation.Vertical;
         Assert.Equal (1, line.Width.GetAnchor (0));
         Assert.Equal (9, line.Height.GetAnchor (0));
         Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
     }
-
-
-
-
 }

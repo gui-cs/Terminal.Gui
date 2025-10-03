@@ -36,7 +36,6 @@ public class LayoutTests : GlobalTestSetup
 
     #endregion Constructor Tests
 
-
     [Fact]
     public void Set_All_Absolute_Sets_Correctly ()
     {
@@ -56,8 +55,8 @@ public class LayoutTests : GlobalTestSetup
         Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Absolute (3), v.Width);
         Assert.Equal (Dim.Absolute (4), v.Height);
-
     }
+
     [Fact]
     public void Add_Does_Not_Call_Layout ()
     {
@@ -192,7 +191,7 @@ public class LayoutTests : GlobalTestSetup
         v.Width = 4;
         v.Dispose ();
     }
-    
+
     /// <summary>This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
     [Fact]
     public void Does_Not_Throw_If_Nested_SubViews_Ref_Topmost_SuperView ()
