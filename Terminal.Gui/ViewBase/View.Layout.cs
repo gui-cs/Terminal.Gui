@@ -400,11 +400,6 @@ public partial class View // Layout APIs
     ///         allowing customization or cancellation of the change. The <see cref="WidthChanging"/> event
     ///         is raised before the change, and <see cref="WidthChanged"/> is raised after.
     ///     </para>
-    ///     <para>
-    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
-    ///         allowing customization or cancellation of the change. The <see cref="WidthChanging"/> event
-    ///         is raised before the change, and <see cref="WidthChanged"/> is raised after.
-    ///     </para>
     ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
     /// <seealso cref="WidthChanging"/>
