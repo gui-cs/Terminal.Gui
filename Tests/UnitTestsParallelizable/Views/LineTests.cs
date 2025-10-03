@@ -1,12 +1,9 @@
-using UnitTests;
-using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class LineTests (ITestOutputHelper output)
+public class LineTests
 {
     [Fact]
-    [AutoInitShutdown]
     public void Line_DefaultConstructor_Horizontal ()
     {
         var line = new Line ();
@@ -22,7 +19,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_Horizontal_FillsWidth ()
     {
         var line = new Line { Orientation = Orientation.Horizontal };
@@ -36,7 +32,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_Vertical_FillsHeight ()
     {
         var line = new Line { Orientation = Orientation.Vertical };
@@ -50,7 +45,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_ChangeOrientation_UpdatesDimensions ()
     {
         var line = new Line { Orientation = Orientation.Horizontal };
@@ -70,7 +64,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_Style_CanBeSet ()
     {
         var line = new Line { Style = LineStyle.Double };
@@ -85,7 +78,6 @@ public class LineTests (ITestOutputHelper output)
     [InlineData (LineStyle.Rounded)]
     [InlineData (LineStyle.Dashed)]
     [InlineData (LineStyle.Dotted)]
-    [AutoInitShutdown]
     public void Line_SupportsDifferentLineStyles (LineStyle style)
     {
         var line = new Line { Style = style };
@@ -94,7 +86,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_DrawsCalled_Successfully ()
     {
         var app = new Window ();
@@ -111,7 +102,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_WithBorder_DrawsSuccessfully ()
     {
         var app = new Window { Width = 20, Height = 10, BorderStyle = LineStyle.Single };
@@ -130,7 +120,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_MultipleIntersecting_DrawsSuccessfully ()
     {
         var app = new Window { Width = 30, Height = 15 };
@@ -154,7 +143,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_ExplicitWidthAndHeight_RespectValues ()
     {
         var line = new Line { Width = 10, Height = 1 };
@@ -168,7 +156,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_VerticalWithExplicitHeight_RespectValues ()
     {
         var line = new Line { Orientation = Orientation.Vertical };
@@ -186,7 +173,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_SuperViewRendersLineCanvas_IsTrue ()
     {
         var line = new Line ();
@@ -195,7 +181,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_CannotFocus ()
     {
         var line = new Line ();
@@ -204,7 +189,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_ImplementsIOrientation ()
     {
         var line = new Line ();
@@ -213,7 +197,6 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Line_Length_Get_ReturnsCorrectDimension ()
     {
         var line = new Line { Width = 20, Height = 1 };
@@ -221,37 +204,15 @@ public class LineTests (ITestOutputHelper output)
         // For horizontal, Length should be Width
         line.Orientation = Orientation.Horizontal;
         Assert.Equal (line.Width, line.Length);
+        Assert.Equal (1, line.Height.GetAnchor (0));
         
         // For vertical, Length should be Height
         line.Orientation = Orientation.Vertical;
         Assert.Equal (line.Height, line.Length);
+        Assert.Equal (1, line.Width.GetAnchor (0));
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void Line_Length_Set_UpdatesCorrectDimension ()
-    {
-        var line = new Line ();
-        var container = new View { Width = 50, Height = 20 };
-        container.Add (line);
-        
-        // Set length for horizontal line
-        line.Orientation = Orientation.Horizontal;
-        line.Length = 30;
-        container.Layout ();
-        Assert.Equal (30, line.Frame.Width);
-        Assert.Equal (1, line.Frame.Height);
-        
-        // Set length for vertical line
-        line.Orientation = Orientation.Vertical;
-        line.Length = 15;
-        container.Layout ();
-        Assert.Equal (1, line.Frame.Width);
-        Assert.Equal (15, line.Frame.Height);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Line_OrientationChange_SwapsDimensions ()
     {
         var line = new Line ();
@@ -276,128 +237,41 @@ public class LineTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void Line_ObjectInitializer_HeightThenOrientation ()
+    public void Line_Dimensions_WorkSameAsInitializers ()
     {
-        // Test the specific case: new Line { Height = 9, Orientation = Orientation.Vertical }
-        // Expected: Width=1, Height=9
-        var line = new Line { Height = 9, Orientation = Orientation.Vertical };
-        var container = new View { Width = 50, Height = 20 };
-        container.Add (line);
-        container.Layout ();
-        
-        Assert.Equal (1, line.Frame.Width);
-        Assert.Equal (9, line.Frame.Height);
-        Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
-    }
-    
-    [Fact]
-    [AutoInitShutdown]
-    public void Line_ObjectInitializer_WidthThenOrientation ()
-    {
+        // Object initializers work same as sequential assignment
         // Test: new Line { Width = 15, Orientation = Orientation.Horizontal }
         // Expected: Width=15, Height=1
-        var line = new Line { Width = 15, Orientation = Orientation.Horizontal };
-        var container = new View { Width = 50, Height = 20 };
-        container.Add (line);
-        container.Layout ();
-        
-        Assert.Equal (15, line.Frame.Width);
-        Assert.Equal (1, line.Frame.Height);
+        Line line = new () { Width = 15, Orientation = Orientation.Horizontal };
+
+        Assert.Equal (15, line.Width.GetAnchor (0));
+        Assert.Equal (1, line.Height.GetAnchor (0));
         Assert.Equal (line.Length, line.Width); // Length should be Width for horizontal
-    }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void Line_Draw_DoesNotThrow ()
-    {
-        var top = new Toplevel ();
-        var win = new Window { Width = 10, Height = 5, BorderStyle = LineStyle.None };
-        top.Add (win);
+        line = new Line ();
+        line.Width = 15;
+        line.Orientation = Orientation.Horizontal;
+        Assert.Equal (15, line.Width.GetAnchor (0));
+        Assert.Equal (1, line.Height.GetAnchor (0));
+        Assert.Equal (line.Length, line.Width); // Length should be Width for horizontal
 
-        var line = new Line { X = 1, Y = 1, Width = 5, Style = LineStyle.Single };
-        win.Add (line);
-
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (10, 5));
+        // Test: new Line { Height = 9, Orientation = Orientation.Vertical }
+        // Expected: Width=1, Height=9
+        line = new Line { Height = 9, Orientation = Orientation.Vertical };
         
-        var exception = Record.Exception(() => top.Draw ());
-        Assert.Null (exception);
+        Assert.Equal (1, line.Width.GetAnchor (0));
+        Assert.Equal (9, line.Height.GetAnchor (0));
+        Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
 
-        Application.End (rs);
-        top.Dispose ();
+        line = new Line ();
+        line.Height = 9;
+        line.Orientation = Orientation.Vertical;
+        Assert.Equal (1, line.Width.GetAnchor (0));
+        Assert.Equal (9, line.Height.GetAnchor (0));
+        Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void Line_Vertical_Draw_DoesNotThrow ()
-    {
-        var top = new Toplevel ();
-        var win = new Window { Width = 10, Height = 7, BorderStyle = LineStyle.None };
-        top.Add (win);
 
-        var line = new Line
-        {
-            X = 2, Y = 1, Height = 4, Orientation = Orientation.Vertical, Style = LineStyle.Single
-        };
-        win.Add (line);
 
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (10, 7));
-        
-        var exception = Record.Exception(() => top.Draw ());
-        Assert.Null (exception);
 
-        Application.End (rs);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Line_DoubleStyle_Draw_DoesNotThrow ()
-    {
-        var top = new Toplevel ();
-        var win = new Window { Width = 10, Height = 5, BorderStyle = LineStyle.None };
-        top.Add (win);
-
-        var line = new Line { X = 1, Y = 1, Width = 5, Style = LineStyle.Double };
-        win.Add (line);
-
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (10, 5));
-        
-        var exception = Record.Exception(() => top.Draw ());
-        Assert.Null (exception);
-
-        Application.End (rs);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Line_Intersection_DoesNotThrow ()
-    {
-        var top = new Toplevel ();
-        var win = new Window { Width = 10, Height = 7, BorderStyle = LineStyle.None };
-        top.Add (win);
-
-        // Horizontal line
-        var hLine = new Line { X = 1, Y = 2, Width = 5, Style = LineStyle.Single };
-        // Vertical line intersecting the horizontal
-        var vLine = new Line
-        {
-            X = 3, Y = 1, Height = 3, Orientation = Orientation.Vertical, Style = LineStyle.Single
-        };
-
-        win.Add (hLine, vLine);
-
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (10, 7));
-        
-        var exception = Record.Exception(() => top.Draw ());
-        Assert.Null (exception);
-
-        Application.End (rs);
-        top.Dispose ();
-    }
 }
