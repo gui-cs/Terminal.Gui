@@ -1,3 +1,4 @@
+#nullable enable
 using UnitTests.Parallelizable;
 
 namespace Terminal.Gui.ViewLayoutEventTests;
