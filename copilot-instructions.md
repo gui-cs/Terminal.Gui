@@ -102,18 +102,13 @@ This file provides instructions for GitHub Copilot when working with the Termina
 - Many existing unit tests are obtuse and not really unit tests. Anytime new tests are added or updated, strive to refactor the tests into more granular tests where each test covers the smallest area possible. 
 - Many existing unit tests in the `./Tests/UnitTests` project incorrectly require `Application.Init` and use `[AutoInitShutdown]`. Anytime new tests are added or updated, strive to remove these dependencies and make the tests parallelizable. This means not taking any dependency on static objects like `Application` and `ConfigurationManager`. 
 
-## Pull Request Checklist
+## Pull Request Guidelines
 
-Before submitting a PR, ensure:
-- [ ] PR title: "Fixes #issue. Terse description."
-- [ ] Code follows style guidelines (`.editorconfig`)
-- [ ] Code follows design guidelines (`CONTRIBUTING.md`)
-- [ ] Ran `dotnet test` and all tests pass
-- [ ] Added/updated XML API documentation (`///` comments)
-- [ ] No new warnings generated
-- [ ] Checked for grammar/spelling errors
-- [ ] Conducted basic QA testing
-- [ ] Added/updated UICatalog scenario if applicable
+- Titles should be of the form "Fixes #issue. Terse description." 
+- If the PR addresses multiple issues, use "Fixes #issue1, #issue2. Terse description."
+- First comment should include "- Fixes #issue" for each issue addressed. If an issue is only partially addressed, use "Partially addresses #issue".
+- First comment should include a thorough description of the change and any impact. 
+- Put temporary .md files in `/docfx/docs/drafts/` and remove before merging.
 
 ## Building and Running
 
