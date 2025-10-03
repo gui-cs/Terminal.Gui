@@ -314,11 +314,6 @@ public partial class View // Layout APIs
     ///         allowing customization or cancellation of the change. The <see cref="HeightChanging"/> event
     ///         is raised before the change, and <see cref="HeightChanged"/> is raised after.
     ///     </para>
-    ///     <para>
-    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
-    ///         allowing customization or cancellation of the change. The <see cref="HeightChanging"/> event
-    ///         is raised before the change, and <see cref="HeightChanged"/> is raised after.
-    ///     </para>
     ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
     /// <seealso cref="HeightChanging"/>
@@ -399,11 +394,6 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
-    ///     </para>
-    ///     <para>
-    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
-    ///         allowing customization or cancellation of the change. The <see cref="WidthChanging"/> event
-    ///         is raised before the change, and <see cref="WidthChanged"/> is raised after.
     ///     </para>
     ///     <para>
     ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
@@ -569,8 +559,6 @@ public partial class View // Layout APIs
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
 
-        //Debug.Assert (_width is { });
-        //Debug.Assert (_height is { });
 
         CheckDimAuto ();
 
@@ -613,7 +601,7 @@ public partial class View // Layout APIs
             }
             else
             {
-                newY = _y.Calculate (superviewContentSize.Height, _height!, this, Dimension.Height);
+                newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
                 newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
             }
         }
