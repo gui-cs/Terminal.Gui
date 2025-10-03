@@ -100,7 +100,7 @@ This file provides instructions for GitHub Copilot when working with the Termina
 - Write unit tests for all new functionality
 - Follow existing test patterns in `/Tests/`
 - Many existing unit tests are obtuse and not really unit tests. Anytime new tests are added or updated, strive to refactor the tests into more granular tests where each test covers the smallest area possible. 
-- Many existing unit tests in the `./Tests/UnitTests` project incorrectly require `Applicaiton.Init` and use `[AutoInitShutdown]`. Anytime new tests are added or updated, strive to remove these dependencies and make the tests parallelizable. This means not taking any dependency on static objects like `Application` and `ConfigurationManager`. 
+- Many existing unit tests in the `./Tests/UnitTests` project incorrectly require `Application.Init` and use `[AutoInitShutdown]`. Anytime new tests are added or updated, strive to remove these dependencies and make the tests parallelizable. This means not taking any dependency on static objects like `Application` and `ConfigurationManager`. 
 
 ## Pull Request Checklist
 
