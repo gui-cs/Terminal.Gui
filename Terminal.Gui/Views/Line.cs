@@ -231,7 +231,8 @@ public class Line : View, IOrientation
                             pos,
                             length,
                             Orientation,
-                            Style
+                            Style,
+                            GetAttributeForRole(VisualRole.Normal)
                            );
 
         return true;
