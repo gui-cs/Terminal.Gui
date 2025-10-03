@@ -185,36 +185,36 @@ public class Line : View, IOrientation
     }
     
     /// <inheritdoc/>
-    protected override void OnWidthChanged (ValueChangedEventArgs<Dim> e)
+    protected override bool OnWidthChanging (ValueChangingEventArgs<Dim> e)
     {
-        base.OnWidthChanged (e);
-        
-        // Update Length when Width changes for horizontal lines
+        // If horizontal, allow width changes and update _length
         if (Orientation == Orientation.Horizontal)
         {
             _length = e.NewValue;
+            return base.OnWidthChanging (e);
         }
+        
+        // If vertical, keep width at 1 (don't allow changes to perpendicular dimension)
+        e.NewValue = 1;
+        return base.OnWidthChanging (e);
     }
     
     /// <inheritdoc/>
-    protected override void OnHeightChanged (ValueChangedEventArgs<Dim> e)
+    protected override bool OnHeightChanging (ValueChangingEventArgs<Dim> e)
     {
-        base.OnHeightChanged (e);
-        
-        // Update Length when Height changes for vertical lines
-        // OR when Height is set to anything for horizontal lines
-        // (this handles: new Line { Height = 9, Orientation = Orientation.Vertical })
+        // If vertical, allow height changes and update _length
         if (Orientation == Orientation.Vertical)
         {
             _length = e.NewValue;
+            return base.OnHeightChanging (e);
         }
-        else
-        {
-            // For horizontal lines, treat Height changes as potential length updates
-            // This allows: new Line { Height = 9, Orientation = Orientation.Vertical }
-            // where Height=9 is set first, then becomes the vertical length
-            _length = e.NewValue;
-        }
+        
+        // If horizontal, update _length (for object initializer case) but keep height at 1
+        // This handles: new Line { Height = 9, Orientation = Orientation.Vertical }
+        // where Height=9 captures the intended length before Orientation is set
+        _length = e.NewValue;
+        e.NewValue = 1;
+        return base.OnHeightChanging (e);
     }
     #endregion
 
