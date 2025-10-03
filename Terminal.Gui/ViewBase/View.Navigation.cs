@@ -92,7 +92,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (SuperView is { })
             {
                 // If we are TabStop, and we have at least one other focusable peer, move to the SuperView's chain
-                if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetFocusChain (direction, behavior).Length > 1)
+                if (TabStop == TabBehavior.TabStop && SuperView is { } && ShouldBubbleUpForWrapping (SuperView, direction, behavior))
                 {
                     return false;
                 }
@@ -169,6 +169,41 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             return false;
         }
+    }
+
+    /// <summary>
+    ///     Determines if focus should bubble up to a SuperView when wrapping would occur.
+    ///     Recursively checks up the SuperView hierarchy to see if there are any focusable peers at any level.
+    /// </summary>
+    /// <param name="view">The SuperView to check.</param>
+    /// <param name="direction">The navigation direction.</param>
+    /// <param name="behavior">The tab behavior to filter by.</param>
+    /// <returns>
+    ///     <see langword="true"/> if there are focusable peers at this level or any ancestor level,
+    ///     <see langword="false"/> otherwise.
+    /// </returns>
+    private bool ShouldBubbleUpForWrapping (View? view, NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (view is null)
+        {
+            return false;
+        }
+
+        // If this parent has multiple focusable children, we should bubble up
+        View [] chain = view.GetFocusChain (direction, behavior);
+
+        if (chain.Length > 1)
+        {
+            return true;
+        }
+
+        // If parent has only 1 child but parent is also TabStop with a SuperView, check recursively
+        if (view.TabStop == TabBehavior.TabStop && view.SuperView is { })
+        {
+            return ShouldBubbleUpForWrapping (view.SuperView, direction, behavior);
+        }
+
+        return false;
     }
 
     private bool RaiseAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
