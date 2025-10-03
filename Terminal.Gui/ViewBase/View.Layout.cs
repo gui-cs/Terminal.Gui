@@ -559,8 +559,6 @@ public partial class View // Layout APIs
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
 
-        //Debug.Assert (_width is { });
-        //Debug.Assert (_height is { });
 
         CheckDimAuto ();
 
