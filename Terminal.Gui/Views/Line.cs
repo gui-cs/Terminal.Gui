@@ -1,4 +1,3 @@
-
 #nullable enable
 
 namespace Terminal.Gui.Views;
@@ -65,10 +64,11 @@ public class Line : View, IOrientation
 
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
-        
+
         // Set default dimensions for horizontal orientation
         // Set Height first (this will update _length, but we'll override it next)
         Height = 1;
+
         // Now set Width and _length to Fill
         _length = Dim.Fill ();
         Width = _length;
@@ -99,7 +99,7 @@ public class Line : View, IOrientation
         set
         {
             _length = value;
-            
+
             // Update the appropriate dimension based on current orientation
             if (Orientation == Orientation.Horizontal)
             {
@@ -133,6 +133,7 @@ public class Line : View, IOrientation
     }
 
     #region IOrientation members
+
     /// <summary>
     ///     The direction of the line.
     /// </summary>
@@ -183,39 +184,38 @@ public class Line : View, IOrientation
             Width = 1;
         }
     }
-    
+
     /// <inheritdoc/>
     protected override bool OnWidthChanging (ValueChangingEventArgs<Dim> e)
     {
         // If horizontal, allow width changes and update _length
+        _length = e.NewValue;
         if (Orientation == Orientation.Horizontal)
         {
-            _length = e.NewValue;
             return base.OnWidthChanging (e);
         }
-        
+
         // If vertical, keep width at 1 (don't allow changes to perpendicular dimension)
         e.NewValue = 1;
+
         return base.OnWidthChanging (e);
     }
-    
+
     /// <inheritdoc/>
     protected override bool OnHeightChanging (ValueChangingEventArgs<Dim> e)
     {
         // If vertical, allow height changes and update _length
+        _length = e.NewValue;
         if (Orientation == Orientation.Vertical)
         {
-            _length = e.NewValue;
             return base.OnHeightChanging (e);
         }
-        
-        // If horizontal, update _length (for object initializer case) but keep height at 1
-        // This handles: new Line { Height = 9, Orientation = Orientation.Vertical }
-        // where Height=9 captures the intended length before Orientation is set
-        _length = e.NewValue;
+
         e.NewValue = 1;
+
         return base.OnHeightChanging (e);
     }
+
     #endregion
 
     /// <inheritdoc/>
@@ -229,11 +229,11 @@ public class Line : View, IOrientation
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
         LineCanvas.AddLine (
-                    pos,
-                    length,
-                    Orientation,
-                    Style
-                   );
+                            pos,
+                            length,
+                            Orientation,
+                            Style
+                           );
 
         return true;
     }

@@ -92,7 +92,7 @@ public class LineExample : Scenario
             {
                 X = gridX,
                 Y = gridY + i * 2,
-                Width = 20,
+                Width = 21,
                 Style = LineStyle.Single
             });
         }
