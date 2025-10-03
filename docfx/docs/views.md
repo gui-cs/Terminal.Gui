@@ -307,14 +307,6 @@ Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.y
 ──────────────────────────────────────────────────
 ```
 
-## [LineView](~/api/Terminal.Gui.Views.LineView.yml)
-
-A straight line control either horizontal or vertical
-
-```text
-──────────────────────────────────────────────────
-```
-
 ## [ListView](~/api/Terminal.Gui.Views.ListView.yml)
 
 Provides a scrollable list of data where each item can be activated to perform an action.
