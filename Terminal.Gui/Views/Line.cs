@@ -95,7 +95,7 @@ public class Line : View, IOrientation
     /// </remarks>
     public Dim Length
     {
-        get => _length;
+        get => Orientation == Orientation.Horizontal ? Width : Height;
         set
         {
             _length = value;
