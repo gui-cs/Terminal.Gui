@@ -79,7 +79,7 @@ public class Wizard : Dialog
         };
 
         //// Add a horiz separator
-        var separator = new LineView (Orientation.Horizontal) { Y = Pos.Top (BackButton) - 1 };
+        var separator = new Line { Orientation = Orientation.Horizontal, Y = Pos.Top (BackButton) - 1 };
 
         base.Add (separator);
         AddButton (BackButton);

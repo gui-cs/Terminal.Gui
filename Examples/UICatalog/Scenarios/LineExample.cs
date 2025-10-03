@@ -203,21 +203,6 @@ public class LineExample : Scenario
 
         app.Add (framedView);
 
-        // Section 6: Comparison with LineView
-        var comparisonLabel = new Label
-        {
-            X = 35,
-            Y = 15,
-            Text = "Line vs LineView Comparison:"
-        };
-        app.Add (comparisonLabel);
-
-        app.Add (new Label { X = 35, Y = 16, Text = "Line (uses LineCanvas):" });
-        app.Add (new Line { X = 35, Y = 17, Width = 20, Style = LineStyle.Single });
-
-        app.Add (new Label { X = 35, Y = 18, Text = "LineView (direct render):" });
-        app.Add (new LineView { X = 35, Y = 19, Width = 20 });
-
         // Add help text
         var helpLabel = new Label
         {
