@@ -1630,7 +1630,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Horizontal ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
         tileView.Orientation = Orientation.Horizontal;
         tileView.Layout ();
         tileView.Draw ();
@@ -1654,7 +1654,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Horizontal_Focused ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
 
         tileView.Orientation = Orientation.Horizontal;
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
@@ -1700,7 +1700,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Horizontal_View1MinSize_Absolute ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
         tileView.Orientation = Orientation.Horizontal;
@@ -1792,7 +1792,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_InsertPanelAtEnd ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
         tileView.InsertTile (2);
 
         tileView.Layout ();
@@ -1811,7 +1811,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_InsertPanelAtStart ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
         tileView.InsertTile (0);
 
         tileView.Layout ();
@@ -1830,7 +1830,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_InsertPanelMiddle ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
         tileView.InsertTile (1);
 
         tileView.Layout ();
@@ -1849,7 +1849,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
 
         tileView.Layout ();
         tileView.Draw ();
@@ -1872,7 +1872,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_Focused ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
         AutoInitShutdownAttribute.RunIteration ();
@@ -1913,7 +1913,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_Focused_50PercentSplit ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
         tileView.SetSplitterPos (0, Pos.Percent (50));
         Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
@@ -1961,7 +1961,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_Focused_WithBorder ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -2001,7 +2001,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_View1MinSize_Absolute ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (0).MinSize = 6;
 
@@ -2044,7 +2044,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (0).MinSize = 5;
 
@@ -2087,7 +2087,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_View2MinSize_Absolute ()
     {
-        TileView tileView = Get11By3TileView (out LineView line);
+        TileView tileView = Get11By3TileView (out Line line);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (1).MinSize = 6;
         AutoInitShutdownAttribute.RunIteration ();
@@ -2132,7 +2132,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
         tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (1).MinSize = 5;
 
@@ -2177,7 +2177,7 @@ public class TileViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void TestTileView_Vertical_WithBorder ()
     {
-        TileView tileView = Get11By3TileView (out LineView line, true);
+        TileView tileView = Get11By3TileView (out Line line, true);
 
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -2210,7 +2210,7 @@ public class TileViewTests (ITestOutputHelper output)
         Assert.Empty (tv.Tiles.ElementAt (0).Title);
     }
 
-    private TileView Get11By3TileView (out LineView line, bool withBorder = false)
+    private TileView Get11By3TileView (out Line line, bool withBorder = false)
     {
         TileView split = Get11By3TileView (withBorder);
         line = GetLine (split);
@@ -2267,7 +2267,7 @@ public class TileViewTests (ITestOutputHelper output)
         return tv;
     }
 
-    private LineView GetLine (TileView tileView) { return tileView.SubViews.OfType<LineView> ().Single (); }
+    private Line GetLine (TileView tileView) { return tileView.SubViews.OfType<Line> ().Single (); }
 
     /// <summary>Creates a vertical orientation root container with left pane split into two (with horizontal splitter line).</summary>
     /// <param name="withBorder"></param>

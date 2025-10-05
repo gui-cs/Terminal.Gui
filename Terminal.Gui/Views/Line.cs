@@ -8,9 +8,8 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         <see cref="Line"/> is a <see cref="View"/> that renders a single horizontal or vertical line
-///         using the <see cref="LineCanvas"/> system. Unlike <see cref="LineView"/>, which directly renders
-///         runes, <see cref="Line"/> integrates with the LineCanvas to enable proper box-drawing character
-///         selection and line intersection handling.
+///         using the <see cref="LineCanvas"/> system. <see cref="Line"/> integrates with the LineCanvas
+///         to enable proper box-drawing character selection and line intersection handling.
 ///     </para>
 ///     <para>
 ///         The line's appearance is controlled by the <see cref="Style"/> property, which supports
@@ -232,7 +231,8 @@ public class Line : View, IOrientation
                             pos,
                             length,
                             Orientation,
-                            Style
+                            Style,
+                            GetAttributeForRole(VisualRole.Normal)
                            );
 
         return true;
