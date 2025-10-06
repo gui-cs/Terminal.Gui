@@ -117,8 +117,11 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
         if (_isVirtualTerminal)
         {
-            //Enable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            if (Environment.GetEnvironmentVariable ("VSAPPIDNAME") is null)
+            {
+                //Enable alternative screen buffer.
+                Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            }
         }
         else
         {
@@ -497,8 +500,17 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
         if (_isVirtualTerminal)
         {
-            //Disable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            if (Environment.GetEnvironmentVariable ("VSAPPIDNAME") is null)
+            {
+                //Disable alternative screen buffer.
+                Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            }
+            else
+            {
+                // Simulate restoring the color and clearing the screen.
+                Console.ResetColor ();
+                Console.Clear ();
+            }
         }
         else
         {
