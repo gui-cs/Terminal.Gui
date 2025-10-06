@@ -173,7 +173,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     /// <summary>
     ///     Determines if focus should bubble up to a SuperView when wrapping would occur.
-    ///     Recursively checks up the SuperView hierarchy to see if there are any focusable peers at any level.
+    ///     Iteratively checks up the SuperView hierarchy to see if there are any focusable peers at any level.
     /// </summary>
     /// <param name="view">The SuperView to check.</param>
     /// <param name="direction">The navigation direction.</param>
@@ -184,23 +184,27 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     private bool ShouldBubbleUpForWrapping (View? view, NavigationDirection direction, TabBehavior? behavior)
     {
-        if (view is null)
-        {
-            return false;
-        }
+        View? currentView = view;
 
-        // If this parent has multiple focusable children, we should bubble up
-        View [] chain = view.GetFocusChain (direction, behavior);
-
-        if (chain.Length > 1)
+        while (currentView is { })
         {
-            return true;
-        }
+            // If this parent has multiple focusable children, we should bubble up
+            View [] chain = currentView.GetFocusChain (direction, behavior);
 
-        // If parent has only 1 child but parent is also TabStop with a SuperView, check recursively
-        if (view.TabStop == TabBehavior.TabStop && view.SuperView is { })
-        {
-            return ShouldBubbleUpForWrapping (view.SuperView, direction, behavior);
+            if (chain.Length > 1)
+            {
+                return true;
+            }
+
+            // If parent has only 1 child but parent is also TabStop with a SuperView, continue checking up the hierarchy
+            if (currentView.TabStop == TabBehavior.TabStop && currentView.SuperView is { })
+            {
+                currentView = currentView.SuperView;
+            }
+            else
+            {
+                break;
+            }
         }
 
         return false;
