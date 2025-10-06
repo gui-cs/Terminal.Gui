@@ -81,24 +81,29 @@ public class ApplicationV2 : ApplicationImpl
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        bool definetlyWin = (driverName?.Contains ("win") ?? false )|| _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
-        bool definetlyNet = (driverName?.Contains ("net") ?? false ) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool definetlyWin = (driverName?.Contains ("win") ?? false) || _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool definetlyNet = (driverName?.Contains ("net") ?? false) || _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool definetlyUnix = (driverName?.Contains ("unix") ?? false) || _componentFactory is IComponentFactory<char>;
 
         if (definetlyWin)
         {
-            _coordinator = CreateWindowsSubcomponents ();
+            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
         else if (definetlyNet)
         {
-            _coordinator = CreateNetSubcomponents ();
+            _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+        }
+        else if (definetlyUnix)
+        {
+            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            _coordinator = CreateWindowsSubcomponents ();
+            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
         else
         {
-            _coordinator = CreateNetSubcomponents ();
+            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }
 
         _coordinator.StartAsync ().Wait ();
@@ -109,49 +114,23 @@ public class ApplicationV2 : ApplicationImpl
         }
     }
 
-    private IMainLoopCoordinator CreateWindowsSubcomponents ()
+    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
     {
-        ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer = new ();
-        MainLoop<WindowsConsole.InputRecord> loop = new ();
+        ConcurrentQueue<T> inputBuffer = new ();
+        MainLoop<T> loop = new ();
 
-        IComponentFactory<WindowsConsole.InputRecord> cf;
+        IComponentFactory<T> cf;
 
-        if (_componentFactory != null)
+        if (_componentFactory is IComponentFactory<T> typedFactory)
         {
-            cf = (IComponentFactory<WindowsConsole.InputRecord>)_componentFactory;
+            cf = typedFactory;
         }
         else
         {
-            cf = new WindowsComponentFactory ();
+            cf = fallbackFactory ();
         }
 
-        return new MainLoopCoordinator<WindowsConsole.InputRecord> (_timedEvents,
-                                                                    inputBuffer,
-                                                                    loop,
-                                                                    cf);
-    }
-
-    private IMainLoopCoordinator CreateNetSubcomponents ()
-    {
-        ConcurrentQueue<ConsoleKeyInfo> inputBuffer = new ();
-        MainLoop<ConsoleKeyInfo> loop = new ();
-
-        IComponentFactory<ConsoleKeyInfo> cf;
-
-        if (_componentFactory != null)
-        {
-            cf = (IComponentFactory<ConsoleKeyInfo>)_componentFactory;
-        }
-        else
-        {
-            cf = new NetComponentFactory ();
-        }
-
-        return new MainLoopCoordinator<ConsoleKeyInfo> (
-                                                        _timedEvents,
-                                                        inputBuffer,
-                                                        loop,
-                                                        cf);
+        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 
     /// <inheritdoc/>

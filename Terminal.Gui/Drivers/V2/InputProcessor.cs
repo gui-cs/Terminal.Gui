@@ -30,6 +30,9 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// </summary>
     public ConcurrentQueue<T> InputBuffer { get; }
 
+    /// <inheritdoc />
+    public string DriverName { get; init; }
+
     /// <inheritdoc/>
     public IAnsiResponseParser GetParser () { return Parser; }
 

@@ -103,16 +103,27 @@ public class AnsiKeyboardParserTests
         yield return new object [] { "\u001b[1;2P", Key.F1.WithShift };
         yield return new object [] { "\u001b[1;3Q", Key.F2.WithAlt };
         yield return new object [] { "\u001b[1;5R", Key.F3.WithCtrl };
-        
+
+        // Keys with Alt modifiers
+        yield return new object [] { "\u001ba", Key.A.WithAlt, true };
+        yield return new object [] { "\u001bA", Key.A.WithShift.WithAlt, true };
+        yield return new object [] { "\u001b1", Key.D1.WithAlt, true };
+
+        // Keys with Ctrl and Alt modifiers
+        yield return new object [] { "\u001b\u0001", Key.A.WithCtrl.WithAlt, true };
+        yield return new object [] { "\u001b\u001a", Key.Z.WithCtrl.WithAlt, true };
+
+        // Keys with Ctrl, Shift and Alt modifiers
+        yield return new object [] { "\u001b\u001f", Key.D7.WithCtrl.WithShift.WithAlt, true };
     }
 
     // Consolidated test for all keyboard events (e.g., arrow keys)
     [Theory]
     [MemberData (nameof (GetKeyboardTestData))]
-    public void ProcessKeyboardInput_ReturnsCorrectKey (string? input, Key? expectedKey)
+    public void ProcessKeyboardInput_ReturnsCorrectKey (string? input, Key? expectedKey, bool isLastMinute = false)
     {
         // Act
-        Key? result = _parser.IsKeyboard (input)?.GetKey (input);
+        Key? result = _parser.IsKeyboard (input, isLastMinute)?.GetKey (input);
 
         // Assert
         Assert.Equal (expectedKey, result); // Verify the returned key matches the expected one

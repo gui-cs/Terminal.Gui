@@ -42,6 +42,12 @@
       "commandLineArgs": "dotnet UICatalog.dll --driver v2",
       "distributionName": ""
     },
+    "WSL: UICatalog --driver v2unix": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2unix",
+      "distributionName": ""
+    },
     "WSL: UICatalog --driver v2net": {
       "commandName": "Executable",
       "executablePath": "wsl",
@@ -63,13 +69,19 @@
     "WSL-Gnome: UICatalog --driver v2": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2; exec bash\"'",
+      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2; exec bash\"'",
+      "distributionName": ""
+    },
+    "WSL-Gnome: UICatalog --driver v2unix": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2unix; exec bash\"'",
       "distributionName": ""
     },
     "WSL-Gnome: UICatalog --driver v2net": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2net; exec bash\"'",
+      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2net; exec bash\"'",
       "distributionName": ""
     },
     "Benchmark All": {
@@ -92,6 +104,24 @@
       "commandName": "Executable",
       "executablePath": "wsl",
       "commandLineArgs": "dotnet UICatalog.dll --benchmark",
+      "distributionName": ""
+    },
+    "WSL: Benchmark All --driver v2": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2 --benchmark",
+      "distributionName": ""
+    },
+    "WSL: Benchmark All --driver v2unix": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2unix --benchmark",
+      "distributionName": ""
+    },
+    "WSL: Benchmark All --driver v2net": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver v2net --benchmark",
       "distributionName": ""
     },
     "Docker": {

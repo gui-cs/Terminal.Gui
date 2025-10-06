@@ -20,7 +20,10 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
 #pragma warning restore CA2211
 
     /// <inheritdoc/>
-    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ()) { }
+    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ())
+    {
+        DriverName = "net";
+    }
 
     /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo consoleKeyInfo)
