@@ -16,6 +16,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Null (lv.Source);
         Assert.True (lv.CanFocus);
         Assert.Equal (-1, lv.SelectedItem);
+        Assert.False (lv.AllowsMultipleSelection);
 
         lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
@@ -37,6 +38,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal (new (0, 1, 10, 20), lv.Frame);
+
     }
 
     [Fact]
@@ -524,10 +526,72 @@ Item 6",
     }
 
     [Fact]
-    public void AllowsMarking_True_SpaceWithShift_SelectsThenDown ()
+    public void AllowsMarking_True_SpaceWithShift_SelectsThenDown_SingleSelection ()
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
+        lv.AllowsMultipleSelection = false;
+
+        Assert.NotNull (lv.Source);
+
+        // first item should be deselected by default
+        Assert.Equal (-1, lv.SelectedItem);
+
+        // nothing is ticked
+        Assert.False (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+        Assert.False (lv.Source.IsMarked (2));
+
+        // view should indicate that it has accepted and consumed the event
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+
+        // first item should now be selected
+        Assert.Equal (0, lv.SelectedItem);
+
+        // none of the items should be ticked
+        Assert.False (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+        Assert.False (lv.Source.IsMarked (2));
+
+        // Press key combo again
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+
+        // second item should now be selected
+        Assert.Equal (1, lv.SelectedItem);
+
+        // first item only should be ticked
+        Assert.True (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+        Assert.False (lv.Source.IsMarked (2));
+
+        // Press key combo again
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.False (lv.Source.IsMarked (0));
+        Assert.True (lv.Source.IsMarked (1));
+        Assert.False (lv.Source.IsMarked (2));
+
+        // Press key combo again
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.Equal (2, lv.SelectedItem); // cannot move down any further
+        Assert.False (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+        Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
+
+        // Press key combo again 
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.Equal (2, lv.SelectedItem); // cannot move down any further
+        Assert.False (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+        Assert.False (lv.Source.IsMarked (2)); // untoggle toggle marked
+    }
+
+    [Fact]
+    public void AllowsMarking_True_SpaceWithShift_SelectsThenDown_MultipleSelection ()
+    {
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
+        lv.AllowsMarking = true;
+        lv.AllowsMultipleSelection = true;
 
         Assert.NotNull (lv.Source);
 
