@@ -56,6 +56,11 @@ public partial class View // Layout APIs
             // This will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
             if (SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) }))
             {
+                // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
+                // BUGBUG: other logic in the property setters does not get executed.  Specifically:
+                // BUGBUG: - Reset TextFormatter
+                // BUGBUG: - SetLayoutNeeded (not an issue as we explictly call Layout below)
+                // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
                 // If Frame gets set, set all Pos/Dim to Absolute values.
                 _x = _frame!.Value.X;
                 _y = _frame!.Value.Y;
@@ -279,7 +284,7 @@ public partial class View // Layout APIs
         }
     }
 
-    private Dim? _height = Dim.Absolute (0);
+    private Dim _height = Dim.Absolute (0);
 
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
@@ -304,28 +309,67 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
-    ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="HeightChanging"/> event
+    ///         is raised before the change, and <see cref="HeightChanged"/> is raised after.
+    ///     </para>
+    ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
-    public Dim? Height
+    /// <seealso cref="HeightChanging"/>
+    /// <seealso cref="HeightChanged"/>
+    public Dim Height
     {
         get => VerifyIsInitialized (_height, nameof (Height));
         set
         {
-            if (Equals (_height, value))
-            {
-                return;
-            }
+            CWPPropertyHelper.ChangeProperty (
+                                              _height,
+                                              value,
+                                              OnHeightChanging,
+                                              HeightChanging,
+                                              newValue =>
+                                              {
+                                                  _height = newValue;
 
-            _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
-
-            // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-            TextFormatter.ConstrainToHeight = null;
-
-            PosDimSet ();
+                                                  // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                                                  TextFormatter.ConstrainToHeight = null;
+                                                  PosDimSet ();
+                                              },
+                                              OnHeightChanged,
+                                              HeightChanged,
+                                              out Dim _);
         }
     }
 
-    private Dim? _width = Dim.Absolute (0);
+    /// <summary>
+    ///     Called before the <see cref="Height"/> property changes, allowing subclasses to cancel or modify the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the current and proposed new height.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnHeightChanging (ValueChangingEventArgs<Dim> args) { return false; }
+
+    /// <summary>
+    ///     Called after the <see cref="Height"/> property changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new height.</param>
+    protected virtual void OnHeightChanged (ValueChangedEventArgs<Dim> args) { }
+
+    /// <summary>
+    ///     Raised before the <see cref="Height"/> property changes, allowing handlers to modify or cancel the change.
+    /// </summary>
+    /// <remarks>
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
+    ///     <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
+    /// </remarks>
+    public event EventHandler<ValueChangingEventArgs<Dim>>? HeightChanging;
+
+    /// <summary>
+    ///     Raised after the <see cref="Height"/> property changes, allowing handlers to react to the change.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<Dim>>? HeightChanged;
+
+    private Dim _width = Dim.Absolute (0);
 
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
@@ -351,25 +395,65 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
-    ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
+    ///     <para>
+    ///         Setting this property raises pre- and post-change events via <see cref="CWPPropertyHelper"/>,
+    ///         allowing customization or cancellation of the change. The <see cref="WidthChanging"/> event
+    ///         is raised before the change, and <see cref="WidthChanged"/> is raised after.
+    ///     </para>
+    ///     <para>The default value is <c>Dim.Absolute (0)</c>.</para>
     /// </remarks>
-    public Dim? Width
+    /// <seealso cref="WidthChanging"/>
+    /// <seealso cref="WidthChanged"/>
+    public Dim Width
     {
         get => VerifyIsInitialized (_width, nameof (Width));
         set
         {
-            if (Equals (_width, value))
-            {
-                return;
-            }
+            CWPPropertyHelper.ChangeProperty (
+                                              _width,
+                                              value,
+                                              OnWidthChanging,
+                                              WidthChanging,
+                                              newValue =>
+                                              {
+                                                  _width = newValue;
 
-            _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
-
-            // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-            TextFormatter.ConstrainToWidth = null;
-            PosDimSet ();
+                                                  // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
+                                                  TextFormatter.ConstrainToWidth = null;
+                                                  PosDimSet ();
+                                              },
+                                              OnWidthChanged,
+                                              WidthChanged,
+                                              out Dim _);
         }
     }
+
+    /// <summary>
+    ///     Called before the <see cref="Width"/> property changes, allowing subclasses to cancel or modify the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the current and proposed new width.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnWidthChanging (ValueChangingEventArgs<Dim> args) { return false; }
+
+    /// <summary>
+    ///     Called after the <see cref="Width"/> property changes, allowing subclasses to react to the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new width.</param>
+    protected virtual void OnWidthChanged (ValueChangedEventArgs<Dim> args) { }
+
+    /// <summary>
+    ///     Raised before the <see cref="Width"/> property changes, allowing handlers to modify or cancel the change.
+    /// </summary>
+    /// <remarks>
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
+    ///     <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
+    /// </remarks>
+    public event EventHandler<ValueChangingEventArgs<Dim>>? WidthChanging;
+
+    /// <summary>
+    ///     Raised after the <see cref="Width"/> property changes, allowing handlers to react to the change.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<Dim>>? WidthChanged;
 
     #endregion Frame/Position/Dimension
 
@@ -474,8 +558,7 @@ public partial class View // Layout APIs
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
-        Debug.Assert (_width is { });
-        Debug.Assert (_height is { });
+
 
         CheckDimAuto ();
 
@@ -532,10 +615,15 @@ public partial class View // Layout APIs
 
         if (Frame != newFrame)
         {
-            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height
-            // This will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
+            // Set the frame. Do NOT use `Frame = newFrame` as it overwrites X, Y, Width, and Height
+            // SetFrame will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
             SetFrame (newFrame);
 
+            // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
+            // BUGBUG: other logic in the property setters does not get executed.  Specifically:
+            // BUGBUG: - Reset TextFormatter
+            // BUGBUG: - SetLayoutNeeded (not an issue as we explicitly call Layout below)
+            // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
             if (_x is PosAbsolute)
             {
                 _x = Frame.X;
@@ -1152,13 +1240,15 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by
+    ///     depth. The
     ///     deepest
     ///     View is at the end of the list (the top most View is at element 0).
     /// </summary>
     /// <param name="screenLocation">Screen-relative location.</param>
     /// <param name="excludeViewportSettingsFlags">
-    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
     public static List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
@@ -1219,21 +1309,24 @@ public partial class View // Layout APIs
 
     /// <summary>
     ///     INTERNAL: Helper for GetViewsUnderLocation that starts from a given root view.
-    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by depth. The
+    ///     Gets the Views that are under <paramref name="screenLocation"/>, including Adornments. The list is ordered by
+    ///     depth. The
     ///     deepest
     ///     View is at the end of the list (the topmost View is at element 0).
     /// </summary>
     /// <param name="root"></param>
     /// <param name="screenLocation">Screen-relative location.</param>
     /// <param name="excludeViewportSettingsFlags">
-    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     If set, excludes Views that have the <see cref="ViewportSettingsFlags.Transparent"/> or
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
     internal static List<View?> GetViewsUnderLocation (View root, in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
     {
         List<View?> viewsUnderLocation = GetViewsAtLocation (root, screenLocation);
 
-        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.Transparent) && !excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.Transparent)
+            && !excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.TransparentMouse))
         {
             // Only filter views if we are excluding transparent views.
             return viewsUnderLocation;
@@ -1241,8 +1334,7 @@ public partial class View // Layout APIs
 
         // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
         // because the point was in their adornment, and if the adornment is transparent, they should be removed.
-        viewsUnderLocation.RemoveAll (
-                                      v =>
+        viewsUnderLocation.RemoveAll (v =>
                                       {
                                           if (v is null or Adornment)
                                           {
@@ -1277,6 +1369,7 @@ public partial class View // Layout APIs
 
         return viewsUnderLocation;
     }
+
     /// <summary>
     ///     INTERNAL: Gets ALL Views (Subviews and Adornments) in the of <see cref="SuperView"/> hierarchcy that are at
     ///     <paramref name="location"/>,
@@ -1320,6 +1413,7 @@ public partial class View // Layout APIs
             for (int i = currentView.InternalSubViews.Count - 1; i >= 0; i--)
             {
                 View subview = currentView.InternalSubViews [i];
+
                 if (subview.Visible && subview.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (subview);
@@ -1350,7 +1444,7 @@ public partial class View // Layout APIs
     }
 
     // Diagnostics to highlight when Width or Height is read before the view has been initialized
-    private Dim? VerifyIsInitialized (Dim? dim, string member)
+    private Dim VerifyIsInitialized (Dim dim, string member)
     {
         //#if DEBUG
         //        if (dim.ReferencesOtherViews () && !IsInitialized)

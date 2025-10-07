@@ -129,7 +129,7 @@ public class CollectionNavigatorTester : Scenario
         _items = new (_items.OrderBy (i => i, StringComparer.OrdinalIgnoreCase));
 
         CreateListView ();
-        var vsep = new LineView (Orientation.Vertical) { X = Pos.Right (_listView), Y = 1, Height = Dim.Fill () };
+        var vsep = new Line { Orientation = Orientation.Vertical, X = Pos.Right (_listView), Y = 1, Height = Dim.Fill () };
         top.Add (vsep);
         CreateTreeView ();
 

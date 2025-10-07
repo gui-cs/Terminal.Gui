@@ -2,8 +2,61 @@
 
 namespace Terminal.Gui.LayoutTests;
 
-public class SetLayoutTests : GlobalTestSetup
+public class LayoutTests : GlobalTestSetup
 {
+    #region Constructor Tests
+
+    [Fact]
+    public void Constructor_Dispose_DoesNotThrow ()
+    {
+        var v = new View ();
+        v.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor_Defaults_Are_Correct ()
+    {
+        // Tests defaults
+        View v = new ();
+        Assert.Equal (new (0, 0, 0, 0), v.Frame);
+        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (Pos.Absolute (0), v.X);
+        Assert.Equal (Pos.Absolute (0), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
+
+        v.Layout ();
+        Assert.Equal (new (0, 0, 0, 0), v.Frame);
+        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (Pos.Absolute (0), v.X);
+        Assert.Equal (Pos.Absolute (0), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
+    }
+
+    #endregion Constructor Tests
+
+    [Fact]
+    public void Set_All_Absolute_Sets_Correctly ()
+    {
+        Rectangle frame = new (1, 2, 3, 4);
+        View v = new () { X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height };
+        Assert.Equal (new (frame.X, frame.Y, 3, 4), v.Frame);
+        Assert.Equal (new (0, 0, 3, 4), v.Viewport);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+
+        v.Layout ();
+        Assert.Equal (new (frame.X, frame.Y, 3, 4), v.Frame);
+        Assert.Equal (new (0, 0, 3, 4), v.Viewport);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+    }
+
     [Fact]
     public void Add_Does_Not_Call_Layout ()
     {
@@ -28,12 +81,26 @@ public class SetLayoutTests : GlobalTestSetup
     }
 
     [Fact]
-    public void Change_Height_or_Width_MakesComputed ()
+    public void Set_X_Y_Does_Not_Impact_Dimensions ()
     {
-        var v = new View { Frame = Rectangle.Empty };
-        v.Height = Dim.Fill ();
-        v.Width = Dim.Fill ();
-        v.Dispose ();
+        // Tests that setting X & Y does not change Frame, Viewport, Width, or Height
+        Rectangle frame = new (1, 2, 3, 4);
+
+        View v = new () { X = frame.X, Y = frame.Y };
+        Assert.Equal (new (frame.X, frame.Y, 0, 0), v.Frame);
+        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
+
+        v.Layout ();
+        Assert.Equal (new (frame.X, frame.Y, 0, 0), v.Frame);
+        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
     }
 
     [Fact]
@@ -56,15 +123,6 @@ public class SetLayoutTests : GlobalTestSetup
         Assert.Equal ($"Absolute({newFrame.Y})", v.Y.ToString ());
         Assert.Equal (Dim.Absolute (3), v.Width);
         Assert.Equal (Dim.Absolute (4), v.Height);
-        v.Dispose ();
-    }
-
-    [Fact]
-    public void Change_X_or_Y_MakesComputed ()
-    {
-        var v = new View { Frame = Rectangle.Empty };
-        v.X = Pos.Center ();
-        v.Y = Pos.Center ();
         v.Dispose ();
     }
 
@@ -131,87 +189,6 @@ public class SetLayoutTests : GlobalTestSetup
         v.Y = 2;
         v.Height = 3;
         v.Width = 4;
-        v.Dispose ();
-    }
-
-    [Fact]
-    public void Constructor ()
-    {
-        var v = new View ();
-        v.Dispose ();
-
-        var frame = Rectangle.Empty;
-        v = new () { Frame = frame };
-        v.Layout ();
-        Assert.Equal (frame, v.Frame);
-
-        Assert.Equal (
-                      new (0, 0, frame.Width, frame.Height),
-                      v.Viewport
-                     ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.Absolute (0), v.X);
-        Assert.Equal (Pos.Absolute (0), v.Y);
-        Assert.Equal (Dim.Absolute (0), v.Width);
-        Assert.Equal (Dim.Absolute (0), v.Height);
-        v.Dispose ();
-
-        frame = new (1, 2, 3, 4);
-        v = new () { Frame = frame };
-        v.Layout ();
-        Assert.Equal (frame, v.Frame);
-
-        Assert.Equal (
-                      new (0, 0, frame.Width, frame.Height),
-                      v.Viewport
-                     ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.Absolute (1), v.X);
-        Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Absolute (3), v.Width);
-        Assert.Equal (Dim.Absolute (4), v.Height);
-        v.Dispose ();
-
-        v = new () { Frame = frame, Text = "v" };
-        v.Layout ();
-        Assert.Equal (frame, v.Frame);
-
-        Assert.Equal (
-                      new (0, 0, frame.Width, frame.Height),
-                      v.Viewport
-                     ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.Absolute (1), v.X);
-        Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Absolute (3), v.Width);
-        Assert.Equal (Dim.Absolute (4), v.Height);
-        v.Dispose ();
-
-        v = new () { X = frame.X, Y = frame.Y, Text = "v" };
-        v.Layout ();
-        Assert.Equal (new (frame.X, frame.Y, 0, 0), v.Frame);
-        Assert.Equal (new (0, 0, 0, 0), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.Absolute (1), v.X);
-        Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Absolute (0), v.Width);
-        Assert.Equal (Dim.Absolute (0), v.Height);
-        v.Dispose ();
-
-        v = new ();
-        v.Layout ();
-        Assert.Equal (new (0, 0, 0, 0), v.Frame);
-        Assert.Equal (new (0, 0, 0, 0), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.Absolute (0), v.X);
-        Assert.Equal (Pos.Absolute (0), v.Y);
-        Assert.Equal (Dim.Absolute (0), v.Width);
-        Assert.Equal (Dim.Absolute (0), v.Height);
-        v.Dispose ();
-
-        v = new () { X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height };
-        v.Layout ();
-        Assert.Equal (new (frame.X, frame.Y, 3, 4), v.Frame);
-        Assert.Equal (new (0, 0, 3, 4), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.Absolute (1), v.X);
-        Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Absolute (3), v.Width);
-        Assert.Equal (Dim.Absolute (4), v.Height);
         v.Dispose ();
     }
 

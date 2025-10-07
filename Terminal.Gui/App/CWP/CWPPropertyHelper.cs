@@ -26,6 +26,7 @@ public static class CWPPropertyHelper
     /// <param name="newValue">The proposed new property value, which may be null for nullable types.</param>
     /// <param name="onChanging">The virtual method invoked before the change, returning true to cancel.</param>
     /// <param name="changingEvent">The pre-change event raised to allow modification or cancellation.</param>
+    /// <param name="doWork">The action that performs the actual work of setting the property (e.g., updating backing field, calling related methods).</param>
     /// <param name="onChanged">The virtual method invoked after the change.</param>
     /// <param name="changedEvent">The post-change event raised to notify of the completed change.</param>
     /// <param name="finalValue">
@@ -39,15 +40,15 @@ public static class CWPPropertyHelper
     /// </exception>
     /// <example>
     ///     <code>
-    ///         string? current = null;
+    ///         string? current = _schemeName;
     ///         string? proposed = "Base";
-    ///         Func&lt;ValueChangingEventArgs&lt;string?&gt;, bool&gt; onChanging = args =&gt; false;
-    ///         EventHandler&lt;ValueChangingEventArgs&lt;string?&gt;&gt;? changingEvent = null;
-    ///         Action&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? onChanged = args =&gt;
-    ///             Console.WriteLine($"SchemeName changed to {args.NewValue ?? "none"}.");
-    ///         EventHandler&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? changedEvent = null;
+    ///         Func&lt;ValueChangingEventArgs&lt;string?&gt;, bool&gt; onChanging = OnSchemeNameChanging;
+    ///         EventHandler&lt;ValueChangingEventArgs&lt;string?&gt;&gt;? changingEvent = SchemeNameChanging;
+    ///         Action&lt;string?&gt; doWork = value => _schemeName = value;
+    ///         Action&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? onChanged = OnSchemeNameChanged;
+    ///         EventHandler&lt;ValueChangedEventArgs&lt;string?&gt;&gt;? changedEvent = SchemeNameChanged;
     ///         bool changed = CWPPropertyHelper.ChangeProperty(
-    ///             current, proposed, onChanging, changingEvent, onChanged, changedEvent, out string? final);
+    ///             current, proposed, onChanging, changingEvent, doWork, onChanged, changedEvent, out string? final);
     ///     </code>
     /// </example>
     public static bool ChangeProperty<T> (
@@ -55,6 +56,7 @@ public static class CWPPropertyHelper
         T newValue,
         Func<ValueChangingEventArgs<T>, bool> onChanging,
         EventHandler<ValueChangingEventArgs<T>>? changingEvent,
+        Action<T> doWork,
         Action<ValueChangedEventArgs<T>>? onChanged,
         EventHandler<ValueChangedEventArgs<T>>? changedEvent,
         out T finalValue
@@ -93,6 +95,10 @@ public static class CWPPropertyHelper
         }
 
         finalValue = args.NewValue;
+        
+        // Do the work (set backing field, update related properties, etc.) BEFORE raising Changed events
+        doWork (finalValue);
+        
         ValueChangedEventArgs<T> changedArgs = new (currentValue, finalValue);
         onChanged?.Invoke (changedArgs);
         changedEvent?.Invoke (null, changedArgs);
