@@ -1490,10 +1490,6 @@ public class PathAnnotationTests
     [InlineData (false)]
     public void ViewChangeText_RendersCorrectly (bool useFill)
     {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-        driver.Init ();
-
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
         var top = new Toplevel ();

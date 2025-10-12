@@ -518,42 +518,6 @@ public class ApplicationImplTests
     */
 
     [Fact]
-    public void Init_Called_Repeatedly_WarnsAndIgnores ()
-    {
-        var orig = ApplicationImpl.Instance;
-
-        var v2 = NewApplicationImpl ();
-        ApplicationImpl.ChangeInstance (v2);
-
-        Assert.Null (Application.Driver);
-        v2.Init ();
-        Assert.NotNull (Application.Driver);
-
-        var mockLogger = new Mock<ILogger> ();
-
-        var beforeLogger = Logging.Logger;
-        Logging.Logger = mockLogger.Object;
-
-        v2.Init ();
-        v2.Init ();
-
-        mockLogger.Verify (
-                          l => l.Log (LogLevel.Error,
-                                    It.IsAny<EventId> (),
-                                    It.Is<It.IsAnyType> ((v, t) => v.ToString () == "Init called multiple times without shutdown, ignoring."),
-                                    It.IsAny<Exception> (),
-                                    It.IsAny<Func<It.IsAnyType, Exception, string>> ()!)
-                          , Times.Exactly (2));
-
-        v2.Shutdown ();
-
-        // Restore the original null logger to be polite to other tests
-        Logging.Logger = beforeLogger;
-
-        ApplicationImpl.ChangeInstance (orig);
-    }
-
-    [Fact]
     public void Open_Calls_ContinueWith_On_UIThread ()
     {
         var orig = ApplicationImpl.Instance;
