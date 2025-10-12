@@ -28,7 +28,8 @@ public class FakeApplicationFactory
         ApplicationImpl.ChangeInstance (impl);
         impl.Init (null, "dotnet");
 
-        ConsoleDriverFacade<ConsoleKeyInfo> d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver!;
+        // Handle different facade types - cast to common interface instead
+        var d = (IConsoleDriverFacade)Application.Driver!;
 
         sizeMonitor.SizeChanging += (_, e) =>
                                     {

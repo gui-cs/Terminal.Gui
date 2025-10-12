@@ -171,6 +171,11 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
     public void Write (ReadOnlySpan<char> str)
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         if (!WriteConsole (_isVirtualTerminal ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");

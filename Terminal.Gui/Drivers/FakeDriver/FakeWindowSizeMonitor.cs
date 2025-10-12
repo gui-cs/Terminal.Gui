@@ -9,6 +9,13 @@ internal class FakeWindowSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer o
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     public event EventHandler<SizeChangedEventArgs> SizeChanging;
 
+    /// <summary>Raises the <see cref="SizeChanging"/> event with the specified size. Used for testing.</summary>
+    /// <param name="newSize">The new size to report.</param>
+    public void RaiseSizeChanging (Size newSize)
+    {
+        SizeChanging?.Invoke (this, new (newSize));
+    }
+
     /// <inheritdoc/>
     public bool Poll ()
     {

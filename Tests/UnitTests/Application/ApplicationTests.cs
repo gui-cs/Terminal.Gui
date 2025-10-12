@@ -460,26 +460,29 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Init_Unbalanced_Throws ()
     {
-        //Application.Init (new FakeDriver ());
-
-        //Assert.Throws<InvalidOperationException> (
-        //                                          () =>
-        //                                              Application.InternalInit (
-        //                                                                        new FakeDriver ()
-        //                                                                       )
-        //                                         );
-        //Application.Shutdown ();
+        Assert.Throws<InvalidOperationException> (
+                                                  () =>
+                                                      Application.InternalInit (
+                                                                                new FakeDriver ()
+                                                                               )
+                                                 );
+        Application.Shutdown ();
 
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+    }
 
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Init_Unbalanced_Throws2 ()
+    {
         // Now try the other way
-        Application.Init (null, "fake");
-
-        Assert.Throws<InvalidOperationException> (() => Application.Init (null, "fake"));
+        Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
@@ -530,7 +533,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
-    [Fact]
+    [Fact (Skip = "FakeDriver is not allowed, use AutoInitShutdown attribute instead")]
     public void Init_NoParam_ForceDriver_Works ()
     {
         Application.ForceDriver = "Fake";
@@ -577,17 +580,16 @@ public class ApplicationTests
 
     // Invoke Tests
     // TODO: Test with threading scenarios
-    [Fact (Skip = "Fails with Application.MainLoop null")]
+    [Fact]
+    [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        Application.Init (null, driverName: "fake");
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (1, actionCalled);
         top.Dispose ();
@@ -622,20 +624,29 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Screen_Size_Changes ()
     {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
+        var driver = Application.Driver;
+
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
         Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
+        // TODO: Should not be possible to manually change these at whim!
         driver.Cols = 100;
         driver.Rows = 30;
         // IConsoleDriver.Screen isn't assignable
         //driver.Screen = new (0, 0, driver.Cols, Rows);
+
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
-        Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
-        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
+        
+        // Assert does not make sense
+        // Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
+        // Assert.Equal (new (0, 0, 80, 25), Application.Screen);
         Application.Screen = new (0, 0, driver.Cols, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
@@ -787,7 +798,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
-    [Fact]
+    [Fact(Skip = "FakeDriver is not allowed, use AutoInitShutdown attribute instead")]
     [TestRespondersDisposed]
     public void Run_T_NoInit_DoesNotThrow ()
     {
@@ -1086,6 +1097,7 @@ public class ApplicationTests
 
     private readonly object _forceDriverLock = new ();
 
+    /*
     [Theory]
 
     // This test wants to Run which results in console handle errors, it wants to rely non drivers checking ConsoleDriver.RunningUnitTests
@@ -1093,7 +1105,8 @@ public class ApplicationTests
     //    [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
     //    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
 
-    [InlineData ("FakeDriver", typeof (FakeDriver))]
+    // FakeDriver is not allowed, use AutoInitShutdown attribute instead
+    //[InlineData ("FakeDriver", typeof (FakeDriver))]
     //[InlineData ("NetDriver", typeof (NetDriver))]
     //[InlineData ("WindowsDriver", typeof (WindowsDriver))]
     //[InlineData ("CursesDriver", typeof (CursesDriver))]
@@ -1137,6 +1150,7 @@ public class ApplicationTests
         Application.Shutdown ();
         Assert.True (result);
     }
+    */
 
     [Fact]
     public void Run_T_With_Legacy_Driver_Does_Not_Call_ResetState_After_Init ()

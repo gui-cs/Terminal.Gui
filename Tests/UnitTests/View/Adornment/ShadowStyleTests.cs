@@ -131,9 +131,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.None, 0, 0, 0, 0)]
     [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
+    [AutoInitShutdown]
     public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
-        Application.Init (new FakeDriver ());
         var superView = new View
         {
             Height = 10, Width = 10
