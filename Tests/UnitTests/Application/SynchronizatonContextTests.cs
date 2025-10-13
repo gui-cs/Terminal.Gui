@@ -93,7 +93,6 @@ public class SyncrhonizationContextTests
     public void SynchronizationContext_Send ()
     {
         ConsoleDriver.RunningUnitTests = true;
-        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;
