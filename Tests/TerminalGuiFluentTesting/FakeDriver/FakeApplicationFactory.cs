@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Drawing;
+﻿using System.Drawing;
 using TerminalGuiFluentTesting;
 
 namespace Terminal.Gui.Drivers;
@@ -26,6 +25,8 @@ public class FakeApplicationFactory
         var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (impl);
+
+        // Initialize with a fake driver
         impl.Init (null, "fake");
 
         // Handle different facade types - cast to common interface instead
