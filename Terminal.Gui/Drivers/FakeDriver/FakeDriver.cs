@@ -48,6 +48,9 @@ public class FakeDriver : ConsoleDriver
 
     public FakeDriver ()
     {
+        // FakeDriver implies UnitTests
+        RunningUnitTests = true;
+
         base.Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
         base.Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 
