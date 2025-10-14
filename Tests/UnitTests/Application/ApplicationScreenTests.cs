@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -29,15 +30,13 @@ public class ApplicationScreenTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void ClearContents_Called_When_Top_Frame_Changes ()
     {
+        Toplevel top = new Toplevel ();
+        RunState rs = Application.Begin (top);
         // Arrange
-        Application.Init (new FakeDriver ());
-        Application.Top = new ();
-        Application.TopLevels.Push (Application.Top);
-
         var clearedContentsRaised = 0;
-
 
         Application.Driver!.ClearedContents += OnClearedContents;
 
@@ -68,12 +67,7 @@ public class ApplicationScreenTests
         // Assert
         Assert.Equal (2, clearedContentsRaised);
 
-        // Cleanup
-        Application.Top.Dispose ();
-        Application.Top = null;
-        Application.Driver!.ClearedContents -= OnClearedContents;
-        Application.Shutdown ();
-        Application.ResetState (true);
+        Application.End (rs);
 
         return;
 
