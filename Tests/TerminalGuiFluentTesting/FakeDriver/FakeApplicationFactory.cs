@@ -26,7 +26,7 @@ public class FakeApplicationFactory
         var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (impl);
-        impl.Init (null, "dotnet");
+        impl.Init (null, "fake");
 
         // Handle different facade types - cast to common interface instead
         var d = (IConsoleDriverFacade)Application.Driver!;
