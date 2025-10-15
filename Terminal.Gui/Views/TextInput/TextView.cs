@@ -3,7 +3,6 @@
 // TextView.cs: multi-line text editing
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui.Views;
 

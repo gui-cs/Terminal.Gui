@@ -1,14 +1,23 @@
-﻿#nullable enable
+#nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
+using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Original Terminal.Gui implementation of core <see cref="Application"/> methods.
+/// Implementation of core <see cref="Application"/> methods using the modern
+/// main loop architecture with component factories for different platforms.
 /// </summary>
 public class ApplicationImpl : IApplication
 {
+    private readonly IComponentFactory? _componentFactory;
+    private IMainLoopCoordinator? _coordinator;
+    private string? _driverName;
+    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
 
@@ -18,14 +27,27 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public static IApplication Instance => _lazyInstance.Value;
 
-
     /// <inheritdoc/>
-    public virtual ITimedEvents? TimedEvents => Application.MainLoop?.TimedEvents;
+    public ITimedEvents? TimedEvents => _timedEvents;
+
+    internal IMainLoopCoordinator? Coordinator => _coordinator;
 
     /// <summary>
     /// Handles which <see cref="View"/> (if any) has captured the mouse
     /// </summary>
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+
+    /// <summary>
+    /// Creates a new instance of the Application backend.
+    /// </summary>
+    public ApplicationImpl ()
+    {
+    }
+
+    internal ApplicationImpl (IComponentFactory componentFactory)
+    {
+        _componentFactory = componentFactory;
+    }
 
     /// <summary>
     /// Change the singleton implementation, should not be called except before application
@@ -41,25 +63,117 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public virtual void Init (IConsoleDriver? driver = null, string? driverName = null)
+    public void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        Application.InternalInit (driver, string.IsNullOrWhiteSpace (driverName) ? Application.ForceDriver : driverName);
+        if (Application.Initialized)
+        {
+            Logging.Logger.LogError ("Init called multiple times without shutdown, aborting.");
+
+            throw new InvalidOperationException ("Init called multiple times without Shutdown");
+        }
+
+        if (!string.IsNullOrWhiteSpace (driverName))
+        {
+            _driverName = driverName;
+        }
+
+        if (string.IsNullOrWhiteSpace (_driverName))
+        {
+            _driverName = Application.ForceDriver;
+        }
+
+        Debug.Assert(Application.Navigation is null);
+        Application.Navigation = new ();
+
+        Debug.Assert (Application.Popover is null);
+        Application.Popover = new ();
+
+        Application.AddKeyBindings ();
+
+        CreateDriver (driverName ?? _driverName);
+
+        Application.Initialized = true;
+
+        Application.OnInitializedChanged (this, new (true));
+        Application.SubscribeDriverEvents ();
+
+        SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
+        Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
+    }
+
+    private void CreateDriver (string? driverName)
+    {
+        PlatformID p = Environment.OSVersion.Platform;
+
+        // Check component factory type first - this takes precedence over driverName
+        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
+        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+
+        // Then check driverName
+        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false);
+        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
+
+        // Decide which driver to use - component factory type takes priority
+        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
+        {
+            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+        }
+        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
+        {
+            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+        }
+        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
+        {
+            _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+        }
+        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
+        {
+            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        {
+            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+        }
+        else
+        {
+            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+
+        _coordinator.StartAsync ().Wait ();
+
+        if (Application.Driver == null)
+        {
+            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+        }
+    }
+
+    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
+    {
+        ConcurrentQueue<T> inputBuffer = new ();
+        ApplicationMainLoop<T> loop = new ();
+
+        IComponentFactory<T> cf;
+
+        if (_componentFactory is IComponentFactory<T> typedFactory)
+        {
+            cf = typedFactory;
+        }
+        else
+        {
+            cf = fallbackFactory ();
+        }
+
+        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
     ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
     /// </summary>
-    /// <remarks>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
-    ///     <para>
-    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
-    ///         ensure resources are cleaned up and terminal settings restored.
-    ///     </para>
-    ///     <para>
-    ///         The caller is responsible for disposing the object returned by this method.
-    ///     </para>
-    /// </remarks>
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
@@ -69,168 +183,71 @@ public class ApplicationImpl : IApplication
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
     ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
     /// </summary>
-    /// <remarks>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
-    ///     <para>
-    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
-    ///         ensure resources are cleaned up and terminal settings restored.
-    ///     </para>
-    ///     <para>
-    ///         The caller is responsible for disposing the object returned by this method.
-    ///     </para>
-    /// </remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
     ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
-    ///     <see langword="null"/> if <see cref="Init"/> has already been called.
+    ///     be used. Must be <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public virtual T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
         if (!Application.Initialized)
         {
-            // Init() has NOT been called.
-            Application.InternalInit (driver, Application.ForceDriver, true);
-        }
-
-        if (Instance is ApplicationV2)
-        {
-            return Instance.Run<T> (errorHandler, driver);
+            // Init() has NOT been called. Auto-initialize as per interface contract.
+            Init (driver, null);
         }
 
         var top = new T ();
-
         Run (top, errorHandler);
-
         return top;
     }
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method is used to start processing events for the main application, but it is also used to run other
-    ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
-    ///     </para>
-    ///     <para>
-    ///         To make a <see cref="Run(Toplevel,System.Func{System.Exception,bool})"/> stop execution, call
-    ///         <see cref="Application.RequestStop"/>.
-    ///     </para>
-    ///     <para>
-    ///         Calling <see cref="Run(Toplevel,System.Func{System.Exception,bool})"/> is equivalent to calling
-    ///         <see cref="Application.Begin(Toplevel)"/>, followed by <see cref="Application.RunLoop(RunState)"/>, and then calling
-    ///         <see cref="Application.End(RunState)"/>.
-    ///     </para>
-    ///     <para>
-    ///         Alternatively, to have a program control the main loop and process events manually, call
-    ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
-    ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
-    ///         return control immediately.
-    ///     </para>
-    ///     <para>When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},IConsoleDriver)"/>
-    ///         <see cref="Init"/> will be called automatically.
-    ///     </para>
-    ///     <para>
-    ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
-    ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
-    ///         returns <see langword="true"/> the <see cref="Application.RunLoop(RunState)"/> will resume; otherwise this method will
-    ///         exit.
-    ///     </para>
-    /// </remarks>
     /// <param name="view">The <see cref="Toplevel"/> to run as a modal.</param>
-    /// <param name="errorHandler">
-    ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
-    ///     rethrows when null).
-    /// </param>
-    public virtual void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
+    /// <param name="errorHandler">Handler for any unhandled exceptions.</param>
+    public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
     {
+        Logging.Information ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
-        if (Application.Initialized)
+        if (!Application.Initialized)
         {
-            if (Application.Driver is null)
-            {
-                // Disposing before throwing
-                view.Dispose ();
-
-                // This code path should be impossible because Init(null, null) will select the platform default driver
-                throw new InvalidOperationException (
-                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
-                                                    );
-            }
-        }
-        else
-        {
-            // Init() has NOT been called.
-            throw new InvalidOperationException (
-                                                 "Init() has not been called. Only Run() or Run<T>() can be used without calling Init()."
-                                                );
+            throw new NotInitializedException (nameof (Run));
         }
 
-        var resume = true;
-
-        while (resume)
+        if (Application.Driver == null)
         {
-#if !DEBUG
-            try
-            {
-#endif
-                resume = false;
-                RunState runState = Application.Begin (view);
-
-                // If EndAfterFirstIteration is true then the user must dispose of the runToken
-                // by using NotifyStopRunState event.
-                Application.RunLoop (runState);
-
-                if (runState.Toplevel is null)
-                {
-#if DEBUG_IDISPOSABLE
-                if (View.EnableDebugIDisposableAsserts)
-                {
-                    Debug.Assert (Application.TopLevels.Count == 0);
-                }
-#endif
-                    runState.Dispose ();
-
-                    return;
-                }
-
-                if (!Application.EndAfterFirstIteration)
-                {
-                    Application.End (runState);
-                }
-#if !DEBUG
-            }
-            catch (Exception error)
-            {
-                Logging.Warning ($"Release Build Exception: {error}");
-                if (errorHandler is null)
-                {
-                    throw;
-                }
-
-                resume = errorHandler (error);
-            }
-#endif
+            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
+
+        Application.Top = view;
+
+        RunState rs = Application.Begin (view);
+
+        Application.Top.Running = true;
+
+        while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
+        {
+            if (_coordinator is null)
+            {
+                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
+            }
+
+            _coordinator.RunIteration ();
+        }
+
+        Logging.Information ($"Run - Calling End");
+        Application.End (rs);
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    /// <remarks>
-    ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
-    ///     up (Disposed)
-    ///     and terminal settings are restored.
-    /// </remarks>
-    public virtual void Shutdown ()
+    public void Shutdown ()
     {
-        // TODO: Throw an exception if Init hasn't been called.
-
+        _coordinator?.Stop ();
+        
         bool wasInitialized = Application.Initialized;
         Application.ResetState ();
         ConfigurationManager.PrintJsonErrors ();
@@ -238,19 +255,21 @@ public class ApplicationImpl : IApplication
         if (wasInitialized)
         {
             bool init = Application.Initialized;
-
             Application.OnInitializedChanged (this, new (in init));
         }
 
+        Application.Driver = null;
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
     /// <inheritdoc />
-    public virtual void RequestStop (Toplevel? top)
+    public void RequestStop (Toplevel? top)
     {
+        Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
+
         top ??= Application.Top;
 
-        if (!top!.Running)
+        if (top == null)
         {
             return;
         }
@@ -264,71 +283,40 @@ public class ApplicationImpl : IApplication
         }
 
         top.Running = false;
-        Application.OnNotifyStopRunState (top);
     }
 
     /// <inheritdoc />
-    public virtual void Invoke (Action action)
+    public void Invoke (Action action)
     {
-
         // If we are already on the main UI thread
         if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
-            WakeupMainLoop ();
-
             return;
         }
 
-        if (Application.MainLoop == null)
-        {
-            Logging.Warning ("Ignored Invoke because MainLoop is not initialized yet");
-            return;
-        }
-
-
-        Application.AddTimeout (TimeSpan.Zero,
-                           () =>
-                           {
-                               action ();
-
-                               return false;
-                           }
-                          );
-
-        WakeupMainLoop ();
-
-        void WakeupMainLoop ()
-        {
-            // Ensure the action is executed in the main loop
-            // Wakeup mainloop if it's waiting for events
-            Application.MainLoop?.Wakeup ();
-        }
+        _timedEvents.Add (TimeSpan.Zero,
+                              () =>
+                              {
+                                  action ();
+                                  return false;
+                              }
+                             );
     }
 
     /// <inheritdoc />
-    public bool IsLegacy { get; protected set; } = true;
+    public bool IsLegacy => false;
 
     /// <inheritdoc />
-    public virtual object AddTimeout (TimeSpan time, Func<bool> callback)
-    {
-        if (Application.MainLoop is null)
-        {
-            throw new NotInitializedException ("Cannot add timeout before main loop is initialized", null);
-        }
-
-        return Application.MainLoop.TimedEvents.Add (time, callback);
-    }
+    public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
 
     /// <inheritdoc />
-    public virtual bool RemoveTimeout (object token)
-    {
-        return Application.MainLoop?.TimedEvents.Remove (token) ?? false;
-    }
+    public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
     /// <inheritdoc />
-    public virtual void LayoutAndDraw (bool forceDraw)
+    public void LayoutAndDraw (bool forceDraw)
     {
-        Application.LayoutAndDrawImpl (forceDraw);
+        Application.Top?.SetNeedsDraw();
+        Application.Top?.SetNeedsLayout ();
     }
 }
