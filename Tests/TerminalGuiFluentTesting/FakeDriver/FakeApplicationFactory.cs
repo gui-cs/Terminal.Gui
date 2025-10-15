@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Drawing;
+﻿using System.Drawing;
 using TerminalGuiFluentTesting;
 
 namespace Terminal.Gui.Drivers;
@@ -23,12 +22,15 @@ public class FakeApplicationFactory
 
         var sizeMonitor = new FakeSizeMonitor ();
 
-        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
+        var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
-        ApplicationImpl.ChangeInstance (v2);
-        v2.Init (null, "v2net");
+        ApplicationImpl.ChangeInstance (impl);
 
-        ConsoleDriverFacade<ConsoleKeyInfo> d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver!;
+        // Initialize with a fake driver
+        impl.Init (null, "fake");
+
+        // Handle different facade types - cast to common interface instead
+        var d = (IConsoleDriverFacade)Application.Driver!;
 
         sizeMonitor.SizeChanging += (_, e) =>
                                     {
