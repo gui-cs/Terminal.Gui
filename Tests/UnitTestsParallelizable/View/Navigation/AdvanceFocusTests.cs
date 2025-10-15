@@ -644,4 +644,48 @@ public class AdvanceFocusTests ()
         Assert.Equal (canFocus, view.CanFocus);
         Assert.Equal (tabStop, view.TabStop);
     }
+
+    [Fact]
+    public void AdvanceFocus_Cycles_Through_Peers_And_All_Nested_SubViews_When_Multiple ()
+    {
+        var top = new View { Id = "top", CanFocus = true };
+
+        View peer1 = new View
+        {
+            CanFocus = true,
+            Id = "peer1",
+        };
+
+        var peer2 = new View
+        {
+            CanFocus = true,
+            Id = "peer2",
+        };
+        var peer2SubView = new View
+        {
+            Id = "peer2SubView", CanFocus = true
+        };
+        var v1 = new View { Id = "v1", CanFocus = true };
+        var v2 = new View { Id = "v2", CanFocus = true };
+        peer2SubView.Add (v1, v2);
+
+        peer2.Add (peer2SubView);
+
+        top.Add (peer1, peer2);
+        top.SetFocus ();
+
+        Assert.Equal (peer1, top.MostFocused);
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (v1, top.MostFocused);
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (v2, top.MostFocused);
+
+        // This should cycle to peer1 - previously it incorrectly cycled to v1
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (peer1, top.MostFocused);
+
+        top.Dispose ();
+    }
 }

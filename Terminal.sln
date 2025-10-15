@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32427.441
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11018.127 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "Terminal.Gui\Terminal.Gui.csproj", "{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}"
 EndProject
@@ -34,6 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C
 		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
 		.github\workflows\build-release.yml = .github\workflows\build-release.yml
 		.github\workflows\check-duplicates.yml = .github\workflows\check-duplicates.yml
+		copilot-instructions.md = copilot-instructions.md
 		GitVersion.yml = GitVersion.yml
 		.github\workflows\integration-tests.yml = .github\workflows\integration-tests.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml

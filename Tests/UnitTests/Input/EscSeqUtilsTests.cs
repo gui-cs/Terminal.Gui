@@ -3,7 +3,7 @@ using UnitTests;
 
 // ReSharper disable HeuristicUnreachableCode
 
-namespace Terminal.Gui.InputTests;
+namespace Terminal.Gui.DriverTests;
 
 public class EscSeqUtilsTests
 {

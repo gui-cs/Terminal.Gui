@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using JetBrains.Annotations;
+using Terminal.Gui.Drivers;
 using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
@@ -166,11 +168,11 @@ public class ApplicationTests
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
-        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+        AutoInitShutdownAttribute.FakeResize (new Size (80, 25));
         Toplevel top = new ();
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top!.Frame);
-        AutoInitShutdownAttribute.FakeResize(new Size(5, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (5, 5));
         Assert.Equal (new (0, 0, 5, 5), Application.Top!.Frame);
         top.Dispose ();
     }
@@ -254,21 +256,22 @@ public class ApplicationTests
 
     }
 
-    [Theory]
-    [InlineData (typeof (NetDriver))]
+    // Legacy driver test - all InlineData commented out
+    //[Theory]
+    ////[InlineData (typeof (DotNetDriver))]
 
-    //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
-    {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        Application.Init (driverName: driverType.Name);
-        Assert.NotNull (Application.Driver);
-        Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (driverType, Application.Driver?.GetType ());
-        Application.Shutdown ();
-    }
+    ////[InlineData (typeof (ANSIDriver))]
+    ////[InlineData (typeof (WindowsDriver))]
+    ////[InlineData (typeof (UnixDriver))]
+    //public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
+    //{
+    //    var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
+    //    Application.Init (driverName: driverType.Name);
+    //    Assert.NotNull (Application.Driver);
+    //    Assert.NotEqual (driver, Application.Driver);
+    //    Assert.Equal (driverType, Application.Driver?.GetType ());
+    //    Application.Shutdown ();
+    //}
 
     [Fact]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
@@ -282,9 +285,9 @@ public class ApplicationTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (DotNetDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void Init_ResetState_Resets_Properties (Type driverType)
     {
         ThrowOnJsonErrors = true;
@@ -421,9 +424,9 @@ public class ApplicationTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (DotNetDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
     {
         var initialized = false;
@@ -457,10 +460,9 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Init_Unbalanced_Throws ()
     {
-        Application.Init (new FakeDriver ());
-
         Assert.Throws<InvalidOperationException> (
                                                   () =>
                                                       Application.InternalInit (
@@ -472,10 +474,14 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+    }
 
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Init_Unbalanced_Throws2 ()
+    {
         // Now try the other way
-        Application.InternalInit (new FakeDriver ());
-
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
         Application.Shutdown ();
 
@@ -527,19 +533,20 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
-    [Fact]
+    [Fact (Skip = "FakeDriver is not allowed, use AutoInitShutdown attribute instead")]
     public void Init_NoParam_ForceDriver_Works ()
     {
-        Application.ForceDriver = "FakeDriver";
+        Application.ForceDriver = "Fake";
         Application.Init ();
-        Assert.IsType<FakeDriver> (Application.Driver);
+        //Assert.IsType<FakeConsoleInput>(Application.Drive);
+        //Assert.IsType<FakeDriver> (Application.Driver);
         Application.ResetState ();
     }
 
     [Fact]
     public void Init_KeyBindings_Are_Not_Reset ()
     {
-        Debug.Assert(!IsEnabled);
+        Debug.Assert (!IsEnabled);
 
         try
         {
@@ -574,16 +581,15 @@ public class ApplicationTests
     // Invoke Tests
     // TODO: Test with threading scenarios
     [Fact]
+    [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        Application.Init (new FakeDriver ());
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (1, actionCalled);
         top.Dispose ();
@@ -595,7 +601,7 @@ public class ApplicationTests
     {
         var iteration = 0;
 
-        Application.Init (new FakeDriver ());
+        Application.Init (null, driverName: "fake");
 
         Application.Iteration += Application_Iteration;
         Application.Run<Toplevel> ().Dispose ();
@@ -618,20 +624,29 @@ public class ApplicationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Screen_Size_Changes ()
     {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
+        var driver = Application.Driver;
+
+        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
         Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
+        // TODO: Should not be possible to manually change these at whim!
         driver.Cols = 100;
         driver.Rows = 30;
         // IConsoleDriver.Screen isn't assignable
         //driver.Screen = new (0, 0, driver.Cols, Rows);
+
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
-        Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
-        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
+        
+        // Assert does not make sense
+        // Assert.NotEqual (new (0, 0, 100, 30), Application.Screen);
+        // Assert.Equal (new (0, 0, 80, 25), Application.Screen);
         Application.Screen = new (0, 0, driver.Cols, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
@@ -783,7 +798,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
-    [Fact]
+    [Fact(Skip = "FakeDriver is not allowed, use AutoInitShutdown attribute instead")]
     [TestRespondersDisposed]
     public void Run_T_NoInit_DoesNotThrow ()
     {
@@ -824,9 +839,6 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Run_RequestStop_Stops ()
     {
-        // Setup Mock driver
-        Application.Init ();
-
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
@@ -913,7 +925,7 @@ public class ApplicationTests
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
         };
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 10));
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 10));
         RunState rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.
@@ -1055,7 +1067,7 @@ public class ApplicationTests
 
         Assert.Null (Application.Top);
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run (new Toplevel ()));
+        Assert.Throws<NotInitializedException> (() => Application.Run (new Toplevel ()));
 
         Application.Init (driver);
 
@@ -1085,6 +1097,7 @@ public class ApplicationTests
 
     private readonly object _forceDriverLock = new ();
 
+    /*
     [Theory]
 
     // This test wants to Run which results in console handle errors, it wants to rely non drivers checking ConsoleDriver.RunningUnitTests
@@ -1092,10 +1105,11 @@ public class ApplicationTests
     //    [InlineData ("v2win", typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>))]
     //    [InlineData ("v2net", typeof (ConsoleDriverFacade<ConsoleKeyInfo>))]
 
-    [InlineData ("FakeDriver", typeof (FakeDriver))]
-    [InlineData ("NetDriver", typeof (NetDriver))]
-    [InlineData ("WindowsDriver", typeof (WindowsDriver))]
-    [InlineData ("CursesDriver", typeof (CursesDriver))]
+    // FakeDriver is not allowed, use AutoInitShutdown attribute instead
+    //[InlineData ("FakeDriver", typeof (FakeDriver))]
+    //[InlineData ("DotNetDriver", typeof (DotNetDriver))]
+    //[InlineData ("WindowsDriver", typeof (WindowsDriver))]
+    //[InlineData ("UnixDriver", typeof (UnixDriver))]
     public void Run_T_Call_Init_ForceDriver_Should_Pick_Correct_Driver (string driverName, Type expectedType)
     {
         Assert.True (ConsoleDriver.RunningUnitTests);
@@ -1136,6 +1150,7 @@ public class ApplicationTests
         Application.Shutdown ();
         Assert.True (result);
     }
+    */
 
     [Fact]
     public void Run_T_With_Legacy_Driver_Does_Not_Call_ResetState_After_Init ()

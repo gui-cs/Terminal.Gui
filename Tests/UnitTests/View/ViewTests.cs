@@ -338,7 +338,7 @@ public class ViewTests
 
         top.Add (new Label { Text = "111" });
         v.Add (top);
-        v.Add (new LineView (Orientation.Horizontal) { Y = 1 });
+        v.Add (new Line { Orientation = Orientation.Horizontal, Y = 1 });
         bottom.Add (new Label { Text = "222" });
         v.Add (bottom);
 
