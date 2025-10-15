@@ -59,7 +59,7 @@ internal partial class DriverAssert
                     case 0:
                         output.WriteLine (
                                           $"{Application.ToString (driver)}\n"
-                                          + $"Expected Attribute {val} (PlatformColor = {val!.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
+                                          + $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]} was not found.\n"
                                           + $" Expected: {string.Join (",", expectedAttributes.Select (attr => attr))}\n"
                                           + $" But Was: <not found>"
                                          );

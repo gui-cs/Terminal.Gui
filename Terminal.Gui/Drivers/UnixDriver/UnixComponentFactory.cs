@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// <see cref="IComponentFactory{T}"/> implementation for native unix console I/O i.e. v2unix.
+/// <see cref="IComponentFactory{T}"/> implementation for native unix console I/O.
 /// This factory creates instances of internal classes <see cref="UnixInput"/>, <see cref="UnixOutput"/> etc.
 /// </summary>
 public class UnixComponentFactory : ComponentFactory<char>

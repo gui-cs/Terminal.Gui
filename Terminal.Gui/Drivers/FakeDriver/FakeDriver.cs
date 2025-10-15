@@ -246,7 +246,6 @@ public class FakeDriver : ConsoleDriver
     //{
     //	// Encode the colors into the int value.
     //	return new Attribute (
-    //		platformColor: 0,//((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
     //		foreground: foreground,
     //		background: background
     //	);

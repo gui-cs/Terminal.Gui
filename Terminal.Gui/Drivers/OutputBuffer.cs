@@ -17,7 +17,6 @@ public class OutputBuffer : IOutputBuffer
     /// </summary>
     public Cell [,] Contents { get; set; } = new Cell[0, 0];
 
-    private Attribute _currentAttribute;
     private int _cols;
     private int _rows;
 
@@ -25,23 +24,7 @@ public class OutputBuffer : IOutputBuffer
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
     ///     call.
     /// </summary>
-    public Attribute CurrentAttribute
-    {
-        get => _currentAttribute;
-        set
-        {
-            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
-            if (Application.Driver is { })
-            {
-                // TODO: Update this when attributes can include TextStyle in the constructor
-                _currentAttribute = new (value.Foreground, value.Background, value.Style);
-
-                return;
-            }
-
-            _currentAttribute = value;
-        }
-    }
+    public Attribute CurrentAttribute { get; set; }
 
     /// <summary>The leftmost column in the terminal.</summary>
     public virtual int Left { get; set; } = 0;
@@ -141,7 +124,7 @@ public class OutputBuffer : IOutputBuffer
             return;
         }
 
-        Clip ??= new Region (Screen);
+        Clip ??= new (Screen);
 
         Rectangle clipRect = Clip!.GetBounds ();
 

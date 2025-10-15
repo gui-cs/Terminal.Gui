@@ -581,7 +581,6 @@ public abstract class ConsoleDriver : IConsoleDriver
         set => Application.Force16Colors = value || !SupportsTrueColor;
     }
 
-    private Attribute _currentAttribute;
     private int _cols;
     private int _rows;
 
@@ -589,22 +588,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
     ///     call.
     /// </summary>
-    public Attribute CurrentAttribute
-    {
-        get => _currentAttribute;
-        set
-        {
-            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
-            if (Application.Driver is { })
-            {
-                _currentAttribute = new (value.Foreground, value.Background, value.Style);
-
-                return;
-            }
-
-            _currentAttribute = value;
-        }
-    }
+    public Attribute CurrentAttribute { get; set; }
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
@@ -621,8 +605,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return CurrentAttribute; }
 
-    // TODO: This is only overridden by UnixDriver. Once UnixDriver supports 24-bit color, this virtual method can be
-    // removed (and Attribute can lose the platformColor property).
     /// <summary>Makes an <see cref="Attribute"/>.</summary>
     /// <param name="foreground">The foreground color.</param>
     /// <param name="background">The background color.</param>
@@ -631,7 +613,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     {
         // Encode the colors into the int value.
         return new (
-                    0xFF, // only used by UnixDriver!
                     foreground,
                     background
                    );
