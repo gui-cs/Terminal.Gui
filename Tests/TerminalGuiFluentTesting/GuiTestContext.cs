@@ -22,11 +22,11 @@ public class GuiTestContext : IDisposable
     private View? _lastView;
     private readonly object _logsLock = new ();
     private readonly StringBuilder _logsSb;
-    private readonly V2TestDriver _driver;
+    private readonly TestDriver _driver;
     private bool _finished;
     private readonly FakeSizeMonitor _fakeSizeMonitor;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver, TextWriter? logWriter = null)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null)
     {
         // Remove frame limit
         Application.MaximumIterationsPerSecond = ushort.MaxValue;
@@ -42,11 +42,11 @@ public class GuiTestContext : IDisposable
         _output.Size = new (width, height);
         _fakeSizeMonitor = new ();
 
-        IComponentFactory cf = driver == V2TestDriver.V2Net
+        IComponentFactory cf = driver == TestDriver.DotNet
                                    ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
                                    : (IComponentFactory)new FakeWindowsComponentFactory (_winInput, _output, _fakeSizeMonitor);
 
-        var v2 = new ApplicationV2 (cf);
+        var impl = new ApplicationImpl (cf);
 
         var booting = new SemaphoreSlim (0, 1);
 
@@ -56,7 +56,7 @@ public class GuiTestContext : IDisposable
                              {
                                  try
                                  {
-                                     ApplicationImpl.ChangeInstance (v2);
+                                     ApplicationImpl.ChangeInstance (impl);
 
                                      ILogger logger = LoggerFactory.Create (
                                                                             builder =>
@@ -67,7 +67,7 @@ public class GuiTestContext : IDisposable
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
-                                     v2.Init (null, GetDriverName ());
+                                     impl.Init (null, GetDriverName ());
 
                                      booting.Release ();
 
@@ -121,8 +121,8 @@ public class GuiTestContext : IDisposable
     {
         return _driver switch
                {
-                   V2TestDriver.V2Win => "v2win",
-                   V2TestDriver.V2Net => "v2net",
+                   TestDriver.Windows => "windows",
+                   TestDriver.DotNet => "dotnet",
                    _ =>
                        throw new ArgumentOutOfRangeException ()
                };
@@ -385,7 +385,7 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
 
                 _winInput.InputBuffer!.Enqueue (
                                                 new ()
@@ -411,7 +411,7 @@ public class GuiTestContext : IDisposable
 
                 return WaitUntil (() => _winInput.InputBuffer.IsEmpty);
 
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
 
                 int netButton = btn switch
                                 {
@@ -455,11 +455,11 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
                 foreach (ConsoleKeyInfo k in NetSequences.Down)
                 {
                     SendNetKey (k);
@@ -482,11 +482,11 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
                 foreach (ConsoleKeyInfo k in NetSequences.Right)
                 {
                     SendNetKey (k);
@@ -511,11 +511,11 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
                 foreach (ConsoleKeyInfo k in NetSequences.Left)
                 {
                     SendNetKey (k);
@@ -538,11 +538,11 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (ConsoleKeyMapping.VK.UP);
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
                 foreach (ConsoleKeyInfo k in NetSequences.Up)
                 {
                     SendNetKey (k);
@@ -565,7 +565,7 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (
                                 new WindowsConsole.KeyEventRecord
                                 {
@@ -577,7 +577,7 @@ public class GuiTestContext : IDisposable
                                 });
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
                 SendNetKey (new ('\r', ConsoleKey.Enter, false, false, false));
 
                 break;
@@ -597,7 +597,7 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (
                                 new WindowsConsole.KeyEventRecord
                                 {
@@ -609,7 +609,7 @@ public class GuiTestContext : IDisposable
                                 });
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
 
                 // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
                 // even though you would think it would be Escape - it isn't
@@ -632,7 +632,7 @@ public class GuiTestContext : IDisposable
     {
         switch (_driver)
         {
-            case V2TestDriver.V2Win:
+            case TestDriver.Windows:
                 SendWindowsKey (
                                 new WindowsConsole.KeyEventRecord
                                 {
@@ -644,7 +644,7 @@ public class GuiTestContext : IDisposable
                                 });
 
                 break;
-            case V2TestDriver.V2Net:
+            case TestDriver.DotNet:
 
                 // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
                 // even though you would think it would be Tab - it isn't

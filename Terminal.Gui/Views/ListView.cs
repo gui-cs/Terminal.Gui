@@ -43,7 +43,7 @@ namespace Terminal.Gui.Views;
 public class ListView : View, IDesignable
 {
     private bool _allowsMarking;
-    private bool _allowsMultipleSelection = true;
+    private bool _allowsMultipleSelection = false;
     private int _lastSelectedItem = -1;
     private int _selected = -1;
     private IListDataSource _source;

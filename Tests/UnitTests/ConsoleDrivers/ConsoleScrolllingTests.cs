@@ -4,7 +4,6 @@
 using Console = Terminal.Gui.Drivers.FakeConsole;
 
 namespace Terminal.Gui.DriverTests;
-
 public class ConsoleScrollingTests
 {
     private readonly ITestOutputHelper output;
@@ -18,10 +17,10 @@ public class ConsoleScrollingTests
     [Theory]
     [InlineData (typeof (FakeDriver))]
 
-    //[InlineData (typeof (NetDriver))]
+    ////[InlineData (typeof (DotNetDriver))]
     //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
+    ////[InlineData (typeof (WindowsDriver))]
+    ////[InlineData (typeof (UnixDriver))]
     public void Left_And_Top_Is_Always_Zero (Type driverType)
     {
         var driver = (FakeDriver)Activator.CreateInstance (driverType);

@@ -11,8 +11,8 @@ public class BasicFluentAssertionTests
     public BasicFluentAssertionTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void GuiTestContext_NewInstance_Runs (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void GuiTestContext_NewInstance_Runs (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (Application.Top!.Running);
@@ -22,8 +22,8 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void GuiTestContext_QuitKey_Stops (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void GuiTestContext_QuitKey_Stops (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d);
         Assert.True (Application.Top!.Running);
@@ -37,8 +37,8 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void GuiTestContext_StartsAndStopsWithoutError (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void GuiTestContext_StartsAndStopsWithoutError (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d);
 
@@ -47,15 +47,15 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void GuiTestContext_ForgotToStop (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void GuiTestContext_ForgotToStop (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d);
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void TestWindowsResize (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void TestWindowsResize (TestDriver d)
     {
         var lbl = new Label
         {
@@ -73,8 +73,8 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void ContextMenu_CrashesOnRight (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void ContextMenu_CrashesOnRight (TestDriver d)
     {
         var clicked = false;
 
@@ -104,8 +104,8 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void ContextMenu_OpenSubmenu (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void ContextMenu_OpenSubmenu (TestDriver d)
     {
         var clicked = false;
 
@@ -152,8 +152,8 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Toplevel_TabGroup_Forward_Backward (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Toplevel_TabGroup_Forward_Backward (TestDriver d)
     {
         var v1 = new View { Id = "v1", CanFocus = true };
         var v2 = new View { Id = "v2", CanFocus = true };

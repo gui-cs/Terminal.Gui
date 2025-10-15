@@ -30,7 +30,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (5, 5);
         Color fg = Color.Red;
         Color bg = Color.Green;
 
@@ -100,7 +100,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Visual_Test (ShadowStyle style, string expected)
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (5, 5);
 
         var superView = new Toplevel
         {
@@ -131,9 +131,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.None, 0, 0, 0, 0)]
     [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
+    [AutoInitShutdown]
     public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
-        Application.Init (new FakeDriver ());
         var superView = new View
         {
             Height = 10, Width = 10

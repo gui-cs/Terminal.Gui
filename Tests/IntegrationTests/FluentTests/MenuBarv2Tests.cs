@@ -20,8 +20,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Initializes_WithNoItems (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Initializes_WithNoItems (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
                                      .Then (
@@ -39,8 +39,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Initializes_WithItems (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Initializes_WithItems (TestDriver d)
     {
         MenuBarItemv2 [] menuItems = [];
 
@@ -81,8 +81,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void AddsItems_WithMenusProperty (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void AddsItems_WithMenusProperty (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
                                      .Then (
@@ -105,8 +105,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void ChangesKey_RaisesEvent (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void ChangesKey_RaisesEvent (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
                                      .Then (
@@ -145,8 +145,8 @@ public class MenuBarv2Tests
 
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void DefaultKey_Activates (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void DefaultKey_Activates (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -183,8 +183,8 @@ public class MenuBarv2Tests
 
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void DefaultKey_DeActivates (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void DefaultKey_DeActivates (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -219,8 +219,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void ShowHidePopovers (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void ShowHidePopovers (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
                                      .Then (
@@ -277,8 +277,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void EnableForDesign_CreatesMenuItems (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void EnableForDesign_CreatesMenuItems (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
                                      .Then (
@@ -312,8 +312,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Navigation_Left_Right_Wraps (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Navigation_Left_Right_Wraps (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -353,8 +353,8 @@ public class MenuBarv2Tests
 
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Restores_Focus_Correctly (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Restores_Focus_Correctly (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -392,8 +392,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -432,8 +432,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -469,8 +469,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -510,8 +510,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBar_Not_Active_DoesNotEat_Space (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBar_Not_Active_DoesNotEat_Space (TestDriver d)
     {
         int spaceKeyDownCount = 0;
         View testView = new View ()
@@ -547,8 +547,8 @@ public class MenuBarv2Tests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBar_Not_Active_DoesNotEat_Enter (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBar_Not_Active_DoesNotEat_Enter (TestDriver d)
     {
         int enterKeyDownCount = 0;
         View testView = new View ()

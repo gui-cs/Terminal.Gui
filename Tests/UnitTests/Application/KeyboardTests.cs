@@ -175,10 +175,9 @@ public class KeyboardTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void NextTabGroupKey_PrevTabGroupKey_Tests ()
     {
-        Application.Init (new FakeDriver ());
-
         Toplevel top = new (); // TabGroup
         var w1 = new Window (); // TabGroup
         var v1 = new TextField (); // TabStop
@@ -344,7 +343,7 @@ public class KeyboardTests
         // Before Init
         Assert.Equal (Key.Esc, Application.QuitKey);
 
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fakedriver");
 
         // After Init
         Assert.Equal (Key.Esc, Application.QuitKey);
@@ -406,7 +405,7 @@ public class KeyboardTests
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fakedriver");
         Assert.True (initialized);
         Assert.False (shutdown);
 

@@ -62,7 +62,7 @@ public class FileDialogExamples : Scenario
         x = 24;
 
         win.Add (
-                 new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+                 new Line { Orientation = Orientation.Vertical, X = x++, Y = 1, Height = 4 }
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
@@ -74,7 +74,7 @@ public class FileDialogExamples : Scenario
         x = 34;
 
         win.Add (
-                 new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+                 new Line { Orientation = Orientation.Vertical, X = x++, Y = 1, Height = 4 }
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
@@ -86,7 +86,7 @@ public class FileDialogExamples : Scenario
         x = 48;
 
         win.Add (
-                 new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
+                 new Line { Orientation = Orientation.Vertical, X = x++, Y = 1, Height = 4 }
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
@@ -101,7 +101,7 @@ public class FileDialogExamples : Scenario
         x = 24;
 
         win.Add (
-                 new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
+                 new Line { Orientation = Orientation.Vertical, X = x++, Y = y + 1, Height = 4 }
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
@@ -113,7 +113,7 @@ public class FileDialogExamples : Scenario
         x = 45;
 
         win.Add (
-                 new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
+                 new Line { Orientation = Orientation.Vertical, X = x++, Y = y + 1, Height = 4 }
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
 

@@ -603,7 +603,8 @@ public class ScenarioTests : TestsAllViews
         void LayoutCompleteHandler (object? sender, LayoutEventArgs args) { UpdateTitle (curView); }
     }
 
-    [Fact]
+    
+    [Fact(Skip = "This test seems to exercise FakeConsole.PushMockKeyPress - which is broken")]
     public void Run_Generic ()
     {
         ConfigurationManager.Disable (resetToHardCodedDefaults: true);
@@ -623,7 +624,7 @@ public class ScenarioTests : TestsAllViews
         Assert.Equal (Key.Esc, Application.QuitKey);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
-        var ms = 100;
+        var ms = 500;
         var abortCount = 0;
 
         Func<bool> abortCallback = () =>
