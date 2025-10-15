@@ -526,9 +526,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        cb.Layout ();
-
-        cb.Draw ();
+        Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
