@@ -507,10 +507,10 @@ public class ToplevelTests
         top.BeginInit ();
         top.EndInit ();
 
-        Exception exception = Record.Exception (() => ((IFakeDriverV2)Application.Driver!).SetBufferSize (0, 10));
+        Exception exception = Record.Exception (() => ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (0, 10));
         Assert.Null (exception);
 
-        exception = Record.Exception (() => ((IFakeDriverV2)Application.Driver!).SetBufferSize (10, 0));
+        exception = Record.Exception (() => ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 0));
         Assert.Null (exception);
     }
 

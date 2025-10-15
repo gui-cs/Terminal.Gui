@@ -418,7 +418,7 @@ public partial class DimAutoTests
         var otherView = new View
         {
             Text = "01234\n01234\n01234\n01234\n01234",
-            Width = Dim.Auto(),
+            Width = Dim.Auto (),
             Height = Dim.Auto ()
         };
         view.Add (otherView);
@@ -478,8 +478,8 @@ public partial class DimAutoTests
 
         var posViewView = new View
         {
-            X = Pos.Bottom(otherView),
-            Y = Pos.Right(otherView),
+            X = Pos.Bottom (otherView),
+            Y = Pos.Right (otherView),
             Width = 5,
             Height = 5,
         };
@@ -639,7 +639,11 @@ public partial class DimAutoTests
             Width = Dim.Auto (),
             Height = Dim.Auto (),
         };
-        var subview = new View { X = Pos.Func (_ => 20), Y = Pos.Func (_ => 25) };
+        var subview = new View
+        {
+            X = Pos.Func (_ => 20),
+            Y = Pos.Func (_ => 25)
+        };
         view.Add (subview);
 
         view.SetRelativeLayout (new (100, 100));

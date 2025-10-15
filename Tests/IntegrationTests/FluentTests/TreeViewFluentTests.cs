@@ -11,8 +11,8 @@ public class TreeViewFluentTests
     public TreeViewFluentTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void TreeView_AllowReOrdering (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void TreeView_AllowReOrdering (TestDriver d)
     {
         var tv = new TreeView
         {
@@ -77,8 +77,8 @@ public class TreeViewFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void TreeViewReOrder_PreservesExpansion (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void TreeViewReOrder_PreservesExpansion (TestDriver d)
     {
         var tv = new TreeView
         {

@@ -3,7 +3,7 @@ using UnitTests;
 
 // ReSharper disable HeuristicUnreachableCode
 
-namespace Terminal.Gui.InputTests;
+namespace Terminal.Gui.DriverTests;
 
 public class EscSeqUtilsTests
 {
@@ -1536,6 +1536,22 @@ public class EscSeqUtilsTests
 
         string actual = builder.ToString();
         Assert.Equal (expected, actual);
+    }
+
+    [Theory]
+    [InlineData ('\u001B', KeyCode.Esc)]
+    [InlineData ('\r', KeyCode.Enter)]
+    [InlineData ('1', KeyCode.D1)]
+    [InlineData ('!', (KeyCode)'!')]
+    [InlineData ('a', KeyCode.A)]
+    [InlineData ('A', KeyCode.A | KeyCode.ShiftMask)]
+    public void MapChar_Returns_Modifiers_If_Needed (char ch, KeyCode keyCode)
+    {
+        ConsoleKeyInfo cki = EscSeqUtils.MapChar (ch);
+        Key key = EscSeqUtils.MapKey (cki);
+        Key expectedKey = keyCode;
+
+        Assert.Equal (key, expectedKey);
     }
 
     private void ClearAll ()

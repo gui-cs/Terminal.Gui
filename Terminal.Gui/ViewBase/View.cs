@@ -38,9 +38,10 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
 #if DEBUG_IDISPOSABLE
         WasDisposed = true;
+
         // Safely remove any disposed views from the Instances list
         List<View> itemsToKeep = Instances.Where (view => !view.WasDisposed).ToList ();
-        Instances = new ConcurrentBag<View> (itemsToKeep);
+        Instances = new (itemsToKeep);
 #endif
     }
 
@@ -108,9 +109,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
-    private IConsoleDriver? _driver = null;
+    private IConsoleDriver? _driver;
+
     /// <summary>
-    ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a convenience property for simplifying the development
+    ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a
+    ///     convenience property for simplifying the development
     ///     of new views.
     /// </summary>
     internal IConsoleDriver? Driver
@@ -121,6 +124,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             {
                 return _driver;
             }
+
             return Application.Driver;
         }
         set => _driver = value;
@@ -345,6 +349,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             {
                 // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
                 _previouslyFocused = SubViews.FirstOrDefault (v => v.CanFocus);
+
                 if (HasFocus)
                 {
                     HasFocus = false;
@@ -449,10 +454,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <value>The title.</value>
     public string Title
     {
-        get
-        {
-            return _title;
-        }
+        get { return _title; }
         set
         {
 #if DEBUG_IDISPOSABLE
@@ -529,7 +531,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public static bool EnableDebugIDisposableAsserts { get; set; } = true;
-
 
     /// <summary>
     ///     Gets whether <see cref="View.Dispose"/> was called on this view or not.
