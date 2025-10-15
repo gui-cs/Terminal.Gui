@@ -37,22 +37,27 @@ public static class RuneExtensions
     public static bool DecodeSurrogatePair (this Rune rune, out char []? chars)
     {
         bool isSingleUtf16CodeUnit = rune.IsBmp;
+
         if (isSingleUtf16CodeUnit)
         {
             chars = null;
+
             return false;
         }
 
-        const int maxCharsPerRune = 2;
-        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        const int MAX_CHARS_PER_RUNE = 2;
+        Span<char> charBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
         int charsWritten = rune.EncodeToUtf16 (charBuffer);
+
         if (charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]))
         {
             chars = charBuffer [..charsWritten].ToArray ();
+
             return true;
         }
 
         chars = null;
+
         return false;
     }
 
@@ -65,23 +70,26 @@ public static class RuneExtensions
     /// <returns>he number of bytes written into the destination buffer.</returns>
     public static int Encode (this Rune rune, byte [] dest, int start = 0, int count = -1)
     {
-        const int maxUtf8BytesPerRune = 4;
-        Span<byte> bytes = stackalloc byte[maxUtf8BytesPerRune];
+        const int MAX_UTF8_BYTES_PER_RUNE = 4;
+        Span<byte> bytes = stackalloc byte [MAX_UTF8_BYTES_PER_RUNE];
         int writtenBytes = rune.EncodeToUtf8 (bytes);
 
         int bytesToCopy = count == -1
-            ? writtenBytes
-            : Math.Min (count, writtenBytes);
-        int bytesWritten = 0;
-        for (int i = 0; i < bytesToCopy; i++)
+                              ? writtenBytes
+                              : Math.Min (count, writtenBytes);
+        var bytesWritten = 0;
+
+        for (var i = 0; i < bytesToCopy; i++)
         {
             if (bytes [i] == '\0')
             {
                 break;
             }
+
             dest [start + i] = bytes [i];
             bytesWritten++;
         }
+
         return bytesWritten;
     }
 
@@ -111,22 +119,7 @@ public static class RuneExtensions
     ///     The number of columns required to fit the rune, 0 if the argument is the null character, or -1 if the value is
     ///     not printable, otherwise the number of columns that the rune occupies.
     /// </returns>
-    public static int GetColumns (this Rune rune)
-    {
-        int value = rune.Value;
-
-        // TODO: Remove this code when #4259 is fixed
-        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4259
-        if (value is >= 0x2630 and <= 0x2637 ||  // Trigrams
-            value is >= 0x268A and <= 0x268F ||  // Monograms/Digrams
-            value is >= 0x4DC0 and <= 0x4DFF)    // Hexagrams
-        {
-            return 2; // Assume double-width due to Windows Terminal font rendering
-        }
-
-        // Fallback to original GetWidth for other code points
-        return UnicodeCalculator.GetWidth (rune);
-    }
+    public static int GetColumns (this Rune rune) { return UnicodeCalculator.GetWidth (rune); }
 
     /// <summary>Get number of bytes required to encode the rune, based on the provided encoding.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
@@ -137,21 +130,23 @@ public static class RuneExtensions
     {
         encoding ??= Encoding.UTF8;
 
-        const int maxCharsPerRune = 2;
+        const int MAX_CHARS_PER_RUNE = 2;
+
         // Get characters with UTF16 to keep that part independent of selected encoding.
-        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
-        int charsWritten = rune.EncodeToUtf16(charBuffer);
-        Span<char> chars = charBuffer[..charsWritten];
+        Span<char> charBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+        Span<char> chars = charBuffer [..charsWritten];
 
         int maxEncodedLength = encoding.GetMaxByteCount (charsWritten);
-        Span<byte> byteBuffer = stackalloc byte[maxEncodedLength];
+        Span<byte> byteBuffer = stackalloc byte [maxEncodedLength];
         int bytesEncoded = encoding.GetBytes (chars, byteBuffer);
-        ReadOnlySpan<byte> encodedBytes = byteBuffer[..bytesEncoded];
+        ReadOnlySpan<byte> encodedBytes = byteBuffer [..bytesEncoded];
 
         if (encodedBytes [^1] == '\0')
         {
             return encodedBytes.Length - 1;
         }
+
         return encodedBytes.Length;
     }
 
@@ -175,14 +170,16 @@ public static class RuneExtensions
     public static bool IsSurrogatePair (this Rune rune)
     {
         bool isSingleUtf16CodeUnit = rune.IsBmp;
+
         if (isSingleUtf16CodeUnit)
         {
             return false;
         }
 
-        const int maxCharsPerRune = 2;
-        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        const int MAX_CHARS_PER_RUNE = 2;
+        Span<char> charBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
         int charsWritten = rune.EncodeToUtf16 (charBuffer);
+
         return charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]);
     }
 
@@ -193,5 +190,5 @@ public static class RuneExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune"></param>
     /// <returns></returns>
-    public static Rune MakePrintable (this Rune rune) { return Rune.IsControl (rune) ? new Rune (rune.Value + 0x2400) : rune; }
+    public static Rune MakePrintable (this Rune rune) { return Rune.IsControl (rune) ? new (rune.Value + 0x2400) : rune; }
 }
