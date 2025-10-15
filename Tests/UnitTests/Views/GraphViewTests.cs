@@ -46,17 +46,14 @@ internal class FakeVAxis : VerticalAxis
 
 public class GraphViewTests
 {
-    private static string LastInitFakeDriver;
-
     /// <summary>
     ///     A cell size of 0 would result in mapping all graph space into the same cell of the console.  Since
     ///     <see cref="GraphView.CellSize"/> is mutable a sensible place to check this is in redraw.
     /// </summary>
     [Fact]
+    [AutoInitShutdown]
     public void CellSizeZero ()
     {
-        InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -77,8 +74,6 @@ public class GraphViewTests
     /// <returns></returns>
     public static GraphView GetGraph ()
     {
-        InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -91,33 +86,6 @@ public class GraphViewTests
         return gv;
     }
 
-    public static FakeDriver InitFakeDriver ()
-    {
-        var driver = new FakeDriver ();
-
-        try
-        {
-            Application.Init (driver);
-        }
-        catch (InvalidOperationException)
-        {
-            // close it so that we don't get a thousand of these errors in a row
-            Application.Shutdown ();
-
-            // but still report a failure and name the test that didn't shut down.  Note
-            // that the test that didn't shutdown won't be the one currently running it will
-            // be the last one
-            throw new Exception (
-                                 "A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver
-                                );
-        }
-
-        driver.Init ();
-
-        LastInitFakeDriver = Environment.StackTrace;
-
-        return driver;
-    }
 
     /// <summary>
     ///     Tests that each point in the screen space maps to a rectangle of (float) graph space and that each corner of
@@ -442,10 +410,9 @@ public class GraphViewTests
 public class SeriesTests
 {
     [Fact]
+    [AutoInitShutdown]
     public void Series_GetsPassedCorrectViewport_AllAtOnce ()
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -495,10 +462,9 @@ public class SeriesTests
     ///     <see cref="GraphView.CellSize"/> results in multiple units of graph space being condensed into each cell of console
     /// </summary>
     [Fact]
+    [AutoInitShutdown]
     public void Series_GetsPassedCorrectViewport_AllAtOnce_LargeCellSize ()
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -635,10 +601,9 @@ public class MultiBarSeriesTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestRendering_MultibarSeries ()
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         //gv.Scheme = new Scheme ();
 
@@ -782,6 +747,7 @@ public class BarSeriesTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTwoTallBars_WithOffset ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
@@ -838,6 +804,7 @@ public class BarSeriesTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestZeroHeightBar_WithName ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
@@ -873,8 +840,6 @@ public class BarSeriesTests
 
     private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.BeginInit ();
         gv.EndInit ();
@@ -919,8 +884,6 @@ public class AxisTests
 
     private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
     {
-        GraphViewTests.InitFakeDriver ();
-
         var gv = new GraphView ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
        // gv.Scheme = new Scheme ();
@@ -940,6 +903,7 @@ public class AxisTests
 
     /// <summary>Tests that the horizontal axis is computed correctly and does not over spill it's bounds</summary>
     [Fact]
+    [AutoInitShutdown]
     public void TestHAxisLocation_NoMargin ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
@@ -962,6 +926,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestHAxisLocation_MarginBottom ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
@@ -986,6 +951,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestHAxisLocation_MarginLeft ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
@@ -1016,6 +982,7 @@ public class AxisTests
 
     /// <summary>Tests that the horizontal axis is computed correctly and does not over spill it's bounds</summary>
     [Fact]
+    [AutoInitShutdown]
     public void TestVAxisLocation_NoMargin ()
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
@@ -1039,6 +1006,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestVAxisLocation_MarginBottom ()
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
@@ -1064,6 +1032,7 @@ public class AxisTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestVAxisLocation_MarginLeft ()
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
@@ -1099,6 +1068,7 @@ public class TextAnnotationTests
     [InlineData (null)]
     [InlineData ("  ")]
     [InlineData ("\t\t")]
+    [AutoInitShutdown]
     public void TestTextAnnotation_EmptyText (string whitespace)
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1130,6 +1100,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_GraphUnits ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1176,6 +1147,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_LongText ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1210,6 +1182,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_Offscreen ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1240,6 +1213,7 @@ public class TextAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void TestTextAnnotation_ScreenUnits ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1330,6 +1304,7 @@ public class LegendTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void LegendNormalUsage_WithBorder ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1356,6 +1331,7 @@ public class LegendTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void LegendNormalUsage_WithoutBorder ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1441,6 +1417,7 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void PathAnnotation_Box ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1474,6 +1451,7 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void PathAnnotation_Diamond ()
     {
         GraphView gv = GraphViewTests.GetGraph ();
@@ -1507,14 +1485,11 @@ public class PathAnnotationTests
     }
 
     [Theory]
+    [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
     public void ViewChangeText_RendersCorrectly (bool useFill)
     {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-        driver.Init ();
-
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
         var top = new Toplevel ();
@@ -1567,9 +1542,9 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void XAxisLabels_With_MarginLeft ()
     {
-        GraphViewTests.InitFakeDriver ();
         var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);
@@ -1606,9 +1581,9 @@ public class PathAnnotationTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void YAxisLabels_With_MarginBottom ()
     {
-        GraphViewTests.InitFakeDriver ();
         var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
 
         gv.CellSize = new PointF (1, 0.5f);

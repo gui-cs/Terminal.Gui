@@ -25,11 +25,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonIgnore]
     public static Attribute Default => new (Color.White, Color.Black);
 
-    // TODO: Once CursesDriver is dead, remove this property
-    /// <summary>INTERNAL: The <see cref="IConsoleDriver"/>-specific color value.</summary>
-    [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
-    internal int PlatformColor { get; init; }
-
     /// <summary>
     ///     Gets the foreground <see cref="Color"/> used to render text.
     /// </summary>
@@ -51,24 +46,12 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with default values.
     /// </summary>
-    public Attribute () { this = Default with { PlatformColor = -1 }; }
+    public Attribute () { this = Default; }
 
     /// <summary>
     ///     Initializes a new <see cref="Attribute"/> from an existing instance, preserving explicit state.
     /// </summary>
-    public Attribute (in Attribute attr) { this = attr with { PlatformColor = -1 }; }
-
-    /// <summary>INTERNAL: Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
-    /// <param name="platformColor">platform-dependent color value.</param>
-    /// <param name="foreground">Foreground</param>
-    /// <param name="background">Background</param>
-    internal Attribute (in int platformColor, in Color foreground, in Color background)
-    {
-        Foreground = foreground;
-        Background = background;
-        PlatformColor = platformColor;
-        Style = TextStyle.None;
-    }
+    public Attribute (in Attribute attr) { this = attr; }
 
     /// <summary>
     ///     Initializes an instance using two named colors.
@@ -78,8 +61,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
 
-        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
-        PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
         Style = TextStyle.None;
     }
 
@@ -91,9 +72,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
         Style = style;
-
-        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
-        PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
     }
 
     /// <summary>
@@ -111,7 +89,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Style = style is { } && Enum.TryParse (style, true, out TextStyle parsedStyle)
                     ? parsedStyle
                     : TextStyle.None;
-        PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
     }
 
     /// <summary>
@@ -127,7 +104,6 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Background = Color.Parse (background);
 
         Style = style;
-        PlatformColor = Application.Driver?.MakeColor (Foreground, Background).PlatformColor ?? -1;
     }
 
     /// <summary>
@@ -186,20 +162,22 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     ///     Initializes a new instance with foreground and background colors and a <see cref="TextStyle"/>.
     /// </summary>
-    public Attribute (in StandardColor foreground, in StandardColor background, in TextStyle style) : this (new (in foreground), new Color (in background), style) { }
-
+    public Attribute (in StandardColor foreground, in StandardColor background, in TextStyle style) : this (
+                                                                                                            new (in foreground),
+                                                                                                            new Color (in background),
+                                                                                                            style)
+    { }
 
     /// <inheritdoc/>
     public bool Equals (Attribute other)
     {
-        return PlatformColor == other.PlatformColor
-               && Foreground.Equals (other.Foreground)
+        return Foreground.Equals (other.Foreground)
                && Background.Equals (other.Background)
                && Style == other.Style;
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, Style); }
+    public override int GetHashCode () { return HashCode.Combine (Foreground, Background, Style); }
 
     /// <inheritdoc/>
     public override string ToString ()

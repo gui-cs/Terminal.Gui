@@ -369,7 +369,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.CheckedState = CheckState.Checked;
-        Application.LayoutAndDrawImpl ();
+        Application.LayoutAndDraw ();
 
         expected = @$"
 ┌┤Test Demo 你├──────────────┐

@@ -5,7 +5,7 @@ namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Helper class for console drivers to invoke shell commands to interact with the clipboard. Used primarily by
-///     CursesDriver, but also used in Unit tests which is why it is in IConsoleDriver.cs.
+///     UnixDriver, but also used in Unit tests which is why it is in IConsoleDriver.cs.
 /// </summary>
 internal static class ClipboardProcessRunner
 {

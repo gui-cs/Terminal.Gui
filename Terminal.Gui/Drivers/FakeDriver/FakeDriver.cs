@@ -48,6 +48,9 @@ public class FakeDriver : ConsoleDriver
 
     public FakeDriver ()
     {
+        // FakeDriver implies UnitTests
+        RunningUnitTests = true;
+
         base.Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
         base.Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 
@@ -70,13 +73,13 @@ public class FakeDriver : ConsoleDriver
             }
             else
             {
-                if (CursesDriver.Is_WSL_Platform ())
+                if (PlatformDetection.IsWSLPlatform ())
                 {
                     Clipboard = new WSLClipboard ();
                 }
                 else
                 {
-                    Clipboard = new CursesClipboard ();
+                    Clipboard = new UnixClipboard ();
                 }
             }
         }
@@ -235,7 +238,7 @@ public class FakeDriver : ConsoleDriver
     #region Color Handling
 
     ///// <remarks>
-    ///// In the FakeDriver, colors are encoded as an int; same as NetDriver
+    ///// In the FakeDriver, colors are encoded as an int; same as DotNetDriver
     ///// However, the foreground color is stored in the most significant 16 bits, 
     ///// and the background color is stored in the least significant 16 bits.
     ///// </remarks>
@@ -243,7 +246,6 @@ public class FakeDriver : ConsoleDriver
     //{
     //	// Encode the colors into the int value.
     //	return new Attribute (
-    //		platformColor: 0,//((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
     //		foreground: foreground,
     //		background: background
     //	);

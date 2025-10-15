@@ -20,7 +20,7 @@ public static partial class Application // Driver abstractions
 
     // BUGBUG: ForceDriver should be nullable.
     /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not
+    ///     Forces the use of the specified driver (one of "fake", "dotnet", "windows", or "unix"). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     /// <remarks>

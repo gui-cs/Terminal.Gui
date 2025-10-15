@@ -27,7 +27,7 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 
 * **[Dozens of Built-in Views](~/docs/views.md)** - The library provides a rich set of built-in views that can be used to build complex user interfaces.
 
-* **[Cross Platform](~/docs/drivers.md)** - Windows, Mac, and Linux. Terminal drivers for Curses, Windows, and the .NET Console mean apps will work well on both color and monochrome terminals. Apps also work over SSH.
+* **[Cross Platform](~/docs/drivers.md)** - Windows, Mac, and Linux. Terminal drivers for Unix, Windows, and the .NET mean apps will work well on both color and monochrome terminals. Apps also work over SSH.
 
 * **[Templates](~/docs/getting-started.md)** - The `dotnet new` command can be used to create a new Terminal.Gui app.
 

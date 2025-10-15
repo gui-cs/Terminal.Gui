@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ApplicationTests.NavigationTests;
 
@@ -6,14 +7,14 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
+
+    [AutoInitShutdown]
     [Theory]
     [InlineData (TabBehavior.NoStop)]
     [InlineData (TabBehavior.TabStop)]
     [InlineData (TabBehavior.TabGroup)]
     public void Begin_SetsFocus_On_Deepest_Focusable_View (TabBehavior behavior)
     {
-        Application.Init (new FakeDriver ());
-
         var top = new Toplevel
         {
             TabStop = behavior
@@ -45,10 +46,9 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Begin_SetsFocus_On_Top ()
     {
-        Application.Init (new FakeDriver ());
-
         var top = new Toplevel ();
         Assert.False (top.HasFocus);
 

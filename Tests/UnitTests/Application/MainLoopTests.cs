@@ -594,7 +594,7 @@ public class MainLoopTests
     )
     {
         // TODO: Expand this test to test all drivers
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fakedriver");
 
         total = 0;
         btn = null;

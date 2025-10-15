@@ -9,7 +9,7 @@ public class PaddingTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Padding_Uses_Parent_Scheme ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (5, 5);
         var view = new View { Height = 3, Width = 3 };
         view.Padding!.Thickness = new (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;

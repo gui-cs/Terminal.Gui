@@ -618,6 +618,7 @@ public class DrawTests (ITestOutputHelper output)
         Application.Begin (top);
         AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
 
+
         var expected = """
 
                        ┌┤𝔹├─────┐

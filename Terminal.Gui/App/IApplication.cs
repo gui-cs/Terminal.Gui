@@ -44,7 +44,7 @@ public interface IApplication
     ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
-    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the
+    ///     The driver name (e.g. "dotnet", "windows", "fake", or "unix") of the
     ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
@@ -89,7 +89,7 @@ public interface IApplication
     /// <param name="errorHandler"></param>
     /// <param name="driver">
     ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
+    ///     be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
@@ -187,11 +187,4 @@ public interface IApplication
     /// <see langword="false"/>
     /// if the timeout is not found.</returns>
     bool RemoveTimeout (object token);
-
-    /// <summary>
-    /// Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
-    /// Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
-    /// </summary>
-    /// <param name="forceDraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
-    void LayoutAndDraw (bool forceDraw);
 }

@@ -11,12 +11,12 @@ public static class With
     /// </summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    /// <param name="v2TestDriver">Which v2 v2TestDriver to use for the test</param>
+    /// <param name="testDriver">Which v2 testDriver to use for the test</param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A<T> (int width, int height, V2TestDriver v2TestDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
+    public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
     {
-        return new (() => new T (), width, height,v2TestDriver,logWriter);
+        return new (() => new T (), width, height,testDriver,logWriter);
     }
 
     /// <summary>
@@ -25,11 +25,11 @@ public static class With
     /// <param name="toplevelFactory"></param>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    /// <param name="v2TestDriver"></param>
+    /// <param name="testDriver"></param>
     /// <returns></returns>
-    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, V2TestDriver v2TestDriver)
+    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, TestDriver testDriver)
     {
-        return new (toplevelFactory, width, height, v2TestDriver);
+        return new (toplevelFactory, width, height, testDriver);
     }
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.

@@ -32,7 +32,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
-    ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the
+    ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
     ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
@@ -40,7 +40,27 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        ApplicationImpl.Instance.Init (driver, driverName);
+        // Check if this is a request for a legacy driver (like FakeDriver)
+        // that isn't supported by the modern application architecture
+        if (driver is null)
+        {
+            var driverNameToCheck = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
+            if (!string.IsNullOrEmpty (driverNameToCheck))
+            {
+                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
+                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (driverNameToCheck, StringComparison.InvariantCultureIgnoreCase));
+                
+                // If it's a legacy IConsoleDriver (not a Facade), use InternalInit which supports legacy drivers
+                if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
+                {
+                    InternalInit (driver, driverName);
+                    return;
+                }
+            }
+        }
+        
+        // Otherwise delegate to the ApplicationImpl instance (which uses the modern architecture)
+        ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
     internal static int MainThreadId { get; set; } = -1;
@@ -90,44 +110,31 @@ public static partial class Application // Initialization (Init/Shutdown)
             ForceDriver = driverName;
         }
 
+        // Check if we need to use a legacy driver (like FakeDriver)
+        // or go through the modern application architecture
         if (Driver is null)
         {
-            PlatformID p = Environment.OSVersion.Platform;
-
-            if (string.IsNullOrEmpty (ForceDriver))
+            //// Try to find a legacy IConsoleDriver type that matches the driver name
+            //bool useLegacyDriver = false;
+            //if (!string.IsNullOrEmpty (ForceDriver))
+            //{
+            //    (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
+            //    Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
+                
+            //    if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
+            //    {
+            //        // This is a legacy driver (not a ConsoleDriverFacade)
+            //        Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
+            //        useLegacyDriver = true;
+            //    }
+            //}
+            
+            //// Use the modern application architecture
+            //if (!useLegacyDriver)
             {
-                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-                {
-                    Driver = new WindowsDriver ();
-                }
-                else
-                {
-                    Driver = new CursesDriver ();
-                }
-            }
-            else
-            {
-                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
-                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
-
-                if (driverType is { })
-                {
-                    Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
-                }
-                else if (ForceDriver?.StartsWith ("v2") ?? false)
-                {
-                    ApplicationImpl.ChangeInstance (new ApplicationV2 ());
-                    ApplicationImpl.Instance.Init (driver, ForceDriver);
-                    Debug.Assert (Driver is { });
-
-                    return;
-                }
-                else
-                {
-                    throw new ArgumentException (
-                                                 $"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t!.Name))}"
-                                                );
-                }
+                ApplicationImpl.Instance.Init (driver, driverName);
+                Debug.Assert (Driver is { });
+                return;
             }
         }
 
@@ -217,8 +224,10 @@ public static partial class Application // Initialization (Init/Shutdown)
         List<string?> driverTypeNames = driverTypes
                                         .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
                                         .Select (d => d!.Name)
-                                        .Union (["v2", "v2win", "v2net", "v2unix"])
+                                        .Union (["dotnet", "windows", "unix", "fake"])
                                         .ToList ()!;
+
+
 
         return (driverTypes, driverTypeNames);
     }
