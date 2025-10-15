@@ -114,12 +114,12 @@ public static class RuneExtensions
 
     /// <summary>Gets the number of columns the rune occupies in the terminal.</summary>
     /// <remarks>
-    /// <para>
-    ///     Implemented via a port of <a href="https://man7.org/linux/man-pages/man3/wcwidth.3.html">wcwidth</a>.
-    /// </para>
-    /// <para>
-    ///     This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.
-    /// </para>
+    ///     <para>
+    ///         Implemented via a port of <a href="https://man7.org/linux/man-pages/man3/wcwidth.3.html">wcwidth</a>.
+    ///     </para>
+    ///     <para>
+    ///         This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.
+    ///     </para>
     /// </remarks>
     /// <param name="rune">The rune to measure.</param>
     /// <returns>
