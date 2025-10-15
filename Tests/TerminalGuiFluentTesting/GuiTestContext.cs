@@ -121,8 +121,8 @@ public class GuiTestContext : IDisposable
     {
         return _driver switch
                {
-                   TestDriver.Windows => "v2win",
-                   TestDriver.DotNet => "v2net",
+                   TestDriver.Windows => "windows",
+                   TestDriver.DotNet => "dotnet",
                    _ =>
                        throw new ArgumentOutOfRangeException ()
                };

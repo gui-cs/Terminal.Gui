@@ -18,10 +18,10 @@ public class ContentsTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    ////[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
+    ////[InlineData (typeof (UnixDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
     ////[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
     public void AddStr_Combining_Character_1st_Column (Type driverType)
     {
@@ -36,10 +36,10 @@ public class ContentsTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    ////[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
+    ////[InlineData (typeof (UnixDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
     ////[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
     public void AddStr_With_Combining_Characters (Type driverType)
     {
@@ -92,11 +92,11 @@ public class ContentsTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
     //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void Move_Bad_Coordinates (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);

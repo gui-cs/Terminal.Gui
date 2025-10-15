@@ -2,12 +2,12 @@
 
 namespace Terminal.Gui.Drivers;
 
-/// <summary>A clipboard implementation for Linux. This implementation uses the xclip command to access the clipboard.</summary>
+/// <summary>A clipboard implementation for Unix that uses the xclip command to access the clipboard.</summary>
 /// <remarks>If xclip is not installed, this implementation will not work.</remarks>
-internal class CursesClipboard : ClipboardBase
+internal class UnixClipboard : ClipboardBase
 {
     private string _xclipPath = string.Empty;
-    public CursesClipboard () { IsSupported = CheckSupport (); }
+    public UnixClipboard () { IsSupported = CheckSupport (); }
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl ()

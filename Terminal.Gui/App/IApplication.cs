@@ -89,7 +89,7 @@ public interface IApplication
     /// <param name="errorHandler"></param>
     /// <param name="driver">
     ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
+    ///     be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>

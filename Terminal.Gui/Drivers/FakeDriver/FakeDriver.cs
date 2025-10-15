@@ -79,7 +79,7 @@ public class FakeDriver : ConsoleDriver
                 }
                 else
                 {
-                    Clipboard = new CursesClipboard ();
+                    Clipboard = new UnixClipboard ();
                 }
             }
         }
@@ -238,7 +238,7 @@ public class FakeDriver : ConsoleDriver
     #region Color Handling
 
     ///// <remarks>
-    ///// In the FakeDriver, colors are encoded as an int; same as NetDriver
+    ///// In the FakeDriver, colors are encoded as an int; same as DotNetDriver
     ///// However, the foreground color is stored in the most significant 16 bits, 
     ///// and the background color is stored in the least significant 16 bits.
     ///// </remarks>

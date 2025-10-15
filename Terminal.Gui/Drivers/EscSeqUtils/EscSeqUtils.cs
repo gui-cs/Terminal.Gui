@@ -384,7 +384,7 @@ public static class EscSeqUtils
                 else
                 {
                     // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/2803
-                    // This is caused by NetDriver depending on Console.KeyAvailable?
+                    // This is caused by DotNetDriver depending on Console.KeyAvailable?
                     //throw new InvalidOperationException ("CSI response, but there's no terminator");
 
                     IncompleteCkInfos = cki;
@@ -1503,7 +1503,7 @@ public static class EscSeqUtils
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
                 || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
-                // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
+                // DotNetDriver doesn't support Shift-Ctrl/Shift-Alt combos
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
             }
 

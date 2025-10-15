@@ -25,7 +25,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonIgnore]
     public static Attribute Default => new (Color.White, Color.Black);
 
-    // TODO: Once CursesDriver is dead, remove this property
+    // TODO: Once UnixDriver is dead, remove this property
     /// <summary>INTERNAL: The <see cref="IConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
     internal int PlatformColor { get; init; }
@@ -78,7 +78,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
 
-        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
+        // TODO: Once UnixDriver supports true color all the PlatformColor stuff goes away
         PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
         Style = TextStyle.None;
     }
@@ -92,7 +92,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Background = background;
         Style = style;
 
-        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
+        // TODO: Once UnixDriver supports true color all the PlatformColor stuff goes away
         PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
     }
 

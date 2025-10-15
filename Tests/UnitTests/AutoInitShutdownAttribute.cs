@@ -21,7 +21,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="consoleDriverType">
-    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
+    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, UnixDriver, DotNetDriver)
     ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>

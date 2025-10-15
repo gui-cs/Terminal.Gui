@@ -56,7 +56,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
                     break;
                 }
                 */
-                // This follows convention in NetDriver
+                // This follows convention in DotNetDriver
 
                 break;
 

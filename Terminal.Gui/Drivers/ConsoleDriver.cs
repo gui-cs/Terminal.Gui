@@ -34,7 +34,7 @@ public abstract class ConsoleDriver : IConsoleDriver
 
     #region ANSI Esc Sequence Handling
 
-    // QUESTION: This appears to be an API to help in debugging. It's only implemented in CursesDriver and WindowsDriver.
+    // QUESTION: This appears to be an API to help in debugging. It's only implemented in UnixDriver and WindowsDriver.
     // QUESTION: Can it be factored such that it does not contaminate the ConsoleDriver API?
     /// <summary>
     ///     Provide proper writing to send escape sequence recognized by the <see cref="ConsoleDriver"/>.
@@ -537,7 +537,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     #endregion Cursor Handling
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
+    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
     public abstract void Suspend ();
 
     /// <summary>Sets the position of the terminal cursor to <see cref="Col"/> and <see cref="Row"/>.</summary>
@@ -621,7 +621,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return CurrentAttribute; }
 
-    // TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
+    // TODO: This is only overridden by UnixDriver. Once UnixDriver supports 24-bit color, this virtual method can be
     // removed (and Attribute can lose the platformColor property).
     /// <summary>Makes an <see cref="Attribute"/>.</summary>
     /// <param name="foreground">The foreground color.</param>
@@ -631,7 +631,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     {
         // Encode the colors into the int value.
         return new (
-                    0xFF, // only used by cursesdriver!
+                    0xFF, // only used by UnixDriver!
                     foreground,
                     background
                    );

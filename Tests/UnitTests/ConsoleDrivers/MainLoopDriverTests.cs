@@ -10,8 +10,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -40,8 +40,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -73,8 +73,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -97,8 +97,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -120,8 +120,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -144,8 +144,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -173,8 +173,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -192,8 +192,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -215,8 +215,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -233,8 +233,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -253,8 +253,8 @@ public class MainLoopDriverTests
 
     [Theory]
     [InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    //[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    //[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    //[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    //[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
 
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
@@ -281,8 +281,8 @@ public class MainLoopDriverTests
 
     //[Theory]
     //[InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
-    ////[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
-    ////[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
+    ////[InlineData (typeof (DotNetDriver), typeof (NetMainLoop))]
+    ////[InlineData (typeof (UnixDriver), typeof (UnixMainLoop))]
     ////[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
     //public void MainLoop_Invoke_ValidAction_RunsAction (Type driverType, Type mainLoopDriverType)
     //{

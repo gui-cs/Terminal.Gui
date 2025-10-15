@@ -258,11 +258,11 @@ public class ApplicationTests
 
     // Legacy driver test - all InlineData commented out
     //[Theory]
-    ////[InlineData (typeof (NetDriver))]
+    ////[InlineData (typeof (DotNetDriver))]
 
     ////[InlineData (typeof (ANSIDriver))]
     ////[InlineData (typeof (WindowsDriver))]
-    ////[InlineData (typeof (CursesDriver))]
+    ////[InlineData (typeof (UnixDriver))]
     //public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
     //{
     //    var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -285,9 +285,9 @@ public class ApplicationTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
     //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void Init_ResetState_Resets_Properties (Type driverType)
     {
         ThrowOnJsonErrors = true;
@@ -424,9 +424,9 @@ public class ApplicationTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
     //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
     {
         var initialized = false;
@@ -1107,9 +1107,9 @@ public class ApplicationTests
 
     // FakeDriver is not allowed, use AutoInitShutdown attribute instead
     //[InlineData ("FakeDriver", typeof (FakeDriver))]
-    //[InlineData ("NetDriver", typeof (NetDriver))]
+    //[InlineData ("DotNetDriver", typeof (DotNetDriver))]
     //[InlineData ("WindowsDriver", typeof (WindowsDriver))]
-    //[InlineData ("CursesDriver", typeof (CursesDriver))]
+    //[InlineData ("UnixDriver", typeof (UnixDriver))]
     public void Run_T_Call_Init_ForceDriver_Should_Pick_Correct_Driver (string driverName, Type expectedType)
     {
         Assert.True (ConsoleDriver.RunningUnitTests);
