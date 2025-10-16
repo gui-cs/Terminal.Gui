@@ -340,8 +340,6 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     internal static void ResetToHardCodedDefaults ()
     {
-        ResetToCurrentValues ();
-        ThrowOnJsonErrors = true;
         LoadHardCodedDefaults ();
         Applied = null;
         Updated = null;
