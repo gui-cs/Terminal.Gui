@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using ColorHelper;
+using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using File = System.IO.File;
@@ -112,6 +113,134 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.NotNull (Settings);
 
         Disable ();
+    }
+
+    [Fact]
+    public void Enable_HardCoded_Resets_Schemes_After_Runtime_Config ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange: Start from hard-coded defaults and capture baseline scheme values.
+            Enable (ConfigLocations.HardCoded);
+            var schemes = SchemeManager.GetSchemes ();
+            Assert.NotNull (schemes);
+            Assert.NotEmpty (schemes);
+            var baselineFg = schemes ["Base"].Normal.Foreground;
+            var baselineBg = schemes ["Base"].Normal.Background;
+
+            // Sanity: defaults should be stable
+            Assert.NotEqual (default (Color), baselineFg);
+            Assert.NotEqual (default (Color), baselineBg);
+
+            // Act: Override the Base scheme via runtime JSON and apply
+            ThrowOnJsonErrors = true;
+            RuntimeConfig = """
+                            {
+                              "Themes": [
+                                {
+                                  "Default": {
+                                    "Schemes": [
+                                      {
+                                        "Base": {
+                                          "Normal": {
+                                            "Foreground": "Black",
+                                            "Background": "Gray"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                            """;
+            Load (ConfigLocations.Runtime);
+            Apply ();
+
+            // Verify override took effect
+            var overridden = SchemeManager.GetSchemes ();
+            Assert.Equal (Color.Black, overridden ["Base"].Normal.Foreground);
+            Assert.Equal (Color.Gray, overridden ["Base"].Normal.Background);
+
+            // Now simulate "CM.Enable(true)" semantics: re-enable with HardCoded to reset
+            Disable ();
+            Enable (ConfigLocations.HardCoded);
+
+            // Assert: schemes are reset to the original hard-coded baseline
+            var reset = SchemeManager.GetSchemes ();
+            Assert.Equal (baselineFg, reset ["Base"].Normal.Foreground);
+            Assert.Equal (baselineBg, reset ["Base"].Normal.Background);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
+    }
+
+    [Fact]
+    public void Enable_HardCoded_Resets_Theme_Dictionary_And_Selection ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange: Enable defaults
+            Enable (ConfigLocations.HardCoded);
+            Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
+            Assert.Single (ThemeManager.Themes!);
+            Assert.True (ThemeManager.Themes.ContainsKey (ThemeManager.DEFAULT_THEME_NAME));
+
+            // Act: Load a runtime config that introduces a custom theme and selects it
+            ThrowOnJsonErrors = true;
+            RuntimeConfig = """
+                            {
+                              "Theme": "Custom",
+                              "Themes": [
+                                {
+                                  "Custom": {
+                                    "Schemes": [
+                                      {
+                                        "Base": {
+                                          "Normal": {
+                                            "Foreground": "Yellow",
+                                            "Background": "Black"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                            """;
+            Load (ConfigLocations.Runtime);
+            Apply ();
+
+            // Verify the runtime selection took effect
+            Assert.Equal ("Custom", ThemeManager.Theme);
+
+            // Now simulate "CM.Enable(true)" semantics: re-enable with HardCoded to reset
+            Disable ();
+            Enable (ConfigLocations.HardCoded);
+
+            // Assert: selection and dictionary have been reset to hard-coded defaults
+            Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
+            Assert.Single (ThemeManager.Themes!);
+            Assert.True (ThemeManager.Themes.ContainsKey (ThemeManager.DEFAULT_THEME_NAME));
+
+            // Also assert the Base scheme is back to defaults (sanity check)
+            var baseScheme = SchemeManager.GetSchemes () ["Base"];
+            Assert.Equal (Color.White, baseScheme.Normal.Foreground);
+            Assert.Equal (Color.Blue, baseScheme.Normal.Background);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
     }
 
 
@@ -1009,7 +1138,57 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
+            output.WriteLine ($"Disabling CM to clean up.");
+
             Disable (resetToHardCodedDefaults: true);
         }
+    }
+
+    [Fact]
+    public void UpdateFromJson_DisableTrue_Should_Reset_TopLevel_Scheme_Back_To_Baseline ()
+    {
+        // Capture baseline hard-coded TopLevel scheme
+        var baselineSchemes = SchemeManager.GetSchemes ();
+        var baselineTopLevelNormalFg = baselineSchemes ["TopLevel"].Normal.Foreground;
+        var baselineTopLevelNormalBg = baselineSchemes ["TopLevel"].Normal.Background;
+
+        // Mutate via UpdateFromJson (sets TopLevel.Normal to BrightGreen/Black) and then calls Disable(true)
+        var cmt = new ConfigurationManagerTests (output);
+        cmt.UpdateFromJson ();
+
+        // After Disable(true) the TopLevel scheme should be restored to hard-coded defaults
+        var afterSchemes = SchemeManager.GetSchemes ();
+        Assert.Equal (baselineTopLevelNormalFg, afterSchemes ["TopLevel"].Normal.Foreground);
+        Assert.Equal (baselineTopLevelNormalBg, afterSchemes ["TopLevel"].Normal.Background);
+    }
+
+    [Fact]
+    public void UpdateFromJson_DisableTrue_NewView_Normal_Attribute_Matches_Baseline_TopLevel_Scheme ()
+    {
+        Assert.True (IsInitialized ());
+        Assert.False (IsEnabled);
+
+        // Capture hardCoded hard-coded TopLevel scheme colors
+        var hardCodedSchemes = SchemeManager.GetSchemes ();
+        var hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
+        var hardCodedTopLevelNormalBg = hardCodedSchemes ["TopLevel"].Normal.Background;
+
+        Assert.Equal (new Color (StandardColor.CadetBlue), hardCodedTopLevelNormalFg);
+        Assert.Equal (new Color (StandardColor.Charcoal), hardCodedTopLevelNormalBg);
+
+        // Mutate via UpdateFromJson (applies runtime theme), then Disable(true)
+        var cmt = new ConfigurationManagerTests (output);
+        cmt.UpdateFromJson ();
+
+        // Create fresh UI and verify the view’s Normal attribute matches hardCoded scheme
+        var top = new Toplevel ();
+
+        var attr = top.GetAttributeForRole (VisualRole.Normal);
+
+        // Use ToString so Assert.Equal shows the actual vs expected values on failure
+        Assert.Equal (hardCodedTopLevelNormalFg.ToString (), attr.Foreground.ToString ());
+        Assert.Equal (hardCodedTopLevelNormalBg.ToString (), attr.Background.ToString ());
+
+        top.Dispose ();
     }
 }

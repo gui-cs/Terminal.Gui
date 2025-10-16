@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Terminal.Gui.ConfigurationTests;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -498,6 +499,9 @@ public class ComboBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void HideDropdownListOnClick_True_Highlight_Current_Item ()
     {
+        ConfigurationManagerTests cmt = new ConfigurationManagerTests (output);
+        cmt.UpdateFromJson ();
+
         var selected = "";
         var cb = new ComboBox { Width = 6, Height = 4, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);

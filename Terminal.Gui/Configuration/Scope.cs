@@ -159,20 +159,24 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
         {
             if (propWithValue.Value.PropertyInfo != null)
             {
+
                 object? currentValue = propWithValue.Value.PropertyInfo.GetValue (null);
+                object? newValue = null;
 
                 // QUESTION: Should we avoid setting if currentValue == newValue?
 
                 if (propWithValue.Value.PropertyValue is Scope<T> scopeSource && currentValue is Scope<T> scopeDest)
                 {
-                    propWithValue.Value.PropertyInfo.SetValue (null, scopeDest.UpdateFrom (scopeSource));
+                    newValue = scopeDest.UpdateFrom (scopeSource);
                 }
                 else
                 {
                     // Use DeepCloner to create a deep copy of the property value
-                    object? val = DeepCloner.DeepClone (propWithValue.Value.PropertyValue);
-                    propWithValue.Value.PropertyInfo.SetValue (null, val);
+                    newValue = DeepCloner.DeepClone (propWithValue.Value.PropertyValue);
                 }
+
+               // Logging.Debug($"{propWithValue.Key}: {currentValue} -> {newValue}");
+                propWithValue.Value.PropertyInfo.SetValue (null, newValue);
 
                 set = true;
             }

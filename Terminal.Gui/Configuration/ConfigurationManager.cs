@@ -291,6 +291,7 @@ public static class ConfigurationManager
 
         if (resetToHardCodedDefaults)
         {
+            // Calls Apply
             ResetToHardCodedDefaults ();
         }
     }
