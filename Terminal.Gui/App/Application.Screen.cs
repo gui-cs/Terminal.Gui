@@ -82,8 +82,8 @@ public static partial class Application // Screen related stuff
     ///     Gets or sets whether the screen will be cleared, and all Views redrawn, during the next Application iteration.
     /// </summary>
     /// <remarks>
-    ///     This is typicall set to true when a View's <see cref="View.Frame"/> changes and that view has no
+    ///     This is typical set to true when a View's <see cref="View.Frame"/> changes and that view has no
     ///     SuperView (e.g. when <see cref="Application.Top"/> is moved or resized.
     /// </remarks>
-    public static bool ClearScreenNextIteration { get; set; }
+    internal static bool ClearScreenNextIteration { get; set; }
 }
