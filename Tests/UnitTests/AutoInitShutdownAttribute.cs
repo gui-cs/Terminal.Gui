@@ -21,7 +21,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="consoleDriverType">
-    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
+    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, UnixDriver, DotNetDriver)
     ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
@@ -160,9 +160,19 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     {
         var d = (IConsoleDriverFacade)Application.Driver!;
         d.OutputBuffer.SetWindowSize (size.Width, size.Height);
-        ((FakeSizeMonitor)d.WindowSizeMonitor).RaiseSizeChanging (size);
+        
+        // Handle both FakeSizeMonitor (from test project) and FakeWindowSizeMonitor (from main library)
+        if (d.WindowSizeMonitor is FakeSizeMonitor fakeSizeMonitor)
+        {
+            fakeSizeMonitor.RaiseSizeChanging (size);
+        }
+        else if (d.WindowSizeMonitor is FakeWindowSizeMonitor fakeWindowSizeMonitor)
+        {
+            // For FakeWindowSizeMonitor, use the RaiseSizeChanging method
+            fakeWindowSizeMonitor.RaiseSizeChanging (size);
+        }
 
-        Application.LayoutAndDrawImpl ();
+        Application.LayoutAndDraw (true);
     }
 
     /// <summary>
@@ -170,7 +180,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     public static void RunIteration ()
     {
-        var a = (ApplicationV2)ApplicationImpl.Instance;
+        var a = (ApplicationImpl)ApplicationImpl.Instance;
         a.Coordinator?.RunIteration ();
     }
 }

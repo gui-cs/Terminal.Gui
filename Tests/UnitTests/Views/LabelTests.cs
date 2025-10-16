@@ -102,7 +102,8 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ┌────────────────────────────┐
@@ -142,7 +143,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         var expected = @"
 ┌────────────────────────────┐
@@ -394,7 +395,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -426,7 +427,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -858,7 +859,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (40,10));
+        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
 
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -905,7 +906,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 10));
+        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -977,7 +978,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 AutoInitShutdownAttribute.FakeResize(new Size(22, count + 4));
+                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1041,7 +1042,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (10, 4);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label
@@ -1128,7 +1129,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 AutoInitShutdownAttribute.FakeResize(new Size(22, count + 4));
+                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1203,7 +1204,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1262,7 +1263,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);

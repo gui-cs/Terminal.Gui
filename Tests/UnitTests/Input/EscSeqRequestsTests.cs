@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.InputTests;
+﻿namespace Terminal.Gui.DriverTests;
 
 public class EscSeqRequestsTests
 {

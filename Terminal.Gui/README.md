@@ -17,7 +17,7 @@
 
 - `Drivers\` - Contains the console driver implementations:
 	- `IConsoleDriver.cs` - Defines the Console Driver API.
-	- Driver implementations for .NET (`NetDriver`), Unix & macOS (`UnixDriver`), and Windows (`WindowsDriver`).
+	- Driver implementations for .NET (`DotNetDriver`), Unix & macOS (`UnixDriver`), and Windows (`WindowsDriver`).
 
 - `Drawing\` - Classes related to rendering graphical elements in the console.
 

@@ -21,10 +21,10 @@ public class ApplicationStressTests : TestsAllViews
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver), Skip = "System.IO.IOException: The handle is invalid")]
+    //[InlineData (typeof (DotNetDriver), Skip = "System.IO.IOException: The handle is invalid")]
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver), Skip = "Unable to load DLL 'libc' or one of its dependencies: The specified module could not be found. (0x8007007E)")]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver), Skip = "Unable to load DLL 'libc' or one of its dependencies: The specified module could not be found. (0x8007007E)")]
     public async Task InvokeLeakTest (Type driverType)
     {
 

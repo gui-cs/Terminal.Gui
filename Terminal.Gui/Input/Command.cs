@@ -312,7 +312,7 @@ public enum Command
     /// <summary>Refresh.</summary>
     Refresh,
 
-    /// <summary>Suspend an application (Only implemented in <see cref="CursesDriver"/>).</summary>
+    /// <summary>Suspend an application (Only implemented in UnixDriver).</summary>
     Suspend,
 
     /// <summary>Open the selected item or invoke a UI for opening something.</summary>

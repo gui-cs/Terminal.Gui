@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -76,11 +77,24 @@ public class UICatalog
         // Process command line args
 
         // If no driver is provided, the default driver is used.
-        Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.").FromAmong (
-             Application.GetDriverTypes ().Item2.ToArray ()!
-            );
+        // Get allowed driver names
+        string? [] allowedDrivers = Application.GetDriverTypes ().Item2.ToArray ();
+
+        Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.")
+            .FromAmong (allowedDrivers!);
+        driverOption.SetDefaultValue (string.Empty);
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
+
+        // Add validator separately (not chained)
+        driverOption.AddValidator (result =>
+        {
+            var value = result.GetValueOrDefault<string> ();
+            if (result.Tokens.Count > 0 && !allowedDrivers.Contains (value))
+            {
+                result.ErrorMessage = $"Invalid driver name '{value}'. Allowed values: {string.Join (", ", allowedDrivers)}";
+            }
+        });
 
         // Configuration Management
         Option<bool> disableConfigManagement = new (
@@ -163,6 +177,17 @@ public class UICatalog
             return 0;
         }
 
+        var parseResult = parser.Parse (args);
+
+        if (parseResult.Errors.Count > 0)
+        {
+            foreach (var error in parseResult.Errors)
+            {
+                Console.Error.WriteLine (error.Message);
+            }
+            return 1; // Non-zero exit code for error
+        }
+
         Scenario.BenchmarkTimeout = Options.BenchmarkTimeout;
 
         Logging.Logger = CreateLogger ();
@@ -175,16 +200,16 @@ public class UICatalog
     public static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
     {
         return logLevel switch
-               {
-                   LogLevel.Trace => LogEventLevel.Verbose,
-                   LogLevel.Debug => LogEventLevel.Debug,
-                   LogLevel.Information => LogEventLevel.Information,
-                   LogLevel.Warning => LogEventLevel.Warning,
-                   LogLevel.Error => LogEventLevel.Error,
-                   LogLevel.Critical => LogEventLevel.Fatal,
-                   LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
-                   _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
-               };
+        {
+            LogLevel.Trace => LogEventLevel.Verbose,
+            LogLevel.Debug => LogEventLevel.Debug,
+            LogLevel.Information => LogEventLevel.Information,
+            LogLevel.Warning => LogEventLevel.Warning,
+            LogLevel.Error => LogEventLevel.Error,
+            LogLevel.Critical => LogEventLevel.Fatal,
+            LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
+            _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
+        };
     }
 
     private static ILogger CreateLogger ()
