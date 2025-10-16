@@ -10,7 +10,7 @@ public class SyncrhonizationContextTests
     public void SynchronizationContext_CreateCopy ()
     {
         ConsoleDriver.RunningUnitTests = true;
-        Application.Init (null, "fake");
+        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 

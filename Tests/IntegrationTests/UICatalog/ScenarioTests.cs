@@ -41,9 +41,8 @@ public class ScenarioTests : TestsAllViews
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
-        var scenarioName = scenario!.GetName ();
 
-        uint abortTime = 2200;
+        uint abortTime = 2000;
         object? timeout = null;
         var initialized = false;
         var shutdownGracefully = false;
@@ -71,7 +70,7 @@ public class ScenarioTests : TestsAllViews
         Assert.True (initialized);
 
 
-        Assert.True (shutdownGracefully, $"Scenario '{scenarioName}' Failed to Quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+        Assert.True (shutdownGracefully, $"Scenario Failed to Quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
@@ -92,6 +91,11 @@ public class ScenarioTests : TestsAllViews
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
+
+                lock (_timeoutLock)
+                {
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
+                }
             }
             else
             {
@@ -122,15 +126,6 @@ public class ScenarioTests : TestsAllViews
 
         void OnApplicationOnIteration (object? s, IterationEventArgs a)
         {
-            if (iterationCount == 0)
-            {
-                // Start the timeout countdown on the first iteration
-                lock (_timeoutLock)
-                {
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-                }
-            }
-
             iterationCount++;
 
             if (Application.Initialized)

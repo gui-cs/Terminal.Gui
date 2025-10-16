@@ -525,9 +525,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        Assert.False (Application.ClearScreenNextIteration);
-        Assert.True (cb.NeedsLayout);
-        Assert.True (cb.NeedsDraw);
+
         cb.Layout ();
 
         cb.Draw ();

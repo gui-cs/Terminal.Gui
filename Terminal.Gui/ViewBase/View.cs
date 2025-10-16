@@ -378,7 +378,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
             else
             {
-                NeedsClearScreenNextIteration ();
+                Application.ClearScreenNextIteration = true;
             }
         }
     }

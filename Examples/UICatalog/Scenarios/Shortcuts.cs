@@ -12,7 +12,6 @@ public class Shortcuts : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var quitKey = Application.QuitKey;
         Window app = new ();
 
         app.Loaded += App_Loaded;
@@ -20,7 +19,6 @@ public class Shortcuts : Scenario
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
-        Application.QuitKey = quitKey;
     }
 
     // Setting everything up in Loaded handler because we change the
