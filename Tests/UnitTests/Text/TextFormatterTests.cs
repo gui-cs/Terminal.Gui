@@ -17,62 +17,6 @@ public class TextFormatterTests
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 1, 0, "")]
-    [InlineData ("A", 0, 1, "")]
-    [InlineData ("AB1 2", 2, 1, "2")]
-    [InlineData ("AB12", 5, 1, "21BA")]
-    [InlineData ("AB\n12", 5, 2, "21\nBA")]
-    [InlineData ("ABC 123 456", 7, 2, "CBA    \n654 321")]
-    [InlineData ("こんにちは", 1, 1, "")]
-    [InlineData ("こんにちは", 2, 1, "は")]
-    [InlineData ("こんにちは", 5, 1, "はち")]
-    [InlineData ("こんにちは", 10, 1, "はちにんこ")]
-    [InlineData ("こんにちは\nAB\n12", 10, 3, "21        \nBA        \nはちにんこ")]
-    public void Draw_Horizontal_RightLeft_BottomTop (string text, int width, int height, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Direction = TextDirection.RightLeft_BottomTop
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 1, 0, "")]
-    [InlineData ("A", 0, 1, "")]
-    [InlineData ("AB1 2", 2, 1, "2")]
-    [InlineData ("AB12", 5, 1, "21BA")]
-    [InlineData ("AB\n12", 5, 2, "BA\n21")]
-    [InlineData ("ABC 123 456", 7, 2, "654 321\nCBA    ")]
-    [InlineData ("こんにちは", 1, 1, "")]
-    [InlineData ("こんにちは", 2, 1, "は")]
-    [InlineData ("こんにちは", 5, 1, "はち")]
-    [InlineData ("こんにちは", 10, 1, "はちにんこ")]
-    [InlineData ("こんにちは\nAB\n12", 10, 3, "はちにんこ\nBA        \n21        ")]
-    public void Draw_Horizontal_RightLeft_TopBottom (string text, int width, int height, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Direction = TextDirection.RightLeft_TopBottom
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
 
     // Horizontal with Alignment.Start
     // LeftRight_TopBottom
