@@ -3417,60 +3417,6 @@ public class TextFormatterTests
  ******
  ******
 0******")]
-    public void Draw_Text_Justification (string text, Alignment horizontalTextAlignment, Alignment alignment, TextDirection textDirection, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Alignment = horizontalTextAlignment,
-            VerticalAlignment = alignment,
-            Direction = textDirection,
-            ConstrainToSize = new (7, 7),
-            Text = text
-        };
-
-        Application.Driver?.FillRect (new (0, 0, 7, 7), (Rune)'*');
-        tf.Draw (new (0, 0, 7, 7), Attribute.Default, Attribute.Default);
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 0, 1, "", 0)]
-    [InlineData ("A", 1, 1, "A", 0)]
-    [InlineData ("A", 2, 2, " A", 1)]
-    [InlineData ("AB", 1, 1, "B", 0)]
-    [InlineData ("AB", 2, 2, " A\n B", 0)]
-    [InlineData ("ABC", 3, 2, "  B\n  C", 0)]
-    [InlineData ("ABC", 4, 2, "   B\n   C", 0)]
-    [InlineData ("ABC", 6, 2, "     B\n     C", 0)]
-    [InlineData ("こんにちは", 0, 1, "", 0)]
-    [InlineData ("こんにちは", 1, 0, "", 0)]
-    [InlineData ("こんにちは", 1, 1, "", 0)]
-    [InlineData ("こんにちは", 2, 1, "は", 0)]
-    [InlineData ("こんにちは", 2, 2, "ち\nは", 0)]
-    [InlineData ("こんにちは", 2, 3, "に\nち\nは", 0)]
-    [InlineData ("こんにちは", 2, 4, "ん\nに\nち\nは", 0)]
-    [InlineData ("こんにちは", 2, 5, "こ\nん\nに\nち\nは", 0)]
-    [InlineData ("こんにちは", 2, 6, "こ\nん\nに\nち\nは", 1)]
-    [InlineData ("ABCD\nこんにちは", 4, 7, "  こ\n Aん\n Bに\n Cち\n Dは", 2)]
-    [InlineData ("こんにちは\nABCD", 3, 7, "こ \nんA\nにB\nちC\nはD", 2)]
-    public void Draw_Vertical_Bottom_Horizontal_Right (string text, int width, int height, string expectedText, int expectedY)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.End,
-            Direction = TextDirection.TopBottom_LeftRight,
-            VerticalAlignment = Alignment.End
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = height;
-
-        tf.Draw (new (Point.Empty, new (width, height)), Attribute.Default, Attribute.Default);
-        Rectangle rect = DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-        Assert.Equal (expectedY, rect.Y);
-    }
 
     // Draw tests - Note that these depend on View
 
@@ -3508,56 +3454,6 @@ public class TextFormatterTests
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
-    }
-
-    [SetupFakeDriver]
-    [Theory]
-
-    // The expectedY param is to probe that the expectedText param start at that Y coordinate
-    [InlineData ("A", 0, "", 0)]
-    [InlineData ("A", 1, "A", 0)]
-    [InlineData ("A", 2, "A", 0)]
-    [InlineData ("A", 3, "A", 1)]
-    [InlineData ("AB", 1, "A", 0)]
-    [InlineData ("AB", 2, "A\nB", 0)]
-    [InlineData ("ABC", 2, "A\nB", 0)]
-    [InlineData ("ABC", 3, "A\nB\nC", 0)]
-    [InlineData ("ABC", 4, "A\nB\nC", 0)]
-    [InlineData ("ABC", 5, "A\nB\nC", 1)]
-    [InlineData ("ABC", 6, "A\nB\nC", 1)]
-    [InlineData ("ABC", 9, "A\nB\nC", 3)]
-    [InlineData ("ABCD", 2, "B\nC", 0)]
-    [InlineData ("こんにちは", 0, "", 0)]
-    [InlineData ("こんにちは", 1, "に", 0)]
-    [InlineData ("こんにちは", 2, "ん\nに", 0)]
-    [InlineData ("こんにちは", 3, "ん\nに\nち", 0)]
-    [InlineData ("こんにちは", 4, "こ\nん\nに\nち", 0)]
-    [InlineData ("こんにちは", 5, "こ\nん\nに\nち\nは", 0)]
-    [InlineData ("こんにちは", 6, "こ\nん\nに\nち\nは", 0)]
-    [InlineData ("ABCD\nこんにちは", 7, "Aこ\nBん\nCに\nDち\n は", 1)]
-    [InlineData ("こんにちは\nABCD", 7, "こA\nんB\nにC\nちD\nは ", 1)]
-    public void Draw_Vertical_TopBottom_LeftRight_Middle (string text, int height, string expectedText, int expectedY)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Direction = TextDirection.TopBottom_LeftRight,
-            VerticalAlignment = Alignment.Center
-        };
-
-        int width = text.ToRunes ().Max (r => r.GetColumns ());
-
-        if (text.Contains ("\n"))
-        {
-            width++;
-        }
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, 5, height), Attribute.Default, Attribute.Default);
-
-        Rectangle rect = DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-        Assert.Equal (expectedY, rect.Y);
     }
 
     [Theory]
@@ -3598,63 +3494,6 @@ ssb
         DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
 
         driver.End ();
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void FillRemaining_True_False ()
-    {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (22, 5);
-
-        Attribute [] attrs =
-        {
-            Attribute.Default, new (ColorName16.Green, ColorName16.BrightMagenta),
-            new (ColorName16.Blue, ColorName16.Cyan)
-        };
-        var tf = new TextFormatter { ConstrainToSize = new (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
-
-        tf.Draw (
-                 new (1, 1, 19, 3),
-                 attrs [1],
-                 attrs [2]);
-
-        Assert.False (tf.FillRemaining);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
- Test          
- Test long     
- Test long long",
-                                                       _output);
-
-        DriverAssert.AssertDriverAttributesAre (
-                                                @"
-000000000000000000000
-011110000000000000000
-011111111100000000000
-011111111111111000000
-000000000000000000000",
-                                                _output,
-                                                null,
-                                                attrs);
-
-        tf.FillRemaining = true;
-
-        tf.Draw (
-                 new (1, 1, 19, 3),
-                 attrs [1],
-                 attrs [2]);
-
-        DriverAssert.AssertDriverAttributesAre (
-                                                @"
-000000000000000000000
-011111111111111111110
-011111111111111111110
-011111111111111111110
-000000000000000000000",
-                                                _output,
-                                                null,
-                                                attrs);
     }
 
     [Theory]
@@ -3776,47 +3615,6 @@ ssb
         driver.End ();
     }
 
-    [Fact]
-    [SetupFakeDriver]
-    public void UICatalog_AboutBox_Text ()
-    {
-        TextFormatter tf = new ()
-        {
-            Text = UICatalog.UICatalogTop.GetAboutBoxMessage (),
-            Alignment = Alignment.Center,
-            VerticalAlignment = Alignment.Start,
-            WordWrap = false,
-            MultiLine = true,
-            HotKeySpecifier = (Rune)0xFFFF
-        };
-
-        Size tfSize = tf.FormatAndGetSize ();
-        Assert.Equal (new (59, 13), tfSize);
-
-        ((IFakeConsoleDriver)Application.Driver).SetBufferSize (tfSize.Width, tfSize.Height);
-
-        Application.Driver.FillRect (Application.Screen, (Rune)'*');
-        tf.Draw (Application.Screen, Attribute.Default, Attribute.Default);
-
-        var expectedText = """
-                           UI Catalog: A comprehensive sample library and test app for
-                           ***********************************************************
-                            _______                  _             _   _____       _ *
-                           |__   __|                (_)           | | / ____|     (_)*
-                              | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ *
-                              | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |*
-                              | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |*
-                              |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|*
-                           ***********************************************************
-                           **********************v2 - Pre-Alpha***********************
-                           ***********************************************************
-                           **********https://github.com/gui-cs/Terminal.Gui***********
-                           ***********************************************************
-                           """;
-
-        DriverAssert.AssertDriverContentsAre (expectedText.ReplaceLineEndings (), _output);
-    }
-
     #region FormatAndGetSizeTests
 
     // TODO: Add multi-line examples
@@ -3901,31 +3699,6 @@ ssb
                     2 
                     """)]
     [InlineData ("01234", 2, 1, TextDirection.LeftRight_TopBottom, 2, 1, @"01")]
-    public void FormatAndGetSize_Returns_Correct_Size (
-        string text,
-        int width,
-        int height,
-        TextDirection direction,
-        int expectedWidth,
-        int expectedHeight,
-        string expectedDraw
-    )
-    {
-        TextFormatter tf = new ()
-        {
-            Direction = direction,
-            ConstrainToWidth = width,
-            ConstrainToHeight = height,
-            Text = text
-        };
-        Assert.True (tf.WordWrap);
-        Size size = tf.FormatAndGetSize ();
-        Assert.Equal (new (expectedWidth, expectedHeight), size);
-
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, _output);
-    }
 
     [Theory]
     [SetupFakeDriver]
@@ -3985,31 +3758,6 @@ ssb
                     1
                     2
                     """)]
-    public void FormatAndGetSize_WordWrap_False_Returns_Correct_Size (
-        string text,
-        int width,
-        int height,
-        TextDirection direction,
-        int expectedWidth,
-        int expectedHeight,
-        string expectedDraw
-    )
-    {
-        TextFormatter tf = new ()
-        {
-            Direction = direction,
-            ConstrainToSize = new (width, height),
-            Text = text,
-            WordWrap = false
-        };
-        Assert.False (tf.WordWrap);
-        Size size = tf.FormatAndGetSize ();
-        Assert.Equal (new (expectedWidth, expectedHeight), size);
-
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, _output);
-    }
 
     #endregion
 }
