@@ -1010,8 +1010,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         finally
         {
             Disable (resetToHardCodedDefaults: true);
-
         }
     }
-
 }
