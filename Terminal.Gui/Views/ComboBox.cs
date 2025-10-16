@@ -810,7 +810,7 @@ public class ComboBox : View, IDesignable
         return true;
     }
 
-    private class ComboListView : ListView
+    internal class ComboListView : ListView
     {
         private ComboBox _container;
         private bool _hideDropdownListOnClick;

@@ -525,9 +525,21 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+
+        Assert.Equal ("Default", ThemeManager.Theme);
         Assert.False (Application.ClearScreenNextIteration);
+        Assert.True (cb.HasFocus);
         Assert.True (cb.NeedsLayout);
         Assert.True (cb.NeedsDraw);
+        var tf = cb.SubViews.ElementAt (0) as TextField;
+        Assert.False (tf!.HasFocus);
+        Assert.True (tf.NeedsLayout);
+        Assert.True (tf.NeedsDraw);
+        var clv = cb.SubViews.ElementAt (1) as ComboBox.ComboListView;
+        Assert.True (clv!.HasFocus);
+        Assert.True (clv.NeedsLayout);
+        Assert.True (clv.NeedsDraw);
+
         cb.Layout ();
 
         cb.Draw ();
@@ -544,13 +556,13 @@ Three ",
         Attribute [] attributes =
         {
             // 0
-            cb.SubViews.ElementAt (0).GetAttributeForRole(VisualRole.Focus),
+            tf.GetAttributeForRole(VisualRole.Focus),
 
             // 1
-            cb.SubViews.ElementAt(1).GetAttributeForRole(VisualRole.HotFocus),
+            clv.GetAttributeForRole(VisualRole.HotFocus),
 
             // 2
-            cb.SubViews.ElementAt(1).GetAttributeForRole(VisualRole.Normal)
+            clv.GetAttributeForRole(VisualRole.Normal)
         };
 
         DriverAssert.AssertDriverAttributesAre (
