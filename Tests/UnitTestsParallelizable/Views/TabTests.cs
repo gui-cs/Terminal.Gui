@@ -1,6 +1,6 @@
-﻿namespace Terminal.Gui.ViewsTests;
+namespace Terminal.Gui.ViewsTests;
 
-public class TabTests
+public class TabTests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void Constructor_Defaults ()
