@@ -376,9 +376,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             {
                 SuperView?.SetNeedsDraw ();
             }
-            else if (Application.Top is { })
+            else
             {
-                Application.Top!.SetNeedsDraw ();
+                NeedsClearScreenNextIteration ();
             }
         }
     }

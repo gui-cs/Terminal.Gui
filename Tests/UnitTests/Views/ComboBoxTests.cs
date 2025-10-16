@@ -525,8 +525,11 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        Assert.False (Application.ClearScreenNextIteration);
 
-        Application.LayoutAndDraw ();
+        cb.Layout ();
+
+        cb.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -540,7 +543,7 @@ Three ",
         Attribute [] attributes =
         {
             // 0
-            cb.SubViews.ElementAt (0).GetAttributeForRole(VisualRole.Focus),
+            cb.SubViews.ElementAt (0).GetAttributeForRole(VisualRole.Normal),
 
             // 1
             cb.SubViews.ElementAt(1).GetAttributeForRole(VisualRole.HotFocus),

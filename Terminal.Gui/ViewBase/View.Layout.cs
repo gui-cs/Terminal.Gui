@@ -440,6 +440,7 @@ public partial class View // Layout APIs
     {
         if (Application.Top is { } && Application.Top == this && Application.TopLevels.Count == 1)
         {
+            // If this is the only TopLevel, we need to redraw the screen
             Application.ClearScreenNextIteration = true;
         }
     }
@@ -669,10 +670,9 @@ public partial class View // Layout APIs
             {
                 SuperView?.SetNeedsDraw ();
             }
-            else if (Application.TopLevels.Count == 1)
+            else
             {
-                // If this is the only TopLevel, we need to redraw the screen
-                Application.Top!.SetNeedsDraw ();
+                NeedsClearScreenNextIteration ();
             }
         }
 
