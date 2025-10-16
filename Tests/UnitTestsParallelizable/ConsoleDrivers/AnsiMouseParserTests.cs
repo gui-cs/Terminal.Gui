@@ -1,6 +1,6 @@
-﻿namespace Terminal.Gui.DriverTests;
+namespace Terminal.Gui.DriverTests;
 
-public class AnsiMouseParserTests
+public class AnsiMouseParserTests : UnitTests.Parallelizable.ParallelizableBase
 {
     private readonly AnsiMouseParser _parser;
 
