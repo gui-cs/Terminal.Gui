@@ -3098,20 +3098,26 @@ public class TextFormatterTests
         // Use Application.ToString which properly handles double-wide chars
         string fullContents = Application.ToString (driver);
         
-        // Extract only the region we care about
+        // Extract only the region we care about  
         string[] allLines = fullContents.Split (new[] { '\r', '\n' }, StringSplitOptions.None);
         var lines = new List<string> ();
         
         for (int i = 0; i < height && i < allLines.Length; i++)
         {
             string line = allLines[i];
-            // Take up to width characters
+            // Take exactly width characters (or less if line is shorter)
             if (line.Length > width)
             {
                 line = line.Substring (0, width);
             }
-            // Trim trailing spaces from each line
+            // Trim trailing spaces only - preserve intentional padding within width
             lines.Add (line.TrimEnd ());
+        }
+        
+        // Remove trailing empty lines
+        while (lines.Count > 0 && string.IsNullOrEmpty (lines[lines.Count - 1]))
+        {
+            lines.RemoveAt (lines.Count - 1);
         }
         
         return string.Join ("\n", lines);
@@ -3173,6 +3179,72 @@ public class TextFormatterTests
         {
             Text = text,
             Direction = TextDirection.RightLeft_TopBottom
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, height);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    [Theory]
+    [InlineData ("A", 1, 0, "")]
+    [InlineData ("A", 0, 1, "")]
+    [InlineData ("AB1 2", 1, 2, "2")]
+    [InlineData ("AB12", 1, 5, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, "B2\nA1")]
+    [InlineData ("ABC 123 456", 2, 7, "6C\n5B\n4A\n\n3\n2\n1")]
+    [InlineData ("こんにちは", 1, 1, "")]
+    [InlineData ("こんにちは", 2, 1, "は")]
+    [InlineData ("こんにちは", 2, 5, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, "はB2\nちA1\nに\nん\nこ")]
+    public void Draw_Vertical_BottomTop_LeftRight (string text, int width, int height, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (Math.Max (25, width), Math.Max (25, height));
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.BottomTop_LeftRight
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, height);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    [Theory]
+    [InlineData ("A", 1, 0, "")]
+    [InlineData ("A", 0, 1, "")]
+    [InlineData ("AB1 2", 1, 2, "2")]
+    [InlineData ("AB12", 1, 5, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, "2B\n1A")]
+    [InlineData ("ABC 123 456", 2, 7, "C6\nB5\nA4\n\n 3\n 2\n 1")]
+    [InlineData ("こんにちは", 1, 1, "")]
+    [InlineData ("こんにちは", 2, 1, "は")]
+    [InlineData ("こんにちは", 2, 5, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, "2Bは\n1Aち\n  に\n  ん\n  こ")]
+    public void Draw_Vertical_BottomTop_RightLeft (string text, int width, int height, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (Math.Max (25, width), Math.Max (25, height));
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.BottomTop_RightLeft
         };
 
         tf.ConstrainToWidth = width;
