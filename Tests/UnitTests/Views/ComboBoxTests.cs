@@ -526,7 +526,8 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
         Assert.False (Application.ClearScreenNextIteration);
-
+        Assert.True (cb.NeedsLayout);
+        Assert.True (cb.NeedsDraw);
         cb.Layout ();
 
         cb.Draw ();
@@ -543,7 +544,7 @@ Three ",
         Attribute [] attributes =
         {
             // 0
-            cb.SubViews.ElementAt (0).GetAttributeForRole(VisualRole.Normal),
+            cb.SubViews.ElementAt (0).GetAttributeForRole(VisualRole.Focus),
 
             // 1
             cb.SubViews.ElementAt(1).GetAttributeForRole(VisualRole.HotFocus),
