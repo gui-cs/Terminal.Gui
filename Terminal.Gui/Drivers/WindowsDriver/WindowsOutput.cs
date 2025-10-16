@@ -100,6 +100,8 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private readonly nint _outputHandle;
     private nint _screenBuffer;
     private readonly bool _isVirtualTerminal;
+    private readonly ConsoleColor _foreground;
+    private readonly ConsoleColor _background;
 
     public WindowsOutput ()
     {
@@ -121,6 +123,11 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
             {
                 //Enable alternative screen buffer.
                 Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            }
+            else
+            {
+                _foreground = Console.ForegroundColor;
+                _background = Console.BackgroundColor;
             }
         }
         else
@@ -513,7 +520,8 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
             else
             {
                 // Simulate restoring the color and clearing the screen.
-                Console.ResetColor ();
+                Console.ForegroundColor = _foreground;
+                Console.BackgroundColor = _background;
                 Console.Clear ();
             }
         }
