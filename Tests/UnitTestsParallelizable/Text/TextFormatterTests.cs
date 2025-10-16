@@ -2,6 +2,7 @@
 using Xunit.Abstractions;
 
 using UnitTests;
+using Terminal.Gui.Drivers;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -2959,4 +2960,165 @@ public class TextFormatterTests
         string actual = TextFormatter.ReplaceCRLFWithSpace(input);
         Assert.Equal (expected, actual);
     }
+
+    #region Draw Tests (using local driver instance for parallelization)
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("A", 3, " A")]
+    [InlineData ("AB", 1, "A")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, "ABC")]
+    [InlineData ("ABC", 5, " ABC")]
+    [InlineData ("ABC", 6, " ABC")]
+    [InlineData ("ABC", 9, "   ABC")]
+    public void Draw_Horizontal_Centered (string text, int width, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (25, 25);
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Center
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, driver: driver);
+
+        // Pass driver to DriverAssert
+        string actualText = GetDriverContents (driver, width, 1);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("A B", 3, "A B")]
+    [InlineData ("A B", 1, "A")]
+    [InlineData ("A B", 2, "A")]
+    [InlineData ("A B", 4, "A  B")]
+    [InlineData ("A B", 5, "A   B")]
+    [InlineData ("A B", 6, "A    B")]
+    [InlineData ("A B", 10, "A        B")]
+    [InlineData ("ABC ABC", 10, "ABC    ABC")]
+    public void Draw_Horizontal_Justified (string text, int width, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (25, 25);
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Fill
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, 1);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("AB", 1, "A")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, "ABC")]
+    [InlineData ("ABC", 6, "ABC")]
+    public void Draw_Horizontal_Left (string text, int width, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (25, 25);
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Start
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, 1);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, " A")]
+    [InlineData ("AB", 1, "B")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, " ABC")]
+    [InlineData ("ABC", 6, "   ABC")]
+    public void Draw_Horizontal_Right (string text, int width, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (25, 25);
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.End
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, 1);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    /// <summary>
+    /// Helper method to extract text content from driver for testing
+    /// </summary>
+    private string GetDriverContents (IConsoleDriver driver, int width, int height)
+    {
+        var sb = new System.Text.StringBuilder ();
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                if (col < driver.Cols && row < driver.Rows)
+                {
+                    sb.Append ((char)driver.Contents [row, col].Rune.Value);
+                }
+            }
+            if (row < height - 1)
+            {
+                sb.AppendLine ();
+            }
+        }
+        // Trim trailing whitespace from each line to match DriverAssert behavior
+        string result = sb.ToString ();
+        string[] lines = result.Split (new[] { '\r', '\n' }, StringSplitOptions.None);
+        for (int i = 0; i < lines.Length; i++)
+        {
+            lines[i] = lines[i].TrimEnd ();
+        }
+        return string.Join ("", lines);
+    }
+
+    #endregion
 }

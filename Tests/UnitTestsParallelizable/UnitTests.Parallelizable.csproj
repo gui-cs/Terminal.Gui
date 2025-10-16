@@ -53,6 +53,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
         </ProjectReference>
+        <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
     </ItemGroup>
 
     <ItemGroup>
