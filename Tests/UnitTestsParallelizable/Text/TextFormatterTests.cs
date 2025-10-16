@@ -3333,4 +3333,44 @@ public class TextFormatterTests
     }
 
     #endregion
+
+    #region Justify Tests
+
+    [Theory]
+    [InlineData ("Hello World", 15, 1, "Hello     World")]
+    [InlineData (
+                    "Well Done\nNice Work",
+                    15,
+                    2,
+                    @"Well       Done
+Nice       Work")]
+    [InlineData ("你好 世界", 15, 1, "你好       世界")]
+    [InlineData (
+                    "做 得好\n幹 得好",
+                    15,
+                    2,
+                    @"做         得好
+幹         得好")]
+    public void Justify_Horizontal (string text, int width, int height, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (Math.Max (25, width), Math.Max (25, height));
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Fill,
+            ConstrainToSize = new Size (width, height),
+            MultiLine = true
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, height);
+        Assert.Equal (expectedText, actualText);
+    }
+
+    #endregion
 }

@@ -3657,39 +3657,6 @@ ssb
                                                 attrs);
     }
 
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("Hello World", 15, 1, "Hello     World")]
-    [InlineData (
-                    "Well Done\nNice Work",
-                    15,
-                    2,
-                    @"
-Well       Done
-Nice       Work")]
-    [InlineData ("你好 世界", 15, 1, "你好       世界")]
-    [InlineData (
-                    "做 得好\n幹 得好",
-                    15,
-                    2,
-                    @"
-做         得好
-幹         得好")]
-    public void Justify_Horizontal (string text, int width, int height, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.Fill,
-            ConstrainToSize = new Size (width, height),
-            MultiLine = true
-        };
-
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
     [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
