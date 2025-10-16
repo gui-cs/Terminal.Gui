@@ -3284,5 +3284,53 @@ public class TextFormatterTests
         Assert.Equal (expectedText, actualText);
     }
 
+    [Theory]
+    [InlineData ("A", 5, "A")]
+    [InlineData (
+                    "AB12",
+                    5,
+                    "A\nB\n1\n2")]
+    [InlineData (
+                    "AB\n12",
+                    5,
+                    "A1\nB2")]
+    [InlineData ("", 1, "")]
+    [InlineData (
+                    "AB1 2",
+                    2,
+                    "A12\nB")]
+    [InlineData (
+                    "こんにちは",
+                    1,
+                    "こん")]
+    [InlineData (
+                    "こんにちは",
+                    2,
+                    "こに\nんち")]
+    [InlineData (
+                    "こんにちは",
+                    5,
+                    "こ\nん\nに\nち\nは")]
+    public void Draw_Vertical_TopBottom_LeftRight_Top (string text, int height, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (Math.Max (25, 5), Math.Max (25, height));
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight
+        };
+
+        tf.ConstrainToWidth = 5;
+        tf.ConstrainToHeight = height;
+        tf.Draw (new Rectangle (0, 0, 5, height), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, 5, height);
+        Assert.Equal (expectedText, actualText);
+    }
+
     #endregion
 }

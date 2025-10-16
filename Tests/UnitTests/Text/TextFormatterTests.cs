@@ -3560,65 +3560,6 @@ public class TextFormatterTests
         Assert.Equal (expectedY, rect.Y);
     }
 
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 5, "A")]
-    [InlineData (
-                    "AB12",
-                    5,
-                    @"
-A
-B
-1
-2")]
-    [InlineData (
-                    "AB\n12",
-                    5,
-                    @"
-A1
-B2")]
-    [InlineData ("", 1, "")]
-    [InlineData (
-                    "AB1 2",
-                    2,
-                    @"
-A12
-B  ")]
-    [InlineData (
-                    "こんにちは",
-                    1,
-                    @"
-こん")]
-    [InlineData (
-                    "こんにちは",
-                    2,
-                    @"
-こに
-んち")]
-    [InlineData (
-                    "こんにちは",
-                    5,
-                    @"
-こ
-ん
-に
-ち
-は")]
-    public void Draw_Vertical_TopBottom_LeftRight_Top (string text, int height, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Direction = TextDirection.TopBottom_LeftRight
-        };
-
-        tf.ConstrainToWidth = 5;
-        tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, 5, height), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
     [Theory]
     [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
     [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
