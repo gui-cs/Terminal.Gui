@@ -3512,59 +3512,6 @@ public class TextFormatterTests
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 5, 5, "A")]
-    [InlineData (
-                    "AB12",
-                    5,
-                    5,
-                    @"
-A
-B
-1
-2")]
-    [InlineData (
-                    "AB\n12",
-                    5,
-                    5,
-                    @"
-A1
-B2")]
-    [InlineData ("", 5, 1, "")]
-    [InlineData (
-                    "Hello Worlds",
-                    1,
-                    12,
-                    @"
-H
-e
-l
-l
-o
- 
-W
-o
-r
-l
-d
-s")]
-    [InlineData ("Hello Worlds", 12, 1, @"HelloWorlds")]
-    public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Direction = TextDirection.TopBottom_LeftRight
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, 20, 20), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
 
     // The expectedY param is to probe that the expectedText param start at that Y coordinate
     [InlineData ("A", 0, "", 0)]

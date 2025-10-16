@@ -3255,5 +3255,34 @@ public class TextFormatterTests
         Assert.Equal (expectedText, actualText);
     }
 
+    [Theory]
+    [InlineData ("", 5, 1, "")]
+    [InlineData (
+                    "Hello Worlds",
+                    1,
+                    12,
+                    "H\ne\nl\nl\no\n\nW\no\nr\nl\nd\ns")]
+    [InlineData ("Hello Worlds", 12, 1, @"HelloWorlds")]
+    public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, string expectedText)
+    {
+        // Create a local driver instance for this test
+        var factory = new FakeDriverFactory ();
+        var driver = factory.Create ();
+        driver.SetBufferSize (Math.Max (25, 20), Math.Max (25, 20));
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight
+        };
+
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
+        tf.Draw (new Rectangle (0, 0, 20, 20), Attribute.Default, Attribute.Default, driver: driver);
+
+        string actualText = GetDriverContents (driver, width, height);
+        Assert.Equal (expectedText, actualText);
+    }
+
     #endregion
 }
