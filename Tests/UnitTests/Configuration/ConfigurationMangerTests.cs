@@ -220,8 +220,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // Capture dynamically created hardCoded hard-coded scheme colors
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
-            Color hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+            Color hardCodedBaseNormalFg = hardCodedSchemes ["Base"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
 
             Load (ConfigLocations.Runtime);
             Apply ();
@@ -239,8 +239,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.True (ThemeManager.Themes.ContainsKey (ThemeManager.DEFAULT_THEME_NAME));
 
             // Also assert the Base scheme is back to defaults (sanity check)
-            Scheme baseScheme = SchemeManager.GetSchemes () ["Toplevel"];
-            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), SchemeManager.GetSchemes () ["Toplevel"]!.Normal.Foreground.ToString ());
+            Scheme baseScheme = SchemeManager.GetSchemes () ["Base"];
+            Assert.Equal (hardCodedBaseNormalFg.ToString (), SchemeManager.GetSchemes () ["Base"]!.Normal.Foreground.ToString ());
         }
         finally
         {
