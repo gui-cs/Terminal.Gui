@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿
+#nullable enable
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Text.Json;
@@ -73,11 +75,11 @@ public class ThemeScopeTests
     {
         Enable (ConfigLocations.HardCoded);
 
-        IDictionary<string, ThemeScope> initial = ThemeManager.Themes;
+        IDictionary<string, ThemeScope> initial = ThemeManager.Themes!;
 
         string serialized = JsonSerializer.Serialize (ThemeManager.Themes, SerializerContext.Options);
 
-        ConcurrentDictionary<string, ThemeScope> deserialized =
+        ConcurrentDictionary<string, ThemeScope>? deserialized =
             JsonSerializer.Deserialize<ConcurrentDictionary<string, ThemeScope>> (serialized, SerializerContext.Options);
 
         Assert.NotEqual (initial, deserialized);
@@ -101,7 +103,7 @@ public class ThemeScopeTests
 
         Assert.Equal (
                       Alignment.End,
-                      (Alignment)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue!
+                      (Alignment)deserialized! ["Dialog.DefaultButtonAlignment"].PropertyValue!
                      );
 
         Disable (true);
@@ -144,9 +146,11 @@ public class ThemeScopeTests
             Color currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
             Assert.Equal (new Color (StandardColor.LightBlue).ToString (), currentBaseNormalFg.ToString ());
 
-            ThemeScope scope = JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope;
+            ThemeScope scope = (JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope)!;
             ThemeScope defaultTheme = ThemeManager.Themes! ["Default"]!;
-            defaultTheme.UpdateFrom (scope!);
+
+            Dictionary<string, Scheme?> schemesScope = (defaultTheme ["Schemes"].PropertyValue as Dictionary<string, Scheme?>)!;
+            defaultTheme ["Schemes"].UpdateFrom (scope ["Schemes"].PropertyValue!);
 
             // Capture  hardCoded hard-coded scheme from cache
             Dictionary<string, Scheme>? hardCodedSchemesViaCache =
