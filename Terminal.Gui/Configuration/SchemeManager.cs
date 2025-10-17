@@ -54,7 +54,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    private static void SetSchemes (Dictionary<string, Scheme?>? value)
+    internal static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
         lock (_schemesLock)
         {
@@ -162,7 +162,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     }
 
     /// <summary>
-    ///     Get the dictionary schemes from the selected theme loaded from configuration.
+    ///     Get the dictionary of schemes from the current theme. Current means active.
     /// </summary>
     /// <returns></returns>
     public static Dictionary<string, Scheme?> GetSchemesForCurrentTheme ()
@@ -194,5 +194,15 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             return GetSchemes ()!.Keys.ToImmutableList ();
         }
+    }
+
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    internal static void ResetToHardCodedDefaults ()
+    {
+        // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This is a work around
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        SetSchemes (GetHardCodedSchemes ()!.ToDictionary ());
     }
 }

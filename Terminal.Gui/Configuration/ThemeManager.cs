@@ -288,8 +288,14 @@ public static class ThemeManager
                                                                         },
                                                                         StringComparer.InvariantCultureIgnoreCase);
 
+        // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This is a work around
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        SchemeManager.ResetToHardCodedDefaults ();
+
         ConfigurationManager.Settings ["Themes"].PropertyValue = hardCodedThemes;
         ConfigurationManager.Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;
+
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>

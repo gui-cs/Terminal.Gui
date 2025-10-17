@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
@@ -70,7 +71,7 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
         {
             throw new InvalidOperationException ($@"{name} is not a ConfigProperty.");
         }
-        ConfigProperty  copy = ConfigProperty.CreateCopy (configProperty);
+        ConfigProperty copy = ConfigProperty.CreateCopy (configProperty);
         copy.PropertyValue = configProperty.PropertyValue;
 
         return copy;
@@ -175,7 +176,8 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
                     newValue = DeepCloner.DeepClone (propWithValue.Value.PropertyValue);
                 }
 
-               // Logging.Debug($"{propWithValue.Key}: {currentValue} -> {newValue}");
+                // Logging.Debug($"{propWithValue.Key}: {currentValue} -> {newValue}");
+                Debug.Assert (!propWithValue.Value.Immutable);
                 propWithValue.Value.PropertyInfo.SetValue (null, newValue);
 
                 set = true;

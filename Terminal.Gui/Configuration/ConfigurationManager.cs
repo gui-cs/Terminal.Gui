@@ -117,6 +117,10 @@ public static class ConfigurationManager
         }
     }
 
+    // TODO: Find a way to make this cache truly read-only at the leaf node level. 
+    // TODO: Right now, the dictionary is frozen, but the ConfigProperty instances can still be modified   
+    // TODO: if the PropertyValue is a reference type.
+    // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4288
     /// <summary>
     ///     A cache of all<see cref="ConfigurationPropertyAttribute"/> properties and their hard coded values.
     /// </summary>

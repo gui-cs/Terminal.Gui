@@ -143,6 +143,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 {
                     // Set the value of propertyName on the scopeT.
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
+
                     prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }
                 else

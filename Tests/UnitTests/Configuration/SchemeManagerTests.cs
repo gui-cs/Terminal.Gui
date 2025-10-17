@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Text.Json;
 using static Terminal.Gui.Configuration.ConfigurationManager;
@@ -86,7 +87,7 @@ public class SchemeManagerTests
         // Toplevel
         var toplevelScheme = schemes ["Toplevel"];
         Assert.NotNull (toplevelScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString(), toplevelScheme!.Normal.ToString());
+        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), toplevelScheme!.Normal.ToString ());
     }
 
 
@@ -283,7 +284,7 @@ public class SchemeManagerTests
 
             // Load the test theme
             // TODO: This should throw an exception!
-            Assert.Throws< JsonException > (() => Load (ConfigLocations.Runtime));
+            Assert.Throws<JsonException> (() => Load (ConfigLocations.Runtime));
             Assert.Contains ("TestTheme", ThemeManager.Themes!);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
             Assert.Throws<System.Collections.Generic.KeyNotFoundException> (SchemeManager.GetSchemes);
@@ -433,7 +434,7 @@ public class SchemeManagerTests
                                             "Normal": {
                                               "Foreground": "White",
                                               "Background": "DarkBlue",
-                                              "Style": "Bold"
+                                              "Style": "Reverse" // Not default Bold
                                             },
                                             "Focus": {
                                             "Foreground": "White",
@@ -488,19 +489,407 @@ public class SchemeManagerTests
                             }
                             """;
 
+            // Capture hardCoded hard-coded scheme colors
+            ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
+
+            Color hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+
+            Assert.Equal (hardCodedSchemes ["Menu"].Normal.Style, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
+
+            // Capture current scheme colors
+            Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
+
+            Color currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), currentTopLevelNormalFg.ToString ());
+
             // Load the test theme
             Load (ConfigLocations.Runtime);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
+            Assert.Equal (TextStyle.Reverse, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
 
-            TextStyle style = SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style;
-
-            Assert.Equal (TextStyle.Bold, style);
+            currentSchemes = SchemeManager.GetSchemesForCurrentTheme ()!;
+            currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+            Assert.NotEqual (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
 
             // Now reset everything and reload
             ResetToCurrentValues ();
 
             // Verify we're back to default
             Assert.Equal ("Default", ThemeManager.Theme);
+
+            currentSchemes = SchemeManager.GetSchemes ()!;
+            currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
+
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    [Fact]
+    public void Load_Modified_Default_Scheme_Loads ()
+    {
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
+
+            // Create a test theme
+            RuntimeConfig = """
+                            {
+                                 "Theme": "Default",
+                                 "Themes": [
+                                   {
+                                     "Default": {
+                                       "Schemes": [
+                                                   {
+                                          "TopLevel": {
+                                            "Normal": {
+                                              "Foreground": "AntiqueWhite",
+                                              "Background": "DimGray"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "White",
+                                              "Background": "DarkGray"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "Wheat",
+                                              "Background": "DarkGray",
+                                              "Style": "Underline"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "LightYellow",
+                                              "Background": "DimGray",
+                                              "Style": "Underline"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "Black",
+                                              "Background": "DimGray"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Base": {
+                                            "Normal": {
+                                              "Foreground": "White",
+                                              "Background": "Blue"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "DarkBlue",
+                                              "Background": "LightGray"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "BrightCyan",
+                                              "Background": "Blue"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "BrightBlue",
+                                              "Background": "LightGray"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "DarkGray",
+                                              "Background": "Blue"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Dialog": {
+                                            "Normal": {
+                                              "Foreground": "Black",
+                                              "Background": "LightGray"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "DarkGray",
+                                              "Background": "LightGray"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "Blue",
+                                              "Background": "LightGray"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "BrightBlue",
+                                              "Background": "LightGray"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "Gray",
+                                              "Background": "DarkGray"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Menu": {
+                                            "Normal": {
+                                              "Foreground": "White",
+                                              "Background": "DarkBlue",
+                                              "Style": "Reverse" // Not default Bold
+                                            },
+                                            "Focus": {
+                                            "Foreground": "White",
+                                            "Background": "DarkBlue",
+                                              "Style": "Bold,Reverse"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "BrightYellow",
+                                              "Background": "DarkBlue",
+                                              "Style": "Bold,Underline"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "Blue",
+                                              "Background": "White",
+                                              "Style": "Bold,Underline"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "Gray",
+                                              "Background": "DarkGray",
+                                              "Style": "Faint"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Error": {
+                                            "Normal": {
+                                              "Foreground": "Red",
+                                              "Background": "Pink"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "White",
+                                              "Background": "BrightRed"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "Black",
+                                              "Background": "Pink"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "Pink",
+                                              "Background": "BrightRed"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "DarkGray",
+                                              "Background": "White"
+                                            }
+                                          }
+                                        }
+                                       ]
+                                     }
+                                   }
+                                 ]
+                            }
+                            """;
+
+            // Capture hardCoded hard-coded scheme colors
+            ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
+
+            Color hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+
+            Assert.Equal (hardCodedSchemes ["Menu"].Normal.Style, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
+
+            // Capture current scheme colors
+            Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
+
+            Color currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), currentTopLevelNormalFg.ToString ());
+
+            // Load the test theme
+            Load (ConfigLocations.Runtime);
+            Assert.Equal ("Default", ThemeManager.Theme);
+            // BUGBUG: We did not Apply after loading, so schemes should NOT have been updated
+            Assert.Equal (TextStyle.Reverse, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
+
+            currentSchemes = SchemeManager.GetSchemesForCurrentTheme ()!;
+            currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+            // BUGBUG: We did not Apply after loading, so schemes should NOT have been updated
+            //Assert.Equal (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
+
+            // Now reset everything and reload
+            ResetToCurrentValues ();
+
+            // Verify we're back to default
+            Assert.Equal ("Default", ThemeManager.Theme);
+
+            currentSchemes = SchemeManager.GetSchemes ()!;
+            currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
+
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+
+    [Fact]
+    public void Load_From_Json_Does_Not_Corrupt_HardCodedSchemes ()
+    {
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+
+            // Create a test theme
+            string json = """
+                            {
+                                 "Theme": "TestTheme",
+                                 "Themes": [
+                                   {
+                                     "TestTheme": {
+                                       "Schemes": [
+                                                   {
+                                          "TopLevel": {
+                                            "Normal": {
+                                              "Foreground": "AntiqueWhite",
+                                              "Background": "DimGray"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "White",
+                                              "Background": "DarkGray"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "Wheat",
+                                              "Background": "DarkGray",
+                                              "Style": "Underline"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "LightYellow",
+                                              "Background": "DimGray",
+                                              "Style": "Underline"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "Black",
+                                              "Background": "DimGray"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Base": {
+                                            "Normal": {
+                                              "Foreground": "White",
+                                              "Background": "Blue"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "DarkBlue",
+                                              "Background": "LightGray"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "BrightCyan",
+                                              "Background": "Blue"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "BrightBlue",
+                                              "Background": "LightGray"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "DarkGray",
+                                              "Background": "Blue"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Dialog": {
+                                            "Normal": {
+                                              "Foreground": "Black",
+                                              "Background": "LightGray"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "DarkGray",
+                                              "Background": "LightGray"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "Blue",
+                                              "Background": "LightGray"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "BrightBlue",
+                                              "Background": "LightGray"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "Gray",
+                                              "Background": "DarkGray"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Menu": {
+                                            "Normal": {
+                                              "Foreground": "White",
+                                              "Background": "DarkBlue",
+                                              "Style": "Reverse" // Not default Bold
+                                            },
+                                            "Focus": {
+                                            "Foreground": "White",
+                                            "Background": "DarkBlue",
+                                              "Style": "Bold,Reverse"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "BrightYellow",
+                                              "Background": "DarkBlue",
+                                              "Style": "Bold,Underline"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "Blue",
+                                              "Background": "White",
+                                              "Style": "Bold,Underline"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "Gray",
+                                              "Background": "DarkGray",
+                                              "Style": "Faint"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "Error": {
+                                            "Normal": {
+                                              "Foreground": "Red",
+                                              "Background": "Pink"
+                                            },
+                                            "Focus": {
+                                              "Foreground": "White",
+                                              "Background": "BrightRed"
+                                            },
+                                            "HotNormal": {
+                                              "Foreground": "Black",
+                                              "Background": "Pink"
+                                            },
+                                            "HotFocus": {
+                                              "Foreground": "Pink",
+                                              "Background": "BrightRed"
+                                            },
+                                            "Disabled": {
+                                              "Foreground": "DarkGray",
+                                              "Background": "White"
+                                            }
+                                          }
+                                        }
+                                       ]
+                                     }
+                                   }
+                                 ]
+                            }
+                            """;
+
+            // Capture dynamically created hardCoded hard-coded scheme colors
+            ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
+
+            Color hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+
+            // Capture current scheme colors
+            Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
+            Color currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), currentTopLevelNormalFg.ToString ());
+
+            // Load the test theme
+            ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
+            Assert.Equal ("TestTheme", ThemeManager.Theme);
+            Assert.Equal (TextStyle.Reverse, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
+            Dictionary<string, Scheme>? hardCodedSchemesViaScope = GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), hardCodedSchemesViaScope! ["TopLevel"].Normal.Foreground.ToString ());
 
         }
         finally

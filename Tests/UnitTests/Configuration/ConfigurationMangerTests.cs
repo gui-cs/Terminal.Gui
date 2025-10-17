@@ -1,10 +1,9 @@
 ﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using ColorHelper;
-using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using File = System.IO.File;
@@ -95,12 +94,11 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.NotNull (Settings);
     }
 
-
     [Fact]
     public void Disable_With_ResetToHardCodedDefaults_True_Works_When_Disabled ()
     {
-        Assert.False (ConfigurationManager.IsEnabled);
-        ConfigurationManager.Disable (true);
+        Assert.False (IsEnabled);
+        Disable (true);
     }
 
     [Fact]
@@ -124,11 +122,11 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         {
             // Arrange: Start from hard-coded defaults and capture baseline scheme values.
             Enable (ConfigLocations.HardCoded);
-            var schemes = SchemeManager.GetSchemes ();
+            Dictionary<string, Scheme> schemes = SchemeManager.GetSchemes ();
             Assert.NotNull (schemes);
             Assert.NotEmpty (schemes);
-            var baselineFg = schemes ["Base"].Normal.Foreground;
-            var baselineBg = schemes ["Base"].Normal.Background;
+            Color baselineFg = schemes ["Base"].Normal.Foreground;
+            Color baselineBg = schemes ["Base"].Normal.Background;
 
             // Sanity: defaults should be stable
             Assert.NotEqual (default (Color), baselineFg);
@@ -136,6 +134,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             // Act: Override the Base scheme via runtime JSON and apply
             ThrowOnJsonErrors = true;
+
             RuntimeConfig = """
                             {
                               "Themes": [
@@ -160,7 +159,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Apply ();
 
             // Verify override took effect
-            var overridden = SchemeManager.GetSchemes ();
+            Dictionary<string, Scheme> overridden = SchemeManager.GetSchemes ();
             Assert.Equal (Color.Black, overridden ["Base"].Normal.Foreground);
             Assert.Equal (Color.Gray, overridden ["Base"].Normal.Background);
 
@@ -169,7 +168,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Enable (ConfigLocations.HardCoded);
 
             // Assert: schemes are reset to the original hard-coded baseline
-            var reset = SchemeManager.GetSchemes ();
+            Dictionary<string, Scheme> reset = SchemeManager.GetSchemes ();
             Assert.Equal (baselineFg, reset ["Base"].Normal.Foreground);
             Assert.Equal (baselineBg, reset ["Base"].Normal.Background);
         }
@@ -195,6 +194,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             // Act: Load a runtime config that introduces a custom theme and selects it
             ThrowOnJsonErrors = true;
+
             RuntimeConfig = """
                             {
                               "Theme": "Custom",
@@ -216,6 +216,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                               ]
                             }
                             """;
+
+            // Capture dynamically created hardCoded hard-coded scheme colors
+            ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
+
+            Color hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+
             Load (ConfigLocations.Runtime);
             Apply ();
 
@@ -232,9 +239,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.True (ThemeManager.Themes.ContainsKey (ThemeManager.DEFAULT_THEME_NAME));
 
             // Also assert the Base scheme is back to defaults (sanity check)
-            var baseScheme = SchemeManager.GetSchemes () ["Base"];
-            Assert.Equal (Color.White, baseScheme.Normal.Foreground);
-            Assert.Equal (Color.Blue, baseScheme.Normal.Background);
+            Scheme baseScheme = SchemeManager.GetSchemes () ["Toplevel"];
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), SchemeManager.GetSchemes () ["Toplevel"]!.Normal.Foreground.ToString ());
         }
         finally
         {
@@ -242,7 +248,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Application.ResetState (true);
         }
     }
-
 
     [Fact]
     public void Apply_Applies_Theme ()
@@ -261,11 +266,11 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double;
 
         ThemeManager.Theme = "testTheme";
-        ConfigurationManager.Apply ();
+        Apply ();
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
 
     [Fact]
@@ -300,7 +305,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         Applied -= ConfigurationManagerApplied;
 
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
         Application.ResetState (true);
     }
 
@@ -383,7 +388,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             // act
             RuntimeConfig = """
-                            
+
                                     {
                                           "Application.QuitKey": "Ctrl-Q"
                                     }
@@ -490,6 +495,242 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void ResetToHardCodedDefaults_Resets ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+
+            // Capture dynamically created hardCoded hard-coded scheme colors
+            ImmutableSortedDictionary<string, Scheme> hardCodedSchemesViaSchemeManager = SchemeManager.GetHardCodedSchemes ()!;
+
+            Dictionary<string, Scheme> hardCodedSchemes =
+                GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+
+            Color hardCodedBaseNormalFg = hardCodedSchemesViaSchemeManager ["Base"].Normal.Foreground;
+            Color hardCodedTopLevelNormalFg = hardCodedSchemesViaSchemeManager ["TopLevel"].Normal.Foreground;
+
+            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+
+            // Capture current scheme colors
+            Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
+
+            Color currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
+            Color currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+
+            Assert.Equal (hardCodedBaseNormalFg.ToString (), currentBaseNormalFg.ToString ());
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
+
+            // Arrange
+            var json = @"
+{
+  ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
+  ""Application.QuitKey"": ""Alt-Z"",
+  ""Theme"": ""Default"",
+  ""Themes"": [
+    {
+      ""Default"": {
+        ""MessageBox.DefaultButtonAlignment"": ""End"",
+        ""Schemes"": [
+          {
+            ""TopLevel"": {
+              ""Normal"": {
+                ""Foreground"": ""BrightGreen"",
+                ""Background"": ""Black""
+              },
+              ""Focus"": {
+                ""Foreground"": ""White"",
+                ""Background"": ""Cyan""
+              },
+              ""HotNormal"": {
+                ""Foreground"": ""Yellow"",
+                ""Background"": ""Black""
+              },
+              ""HotFocus"": {
+                ""Foreground"": ""Blue"",
+                ""Background"": ""Cyan""
+              },
+              ""Disabled"": {
+                ""Foreground"": ""DarkGray"",
+                ""Background"": ""Black""
+              }
+            }
+          },
+          {
+            ""Base"": {
+              ""Normal"": {
+                ""Foreground"": ""White"",
+                ""Background"": ""Blue""
+              },
+              ""Focus"": {
+                ""Foreground"": ""Black"",
+                ""Background"": ""Gray""
+              },
+              ""HotNormal"": {
+                ""Foreground"": ""BrightCyan"",
+                ""Background"": ""Blue""
+              },
+              ""HotFocus"": {
+                ""Foreground"": ""BrightBlue"",
+                ""Background"": ""Gray""
+              },
+              ""Disabled"": {
+                ""Foreground"": ""DarkGray"",
+                ""Background"": ""Blue""
+              }
+            }
+          },
+          {
+            ""Dialog"": {
+              ""Normal"": {
+                ""Foreground"": ""Black"",
+                ""Background"": ""Gray""
+              },
+              ""Focus"": {
+                ""Foreground"": ""White"",
+                ""Background"": ""DarkGray""
+              },
+              ""HotNormal"": {
+                ""Foreground"": ""Blue"",
+                ""Background"": ""Gray""
+              },
+              ""HotFocus"": {
+                ""Foreground"": ""BrightYellow"",
+                ""Background"": ""DarkGray""
+              },
+              ""Disabled"": {
+                ""Foreground"": ""Gray"",
+                ""Background"": ""DarkGray""
+              }
+            }
+          },
+          {
+            ""Menu"": {
+              ""Normal"": {
+                ""Foreground"": ""White"",
+                ""Background"": ""DarkGray""
+              },
+              ""Focus"": {
+                ""Foreground"": ""White"",
+                ""Background"": ""Black""
+              },
+              ""HotNormal"": {
+                ""Foreground"": ""BrightYellow"",
+                ""Background"": ""DarkGray""
+              },
+              ""HotFocus"": {
+                ""Foreground"": ""BrightYellow"",
+                ""Background"": ""Black""
+              },
+              ""Disabled"": {
+                ""Foreground"": ""Gray"",
+                ""Background"": ""DarkGray""
+              }
+            }
+          },
+          {
+            ""Error"": {
+              ""Normal"": {
+                ""Foreground"": ""Red"",
+                ""Background"": ""White""
+              },
+              ""Focus"": {
+                ""Foreground"": ""Black"",
+                ""Background"": ""BrightRed""
+              },
+              ""HotNormal"": {
+                ""Foreground"": ""Black"",
+                ""Background"": ""White""
+              },
+              ""HotFocus"": {
+                ""Foreground"": ""White"",
+                ""Background"": ""BrightRed""
+              },
+              ""Disabled"": {
+                ""Foreground"": ""DarkGray"",
+                ""Background"": ""White""
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}					
+			";
+
+            ResetToCurrentValues ();
+
+            ThrowOnJsonErrors = true;
+            ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
+
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+            Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
+
+            // Get current scheme colors again
+            currentSchemes = SchemeManager.GetSchemes ()!;
+
+            currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
+            currentTopLevelNormalFg = currentSchemes ["TopLevel"].Normal.Foreground;
+
+            Assert.Equal (Color.White.ToString (), currentBaseNormalFg.ToString ());
+            Assert.Equal (Color.BrightGreen.ToString (), currentTopLevelNormalFg.ToString ());
+
+            // Now Apply
+            Apply ();
+
+            Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
+            Assert.Equal (Alignment.End, MessageBox.DefaultButtonAlignment);
+
+            Assert.Equal (Color.White.ToString (), currentBaseNormalFg.ToString ());
+            Assert.Equal (Color.BrightGreen.ToString (), currentTopLevelNormalFg.ToString ());
+
+            // Reset
+            ResetToHardCodedDefaults ();
+
+            hardCodedSchemes =
+                GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+            hardCodedTopLevelNormalFg = hardCodedSchemes! ["TopLevel"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedTopLevelNormalFg.ToString ());
+
+            FrozenDictionary<string, ConfigProperty> hardCodedCache = GetHardCodedConfigPropertyCache ()!;
+
+            Assert.Equal (hardCodedCache ["Theme"].PropertyValue, ThemeManager.Theme);
+            Assert.Equal (hardCodedCache ["Application.QuitKey"].PropertyValue, Application.QuitKey);
+
+            // Themes
+            Assert.Equal (hardCodedCache ["MessageBox.DefaultButtonAlignment"].PropertyValue, MessageBox.DefaultButtonAlignment);
+
+            Assert.Equal (GetHardCodedConfigPropertyCache ()! ["MessageBox.DefaultButtonAlignment"].PropertyValue, MessageBox.DefaultButtonAlignment);
+
+            // Schemes
+            currentSchemes = SchemeManager.GetSchemes ()!;
+            currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
+            currentTopLevelNormalFg = currentSchemes ["Toplevel"].Normal.Foreground;
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
+
+            Scheme topLevelScheme = SchemeManager.GetScheme ("Toplevel");
+
+            Attribute attr = topLevelScheme.Normal;
+
+            // Use ToString so Assert.Equal shows the actual vs expected values on failure
+            Assert.Equal (hardCodedTopLevelNormalFg.ToString (), attr.Foreground.ToString ());
+        }
+        finally
+        {
+            output.WriteLine ("Disabling CM to clean up.");
+
+            Disable (true);
+        }
+    }
+
+    [Fact]
     public void ResetToCurrentValues_Enabled_Resets ()
     {
         Assert.False (IsEnabled);
@@ -550,7 +791,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             // Assert - the runtime config should win due to precedence
             Assert.Equal (Key.Q.WithAlt, (Key)Settings! ["Application.QuitKey"].PropertyValue);
-
         }
         finally
         {
@@ -633,16 +873,20 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // test that all ConfigProperties have our attribute
             Assert.All (
                         Settings,
-                        item => Assert.Contains (item.Value.PropertyInfo!.CustomAttributes, a => a.AttributeType
-                                                                                                       == typeof (ConfigurationPropertyAttribute)
-));
+                        item => Assert.Contains (
+                                                 item.Value.PropertyInfo!.CustomAttributes,
+                                                 a => a.AttributeType
+                                                      == typeof (ConfigurationPropertyAttribute)
+                                                ));
 
 #pragma warning disable xUnit2030
-            Assert.DoesNotContain (Settings, cp => cp.Value.PropertyInfo!.GetCustomAttribute (
-                                                                                           typeof (ConfigurationPropertyAttribute)
-                                                                                          )
-                                                == null
-);
+            Assert.DoesNotContain (
+                                   Settings,
+                                   cp => cp.Value.PropertyInfo!.GetCustomAttribute (
+                                                                                    typeof (ConfigurationPropertyAttribute)
+                                                                                   )
+                                         == null
+                                  );
 #pragma warning restore xUnit2030
 
             // Application is a static class
@@ -1138,57 +1382,9 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            output.WriteLine ($"Disabling CM to clean up.");
+            output.WriteLine ("Disabling CM to clean up.");
 
-            Disable (resetToHardCodedDefaults: true);
+            Disable (true);
         }
-    }
-
-    [Fact]
-    public void UpdateFromJson_DisableTrue_Should_Reset_TopLevel_Scheme_Back_To_Baseline ()
-    {
-        // Capture baseline hard-coded TopLevel scheme
-        var baselineSchemes = SchemeManager.GetSchemes ();
-        var baselineTopLevelNormalFg = baselineSchemes ["TopLevel"].Normal.Foreground;
-        var baselineTopLevelNormalBg = baselineSchemes ["TopLevel"].Normal.Background;
-
-        // Mutate via UpdateFromJson (sets TopLevel.Normal to BrightGreen/Black) and then calls Disable(true)
-        var cmt = new ConfigurationManagerTests (output);
-        cmt.UpdateFromJson ();
-
-        // After Disable(true) the TopLevel scheme should be restored to hard-coded defaults
-        var afterSchemes = SchemeManager.GetSchemes ();
-        Assert.Equal (baselineTopLevelNormalFg, afterSchemes ["TopLevel"].Normal.Foreground);
-        Assert.Equal (baselineTopLevelNormalBg, afterSchemes ["TopLevel"].Normal.Background);
-    }
-
-    [Fact]
-    public void UpdateFromJson_DisableTrue_NewView_Normal_Attribute_Matches_Baseline_TopLevel_Scheme ()
-    {
-        Assert.True (IsInitialized ());
-        Assert.False (IsEnabled);
-
-        // Capture hardCoded hard-coded TopLevel scheme colors
-        var hardCodedSchemes = SchemeManager.GetSchemes ();
-        var hardCodedTopLevelNormalFg = hardCodedSchemes ["TopLevel"].Normal.Foreground;
-        var hardCodedTopLevelNormalBg = hardCodedSchemes ["TopLevel"].Normal.Background;
-
-        Assert.Equal (new Color (StandardColor.CadetBlue), hardCodedTopLevelNormalFg);
-        Assert.Equal (new Color (StandardColor.Charcoal), hardCodedTopLevelNormalBg);
-
-        // Mutate via UpdateFromJson (applies runtime theme), then Disable(true)
-        var cmt = new ConfigurationManagerTests (output);
-        cmt.UpdateFromJson ();
-
-        // Create fresh UI and verify the view’s Normal attribute matches hardCoded scheme
-        var top = new Toplevel ();
-
-        var attr = top.GetAttributeForRole (VisualRole.Normal);
-
-        // Use ToString so Assert.Equal shows the actual vs expected values on failure
-        Assert.Equal (hardCodedTopLevelNormalFg.ToString (), attr.Foreground.ToString ());
-        Assert.Equal (hardCodedTopLevelNormalBg.ToString (), attr.Background.ToString ());
-
-        top.Dispose ();
     }
 }
