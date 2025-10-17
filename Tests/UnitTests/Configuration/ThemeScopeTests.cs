@@ -1,5 +1,8 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Text.Json;
+using UICatalog.Scenarios;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -102,5 +105,51 @@ public class ThemeScopeTests
                      );
 
         Disable (true);
+    }
+
+
+    [Fact]
+    public void UpdateFrom_Corrupts_Schemes_HardCodeDefaults ()
+    {
+        // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This test demonstrates the problem.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+
+        // Create a test theme
+        var json = """
+                   {
+                      "Schemes": [
+                       {
+                         "Base": {
+                           "Normal": {
+                             "Foreground": "White",
+                             "Background": "Blue"
+                           }
+                         }
+                       }
+                      ]
+                   }
+                   """;
+
+        // Capture dynamically created hardCoded hard-coded scheme colors
+        ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
+
+        Color hardCodedBaseNormalFg = hardCodedSchemes ["Base"].Normal.Foreground;
+        Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+
+        // Capture current scheme 
+        Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
+        Color currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
+        Assert.Equal (new Color (StandardColor.LightBlue).ToString (), currentBaseNormalFg.ToString ());
+
+        ThemeScope scope = JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope;
+        ThemeScope defaultTheme = ThemeManager.Themes! ["Default"]!;
+        defaultTheme.UpdateFrom (scope!);
+
+        // Capture  hardCoded hard-coded scheme from cache
+        Dictionary<string, Scheme>? hardCodedSchemesViaCache =
+            GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+
+        Assert.NotEqual (hardCodedBaseNormalFg.ToString (), hardCodedSchemesViaCache! ["Base"].Normal.Foreground.ToString ());
     }
 }

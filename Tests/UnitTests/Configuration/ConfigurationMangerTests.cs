@@ -1213,7 +1213,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void UpdateFromJson ()
+    public void SourcesManager_Load_FromJson_Loads ()
     {
         Assert.False (IsEnabled);
 
@@ -1370,7 +1370,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
             Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
 
-            // Now re-apply
+            // Now Apply
             Apply ();
 
             Assert.Equal ("Default", ThemeManager.Theme);

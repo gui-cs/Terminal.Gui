@@ -886,6 +886,7 @@ public class SchemeManagerTests
 
             // Load the test theme
             ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
+
             Assert.Equal ("TestTheme", ThemeManager.Theme);
             Assert.Equal (TextStyle.Reverse, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
             Dictionary<string, Scheme>? hardCodedSchemesViaScope = GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;

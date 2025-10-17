@@ -1,5 +1,8 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Collections.Frozen;
+using System.Collections.Immutable;
+using System.Text.Json;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -18,11 +21,11 @@ public class SettingsScopeTests
 
         // act
         RuntimeConfig = """
-                   
-                           {
-                                 "Application.QuitKey": "Ctrl-Q"
-                           }
-                   """;
+
+                                {
+                                      "Application.QuitKey": "Ctrl-Q"
+                                }
+                        """;
 
         Load (ConfigLocations.Runtime);
 
@@ -30,10 +33,8 @@ public class SettingsScopeTests
         Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue!);
 
         // clean up
-        Disable (resetToHardCodedDefaults: true);
-
+        Disable (true);
     }
-
 
     [Fact]
     public void Load_Dictionary_Property_Overrides_Defaults ()
@@ -52,7 +53,6 @@ public class SettingsScopeTests
         ThemeScope scope = dict [ThemeManager.DEFAULT_THEME_NAME];
         Assert.NotNull (scope);
         Assert.Equal (MouseState.In | MouseState.Pressed | MouseState.PressedOutside, scope ["Button.DefaultHighlightStates"].PropertyValue);
-
 
         RuntimeConfig = """
                         {
@@ -100,8 +100,7 @@ public class SettingsScopeTests
         Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStates"].PropertyValue!);
 
         // clean up
-        Disable (resetToHardCodedDefaults: true);
-
+        Disable (true);
     }
 
     [Fact]
@@ -111,16 +110,16 @@ public class SettingsScopeTests
         Load (ConfigLocations.LibraryResources);
 
         // arrange
-        Assert.Equal (Key.Esc, (Key)Settings!["Application.QuitKey"].PropertyValue!);
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue!);
 
         Assert.Equal (
                       Key.F6,
-                      (Key)Settings["Application.NextTabGroupKey"].PropertyValue!
+                      (Key)Settings ["Application.NextTabGroupKey"].PropertyValue!
                      );
 
         Assert.Equal (
                       Key.F6.WithShift,
-                      (Key)Settings["Application.PrevTabGroupKey"].PropertyValue!
+                      (Key)Settings ["Application.PrevTabGroupKey"].PropertyValue!
                      );
 
         // act
@@ -135,7 +134,7 @@ public class SettingsScopeTests
         Assert.Equal (Key.F, Application.NextTabGroupKey);
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
 
     [Fact]
@@ -154,10 +153,10 @@ public class SettingsScopeTests
         updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Settings.UpdateFrom (updatedSettings);
-        Assert.Equal (KeyCode.End, ((Key)Settings["Application.QuitKey"].PropertyValue!).KeyCode);
-        Assert.Equal (KeyCode.F, ((Key)updatedSettings["Application.NextTabGroupKey"].PropertyValue!).KeyCode);
-        Assert.Equal (KeyCode.B, ((Key)updatedSettings["Application.PrevTabGroupKey"].PropertyValue!).KeyCode);
-        Disable (resetToHardCodedDefaults: true);
+        Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue!).KeyCode);
+        Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue!).KeyCode);
+        Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue!).KeyCode);
+        Disable (true);
     }
 
     [Fact]
@@ -180,7 +179,6 @@ public class SettingsScopeTests
         Disable ();
     }
 
-
     [Fact]
     public void Themes_Property_Exists ()
     {
@@ -195,7 +193,6 @@ public class SettingsScopeTests
 
         Assert.NotEmpty (settingsScope);
     }
-
 
     [Fact]
     public void LoadHardCodedDefaults_Resets ()
@@ -216,9 +213,9 @@ public class SettingsScopeTests
         // Assert
         Assert.Equal (Key.Esc, Application.QuitKey);
 
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
-    
+
     private class ConfigPropertyMock
     {
         public object? PropertyValue { get; init; }
@@ -229,7 +226,6 @@ public class SettingsScopeTests
     {
         public string? Theme { get; set; }
     }
-
 
     [Fact]
     public void SettingsScopeMockWithKey_CreatesDeepCopy ()
@@ -263,18 +259,18 @@ public class SettingsScopeTests
         Assert.Equal ("Dark", source.Theme);
         Assert.True (((Key)source ["KeyBinding"].PropertyValue!).Handled);
         Assert.Single ((Dictionary<string, int>)source ["Counts"].PropertyValue!);
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
 
     [Fact /*(Skip = "This test randomly fails due to a concurrent change to something. Needs to be moved to non-parallel tests.")*/]
     public void ThemeScopeList_WithThemes_ClonesSuccessfully ()
     {
         // Arrange: Create a ThemeScope and verify a property exists
-        ThemeScope defaultThemeScope = new ThemeScope ();
+        var defaultThemeScope = new ThemeScope ();
         defaultThemeScope.LoadHardCodedDefaults ();
         Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStates"));
 
-        ThemeScope darkThemeScope = new ThemeScope ();
+        var darkThemeScope = new ThemeScope ();
         darkThemeScope.LoadHardCodedDefaults ();
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStates"));
 
@@ -286,7 +282,7 @@ public class SettingsScopeTests
         ];
 
         // Create a SettingsScope and set the Themes property
-        SettingsScope settingsScope = new SettingsScope ();
+        var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
         Assert.True (settingsScope.ContainsKey ("Themes"));
         settingsScope ["Themes"].PropertyValue = themesList;
@@ -297,14 +293,14 @@ public class SettingsScopeTests
         // Assert
         Assert.NotNull (result);
         Assert.IsType<SettingsScope> (result);
-        SettingsScope resultScope = (SettingsScope)result;
+        var resultScope = result;
         Assert.True (resultScope.ContainsKey ("Themes"));
 
         Assert.NotNull (resultScope ["Themes"].PropertyValue);
 
         List<Dictionary<string, ThemeScope>> clonedThemes = (List<Dictionary<string, ThemeScope>>)resultScope ["Themes"].PropertyValue!;
         Assert.Equal (2, clonedThemes.Count);
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
 
     [Fact]
@@ -322,7 +318,7 @@ public class SettingsScopeTests
         Assert.IsType<SettingsScope> (result);
 
         Assert.True (result.ContainsKey ("Themes"));
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
 
     [Fact]
@@ -334,8 +330,8 @@ public class SettingsScopeTests
 
         settingsScope ["Themes"].PropertyValue = new List<Dictionary<string, ThemeScope>>
         {
-            new() { { "Default", new () } },
-            new() { { "Dark", new () } }
+            new () { { "Default", new () } },
+            new () { { "Dark", new () } }
         };
 
         // Act
@@ -346,6 +342,6 @@ public class SettingsScopeTests
         Assert.IsType<SettingsScope> (result);
         Assert.True (result.ContainsKey ("Themes"));
         Assert.NotNull (result ["Themes"].PropertyValue);
-        Disable (resetToHardCodedDefaults: true);
+        Disable (true);
     }
 }
