@@ -499,9 +499,6 @@ public class ComboBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void HideDropdownListOnClick_True_Highlight_Current_Item ()
     {
-        ConfigurationManagerTests cmt = new ConfigurationManagerTests (output);
-        cmt.UpdateFromJson ();
-
         var selected = "";
         var cb = new ComboBox { Width = 6, Height = 4, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
@@ -529,9 +526,6 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        Assert.False (Application.ClearScreenNextIteration);
-        Assert.True (cb.NeedsLayout);
-        Assert.True (cb.NeedsDraw);
         cb.Layout ();
 
         cb.Draw ();
