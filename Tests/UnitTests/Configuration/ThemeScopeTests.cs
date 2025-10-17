@@ -131,25 +131,32 @@ public class ThemeScopeTests
                    }
                    """;
 
-        // Capture dynamically created hardCoded hard-coded scheme colors
-        ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
+        try
+        {
+            // Capture dynamically created hardCoded hard-coded scheme colors
+            ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
-        Color hardCodedBaseNormalFg = hardCodedSchemes ["Base"].Normal.Foreground;
-        Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Color hardCodedBaseNormalFg = hardCodedSchemes ["Base"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
 
-        // Capture current scheme 
-        Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
-        Color currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
-        Assert.Equal (new Color (StandardColor.LightBlue).ToString (), currentBaseNormalFg.ToString ());
+            // Capture current scheme 
+            Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
+            Color currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
+            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), currentBaseNormalFg.ToString ());
 
-        ThemeScope scope = JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope;
-        ThemeScope defaultTheme = ThemeManager.Themes! ["Default"]!;
-        defaultTheme.UpdateFrom (scope!);
+            ThemeScope scope = JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope;
+            ThemeScope defaultTheme = ThemeManager.Themes! ["Default"]!;
+            defaultTheme.UpdateFrom (scope!);
 
-        // Capture  hardCoded hard-coded scheme from cache
-        Dictionary<string, Scheme>? hardCodedSchemesViaCache =
-            GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+            // Capture  hardCoded hard-coded scheme from cache
+            Dictionary<string, Scheme>? hardCodedSchemesViaCache =
+                GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
 
-        Assert.NotEqual (hardCodedBaseNormalFg.ToString (), hardCodedSchemesViaCache! ["Base"].Normal.Foreground.ToString ());
+            Assert.NotEqual (hardCodedBaseNormalFg.ToString (), hardCodedSchemesViaCache! ["Base"].Normal.Foreground.ToString ());
+        }
+        finally
+        {
+            ResetToHardCodedDefaults ();
+        }
     }
 }
