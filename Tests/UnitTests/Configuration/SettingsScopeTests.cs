@@ -162,21 +162,26 @@ public class SettingsScopeTests
     [Fact]
     public void ResetToHardCodedDefaults_Resets_Config_And_Applies ()
     {
-        Enable (ConfigLocations.HardCoded);
-        Load (ConfigLocations.LibraryResources);
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+            Load (ConfigLocations.LibraryResources);
 
-        Assert.True (Settings! ["Application.QuitKey"].PropertyValue is Key);
-        Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
-        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Apply ();
-        Assert.Equal (Key.Q, Application.QuitKey);
+            Assert.True (Settings! ["Application.QuitKey"].PropertyValue is Key);
+            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+            Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+            Apply ();
+            Assert.Equal (Key.Q, Application.QuitKey);
 
-        // Act
-        ResetToHardCodedDefaults ();
-        Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        Disable ();
+            // Act
+            ResetToHardCodedDefaults ();
+            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+            Assert.Equal (Key.Esc, Application.QuitKey);
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]

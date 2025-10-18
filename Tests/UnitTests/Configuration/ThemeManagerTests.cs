@@ -78,20 +78,26 @@ public class ThemeManagerTests (ITestOutputHelper output)
     [Fact]
     public void Theme_ResetToHardCodedDefaults_Sets_To_Default ()
     {
-        Assert.False (IsEnabled);
-        Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
+        try
+        {
+            Assert.False (IsEnabled);
+            Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
 
-        Enable (ConfigLocations.HardCoded);
-        Assert.Equal ("Default", ThemeManager.Theme);
+            Enable (ConfigLocations.HardCoded);
+            Assert.Equal ("Default", ThemeManager.Theme);
 
-        ThemeManager.Theme = "Test";
-        Assert.Equal ("Test", ThemeManager.Theme);
-        Assert.Equal (Settings! ["Theme"].PropertyValue, ThemeManager.Theme);
-        Assert.Equal ("Test", Settings! ["Theme"].PropertyValue);
+            ThemeManager.Theme = "Test";
+            Assert.Equal ("Test", ThemeManager.Theme);
+            Assert.Equal (Settings! ["Theme"].PropertyValue, ThemeManager.Theme);
+            Assert.Equal ("Test", Settings! ["Theme"].PropertyValue);
 
-        ResetToHardCodedDefaults ();
-        Assert.Equal ("Default", ThemeManager.Theme);
-        Disable ();
+            ResetToHardCodedDefaults ();
+            Assert.Equal ("Default", ThemeManager.Theme);
+        }
+        finally
+        {
+            Disable(true);
+        }
     }
 
     #endregion Tests Settings["Theme"] and ThemeManager.Theme

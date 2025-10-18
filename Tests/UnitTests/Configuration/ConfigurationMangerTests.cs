@@ -128,7 +128,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         Assert.NotNull (Settings);
 
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
@@ -753,26 +753,32 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        // Act
-        Enable (ConfigLocations.HardCoded);
+        try
+        {
+            // Act
+            Enable (ConfigLocations.HardCoded);
 
-        Application.QuitKey = Key.A;
+            Application.QuitKey = Key.A;
 
-        ResetToCurrentValues ();
+            ResetToCurrentValues ();
 
-        Assert.Equal (Key.A, (Key)Settings! ["Application.QuitKey"].PropertyValue);
-        Assert.NotNull (Settings);
-        Assert.NotNull (AppSettings);
-        Assert.NotNull (ThemeManager.Themes);
+            Assert.Equal (Key.A, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.NotNull (Settings);
+            Assert.NotNull (AppSettings);
+            Assert.NotNull (ThemeManager.Themes);
 
-        // Default Theme should be "Default"
-        Assert.Single (ThemeManager.Themes);
-        Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
+            // Default Theme should be "Default"
+            Assert.Single (ThemeManager.Themes);
+            Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
 
-        ResetToHardCodedDefaults ();
-        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
-        Disable ();
-        Application.ResetState (true);
+            ResetToHardCodedDefaults ();
+            Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
     }
 
     [Fact]
