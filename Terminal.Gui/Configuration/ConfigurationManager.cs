@@ -129,6 +129,8 @@ public static class ConfigurationManager
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
     private static readonly object _hardCodedConfigPropertyCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
+    [RequiresUnreferencedCode ("Calls DeepCopy")]
+    [RequiresDynamicCode ("Calls DeepCopy")]
 
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
     {
@@ -139,7 +141,9 @@ public static class ConfigurationManager
                 throw new InvalidOperationException ("_hardCodedConfigPropertyCache has not been set.");
             }
 
-            return _hardCodedConfigPropertyCache;
+            // Create a DEEP COPY of the cache to ensure that the original is not modified.
+
+            return DeepCloner.DeepClone (_hardCodedConfigPropertyCache.ToDictionary ())!.ToFrozenDictionary ();
         }
     }
 
@@ -187,7 +191,7 @@ public static class ConfigurationManager
         lock (_uninitializedConfigPropertiesCacheCacheLock)
         {
             // _allConfigProperties: for ordered, iterable access (LINQ-friendly)
-            // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
+            // _hardCodedConfigPropertyCache: for high-speed key lookup (frozen)
 
             // Note GetAllConfigProperties returns a new instance and all the properties !HasValue and Immutable.
             _uninitializedConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
