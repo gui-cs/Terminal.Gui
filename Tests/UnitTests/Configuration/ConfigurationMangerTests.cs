@@ -50,6 +50,25 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void GetHardCodedDefaultCache_Always_Returns_Same_Ref ()
+    {
+        // It's important it always returns the same cache ref, so no copies are made
+        // Otherwise it's a big performance hit
+        Assert.False (IsEnabled);
+
+        try
+        {
+            FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
+            FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
+            Assert.Equal (initialCache, cache);
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    [Fact]
     public void HardCodedDefaultCache_Properties_Are_Immutable ()
     {
         Assert.False (IsEnabled);
@@ -74,8 +93,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             // Assert
             FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
-            // Per PR #4287 GetHardCodedConfigPropertyCache always returns a new instance
-            //Assert.Equal (initialCache, cache);
             Assert.True (initialCache ["Application.QuitKey"].Immutable);
             Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
         }

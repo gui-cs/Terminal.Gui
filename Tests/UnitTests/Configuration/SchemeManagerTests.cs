@@ -26,27 +26,40 @@ public class SchemeManagerTests
     [Fact]
     public void GetSchemes_Enabled_Gets_Current ()
     {
-        Enable (ConfigLocations.HardCoded);
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
 
-        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
-        Assert.NotNull (schemes);
-        Assert.NotNull (schemes ["Base"]);
-        Assert.True (schemes!.ContainsKey ("Base"));
-        Assert.True (schemes.ContainsKey ("base"));
+            Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
+            Assert.NotNull (schemes);
+            Assert.NotNull (schemes ["Base"]);
+            Assert.True (schemes!.ContainsKey ("Base"));
+            Assert.True (schemes.ContainsKey ("base"));
 
-        Assert.Equal (SchemeManager.GetSchemes (), schemes);
+            Assert.Equal (SchemeManager.GetSchemes (), schemes);
 
-        Disable (true);
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
     public void GetSchemes_Get_Schemes_After_Load ()
     {
-        Enable (ConfigLocations.HardCoded);
-        Load (ConfigLocations.All);
-        Apply ();
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+            Load (ConfigLocations.All);
+            Apply ();
 
-        Assert.Equal (SchemeManager.GetSchemes (), SchemeManager.GetSchemesForCurrentTheme ());
+            Assert.Equal (SchemeManager.GetSchemes (), SchemeManager.GetSchemesForCurrentTheme ());
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
 
@@ -139,19 +152,25 @@ public class SchemeManagerTests
     public void Not_Case_Sensitive_Enabled ()
     {
         Assert.False (IsEnabled);
-        Enable (ConfigLocations.HardCoded);
 
-        Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("Base"));
-        Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("base"));
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
 
-        ResetToHardCodedDefaults ();
-        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemesForCurrentTheme ();
-        Assert.NotNull (current);
+            Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("Base"));
+            Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("base"));
 
-        Assert.True (current!.ContainsKey ("Base"));
-        Assert.True (current.ContainsKey ("base"));
+            ResetToHardCodedDefaults ();
+            Dictionary<string, Scheme?>? current = SchemeManager.GetSchemesForCurrentTheme ();
+            Assert.NotNull (current);
 
-        Disable (true);
+            Assert.True (current!.ContainsKey ("Base"));
+            Assert.True (current.ContainsKey ("base"));
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]

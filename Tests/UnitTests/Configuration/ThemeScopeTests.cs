@@ -107,7 +107,7 @@ public class ThemeScopeTests
         Disable (true);
     }
 
-    [Fact (Skip = "Fixed via GetHardCodedConfigPropertyCache returning a copy.")]
+    [Fact]
     public void UpdateFrom_Corrupts_Schemes_HardCodeDefaults ()
     {
         // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.

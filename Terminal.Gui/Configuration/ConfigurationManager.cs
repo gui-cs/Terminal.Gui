@@ -141,9 +141,7 @@ public static class ConfigurationManager
                 throw new InvalidOperationException ("_hardCodedConfigPropertyCache has not been set.");
             }
 
-            // Create a DEEP COPY of the cache to ensure that the original is not modified.
-
-            return DeepCloner.DeepClone (_hardCodedConfigPropertyCache.ToDictionary ())!.ToFrozenDictionary ();
+            return _hardCodedConfigPropertyCache;
         }
     }
 
