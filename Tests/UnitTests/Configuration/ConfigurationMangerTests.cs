@@ -74,7 +74,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             // Assert
             FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
-            Assert.Equal (initialCache, cache);
+            // Per PR #4287 GetHardCodedConfigPropertyCache always returns a new instance
+            //Assert.Equal (initialCache, cache);
             Assert.True (initialCache ["Application.QuitKey"].Immutable);
             Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
         }
