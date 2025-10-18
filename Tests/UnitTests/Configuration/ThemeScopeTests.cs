@@ -62,7 +62,7 @@ public class ThemeScopeTests
         Assert.Equal ("Dark", ThemeManager.Theme);
 
         // Act
-        ThemeManager.ResetToHardCodedDefaults ();
+        ThemeManager.LoadHardCodedDefaults ();
         Assert.Equal ("Default", ThemeManager.Theme);
 
         Disable (true);
@@ -155,6 +155,7 @@ public class ThemeScopeTests
         {
             Assert.False (IsEnabled);
             ThrowOnJsonErrors = true;
+           // Enable(ConfigLocations.HardCoded);
 
             // Capture dynamically created hardCoded hard-coded scheme colors
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;

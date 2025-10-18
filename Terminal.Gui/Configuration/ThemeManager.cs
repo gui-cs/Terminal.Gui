@@ -166,7 +166,16 @@ public static class ThemeManager
         var hardCodedThemeScope = new ThemeScope ();
         foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeProperties)
         {
-            hardCodedThemeScope.AddValue (p.Key, p.Value.PropertyValue);
+            var val = p.Value.PropertyValue;
+
+            if (p.Key == "Schemes")
+            {
+                // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+                // BUGBUG: This is a work around
+                // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+                val = SchemeManager.GetHardCodedSchemes ()!.ToDictionary ();
+            }
+            hardCodedThemeScope.AddValue (p.Key, val);
         }
 
         return hardCodedThemeScope;
@@ -256,13 +265,13 @@ public static class ThemeManager
     /// </summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void UpdateToCurrentValues () { Themes! [Theme].LoadCurrentValues (); }
+    internal static void UpdateToCurrentValues () { Themes! [Theme].UpdateToCurrentValues (); }
 
     /// <summary>
     ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
     ///     when the module was initialized.
     /// </summary>
-    internal static void ResetToHardCodedDefaults ()
+    internal static void LoadHardCodedDefaults ()
     {
         if (!ConfigurationManager.IsInitialized ())
         {
@@ -291,7 +300,7 @@ public static class ThemeManager
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
         // BUGBUG: This is a work around
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
-        SchemeManager.ResetToHardCodedDefaults ();
+        SchemeManager.LoadToHardCodedDefaults ();
 
         ConfigurationManager.Settings ["Themes"].PropertyValue = hardCodedThemes;
         ConfigurationManager.Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;

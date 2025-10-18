@@ -194,7 +194,7 @@ public class SettingsScopeTests
         // Themes exists, but is not initialized
         Assert.Null (settingsScope ["Themes"].PropertyValue);
 
-        settingsScope.LoadCurrentValues ();
+        settingsScope.UpdateToCurrentValues ();
 
         Assert.NotEmpty (settingsScope);
     }

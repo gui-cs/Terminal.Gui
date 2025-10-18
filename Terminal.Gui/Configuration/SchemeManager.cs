@@ -199,7 +199,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    internal static void ResetToHardCodedDefaults ()
+    internal static void LoadToHardCodedDefaults ()
     {
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
         // BUGBUG: This is a work around

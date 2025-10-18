@@ -83,7 +83,7 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresDynamicCode ("Uses reflection to retrieve property values")]
-    internal void LoadCurrentValues ()
+    internal void UpdateToCurrentValues ()
     {
         foreach (KeyValuePair<string, ConfigProperty> validProperties in this.Where (cp => cp.Value.PropertyInfo is { }))
         {
@@ -160,7 +160,6 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
         {
             if (propWithValue.Value.PropertyInfo != null)
             {
-
                 object? currentValue = propWithValue.Value.PropertyInfo.GetValue (null);
                 object? newValue = null;
 

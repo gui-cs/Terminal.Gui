@@ -129,9 +129,6 @@ public static class ConfigurationManager
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
     private static readonly object _hardCodedConfigPropertyCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
-    [RequiresUnreferencedCode ("Calls DeepCopy")]
-    [RequiresDynamicCode ("Calls DeepCopy")]
-
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
     {
         lock (_hardCodedConfigPropertyCacheLock)
@@ -334,9 +331,9 @@ public static class ConfigurationManager
             _settingsLockSlim.ExitWriteLock ();
         }
 
-        Settings!.LoadCurrentValues ();
+        Settings!.UpdateToCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
-        AppSettings!.LoadCurrentValues ();
+        AppSettings!.UpdateToCurrentValues ();
     }
 
     /// <summary>
@@ -381,7 +378,7 @@ public static class ConfigurationManager
 
         Settings = new ();
         Settings!.LoadHardCodedDefaults ();
-        ThemeManager.ResetToHardCodedDefaults ();
+        ThemeManager.LoadHardCodedDefaults ();
         AppSettings!.LoadHardCodedDefaults ();
     }
 
@@ -645,7 +642,7 @@ public static class ConfigurationManager
                 if (!appSettingsConfigProperty.HasValue)
                 {
                     var appSettings = new AppSettingsScope ();
-                    appSettings.LoadCurrentValues ();
+                    appSettings.UpdateToCurrentValues ();
 
                     return appSettings;
                 }
