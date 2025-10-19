@@ -166,16 +166,7 @@ public static class ThemeManager
         var hardCodedThemeScope = new ThemeScope ();
         foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeProperties)
         {
-            var val = p.Value.PropertyValue;
-
-            if (p.Key == "Schemes")
-            {
-                // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
-                // BUGBUG: This is a partial workaround
-                // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
-                val = SchemeManager.GetHardCodedSchemes ()!.ToDictionary ();
-            }
-            hardCodedThemeScope.AddValue (p.Key, val);
+            hardCodedThemeScope.AddValue (p.Key, p.Value.PropertyValue);
         }
 
         return hardCodedThemeScope;
