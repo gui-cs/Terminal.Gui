@@ -33,7 +33,7 @@ public class ScenariosStressTests : TestsAllViews
         Assert.Null (_timeoutLock);
         _timeoutLock = new ();
 
-        ConfigurationManager.Disable();
+        ConfigurationManager.Disable(true);
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);

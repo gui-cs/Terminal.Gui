@@ -239,6 +239,8 @@ public partial class View // Layout APIs
             _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
 
             PosDimSet ();
+
+            NeedsClearScreenNextIteration ();
         }
     }
 
@@ -281,6 +283,8 @@ public partial class View // Layout APIs
 
             _y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
             PosDimSet ();
+
+            NeedsClearScreenNextIteration ();
         }
     }
 
@@ -339,6 +343,8 @@ public partial class View // Layout APIs
                                               OnHeightChanged,
                                               HeightChanged,
                                               out Dim _);
+
+            NeedsClearScreenNextIteration ();
         }
     }
 
@@ -425,6 +431,17 @@ public partial class View // Layout APIs
                                               OnWidthChanged,
                                               WidthChanged,
                                               out Dim _);
+
+            NeedsClearScreenNextIteration ();
+        }
+    }
+
+    private void NeedsClearScreenNextIteration ()
+    {
+        if (Application.Top is { } && Application.Top == this && Application.TopLevels.Count == 1)
+        {
+            // If this is the only TopLevel, we need to redraw the screen
+            Application.ClearScreenNextIteration = true;
         }
     }
 
@@ -653,10 +670,9 @@ public partial class View // Layout APIs
             {
                 SuperView?.SetNeedsDraw ();
             }
-            else if (Application.TopLevels.Count == 1)
+            else
             {
-                // If this is the only TopLevel, we need to redraw the screen
-                Application.ClearScreenNextIteration = true;
+                NeedsClearScreenNextIteration ();
             }
         }
 

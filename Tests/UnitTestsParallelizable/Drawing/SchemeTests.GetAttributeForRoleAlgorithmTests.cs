@@ -10,7 +10,6 @@ public class SchemeGetAttributeForRoleAlgorithmTests
         Attribute normal = new ("Red", "Blue");
         Scheme scheme = new (normal);
 
-        Assert.NotNull (scheme.Normal);
         Assert.Equal (normal, scheme.GetAttributeForRole (VisualRole.Normal));
     }
 

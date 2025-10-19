@@ -125,16 +125,16 @@ public partial class View
         ResultEventArgs<Scheme?> args = new ();
 
         return CWPWorkflowHelper.ExecuteWithResult (
-                                                    args =>
+                                                    resultEventArgs =>
                                                     {
                                                         bool cancelled = OnGettingScheme (out Scheme? newScheme);
-                                                        args.Result = newScheme;
+                                                        resultEventArgs.Result = newScheme;
 
                                                         return cancelled;
                                                     },
                                                     GettingScheme,
                                                     args,
-                                                    DefaultAction);
+                                                    DefaultAction)!;
 
         Scheme DefaultAction ()
         {
