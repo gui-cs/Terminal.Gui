@@ -440,7 +440,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Updated += ConfigurationManagerUpdated;
 
             // Act
-            ResetToCurrentValues ();
+            UpdateToCurrentValues ();
 
             // assert
             Assert.True (fired);
@@ -752,7 +752,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Application.QuitKey = Key.A;
 
-            ResetToCurrentValues ();
+            UpdateToCurrentValues ();
 
             Assert.Equal (Key.A, (Key)Settings! ["Application.QuitKey"].PropertyValue);
             Assert.NotNull (Settings);

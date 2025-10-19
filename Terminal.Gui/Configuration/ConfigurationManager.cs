@@ -51,7 +51,7 @@ public static class ConfigurationManager
 {
     /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
     /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="ResetToCurrentValues"/> is called. Gets set to a new instance by
+    ///     Is <see langword="null"/> until <see cref="UpdateToCurrentValues"/> is called. Gets set to a new instance by
     ///     deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
@@ -127,6 +127,7 @@ public static class ConfigurationManager
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
 #pragma warning disable IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
+
     private static readonly object _hardCodedConfigPropertyCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
@@ -308,16 +309,17 @@ public static class ConfigurationManager
 
     #region Reset
 
-    // `Reset` - Reset the configuration to either the current values or the hard-coded defaults.
-    // Resetting does not load the configuration; it only resets the configuration to the default values.
+    // `Update` - Updates the configuration from either the current values or the hard-coded defaults.
+    // Updating does not load the configuration; it only updates the configuration to the values currently
+    // in the static ConfigProperties.
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads settings from the current
+    ///     INTERNAL: Updates <see cref="ConfigurationManager"/> to the settings from the current
     ///     values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    internal static void ResetToCurrentValues ()
+    internal static void UpdateToCurrentValues ()
     {
         if (!IsInitialized ())
         {
@@ -342,7 +344,7 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads the hard-coded values of the
+    ///     INTERNAL: Loads the hard-coded values of the
     ///     <see cref="ConfigurationPropertyAttribute"/> properties and applies them.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
@@ -571,7 +573,7 @@ public static class ConfigurationManager
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly SourceGenerationContext SerializerContext = new (
-                                                                              new JsonSerializerOptions
+                                                                              new()
                                                                               {
                                                                                   // Be relaxed
                                                                                   ReadCommentHandling = JsonCommentHandling.Skip,
@@ -715,8 +717,9 @@ public static class ConfigurationManager
         {
             if (_jsonErrors.Length > 0)
             {
-                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files" +
-                                   @"(set ThrowOnJsonErrors to have these caught during execution):");
+                Console.WriteLine (
+                                   @"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"
+                                   + @"(set ThrowOnJsonErrors to have these caught during execution):");
                 Console.WriteLine (_jsonErrors.ToString ());
             }
         }
@@ -788,8 +791,10 @@ public static class ConfigurationManager
 
             Debug.Assert (filtered is { });
 
-            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope = filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
+            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope =
+                filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
             Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
+
             return configPropertiesByScope;
         }
     }
