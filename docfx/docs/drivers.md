@@ -189,6 +189,16 @@ This interface allows advanced scenarios and testing.
 - Supports Windows-specific features and better performance
 - Automatically selected on Windows platforms
 
+#### Visual Studio Debug Console Support
+
+When running in Visual Studio's debug console (`VSDebugConsole.exe`), WindowsDriver detects the `VSAPPIDNAME` environment variable and automatically adjusts its behavior:
+
+- Disables the alternative screen buffer (which is not supported in VS debug console)
+- Preserves the original console colors on startup
+- Restores the original colors and clears the screen on shutdown
+
+This ensures Terminal.Gui applications can be debugged directly in Visual Studio without rendering issues.
+
 ### UnixDriver (UnixComponentFactory)
 
 - Uses Unix/Linux terminal APIs
