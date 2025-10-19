@@ -142,6 +142,7 @@ public class SchemeTests
         var customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"]! with { Normal = Attribute.Default };
 
         Assert.NotEqual (Attribute.Default, view.GetScheme ().Normal);
+
         view.GettingScheme += (sender, args) =>
                               {
                                   args.Result = customScheme;
@@ -174,13 +175,13 @@ public class SchemeTests
         var customAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
 
         view.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Focus)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
+                                        {
+                                            if (args.Role == VisualRole.Focus)
+                                            {
+                                                args.Result = customAttribute;
+                                                args.Handled = true;
+                                            }
+                                        };
 
         Assert.Equal (customAttribute, view.GetAttributeForRole (VisualRole.Focus));
         view.Dispose ();
@@ -198,6 +199,7 @@ public class SchemeTests
         Assert.Contains ("Menu", schemes.Keys);
         Assert.Contains ("Toplevel", schemes.Keys);
     }
+
 
     [Fact]
     public void SchemeName_OverridesSuperViewScheme ()
@@ -243,6 +245,7 @@ public class SchemeTests
         protected override bool OnGettingScheme (out Scheme? scheme)
         {
             scheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
+
             return true;
         }
 
@@ -265,4 +268,5 @@ public class SchemeTests
 
         view.Dispose ();
     }
+
 }
