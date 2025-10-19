@@ -103,6 +103,23 @@ public class ApplicationImpl : IApplication
 
     private void CreateDriver (string? driverName)
     {
+        // When running unit tests, always use FakeDriver unless explicitly specified
+        if (ConsoleDriver.RunningUnitTests && 
+            string.IsNullOrEmpty (driverName) && 
+            _componentFactory is null)
+        {
+            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
+            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            _coordinator.StartAsync ().Wait ();
+
+            if (Application.Driver == null)
+            {
+                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+            }
+
+            return;
+        }
+
         PlatformID p = Environment.OSVersion.Platform;
 
         // Check component factory type first - this takes precedence over driverName
