@@ -7,25 +7,29 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
-///     Holds the <see cref="Drawing.Scheme"/>s that define the <see cref="System.Attribute"/>s that are used by views to render
-///     themselves. A Scheme is a mapping from <see cref="Drawing.VisualRole"/>s (such as <see cref="Drawing.VisualRole.Focus"/>) to <see cref="System.Attribute"/>s.
+///     Holds the <see cref="Drawing.Scheme"/>s that define the <see cref="System.Attribute"/>s that are used by views to
+///     render
+///     themselves. A Scheme is a mapping from <see cref="Drawing.VisualRole"/>s (such as
+///     <see cref="Drawing.VisualRole.Focus"/>) to <see cref="System.Attribute"/>s.
 ///     A Scheme defines how a `View` should look based on its purpose (e.g. Menu or Dialog).
 /// </summary>
-public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<string, Scheme?>
+public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
 #pragma warning disable IDE1006 // Naming Styles
     private static readonly object _schemesLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
-    ///     INTERNAL: Gets the hard-coded schemes defined by <see cref="View"/>. These are not loaded from the configuration files,
+    ///     INTERNAL: Gets the hard-coded schemes defined by <see cref="View"/>. These are not loaded from the configuration
+    ///     files,
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
     internal static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes ()!; }
 
     /// <summary>
-    ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Drawing.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
+    ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Drawing.Schemes)"/>, <see cref="GetSchemeNames"/>,
+    ///     <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
@@ -54,7 +58,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    private static void SetSchemes (Dictionary<string, Scheme?>? value)
+    internal static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
         lock (_schemesLock)
         {
@@ -117,6 +121,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     {
         // Convert schemeName to string via Enum api
         string? schemeNameString = SchemesToSchemeName (schemeName);
+
         if (schemeNameString is null)
         {
             throw new ArgumentException ($"Invalid scheme name: {schemeName}");
@@ -131,10 +136,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <param name="schemeName"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public static Scheme GetScheme (string schemeName)
-    {
-        return GetSchemesForCurrentTheme ()! [schemeName]!;
-    }
+    public static Scheme GetScheme (string schemeName) { return GetSchemesForCurrentTheme ()! [schemeName]!; }
 
     /// <summary>
     ///     Gets the name of the specified <see cref="Schemes"/>. Will throw an exception if <paramref name="schemeName"/>
@@ -142,10 +144,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// </summary>
     /// <param name="schemeName"></param>
     /// <returns>The name of scheme.</returns>
-    public static string? SchemesToSchemeName (Schemes schemeName)
-    {
-        return Enum.GetName (typeof (Schemes), schemeName);
-    }
+    public static string? SchemesToSchemeName (Schemes schemeName) { return Enum.GetName (typeof (Schemes), schemeName); }
 
     /// <summary>
     ///     Converts a string to a <see cref="Schemes"/> enum value.
@@ -158,11 +157,12 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             return value?.ToString ();
         }
+
         return null;
     }
 
     /// <summary>
-    ///     Get the dictionary schemes from the selected theme loaded from configuration.
+    ///     Get the dictionary of schemes from the current theme. Current means active.
     /// </summary>
     /// <returns></returns>
     public static Dictionary<string, Scheme?> GetSchemesForCurrentTheme ()
@@ -194,5 +194,15 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             return GetSchemes ()!.Keys.ToImmutableList ();
         }
+    }
+
+    [RequiresUnreferencedCode ("Calls SetSchemes")]
+    [RequiresDynamicCode ("Calls SetSchemes")]
+    internal static void LoadToHardCodedDefaults ()
+    {
+        // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This is a partial workaround
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        SetSchemes (GetHardCodedSchemes ()!.ToDictionary ());
     }
 }
