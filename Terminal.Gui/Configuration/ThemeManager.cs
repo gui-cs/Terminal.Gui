@@ -265,7 +265,11 @@ public static class ThemeManager
     /// </summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void UpdateToCurrentValues () { Themes! [Theme].UpdateToCurrentValues (); }
+    internal static void UpdateToCurrentValues ()
+    {
+        // BUGBUG: This corrupts _hardCodedDefaults
+        Themes! [Theme].UpdateToCurrentValues ();
+    }
 
     /// <summary>
     ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained

@@ -212,6 +212,11 @@ public static class ConfigurationManager
         }
 
         LoadHardCodedDefaults ();
+
+        // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This a partial workaround.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        ThemeManager.Themes? [ThemeManager.Theme]?.Apply ();
     }
 
     #endregion Initialization

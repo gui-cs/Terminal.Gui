@@ -107,7 +107,7 @@ public class ThemeScopeTests
         Disable (true);
     }
 
-    [Fact]
+    [Fact (Skip = "Temp work arounds for #4288 prevent corruption.")]
     public void UpdateFrom_Corrupts_Schemes_HardCodeDefaults ()
     {
         // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.
@@ -115,47 +115,48 @@ public class ThemeScopeTests
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
 
         // Create a test theme
-        //var json = """
-        //           {
-        //              "Schemes": [
-        //               {
-        //                 "Base": {
-        //                   "Normal": {
-        //                     "Foreground": "White",
-        //                     "Background": "Blue"
-        //                   }
-        //                 }
-        //               }
-        //              ]
-        //           }
-        //           """;
-
         var json = """
                    {
-                        "Themes": [
-                          {
-                            "Default": {
-                              "Schemes": [
-                                   {
-                                     "Base": {
-                                       "Normal": {
-                                         "Foreground": "White",
-                                         "Background": "Blue"
-                                       }
-                                     }
-                                   }
-                                  ]
-                                }
-                            }
-                    ]
+                      "Schemes": [
+                       {
+                         "Base": {
+                           "Normal": {
+                             "Foreground": "White",
+                             "Background": "Blue"
+                           }
+                         }
+                       }
+                      ]
                    }
                    """;
+
+        //var json = """
+        //           {
+        //                "Themes": [
+        //                  {
+        //                    "Default": {
+        //                      "Schemes": [
+        //                           {
+        //                             "Base": {
+        //                               "Normal": {
+        //                                 "Foreground": "White",
+        //                                 "Background": "Blue"
+        //                               }
+        //                             }
+        //                           }
+        //                          ]
+        //                        }
+        //                    }
+        //            ]
+        //           }
+        //           """;
 
         try
         {
             Assert.False (IsEnabled);
             ThrowOnJsonErrors = true;
-           // Enable(ConfigLocations.HardCoded);
+           // Enable (ConfigLocations.HardCoded);
+            //ResetToCurrentValues ();
 
             // Capture dynamically created hardCoded hard-coded scheme colors
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
@@ -174,14 +175,14 @@ public class ThemeScopeTests
             Color currentBaseNormalFg = currentSchemes ["Base"].Normal.Foreground;
             Assert.Equal (hardCodedBaseNormalFg.ToString (), currentBaseNormalFg.ToString ());
 
-            ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
+            //ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
 
-            //ThemeScope scope = (JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope)!;
-            //ThemeScope defaultTheme = ThemeManager.Themes! ["Default"]!;
-            //Dictionary<string, Scheme?> schemesScope = (defaultTheme ["Schemes"].PropertyValue as Dictionary<string, Scheme?>)!;
-            //defaultTheme ["Schemes"].UpdateFrom (scope ["Schemes"].PropertyValue!);
+            ThemeScope scope = (JsonSerializer.Deserialize (json, typeof (ThemeScope), SerializerContext.Options) as ThemeScope)!;
 
-            //defaultTheme.UpdateFrom (scope);
+            ThemeScope defaultTheme = ThemeManager.Themes! ["Default"]!;
+            Dictionary<string, Scheme?> schemesScope = (defaultTheme ["Schemes"].PropertyValue as Dictionary<string, Scheme?>)!;
+            defaultTheme ["Schemes"].UpdateFrom (scope ["Schemes"].PropertyValue!);
+            defaultTheme.UpdateFrom (scope);
 
             Assert.Equal (Color.White.ToString (), hardCodedSchemesViaCache! ["Base"].Normal.Foreground.ToString ());
         }

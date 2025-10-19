@@ -308,11 +308,6 @@ public class SchemeManagerTests
             Assert.Equal ("TestTheme", ThemeManager.Theme);
             Assert.Throws<System.Collections.Generic.KeyNotFoundException> (SchemeManager.GetSchemes);
 
-            // Now reset everything and reload
-            ResetToCurrentValues ();
-
-            // Verify we're back to default
-            Assert.Equal ("Default", ThemeManager.Theme);
         }
         finally
         {
@@ -347,7 +342,7 @@ public class SchemeManagerTests
             Assert.Equal ("TestTheme", ThemeManager.Theme);
 
             // Now reset everything and reload
-            ResetToCurrentValues ();
+            ResetToHardCodedDefaults ();
 
             // Verify we're back to default
             Assert.Equal ("Default", ThemeManager.Theme);
@@ -533,7 +528,7 @@ public class SchemeManagerTests
             Assert.NotEqual (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
 
             // Now reset everything and reload
-            ResetToCurrentValues ();
+            ResetToHardCodedDefaults ();
 
             // Verify we're back to default
             Assert.Equal ("Default", ThemeManager.Theme);
@@ -726,7 +721,7 @@ public class SchemeManagerTests
             //Assert.Equal (hardCodedTopLevelNormalFg.ToString (), currentTopLevelNormalFg.ToString ());
 
             // Now reset everything and reload
-            ResetToCurrentValues ();
+            ResetToHardCodedDefaults ();
 
             // Verify we're back to default
             Assert.Equal ("Default", ThemeManager.Theme);

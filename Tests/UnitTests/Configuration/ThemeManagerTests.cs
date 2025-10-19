@@ -237,7 +237,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
             Assert.Equal ("TestTheme", ThemeManager.Theme);
 
             // Now reset everything and reload
-            ResetToCurrentValues ();
+            ResetToHardCodedDefaults ();
 
             // Verify we're back to default
             Assert.Equal ("Default", ThemeManager.Theme);
