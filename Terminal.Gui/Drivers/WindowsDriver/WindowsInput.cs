@@ -61,6 +61,11 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 
     protected override bool Peek ()
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return false;
+        }
+
         const int bufferSize = 1; // We only need to check if there's at least one event
         nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
 
@@ -80,11 +85,8 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
         }
         catch (Exception ex)
         {
-            if (!ConsoleDriver.RunningUnitTests)
-            {
-                // Optionally log the exception
-                Console.WriteLine ($"Error in Peek: {ex.Message}");
-            }
+            // Optionally log the exception
+            Console.WriteLine ($"Error in Peek: {ex.Message}");
 
             return false;
         }
