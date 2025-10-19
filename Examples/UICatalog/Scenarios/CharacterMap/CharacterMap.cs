@@ -371,12 +371,7 @@ public class CharacterMap : Scenario
         options [0] = "All";
         Array.Copy (allCategoryNames, 0, options, 1, allCategoryNames.Length);
 
-        // TODO: When #4126 is merged update this to use OptionSelector<UnicodeCategory?>
-        var selector = new OptionSelector
-        {
-            AssignHotKeysToCheckBoxes = true,
-            Options = options
-        };
+        var selector = new OptionSelector<UnicodeCategory> ();
 
         _unicodeCategorySelector = selector;
 
@@ -405,6 +400,6 @@ public class CharacterMap : Scenario
                                             }
                                         };
 
-        return new() { CommandView = selector };
+        return new () { CommandView = selector };
     }
 }

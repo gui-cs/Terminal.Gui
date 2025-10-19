@@ -469,10 +469,10 @@ public class Shortcut : View, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStates = HighlightStates.None;
-        if (CommandView.InvertFocusAttribute is null)
-        {
-            CommandView.InvertFocusAttribute = CanFocus;
-        }
+        //if (CommandView.InvertFocusAttribute is null)
+        //{
+        //    CommandView.InvertFocusAttribute = CanFocus;
+        //}
 
         //CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -562,7 +562,7 @@ public class Shortcut : View, IDesignable
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = true;
         HelpView.HighlightStates = ViewBase.MouseState.None;
-        HelpView.InvertFocusAttribute = true;
+        //HelpView.InvertFocusAttribute = true;
 
         //HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -697,7 +697,7 @@ public class Shortcut : View, IDesignable
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
         KeyView.HighlightStates = ViewBase.MouseState.None;
-        KeyView.InvertFocusAttribute = true;
+        //KeyView.InvertFocusAttribute = true;
 
         KeyView.DrawingText += (sender, args) =>
                                {

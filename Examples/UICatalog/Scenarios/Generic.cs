@@ -16,7 +16,7 @@ public sealed class Generic : Scenario
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None,
-            InvertFocusAttribute = true
+            //InvertFocusAttribute = true
         };
 
 
