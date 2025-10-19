@@ -12,7 +12,7 @@ public class LineCanvasTests : UnitTests.Parallelizable.ParallelizableBase
     #region Basic API Tests
 
     [Fact]
-    public void ToString_Empty ()
+    public void Empty_Canvas_ToString_Returns_EmptyString ()
     {
         var canvas = new LineCanvas ();
         Assert.Equal (string.Empty, canvas.ToString ());
@@ -123,7 +123,7 @@ public class LineCanvasTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Viewport_Specific ()
+    public void Bounds_Specific_Coordinates ()
     {
         var canvas = new LineCanvas ();
         canvas.AddLine (new (5, 5), 3, Orientation.Horizontal, LineStyle.Single);
