@@ -130,3 +130,50 @@ dotnet test
 1. Maintain existing code structure and organization unless explicitly told
 2. View sub-classes must not use private APIs
 3. Suggest changes to the `./docfx/docs/` folder when appropriate
+
+## Working with Pull Request Branches
+
+When creating PRs, include instructions at the end of each PR description for how to pull the branch down locally. Use the following template, adapted for the typical remote setup where `origin` points to the user's fork and `upstream` points to `gui-cs/Terminal.Gui`:
+
+```markdown
+## How to Pull This PR Branch Locally
+
+If you want to test or modify this PR locally, use one of these approaches based on your remote setup:
+
+### Method 1: Fetch from upstream (if branch exists there)
+```bash
+# Fetch the branch from upstream
+git fetch upstream <branch-name>
+
+# Switch to the branch
+git checkout <branch-name>
+
+# Make your changes, then commit them
+git add .
+git commit -m "Your commit message"
+
+# Push to your fork (origin)
+git push origin <branch-name>
+```
+
+### Method 2: Fetch by PR number
+```bash
+# Fetch the PR branch from upstream by PR number
+git fetch upstream pull/<PR_NUMBER>/head:<branch-name>
+
+# Switch to the branch
+git checkout <branch-name>
+
+# Make your changes, then commit them
+git add .
+git commit -m "Your commit message"
+
+# Push to your fork (origin)
+git push origin <branch-name>
+```
+
+The PR will automatically update when you push to the branch in your fork.
+```
+
+**Note:** Adjust the remote names if your setup differs (e.g., if `origin` points to `gui-cs/Terminal.Gui` and you have a separate remote for your fork).
+
