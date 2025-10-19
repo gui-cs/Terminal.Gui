@@ -80,8 +80,11 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
         }
         catch (Exception ex)
         {
-            // Optionally log the exception
-            Console.WriteLine ($"Error in Peek: {ex.Message}");
+            if (!ConsoleDriver.RunningUnitTests)
+            {
+                // Optionally log the exception
+                Console.WriteLine ($"Error in Peek: {ex.Message}");
+            }
 
             return false;
         }
