@@ -315,15 +315,4 @@ public static class ThemeManager
 
     /// <summary>Raised when the selected theme has changed.</summary>
     public static event EventHandler<EventArgs<string>>? ThemeChanged;
-
-    /// <summary>
-    ///     Validates all themes in the <see cref="Themes"/> dictionary.
-    /// </summary>
-    public static void Validate ()
-    {
-        foreach (ThemeScope theme in Themes!.Values)
-        {
-            theme.Validate ();
-        }
-    }
 }

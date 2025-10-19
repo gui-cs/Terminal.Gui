@@ -456,10 +456,6 @@ public static class ConfigurationManager
         {
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
-
-        Settings!.Validate ();
-        ThemeManager.Validate ();
-        AppSettings!.Validate ();
     }
 
     // TODO: Rename to Loaded?
