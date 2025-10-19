@@ -44,7 +44,7 @@ public class AppSettingsScopeTests
         Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
         AppSettingsTestClass.NullableValueProperty = true;
-        ResetToCurrentValues ();
+        UpdateToCurrentValues ();
         Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings);
         Assert.True (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
@@ -74,7 +74,7 @@ public class AppSettingsScopeTests
         AppSettingsTestClass.NullableValueProperty = null;
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
-        ResetToCurrentValues ();
+        ResetToHardCodedDefaults ();
         Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
         Apply ();
@@ -82,7 +82,7 @@ public class AppSettingsScopeTests
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
         AppSettingsTestClass.NullableValueProperty = true;
-        ResetToCurrentValues ();
+        UpdateToCurrentValues ();
         Assert.True ((bool)AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue!);
         Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
