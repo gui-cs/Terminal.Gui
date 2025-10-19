@@ -40,9 +40,9 @@ This document summarizes the Category A test migration effort to move paralleliz
 - Orientation_Set
 
 **Tests that remain in UnitTests as integration tests:**
-- Draw_Default (requires Application.Init)
-- Draw_Horizontal (requires SetupFakeDriver)
-- Draw_Vertical (requires SetupFakeDriver)
+- Draw_Default (requires Application.Init with [AutoInitShutdown])
+- Draw_Horizontal (uses [SetupFakeDriver] - could potentially be migrated)
+- Draw_Vertical (uses [SetupFakeDriver] - could potentially be migrated)
 
 ## Key Findings
 
@@ -52,7 +52,7 @@ This document summarizes the Category A test migration effort to move paralleliz
 - Line intersection character selection
 - Style-specific characters (Single, Double, Heavy, etc.)
 
-**Solution:** Only migrate tests that check properties and behavior without verifying rendered output. Tests that verify visual output require Application.Driver and must remain as integration tests.
+**Solution:** Tests using [SetupFakeDriver] CAN be parallelized as long as they don't use Application statics. This includes rendering tests that verify visual output with DriverAssert.
 
 ### 2. Test Categories
 Tests fall into three categories:
@@ -60,17 +60,19 @@ Tests fall into three categories:
 **a) Pure Unit Tests (CAN be parallelized):**
 - Tests of properties (Bounds, Lines, Length, Orientation, Attribute, Fill)
 - Tests of basic operations (AddLine, Clear, Exclude, ClearExclusions)
-- Tests that don't require rendering or Application context
+- Tests that don't require Application static context
 
-**b) Rendering Tests (CANNOT be parallelized):**
-- Tests using View.Draw()
-- Tests that verify ToString() output with specific glyphs
-- Tests using GetCanvas() helper that creates View and uses DrawComplete event
+**b) Rendering Tests with [SetupFakeDriver] (CAN be parallelized):**
+- Tests using [SetupFakeDriver] without Application statics
+- Tests using View.Draw() and LayoutAndDraw() without Application statics
+- Tests that verify visual output with DriverAssert (when using [SetupFakeDriver])
+- Tests using GetCanvas() helper as long as Application statics are not used
 
-**c) Integration Tests (SHOULD NOT be parallelized):**
-- Tests using [AutoInitShutdown] or [SetupFakeDriver]
-- Tests that validate component behavior within Application context
-- Tests that require ConfigurationManager, keyboard/mouse input, or driver-specific behavior
+**c) Integration Tests (CANNOT be parallelized):**
+- Tests using [AutoInitShutdown]
+- Tests using Application.Begin, Application.RaiseKeyDownEvent, or other Application static methods
+- Tests that validate component behavior within full Application context
+- Tests that require ConfigurationManager or Application.Navigation
 
 ### 3. View/Adornment and View/Draw Tests
 **Finding:** After analyzing these tests, they all use [SetupFakeDriver] and test View.Draw() with visual verification. These are integration tests that validate how adornments render within the View system. They correctly belong in UnitTests.
@@ -95,10 +97,12 @@ When migrating tests, use this checklist:
 - ✅ Tests properties without rendering
 - ✅ Tests basic operations (add, remove, clear)
 - ✅ Tests constructors and defaults
-- ❌ Uses [AutoInitShutdown] or [SetupFakeDriver]
-- ❌ Calls View.Draw(), View.LayoutAndDraw(), or rendering methods
-- ❌ Verifies visual output (ToString(), DriverAssert)
-- ❌ Requires Application context, ConfigurationManager, or driver
+- ✅ Uses [SetupFakeDriver] without Application statics (can run concurrently)
+- ✅ Calls View.Draw(), View.LayoutAndDraw() without Application statics
+- ✅ Verifies visual output with DriverAssert (when using [SetupFakeDriver])
+- ❌ Uses [AutoInitShutdown]
+- ❌ Requires Application context, Application.Navigation, or other static Application members
+- ❌ Requires ConfigurationManager
 
 ### 2. Documentation
 Update test documentation to clarify:
@@ -110,20 +114,26 @@ Update test documentation to clarify:
 - Default to UnitTests.Parallelizable for new tests unless they require Application/Driver
 - When testing rendering, create both:
   - Pure unit test (properties, behavior) in Parallelizable
-  - Integration test (rendering) in UnitTests
+  - Rendering test with [SetupFakeDriver] can also go in Parallelizable (as long as Application statics are not used)
+  - Integration test (Application context) in UnitTests
 
 ### 4. Remaining Category A Tests
-**Status:** Analyzed and determined NOT to migrate
+**Status:** Can be re-evaluated for migration
 
 **Rationale:**
-- View/Adornment/* tests (19 tests): All test View.Draw() with visual verification - integration tests
-- View/Draw/* tests (32 tests): All test View rendering and visual output - integration tests
-- These tests correctly belong in UnitTests as they validate component integration
+- View/Adornment/* tests (19 tests): Use [SetupFakeDriver] and test View.Draw() - CAN be migrated if they don't use Application statics
+- View/Draw/* tests (32 tests): Use [SetupFakeDriver] and test rendering - CAN be migrated if they don't use Application statics
+- Need to analyze each test individually to check for Application static dependencies
 
 ## Conclusion
 
-This migration successfully identified and moved 35 pure unit tests from Category A to UnitTests.Parallelizable. The remaining tests in Category A are integration tests that correctly belong in UnitTests as they validate rendering and component behavior within the Application context.
+This migration successfully identified and moved 52 tests (35 Category A + 17 Views) to UnitTests.Parallelizable. 
 
-The approach taken was surgical and focused on tests that clearly don't require global state. This ensures the migrated tests can run in parallel without interference while maintaining the integrity of integration tests that validate the full component behavior.
+**Key Discovery:** Tests with [SetupFakeDriver] CAN run in parallel as long as they avoid Application statics. This significantly expands the scope of tests that can be parallelized beyond just property/constructor tests to include rendering tests.
 
-**Migration Rate:** 35 out of ~86 Category A tests (41%) were identified as pure unit tests and migrated. The remaining 59% are integration tests that should remain in UnitTests.
+The approach taken was to:
+1. Identify tests that don't use Application.Begin, Application.RaiseKeyDownEvent, Application.Navigation, or other Application static members
+2. Keep [SetupFakeDriver] tests that only use View.Draw() and DriverAssert
+3. Move [AutoInitShutdown] tests only if they can be rewritten to not use Application.Begin
+
+**Migration Rate:** 52 tests migrated so far. Many more tests with [SetupFakeDriver] can potentially be migrated once they're analyzed for Application static usage. Estimated ~3,400 tests remaining to analyze.
