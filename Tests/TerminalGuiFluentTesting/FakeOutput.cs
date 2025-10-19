@@ -4,7 +4,7 @@ namespace TerminalGuiFluentTesting;
 
 internal class FakeOutput : IConsoleOutput
 {
-    public IOutputBuffer LastBuffer { get; set; }
+    public IOutputBuffer? LastBuffer { get; set; }
     public Size Size { get; set; }
 
     /// <inheritdoc/>

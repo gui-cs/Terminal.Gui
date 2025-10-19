@@ -172,7 +172,7 @@ public sealed class Themes : Scenario
                                                     else
                                                     {
                                                         appWindow.Remove (allViewsView);
-                                                        allViewsView.Dispose ();
+                                                        allViewsView!.Dispose ();
                                                         allViewsView = null;
 
                                                         appWindow.Add (viewFrame);

@@ -780,7 +780,6 @@ public class TileView : View
             line.Height = _orientation == Orientation.Vertical
                               ? Dim.Fill ()
                               : 1;
-            line.LineRune = _orientation == Orientation.Vertical ? Glyphs.VLine : Glyphs.HLine;
 
             if (_orientation == Orientation.Vertical)
             {
@@ -864,7 +863,7 @@ public class TileView : View
         }
     }
 
-    private class TileViewLineView : LineView
+    private class TileViewLineView : Line
     {
         public Point? moveRuneRenderLocation;
 

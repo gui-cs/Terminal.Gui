@@ -222,10 +222,12 @@ public class RuneTests
     [InlineData (
                     '\u4dc0',
                     "䷀",
-                    1,
+                    2,
                     1,
                     3
-                )] // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+                )]  // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+                    // See https://github.com/microsoft/terminal/issues/19389
+
     [InlineData ('\ud7b0', "ힰ", 1, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
     [InlineData ('\uf61e', "", 1, 1, 3)] // Private Use Area
     [InlineData ('\u23f0', "⏰", 2, 1, 3)] // Alarm Clock - ⏰ U+23f0

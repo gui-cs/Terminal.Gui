@@ -11,8 +11,10 @@ using Terminal.Gui.Views;
 using Attribute = Terminal.Gui.Drawing.Attribute;
 
 // Override the default configuration for the application to use the Light theme
-ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
+//ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
 ConfigurationManager.Enable(ConfigLocations.All);
+
+
 
 Application.Run<ExampleWindow> ().Dispose ();
 
@@ -89,5 +91,22 @@ public class ExampleWindow : Window
 
         // Add the views to the Window
         Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
+
+        ListView lv = new ListView ()
+        {
+            Y = Pos.AnchorEnd(),
+            Height= Dim.Auto(),
+            Width = Dim.Auto()
+        };
+        lv.SetSource (["One", "Two", "Three", "Four"]);
+        Add (lv);
+    }
+
+    public override void EndInit ()
+    {
+        base.EndInit ();
+        // Set the theme to "Anders" if it exists, otherwise use "Default"
+        ThemeManager.Theme = ThemeManager.GetThemeNames ().FirstOrDefault (x => x == "Anders") ?? "Default";
     }
 }
+ 

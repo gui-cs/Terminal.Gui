@@ -6,9 +6,11 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>Base class for Terminal.Gui IConsoleDriver implementations.</summary>
 /// <remarks>
-///     There are currently four implementations: - <see cref="CursesDriver"/> (for Unix and Mac) -
-///     <see cref="WindowsDriver"/> - <see cref="NetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
-///     for unit testing.
+///     There are currently four implementations:
+/// - DotNetDriver that uses the .NET Console API and works on all platforms
+/// - UnixDriver optimized for Unix and Mac.
+/// - WindowsDriver optimized for Windows.
+/// - FakeDriver for unit testing.
 /// </remarks>
 public abstract class ConsoleDriver : IConsoleDriver
 {
@@ -32,7 +34,7 @@ public abstract class ConsoleDriver : IConsoleDriver
 
     #region ANSI Esc Sequence Handling
 
-    // QUESTION: This appears to be an API to help in debugging. It's only implemented in CursesDriver and WindowsDriver.
+    // QUESTION: This appears to be an API to help in debugging. It's only implemented in UnixDriver and WindowsDriver.
     // QUESTION: Can it be factored such that it does not contaminate the ConsoleDriver API?
     /// <summary>
     ///     Provide proper writing to send escape sequence recognized by the <see cref="ConsoleDriver"/>.
@@ -269,7 +271,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                         if (Contents [Row, Col - 1].Rune.GetColumns () > 1)
                         {
                             // Invalidate cell to left
-                            Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
+                            Contents [Row, Col - 1].Rune = (Rune)'\0';
                             Contents [Row, Col - 1].IsDirty = true;
                         }
                     }
@@ -308,7 +310,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                             {
                                 // Invalidate cell to right so that it doesn't get drawn
                                 // TODO: Figure out if it is better to show a replacement character or ' '
-                                Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
+                                Contents [Row, Col + 1].Rune = (Rune)'\0';
                                 Contents [Row, Col + 1].IsDirty = true;
                             }
                         }
@@ -535,7 +537,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     #endregion Cursor Handling
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
+    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
     public abstract void Suspend ();
 
     /// <summary>Sets the position of the terminal cursor to <see cref="Col"/> and <see cref="Row"/>.</summary>
@@ -579,7 +581,6 @@ public abstract class ConsoleDriver : IConsoleDriver
         set => Application.Force16Colors = value || !SupportsTrueColor;
     }
 
-    private Attribute _currentAttribute;
     private int _cols;
     private int _rows;
 
@@ -587,22 +588,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
     ///     call.
     /// </summary>
-    public Attribute CurrentAttribute
-    {
-        get => _currentAttribute;
-        set
-        {
-            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
-            if (Application.Driver is { })
-            {
-                _currentAttribute = new (value.Foreground, value.Background, value.Style);
-
-                return;
-            }
-
-            _currentAttribute = value;
-        }
-    }
+    public Attribute CurrentAttribute { get; set; }
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
@@ -619,8 +605,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return CurrentAttribute; }
 
-    // TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
-    // removed (and Attribute can lose the platformColor property).
     /// <summary>Makes an <see cref="Attribute"/>.</summary>
     /// <param name="foreground">The foreground color.</param>
     /// <param name="background">The background color.</param>
@@ -629,7 +613,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     {
         // Encode the colors into the int value.
         return new (
-                    0xFF, // only used by cursesdriver!
                     foreground,
                     background
                    );
@@ -681,16 +664,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="a"></param>
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
-    // TODO: Remove this API - it was needed when we didn't have a reliable way to simulate key presses.
-    // TODO: We now do: Application.RaiseKeyDown and Application.RaiseKeyUp
-    /// <summary>Simulates a key press.</summary>
-    /// <param name="keyChar">The key character.</param>
-    /// <param name="key">The key.</param>
-    /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-    /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-    /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
     internal char _highSurrogate = '\0';
 
     internal bool IsValidInput (KeyCode keyCode, out KeyCode result)
@@ -707,6 +680,22 @@ public abstract class ConsoleDriver : IConsoleDriver
         if (_highSurrogate > 0 && char.IsLowSurrogate ((char)keyCode))
         {
             result = (KeyCode)new Rune (_highSurrogate, (char)keyCode).Value;
+
+            if ((keyCode & KeyCode.AltMask) != 0)
+            {
+                result |= KeyCode.AltMask;
+            }
+
+            if ((keyCode & KeyCode.CtrlMask) != 0)
+            {
+                result |= KeyCode.CtrlMask;
+            }
+
+            if ((keyCode & KeyCode.ShiftMask) != 0)
+            {
+                result |= KeyCode.ShiftMask;
+            }
+
             _highSurrogate = '\0';
 
             return true;

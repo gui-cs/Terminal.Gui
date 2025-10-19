@@ -39,6 +39,40 @@ public class SchemeTests
         Assert.True (schemes.ContainsKey ("TopLevel"));
     }
 
+
+    [Fact]
+    public void GetHardCodedSchemes_Have_Expected_Normal_Attributes ()
+    {
+        var schemes = Scheme.GetHardCodedSchemes ();
+        Assert.NotNull (schemes);
+
+        // Base
+        var baseScheme = schemes! ["Base"];
+        Assert.NotNull (baseScheme);
+        Assert.Equal (new Attribute (StandardColor.LightBlue, StandardColor.RaisinBlack), baseScheme!.Normal);
+
+        // Dialog
+        var dialogScheme = schemes ["Dialog"];
+        Assert.NotNull (dialogScheme);
+        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme!.Normal);
+
+        // Error
+        var errorScheme = schemes ["Error"];
+        Assert.NotNull (errorScheme);
+        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme!.Normal);
+
+        // Menu (Bold style)
+        var menuScheme = schemes ["Menu"];
+        Assert.NotNull (menuScheme);
+        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
+
+        // Toplevel
+        var toplevelScheme = schemes ["Toplevel"];
+        Assert.NotNull (toplevelScheme);
+        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), toplevelScheme!.Normal.ToString ());
+    }
+
+
     [Fact]
     public void Built_Ins_Are_Implicit ()
     {
