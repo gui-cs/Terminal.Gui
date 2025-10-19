@@ -81,7 +81,7 @@ public class ThemeScopeTests
             JsonSerializer.Deserialize<ConcurrentDictionary<string, ThemeScope>> (serialized, SerializerContext.Options);
 
         Assert.NotEqual (initial, deserialized);
-        Assert.Equal (deserialized.Count, initial!.Count);
+        Assert.Equal (deserialized!.Count, initial!.Count);
 
         Disable (true);
     }

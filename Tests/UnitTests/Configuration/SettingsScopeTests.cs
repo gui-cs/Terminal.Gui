@@ -76,9 +76,9 @@ public class SettingsScopeTests
         Load (ConfigLocations.Runtime);
 
         // assert
-        Assert.Equal (2, ThemeManager.GetThemes ().Count);
+        Assert.Equal (2, ThemeManager.Themes!.Count);
         Assert.Equal (MouseState.None, (MouseState)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStates"].PropertyValue!);
-        Assert.Equal (MouseState.In, (MouseState)ThemeManager.GetThemes () ["NewTheme"] ["Button.DefaultHighlightStates"].PropertyValue!);
+        Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes ["NewTheme"] ["Button.DefaultHighlightStates"].PropertyValue!);
 
         RuntimeConfig = """
                         {
@@ -95,7 +95,7 @@ public class SettingsScopeTests
         Load (ConfigLocations.Runtime);
 
         // assert
-        Assert.Equal (2, ThemeManager.GetThemes ().Count);
+        Assert.Equal (2, ThemeManager.Themes.Count);
         Assert.Equal (MouseState.Pressed, (MouseState)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultHighlightStates"].PropertyValue!);
         Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStates"].PropertyValue!);
 
@@ -141,7 +141,7 @@ public class SettingsScopeTests
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
         Enable (ConfigLocations.HardCoded);
-        Settings ["Application.QuitKey"].PropertyValue = Key.End;
+        Settings! ["Application.QuitKey"].PropertyValue = Key.End;
 
         var updatedSettings = new SettingsScope ();
         updatedSettings.LoadHardCodedDefaults ();
