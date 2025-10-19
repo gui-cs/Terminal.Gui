@@ -102,4 +102,37 @@ public class BarTests
         bar.LayoutSubViews ();
         // TODO: Assert specific layout expectations for vertical orientation
     }
+
+    [Fact]
+    public void GetAttributeForRole_DoesNotDeferToSuperView_WhenSchemeNameIsSet ()
+    {
+        // This test would fail before the fix that checks SchemeName in GetAttributeForRole
+        // StatusBar and MenuBarv2 set SchemeName = "Menu", and should use Menu scheme
+        // instead of deferring to parent's customized attributes
+        
+        var parentView = new View { SchemeName = "Base" };
+        var statusBar = new StatusBar ();
+        parentView.Add (statusBar);
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // StatusBar sets SchemeName = "Menu" in its constructor
+        // Before the fix: StatusBar would defer to parent and get customAttribute (WRONG)
+        // After the fix: StatusBar uses Menu scheme (CORRECT)
+        var menuScheme = SchemeManager.GetHardCodedSchemes ()? ["Menu"];
+        Assert.NotEqual (customAttribute, statusBar.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (menuScheme!.Normal, statusBar.GetAttributeForRole (VisualRole.Normal));
+
+        statusBar.Dispose ();
+        parentView.Dispose ();
+    }
 }
