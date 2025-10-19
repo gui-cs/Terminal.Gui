@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 60
+    timeout-minutes: 10
     steps:
 
     - name: Checkout code
@@ -49,35 +49,8 @@ jobs:
       run: echo "{VSTEST_DUMP_PATH}={logs/UnitTests/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTests
-      shell: bash
       run: |
-        if [ "${{ runner.os }}" == "macOS" ]; then
-          # Run tests 10 times on macOS to verify stability
-          echo "Running tests 10 times on macOS to verify fix for intermittent failures..."
-          PASSED=0
-          FAILED=0
-          for i in {1..10}; do
-            echo "========================================="
-            echo "macOS Test Run $i/10"
-            echo "========================================="
-            if dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/UnitTests/${{ runner.os }}/logs_run_$i.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false; then
-              echo "✓ Run $i PASSED"
-              PASSED=$((PASSED + 1))
-            else
-              echo "✗ Run $i FAILED"
-              FAILED=$((FAILED + 1))
-            fi
-          done
-          echo "========================================="
-          echo "macOS Test Summary: $PASSED passed, $FAILED failed out of 10 runs"
-          echo "========================================="
-          if [ $FAILED -gt 0 ]; then
-            exit 1
-          fi
-        else
-          # Run tests once on other platforms
-          dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/UnitTests/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false
-        fi
+       dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/UnitTests/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false
      
        # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
 
@@ -99,7 +72,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 60
+    timeout-minutes: 10
     steps:
 
     - name: Checkout code
@@ -128,35 +101,8 @@ jobs:
       run: echo "{VSTEST_DUMP_PATH}={logs/UnitTestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTestsParallelizable
-      shell: bash
       run: |
-        if [ "${{ runner.os }}" == "macOS" ]; then
-          # Run tests 10 times on macOS to verify stability
-          echo "Running tests 10 times on macOS to verify fix for intermittent failures..."
-          PASSED=0
-          FAILED=0
-          for i in {1..10}; do
-            echo "========================================="
-            echo "macOS Test Run $i/10"
-            echo "========================================="
-            if dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs_run_$i.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false; then
-              echo "✓ Run $i PASSED"
-              PASSED=$((PASSED + 1))
-            else
-              echo "✗ Run $i FAILED"
-              FAILED=$((FAILED + 1))
-            fi
-          done
-          echo "========================================="
-          echo "macOS Test Summary: $PASSED passed, $FAILED failed out of 10 runs"
-          echo "========================================="
-          if [ $FAILED -gt 0 ]; then
-            exit 1
-          fi
-        else
-          # Run tests once on other platforms
-          dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false
-        fi
+       dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false
      
        # mv -v Tests/UnitTestsParallelizable/TestResults/*/*.* TestResults/UnitTestsParallelizable/
 
