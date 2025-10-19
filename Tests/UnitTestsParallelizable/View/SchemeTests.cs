@@ -269,4 +269,269 @@ public class SchemeTests
         view.Dispose ();
     }
 
+    [Fact]
+    public void GetAttributeForRole_SubView_DefersToSuperView_WhenNoExplicitScheme ()
+    {
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child without explicit scheme should get customized attribute from parent
+        Assert.Equal (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_SubView_UsesOwnScheme_WhenExplicitlySet ()
+    {
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        // Set explicit scheme on child
+        var childScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        childView.SetScheme (childScheme);
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child with explicit scheme should NOT get customized attribute from parent
+        Assert.NotEqual (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (childScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_Adornment_UsesParentScheme ()
+    {
+        // Border (an Adornment) doesn't have a SuperView but should use its Parent's scheme
+        var view = new View { SchemeName = "Dialog" };
+        var border = view.Border!;
+        
+        Assert.NotNull (border);
+        Assert.Null (border.SuperView); // Adornments don't have SuperView
+        Assert.NotNull (border.Parent);
+        
+        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        
+        // Border should use its Parent's scheme, not Base
+        Assert.Equal (dialogScheme!.Normal, border.GetAttributeForRole (VisualRole.Normal));
+        
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_SubView_UsesSchemeName_WhenSet ()
+    {
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        // Set SchemeName on child (not explicit scheme)
+        childView.SchemeName = "Dialog";
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child with SchemeName should NOT get customized attribute from parent
+        // It should use the Dialog scheme instead
+        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Assert.NotEqual (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (dialogScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_NestedHierarchy_DefersCorrectly ()
+    {
+        // Test: grandchild without explicit scheme defers through parent to grandparent
+        // Would fail without the SuperView deferral fix (commit 154ac15)
+        
+        var grandparentView = new View { SchemeName = "Base" };
+        var parentView = new View (); // No scheme or SchemeName
+        var childView = new View (); // No scheme or SchemeName
+        
+        grandparentView.Add (parentView);
+        parentView.Add (childView);
+
+        // Grandparent customizes attributes
+        var customAttribute = new Attribute (Color.BrightYellow, Color.BrightBlue);
+        grandparentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child should get attribute from grandparent through parent
+        Assert.Equal (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+        
+        // Parent should also get attribute from grandparent
+        Assert.Equal (customAttribute, parentView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+        grandparentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_ParentWithSchemeNameBreaksChain ()
+    {
+        // Test: parent with SchemeName stops deferral chain
+        // Would fail without the SchemeName check (commit 866e002)
+        
+        var grandparentView = new View { SchemeName = "Base" };
+        var parentView = new View { SchemeName = "Dialog" }; // Sets SchemeName
+        var childView = new View (); // No scheme or SchemeName
+        
+        grandparentView.Add (parentView);
+        parentView.Add (childView);
+
+        // Grandparent customizes attributes
+        var customAttribute = new Attribute (Color.BrightYellow, Color.BrightBlue);
+        grandparentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Parent should NOT get grandparent's customization (it has SchemeName)
+        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Assert.NotEqual (customAttribute, parentView.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (dialogScheme!.Normal, parentView.GetAttributeForRole (VisualRole.Normal));
+        
+        // Child should get parent's Dialog scheme (defers to parent, parent uses Dialog scheme)
+        Assert.Equal (dialogScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+        grandparentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_OnGettingAttributeForRole_TakesPrecedence ()
+    {
+        // Test: view's own OnGettingAttributeForRole takes precedence over parent
+        // This should work with or without the fix, but validates precedence
+        
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new TestViewWithAttributeOverride ();
+        parentView.Add (childView);
+
+        // Parent customizes attributes
+        var parentAttribute = new Attribute (Color.BrightYellow, Color.BrightBlue);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = parentAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child's own override should take precedence
+        var childOverrideAttribute = new Attribute (Color.BrightRed, Color.BrightCyan);
+        childView.OverrideAttribute = childOverrideAttribute;
+        
+        Assert.Equal (childOverrideAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_MultipleRoles_DeferCorrectly ()
+    {
+        // Test: multiple VisualRoles all defer correctly
+        // Would fail without the SuperView deferral fix for any role
+        
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        var normalAttr = new Attribute (Color.Red, Color.Blue);
+        var focusAttr = new Attribute (Color.Green, Color.Yellow);
+        var hotNormalAttr = new Attribute (Color.Magenta, Color.Cyan);
+
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            switch (args.Role)
+            {
+                case VisualRole.Normal:
+                    args.Result = normalAttr;
+                    args.Handled = true;
+                    break;
+                case VisualRole.Focus:
+                    args.Result = focusAttr;
+                    args.Handled = true;
+                    break;
+                case VisualRole.HotNormal:
+                    args.Result = hotNormalAttr;
+                    args.Handled = true;
+                    break;
+            }
+        };
+
+        // All roles should defer to parent
+        Assert.Equal (normalAttr, childView.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (focusAttr, childView.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (hotNormalAttr, childView.GetAttributeForRole (VisualRole.HotNormal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
+    private class TestViewWithAttributeOverride : View
+    {
+        public Attribute? OverrideAttribute { get; set; }
+
+        protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+        {
+            if (OverrideAttribute.HasValue && role == VisualRole.Normal)
+            {
+                currentAttribute = OverrideAttribute.Value;
+                return true;
+            }
+            return base.OnGettingAttributeForRole (role, ref currentAttribute);
+        }
+    }
+
 }
