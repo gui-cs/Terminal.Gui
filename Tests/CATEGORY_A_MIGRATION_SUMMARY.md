@@ -93,16 +93,28 @@ Tests fall into three categories:
 ## Recommendations for Future Work
 
 ### 1. Continue Focused Migration
-When migrating tests, use this checklist:
-- ✅ Tests properties without rendering
-- ✅ Tests basic operations (add, remove, clear)
-- ✅ Tests constructors and defaults
-- ✅ Uses [SetupFakeDriver] without Application statics (can run concurrently)
-- ✅ Calls View.Draw(), View.LayoutAndDraw() without Application statics
-- ✅ Verifies visual output with DriverAssert (when using [SetupFakeDriver])
-- ❌ Uses [AutoInitShutdown]
-- ❌ Requires Application context, Application.Navigation, or other static Application members
-- ❌ Requires ConfigurationManager
+
+**Tests CAN be parallelized if they:**
+- ✅ Test properties, constructors, and basic operations
+- ✅ Use [SetupFakeDriver] without Application statics
+- ✅ Call View.Draw(), LayoutAndDraw() without Application statics
+- ✅ Verify visual output with DriverAssert (when using [SetupFakeDriver])
+- ✅ Create View hierarchies without Application.Top
+- ✅ Test events and behavior without global state
+
+**Tests CANNOT be parallelized if they:**
+- ❌ Use [AutoInitShutdown] (requires Application.Init/Shutdown global state)
+- ❌ Set Application.Driver (global singleton)
+- ❌ Call Application.Init(), Application.Run/Run<T>(), or Application.Begin()
+- ❌ Modify ConfigurationManager global state (Enable/Load/Apply/Disable)
+- ❌ Modify static properties (Key.Separator, CultureInfo.CurrentCulture, etc.)
+- ❌ Use Application.Top, Application.Driver, Application.MainLoop, or Application.Navigation
+- ❌ Are true integration tests testing multiple components together
+
+**Important Notes:**
+- Many tests blindly use the above when they don't need to and CAN be rewritten
+- Many tests APPEAR to be integration tests but are just poorly written and can be split
+- When in doubt, analyze if the test truly needs global state or can be refactored
 
 ### 2. Documentation
 Update test documentation to clarify:
