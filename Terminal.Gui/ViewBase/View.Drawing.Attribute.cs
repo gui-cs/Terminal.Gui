@@ -36,11 +36,12 @@ public partial class View
     public Attribute GetAttributeForRole (VisualRole role)
     {
         // Get the base attribute
-        // If this view doesn't have an explicit scheme, defer to SuperView for attribute resolution.
+        // If this view doesn't have an explicit scheme or scheme name, defer to SuperView for attribute resolution.
         // This allows parent views to customize attribute resolution for their children via
         // OnGettingAttributeForRole/GettingAttributeForRole.
+        // This matches the logic in GetScheme() where SchemeName takes precedence over SuperView inheritance.
         Attribute schemeAttribute;
-        if (!HasScheme && SuperView is { })
+        if (!HasScheme && string.IsNullOrEmpty (SchemeName) && SuperView is { })
         {
             schemeAttribute = SuperView.GetAttributeForRole (role);
         }

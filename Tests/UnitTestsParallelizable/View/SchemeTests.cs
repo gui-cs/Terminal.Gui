@@ -343,4 +343,35 @@ public class SchemeTests
         view.Dispose ();
     }
 
+    [Fact]
+    public void GetAttributeForRole_SubView_UsesSchemeName_WhenSet ()
+    {
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        // Set SchemeName on child (not explicit scheme)
+        childView.SchemeName = "Dialog";
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child with SchemeName should NOT get customized attribute from parent
+        // It should use the Dialog scheme instead
+        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Assert.NotEqual (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (dialogScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
 }
