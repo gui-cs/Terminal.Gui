@@ -202,7 +202,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     internal static void LoadToHardCodedDefaults ()
     {
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
-        // BUGBUG: This is a work around
+        // BUGBUG: This is a partial workaround
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
         Dictionary<string, Scheme?> schemeDict = GetHardCodedSchemes()!.ToDictionary ();
         SetSchemes (schemeDict);

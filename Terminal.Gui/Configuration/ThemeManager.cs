@@ -171,7 +171,7 @@ public static class ThemeManager
             if (p.Key == "Schemes")
             {
                 // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
-                // BUGBUG: This is a work around
+                // BUGBUG: This is a partial workaround
                 // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
                 val = SchemeManager.GetHardCodedSchemes ()!.ToDictionary ();
             }
@@ -275,6 +275,9 @@ public static class ThemeManager
     ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
     ///     when the module was initialized.
     /// </summary>
+    [RequiresUnreferencedCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
+    [RequiresDynamicCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
+
     internal static void LoadHardCodedDefaults ()
     {
         if (!ConfigurationManager.IsInitialized ())
@@ -302,7 +305,7 @@ public static class ThemeManager
                                                                         StringComparer.InvariantCultureIgnoreCase);
 
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
-        // BUGBUG: This is a work around
+        // BUGBUG: This is a partial workaround
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
         SchemeManager.LoadToHardCodedDefaults ();
 
