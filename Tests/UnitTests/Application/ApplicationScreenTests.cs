@@ -47,7 +47,7 @@ public class ApplicationScreenTests
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Top.SetNeedsLayout ();
+        Application.Top!.SetNeedsLayout ();
         Application.LayoutAndDraw ();
 
         // Assert
@@ -66,6 +66,20 @@ public class ApplicationScreenTests
 
         // Assert
         Assert.Equal (2, clearedContentsRaised);
+
+        // Act
+        Application.Top.Y = 1;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (3, clearedContentsRaised);
+
+        // Act
+        Application.Top.Height = 10;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (4, clearedContentsRaised);
 
         Application.End (rs);
 

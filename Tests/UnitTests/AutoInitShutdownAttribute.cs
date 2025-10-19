@@ -114,6 +114,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"Before: {methodUnderTest?.Name ?? "Unknown Test"}");
 
+        Debug.Assert (!CM.IsEnabled, "A previous test left ConfigurationManager enabled!");
+
         // Disable & force the ConfigurationManager to reset to its hardcoded defaults
         CM.Disable (true);
 

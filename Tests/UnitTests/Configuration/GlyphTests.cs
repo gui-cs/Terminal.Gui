@@ -10,39 +10,46 @@ public class GlyphTests
     [Fact]
     public void Apply_Applies_Over_Defaults ()
     {
-        // arrange
-        Enable (ConfigLocations.HardCoded);
+        try
+        {
+            // arrange
+            Enable (ConfigLocations.HardCoded);
 
-        Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
+            Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 
-        var glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
-        Assert.Equal ((Rune)'⟦', glyph);
+            var glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
+            Assert.Equal ((Rune)'⟦', glyph);
 
-        ThrowOnJsonErrors = true;
+            ThrowOnJsonErrors = true;
 
-        // act
-        RuntimeConfig = """
-                   {
-                       "Themes": [
-                           {
-                             "Default": 
-                                {
-                                    "Glyphs.LeftBracket": "["
-                                }
-                           }
-                       ]
-                   }
-                   """;
+            // act
+            RuntimeConfig = """
+                            {
+                                "Themes": [
+                                    {
+                                      "Default": 
+                                         {
+                                             "Glyphs.LeftBracket": "["
+                                         }
+                                    }
+                                ]
+                            }
+                            """;
 
-        Load (ConfigLocations.Runtime);
-        Apply ();
+            Load (ConfigLocations.Runtime);
 
-        // assert
-        glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
-        Assert.Equal ((Rune)'[', glyph);
-        Assert.Equal ((Rune)'[', Glyphs.LeftBracket);
+            Apply ();
 
-        // clean up
-        Disable (resetToHardCodedDefaults: true);
+            // assert
+            glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
+            Assert.Equal ((Rune)'[', glyph);
+            Assert.Equal ((Rune)'[', Glyphs.LeftBracket);
+        }
+        finally
+        {
+            // clean up
+            Disable (resetToHardCodedDefaults: true);
+
+        }
     }
 }
