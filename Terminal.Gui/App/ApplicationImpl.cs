@@ -108,6 +108,7 @@ public class ApplicationImpl : IApplication
             string.IsNullOrEmpty (driverName) && 
             _componentFactory is null)
         {
+            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
             _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
             _coordinator.StartAsync ().Wait ();
 
