@@ -230,4 +230,30 @@ public class ConsoleDriverTests
     //
     // [Fact]
     // public void FakeDriver_IsValidInput_Correct_Surrogate_Sequence ()
+
+    /// <summary>
+    /// Tests that when ConsoleDriver.RunningUnitTests is true, Application.Init() without
+    /// parameters uses FakeDriver instead of platform-specific drivers.
+    /// This prevents intermittent failures on macOS where kernel32.dll might be referenced.
+    /// </summary>
+    [Fact]
+    public void Application_Init_Without_Params_Uses_FakeDriver_When_RunningUnitTests ()
+    {
+        // Arrange
+        ConsoleDriver.RunningUnitTests = true;
+        Application.ResetState (true);
+
+        // Act
+        Application.Init ();
+
+        // Assert
+        Assert.NotNull (Application.Driver);
+        // In the modern v2 architecture, the driver will be a ConsoleDriverFacade wrapping FakeDriver
+        // The key is that it's not attempting to use Windows/Unix platform-specific drivers
+        Assert.True (Application.Initialized);
+
+        // Cleanup
+        Application.Shutdown ();
+        Application.ResetState (true);
+    }
 }

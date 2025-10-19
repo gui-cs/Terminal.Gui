@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Terminal.Gui.ConfigurationTests;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -525,7 +526,6 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-
         cb.Layout ();
 
         cb.Draw ();
