@@ -35,7 +35,19 @@ public partial class View
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Drawing.Scheme"/>.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
-        Attribute schemeAttribute = GetScheme ()!.GetAttributeForRole (role);
+        // Get the base attribute
+        // If this view doesn't have an explicit scheme, defer to SuperView for attribute resolution.
+        // This allows parent views to customize attribute resolution for their children via
+        // OnGettingAttributeForRole/GettingAttributeForRole.
+        Attribute schemeAttribute;
+        if (!HasScheme && SuperView is { })
+        {
+            schemeAttribute = SuperView.GetAttributeForRole (role);
+        }
+        else
+        {
+            schemeAttribute = GetScheme ()!.GetAttributeForRole (role);
+        }
 
         if (OnGettingAttributeForRole (role, ref schemeAttribute))
         {

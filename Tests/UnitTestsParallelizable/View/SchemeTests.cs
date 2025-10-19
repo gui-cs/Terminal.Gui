@@ -269,4 +269,59 @@ public class SchemeTests
         view.Dispose ();
     }
 
+    [Fact]
+    public void GetAttributeForRole_SubView_DefersToSuperView_WhenNoExplicitScheme ()
+    {
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child without explicit scheme should get customized attribute from parent
+        Assert.Equal (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
+    [Fact]
+    public void GetAttributeForRole_SubView_UsesOwnScheme_WhenExplicitlySet ()
+    {
+        var parentView = new View { SchemeName = "Base" };
+        var childView = new View ();
+        parentView.Add (childView);
+
+        // Set explicit scheme on child
+        var childScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        childView.SetScheme (childScheme);
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+        parentView.GettingAttributeForRole += (sender, args) =>
+        {
+            if (args.Role == VisualRole.Normal)
+            {
+                args.Result = customAttribute;
+                args.Handled = true;
+            }
+        };
+
+        // Child with explicit scheme should NOT get customized attribute from parent
+        Assert.NotEqual (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (childScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
+
+        childView.Dispose ();
+        parentView.Dispose ();
+    }
+
 }
