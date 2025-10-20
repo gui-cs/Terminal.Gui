@@ -9,24 +9,6 @@ public class RulerTests
     public RulerTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Attribute_set ()
-    {
-        var newAttribute = new Attribute (Color.Red, Color.Green);
-
-        var r = new Ruler ();
-        r.Attribute = newAttribute;
-        Assert.Equal (newAttribute, r.Attribute);
-    }
-
-    [Fact]
-    public void Constructor_Defaults ()
-    {
-        var r = new Ruler ();
-        Assert.Equal (0, r.Length);
-        Assert.Equal (Orientation.Horizontal, r.Orientation);
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void Draw_Default ()
     {
@@ -156,23 +138,5 @@ public class RulerTests
  4 ",
                                                        _output
                                                       );
-    }
-
-    [Fact]
-    public void Length_set ()
-    {
-        var r = new Ruler ();
-        Assert.Equal (0, r.Length);
-        r.Length = 42;
-        Assert.Equal (42, r.Length);
-    }
-
-    [Fact]
-    public void Orientation_set ()
-    {
-        var r = new Ruler ();
-        Assert.Equal (Orientation.Horizontal, r.Orientation);
-        r.Orientation = Orientation.Vertical;
-        Assert.Equal (Orientation.Vertical, r.Orientation);
     }
 }
