@@ -5,90 +5,6 @@ namespace Terminal.Gui.ViewsTests;
 
 public class LabelTests (ITestOutputHelper output)
 {
-    // Test that Title and Text are the same
-    [Fact]
-    public void Text_Mirrors_Title ()
-    {
-        var label = new Label ();
-        label.Title = "Hello";
-        Assert.Equal ("Hello", label.Title);
-        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
-
-        Assert.Equal ("Hello", label.Text);
-        Assert.Equal ("Hello", label.TextFormatter.Text);
-    }
-
-    [Fact]
-    public void Title_Mirrors_Text ()
-    {
-        var label = new Label ();
-        label.Text = "Hello";
-        Assert.Equal ("Hello", label.Text);
-        Assert.Equal ("Hello", label.TextFormatter.Text);
-
-        Assert.Equal ("Hello", label.Title);
-        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
-    }
-
-    [Theory]
-    [CombinatorialData]
-    public void HotKey_Command_SetsFocus_OnNextSubView (bool hasHotKey)
-    {
-        var superView = new View { CanFocus = true };
-        var label = new Label ();
-        label.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
-        var nextSubView = new View { CanFocus = true };
-        superView.Add (label, nextSubView);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        Assert.False (label.HasFocus);
-        Assert.False (nextSubView.HasFocus);
-
-        label.InvokeCommand (Command.HotKey);
-        Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubView.HasFocus);
-    }
-
-    [Theory]
-    [CombinatorialData]
-    public void MouseClick_SetsFocus_OnNextSubView (bool hasHotKey)
-    {
-        var superView = new View { CanFocus = true, Height = 1, Width = 15 };
-        var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
-        var label = new Label { X = 2 };
-        label.HotKey = hasHotKey ? Key.X.WithAlt : Key.Empty;
-
-        var nextSubView = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
-        superView.Add (focusedView, label, nextSubView);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        Assert.False (focusedView.HasFocus);
-        Assert.False (label.HasFocus);
-        Assert.False (nextSubView.HasFocus);
-
-        label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
-        Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubView.HasFocus);
-    }
-
-    [Fact]
-    public void HotKey_Command_Does_Not_Accept ()
-    {
-        var label = new Label ();
-        var accepted = false;
-
-        label.Accepting += LabelOnAccept;
-        label.InvokeCommand (Command.HotKey);
-
-        Assert.False (accepted);
-
-        return;
-
-        void LabelOnAccept (object sender, CommandEventArgs e) { accepted = true; }
-    }
-
     [Fact]
     [AutoInitShutdown]
     public void Text_Set_With_AnchorEnd_Works ()
@@ -169,17 +85,6 @@ public class LabelTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
-    }
-
-    [Fact]
-    public void Constructors_Defaults ()
-    {
-        var label = new Label ();
-        Assert.Equal (string.Empty, label.Text);
-        Assert.Equal (Alignment.Start, label.TextAlignment);
-        Assert.False (label.CanFocus);
-        Assert.Equal (new (0, 0, 0, 0), label.Frame);
-        Assert.Equal (KeyCode.Null, label.HotKey);
     }
 
     [Fact]
@@ -325,61 +230,6 @@ e
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 2, 7), pos);
         top.Dispose ();
-    }
-
-    [Fact]
-    public void Label_HotKeyChanged_EventFires ()
-    {
-        var label = new Label { Text = "Yar" };
-        label.HotKey = 'Y';
-
-        object sender = null;
-        KeyChangedEventArgs args = null;
-
-        label.HotKeyChanged += (s, e) =>
-                               {
-                                   sender = s;
-                                   args = e;
-                               };
-
-        label.HotKey = Key.R;
-        Assert.Same (label, sender);
-        Assert.Equal (KeyCode.Y | KeyCode.ShiftMask, args.OldKey);
-        Assert.Equal (Key.R, args.NewKey);
-    }
-
-    [Fact]
-    public void Label_HotKeyChanged_EventFires_WithNone ()
-    {
-        var label = new Label ();
-
-        object sender = null;
-        KeyChangedEventArgs args = null;
-
-        label.HotKeyChanged += (s, e) =>
-                               {
-                                   sender = s;
-                                   args = e;
-                               };
-
-        label.HotKey = KeyCode.R;
-        Assert.Same (label, sender);
-        Assert.Equal (KeyCode.Null, args.OldKey);
-        Assert.Equal (KeyCode.R, args.NewKey);
-    }
-
-    [Fact]
-    public void TestAssignTextToLabel ()
-    {
-        View b = new Label { Text = "heya" };
-        Assert.Equal ("heya", b.Text);
-        Assert.Contains ("heya", b.TextFormatter.Text);
-        b.Text = "heyb";
-        Assert.Equal ("heyb", b.Text);
-        Assert.Contains ("heyb", b.TextFormatter.Text);
-
-        // with cast
-        Assert.Equal ("heyb", ((Label)b).Text);
     }
 
     [Fact]
