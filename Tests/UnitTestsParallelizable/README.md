@@ -22,6 +22,7 @@ This project contains unit tests that can run in parallel without interference. 
 - ❌ Access `SchemeManager.GetSchemes()` or dictionary lookups like `schemes["Base"]` - requires module initialization
 - ❌ Access `View.Schemes` - there can be weird interactions with xunit and dotnet module initialization such that tests run before module initialization sets up the Schemes array
 - ❌ Modify static properties like `Key.Separator`, `CultureInfo.CurrentCulture`, etc.
+- ❌ Set static members on View subclasses (e.g., configuration properties like `Dialog.DefaultButtonAlignment`) or any static fields/properties - these are shared across all parallel tests
 - ❌ Use `Application.Top`, `Application.Driver`, `Application.MainLoop`, or `Application.Navigation`
 - ❌ Are true integration tests that test multiple components working together
 
