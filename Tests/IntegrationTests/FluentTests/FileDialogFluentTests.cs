@@ -159,7 +159,7 @@ public class FileDialogFluentTests
                 "/";
     }
 
-    [Theory]
+    [Theory (Skip = "New splitter design removes expand button.")]
     [ClassData (typeof (TestDrivers))]
     public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (TestDriver d)
     {
@@ -177,7 +177,7 @@ public class FileDialogFluentTests
 
     }
 
-    [Theory]
+    [Theory (Skip = "New splitter design removes expand button.")]
     [ClassData (typeof (TestDrivers))]
     public void SaveFileDialog_PopTree_AndNavigate (TestDriver d)
     {
@@ -224,8 +224,8 @@ public class FileDialogFluentTests
                           .WaitIteration ()
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd.Path)
-                          .LeftClick<Button> (b => b.Text == "►►")
-                          .ScreenShot ("After pop tree", _out)
+                          //.LeftClick<Button> (b => b.Text == "►►")
+                          //.ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
                           .Right ()
                           .ScreenShot ("After expand tree", _out)
@@ -267,8 +267,8 @@ public class FileDialogFluentTests
                           .WaitIteration ()
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd.Path)
-                          .LeftClick<Button> (b => b.Text == "►►")
-                          .ScreenShot ("After pop tree", _out)
+                          //.LeftClick<Button> (b => b.Text == "►►")
+                          //.ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
                           .Right ()
                           .ScreenShot ("After expand tree", _out)
