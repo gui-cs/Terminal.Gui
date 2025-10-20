@@ -1,8 +1,8 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class SliderOptionTests
+public class SliderOptionTests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void OnChanged_Should_Raise_ChangedEvent ()
@@ -94,7 +94,7 @@ public class SliderOptionTests
     }
 }
 
-public class SliderEventArgsTests
+public class SliderEventArgsTests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void Constructor_Sets_Cancel_Default_To_False ()
@@ -138,7 +138,7 @@ public class SliderEventArgsTests
     }
 }
 
-public class SliderTests
+public class SliderTests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void Constructor_Default ()
