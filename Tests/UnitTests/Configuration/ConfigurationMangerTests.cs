@@ -10,7 +10,7 @@ using File = System.IO.File;
 
 #pragma warning disable IDE1006
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class ConfigurationManagerTests (ITestOutputHelper output)
 {

@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Button"/> that don't require Application static dependencies.

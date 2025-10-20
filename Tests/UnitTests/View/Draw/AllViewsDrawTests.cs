@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
 {

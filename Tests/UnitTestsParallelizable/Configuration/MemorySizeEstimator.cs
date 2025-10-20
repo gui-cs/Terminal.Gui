@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parallelizable.ConfigurationTests;
 
 using System;
 using System.Collections;

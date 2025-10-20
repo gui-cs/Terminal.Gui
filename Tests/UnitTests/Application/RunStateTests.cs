@@ -4,7 +4,7 @@ using System.Numerics;
 using Terminal.Gui.Drivers;
 using UnitTests;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests.ApplicationTests;
 
 /// <summary>These tests focus on Application.RunState and the various ways it can be changed.</summary>
 public class RunStateTests

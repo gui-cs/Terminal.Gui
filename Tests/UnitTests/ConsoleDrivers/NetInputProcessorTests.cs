@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 public class NetInputProcessorTests
 {
     public static IEnumerable<object []> GetConsoleKeyInfoToKeyTestCases_Rune ()

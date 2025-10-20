@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 /// <summary>
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.

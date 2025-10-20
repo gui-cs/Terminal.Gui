@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Terminal.Gui.TextTests;
+namespace UnitTests_Parallelizable.TextTests;
 
 public class RuneTests
 {
