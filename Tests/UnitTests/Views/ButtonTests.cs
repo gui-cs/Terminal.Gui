@@ -104,114 +104,6 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Dispose ();
     }
 
-    [Fact]
-    public void HotKeyChange_Works ()
-    {
-        var clicked = false;
-        var btn = new Button { Text = "_Test" };
-        btn.Accepting += (s, e) => clicked = true;
-
-        Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
-        Assert.True (clicked);
-
-        clicked = false;
-        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt)); // Button processes, but does not handle
-        Assert.True (clicked);
-
-        clicked = false;
-        btn.HotKey = KeyCode.E;
-        Assert.False (btn.NewKeyDownEvent (Key.E.WithAlt)); // Button processes, but does not handle
-        Assert.True (clicked);
-    }
-
-    [Theory]
-    [InlineData (false, 0)]
-    [InlineData (true, 1)]
-    public void Space_Fires_Accept (bool focused, int expected)
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-
-        Button button = new ();
-
-        button.CanFocus = focused;
-
-        var acceptInvoked = 0;
-        button.Accepting += (s, e) => acceptInvoked++;
-
-        superView.Add (button);
-        button.SetFocus ();
-        Assert.Equal (focused, button.HasFocus);
-
-        superView.NewKeyDownEvent (Key.Space);
-
-        Assert.Equal (expected, acceptInvoked);
-
-        superView.Dispose ();
-    }
-
-    [Theory]
-    [InlineData (false, 0)]
-    [InlineData (true, 1)]
-    public void Enter_Fires_Accept (bool focused, int expected)
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-
-        Button button = new ();
-
-        button.CanFocus = focused;
-
-        var acceptInvoked = 0;
-        button.Accepting += (s, e) => acceptInvoked++;
-
-        superView.Add (button);
-        button.SetFocus ();
-        Assert.Equal (focused, button.HasFocus);
-
-        superView.NewKeyDownEvent (Key.Enter);
-
-        Assert.Equal (expected, acceptInvoked);
-
-        superView.Dispose ();
-    }
-
-    [Theory]
-    [InlineData (false, 1)]
-    [InlineData (true, 1)]
-    public void HotKey_Fires_Accept (bool focused, int expected)
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-
-        Button button = new ()
-        {
-            HotKey = Key.A
-        };
-
-        button.CanFocus = focused;
-
-        var acceptInvoked = 0;
-        button.Accepting += (s, e) => acceptInvoked++;
-
-        superView.Add (button);
-        button.SetFocus ();
-        Assert.Equal (focused, button.HasFocus);
-
-        superView.NewKeyDownEvent (Key.A);
-
-        Assert.Equal (expected, acceptInvoked);
-
-        superView.Dispose ();
-    }
-
     /// <summary>
     ///     This test demonstrates how to change the activation key for Button as described in the README.md keyboard
     ///     handling section
@@ -338,86 +230,6 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void HotKey_Command_Accepts ()
-    {
-        var button = new Button ();
-        var accepted = false;
-
-        button.Accepting += ButtonOnAccept;
-        button.InvokeCommand (Command.HotKey);
-
-        Assert.True (accepted);
-        button.Dispose ();
-
-        return;
-
-        void ButtonOnAccept (object sender, CommandEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var button = new Button ();
-        var acceptInvoked = false;
-
-        button.Accepting += ButtonAccept;
-
-        bool? ret = button.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        button.Dispose ();
-
-        return;
-
-        void ButtonAccept (object sender, CommandEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Handled = true;
-        }
-    }
-
-    [Fact]
-    public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
-    {
-        var super = new View ();
-        var btn = new Button { Text = "_Test" };
-        super.Add (btn);
-        super.BeginInit ();
-        super.EndInit ();
-
-        Assert.Equal ("_Test", btn.Text);
-        Assert.Equal (KeyCode.T, btn.HotKey);
-
-        btn.Text = string.Empty;
-        Assert.Equal ("", btn.Text);
-        Assert.Equal (KeyCode.Null, btn.HotKey);
-        btn.Text = string.Empty;
-        Assert.Equal ("", btn.Text);
-        Assert.Equal (KeyCode.Null, btn.HotKey);
-
-        btn.Text = "Te_st";
-        Assert.Equal ("Te_st", btn.Text);
-        Assert.Equal (KeyCode.S, btn.HotKey);
-        super.Dispose ();
-    }
-
-    [Fact]
-    public void TestAssignTextToButton ()
-    {
-        View b = new Button { Text = "heya" };
-        Assert.Equal ("heya", b.Text);
-        Assert.Contains ("heya", b.TextFormatter.Text);
-        b.Text = "heyb";
-        Assert.Equal ("heyb", b.Text);
-        Assert.Contains ("heyb", b.TextFormatter.Text);
-
-        // with cast
-        Assert.Equal ("heyb", ((Button)b).Text);
-        b.Dispose ();
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
@@ -451,7 +263,6 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
-
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]

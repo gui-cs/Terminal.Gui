@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui.DriverTests;
 
-public class EscSeqRequestsTests
+public class EscSeqRequestsTests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void Add_Tests ()

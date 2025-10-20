@@ -1,14 +1,19 @@
 ﻿using System.Text;
-using Xunit.Abstractions;
-
 using UnitTests;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.TextTests;
 
-public class TextFormatterTests
+public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 {
+    private readonly ITestOutputHelper _output;
+
+    public TextFormatterTests (ITestOutputHelper output)
+    {
+        _output = output;
+    }
     [Theory]
     [InlineData ("")]
     [InlineData (null)]
@@ -2958,5 +2963,121 @@ public class TextFormatterTests
     {
         string actual = TextFormatter.ReplaceCRLFWithSpace(input);
         Assert.Equal (expected, actual);
+    }
+
+    // ============================================================
+    // MIGRATED TESTS FROM UnitTests/Text/TextFormatterTests.cs
+    // These tests now use CreateFakeDriver() from ParallelizableBase
+    // instead of relying on Application.Driver via [SetupFakeDriver]
+    // ============================================================
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("A", 3, " A")]
+    [InlineData ("AB", 1, "A")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, "ABC")]
+    [InlineData ("ABC", 5, " ABC")]
+    [InlineData ("ABC", 6, " ABC")]
+    [InlineData ("ABC", 9, "   ABC")]
+    public void Draw_Horizontal_Centered (string text, int width, string expectedText)
+    {
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
+        
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Center,
+            ConstrainToWidth = width,
+            ConstrainToHeight = 1
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+    }
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("A B", 3, "A B")]
+    [InlineData ("A B", 1, "A")]
+    [InlineData ("A B", 2, "A")]
+    [InlineData ("A B", 4, "A  B")]
+    [InlineData ("A B", 5, "A   B")]
+    [InlineData ("A B", 6, "A    B")]
+    [InlineData ("A B", 10, "A        B")]
+    [InlineData ("ABC ABC", 10, "ABC    ABC")]
+    public void Draw_Horizontal_Justified (string text, int width, string expectedText)
+    {
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
+        
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Fill,
+            ConstrainToWidth = width,
+            ConstrainToHeight = 1
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+    }
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, "A")]
+    [InlineData ("AB", 1, "A")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, "ABC")]
+    [InlineData ("ABC", 6, "ABC")]
+    public void Draw_Horizontal_Left (string text, int width, string expectedText)
+    {
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
+        
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Start,
+            ConstrainToWidth = width,
+            ConstrainToHeight = 1
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+    }
+
+    [Theory]
+    [InlineData ("A", 0, "")]
+    [InlineData ("A", 1, "A")]
+    [InlineData ("A", 2, " A")]
+    [InlineData ("AB", 1, "B")]
+    [InlineData ("AB", 2, "AB")]
+    [InlineData ("ABC", 3, "ABC")]
+    [InlineData ("ABC", 4, " ABC")]
+    [InlineData ("ABC", 6, "   ABC")]
+    public void Draw_Horizontal_Right (string text, int width, string expectedText)
+    {
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
+        
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.End,
+            ConstrainToWidth = width,
+            ConstrainToHeight = 1
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
     }
 }
