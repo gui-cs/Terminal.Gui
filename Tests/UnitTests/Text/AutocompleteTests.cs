@@ -254,5 +254,31 @@ This an long line and against TextView.",
         top.Dispose ();
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void TestSettingSchemeOnAutocomplete ()
+    {
+        var tv = new TextView ();
+
+        // to begin with we should be using the default menu scheme
+        Assert.Same (SchemeManager.GetSchemes () ["Menu"], tv.Autocomplete.Scheme);
+
+        // allocate a new custom scheme
+        tv.Autocomplete.Scheme = new ()
+        {
+            Normal = new (Color.Black, Color.Blue), Focus = new (Color.Black, Color.Cyan)
+        };
+
+        // should be separate instance
+        Assert.NotSame (SchemeManager.GetSchemes () ["Menu"], tv.Autocomplete.Scheme);
+
+        // with the values we set on it
+        Assert.Equal (new (Color.Black), tv.Autocomplete.Scheme.Normal.Foreground);
+        Assert.Equal (new (Color.Blue), tv.Autocomplete.Scheme.Normal.Background);
+
+        Assert.Equal (new (Color.Black), tv.Autocomplete.Scheme.Focus.Foreground);
+        Assert.Equal (new (Color.Cyan), tv.Autocomplete.Scheme.Focus.Background);
+    }
+
 
 }
