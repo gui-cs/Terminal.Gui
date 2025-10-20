@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TextViewTests
 {

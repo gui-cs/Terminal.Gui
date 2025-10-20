@@ -1,6 +1,6 @@
 ﻿using Xunit.Sdk;
 
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class DifferenceTests
 {

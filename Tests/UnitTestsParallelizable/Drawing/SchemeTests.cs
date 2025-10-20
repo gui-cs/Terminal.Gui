@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Reflection;
 
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class SchemeTests
 {

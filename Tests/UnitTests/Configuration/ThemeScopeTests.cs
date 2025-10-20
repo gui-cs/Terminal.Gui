@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class ThemeScopeTests
 {
