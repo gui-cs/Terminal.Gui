@@ -66,44 +66,4 @@ public class AutocompleteTests : UnitTests.Parallelizable.ParallelizableBase
         Assert.Equal (new (Color.Black), tv.Autocomplete.Scheme.Focus.Foreground);
         Assert.Equal (new (Color.Cyan), tv.Autocomplete.Scheme.Focus.Background);
     }
-
-    /// <summary>
-    /// Proof-of-concept: This test demonstrates that TextFormatter.Draw() can be used in parallel tests
-    /// by passing a local driver instance instead of relying on Application.Driver.
-    /// 
-    /// This proves that the 18 TextFormatterTests in UnitTests that use [SetupFakeDriver] + Draw() + DriverAssert
-    /// can be migrated to Parallelizable by using a local driver.
-    /// </summary>
-    [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("A", 3, " A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 5, " ABC")]
-    [InlineData ("ABC", 6, " ABC")]
-    [InlineData ("ABC", 9, "   ABC")]
-    public void ProofOfConcept_TextFormatter_Draw_With_Local_Driver (string text, int width, string expectedText)
-    {
-        // Use helper from ParallelizableBase to create local driver
-        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
-        
-        // Create TextFormatter
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.Center,
-            ConstrainToWidth = width,
-            ConstrainToHeight = 1
-        };
-        
-        // Call Draw with the LOCAL driver (not Application.Driver)
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
-        
-        // Use DriverAssert to verify the output
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
-    }
 }
