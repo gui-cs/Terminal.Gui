@@ -107,7 +107,7 @@ public class FileDialogTests ()
         Assert.IsType<TextField> (dlg.MostFocused);
         Assert.Same (tf, dlg.MostFocused);
 
-        Assert.Equal ("Enter Search", tf.Caption);
+        Assert.Equal ("_Find:", tf.Caption);
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
@@ -798,8 +798,28 @@ public class FileDialogTests ()
 
     private TableView GetTableView (FileDialog dlg)
     {
-        var tile = dlg.SubViews.OfType<TileView> ().Single ();
-        return (TableView)tile.Tiles.ElementAt (1).ContentView.SubViews.ElementAt(0);
+        // The table view is in the _tableViewContainer which is a direct subview of the dialog
+        // We need to search through all subviews recursively
+        TableView FindTableView (View view)
+        {
+            if (view is TableView tv)
+            {
+                return tv;
+            }
+
+            foreach (View subview in view.SubViews)
+            {
+                TableView result = FindTableView (subview);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        return FindTableView (dlg);
     }
 
     private enum FileDialogPart
