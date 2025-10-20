@@ -4,7 +4,7 @@
 
 namespace Terminal.Gui.DriverTests;
 
-public class MainLoopDriverTests
+public class MainLoopDriverTests : UnitTests.Parallelizable.ParallelizableBase
 {
     public MainLoopDriverTests (ITestOutputHelper output) { ConsoleDriver.RunningUnitTests = true; }
 

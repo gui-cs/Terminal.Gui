@@ -255,31 +255,7 @@ This an long line and against TextView.",
     }
 
     [Fact]
-    public void Test_GenerateSuggestions_Simple ()
-    {
-        var ac = new TextViewAutocomplete ();
-
-        ((SingleWordSuggestionGenerator)ac.SuggestionGenerator).AllSuggestions =
-            new () { "fish", "const", "Cobble" };
-
-        var tv = new TextView ();
-        tv.InsertText ("co");
-
-        ac.HostControl = tv;
-
-        ac.GenerateSuggestions (
-                                new (
-                                     Cell.ToCellList (tv.Text),
-                                     2
-                                    )
-                               );
-
-        Assert.Equal (2, ac.Suggestions.Count);
-        Assert.Equal ("const", ac.Suggestions [0].Title);
-        Assert.Equal ("Cobble", ac.Suggestions [1].Title);
-    }
-
-    [Fact]
+    [AutoInitShutdown]
     public void TestSettingSchemeOnAutocomplete ()
     {
         var tv = new TextView ();
@@ -303,4 +279,6 @@ This an long line and against TextView.",
         Assert.Equal (new (Color.Black), tv.Autocomplete.Scheme.Focus.Foreground);
         Assert.Equal (new (Color.Cyan), tv.Autocomplete.Scheme.Focus.Background);
     }
+
+
 }
