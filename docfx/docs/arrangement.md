@@ -50,6 +50,49 @@ A form of layout where SubViews of a View are visually arranged such that their 
 
 In most use-cases, subviews do not overlap with each other (the exception being when it's done intentionally to create some visual effect). As a result, the default layout for most TUI apps is "tiled", and by default @Terminal.Gui.ViewBase.View.Arrangement is set to @Terminal.Gui.ViewBase.ViewArrangement.Fixed.
 
+### Creating a Resizable Splitter
+
+A common pattern in tiled layouts is to create a resizable splitter between two views. This can be achieved using the @Terminal.Gui.ViewBase.ViewArrangement.LeftResizable, @Terminal.Gui.ViewBase.ViewArrangement.RightResizable, @Terminal.Gui.ViewBase.ViewArrangement.TopResizable, or @Terminal.Gui.ViewBase.ViewArrangement.BottomResizable flags.
+
+Here's an example of creating a horizontal resizable splitter between two views:
+
+```csharp
+// Create left pane that fills remaining space
+View leftPane = new ()
+{
+    X = 0,
+    Y = 0,
+    Width = Dim.Fill (Dim.Func (_ => rightPane.Frame.Width)),
+    Height = Dim.Fill (),
+    CanFocus = true
+};
+
+// Create right pane with resizable left border (acts as splitter)
+View rightPane = new ()
+{
+    X = Pos.Right (leftPane) - 1,
+    Y = 0,
+    Width = Dim.Fill (),
+    Height = Dim.Fill (),
+    Arrangement = ViewArrangement.LeftResizable,
+    BorderStyle = LineStyle.Single,
+    SuperViewRendersLineCanvas = true,
+    CanFocus = true
+};
+rightPane.Border!.Thickness = new (1, 0, 0, 0); // Only left border
+
+container.Add (leftPane, rightPane);
+```
+
+In this example:
+- The `rightPane` has `ViewArrangement.LeftResizable` which makes its left border draggable
+- The left border acts as a splitter that users can drag to resize both panes
+- The `leftPane` uses `Dim.Fill` with a function that subtracts the `rightPane`'s width to automatically fill the remaining space
+- The `rightPane` has `SuperViewRendersLineCanvas = true` to ensure the border is rendered properly
+- Only the left border is shown by setting `Border.Thickness` to `(1, 0, 0, 0)`
+
+For a vertical splitter (top and bottom panes), use `ViewArrangement.TopResizable` or `ViewArrangement.BottomResizable` instead.
+
 ## Runnable
 
 Today, Overlapped and Runnable are intrinsically linked. A runnable view is one where `Application.Run(Toplevel)` is called. Each *Runnable* view where (`Modal == false`) has it's own `RunState` and is, effectively, a self-contained "application". 
