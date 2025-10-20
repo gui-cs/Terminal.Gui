@@ -18,6 +18,9 @@ This project contains unit tests that can run in parallel without interference. 
 - ❌ Set `Application.Driver` (global singleton)
 - ❌ Call `Application.Init()`, `Application.Run/Run<T>()`, or `Application.Begin()`
 - ❌ Modify `ConfigurationManager` global state (Enable/Load/Apply/Disable)
+- ❌ Access `ConfigurationManager` including `ThemeManager` and `SchemeManager` - these rely on global state
+- ❌ Access `SchemeManager.GetSchemes()` or dictionary lookups like `schemes["Base"]` - requires module initialization
+- ❌ Access `View.Schemes` - there can be weird interactions with xunit and dotnet module initialization such that tests run before module initialization sets up the Schemes array
 - ❌ Modify static properties like `Key.Separator`, `CultureInfo.CurrentCulture`, etc.
 - ❌ Use `Application.Top`, `Application.Driver`, `Application.MainLoop`, or `Application.Navigation`
 - ❌ Are true integration tests that test multiple components working together
