@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 [Collection ("Global Test Setup")]
 

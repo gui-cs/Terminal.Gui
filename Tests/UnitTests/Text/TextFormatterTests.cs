@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.TextTests;
+namespace UnitTests.TextTests;
 
 public class TextFormatterTests
 {

@@ -8,7 +8,7 @@ using static Terminal.Gui.Configuration.ConfigurationManager;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests.ApplicationTests;
 
 public class ApplicationTests
 {

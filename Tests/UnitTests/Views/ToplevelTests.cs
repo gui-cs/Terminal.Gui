@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ToplevelTests
 {

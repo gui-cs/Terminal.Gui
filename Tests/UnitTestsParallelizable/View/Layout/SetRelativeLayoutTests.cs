@@ -3,7 +3,7 @@ using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parallelizable.LayoutTests;
 
 public class SetRelativeLayoutTests
 {

@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.DialogTests;
+namespace UnitTests.DialogTests;
 
 public class WizardTests ()
 {

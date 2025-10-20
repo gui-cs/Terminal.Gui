@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Reflection;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parallelizable.ConfigurationTests;
 
 public class ScopeTests
 {

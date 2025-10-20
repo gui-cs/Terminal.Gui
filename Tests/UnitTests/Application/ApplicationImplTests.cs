@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using TerminalGuiFluentTesting;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests.ApplicationTests;
 public class ApplicationImplTests
 {
     public ApplicationImplTests ()

@@ -1,7 +1,7 @@
 ﻿using Moq;
 using UnitTests;
 
-namespace Terminal.Gui.ViewMouseTests;
+namespace UnitTests.ViewMouseTests;
 
 [Trait ("Category", "Input")]
 public class MouseTests : TestsAllViews

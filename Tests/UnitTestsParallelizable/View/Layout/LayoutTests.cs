@@ -1,6 +1,6 @@
 ﻿using UnitTests.Parallelizable;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parallelizable.LayoutTests;
 
 public class LayoutTests : GlobalTestSetup
 {

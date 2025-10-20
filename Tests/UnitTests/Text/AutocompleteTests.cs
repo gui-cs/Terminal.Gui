@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TextTests;
+namespace UnitTests.TextTests;
 
 public class AutocompleteTests (ITestOutputHelper output)
 {

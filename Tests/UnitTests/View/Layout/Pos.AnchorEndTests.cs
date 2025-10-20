@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class PosAnchorEndTests ()
 {

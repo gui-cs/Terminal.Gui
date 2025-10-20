@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class AnsiColorNameResolverTests
 {
