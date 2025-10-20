@@ -88,10 +88,8 @@ public class AutocompleteTests : UnitTests.Parallelizable.ParallelizableBase
     [InlineData ("ABC", 9, "   ABC")]
     public void ProofOfConcept_TextFormatter_Draw_With_Local_Driver (string text, int width, string expectedText)
     {
-        // Create a local driver instance (not Application.Driver!)
-        var driverFactory = new FakeDriverFactory ();
-        var driver = driverFactory.Create ();
-        driver.SetBufferSize (width > 0 ? width : 1, 1);
+        // Use helper from ParallelizableBase to create local driver
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
         
         // Create TextFormatter
         TextFormatter tf = new ()
@@ -103,7 +101,7 @@ public class AutocompleteTests : UnitTests.Parallelizable.ParallelizableBase
         };
         
         // Call Draw with the LOCAL driver (not Application.Driver)
-        tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
         
         // Use DriverAssert to verify the output
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
