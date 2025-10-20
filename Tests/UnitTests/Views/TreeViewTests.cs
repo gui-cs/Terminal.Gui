@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TreeViewTests (ITestOutputHelper output)
 {

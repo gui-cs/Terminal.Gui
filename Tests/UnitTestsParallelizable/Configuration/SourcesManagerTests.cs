@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+namespace UnitTests_Parrallelizable.ConfigurationTests;
 
 public class SourcesManagerTests
 {

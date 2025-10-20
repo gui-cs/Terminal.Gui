@@ -4,7 +4,7 @@ using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parrallelizable.LayoutTests;
 
 [Collection ("Global Test Setup")]
 public class DimTests

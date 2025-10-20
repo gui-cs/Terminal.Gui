@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parrallelizable.ConfigurationTests;
 
 public class ConfigurationPropertyAttributeTests
 {

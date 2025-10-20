@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parrallelizable.ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="DatePicker"/> that don't require Application.Driver or View context.

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class CheckBoxTests (ITestOutputHelper output)
 {

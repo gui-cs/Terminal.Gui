@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parrallelizable.ViewTests;
 
 /// <summary>Tests View BeginInit/EndInit/Initialized functionality.</summary>
 public class InitTests

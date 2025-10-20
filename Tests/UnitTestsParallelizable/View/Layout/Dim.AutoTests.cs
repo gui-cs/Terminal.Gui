@@ -3,7 +3,7 @@ using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parrallelizable.LayoutTests;
 
 [Trait ("Category", "Layout")]
 public partial class DimAutoTests (ITestOutputHelper output)

@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 public class AnsiKeyboardParserTests
 {

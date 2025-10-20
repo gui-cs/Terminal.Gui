@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parrallelizable.ViewsTests;
 
 public class TextFieldTests
 {

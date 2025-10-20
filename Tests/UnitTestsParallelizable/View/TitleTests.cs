@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parrallelizable.ViewTests;
 
 public class TitleTests
 {

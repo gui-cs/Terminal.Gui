@@ -1,5 +1,5 @@
 ﻿
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parrallelizable.ConfigurationTests;
 
 public class SettingsScopeTests
 {

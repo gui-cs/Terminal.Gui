@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Moq;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parrallelizable.ViewsTests;
 
 public class ListViewTests
 {

@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parrallelizable.LayoutTests;
 
 /// <summary>
 ///     Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.

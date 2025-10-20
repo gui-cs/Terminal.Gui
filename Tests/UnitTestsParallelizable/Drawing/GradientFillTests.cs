@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.DrawingTests;
+﻿namespace UnitTests_Parrallelizable.DrawingTests;
 
 public class GradientFillTests
 {

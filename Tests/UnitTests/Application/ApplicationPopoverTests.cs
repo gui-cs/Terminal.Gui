@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ApplicationTests;
+﻿namespace UnitTests.ApplicationTests;
 
 public class ApplicationPopoverTests
 {

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parrallelizable.ConfigurationTests;
 
 public class ConfigPropertyTests
 {

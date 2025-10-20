@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class NeedsDrawTests ()

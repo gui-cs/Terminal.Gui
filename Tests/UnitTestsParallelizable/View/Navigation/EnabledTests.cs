@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parrallelizable.ViewTests;
 
 [Collection ("Global Test Setup")]
 public class EnabledTests : TestsAllViews

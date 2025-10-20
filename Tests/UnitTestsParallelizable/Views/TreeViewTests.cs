@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parrallelizable.ViewsTests;
 
 [TestSubject (typeof (TreeView))]
 public class TreeViewTests

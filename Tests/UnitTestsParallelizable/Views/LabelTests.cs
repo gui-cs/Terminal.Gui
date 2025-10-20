@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parrallelizable.ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Label"/> that don't require Application.Driver or Application context.

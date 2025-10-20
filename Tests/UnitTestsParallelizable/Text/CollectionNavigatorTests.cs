@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TextTests;
+namespace UnitTests_Parrallelizable.TextTests;
 
 public class CollectionNavigatorTests
 {

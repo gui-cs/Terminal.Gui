@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parrallelizable.ViewsTests;
 
 [Collection ("Global Test Setup")]
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews

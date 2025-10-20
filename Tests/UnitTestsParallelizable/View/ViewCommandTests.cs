@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parrallelizable.ViewTests;
 public class ViewCommandTests
 {
     #region OnAccept/Accept tests

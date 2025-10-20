@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests_Parrallelizable.DriverTests;
 
 public class AnsiResponseParserTests (ITestOutputHelper output)
 {

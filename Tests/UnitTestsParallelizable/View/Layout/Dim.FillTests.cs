@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parrallelizable.LayoutTests;
 
 public class DimFillTests (ITestOutputHelper output)
 {

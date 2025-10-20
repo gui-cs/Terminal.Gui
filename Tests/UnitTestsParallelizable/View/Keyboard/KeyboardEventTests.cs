@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parrallelizable.ViewTests;
 
 [Collection ("Global Test Setup")]
 public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews

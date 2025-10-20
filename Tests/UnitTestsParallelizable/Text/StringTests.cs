@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.TextTests;
+﻿namespace UnitTests_Parrallelizable.TextTests;
 
 #nullable enable
 

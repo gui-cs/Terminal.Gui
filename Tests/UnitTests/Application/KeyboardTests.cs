@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests.ApplicationTests;
 
 /// <summary>
 ///     Application tests for keyboard support.

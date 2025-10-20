@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parrallelizable.ConfigurationTests;
 
 /// <summary>
 ///     Unit tests for the <see cref="DeepCloner"/> class, ensuring robust deep cloning for

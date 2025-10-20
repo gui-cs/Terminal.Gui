@@ -1,6 +1,6 @@
 ﻿using static Terminal.Gui.ViewBase.Pos;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parrallelizable.LayoutTests;
 
 public class PosViewTests
 {

@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewTests.OrientationTests;
+namespace UnitTests_Parrallelizable.ViewTests.OrientationTests;
 
 public class OrientationTests
 {

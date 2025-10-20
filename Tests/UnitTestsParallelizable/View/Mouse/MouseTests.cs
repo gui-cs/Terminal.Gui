@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewMouseTests;
+namespace UnitTests_Parrallelizable.ViewMouseTests;
 
 
 [Collection ("Global Test Setup")]

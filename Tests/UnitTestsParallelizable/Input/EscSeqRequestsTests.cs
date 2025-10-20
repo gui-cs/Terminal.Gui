@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.DriverTests;
+﻿namespace UnitTests_Parrallelizable.DriverTests;
 
 public class EscSeqRequestsTests : UnitTests.Parallelizable.ParallelizableBase
 {

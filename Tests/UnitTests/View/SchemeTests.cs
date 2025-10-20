@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "View.Scheme")]
 public class SchemeTests

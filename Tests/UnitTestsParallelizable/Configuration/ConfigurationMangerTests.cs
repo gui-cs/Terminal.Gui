@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parrallelizable.ConfigurationTests;
 
 public class ConfigurationManagerTests
 {

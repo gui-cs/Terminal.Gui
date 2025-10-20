@@ -2,7 +2,7 @@
 using System.Buffers.Binary;
 using System.Globalization;
 
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parrallelizable.DrawingTests;
 
 public partial class ColorTests
 {
