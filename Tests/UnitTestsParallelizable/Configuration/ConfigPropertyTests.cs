@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace UnitTests_Parrallelizable.ConfigurationTests;
+namespace UnitTests_Parallelizable.ConfigurationTests;
 
 public class ConfigPropertyTests
 {

@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 /// <summary>Tests View BeginInit/EndInit/Initialized functionality.</summary>
 public class InitTests

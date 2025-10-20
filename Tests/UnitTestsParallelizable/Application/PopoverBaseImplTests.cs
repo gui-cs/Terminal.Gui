@@ -2,7 +2,7 @@ using System;
 using Terminal.Gui;
 using Terminal.Gui.App;
 using Xunit;
-namespace UnitTests_Parrallelizable.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 public class PopoverBaseImplTests
 {

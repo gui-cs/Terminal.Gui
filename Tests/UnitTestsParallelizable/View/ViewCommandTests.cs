@@ -1,4 +1,4 @@
-namespace UnitTests_Parrallelizable.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 public class ViewCommandTests
 {
     #region OnAccept/Accept tests

@@ -1,4 +1,4 @@
-namespace UnitTests_Parrallelizable.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="ColorPicker"/> that don't require Application.Driver or View context.

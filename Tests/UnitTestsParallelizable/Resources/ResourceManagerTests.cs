@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Resources;
 using System.Runtime.CompilerServices;
 
-namespace UnitTests_Parrallelizable.ResourcesTests;
+namespace UnitTests_Parallelizable.ResourcesTests;
 
 public class ResourceManagerTests : UnitTests.Parallelizable.ParallelizableBase
 {

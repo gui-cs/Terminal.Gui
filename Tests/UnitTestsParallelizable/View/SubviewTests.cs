@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parrallelizable.ViewTests;
+﻿namespace UnitTests_Parallelizable.ViewTests;
 
 [Collection ("Global Test Setup")]
 public class SubViewTests

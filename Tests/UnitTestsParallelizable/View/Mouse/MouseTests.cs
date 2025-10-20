@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.ViewMouseTests;
+namespace UnitTests_Parallelizable.ViewMouseTests;
 
 
 [Collection ("Global Test Setup")]

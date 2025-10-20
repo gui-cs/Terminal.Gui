@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests.Parallelizable;
 
-namespace UnitTests_Parrallelizable.ViewLayoutEventTests;
+namespace UnitTests_Parallelizable.ViewLayoutEventTests;
 
 public class ViewLayoutEventTests : GlobalTestSetup
 {

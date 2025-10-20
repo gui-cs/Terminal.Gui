@@ -1,4 +1,4 @@
-namespace UnitTests_Parrallelizable.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Ruler"/> that don't require Application.Driver or View context.

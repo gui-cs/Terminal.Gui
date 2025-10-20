@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parrallelizable.TextTests;
+namespace UnitTests_Parallelizable.TextTests;
 
 public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 {

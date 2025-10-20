@@ -2,7 +2,7 @@
 using Moq;
 using UnitTests;
 
-namespace UnitTests_Parrallelizable.ConfigurationTests;
+namespace UnitTests_Parallelizable.ConfigurationTests;
 
 public class AttributeJsonConverterTests
 {

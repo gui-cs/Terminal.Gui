@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Xunit.Abstractions;
 using Terminal.Gui;
 
-namespace UnitTests_Parrallelizable.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class MultiStandardColorNameResolverTests (ITestOutputHelper output)
 {

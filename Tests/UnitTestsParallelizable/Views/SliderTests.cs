@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace UnitTests_Parrallelizable.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class SliderOptionTests : UnitTests.Parallelizable.ParallelizableBase
 {

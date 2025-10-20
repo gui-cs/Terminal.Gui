@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace UnitTests_Parrallelizable.ViewMouseTests;
+namespace UnitTests_Parallelizable.ViewMouseTests;
 
 [Trait ("Category", "Layout")]
 public class GetViewsAtLocationTests

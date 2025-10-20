@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using Moq;
 
-namespace UnitTests_Parrallelizable.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 public class ApplicationPopoverTests
 {

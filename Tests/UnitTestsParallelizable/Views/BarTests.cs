@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace UnitTests_Parrallelizable.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 [TestSubject (typeof (Bar))]
 public class BarTests

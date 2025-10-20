@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnitTests_Parrallelizable.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class FillPairTests
 {

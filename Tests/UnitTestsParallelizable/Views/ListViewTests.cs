@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Moq;
 
-namespace UnitTests_Parrallelizable.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class ListViewTests
 {

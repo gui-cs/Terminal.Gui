@@ -2,7 +2,7 @@
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parrallelizable.DriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
 public class MainLoopDriverTests : UnitTests.Parallelizable.ParallelizableBase
 {

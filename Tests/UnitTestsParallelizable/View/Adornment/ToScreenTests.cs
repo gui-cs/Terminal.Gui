@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 /// <summary>
 /// Test the <see cref="Adornment.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.

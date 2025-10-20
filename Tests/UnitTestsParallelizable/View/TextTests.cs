@@ -2,7 +2,7 @@
 using System.Text;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 /// <summary>
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.

@@ -1,4 +1,4 @@
-namespace UnitTests_Parrallelizable.ViewTests.OrientationTests;
+namespace UnitTests_Parallelizable.ViewTests.OrientationTests;
 
 public class OrientationTests
 {

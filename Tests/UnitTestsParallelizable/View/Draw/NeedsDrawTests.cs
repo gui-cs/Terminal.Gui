@@ -1,5 +1,5 @@
 #nullable enable
-namespace UnitTests_Parrallelizable.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "Output")]
 public class NeedsDrawTests

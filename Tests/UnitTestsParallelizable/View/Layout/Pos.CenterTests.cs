@@ -1,7 +1,7 @@
 ﻿using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Pos;
 
-namespace UnitTests_Parrallelizable.LayoutTests;
+namespace UnitTests_Parallelizable.LayoutTests;
 
 public class PosCenterTests (ITestOutputHelper output)
 {

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class CellTests ()
 {

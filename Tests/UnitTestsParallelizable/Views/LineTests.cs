@@ -1,4 +1,4 @@
-namespace UnitTests_Parrallelizable.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class LineTests
 {

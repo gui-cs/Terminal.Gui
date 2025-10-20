@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parrallelizable.DrawingTests;
+﻿namespace UnitTests_Parallelizable.DrawingTests;
 
 public class ThicknessTests
 {

@@ -3,7 +3,7 @@ using TerminalGuiFluentTesting;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.TextTests;
+namespace UnitTests_Parallelizable.TextTests;
 
 /// <summary>
 /// Pure unit tests for Autocomplete functionality that don't require Application or Driver.

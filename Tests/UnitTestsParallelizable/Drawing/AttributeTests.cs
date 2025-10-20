@@ -1,6 +1,6 @@
 ﻿// Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parrallelizable.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class AttributeTests
 {

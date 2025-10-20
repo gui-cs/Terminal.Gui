@@ -1,5 +1,5 @@
 ﻿
-namespace UnitTests_Parrallelizable.BuildAndDeployTests;
+namespace UnitTests_Parallelizable.BuildAndDeployTests;
 
 public class LocalPackagesTests
 {

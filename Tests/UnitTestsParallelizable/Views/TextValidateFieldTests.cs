@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace UnitTests_Parrallelizable.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
 {

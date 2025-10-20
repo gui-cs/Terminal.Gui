@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace UnitTests_Parrallelizable.LayoutTests;
+namespace UnitTests_Parallelizable.LayoutTests;
 
 public class PosAbsoluteTests (ITestOutputHelper output)
 {
