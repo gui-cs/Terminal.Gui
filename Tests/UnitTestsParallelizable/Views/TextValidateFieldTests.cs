@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TextValidateField_NET_Provider_Tests
+public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void Backspace_Key_Deletes_Previous_Character ()
@@ -425,7 +425,7 @@ public class TextValidateField_NET_Provider_Tests
     }
 }
 
-public class TextValidateField_Regex_Provider_Tests
+public class TextValidateField_Regex_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void End_Key_End_Of_Input ()
