@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class ConfigPropertyTests
 {

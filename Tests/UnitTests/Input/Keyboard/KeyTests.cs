@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Terminal.Gui.InputTests;
+namespace UnitTests.InputTests;
 
 public class KeyTests
 {

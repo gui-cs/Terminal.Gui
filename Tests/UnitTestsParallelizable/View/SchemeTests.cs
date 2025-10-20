@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using Xunit;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "View.Scheme")]
 public class SchemeTests

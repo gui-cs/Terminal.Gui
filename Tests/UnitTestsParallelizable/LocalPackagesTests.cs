@@ -1,5 +1,5 @@
 ﻿
-namespace Terminal.Gui.BuildAndDeployTests;
+namespace UnitTests_Parallelizable.BuildAndDeployTests;
 
 public class LocalPackagesTests
 {

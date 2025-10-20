@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parallelizable.LayoutTests;
 
 public class PosAbsoluteTests (ITestOutputHelper output)
 {

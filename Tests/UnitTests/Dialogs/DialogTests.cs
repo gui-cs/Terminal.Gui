@@ -3,7 +3,7 @@ using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.App.Application;
 
-namespace Terminal.Gui.DialogTests;
+namespace UnitTests.DialogTests;
 
 public class DialogTests (ITestOutputHelper output)
 {

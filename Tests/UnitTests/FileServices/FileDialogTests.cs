@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.FileServicesTests;
+namespace UnitTests.FileServicesTests;
 
 public class FileDialogTests ()
 {

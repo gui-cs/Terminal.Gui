@@ -1,4 +1,4 @@
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="LineCanvas"/> that don't require Application.Driver or View context.

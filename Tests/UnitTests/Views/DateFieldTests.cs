@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using UnitTests;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class DateFieldTests
 {

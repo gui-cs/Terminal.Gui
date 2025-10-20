@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests.Parallelizable;
 
-namespace Terminal.Gui.ViewLayoutEventTests;
+namespace UnitTests_Parallelizable.ViewLayoutEventTests;
 
 public class ViewLayoutEventTests : GlobalTestSetup
 {
@@ -240,12 +240,12 @@ public class ViewLayoutEventTests : GlobalTestSetup
         public bool CancelWidthChange { get; set; }
         public bool CancelHeightChange { get; set; }
 
-        protected override bool OnWidthChanging (App.ValueChangingEventArgs<Dim> args)
+        protected override bool OnWidthChanging (ValueChangingEventArgs<Dim> args)
         {
             return CancelWidthChange;
         }
 
-        protected override bool OnHeightChanging (App.ValueChangingEventArgs<Dim> args)
+        protected override bool OnHeightChanging (ValueChangingEventArgs<Dim> args)
         {
             return CancelHeightChange;
         }
