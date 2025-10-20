@@ -107,7 +107,7 @@ public class FileDialogTests ()
         Assert.IsType<TextField> (dlg.MostFocused);
         Assert.Same (tf, dlg.MostFocused);
 
-        Assert.Equal ("Enter Search", tf.Caption);
+        Assert.Equal ("_Find:", tf.Caption);
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
