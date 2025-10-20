@@ -179,8 +179,6 @@ public static partial class Application
     // starts running and after Shutdown returns.
     internal static void ResetState (bool ignoreDisposed = false)
     {
-        Navigation = new ();
-
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
