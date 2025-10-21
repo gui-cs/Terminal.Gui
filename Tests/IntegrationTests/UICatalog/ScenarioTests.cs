@@ -43,7 +43,7 @@ public class ScenarioTests : TestsAllViews
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
         var scenarioName = scenario!.GetName ();
 
-        uint abortTime = 2200;
+        uint abortTime = 1800;
         object? timeout = null;
         var initialized = false;
         var shutdownGracefully = false;
