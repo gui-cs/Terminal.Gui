@@ -148,7 +148,9 @@ public class TimedEvents : ITimedEvents
             // if user wants to run as soon as possible set timer such that it expires right away (no race conditions)
             if (time == TimeSpan.Zero)
             {
-                k -= 100;
+                // Use a more substantial buffer (1ms) to ensure it's truly in the past
+                // even under debugger overhead and extreme timing variations
+                k -= TimeSpan.TicksPerMillisecond;
             }
 
             _timeouts.Add (NudgeToUniqueKey (k), timeout);

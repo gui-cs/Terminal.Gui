@@ -51,22 +51,25 @@ public class TimedEventsTests
         // Add multiple timeouts with TimeSpan.Zero rapidly
         var timestamps = new List<long> ();
         
+        // Single event handler to capture all timestamps
+        EventHandler<Terminal.Gui.App.TimeoutEventArgs>? handler = null;
+        handler = (s, e) =>
+        {
+            timestamps.Add (e.Ticks);
+        };
+        
+        timedEvents.Added += handler;
+        
         for (int i = 0; i < 100; i++)
         {
-            long capturedTimestamp = 0;
-            timedEvents.Added += (s, e) =>
-            {
-                capturedTimestamp = e.Ticks;
-            };
-            
             timedEvents.Add (TimeSpan.Zero, () => false);
-            
-            if (capturedTimestamp > 0)
-            {
-                timestamps.Add (capturedTimestamp);
-            }
         }
+        
+        timedEvents.Added -= handler;
 
+        // Verify that we got timestamps
+        Assert.True (timestamps.Count > 0, $"Should have captured timestamps. Got {timestamps.Count}");
+        
         // Verify that we got unique timestamps (or very close)
         // With Stopwatch, we should have much better resolution than DateTime.UtcNow
         var uniqueTimestamps = timestamps.Distinct ().Count ();
