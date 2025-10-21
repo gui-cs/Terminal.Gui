@@ -19,6 +19,23 @@ public class ApplicationStressTests : TestsAllViews
     private const int NUM_INCREMENTS = 500;
     private const int POLL_MS = 100;
 
+    /// <summary>
+    /// Stress test for Application.Invoke to verify that invocations from background threads
+    /// are not lost or delayed indefinitely. Tests 25,000 concurrent invocations (50 passes × 500 increments).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// NOTE: This test may fail when run under a debugger due to timing issues related to 
+    /// DateTime.UtcNow resolution and debugger overhead. See InvokeLeakTest_Analysis.md for details.
+    /// </para>
+    /// <para>
+    /// If this test fails under debugger:
+    /// - It is likely a timing issue, not a functional bug
+    /// - Try running without debugger to verify
+    /// - Consider increasing POLL_MS if debugging is required
+    /// - See issue #4296 for detailed analysis
+    /// </para>
+    /// </remarks>
     [Theory]
     [InlineData (typeof (FakeDriver))]
     //[InlineData (typeof (DotNetDriver), Skip = "System.IO.IOException: The handle is invalid")]
