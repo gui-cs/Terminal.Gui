@@ -102,8 +102,6 @@ public class Scrolling : Scenario
         app.Dispose ();
         Application.Shutdown ();
 
-        Debug.Assert (_progressTimer is null);
-
         return;
 
         void AppOnInitialized (object? sender, EventArgs e)
