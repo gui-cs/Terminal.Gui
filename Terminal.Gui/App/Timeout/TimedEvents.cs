@@ -133,24 +133,33 @@ public class TimedEvents : ITimedEvents
                 k -= 100;
             }
 
-            _timeouts.Add (NudgeToUniqueKey (k), timeout);
+            _timeouts.Add (NudgeToUniqueKey (k, time == TimeSpan.Zero), timeout);
             Added?.Invoke (this, new (timeout, k));
         }
     }
 
     /// <summary>
-    ///     Finds the closest number to <paramref name="k"/> that is not present in <see cref="_timeouts"/>
-    ///     (incrementally).
+    ///     Finds the closest number to <paramref name="k"/> that is not present in <see cref="_timeouts"/>.
+    ///     For immediate execution timeouts (decrementForImmediate=true), decrements to maintain FIFO order.
+    ///     For delayed timeouts, increments to maintain order.
     /// </summary>
-    /// <param name="k"></param>
-    /// <returns></returns>
-    private long NudgeToUniqueKey (long k)
+    /// <param name="k">The initial key to try</param>
+    /// <param name="decrementForImmediate">If true, decrements on collision; otherwise increments</param>
+    /// <returns>A unique key</returns>
+    private long NudgeToUniqueKey (long k, bool decrementForImmediate)
     {
         lock (_timeoutsLockToken)
         {
             while (_timeouts.ContainsKey (k))
             {
-                k++;
+                if (decrementForImmediate)
+                {
+                    k--;
+                }
+                else
+                {
+                    k++;
+                }
             }
         }
 
@@ -185,7 +194,8 @@ public class TimedEvents : ITimedEvents
             {
                 lock (_timeoutsLockToken)
                 {
-                    _timeouts.Add (NudgeToUniqueKey (k), timeout);
+                    // When re-adding non-executed timeouts, increment on collision to maintain original order
+                    _timeouts.Add (NudgeToUniqueKey (k, decrementForImmediate: false), timeout);
                 }
             }
         }
