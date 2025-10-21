@@ -1,11 +1,13 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Manages scheduled timeouts (timed callbacks) for the application.
 ///     <para>
 ///         Allows scheduling of callbacks to be invoked after a specified delay, with optional repetition.
-///         Timeouts are stored in a sorted list by their scheduled execution time (UTC ticks).
+///         Timeouts are stored in a sorted list by their scheduled execution time (high-resolution ticks).
 ///         Thread-safe for concurrent access.
 ///     </para>
 ///     <para>
@@ -26,6 +28,10 @@ namespace Terminal.Gui.App;
 ///         </list>
 ///     </para>
 /// </summary>
+/// <remarks>
+///     Uses <see cref="Stopwatch.GetTimestamp"/> for high-resolution timing instead of <see cref="DateTime.UtcNow"/>
+///     to provide microsecond-level precision and eliminate race conditions from timer resolution issues.
+/// </remarks>
 public class TimedEvents : ITimedEvents
 {
     internal SortedList<long, Timeout> _timeouts = new ();
@@ -39,6 +45,18 @@ public class TimedEvents : ITimedEvents
 
     /// <inheritdoc/>
     public event EventHandler<TimeoutEventArgs>? Added;
+
+    /// <summary>
+    ///     Gets the current high-resolution timestamp in TimeSpan ticks.
+    ///     Uses <see cref="Stopwatch.GetTimestamp"/> for microsecond-level precision.
+    /// </summary>
+    /// <returns>Current timestamp in TimeSpan ticks (100-nanosecond units).</returns>
+    private static long GetTimestampTicks ()
+    {
+        // Convert Stopwatch ticks to TimeSpan ticks (100-nanosecond units)
+        // Stopwatch.Frequency gives ticks per second, so we need to scale appropriately
+        return Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency;
+    }
 
     /// <inheritdoc/>
     public void RunTimers ()
@@ -92,7 +110,7 @@ public class TimedEvents : ITimedEvents
     /// <inheritdoc/>
     public bool CheckTimers (out int waitTimeout)
     {
-        long now = DateTime.UtcNow.Ticks;
+        long now = GetTimestampTicks ();
 
         waitTimeout = 0;
 
@@ -125,7 +143,7 @@ public class TimedEvents : ITimedEvents
     {
         lock (_timeoutsLockToken)
         {
-            long k = (DateTime.UtcNow + time).Ticks;
+            long k = GetTimestampTicks () + time.Ticks;
 
             // if user wants to run as soon as possible set timer such that it expires right away (no race conditions)
             if (time == TimeSpan.Zero)
@@ -159,7 +177,7 @@ public class TimedEvents : ITimedEvents
 
     private void RunTimersImpl ()
     {
-        long now = DateTime.UtcNow.Ticks;
+        long now = GetTimestampTicks ();
         SortedList<long, Timeout> copy;
 
         // lock prevents new timeouts being added
