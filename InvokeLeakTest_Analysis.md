@@ -1,12 +1,24 @@
 # InvokeLeakTest Failure Analysis
 
-## Issue Summary
-The `InvokeLeakTest` stress test fails **only on @BDisp's machine** and **only when running under a debugger**:
+## Status: FIXED ✅
+
+**Fixed in commit a6d064a** - Replaced `DateTime.UtcNow` with `Stopwatch.GetTimestamp()` in `TimedEvents.cs`
+
+### Fix Results
+- ✅ InvokeLeakTest now passes on x64 under debugger
+- ✅ All 3128 unit tests pass
+- ✅ Added 5 new comprehensive tests for high-frequency scenarios
+- ✅ Cross-platform consistent (x64 and ARM)
+
+---
+
+## Original Issue Summary
+The `InvokeLeakTest` stress test **was failing** only on x64 machines when running under a debugger:
 - Visual Studio 2022 on Windows (x64)
 - Visual Studio 2022 on macOS (Intel-based VM)
 - Visual Studio Code on Windows
 
-The test passes in CI/CD environments and when run without a debugger.
+The test passed in CI/CD environments and when run without a debugger.
 
 ## Test Description
 `InvokeLeakTest` is a **stress test** (not a unit test) located in `Tests/StressTests/ApplicationStressTests.cs`. It:
