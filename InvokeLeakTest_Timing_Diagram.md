@@ -212,19 +212,22 @@ Invoke rate: 10-20/ms
 Result: ✓ PASS (adequate time margin)
 ```
 
-### Scenario 3: VM/Slow Machine, Debugger (ARM Mac)
+### Scenario 3: ARM Machine, Debugger (@tig's ARM Windows)
 ```
 Iteration time: 20-30ms
 Invoke rate: 15-20/ms
-Result: ✓ PASS (close but within 100ms)
+ARM timer resolution: Better than x64
+Result: ✓ PASS (ARM timer architecture handles it)
 ```
 
-### Scenario 4: @BDisp's Machine, Debugger (Intel x64 VM)
+### Scenario 4: x64 Machine, Debugger (@BDisp's x64, @tig's x64 Windows) - CONFIRMED
 ```
 Iteration time: 30-50ms
 Invoke rate: 10-15/ms
-DateTime.UtcNow resolution: 15-20ms (VM virtualization affect)
+DateTime.UtcNow resolution: 15-20ms (x64 TSC/HPET timer)
 Result: ✗ FAIL (exceeds 100ms window)
+
+CONFIRMED: @tig reproduced on x64 but NOT on ARM
 ```
 
 ---

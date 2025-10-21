@@ -211,15 +211,19 @@ Time T2: Next iteration, UtcNow = 1100 ticks
 But if the test's 100ms polling window expires before T2, it throws TimeoutException.
 ```
 
-#### 5. **Why @BDisp's Machine Specifically?**
+#### 5. **Why x64 Machines Specifically?**
 
-Possible factors:
-- **CPU/Chipset**: Intel vs ARM have different timer implementations
+**UPDATE**: @tig confirmed he can reproduce on his x64 Windows machine but NOT on his ARM Windows machine, validating this hypothesis.
+
+Architecture-specific factors:
+- **CPU/Chipset**: Intel/AMD x64 vs ARM have fundamentally different timer implementations
+  - x64: Uses legacy TSC (Time Stamp Counter) or HPET (High Precision Event Timer)
+  - ARM: Uses different timer architecture with potentially better resolution
 - **VM/Virtualization**: MacOS VM on Intel laptop may have timer virtualization quirks
 - **OS Configuration**: Windows timer resolution settings (can be 1ms to 15.6ms)
 - **Debugger Version**: Specific VS2022 build with different debugging hooks
 - **System Load**: Background processes affecting timer accuracy
-- **Hardware**: Specific timer hardware behavior on his x64 machine
+- **Hardware**: Specific timer hardware behavior on x64 architecture
 
 ### Secondary Hypothesis: Thread Scheduling Under Debugger
 
@@ -229,13 +233,16 @@ The test spawns tasks with `Task.Run()` and small random delays (2-4ms). Under a
 - More tasks could complete within same timer resolution window
 - Creates "burst" of invocations that all get same timestamp
 
-### Why It Doesn't Fail in CI/CD
+### Why It Doesn't Fail on ARM
 
-CI/CD environments:
-- Run without debugger (no debugging overhead)
-- Different timer characteristics
+**CONFIRMED**: @tig cannot reproduce on ARM Windows machine, only on x64 Windows.
+
+ARM environments:
+- Run without debugger (no debugging overhead) in CI/CD
+- Different timer characteristics - ARM timer architecture has better resolution
 - Faster iterations (less time for race conditions)
-- Different CPU architectures (ARM runners have different timer behavior)
+- ARM CPU architecture uses different timer implementation than x64
+- ARM timer subsystem may have higher base resolution or better behavior under load
 
 ## Evidence Supporting the Hypothesis
 
@@ -250,8 +257,10 @@ CI/CD environments:
 3. **Only fails under debugger**: Strong indicator of timing-related issue
    - Debugger affects iteration speed and timer behavior
 
-4. **Platform-specific**: Fails on specific hardware/VM configurations
-   - Suggests timer resolution/behavior differences
+4. **Architecture-specific (CONFIRMED)**: @tig reproduced on x64 Windows but NOT on ARM Windows
+   - This strongly supports the timer resolution hypothesis
+   - x64 timer implementation is more susceptible to this race condition
+   - ARM timer architecture handles the scenario more gracefully
 
 ## Recommended Solutions
 

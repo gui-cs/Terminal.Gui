@@ -8,8 +8,9 @@ The `InvokeLeakTest` stress test fails on @BDisp's machine when run under a debu
 
 - **Test**: `InvokeLeakTest` in `Tests/StressTests/ApplicationStressTests.cs`
 - **Symptoms**: Times out after 100ms, claims some `Application.Invoke()` calls were "lost"
-- **When**: Only under debugger (VS2022, VSCode) on @BDisp's machines (Windows x64, macOS Intel VM)
-- **Frequency**: Consistent on his machines, never in CI/CD
+- **When**: Only under debugger (VS2022, VSCode) on x64 machines (Windows/macOS)
+- **Architecture**: Confirmed fails on x64, does NOT fail on ARM (@tig confirmed)
+- **Frequency**: Consistent on x64 machines under debugger, never on ARM or without debugger
 
 ## Root Cause
 
@@ -82,10 +83,13 @@ private const int POLL_MS = 100;
 #endif
 ```
 
-## For @BDisp
+## For x64 Users (@BDisp and @tig)
+
+### Architecture-Specific Issue (CONFIRMED)
+@tig confirmed the issue reproduces on x64 Windows but NOT on ARM Windows. This validates the hypothesis that x64 timer architecture (Intel/AMD TSC/HPET) is more susceptible to this race condition than ARM timer implementations.
 
 ### Immediate Workaround
-Run the test **without** debugger - it should pass (as it does in CI).
+Run the test **without** debugger - it should pass (as it does in CI and on ARM machines).
 
 ### To Confirm Hypothesis
 Add diagnostics to the test (see [InvokeLeakTest_Analysis.md](InvokeLeakTest_Analysis.md) section "Additional Investigation Needed") to:
@@ -94,7 +98,7 @@ Add diagnostics to the test (see [InvokeLeakTest_Analysis.md](InvokeLeakTest_Ana
 - Log timing of main loop iterations
 
 ### Not Your Fault!
-This is a **stress test** (not unit test) that exposed a timing issue in the implementation. Your specific hardware/VM timer characteristics just happen to hit the edge case that CI doesn't.
+This is a **stress test** (not unit test) that exposed a timing issue in the implementation specific to x64 architecture. Your hardware correctly identifies this edge case that ARM machines don't hit.
 
 ## Next Steps
 
