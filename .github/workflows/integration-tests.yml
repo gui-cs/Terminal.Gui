@@ -43,25 +43,11 @@ jobs:
       shell: bash
       run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
 
-    - name: Run IntegrationTests 1
-      run: |
-       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
-
-    - name: Run IntegrationTests 2
-      run: |
-       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
-
-    - name: Run IntegrationTests 3
-      run: |
-       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
-
-    - name: Run IntegrationTests 4
+    - name: Run IntegrationTests
       run: |
        dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
-    - name: Run IntegrationTests 5
-      run: |
-       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+       # mv -v Tests/IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
 
     - name: Upload Test Logs
       if: always()
