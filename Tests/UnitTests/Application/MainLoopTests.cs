@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests.ApplicationTests;
 
 /// <summary>Tests MainLoop using the FakeMainLoop.</summary>
 public class MainLoopTests
@@ -575,7 +575,7 @@ public class MainLoopTests
         Assert.Empty (mainloop.TimedEvents.Timeouts);
 
         Assert.NotNull (
-                        new App.Timeout { Span = new (), Callback = () => true }
+                        new Terminal.Gui.App.Timeout { Span = new (), Callback = () => true }
                        );
     }
 
@@ -594,7 +594,7 @@ public class MainLoopTests
     )
     {
         // TODO: Expand this test to test all drivers
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fakedriver");
 
         total = 0;
         btn = null;

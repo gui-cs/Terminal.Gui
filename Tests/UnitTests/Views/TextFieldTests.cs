@@ -4,7 +4,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TextFieldTests (ITestOutputHelper output)
 {

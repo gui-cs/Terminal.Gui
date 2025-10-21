@@ -1,6 +1,7 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class SubViewTests
 {
@@ -9,9 +10,9 @@ public class SubViewTests
 
     // TODO: This is a poor unit tests. Not clear what it's testing. Refactor.
     [Fact]
+    [AutoInitShutdown]
     public void Initialized_Event_Will_Be_Invoked_When_Added_Dynamically ()
     {
-        Application.Init (new FakeDriver ());
 
         var t = new Toplevel { Id = "0" };
 

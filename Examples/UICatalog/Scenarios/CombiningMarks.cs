@@ -13,7 +13,7 @@ public class CombiningMarks : Scenario
         top.DrawComplete += (s, e) =>
         {
             // Forces reset _lineColsOffset because we're dealing with direct draw
-            Application.ClearScreenNextIteration = true;
+            Application.Top!.SetNeedsDraw ();
 
             var i = -1;
             top.AddStr ("Terminal.Gui only supports combining marks that normalize. See Issue #2616.");

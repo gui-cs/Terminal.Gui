@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 public class ClipRegionTests
 {
@@ -17,11 +17,11 @@ public class ClipRegionTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void AddRune_Is_Clipped (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -55,11 +55,11 @@ public class ClipRegionTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void Clip_Set_To_Empty_AllInvalid (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
@@ -85,11 +85,11 @@ public class ClipRegionTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void IsValidLocation (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);

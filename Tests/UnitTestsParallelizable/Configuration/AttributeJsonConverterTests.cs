@@ -2,7 +2,7 @@
 using Moq;
 using UnitTests;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parallelizable.ConfigurationTests;
 
 public class AttributeJsonConverterTests
 {

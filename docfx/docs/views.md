@@ -307,14 +307,6 @@ Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.y
 ──────────────────────────────────────────────────
 ```
 
-## [LineView](~/api/Terminal.Gui.Views.LineView.yml)
-
-A straight line control either horizontal or vertical
-
-```text
-──────────────────────────────────────────────────
-```
-
 ## [ListView](~/api/Terminal.Gui.Views.ListView.yml)
 
 Provides a scrollable list of data where each item can be activated to perform an action.
@@ -634,33 +626,6 @@ Fully featured multi-line text editor
 ```text
 TextView provides a fully featured multi-line text
 It supports word wrap and history for undo.
-```
-
-## [TileView](~/api/Terminal.Gui.Views.TileView.yml)
-
-A [View](~/api/Terminal.Gui.ViewBase.View.yml) consisting of a moveable bar that divides the display area into resizeable [TileView.Tiles](~/api/Terminal.Gui.Views.TileView.Tiles.yml).
-
-```text
-│
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
 ```
 
 ## [TimeField](~/api/Terminal.Gui.Views.TimeField.yml)

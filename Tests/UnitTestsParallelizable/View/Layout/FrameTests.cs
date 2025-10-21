@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.LayoutTests;
+﻿namespace UnitTests_Parallelizable.LayoutTests;
 
 public class FrameTests
 {
@@ -241,6 +241,25 @@ public class FrameTests
         Assert.Equal (view.Y, frame.Y);
         Assert.Equal (view.Width, frame.Width);
         Assert.Equal (view.Height, frame.Height);
+    }
+
+
+    [Fact]
+    public void Frame_Set_Sets_Viewport_Without_Layout ()
+    {
+        Rectangle frame = new (1, 2, 3, 4);
+
+        View v = new () { Frame = frame };
+        Assert.Equal (frame, v.Frame);
+
+        Assert.Equal (
+                      new (0, 0, frame.Width, frame.Height),
+                      v.Viewport
+                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
     }
 
     [Fact]

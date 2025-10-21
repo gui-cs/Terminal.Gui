@@ -78,8 +78,8 @@ public class Wizard : Dialog
             IsDefault = true
         };
 
-        //// Add a horiz separator
-        var separator = new LineView (Orientation.Horizontal) { Y = Pos.Top (BackButton) - 1 };
+        // Add a horiz separator
+        var separator = new Line { Orientation = Orientation.Horizontal, X = -1, Y = Pos.Top (BackButton) - 1, Length = Dim.Fill (-1) };
 
         base.Add (separator);
         AddButton (BackButton);
@@ -301,7 +301,7 @@ public class Wizard : Dialog
 
         if (previous is { })
         {
-           return GoToStep (previous);
+            return GoToStep (previous);
         }
 
         return false;

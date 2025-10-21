@@ -5,12 +5,12 @@ namespace Terminal.Gui.Drivers;
 public class FakeDriverFactory
 {
     /// <summary>
-    ///     Creates a new instance of <see cref="FakeDriverV2"/> using default options
+    ///     Creates a new instance of <see cref="FakeConsoleDriver"/> using default options
     /// </summary>
     /// <returns></returns>
-    public IFakeDriverV2 Create ()
+    public IFakeConsoleDriver Create ()
     {
-        return new FakeDriverV2 (
+        return new FakeConsoleDriver (
                                  new (),
                                  new (),
                                  new (),

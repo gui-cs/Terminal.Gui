@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using Moq;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 public class ApplicationPopoverTests
 {

@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class ClipTests (ITestOutputHelper _output)
@@ -171,7 +171,7 @@ public class ClipTests (ITestOutputHelper _output)
     [Trait ("Category", "Unicode")]
     public void Clipping_Wide_Runes ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (30, 1);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (30, 1);
 
         var top = new View
         {

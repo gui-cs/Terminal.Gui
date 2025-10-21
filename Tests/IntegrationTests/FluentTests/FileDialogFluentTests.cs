@@ -55,8 +55,8 @@ public class FileDialogFluentTests
 
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog_UsingEscape (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void CancelFileDialog_UsingEscape (TestDriver d)
     {
         SaveDialog? sd = null;
         using var c = With.A (()=>NewSaveDialog(out sd), 100, 20, d)
@@ -67,8 +67,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog_UsingCancelButton_TabThenEnter (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void CancelFileDialog_UsingCancelButton_TabThenEnter (TestDriver d)
     {
         SaveDialog? sd = null;
         using var c = With.A (() => NewSaveDialog (out sd,modal:false), 100, 20, d)
@@ -80,8 +80,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog_UsingCancelButton_LeftClickButton (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void CancelFileDialog_UsingCancelButton_LeftClickButton (TestDriver d)
     {
         SaveDialog? sd = null;
         using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
@@ -92,8 +92,8 @@ public class FileDialogFluentTests
                           .Stop ();
     }
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog_UsingCancelButton_AltC (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void CancelFileDialog_UsingCancelButton_AltC (TestDriver d)
     {
         SaveDialog? sd = null;
         using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
@@ -105,8 +105,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_UsingOkButton_Enter (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_UsingOkButton_Enter (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -121,8 +121,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_UsingOkButton_AltS (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_UsingOkButton_AltS (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -137,8 +137,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_UsingOkButton_TabEnter (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_UsingOkButton_TabEnter (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -159,9 +159,9 @@ public class FileDialogFluentTests
                 "/";
     }
 
-    [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (V2TestDriver d)
+    [Theory (Skip = "New splitter design removes expand button.")]
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -177,9 +177,9 @@ public class FileDialogFluentTests
 
     }
 
-    [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_PopTree_AndNavigate (V2TestDriver d)
+    [Theory (Skip = "New splitter design removes expand button.")]
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_PopTree_AndNavigate (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -202,8 +202,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_True (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_True (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -224,8 +224,8 @@ public class FileDialogFluentTests
                           .WaitIteration ()
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd.Path)
-                          .LeftClick<Button> (b => b.Text == "►►")
-                          .ScreenShot ("After pop tree", _out)
+                          //.LeftClick<Button> (b => b.Text == "►►")
+                          //.ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
                           .Right ()
                           .ScreenShot ("After expand tree", _out)
@@ -245,8 +245,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_False (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_False (TestDriver d)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
@@ -267,8 +267,8 @@ public class FileDialogFluentTests
                           .WaitIteration ()
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd.Path)
-                          .LeftClick<Button> (b => b.Text == "►►")
-                          .ScreenShot ("After pop tree", _out)
+                          //.LeftClick<Button> (b => b.Text == "►►")
+                          //.ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
                           .Right ()
                           .ScreenShot ("After expand tree", _out)
@@ -286,8 +286,8 @@ public class FileDialogFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers_WithTrueFalseParameter))]
-    public void SaveFileDialog_TableView_UpDown_PreserveFilenameOnDirectoryChanges_True (V2TestDriver d, bool preserve)
+    [ClassData (typeof (TestDrivers_WithTrueFalseParameter))]
+    public void SaveFileDialog_TableView_UpDown_PreserveFilenameOnDirectoryChanges_True (TestDriver d, bool preserve)
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;

@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 /// <summary>
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.
@@ -998,7 +998,7 @@ w ";
     [SetupFakeDriver]
     public void Narrow_Wide_Runes ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (32, 32);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
 
         var text = $"First line{Environment.NewLine}Second line";

@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TreeTableSourceTests : IDisposable
 {
@@ -30,7 +30,7 @@ public class TreeTableSourceTests : IDisposable
     [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (100, 100);
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -91,7 +91,7 @@ public class TreeTableSourceTests : IDisposable
     [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (100, 100);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (100, 100);
 
         TableView tv = GetTreeTable (out _);
 

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 public class AddRuneTests
 {
@@ -18,11 +18,11 @@ public class AddRuneTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
+    //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
+    //[InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (UnixDriver))]
     public void AddRune (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);

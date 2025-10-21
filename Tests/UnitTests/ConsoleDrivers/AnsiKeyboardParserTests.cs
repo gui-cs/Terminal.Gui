@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace UnitTests.ConsoleDrivers;
+namespace UnitTests.DriverTests;
 
 public class AnsiKeyboardParserTests
 {

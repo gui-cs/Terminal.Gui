@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class SchemeGetAttributeForRoleAlgorithmTests
 {
@@ -10,7 +10,6 @@ public class SchemeGetAttributeForRoleAlgorithmTests
         Attribute normal = new ("Red", "Blue");
         Scheme scheme = new (normal);
 
-        Assert.NotNull (scheme.Normal);
         Assert.Equal (normal, scheme.GetAttributeForRole (VisualRole.Normal));
     }
 

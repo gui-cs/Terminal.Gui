@@ -51,7 +51,7 @@ public static class ConfigurationManager
 {
     /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
     /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="ResetToCurrentValues"/> is called. Gets set to a new instance by
+    ///     Is <see langword="null"/> until <see cref="UpdateToCurrentValues"/> is called. Gets set to a new instance by
     ///     deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
@@ -117,15 +117,19 @@ public static class ConfigurationManager
         }
     }
 
+    // TODO: Find a way to make this cache truly read-only at the leaf node level. 
+    // TODO: Right now, the dictionary is frozen, but the ConfigProperty instances can still be modified   
+    // TODO: if the PropertyValue is a reference type.
+    // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4288
     /// <summary>
     ///     A cache of all<see cref="ConfigurationPropertyAttribute"/> properties and their hard coded values.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
 #pragma warning disable IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
+
     private static readonly object _hardCodedConfigPropertyCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
-
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
     {
         lock (_hardCodedConfigPropertyCacheLock)
@@ -183,7 +187,7 @@ public static class ConfigurationManager
         lock (_uninitializedConfigPropertiesCacheCacheLock)
         {
             // _allConfigProperties: for ordered, iterable access (LINQ-friendly)
-            // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
+            // _hardCodedConfigPropertyCache: for high-speed key lookup (frozen)
 
             // Note GetAllConfigProperties returns a new instance and all the properties !HasValue and Immutable.
             _uninitializedConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
@@ -209,6 +213,11 @@ public static class ConfigurationManager
         }
 
         LoadHardCodedDefaults ();
+
+        // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This a partial workaround.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        ThemeManager.Themes? [ThemeManager.Theme]?.Apply ();
     }
 
     #endregion Initialization
@@ -291,6 +300,7 @@ public static class ConfigurationManager
 
         if (resetToHardCodedDefaults)
         {
+            // Calls Apply
             ResetToHardCodedDefaults ();
         }
     }
@@ -299,16 +309,17 @@ public static class ConfigurationManager
 
     #region Reset
 
-    // `Reset` - Reset the configuration to either the current values or the hard-coded defaults.
-    // Resetting does not load the configuration; it only resets the configuration to the default values.
+    // `Update` - Updates the configuration from either the current values or the hard-coded defaults.
+    // Updating does not load the configuration; it only updates the configuration to the values currently
+    // in the static ConfigProperties.
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads settings from the current
+    ///     INTERNAL: Updates <see cref="ConfigurationManager"/> to the settings from the current
     ///     values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    internal static void ResetToCurrentValues ()
+    internal static void UpdateToCurrentValues ()
     {
         if (!IsInitialized ())
         {
@@ -327,13 +338,13 @@ public static class ConfigurationManager
             _settingsLockSlim.ExitWriteLock ();
         }
 
-        Settings!.LoadCurrentValues ();
+        Settings!.UpdateToCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
-        AppSettings!.LoadCurrentValues ();
+        AppSettings!.UpdateToCurrentValues ();
     }
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads the hard-coded values of the
+    ///     INTERNAL: Loads the hard-coded values of the
     ///     <see cref="ConfigurationPropertyAttribute"/> properties and applies them.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
@@ -374,7 +385,7 @@ public static class ConfigurationManager
 
         Settings = new ();
         Settings!.LoadHardCodedDefaults ();
-        ThemeManager.ResetToHardCodedDefaults ();
+        ThemeManager.LoadHardCodedDefaults ();
         AppSettings!.LoadHardCodedDefaults ();
     }
 
@@ -447,10 +458,6 @@ public static class ConfigurationManager
         {
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
-
-        Settings!.Validate ();
-        ThemeManager.Validate ();
-        AppSettings!.Validate ();
     }
 
     // TODO: Rename to Loaded?
@@ -566,7 +573,7 @@ public static class ConfigurationManager
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly SourceGenerationContext SerializerContext = new (
-                                                                              new JsonSerializerOptions
+                                                                              new()
                                                                               {
                                                                                   // Be relaxed
                                                                                   ReadCommentHandling = JsonCommentHandling.Skip,
@@ -638,7 +645,7 @@ public static class ConfigurationManager
                 if (!appSettingsConfigProperty.HasValue)
                 {
                     var appSettings = new AppSettingsScope ();
-                    appSettings.LoadCurrentValues ();
+                    appSettings.UpdateToCurrentValues ();
 
                     return appSettings;
                 }
@@ -710,8 +717,9 @@ public static class ConfigurationManager
         {
             if (_jsonErrors.Length > 0)
             {
-                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files" +
-                                   @"(set ThrowOnJsonErrors to have these caught during execution):");
+                Console.WriteLine (
+                                   @"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"
+                                   + @"(set ThrowOnJsonErrors to have these caught during execution):");
                 Console.WriteLine (_jsonErrors.ToString ());
             }
         }
@@ -783,8 +791,10 @@ public static class ConfigurationManager
 
             Debug.Assert (filtered is { });
 
-            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope = filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
+            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope =
+                filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
             Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
+
             return configPropertiesByScope;
         }
     }

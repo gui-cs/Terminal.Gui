@@ -1,4 +1,4 @@
-﻿namespace UnitTests.ConsoleDrivers;
+﻿namespace UnitTests.DriverTests;
 
 public class AnsiMouseParserTests
 {
