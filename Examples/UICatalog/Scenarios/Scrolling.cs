@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public class Scrolling : Scenario
 {
-    private static object? _progressTimer = null;
+    private object? _progressTimer = null;
 
     public override void Main ()
     {
