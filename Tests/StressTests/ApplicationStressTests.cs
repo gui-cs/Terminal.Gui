@@ -17,7 +17,9 @@ public class ApplicationStressTests : TestsAllViews
 
     private const int NUM_PASSES = 50;
     private const int NUM_INCREMENTS = 500;
-    private const int POLL_MS = 100;
+    
+    // Use longer timeout when running under debugger to account for slower iterations
+    private static readonly int POLL_MS = System.Diagnostics.Debugger.IsAttached ? 500 : 100;
 
     /// <summary>
     /// Stress test for Application.Invoke to verify that invocations from background threads
@@ -25,15 +27,12 @@ public class ApplicationStressTests : TestsAllViews
     /// </summary>
     /// <remarks>
     /// <para>
-    /// NOTE: This test may fail when run under a debugger due to timing issues related to 
-    /// DateTime.UtcNow resolution and debugger overhead. See InvokeLeakTest_Analysis.md for details.
+    /// This test automatically adapts its timeout when running under a debugger (500ms vs 100ms)
+    /// to account for slower iteration times caused by debugger overhead.
     /// </para>
     /// <para>
-    /// If this test fails under debugger:
-    /// - It is likely a timing issue, not a functional bug
-    /// - Try running without debugger to verify
-    /// - Consider increasing POLL_MS if debugging is required
-    /// - See issue #4296 for detailed analysis
+    /// See InvokeLeakTest_Analysis.md for technical details about the timing improvements made
+    /// to TimedEvents (Stopwatch-based timing) and Application.Invoke (MainLoop wakeup).
     /// </para>
     /// </remarks>
     [Theory]
