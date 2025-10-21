@@ -195,7 +195,7 @@
     <value>Enter Path</value>
   </data>
   <data name="fdSearchCaption" xml:space="preserve">
-    <value>_Find:</value>
+    <value>Enter search string</value>
   </data>
   <data name="fdSize" xml:space="preserve">
     <value>Size</value>

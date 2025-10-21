@@ -148,20 +148,23 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
+
         // Create tree view container (left pane)
-        View treeViewContainer = new ()
+        _treeView = new ()
         {
+            // Title = "Tree",
             X = -1,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 1 : 1)),
+            Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 1 : 30)),
             Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
-            CanFocus = true,
+            //BorderStyle = LineStyle.Dashed,
+            // CanFocus = true,
         };
 
         // Create table view container (right pane)
         _tableViewContainer = new ()
         {
-            X = 0,
+            X = 30,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
             Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
@@ -200,7 +203,7 @@ public class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-        _treeView = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+        //   _treeView = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
         _treeView.TreeBuilder = fileDialogTreeBuilder;
@@ -209,39 +212,9 @@ public class FileDialog : Dialog, IDesignable
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
 
-        treeViewContainer.Add (_treeView);
+        //_treeView.Add (_treeView);
         _tableViewContainer.Add (_tableView);
 
-        _tbFind = new ()
-        {
-            X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_INPUT),
-            CaptionColor = new (Color.Black),
-            Width = 30,
-            Y = Pos.Top (_btnOk),
-            HotKey = Key.F.WithAlt
-        };
-
-        _spinnerView = new ()
-        { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_INPUT), Y = Pos.AnchorEnd (1), Visible = false };
-
-        _tbFind.TextChanged += (s, o) => RestartSearch ();
-
-        _tbFind.KeyDown += (s, o) =>
-                           {
-                               if (o.KeyCode == KeyCode.Enter)
-                               {
-                                   RestartSearch ();
-                                   o.Handled = true;
-                               }
-
-                               if (o.KeyCode == KeyCode.Esc)
-                               {
-                                   if (CancelSearch ())
-                                   {
-                                       o.Handled = true;
-                                   }
-                               }
-                           };
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
         _tableView.Style.ShowVerticalCellLines = true;
@@ -263,6 +236,39 @@ public class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
 
+        _tbFind = new ()
+        {
+            X = Pos.Left (_tableViewContainer),
+            Width = Dim.Width (_tableViewContainer),
+            Y = Pos.Top (_tableViewContainer)-1,
+            HotKey = Key.F.WithAlt
+        };
+
+        _spinnerView = new ()
+        {
+            X = Pos.Left (_tbFind) - 1,
+            Y = Pos.Top (_tbFind),
+            Visible = false
+        };
+
+        _tbFind.TextChanged += (s, o) => RestartSearch ();
+
+        _tbFind.KeyDown += (s, o) =>
+                           {
+                               if (o.KeyCode == KeyCode.Enter)
+                               {
+                                   RestartSearch ();
+                                   o.Handled = true;
+                               }
+
+                               if (o.KeyCode == KeyCode.Esc)
+                               {
+                                   if (CancelSearch ())
+                                   {
+                                       o.Handled = true;
+                                   }
+                               }
+                           };
         AllowsMultipleSelection = false;
 
         UpdateNavigationVisibility ();
@@ -271,9 +277,9 @@ public class FileDialog : Dialog, IDesignable
         base.Add (_btnUp);
         base.Add (_btnBack);
         base.Add (_btnForward);
-        base.Add (treeViewContainer);
-        base.Add (_tableViewContainer);
         base.Add (_tbFind);
+        base.Add (_treeView);
+        base.Add (_tableViewContainer);
         base.Add (_spinnerView);
 
         base.Add (_btnOk);
