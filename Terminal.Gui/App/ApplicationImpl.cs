@@ -319,6 +319,10 @@ public class ApplicationImpl : IApplication
                                   return false;
                               }
                              );
+        
+        // Wake up the main loop to process the timeout immediately
+        // This is especially important under debugger where iterations are slower
+        Application.MainLoop?.Wakeup ();
     }
 
     /// <inheritdoc />

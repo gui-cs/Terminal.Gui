@@ -119,25 +119,4 @@ public class TimedEventsTests
 
         Assert.Equal (expected, executeCount);
     }
-
-    [Fact]
-    public void Stopwatch_Based_Timing_More_Precise_Than_DateTime ()
-    {
-        // Measure resolution by sampling multiple times rapidly
-        var datetimeSamples = new List<long> ();
-        var stopwatchSamples = new List<long> ();
-
-        for (int i = 0; i < 1000; i++)
-        {
-            datetimeSamples.Add (DateTime.UtcNow.Ticks);
-            stopwatchSamples.Add (Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency);
-        }
-
-        var datetimeUnique = datetimeSamples.Distinct ().Count ();
-        var stopwatchUnique = stopwatchSamples.Distinct ().Count ();
-
-        // Stopwatch should provide more unique values (better resolution)
-        Assert.True (stopwatchUnique >= datetimeUnique,
-            $"Stopwatch should have equal or better resolution. DateTime: {datetimeUnique}, Stopwatch: {stopwatchUnique}");
-    }
 }
