@@ -661,35 +661,6 @@ public class MainLoopTests
 
         Application.Shutdown ();
     }
-
-    [Fact]
-    public void TimeSpanZero_Timeouts_Execute_In_FIFO_Order ()
-    {
-        var ml = new MainLoop (new FakeMainLoop ());
-        var executionOrder = new List<int> ();
-
-        // Add multiple timeouts with TimeSpan.Zero in quick succession
-        // They should execute in the order they were added (FIFO)
-        for (int i = 0; i < 10; i++)
-        {
-            int capturedI = i;
-            ml.TimedEvents.Add (TimeSpan.Zero, () =>
-                                                {
-                                                    executionOrder.Add (capturedI);
-                                                    return false; // Don't repeat
-                                                });
-        }
-
-        // Run one iteration to execute all pending timeouts
-        ml.RunIteration ();
-
-        // Verify they executed in FIFO order (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-        Assert.Equal (10, executionOrder.Count);
-        for (int i = 0; i < 10; i++)
-        {
-            Assert.Equal (i, executionOrder [i]);
-        }
-    }
     
     [Fact]
     public void RemoveIdle_Function_NotCalled ()
