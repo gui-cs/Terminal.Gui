@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Diagnostics;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Scrolling", "Content scrolling, IScrollBars, etc...")]
@@ -99,6 +101,8 @@ public class Scrolling : Scenario
         app.Unloaded -= AppUnloaded;
         app.Dispose ();
         Application.Shutdown ();
+
+        Debug.Assert (_progressTimer is null);
 
         return;
 
