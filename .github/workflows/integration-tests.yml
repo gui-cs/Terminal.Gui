@@ -47,8 +47,6 @@ jobs:
       run: |
        dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
-       # mv -v Tests/IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
-
     - name: Upload Test Logs
       if: always()
       uses: actions/upload-artifact@v4
