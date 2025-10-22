@@ -35,6 +35,7 @@ public class FileDialog : Dialog, IDesignable
     private readonly Button _btnForward;
     private readonly Button _btnOk;
     private readonly Button _btnUp;
+    private readonly Button _btnTreeToggle;
     private readonly IFileSystem? _fileSystem;
     private readonly FileDialogHistory _history;
     private readonly SpinnerView _spinnerView;
@@ -110,6 +111,19 @@ public class FileDialog : Dialog, IDesignable
                                     }
                                 };
 
+        // Tree toggle button - shares alignment group with OK/Cancel
+        _btnTreeToggle = new ()
+        {
+            X = 0,//Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
+            Y = Pos.AnchorEnd (),
+            NoPadding = true
+        };
+        _btnTreeToggle.Accepting += (s, e) =>
+        {
+            e.Handled = true;
+            ToggleTreeVisibility ();
+        };
+
         _btnUp = new () { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
         _btnUp.Accepting += (s, e) =>
@@ -148,23 +162,21 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-
         // Create tree view container (left pane)
         _treeView = new ()
         {
             // Title = "Tree",
-            X = -1,
+            X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 1 : 30)),
+            Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30)),
             Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
-            //BorderStyle = LineStyle.Dashed,
-            // CanFocus = true,
+            Visible = false
         };
 
         // Create table view container (right pane)
         _tableViewContainer = new ()
         {
-            X = 30,
+            X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
             Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
@@ -173,7 +185,7 @@ public class FileDialog : Dialog, IDesignable
             SuperViewRendersLineCanvas = true,
             CanFocus = true
         };
-        _tableViewContainer.Border!.Thickness = new (1, 0, 0, 0);
+        //_tableViewContainer.Border!.Thickness = new (1, 0, 0, 0);
 
         _tableView = new ()
         {
@@ -214,7 +226,6 @@ public class FileDialog : Dialog, IDesignable
         //_treeView.Add (_treeView);
         _tableViewContainer.Add (_tableView);
 
-
         _tableView.Style.ShowHorizontalHeaderOverline = true;
         _tableView.Style.ShowVerticalCellLines = true;
         _tableView.Style.ShowVerticalHeaderLines = true;
@@ -239,7 +250,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = Pos.Left (_tableViewContainer),
             Width = Dim.Width (_tableViewContainer),
-            Y = Pos.Top (_tableViewContainer)-1,
+            Y = Pos.Top (_tableViewContainer) - 1,
             HotKey = Key.F.WithAlt
         };
 
@@ -281,8 +292,13 @@ public class FileDialog : Dialog, IDesignable
         base.Add (_tableViewContainer);
         base.Add (_spinnerView);
 
+        // Add the toggle along with OK/Cancel so they align as a group
+        base.Add (_btnTreeToggle);
         base.Add (_btnOk);
         base.Add (_btnCancel);
+
+        // Default: Tree hidden and splitter hidden
+        SetTreeVisible (false);
     }
 
     /// <summary>
@@ -430,6 +446,8 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
+        Arrangement |= ViewArrangement.Resizable;
+
         _loaded = true;
 
         // May have been updated after instance was constructed
@@ -519,6 +537,9 @@ public class FileDialog : Dialog, IDesignable
             _btnOk.X = Pos.Right (_btnCancel) + 1;
             MoveSubViewTowardsStart (_btnCancel);
         }
+
+        // Ensure toggle button text matches current state after sizing
+        SetTreeVisible (false);
 
         SetNeedsDraw ();
         SetNeedsLayout ();
@@ -1429,6 +1450,49 @@ public class FileDialog : Dialog, IDesignable
 
         ApplySort ();
         _tableView.Update ();
+    }
+
+    // --- Tree visibility management ---
+
+    private void ToggleTreeVisibility ()
+    {
+        SetTreeVisible (!_treeView.Visible);
+    }
+
+    private void SetTreeVisible (bool visible)
+    {
+        _treeView.Enabled = visible;
+        _treeView.Visible = visible;
+
+        if (visible)
+        {
+            // When visible, the table view's left edge is a splitter next to the tree
+            _treeView.Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30));
+            _tableViewContainer.X = 30;
+            _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
+            _tableViewContainer.Border!.Thickness = new (1, 0, 0, 0);
+        }
+        else
+        {
+            // When hidden, table occupies full width and splitter is hidden/disabled
+            _treeView.Width = 0;
+            _tableViewContainer.X = 0;
+            _tableViewContainer.Width = Dim.Fill ();
+            _tableViewContainer.Arrangement = ViewArrangement.Fixed;
+            _tableViewContainer.Border!.Thickness = new (0, 0, 0, 0);
+        }
+        _btnTreeToggle.Text = GetTreeToggleText (visible);
+
+        SetNeedsLayout ();
+        SetNeedsDraw ();
+    }
+
+    private string GetTreeToggleText (bool visible)
+    {
+        return visible
+                   ? $"{Glyphs.LeftArrow}{Strings.fdTree}"
+                   : $"{Glyphs.RightArrow}{Strings.fdTree}";
+
     }
 
     /// <summary>State representing a recursive search from <see cref="FileDialogState.Directory"/> downwards.</summary>

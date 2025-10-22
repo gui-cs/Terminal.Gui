@@ -718,6 +718,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Tree.
+        /// </summary>
+        internal static string fdTree {
+            get {
+                return ResourceManager.GetString("fdTree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type.
         /// </summary>
         internal static string fdType {
