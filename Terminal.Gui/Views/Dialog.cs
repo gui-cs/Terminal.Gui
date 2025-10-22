@@ -88,15 +88,14 @@ public class Dialog : Window
     // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
 
     /// <inheritdoc/>
-    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (role == VisualRole.Normal || role == VisualRole.Focus)
-        {
-            currentAttribute = GetScheme ().Normal;
+        //if (role == VisualRole.Normal || role == VisualRole.Focus)
+        //{
+        //    currentAttribute = GetScheme ().Normal;
 
-            return true;
-        }
+        //    return true;
+        //}
 
         return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }

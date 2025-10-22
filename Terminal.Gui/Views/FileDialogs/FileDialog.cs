@@ -184,7 +184,6 @@ public class FileDialog : Dialog, IDesignable
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
         _tableView.MouseClick += OnTableViewMouseClick;
-        _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
