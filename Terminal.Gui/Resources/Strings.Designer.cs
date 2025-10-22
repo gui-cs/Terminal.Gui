@@ -682,7 +682,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter search string.
+        ///   Looks up a localized string similar to Find.
         /// </summary>
         internal static string fdSearchCaption {
             get {
