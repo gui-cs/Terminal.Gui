@@ -1470,7 +1470,7 @@ public class DialogTests (ITestOutputHelper output)
         int width = buttonRow.Length;
         AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
 
-        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, null!);
+        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, []);
 
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 
