@@ -38,6 +38,11 @@ public class ApplicationImpl : IApplication
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
 
     /// <summary>
+    /// Handles keyboard input and key bindings at the Application level
+    /// </summary>
+    public IKeyboard Keyboard { get; set; } = new Keyboard ();
+
+    /// <summary>
     /// Creates a new instance of the Application backend.
     /// </summary>
     public ApplicationImpl ()
@@ -87,8 +92,6 @@ public class ApplicationImpl : IApplication
 
         Debug.Assert (Application.Popover is null);
         Application.Popover = new ();
-
-        Application.AddKeyBindings ();
 
         CreateDriver (driverName ?? _driverName);
 

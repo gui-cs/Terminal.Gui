@@ -1,19 +1,15 @@
 ﻿#nullable enable
-
 namespace Terminal.Gui.App;
 
-public static partial class Application // Keyboard handling
+/// <summary>
+///     Defines a contract for managing keyboard input and key bindings at the Application level.
+///     <para>
+///         This interface decouples keyboard handling state from the static <see cref="Application"/> class,
+///         enabling parallelizable unit tests and better testability.
+///     </para>
+/// </summary>
+public interface IKeyboard
 {
-    /// <summary>
-    /// Static reference to the current <see cref="IApplication"/> <see cref="IKeyboard"/>.
-    /// </summary>
-    public static IKeyboard Keyboard
-    {
-        get => ApplicationImpl.Instance.Keyboard;
-        set => ApplicationImpl.Instance.Keyboard = value ??
-                                                           throw new ArgumentNullException(nameof(value));
-    }
-
     /// <summary>
     ///     Called when the user presses a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
     ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
@@ -22,7 +18,18 @@ public static partial class Application // Keyboard handling
     /// <remarks>Can be used to simulate key press events.</remarks>
     /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool RaiseKeyDownEvent (Key key) => Keyboard.RaiseKeyDownEvent (key);
+    bool RaiseKeyDownEvent (Key key);
+
+    /// <summary>
+    ///     Called when the user releases a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
+    ///     <see cref="KeyUp"/>
+    ///     event
+    ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="RaiseKeyDownEvent"/>.
+    /// </summary>
+    /// <remarks>Can be used to simulate key release events.</remarks>
+    /// <param name="key"></param>
+    /// <returns><see langword="true"/> if the key was handled.</returns>
+    bool RaiseKeyUpEvent (Key key);
 
     /// <summary>
     ///     Invokes any commands bound at the Application-level to <paramref name="key"/>.
@@ -33,7 +40,7 @@ public static partial class Application // Keyboard handling
     ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
-    public static bool? InvokeCommandsBoundToKey (Key key) => Keyboard.InvokeCommandsBoundToKey (key);
+    bool? InvokeCommandsBoundToKey (Key key);
 
     /// <summary>
     ///     Invokes an Application-bound command.
@@ -47,7 +54,7 @@ public static partial class Application // Keyboard handling
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
     /// <exception cref="NotSupportedException"></exception>
-    public static bool? InvokeCommand (Command command, Key key, KeyBinding binding) => Keyboard.InvokeCommand (command, key, binding);
+    bool? InvokeCommand (Command command, Key key, KeyBinding binding);
 
     /// <summary>
     ///     Raised when the user presses a key.
@@ -61,31 +68,40 @@ public static partial class Application // Keyboard handling
     ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
     ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
     /// </remarks>
-    public static event EventHandler<Key>? KeyDown
-    {
-        add => Keyboard.KeyDown += value;
-        remove => Keyboard.KeyDown -= value;
-    }
+    event EventHandler<Key>? KeyDown;
 
     /// <summary>
-    ///     Called when the user releases a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
-    ///     <see cref="KeyUp"/>
-    ///     event
-    ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="RaiseKeyDownEvent"/>.
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
     /// </summary>
-    /// <remarks>Can be used to simulate key release events.</remarks>
-    /// <param name="key"></param>
-    /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool RaiseKeyUpEvent (Key key) => Keyboard.RaiseKeyUpEvent (key);
+    /// <remarks>
+    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Unix) do not support firing the
+    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+    ///     <para>Fired after <see cref="KeyDown"/>.</para>
+    /// </remarks>
+    event EventHandler<Key>? KeyUp;
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
-    public static KeyBindings KeyBindings => Keyboard.KeyBindings;
+    KeyBindings KeyBindings { get; }
 
-    internal static void AddKeyBindings ()
-    {
-        if (Keyboard is Keyboard keyboard)
-        {
-            keyboard.AddKeyBindings ();
-        }
-    }
+    /// <summary>Gets or sets the key to quit the application.</summary>
+    Key QuitKey { get; set; }
+
+    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
+    Key ArrangeKey { get; set; }
+
+    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
+    Key NextTabGroupKey { get; set; }
+
+    /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
+    Key NextTabKey { get; set; }
+
+    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
+    Key PrevTabGroupKey { get; set; }
+
+    /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
+    Key PrevTabKey { get; set; }
 }
