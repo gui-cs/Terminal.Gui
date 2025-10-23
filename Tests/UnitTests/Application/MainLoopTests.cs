@@ -243,7 +243,8 @@ public class MainLoopTests
         var ml = new MainLoop (new FakeMainLoop ());
         var ms = 100;
 
-        long originTicks = DateTime.UtcNow.Ticks;
+        // Use Stopwatch ticks since TimedEvents now uses Stopwatch.GetTimestamp internally
+        long originTicks = Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency;
 
         var callbackCount = 0;
 
