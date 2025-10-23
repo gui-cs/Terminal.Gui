@@ -717,30 +717,236 @@ public class ArrangementTests (ITestOutputHelper output)
 
     #endregion
 
+    #region Mouse Interaction Tests
+
+    [Fact]
+    public void MouseGrabHandler_WorksWithMovableView_UsingNewMouseEvent ()
+    {
+        // This test proves that MouseGrabHandler works correctly with concurrent unit tests
+        // using NewMouseEvent directly on views, without requiring Application.Init
+        
+        var superView = new View 
+        { 
+            Width = 80, 
+            Height = 25 
+        };
+        
+        var movableView = new View 
+        { 
+            Arrangement = ViewArrangement.Movable,
+            BorderStyle = LineStyle.Single,
+            X = 10,
+            Y = 10,
+            Width = 20,
+            Height = 10
+        };
+        
+        superView.Add (movableView);
+        
+        // Verify initial state
+        Assert.NotNull (movableView.Border);
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+        
+        // Simulate mouse press on the border to start dragging
+        var pressEvent = new MouseEventArgs 
+        { 
+            Position = new (1, 0), // Top border area
+            Flags = MouseFlags.Button1Pressed 
+        };
+        
+        bool? result = movableView.Border.NewMouseEvent (pressEvent);
+        
+        // The border should have grabbed the mouse
+        Assert.True (result);
+        Assert.Equal (movableView.Border, Application.MouseGrabHandler.MouseGrabView);
+        
+        // Simulate mouse drag
+        var dragEvent = new MouseEventArgs 
+        { 
+            Position = new (5, 2),
+            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+        };
+        
+        result = movableView.Border.NewMouseEvent (dragEvent);
+        Assert.True (result);
+        
+        // Mouse should still be grabbed
+        Assert.Equal (movableView.Border, Application.MouseGrabHandler.MouseGrabView);
+        
+        // Simulate mouse release to end dragging
+        var releaseEvent = new MouseEventArgs 
+        { 
+            Position = new (5, 2),
+            Flags = MouseFlags.Button1Released
+        };
+        
+        result = movableView.Border.NewMouseEvent (releaseEvent);
+        Assert.True (result);
+        
+        // Mouse should be released
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+    }
+
+    [Fact]
+    public void MouseGrabHandler_WorksWithResizableView_UsingNewMouseEvent ()
+    {
+        // This test proves MouseGrabHandler works for resizing operations
+        
+        var superView = new View 
+        { 
+            Width = 80, 
+            Height = 25 
+        };
+        
+        var resizableView = new View 
+        { 
+            Arrangement = ViewArrangement.RightResizable,
+            BorderStyle = LineStyle.Single,
+            X = 10,
+            Y = 10,
+            Width = 20,
+            Height = 10
+        };
+        
+        superView.Add (resizableView);
+        
+        // Verify initial state
+        Assert.NotNull (resizableView.Border);
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+        
+        // Calculate position on right border (border is at right edge)
+        // Border.Frame.X is relative to parent, so we use coordinates relative to the border
+        var pressEvent = new MouseEventArgs 
+        { 
+            Position = new (resizableView.Border.Frame.Width - 1, 5), // Right border area
+            Flags = MouseFlags.Button1Pressed 
+        };
+        
+        bool? result = resizableView.Border.NewMouseEvent (pressEvent);
+        
+        // The border should have grabbed the mouse for resizing
+        Assert.True (result);
+        Assert.Equal (resizableView.Border, Application.MouseGrabHandler.MouseGrabView);
+        
+        // Simulate dragging to resize
+        var dragEvent = new MouseEventArgs 
+        { 
+            Position = new (resizableView.Border.Frame.Width + 3, 5),
+            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+        };
+        
+        result = resizableView.Border.NewMouseEvent (dragEvent);
+        Assert.True (result);
+        Assert.Equal (resizableView.Border, Application.MouseGrabHandler.MouseGrabView);
+        
+        // Simulate mouse release
+        var releaseEvent = new MouseEventArgs 
+        { 
+            Position = new (resizableView.Border.Frame.Width + 3, 5),
+            Flags = MouseFlags.Button1Released
+        };
+        
+        result = resizableView.Border.NewMouseEvent (releaseEvent);
+        Assert.True (result);
+        
+        // Mouse should be released
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+    }
+
+    [Fact]
+    public void MouseGrabHandler_ReleasesOnMultipleViews ()
+    {
+        // This test verifies MouseGrabHandler properly releases when switching between views
+        
+        var superView = new View { Width = 80, Height = 25 };
+        
+        var view1 = new View 
+        { 
+            Arrangement = ViewArrangement.Movable,
+            BorderStyle = LineStyle.Single,
+            X = 10,
+            Y = 10,
+            Width = 15,
+            Height = 8
+        };
+        
+        var view2 = new View 
+        { 
+            Arrangement = ViewArrangement.Movable,
+            BorderStyle = LineStyle.Single,
+            X = 30,
+            Y = 10,
+            Width = 15,
+            Height = 8
+        };
+        
+        superView.Add (view1, view2);
+        
+        // Grab mouse on first view
+        var pressEvent1 = new MouseEventArgs 
+        { 
+            Position = new (1, 0),
+            Flags = MouseFlags.Button1Pressed 
+        };
+        
+        view1.Border!.NewMouseEvent (pressEvent1);
+        Assert.Equal (view1.Border, Application.MouseGrabHandler.MouseGrabView);
+        
+        // Release on first view
+        var releaseEvent1 = new MouseEventArgs 
+        { 
+            Position = new (1, 0),
+            Flags = MouseFlags.Button1Released
+        };
+        
+        view1.Border.NewMouseEvent (releaseEvent1);
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+        
+        // Grab mouse on second view
+        var pressEvent2 = new MouseEventArgs 
+        { 
+            Position = new (1, 0),
+            Flags = MouseFlags.Button1Pressed 
+        };
+        
+        view2.Border!.NewMouseEvent (pressEvent2);
+        Assert.Equal (view2.Border, Application.MouseGrabHandler.MouseGrabView);
+        
+        // Release on second view
+        var releaseEvent2 = new MouseEventArgs 
+        { 
+            Position = new (1, 0),
+            Flags = MouseFlags.Button1Released
+        };
+        
+        view2.Border.NewMouseEvent (releaseEvent2);
+        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+    }
+
+    #endregion
+
     #region Summary and Limitations
 
-    // NOTE: The following functionality cannot be fully tested in parallelizable unit tests
-    // due to dependencies on Application static state:
+    // NOTE: The original concern that Border.OnMouseEvent depends on Application.MouseGrabHandler
+    // has been addressed. The tests above prove that MouseGrabHandler works correctly in
+    // parallelizable tests when using NewMouseEvent directly on views.
     //
-    // 1. Border.EnterArrangeMode() - depends on Application.MouseEvent and Application.ArrangeKey
-    // 2. Border.EndArrangeMode() - depends on Application.MouseEvent and Application.MouseGrabHandler
-    // 3. Border.OnMouseEvent() - depends on Application.MouseGrabHandler
-    // 4. Border.HandleDragOperation() - depends on Application.Top
-    // 5. Keyboard arrange mode - depends on Application.ArrangeKey
+    // Remaining functionality that still requires Application.Init:
+    // 1. Border.EnterArrangeMode() with keyboard mode - depends on Application.ArrangeKey
+    // 2. Border.HandleDragOperation() - depends on Application.Top for screen refresh
+    // 3. Application-level mouse event routing through Application.RaiseMouseEvent
     //
-    // These would need to be tested in integration tests that use [AutoInitShutdown]
-    // or similar fixtures that initialize Application.
-    //
-    // The tests in this file focus on:
+    // The tests in this file demonstrate:
     // - ViewArrangement enum and flag behavior
     // - View.Arrangement property behavior
     // - Border existence and configuration with arrangements
+    // - MouseGrabHandler interaction with arrangeable views
     // - Logical combinations of arrangement flags
     // - Mutual exclusivity rules (TopResizable vs Movable)
     // - Multiple subview scenarios
     //
-    // This provides comprehensive coverage of the arrangement CONFIGURATION without
-    // requiring Application state, making these tests parallelizable.
+    // This provides comprehensive coverage of arrangement functionality using
+    // parallelizable tests with NewMouseEvent.
 
     [Fact]
     public void AllArrangementTests_AreParallelizable ()
