@@ -106,8 +106,28 @@ public class ApplicationImpl : IApplication
         Debug.Assert (Application.Popover is null);
         Application.Popover = new ();
 
-        // Reset keyboard to ensure fresh state
+        // Preserve existing keyboard settings if they exist
+        bool hasExistingKeyboard = _keyboard is not null;
+        Key existingQuitKey = _keyboard?.QuitKey ?? Key.Esc;
+        Key existingArrangeKey = _keyboard?.ArrangeKey ?? Key.F5.WithCtrl;
+        Key existingNextTabKey = _keyboard?.NextTabKey ?? Key.Tab;
+        Key existingPrevTabKey = _keyboard?.PrevTabKey ?? Key.Tab.WithShift;
+        Key existingNextTabGroupKey = _keyboard?.NextTabGroupKey ?? Key.F6;
+        Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
+
+        // Reset keyboard to ensure fresh state with default bindings
         _keyboard = new Keyboard ();
+
+        // Restore previously set keys if they existed and were different from defaults
+        if (hasExistingKeyboard)
+        {
+            _keyboard.QuitKey = existingQuitKey;
+            _keyboard.ArrangeKey = existingArrangeKey;
+            _keyboard.NextTabKey = existingNextTabKey;
+            _keyboard.PrevTabKey = existingPrevTabKey;
+            _keyboard.NextTabGroupKey = existingNextTabGroupKey;
+            _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
+        }
 
         CreateDriver (driverName ?? _driverName);
 
