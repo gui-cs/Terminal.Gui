@@ -37,10 +37,23 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
 
+    private IKeyboard? _keyboard;
+
     /// <summary>
     /// Handles keyboard input and key bindings at the Application level
     /// </summary>
-    public IKeyboard Keyboard { get; set; } = new Keyboard ();
+    public IKeyboard Keyboard
+    {
+        get
+        {
+            if (_keyboard is null)
+            {
+                _keyboard = new Keyboard ();
+            }
+            return _keyboard;
+        }
+        set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
+    }
 
     /// <summary>
     /// Creates a new instance of the Application backend.
@@ -92,6 +105,9 @@ public class ApplicationImpl : IApplication
 
         Debug.Assert (Application.Popover is null);
         Application.Popover = new ();
+
+        // Reset keyboard to ensure fresh state
+        _keyboard = new Keyboard ();
 
         CreateDriver (driverName ?? _driverName);
 
@@ -279,6 +295,7 @@ public class ApplicationImpl : IApplication
         }
 
         Application.Driver = null;
+        _keyboard = null;
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
