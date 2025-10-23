@@ -86,6 +86,7 @@ public class FileDialog : Dialog, IDesignable
                                 }
 
                                 Accept (true);
+                                e.Handled = true;
                             };
 
         _btnCancel = new ()
@@ -743,7 +744,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.ClearAllSelection ();
         _tbPath.Autocomplete.ClearSuggestions ();
 
-        State.RefreshChildren ();
+        State!.RefreshChildren ();
         WriteStateToTableView ();
     }
 
@@ -839,7 +840,7 @@ public class FileDialog : Dialog, IDesignable
 
     private void Delete ()
     {
-        IFileSystemInfo [] toDelete = GetFocusedFiles ();
+        IFileSystemInfo [] toDelete = GetFocusedFiles ()!;
 
         if (FileOperationsHandler.Delete (toDelete))
         {
@@ -939,7 +940,7 @@ public class FileDialog : Dialog, IDesignable
 
     private bool IsCompatibleWithOpenMode (string s, out string reason)
     {
-        reason = null;
+        reason = string.Empty;
 
         if (string.IsNullOrWhiteSpace (s))
         {
@@ -1031,7 +1032,7 @@ public class FileDialog : Dialog, IDesignable
     private void New ()
     {
         {
-            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem, State.Directory);
+            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem, State!.Directory);
 
             if (created is { })
             {
@@ -1162,13 +1163,13 @@ public class FileDialog : Dialog, IDesignable
 
     private void RefreshState ()
     {
-        State.RefreshChildren ();
+        State!.RefreshChildren ();
         PushState (State, false, false, false);
     }
 
     private void Rename ()
     {
-        IFileSystemInfo [] toRename = GetFocusedFiles ();
+        IFileSystemInfo [] toRename = GetFocusedFiles ()!;
 
         if (toRename?.Length == 1)
         {
@@ -1364,7 +1365,7 @@ public class FileDialog : Dialog, IDesignable
             _pushingState = true;
 
             SetPathToSelectedObject (dest);
-            State.Selected = stats;
+            State!.Selected = stats;
             _tbPath.Autocomplete.ClearSuggestions ();
         }
         finally

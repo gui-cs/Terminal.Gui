@@ -1,5 +1,4 @@
 #nullable enable
-using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.App.Application;
 
@@ -21,7 +20,7 @@ public class DialogTests (ITestOutputHelper output)
 
         // We test with one button first, but do this to get the width right for 2
         int width = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}".Length;
-        AutoInitShutdownAttribute.FakeResize(new(width, 1));
+        AutoInitShutdownAttribute.FakeResize (new (width, 1));
 
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
@@ -164,7 +163,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {btn3} {btn4} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize(new (buttonRow.Length, 3));
+        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
 
         // Default - Center
         (runState, Dialog dlg) = BeginButtonTestDialog (
@@ -256,7 +255,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = string.Empty;
 
         var width = 30;
-        AutoInitShutdownAttribute.FakeResize(new(width, 1));
+        AutoInitShutdownAttribute.FakeResize (new (width, 1));
 
         // Default - Center
         buttonRow =
@@ -447,7 +446,7 @@ public class DialogTests (ITestOutputHelper output)
         //                         123456                           123456
         var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.GetColumns ();
-        AutoInitShutdownAttribute.FakeResize(new(width, 3));
+        AutoInitShutdownAttribute.FakeResize (new (width, 3));
 
         // Default - Center
         (runState, Dialog dlg) = BeginButtonTestDialog (
@@ -532,7 +531,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}  {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}  {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize(new(width, 1));
+        AutoInitShutdownAttribute.FakeResize (new (width, 1));
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -596,7 +595,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
         width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize(new(width, 1));
+        AutoInitShutdownAttribute.FakeResize (new (width, 1));
 
         (runState, dlg) = BeginButtonTestDialog (
                                                  title,
@@ -676,7 +675,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {btn3} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize(new(buttonRow.Length, 3));
+        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -759,7 +758,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize(new(buttonRow.Length, 3));
+        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -823,7 +822,6 @@ public class DialogTests (ITestOutputHelper output)
     public void ButtonAlignment_Two_Hidden ()
     {
         RunState? runState = null;
-        var firstIteration = false;
 
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
@@ -839,15 +837,12 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize(new(buttonRow.Length, 3));
-
-        Dialog dlg = null;
-        Button button1, button2;
+        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
 
         // Default (Center)
-        button1 = new () { Text = btn1Text };
-        button2 = new () { Text = btn2Text };
-        (runState, dlg) = BeginButtonTestDialog (title, width, Alignment.Center, button1, button2);
+        Button button1 = new () { Text = btn1Text };
+        Button button2 = new () { Text = btn2Text };
+        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, button1, button2);
         button1.Visible = false;
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -898,9 +893,71 @@ public class DialogTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
+    public void Can_Access_Cancel_Property_After_Run ()
+    {
+        Dialog dlg = new ();
+
+        dlg.Ready += Dlg_Ready;
+
+        Run (dlg);
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (dlg.WasDisposed);
+        Assert.False (Top!.WasDisposed);
+        Assert.Equal (dlg, Top);
+#endif
+
+        Assert.True (dlg.Canceled);
+
+        // Run it again is possible because it isn't disposed yet
+        Run (dlg);
+
+        // Run another view without dispose the prior will throw an assertion
+#if DEBUG_IDISPOSABLE
+        Dialog dlg2 = new ();
+        dlg2.Ready += Dlg_Ready;
+
+        //   Exception exception = Record.Exception (() => Run (dlg2));
+        //     Assert.NotNull (exception);
+
+        dlg.Dispose ();
+
+        // Now it's possible to tun dlg2 without throw
+        Run (dlg2);
+
+        Assert.True (dlg.WasDisposed);
+        Assert.False (Top.WasDisposed);
+        Assert.Equal (dlg2, Top);
+        Assert.False (dlg2.WasDisposed);
+
+        dlg2.Dispose ();
+
+        // tznind REMOVED: Why wouldn't you be able to read cancelled after dispose - that makes no sense
+        // Now an assertion will throw accessing the Canceled property
+        //var exception = Record.Exception (() => Assert.True (dlg.Canceled))!;
+        //Assert.NotNull (exception);
+        //Assert.StartsWith ("Cannot access a disposed object.", exception.Message);
+
+        Assert.True (Top.WasDisposed);
+        Shutdown ();
+        Assert.True (dlg2.WasDisposed);
+        Assert.Null (Top);
+#endif
+
+        return;
+
+        void Dlg_Ready (object? sender, EventArgs e)
+        {
+            ((Dialog)sender!).Canceled = true;
+            RequestStop ();
+        }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void Dialog_In_Window_With_Size_One_Button_Aligns ()
     {
-        AutoInitShutdownAttribute.FakeResize(new(20, 5));
+        AutoInitShutdownAttribute.FakeResize (new (20, 5));
 
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
@@ -1005,7 +1062,7 @@ public class DialogTests (ITestOutputHelper output)
                 )]
     public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height, string expected)
     {
-        AutoInitShutdownAttribute.FakeResize(new (20, height));
+        AutoInitShutdownAttribute.FakeResize (new (20, height));
         var win = new Window ();
 
         int iterations = -1;
@@ -1052,7 +1109,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Dialog_Opened_From_Another_Dialog ()
     {
-        AutoInitShutdownAttribute.FakeResize(new (30, 10));
+        AutoInitShutdownAttribute.FakeResize (new (30, 10));
 
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
@@ -1194,7 +1251,7 @@ public class DialogTests (ITestOutputHelper output)
             Height = Dim.Percent (85)
         };
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize(new(100, 100));
+        AutoInitShutdownAttribute.FakeResize (new (100, 100));
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 7;
@@ -1208,7 +1265,7 @@ public class DialogTests (ITestOutputHelper output)
     {
         var d = new Dialog { X = 1, Y = 1 };
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize(new(100, 100));
+        AutoInitShutdownAttribute.FakeResize (new (100, 100));
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 1;
@@ -1230,7 +1287,7 @@ public class DialogTests (ITestOutputHelper output)
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize(new(20, 10));
+        AutoInitShutdownAttribute.FakeResize (new (20, 10));
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         Assert.Equal (new (expected, expected), d.Frame.Location);
@@ -1249,10 +1306,61 @@ public class DialogTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
+    public void Modal_Captures_All_Mouse ()
+    {
+        var top = new Toplevel
+        {
+            Id = "top"
+        };
+
+        var d = new Dialog
+        {
+            Width = 10,
+            Height = 10,
+            X = 1,
+            Y = 1
+        };
+
+        AutoInitShutdownAttribute.FakeResize (new (20, 20));
+
+        var iterations = 0;
+
+        Iteration += (s, a) =>
+                     {
+                         if (++iterations > 2)
+                         {
+                             RequestStop ();
+                         }
+
+                         if (iterations == 1)
+                         {
+                             Run (d);
+                             d.Dispose ();
+                         }
+                         else if (iterations == 2)
+                         {
+                             // Mouse click outside of dialog
+                             RaiseMouseEvent (new() { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
+                         }
+                     };
+
+        top.MouseEvent += (s, e) =>
+                          {
+                              // This should not be called because the dialog is modal
+                              Assert.Fail ("Mouse event should not be captured by the top level when a dialog is modal.");
+                          };
+
+        Run (top);
+        top.Dispose ();
+        Shutdown ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void One_Button_Works ()
     {
         RunState? runState = null;
-        
+
         Button.DefaultShadow = ShadowStyle.None;
 
         var title = "";
@@ -1262,7 +1370,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
 
         int width = buttonRow.Length;
-        AutoInitShutdownAttribute.FakeResize(new(buttonRow.Length, 10));
+        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 10));
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -1273,97 +1381,6 @@ public class DialogTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
         End (runState);
         dlg.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Size_Default ()
-    {
-        var d = new Dialog
-        {
-            Width = Dim.Percent (85),
-            Height = Dim.Percent (85)
-        };
-
-        Begin (d);
-        AutoInitShutdownAttribute.FakeResize(new(100, 100));
-
-        // Default size is Percent(85) 
-        Assert.Equal (new ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
-        d.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Size_Not_Default ()
-    {
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
-        var d = new Dialog { Width = 50, Height = 50 };
-
-        Begin (d);
-        AutoInitShutdownAttribute.FakeResize(new(100, 100));
-
-        // Default size is Percent(85) 
-        Assert.Equal (new (50, 50), d.Frame.Size);
-        d.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Zero_Buttons_Works ()
-    {
-        RunState? runState = null;
-
-        var title = "1234";
-
-        var buttonRow = $"{Glyphs.VLine}        {Glyphs.VLine}";
-        int width = buttonRow.Length;
-        AutoInitShutdownAttribute.FakeResize(new(buttonRow.Length, 3));
-
-        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, null);
-
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-
-        End (runState);
-        dlg.Dispose ();
-    }
-
-    private (RunState, Dialog) BeginButtonTestDialog (
-        string title,
-        int width,
-        Alignment align,
-        params Button [] btns
-    )
-    {
-        // Override CM
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
-
-        var dlg = new Dialog
-        {
-            Title = title,
-            X = 0,
-            Y = 0,
-            Width = width,
-            Height = 1,
-            ButtonAlignment = align,
-            Buttons = btns
-        };
-
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
-        dlg.Border!.Thickness = new (1, 0, 1, 0);
-
-        RunState runState = Begin (dlg);
-
-        dlg.SetNeedsDraw ();
-        dlg.SetNeedsLayout ();
-
-        AutoInitShutdownAttribute.RunIteration ();
-
-        return (runState, dlg);
     }
 
     [Fact]
@@ -1409,115 +1426,92 @@ public class DialogTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Can_Access_Cancel_Property_After_Run ()
+    public void Size_Default ()
     {
-        Dialog dlg = new ();
-
-        dlg.Ready += Dlg_Ready;
-
-        Run (dlg);
-
-#if DEBUG_IDISPOSABLE
-        Assert.False (dlg.WasDisposed);
-        Assert.False (Top!.WasDisposed);
-        Assert.Equal (dlg, Top);
-#endif
-
-        Assert.True (dlg.Canceled);
-
-        // Run it again is possible because it isn't disposed yet
-        Run (dlg);
-
-        // Run another view without dispose the prior will throw an assertion
-#if DEBUG_IDISPOSABLE
-        Dialog dlg2 = new ();
-        dlg2.Ready += Dlg_Ready; 
-        //   Exception exception = Record.Exception (() => Run (dlg2));
-   //     Assert.NotNull (exception);
-
-        dlg.Dispose ();
-
-        // Now it's possible to tun dlg2 without throw
-        Run (dlg2);
-
-        Assert.True (dlg.WasDisposed);
-        Assert.False (Top.WasDisposed);
-        Assert.Equal (dlg2, Top);
-        Assert.False (dlg2.WasDisposed);
-
-        dlg2.Dispose ();
-
-        // tznind REMOVED: Why wouldn't you be able to read cancelled after dispose - that makes no sense
-        // Now an assertion will throw accessing the Canceled property
-        //var exception = Record.Exception (() => Assert.True (dlg.Canceled))!;
-        //Assert.NotNull (exception);
-        //Assert.StartsWith ("Cannot access a disposed object.", exception.Message);
-
-        Assert.True (Top.WasDisposed);
-        Shutdown ();
-        Assert.True (dlg2.WasDisposed);
-        Assert.Null (Top);
-#endif
-
-        return;
-
-        void Dlg_Ready (object? sender, EventArgs e)
+        var d = new Dialog
         {
-            ((Dialog)sender!).Canceled = true;
-            RequestStop ();
-        }
-    }
+            Width = Dim.Percent (85),
+            Height = Dim.Percent (85)
+        };
 
+        Begin (d);
+        AutoInitShutdownAttribute.FakeResize (new (100, 100));
+
+        // Default size is Percent(85) 
+        Assert.Equal (new ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
+        d.Dispose ();
+    }
 
     [Fact]
     [AutoInitShutdown]
-    public void Modal_Captures_All_Mouse ()
+    public void Size_Not_Default ()
     {
-        Toplevel top = new Toplevel ()
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+        var d = new Dialog { Width = 50, Height = 50 };
+
+        Begin (d);
+        AutoInitShutdownAttribute.FakeResize (new (100, 100));
+
+        // Default size is Percent(85) 
+        Assert.Equal (new (50, 50), d.Frame.Size);
+        d.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Zero_Buttons_Works ()
+    {
+        RunState? runState = null;
+
+        var title = "1234";
+
+        var buttonRow = $"{Glyphs.VLine}        {Glyphs.VLine}";
+        int width = buttonRow.Length;
+        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
+
+        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, null!);
+
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+
+        End (runState);
+        dlg.Dispose ();
+    }
+
+    private (RunState, Dialog) BeginButtonTestDialog (
+        string title,
+        int width,
+        Alignment align,
+        params Button [] btns
+    )
+    {
+        // Override CM
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+
+        var dlg = new Dialog
         {
-            Id = "top",
+            Title = title,
+            X = 0,
+            Y = 0,
+            Width = width,
+            Height = 1,
+            ButtonAlignment = align,
+            Buttons = btns
         };
 
-        var d = new Dialog
-        {
-            Width = 10,
-            Height = 10,
-            X = 1,
-            Y = 1
-        };
+        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
+        dlg.Border!.Thickness = new (1, 0, 1, 0);
 
-        AutoInitShutdownAttribute.FakeResize(new(20, 20));
+        RunState runState = Begin (dlg);
 
-        int iterations = 0;
-        Iteration += (s, a) =>
-                     {
-                         if (++iterations > 2)
-                         {
-                             RequestStop ();
-                         }
+        dlg.SetNeedsDraw ();
+        dlg.SetNeedsLayout ();
 
-                         if (iterations == 1)
-                         {
-                             Application.Run (d);
-                             d.Dispose ();
-                         }
-                         else if (iterations == 2)
-                         {
-                             // Mouse click outside of dialog
-                             Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new Point (0, 0) });
-                         }
+        AutoInitShutdownAttribute.RunIteration ();
 
-
-                     };
-
-        top.MouseEvent += (s, e) =>
-                          {
-                              // This should not be called because the dialog is modal
-                              Assert.False (true, "Mouse event should not be captured by the top level when a dialog is modal.");
-                          };
-
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
+        return (runState, dlg);
     }
 }
