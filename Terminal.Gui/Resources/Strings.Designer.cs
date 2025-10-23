@@ -19,7 +19,7 @@ namespace Terminal.Gui.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -682,7 +682,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter Search.
+        ///   Looks up a localized string similar to Find.
         /// </summary>
         internal static string fdSearchCaption {
             get {
@@ -714,6 +714,15 @@ namespace Terminal.Gui.Resources {
         internal static string fdSize {
             get {
                 return ResourceManager.GetString("fdSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Tree.
+        /// </summary>
+        internal static string fdTree {
+            get {
+                return ResourceManager.GetString("fdTree", resourceCulture);
             }
         }
         
