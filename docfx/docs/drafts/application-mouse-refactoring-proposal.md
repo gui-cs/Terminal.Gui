@@ -401,11 +401,183 @@ public void RaiseMouseEvent_WorksConcurrently ()
 - Testing: 2-3 hours
 - **Total: 6-9 hours**
 
+## Interface Design Discussion
+
+### Option 1: Unified IMouse Interface
+
+Combine `IMouseGrabHandler` and `IMouseEventHandler` into a single `IMouse` interface:
+
+**Pros:**
+- Single interface to inject/mock for testing
+- Simpler API surface: `Application.Mouse` instead of separate properties
+- More cohesive - all mouse functionality in one place
+- Aligns with potential `IKeyboard` interface (see #4315)
+- Shorter, more intuitive name
+
+**Cons:**
+- Larger interface (violates Interface Segregation Principle)
+- Breaking change to existing code using `IMouseGrabHandler`
+- Less granular control - can't swap just grab handler or event handler independently
+- Harder to test individual aspects in isolation
+
+**Example:**
+```csharp
+public interface IMouse
+{
+    // From IMouseGrabHandler
+    View? MouseGrabView { get; }
+    void GrabMouse (View? view);
+    void UngrabMouse ();
+    event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
+    event EventHandler<ViewEventArgs>? GrabbedMouse;
+    event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
+    event EventHandler<ViewEventArgs>? UnGrabbedMouse;
+    
+    // From IMouseEventHandler
+    Point? LastMousePosition { get; set; }
+    bool IsMouseDisabled { get; set; }
+    event EventHandler<MouseEventArgs>? MouseEvent;
+    List<View?> CachedViewsUnderMouse { get; }
+    void RaiseMouseEvent (MouseEventArgs mouseEvent, View? top, IPopover? popover, IMouse mouse);
+}
+
+// Usage:
+public static IMouse Mouse { get; set; }
+```
+
+### Option 2: Two Separate Interfaces with Shorter Names
+
+Keep separate interfaces but use shorter names: `IMouseGrab` and `IMouseEvents`:
+
+**Pros:**
+- Follows Single Responsibility Principle
+- Non-breaking change to existing `IMouseGrabHandler`
+- Granular testability - can mock/inject each independently  
+- Clear separation of concerns (grab vs routing)
+- Can evolve independently
+
+**Cons:**
+- Two properties to inject/configure
+- Slightly more verbose API
+- Conceptual split between related functionality
+
+**Example:**
+```csharp
+public interface IMouseGrab  // Rename from IMouseGrabHandler
+{
+    View? MouseGrabView { get; }
+    void GrabMouse (View? view);
+    void UngrabMouse ();
+    event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
+    event EventHandler<ViewEventArgs>? GrabbedMouse;
+    event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
+    event EventHandler<ViewEventArgs>? UnGrabbedMouse;
+}
+
+public interface IMouseEvents  // Or IMouseRouter
+{
+    Point? LastMousePosition { get; set; }
+    bool IsMouseDisabled { get; set; }
+    event EventHandler<MouseEventArgs>? MouseEvent;
+    List<View?> CachedViewsUnderMouse { get; }
+    void RaiseMouseEvent (MouseEventArgs mouseEvent, View? top, IPopover? popover, IMouseGrab grab);
+}
+
+// Usage:
+public static IMouseGrab MouseGrab { get; set; }
+public static IMouseEvents MouseEvents { get; set; }
+```
+
+### Option 3: Keep Current Names, Add New Interface
+
+Keep `IMouseGrabHandler` as-is, add `IMouseEventHandler`:
+
+**Pros:**
+- Zero breaking changes
+- Clear, descriptive names
+- Consistent with existing naming pattern
+- Easy migration path
+
+**Cons:**
+- Longer names (though descriptive)
+- Two properties to manage
+
+This is what the current proposal uses.
+
+### Recommendation: Option 2 (Two Separate Interfaces with Shorter Names)
+
+**Rationale:**
+
+1. **Aligns with future IKeyboard work (#4315)**: 
+   - Keyboard will likely need `IKeyboardGrab` (or similar) and `IKeyboardEvents`
+   - Consistent pattern across input types
+
+2. **Follows SOLID principles**:
+   - Single Responsibility: Each interface has one clear purpose
+   - Interface Segregation: Clients only depend on what they need
+
+3. **Better testability**:
+   - Can test grab logic independently from routing logic
+   - Can mock just the aspect being tested
+
+4. **Non-breaking migration path**:
+   - Rename `IMouseGrabHandler` → `IMouseGrab` (add obsolete attribute to old name)
+   - Add new `IMouseEvents` interface
+   - Existing code continues working during transition
+
+5. **Future-proof**:
+   - If touch input is added later, can have `ITouchGrab` + `ITouchEvents`
+   - Pattern scales to other input types
+
+**Suggested naming:**
+- `IMouseGrab` / `MouseGrab` (renamed from `IMouseGrabHandler`)
+- `IMouseEvents` / `MouseEvents` (new)
+- `IKeyboardGrab` / `KeyboardGrab` (future, per #4315)
+- `IKeyboardEvents` / `KeyboardEvents` (future, per #4315)
+
+### Implementation with Option 2
+
+```csharp
+// IApplication.cs
+public interface IApplication
+{
+    IMouseGrab MouseGrab { get; set; }
+    IMouseEvents MouseEvents { get; set; }
+    ITimedEvents? TimedEvents { get; }
+    // ... other methods
+}
+
+// Application.cs
+public static partial class Application
+{
+    public static IMouseGrab MouseGrab
+    {
+        get => ApplicationImpl.Instance.MouseGrab;
+        set => ApplicationImpl.Instance.MouseGrab = value;
+    }
+    
+    public static IMouseEvents MouseEvents
+    {
+        get => ApplicationImpl.Instance.MouseEvents;
+        set => ApplicationImpl.Instance.MouseEvents = value;
+    }
+    
+    // For backward compatibility during transition
+    [Obsolete("Use MouseGrab instead")]
+    public static IMouseGrabHandler MouseGrabHandler
+    {
+        get => MouseGrab;
+        set => MouseGrab = value;
+    }
+}
+```
+
 ## Related Work
 
 This proposal aligns with the ongoing v2 architecture migration:
-- ✅ `IMouseGrabHandler` / `MouseGrabHandler` (completed)
 - ✅ `ITimedEvents` / `TimedEvents` (completed)
-- 🔄 `IMouseEventHandler` / `MouseEventHandler` (this proposal)
-- 📝 `IKeyboardEventHandler` (future)
+- 🔄 `IMouseGrab` / `MouseGrab` (rename from `IMouseGrabHandler`, this proposal)
+- 🔄 `IMouseEvents` / `MouseEvents` (new, this proposal)
+- 📝 `IKeyboardGrab` / `KeyboardGrab` (future - see issue #4315)
+- 📝 `IKeyboardEvents` / `KeyboardEvents` (future - see issue #4315)
 - 📝 `IViewHierarchyManager` (future - for Top, Popover, Navigation)
