@@ -144,8 +144,6 @@ public static partial class Application // Initialization (Init/Shutdown)
         Debug.Assert (Popover is null);
         Popover = new ();
 
-        AddKeyBindings ();
-
         try
         {
             MainLoop = Driver!.Init ();
