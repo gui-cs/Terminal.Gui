@@ -23,7 +23,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_NewMouseEvent_ReceivesCorrectCoordinates (int screenX, int screenY, int expectedViewX, int expectedViewY, bool shouldReceive)
     {
         // Arrange
-        var view = new View
+        View view = new ()
         {
             X = 0,
             Y = 0,
@@ -40,7 +40,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (screenX, screenY),
             Flags = MouseFlags.Button1Clicked
@@ -81,7 +81,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         // Note: When testing View.NewMouseEvent directly (without Application routing),
         // coordinates are already view-relative. The view's X/Y position doesn't affect
         // the coordinate transformation at this level.
-        var view = new View
+        View view = new ()
         {
             X = viewX,
             Y = viewY,
@@ -98,7 +98,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (viewRelativeX, viewRelativeY),
             Flags = MouseFlags.Button1Clicked
@@ -127,7 +127,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void SubView_ReceivesMouseEvent_WithCorrectRelativeCoordinates ()
     {
         // Arrange
-        var superView = new View
+        View superView = new ()
         {
             X = 0,
             Y = 0,
@@ -135,7 +135,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Height = 20
         };
 
-        var subView = new View
+        View subView = new ()
         {
             X = 5,
             Y = 5,
@@ -155,7 +155,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Click at position (2, 2) relative to subView (which is at 5,5 relative to superView)
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (2, 2), // Relative to subView
             Flags = MouseFlags.Button1Clicked
@@ -178,13 +178,13 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void MouseClick_OnSubView_RaisesMouseClickEvent ()
     {
         // Arrange
-        var superView = new View
+        View superView = new ()
         {
             Width = 20,
             Height = 20
         };
 
-        var subView = new View
+        View subView = new ()
         {
             X = 5,
             Y = 5,
@@ -197,7 +197,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var clickCount = 0;
         subView.MouseClick += (sender, args) => clickCount++;
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -221,7 +221,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_HandledEvent_StopsPropagation ()
     {
         // Arrange
-        var view = new View { Width = 10, Height = 10 };
+        View view = new () { Width = 10, Height = 10 };
         var handlerCalled = false;
         var clickHandlerCalled = false;
 
@@ -233,7 +233,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseClick += (sender, args) => { clickHandlerCalled = true; };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -254,7 +254,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_UnhandledEvent_ContinuesProcessing ()
     {
         // Arrange
-        var view = new View { Width = 10, Height = 10 };
+        View view = new () { Width = 10, Height = 10 };
         var eventHandlerCalled = false;
         var clickHandlerCalled = false;
 
@@ -266,7 +266,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseClick += (sender, args) => { clickHandlerCalled = true; };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -293,7 +293,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased, int expectedClicked)
     {
         // Arrange
-        var view = new View { Width = 10, Height = 10 };
+        View view = new () { Width = 10, Height = 10 };
         var pressedCount = 0;
         var releasedCount = 0;
         var clickedCount = 0;
@@ -313,7 +313,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseClick += (sender, args) => { clickedCount++; };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = flags
@@ -338,12 +338,12 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_AllMouseButtons_TriggerClickEvent (MouseFlags clickFlag)
     {
         // Arrange
-        var view = new View { Width = 10, Height = 10 };
+        View view = new () { Width = 10, Height = 10 };
         var clickCount = 0;
 
         view.MouseClick += (sender, args) => clickCount++;
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = clickFlag
@@ -366,7 +366,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_Disabled_DoesNotRaiseMouseEvent ()
     {
         // Arrange
-        var view = new View
+        View view = new ()
         {
             Width = 10,
             Height = 10,
@@ -376,7 +376,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var eventCalled = false;
         view.MouseEvent += (sender, args) => { eventCalled = true; };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -395,7 +395,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void View_Disabled_DoesNotRaiseMouseClickEvent ()
     {
         // Arrange
-        var view = new View
+        View view = new ()
         {
             Width = 10,
             Height = 10,
@@ -405,7 +405,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var clickCalled = false;
         view.MouseClick += (sender, args) => { clickCalled = true; };
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -430,8 +430,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void MouseClick_SetsFocus_BasedOnCanFocus (bool canFocus, bool expectFocus)
     {
         // Arrange
-        var superView = new View { CanFocus = true, Width = 20, Height = 20 };
-        var subView = new View
+        View superView = new () { CanFocus = true, Width = 20, Height = 20 };
+        View subView = new ()
         {
             X = 5,
             Y = 5,
@@ -443,7 +443,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
         superView.SetFocus (); // Give superView focus first
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (2, 2),
             Flags = MouseFlags.Button1Clicked
@@ -463,8 +463,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void MouseClick_RaisesSelecting_WhenCanFocus ()
     {
         // Arrange
-        var superView = new View { CanFocus = true, Width = 20, Height = 20 };
-        var view = new View
+        View superView = new () { CanFocus = true, Width = 20, Height = 20 };
+        View view = new ()
         {
             X = 5,
             Y = 5,
@@ -478,7 +478,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var selectingCount = 0;
         view.Selecting += (sender, args) => selectingCount++;
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked

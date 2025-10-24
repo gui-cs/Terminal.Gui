@@ -18,7 +18,7 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_MouseGrabView_InitiallyNull ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
+        MouseGrabHandler handler = new ();
 
         // Act & Assert
         Assert.Null (handler.MouseGrabView);
@@ -28,8 +28,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_GrabMouse_SetsMouseGrabView ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
 
         // Act
         handler.GrabMouse (view);
@@ -45,8 +45,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_UngrabMouse_ClearsMouseGrabView ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
         handler.GrabMouse (view);
         Assert.NotNull (handler.MouseGrabView);
 
@@ -63,7 +63,7 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_UngrabMouse_WhenNoGrab_DoesNothing ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
+        MouseGrabHandler handler = new ();
         Assert.Null (handler.MouseGrabView);
 
         // Act & Assert - Should not throw
@@ -75,7 +75,7 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_GrabMouse_WithNull_DoesNothing ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
+        MouseGrabHandler handler = new ();
 
         // Act
         handler.GrabMouse (null);
@@ -92,8 +92,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_GrabbingMouse_FiredBeforeGrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
         View capturedView = null;
         var eventFired = false;
 
@@ -120,8 +120,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_GrabbingMouse_CanCancelGrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
 
         handler.GrabbingMouse += (sender, args) => { args.Cancel = true; };
 
@@ -142,8 +142,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_GrabbedMouse_FiredDuringGrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
         View capturedView = null;
         var eventFired = false;
 
@@ -176,8 +176,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_UnGrabbingMouse_FiredBeforeUngrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
         handler.GrabMouse (view);
 
         View capturedView = null;
@@ -206,8 +206,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_UnGrabbingMouse_CanCancelUngrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
         handler.GrabMouse (view);
 
         handler.UnGrabbingMouse += (sender, args) => { args.Cancel = true; };
@@ -230,8 +230,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_UnGrabbedMouse_FiredAfterUngrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler = new ();
+        View view = new () { Id = "testView" };
         handler.GrabMouse (view);
 
         View capturedView = null;
@@ -263,8 +263,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_HandleMouseGrab_NoGrab_ReturnsFalse ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var mouseEvent = new MouseEventArgs
+        MouseGrabHandler handler = new ();
+        MouseEventArgs mouseEvent = new ()
         {
             ScreenPosition = new Point (10, 10),
             Flags = MouseFlags.Button1Pressed
@@ -281,8 +281,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_HandleMouseGrab_WithGrabbedView_RoutesEventToView ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View
+        MouseGrabHandler handler = new ();
+        View view = new ()
         {
             Width = 20,
             Height = 20
@@ -297,7 +297,7 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
 
         handler.GrabMouse (view);
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             ScreenPosition = new Point (10, 10),
             Flags = MouseFlags.Button1Pressed
@@ -317,8 +317,8 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_HandleMouseGrab_ViewDoesNotHandle_ReturnsFalse ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view = new View
+        MouseGrabHandler handler = new ();
+        View view = new ()
         {
             Width = 20,
             Height = 20
@@ -333,7 +333,7 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
 
         handler.GrabMouse (view);
 
-        var mouseEvent = new MouseEventArgs
+        MouseEventArgs mouseEvent = new ()
         {
             ScreenPosition = new Point (10, 10),
             Flags = MouseFlags.Button1Pressed
@@ -357,9 +357,9 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_GrabMouse_MultipleTimes_ReplacesGrab ()
     {
         // Arrange
-        var handler = new MouseGrabHandler ();
-        var view1 = new View { Id = "view1" };
-        var view2 = new View { Id = "view2" };
+        MouseGrabHandler handler = new ();
+        View view1 = new () { Id = "view1" };
+        View view2 = new () { Id = "view2" };
 
         // Act
         handler.GrabMouse (view1);
@@ -382,10 +382,10 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_Instances_AreIndependent ()
     {
         // Arrange
-        var handler1 = new MouseGrabHandler ();
-        var handler2 = new MouseGrabHandler ();
-        var view1 = new View { Id = "view1" };
-        var view2 = new View { Id = "view2" };
+        MouseGrabHandler handler1 = new ();
+        MouseGrabHandler handler2 = new ();
+        View view1 = new () { Id = "view1" };
+        View view2 = new () { Id = "view2" };
 
         // Act
         handler1.GrabMouse (view1);
@@ -404,9 +404,9 @@ public class MouseGrabHandlerTests (ITestOutputHelper output)
     public void MouseGrabHandler_Events_AreIndependent ()
     {
         // Arrange
-        var handler1 = new MouseGrabHandler ();
-        var handler2 = new MouseGrabHandler ();
-        var view = new View { Id = "testView" };
+        MouseGrabHandler handler1 = new ();
+        MouseGrabHandler handler2 = new ();
+        View view = new () { Id = "testView" };
 
         var handler1GrabbedFired = false;
         var handler2GrabbedFired = false;

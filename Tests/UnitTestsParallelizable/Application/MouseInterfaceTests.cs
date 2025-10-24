@@ -18,8 +18,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_LastMousePosition_InitiallyNull ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
 
         // Act & Assert
         Assert.Null (mouse.LastMousePosition);
@@ -33,9 +33,9 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_LastMousePosition_CanBeSetAndRetrieved (int x, int y)
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
-        var testPosition = new Point (x, y);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
+        Point testPosition = new (x, y);
 
         // Act
         mouse.LastMousePosition = testPosition;
@@ -49,8 +49,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_IsMouseDisabled_DefaultsFalse ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
 
         // Act & Assert
         Assert.False (mouse.IsMouseDisabled);
@@ -62,8 +62,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_IsMouseDisabled_CanBeSetAndRetrieved (bool disabled)
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
 
         // Act
         mouse.IsMouseDisabled = disabled;
@@ -76,8 +76,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_CachedViewsUnderMouse_InitiallyEmpty ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
 
         // Act & Assert
         Assert.NotNull (mouse.CachedViewsUnderMouse);
@@ -92,8 +92,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_MouseEvent_CanSubscribeAndFire ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
         var eventFired = false;
         MouseEventArgs capturedArgs = null;
 
@@ -103,7 +103,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
             capturedArgs = args;
         };
 
-        var testEvent = new MouseEventArgs
+        MouseEventArgs testEvent = new ()
         {
             ScreenPosition = new Point (5, 10),
             Flags = MouseFlags.Button1Pressed
@@ -123,15 +123,15 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_MouseEvent_CanUnsubscribe ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
         var eventCount = 0;
 
         void Handler (object sender, MouseEventArgs args) => eventCount++;
 
         mouse.MouseEvent += Handler;
 
-        var testEvent = new MouseEventArgs
+        MouseEventArgs testEvent = new ()
         {
             ScreenPosition = new Point (0, 0),
             Flags = MouseFlags.Button1Pressed
@@ -155,14 +155,14 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_RaiseMouseEvent_WithDisabledMouse_DoesNotFireEvent ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
         var eventFired = false;
 
         mouse.MouseEvent += (sender, args) => { eventFired = true; };
         mouse.IsMouseDisabled = true;
 
-        var testEvent = new MouseEventArgs
+        MouseEventArgs testEvent = new ()
         {
             ScreenPosition = new Point (0, 0),
             Flags = MouseFlags.Button1Pressed
@@ -185,13 +185,13 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_RaiseMouseEvent_CorrectlyPassesFlags (MouseFlags flags)
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
         MouseFlags? capturedFlags = null;
 
         mouse.MouseEvent += (sender, args) => { capturedFlags = args.Flags; };
 
-        var testEvent = new MouseEventArgs
+        MouseEventArgs testEvent = new ()
         {
             ScreenPosition = new Point (5, 5),
             Flags = flags
@@ -213,9 +213,9 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_ResetState_ClearsCachedViews ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
-        var testView = new View { Width = 10, Height = 10 };
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
+        View testView = new () { Width = 10, Height = 10 };
 
         mouse.CachedViewsUnderMouse.Add (testView);
         Assert.Single (mouse.CachedViewsUnderMouse);
@@ -233,13 +233,13 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_ResetState_ClearsEventHandlers ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
         var eventCount = 0;
 
         mouse.MouseEvent += (sender, args) => eventCount++;
 
-        var testEvent = new MouseEventArgs
+        MouseEventArgs testEvent = new ()
         {
             ScreenPosition = new Point (0, 0),
             Flags = MouseFlags.Button1Pressed
@@ -263,9 +263,9 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_ResetState_DoesNotClearLastMousePosition ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
-        var testPosition = new Point (42, 84);
+        MouseGrabHandler mouseGrabHandler = new ();
+        Mouse mouse = new (mouseGrabHandler);
+        Point testPosition = new (42, 84);
 
         mouse.LastMousePosition = testPosition;
 
@@ -284,11 +284,11 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_Instances_AreIndependent ()
     {
         // Arrange
-        var grabHandler1 = new MouseGrabHandler ();
-        var mouse1 = new Mouse (grabHandler1);
+        MouseGrabHandler grabHandler1 = new ();
+        Mouse mouse1 = new (grabHandler1);
 
-        var grabHandler2 = new MouseGrabHandler ();
-        var mouse2 = new Mouse (grabHandler2);
+        MouseGrabHandler grabHandler2 = new ();
+        Mouse mouse2 = new (grabHandler2);
 
         // Act
         mouse1.IsMouseDisabled = true;
@@ -303,18 +303,18 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_Events_AreIndependent ()
     {
         // Arrange
-        var grabHandler1 = new MouseGrabHandler ();
-        var mouse1 = new Mouse (grabHandler1);
+        MouseGrabHandler grabHandler1 = new ();
+        Mouse mouse1 = new (grabHandler1);
         var mouse1EventCount = 0;
 
-        var grabHandler2 = new MouseGrabHandler ();
-        var mouse2 = new Mouse (grabHandler2);
+        MouseGrabHandler grabHandler2 = new ();
+        Mouse mouse2 = new (grabHandler2);
         var mouse2EventCount = 0;
 
         mouse1.MouseEvent += (sender, args) => mouse1EventCount++;
         mouse2.MouseEvent += (sender, args) => mouse2EventCount++;
 
-        var testEvent = new MouseEventArgs
+        MouseEventArgs testEvent = new ()
         {
             ScreenPosition = new Point (0, 0),
             Flags = MouseFlags.Button1Pressed
@@ -332,14 +332,14 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_CachedViews_AreIndependent ()
     {
         // Arrange
-        var grabHandler1 = new MouseGrabHandler ();
-        var mouse1 = new Mouse (grabHandler1);
+        MouseGrabHandler grabHandler1 = new ();
+        Mouse mouse1 = new (grabHandler1);
 
-        var grabHandler2 = new MouseGrabHandler ();
-        var mouse2 = new Mouse (grabHandler2);
+        MouseGrabHandler grabHandler2 = new ();
+        Mouse mouse2 = new (grabHandler2);
 
-        var view1 = new View ();
-        var view2 = new View ();
+        View view1 = new ();
+        View view2 = new ();
 
         // Act
         mouse1.CachedViewsUnderMouse.Add (view1);
