@@ -62,24 +62,10 @@ public static partial class Application // Mouse handling
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
     /// <summary>
-    ///     Static reference to the current <see cref="IApplication"/> <see cref="IMouseGrabHandler"/>.
-    /// </summary>
-    public static IMouseGrabHandler MouseGrabHandler
-    {
-        get => ApplicationImpl.Instance.MouseGrabHandler;
-        set => ApplicationImpl.Instance.MouseGrabHandler = value ?? throw new ArgumentNullException (nameof (value));
-    }
-
-    /// <summary>
     ///     INTERNAL: Holds the non-<see cref="ViewportSettingsFlags.TransparentMouse"/> views that are currently under the
     ///     mouse.
     /// </summary>
     internal static List<View?> CachedViewsUnderMouse => Mouse.CachedViewsUnderMouse;
-
-    internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
-    {
-        return MouseGrabHandler.HandleMouseGrab (deepestViewUnderMouse, mouseEvent);
-    }
 
     /// <summary>
     ///     INTERNAL API: Holds the last mouse position.

@@ -10,8 +10,14 @@ namespace Terminal.Gui.App;
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-public interface IMouse
+public interface IMouse : IMouseGrabHandler
 {
+    /// <summary>
+    /// Sets the application instance that this mouse handler is associated with.
+    /// This provides access to application state without coupling to static Application class.
+    /// </summary>
+    IApplication? Application { get; set; }
+
     /// <summary>
     ///     Gets or sets the last known position of the mouse.
     /// </summary>

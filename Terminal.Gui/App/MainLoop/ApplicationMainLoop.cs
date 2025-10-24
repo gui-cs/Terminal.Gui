@@ -150,7 +150,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
         {
             bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Popover?.GetActivePopover () as View)
                                      || AnySubViewsNeedDrawn (Application.Top)
-                                     || (Application.MouseGrabHandler.MouseGrabView != null && AnySubViewsNeedDrawn (Application.MouseGrabHandler.MouseGrabView));
+                                     || (Application.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (Application.Mouse.MouseGrabView));
 
             bool sizeChanged = WindowSizeMonitor.Poll ();
 

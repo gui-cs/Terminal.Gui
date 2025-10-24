@@ -22,6 +22,11 @@ public interface IApplication
     /// </summary>
     IKeyboard Keyboard { get; set; }
 
+    /// <summary>
+    ///     Handles mouse event state and processing.
+    /// </summary>
+    IMouse Mouse { get; set; }
+
     /// <summary>Gets or sets the console driver being used.</summary>
     IConsoleDriver? Driver { get; set; }
 
@@ -95,16 +100,6 @@ public interface IApplication
     ///     is cutting edge.
     /// </summary>
     bool IsLegacy { get; }
-
-    /// <summary>
-    ///     Handles mouse event state and processing.
-    /// </summary>
-    IMouse Mouse { get; }
-
-    /// <summary>
-    ///     Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
-    /// </summary>
-    IMouseGrabHandler MouseGrabHandler { get; set; }
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>

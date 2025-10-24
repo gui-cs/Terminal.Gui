@@ -14,11 +14,8 @@ public class MouseTests (ITestOutputHelper output)
     [Fact]
     public void Mouse_Instance_CreatedSuccessfully ()
     {
-        // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-
-        // Act
-        var mouse = new Mouse (mouseGrabHandler);
+        // Arrange & Act
+        Mouse mouse = new ();
 
         // Assert
         Assert.NotNull (mouse);
@@ -30,13 +27,12 @@ public class MouseTests (ITestOutputHelper output)
     public void Mouse_LastMousePosition_CanBeSetAndRetrieved ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
-        var expectedPosition = new Point (10, 20);
+        Mouse mouse = new ();
+        Point expectedPosition = new (10, 20);
 
         // Act
         mouse.LastMousePosition = expectedPosition;
-        var actualPosition = mouse.GetLastMousePosition ();
+        Point? actualPosition = mouse.GetLastMousePosition ();
 
         // Assert
         Assert.Equal (expectedPosition, actualPosition);
@@ -46,8 +42,7 @@ public class MouseTests (ITestOutputHelper output)
     public void Mouse_IsMouseDisabled_CanBeSetAndRetrieved ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        Mouse mouse = new ();
 
         // Act
         mouse.IsMouseDisabled = true;
@@ -60,8 +55,7 @@ public class MouseTests (ITestOutputHelper output)
     public void Mouse_CachedViewsUnderMouse_InitializedEmpty ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        Mouse mouse = new ();
 
         // Assert
         Assert.NotNull (mouse.CachedViewsUnderMouse);
@@ -72,8 +66,7 @@ public class MouseTests (ITestOutputHelper output)
     public void Mouse_ResetState_ClearsEventAndCachedViews ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        Mouse mouse = new ();
         var eventFired = false;
         mouse.MouseEvent += (sender, args) => eventFired = true;
         mouse.CachedViewsUnderMouse.Add (new View ());
@@ -85,7 +78,7 @@ public class MouseTests (ITestOutputHelper output)
         Assert.Empty (mouse.CachedViewsUnderMouse);
         
         // Event handlers should be cleared
-        var mouseEvent = new MouseEventArgs { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
         mouse.RaiseMouseEvent (mouseEvent);
         Assert.False (eventFired, "Event should not fire after ResetState");
     }
@@ -94,9 +87,8 @@ public class MouseTests (ITestOutputHelper output)
     public void Mouse_RaiseMouseEvent_DoesNotUpdateLastPositionWhenNotInitialized ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
-        var mouseEvent = new MouseEventArgs { ScreenPosition = new Point (5, 10), Flags = MouseFlags.Button1Pressed };
+        Mouse mouse = new ();
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.Button1Pressed };
 
         // Act - Application is not initialized, so LastMousePosition should not be set
         mouse.RaiseMouseEvent (mouseEvent);
@@ -111,14 +103,13 @@ public class MouseTests (ITestOutputHelper output)
     public void Mouse_MouseEvent_CanBeSubscribedAndUnsubscribed ()
     {
         // Arrange
-        var mouseGrabHandler = new MouseGrabHandler ();
-        var mouse = new Mouse (mouseGrabHandler);
+        Mouse mouse = new ();
         var eventCount = 0;
         EventHandler<MouseEventArgs> handler = (sender, args) => eventCount++;
 
         // Act - Subscribe
         mouse.MouseEvent += handler;
-        var mouseEvent = new MouseEventArgs { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
         mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert - Event fired once

@@ -18,12 +18,11 @@ public class ApplicationImpl : IApplication
     /// <summary>
     ///     Creates a new instance of the Application backend.
     /// </summary>
-    public ApplicationImpl () { Mouse = new Mouse (MouseGrabHandler); }
+    public ApplicationImpl () { }
 
     internal ApplicationImpl (IComponentFactory componentFactory)
     {
         _componentFactory = componentFactory;
-        Mouse = new Mouse (MouseGrabHandler);
     }
 
     private readonly IComponentFactory? _componentFactory;
@@ -33,15 +32,23 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ITimedEvents? TimedEvents => _timedEvents;
 
-    /// <summary>
-    /// Creates a new instance of the Application backend.
-    /// </summary>
-    public IMouse Mouse { get; }
+    private IMouse? _mouse;
 
     /// <summary>
-    ///     Handles which <see cref="View"/> (if any) has captured the mouse
+    /// Handles mouse event state and processing.
     /// </summary>
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+    public IMouse Mouse
+    {
+        get
+        {
+            if (_mouse is null)
+            {
+                _mouse = new Mouse { Application = this };
+            }
+            return _mouse;
+        }
+        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
+    }
 
     private IKeyboard? _keyboard;
 

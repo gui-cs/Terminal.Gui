@@ -242,8 +242,7 @@ public static partial class Application
         // Run State stuff
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        MouseGrabHandler = new MouseGrabHandler ();
-        // Keyboard will be lazy-initialized in ApplicationImpl on next access
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
         Initialized = false;
 
         // Mouse
