@@ -84,6 +84,7 @@ public class ApplicationImpl : IApplication
         set => Application.Navigation = value;
     }
 
+    // TODO: Create an IViewHierarchy that encapsulates Top and TopLevels and LayoutAndDraw
     /// <inheritdoc/>
     public Toplevel? Top
     {
@@ -94,9 +95,39 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels => Application.TopLevels;
 
-    /// <inheritdoc/>
-    public void RequestStop () => Application.RequestStop ();
+    /// <inheritdoc />
+    public void LayoutAndDraw (bool forceRedraw = false)
+    {
+        List<View> tops = [.. TopLevels];
 
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
+        }
+
+        // BUGBUG: Application.Screen needs to be moved to IApplication
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Application.Screen.Size);
+
+        // BUGBUG: Application.ClearScreenNextIteration needs to be moved to IApplication
+        if (Application.ClearScreenNextIteration)
+        {
+            forceRedraw = true;
+            // BUGBUG: Application.Screen needs to be moved to IApplication
+            Application.ClearScreenNextIteration = false;
+        }
+
+        if (forceRedraw)
+        {
+            Driver?.ClearContents ();
+        }
+
+        View.SetClipToScreen ();
+        View.Draw (tops, neededLayout || forceRedraw);
+        View.SetClipToScreen ();
+        Driver?.Refresh ();
+    }
     /// <summary>
     /// Creates a new instance of the Application backend.
     /// </summary>
@@ -186,7 +217,7 @@ public class ApplicationImpl : IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         if (!Application.Initialized)
         {
@@ -280,6 +311,10 @@ public class ApplicationImpl : IApplication
 
         top.Running = false;
     }
+
+    /// <inheritdoc/>
+    public void RequestStop () => Application.RequestStop ();
+
 
     /// <inheritdoc/>
     public void Invoke (Action action)

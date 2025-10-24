@@ -43,9 +43,16 @@ public interface IApplication
     /// <summary>Requests that the application stop running.</summary>
     void RequestStop ();
 
-    /// <summary>Forces all views to be laid out and drawn.</summary>
-    /// <param name="clearScreen">If true, clears the screen before drawing.</param>
-    void LayoutAndDraw (bool clearScreen = false);
+    /// <summary>
+    ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
+    ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
+    ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
+    /// </summary>
+    /// <param name="forceRedraw">
+    ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
+    ///     should only be overriden for testing.
+    /// </param>
+    public void LayoutAndDraw (bool forceRedraw = false);
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
@@ -166,7 +173,7 @@ public interface IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new ();
+        where T : Toplevel, new();
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
     /// <remarks>

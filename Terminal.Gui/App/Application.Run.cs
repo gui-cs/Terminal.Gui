@@ -187,7 +187,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
         toplevel.OnLoaded ();
 
-        LayoutAndDraw (true);
+        ApplicationImpl.Instance.LayoutAndDraw (true);
 
         if (PositionCursor ())
         {
@@ -406,40 +406,15 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
     ///     should only be overriden for testing.
     /// </param>
-    public static void LayoutAndDraw (bool forceDraw = false)
+    public static void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. TopLevels];
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-            tops.Insert (0, visiblePopover);
-        }
-
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
-
-        if (ClearScreenNextIteration)
-        {
-            forceDraw = true;
-            ClearScreenNextIteration = false;
-        }
-
-        if (forceDraw)
-        {
-            Driver?.ClearContents ();
-        }
-
-        View.SetClipToScreen ();
-        View.Draw (tops, neededLayout || forceDraw);
-        View.SetClipToScreen ();
-        Driver?.Refresh ();
+        ApplicationImpl.Instance.LayoutAndDraw (forceRedraw);
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
-    
+
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
     internal static MainLoop? MainLoop { get; set; }
