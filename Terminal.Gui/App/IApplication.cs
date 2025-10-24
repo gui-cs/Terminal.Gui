@@ -17,6 +17,36 @@ public interface IApplication
     /// </remarks>
     object AddTimeout (TimeSpan time, Func<bool> callback);
 
+    /// <summary>
+    /// Handles keyboard input and key bindings at the Application level.
+    /// </summary>
+    IKeyboard Keyboard { get; set; }
+
+    /// <summary>Gets or sets the console driver being used.</summary>
+    IConsoleDriver? Driver { get; set; }
+
+    /// <summary>Gets or sets whether the application has been initialized.</summary>
+    bool Initialized { get; set; }
+
+    /// <summary>Gets or sets the popover manager.</summary>
+    ApplicationPopover? Popover { get; set; }
+
+    /// <summary>Gets or sets the navigation manager.</summary>
+    ApplicationNavigation? Navigation { get; set; }
+
+    /// <summary>Gets the currently active Toplevel.</summary>
+    Toplevel? Top { get; set; }
+
+    /// <summary>Gets the stack of all Toplevels.</summary>
+    System.Collections.Concurrent.ConcurrentStack<Toplevel> TopLevels { get; }
+
+    /// <summary>Requests that the application stop running.</summary>
+    void RequestStop ();
+
+    /// <summary>Forces all views to be laid out and drawn.</summary>
+    /// <param name="clearScreen">If true, clears the screen before drawing.</param>
+    void LayoutAndDraw (bool clearScreen = false);
+
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>

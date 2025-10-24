@@ -38,8 +38,67 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
 
+    private IKeyboard? _keyboard;
+
     /// <summary>
-    ///     Handles mouse event state and processing.
+    /// Handles keyboard input and key bindings at the Application level
+    /// </summary>
+    public IKeyboard Keyboard
+    {
+        get
+        {
+            if (_keyboard is null)
+            {
+                _keyboard = new Keyboard { Application = this };
+            }
+            return _keyboard;
+        }
+        set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
+    /// <inheritdoc/>
+    public IConsoleDriver? Driver
+    {
+        get => Application.Driver;
+        set => Application.Driver = value;
+    }
+
+    /// <inheritdoc/>
+    public bool Initialized
+    {
+        get => Application.Initialized;
+        set => Application.Initialized = value;
+    }
+
+    /// <inheritdoc/>
+    public ApplicationPopover? Popover
+    {
+        get => Application.Popover;
+        set => Application.Popover = value;
+    }
+
+    /// <inheritdoc/>
+    public ApplicationNavigation? Navigation
+    {
+        get => Application.Navigation;
+        set => Application.Navigation = value;
+    }
+
+    /// <inheritdoc/>
+    public Toplevel? Top
+    {
+        get => Application.Top;
+        set => Application.Top = value;
+    }
+
+    /// <inheritdoc/>
+    public ConcurrentStack<Toplevel> TopLevels => Application.TopLevels;
+
+    /// <inheritdoc/>
+    public void RequestStop () => Application.RequestStop ();
+
+    /// <summary>
+    /// Creates a new instance of the Application backend.
     /// </summary>
     public IMouse Mouse { get; }
 
@@ -71,7 +130,28 @@ public class ApplicationImpl : IApplication
         Debug.Assert (Application.Popover is null);
         Application.Popover = new ();
 
-        Application.AddKeyBindings ();
+        // Preserve existing keyboard settings if they exist
+        bool hasExistingKeyboard = _keyboard is not null;
+        Key existingQuitKey = _keyboard?.QuitKey ?? Key.Esc;
+        Key existingArrangeKey = _keyboard?.ArrangeKey ?? Key.F5.WithCtrl;
+        Key existingNextTabKey = _keyboard?.NextTabKey ?? Key.Tab;
+        Key existingPrevTabKey = _keyboard?.PrevTabKey ?? Key.Tab.WithShift;
+        Key existingNextTabGroupKey = _keyboard?.NextTabGroupKey ?? Key.F6;
+        Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
+
+        // Reset keyboard to ensure fresh state with default bindings
+        _keyboard = new Keyboard { Application = this };
+
+        // Restore previously set keys if they existed and were different from defaults
+        if (hasExistingKeyboard)
+        {
+            _keyboard.QuitKey = existingQuitKey;
+            _keyboard.ArrangeKey = existingArrangeKey;
+            _keyboard.NextTabKey = existingNextTabKey;
+            _keyboard.PrevTabKey = existingPrevTabKey;
+            _keyboard.NextTabGroupKey = existingNextTabGroupKey;
+            _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
+        }
 
         CreateDriver (driverName ?? _driverName);
 
@@ -80,7 +160,7 @@ public class ApplicationImpl : IApplication
         Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
+        SynchronizationContext.SetSynchronizationContext (new ());
         Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
     }
 
@@ -114,7 +194,7 @@ public class ApplicationImpl : IApplication
             Init (driver);
         }
 
-        var top = new T ();
+        T top = new ();
         Run (top, errorHandler);
 
         return top;
@@ -174,6 +254,7 @@ public class ApplicationImpl : IApplication
         }
 
         Application.Driver = null;
+        _keyboard = null;
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
@@ -189,7 +270,7 @@ public class ApplicationImpl : IApplication
             return;
         }
 
-        var ev = new ToplevelClosingEventArgs (top);
+        ToplevelClosingEventArgs ev = new (top);
         top.OnClosing (ev);
 
         if (ev.Cancel)

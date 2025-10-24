@@ -210,8 +210,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         Debug.Assert (Popover is null);
         Popover = new ();
 
-        AddKeyBindings ();
-
         try
         {
             MainLoop = Driver!.Init ();

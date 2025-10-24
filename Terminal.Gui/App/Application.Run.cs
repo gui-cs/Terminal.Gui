@@ -6,38 +6,20 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Run (Begin -> Run -> Layout/Draw -> End -> Stop)
 {
-    private static Key _quitKey = Key.Esc; // Resources/config.json overrides
-
     /// <summary>Gets or sets the key to quit the application.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
     {
-        get => _quitKey;
-        set
-        {
-            //if (_quitKey != value)
-            {
-                KeyBindings.Replace (_quitKey, value);
-                _quitKey = value;
-            }
-        }
+        get => Keyboard.QuitKey;
+        set => Keyboard.QuitKey = value;
     }
-
-    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
     {
-        get => _arrangeKey;
-        set
-        {
-            //if (_arrangeKey != value)
-            {
-                KeyBindings.Replace (_arrangeKey, value);
-                _arrangeKey = value;
-            }
-        }
+        get => Keyboard.ArrangeKey;
+        set => Keyboard.ArrangeKey = value;
     }
 
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
