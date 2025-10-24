@@ -462,7 +462,7 @@ public partial class View // Drawing APIs
     /// </summary>
     protected virtual void OnDrewText () { }
 
-    /// <summary>Raised when the <see cref="Text"/> of the View has been  drawn.</summary>
+    /// <summary>Raised when the <see cref="Text"/> of the View has been drawn.</summary>
     public event EventHandler? DrewText;
 
     #endregion DrawText
