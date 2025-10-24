@@ -6,34 +6,6 @@ namespace Terminal.Gui.App;
 public static partial class Application // Mouse handling
 {
     /// <summary>
-    ///     Gets the <see cref="IMouse"/> instance that manages mouse event handling and state.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This property provides access to mouse-related functionality in a way that supports
-    ///         parallel test execution by avoiding static state.
-    ///     </para>
-    ///     <para>
-    ///         New code should use <c>Application.Mouse</c> instead of the static properties and methods
-    ///         for better testability. Legacy static properties like <see cref="IsMouseDisabled"/> and
-    ///         <see cref="GetLastMousePosition"/> are retained for backward compatibility.
-    ///     </para>
-    /// </remarks>
-    public static IMouse Mouse
-    {
-        get => ApplicationImpl.Instance.Mouse;
-    }
-
-    /// <summary>
-    /// INTERNAL API: Holds the last mouse position.
-    /// </summary>
-    internal static Point? LastMousePosition
-    {
-        get => Mouse.LastMousePosition;
-        set => Mouse.LastMousePosition = value;
-    }
-
-    /// <summary>
     ///     Gets the most recent position of the mouse.
     /// </summary>
     public static Point? GetLastMousePosition () { return Mouse.GetLastMousePosition (); }
@@ -47,30 +19,25 @@ public static partial class Application // Mouse handling
     }
 
     /// <summary>
-    /// Static reference to the current <see cref="IApplication"/> <see cref="IMouseGrabHandler"/>.
+    ///     Gets the <see cref="IMouse"/> instance that manages mouse event handling and state.
     /// </summary>
-    public static IMouseGrabHandler MouseGrabHandler
-    {
-        get => ApplicationImpl.Instance.MouseGrabHandler;
-        set => ApplicationImpl.Instance.MouseGrabHandler = value ??
-                                                           throw new ArgumentNullException(nameof(value));
-    }
-
-    /// <summary>
-    ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
-    ///     calls the appropriate View mouse event handlers.
-    /// </summary>
-    /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
-    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
-    {
-        Mouse.RaiseMouseEvent (mouseEvent);
-    }
-
+    /// <remarks>
+    ///     <para>
+    ///         This property provides access to mouse-related functionality in a way that supports
+    ///         parallel test execution by avoiding static state.
+    ///     </para>
+    ///     <para>
+    ///         New code should use <c>Application.Mouse</c> instead of the static properties and methods
+    ///         for better testability. Legacy static properties like <see cref="IsMouseDisabled"/> and
+    ///         <see cref="GetLastMousePosition"/> are retained for backward compatibility.
+    ///     </para>
+    /// </remarks>
+    public static IMouse Mouse => ApplicationImpl.Instance.Mouse;
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
     /// <summary>
-    /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="HandledEventArgs.Handled"/> to <see langword="true"/>.
+    ///     Raised when a mouse event occurs. Can be cancelled by setting <see cref="HandledEventArgs.Handled"/> to
+    ///     <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -80,7 +47,8 @@ public static partial class Application // Mouse handling
     ///         <see cref="MouseEventArgs.View"/> will be the deepest view under the mouse.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEventArgs.Position"/> coordinates are view-relative. Only valid if <see cref="MouseEventArgs.View"/> is set.
+    ///         <see cref="MouseEventArgs.Position"/> coordinates are view-relative. Only valid if
+    ///         <see cref="MouseEventArgs.View"/> is set.
     ///     </para>
     ///     <para>
     ///         Use this even to handle mouse events at the application level, before View-specific handling.
@@ -93,15 +61,34 @@ public static partial class Application // Mouse handling
     }
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
+    /// <summary>
+    ///     Static reference to the current <see cref="IApplication"/> <see cref="IMouseGrabHandler"/>.
+    /// </summary>
+    public static IMouseGrabHandler MouseGrabHandler
+    {
+        get => ApplicationImpl.Instance.MouseGrabHandler;
+        set => ApplicationImpl.Instance.MouseGrabHandler = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
+    /// <summary>
+    ///     INTERNAL: Holds the non-<see cref="ViewportSettingsFlags.TransparentMouse"/> views that are currently under the
+    ///     mouse.
+    /// </summary>
+    internal static List<View?> CachedViewsUnderMouse => Mouse.CachedViewsUnderMouse;
+
     internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
     {
         return MouseGrabHandler.HandleMouseGrab (deepestViewUnderMouse, mouseEvent);
     }
 
     /// <summary>
-    ///     INTERNAL: Holds the non-<see cref="ViewportSettingsFlags.TransparentMouse"/> views that are currently under the mouse.
+    ///     INTERNAL API: Holds the last mouse position.
     /// </summary>
-    internal static List<View?> CachedViewsUnderMouse => Mouse.CachedViewsUnderMouse;
+    internal static Point? LastMousePosition
+    {
+        get => Mouse.LastMousePosition;
+        set => Mouse.LastMousePosition = value;
+    }
 
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.
@@ -114,10 +101,15 @@ public static partial class Application // Mouse handling
     }
 
     /// <summary>
+    ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
+    ///     calls the appropriate View mouse event handlers.
+    /// </summary>
+    /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
+    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
+    internal static void RaiseMouseEvent (MouseEventArgs mouseEvent) { Mouse.RaiseMouseEvent (mouseEvent); }
+
+    /// <summary>
     ///     INTERNAL: Clears mouse state during application reset.
     /// </summary>
-    internal static void ResetMouseState ()
-    {
-        Mouse.ResetState ();
-    }
+    internal static void ResetMouseState () { Mouse.ResetState (); }
 }
