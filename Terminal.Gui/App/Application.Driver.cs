@@ -34,5 +34,5 @@ public static partial class Application // Driver abstractions
     /// Collection of sixel images to write out to screen when updating.
     /// Only add to this collection if you are sure terminal supports sixel format.
     /// </summary>
-    public static List<SixelToRender> Sixel = new List<SixelToRender> ();
+    public static List<SixelToRender> Sixel { get; } = new List<SixelToRender> ();
 }

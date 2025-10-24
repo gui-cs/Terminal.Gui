@@ -3,52 +3,22 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Implementation of core <see cref="Application"/> methods using the modern
-/// main loop architecture with component factories for different platforms.
+///     Implementation of core <see cref="Application"/> methods using the modern
+///     main loop architecture with component factories for different platforms.
 /// </summary>
 public class ApplicationImpl : IApplication
 {
-    private readonly IComponentFactory? _componentFactory;
-    private IMainLoopCoordinator? _coordinator;
-    private string? _driverName;
-    private readonly ITimedEvents _timedEvents = new TimedEvents ();
-
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
 
     /// <summary>
-    /// Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
-    /// Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    ///     Creates a new instance of the Application backend.
     /// </summary>
-    public static IApplication Instance => _lazyInstance.Value;
-
-    /// <inheritdoc/>
-    public ITimedEvents? TimedEvents => _timedEvents;
-
-    internal IMainLoopCoordinator? Coordinator => _coordinator;
-
-    /// <summary>
-    /// Handles which <see cref="View"/> (if any) has captured the mouse
-    /// </summary>
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
-
-    /// <summary>
-    /// Handles mouse event state and processing.
-    /// </summary>
-    public IMouse Mouse { get; private set; }
-
-    /// <summary>
-    /// Creates a new instance of the Application backend.
-    /// </summary>
-    public ApplicationImpl ()
-    {
-        Mouse = new Mouse (MouseGrabHandler);
-    }
+    public ApplicationImpl () { Mouse = new Mouse (MouseGrabHandler); }
 
     internal ApplicationImpl (IComponentFactory componentFactory)
     {
@@ -56,16 +26,22 @@ public class ApplicationImpl : IApplication
         Mouse = new Mouse (MouseGrabHandler);
     }
 
+    private readonly IComponentFactory? _componentFactory;
+    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    private string? _driverName;
+
+    /// <inheritdoc/>
+    public ITimedEvents? TimedEvents => _timedEvents;
+
     /// <summary>
-    /// Change the singleton implementation, should not be called except before application
-    /// startup. This method lets you provide alternative implementations of core static gateway
-    /// methods of <see cref="Application"/>.
+    ///     Handles which <see cref="View"/> (if any) has captured the mouse
     /// </summary>
-    /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication newApplication)
-    {
-        _lazyInstance = new Lazy<IApplication> (newApplication);
-    }
+    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+
+    /// <summary>
+    ///     Handles mouse event state and processing.
+    /// </summary>
+    public IMouse Mouse { get; }
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
@@ -89,7 +65,7 @@ public class ApplicationImpl : IApplication
             _driverName = Application.ForceDriver;
         }
 
-        Debug.Assert(Application.Navigation is null);
+        Debug.Assert (Application.Navigation is null);
         Application.Navigation = new ();
 
         Debug.Assert (Application.Popover is null);
@@ -106,92 +82,6 @@ public class ApplicationImpl : IApplication
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
         Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
-    }
-
-    private void CreateDriver (string? driverName)
-    {
-        // When running unit tests, always use FakeDriver unless explicitly specified
-        if (ConsoleDriver.RunningUnitTests && 
-            string.IsNullOrEmpty (driverName) && 
-            _componentFactory is null)
-        {
-            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-            _coordinator.StartAsync ().Wait ();
-
-            if (Application.Driver == null)
-            {
-                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
-            }
-
-            return;
-        }
-
-        PlatformID p = Environment.OSVersion.Platform;
-
-        // Check component factory type first - this takes precedence over driverName
-        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
-        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
-        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-
-        // Then check driverName
-        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false);
-        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
-
-        // Decide which driver to use - component factory type takes priority
-        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
-        {
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-        }
-        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
-        {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-        }
-        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
-        {
-            _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
-        }
-        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
-        {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-        }
-        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-        {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-        }
-        else
-        {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-        }
-
-        _coordinator.StartAsync ().Wait ();
-
-        if (Application.Driver == null)
-        {
-            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
-        }
-    }
-
-    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
-    {
-        ConcurrentQueue<T> inputBuffer = new ();
-        ApplicationMainLoop<T> loop = new ();
-
-        IComponentFactory<T> cf;
-
-        if (_componentFactory is IComponentFactory<T> typedFactory)
-        {
-            cf = typedFactory;
-        }
-        else
-        {
-            cf = fallbackFactory ();
-        }
-
-        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 
     /// <summary>
@@ -216,16 +106,17 @@ public class ApplicationImpl : IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new()
+        where T : Toplevel, new ()
     {
         if (!Application.Initialized)
         {
             // Init() has NOT been called. Auto-initialize as per interface contract.
-            Init (driver, null);
+            Init (driver);
         }
 
         var top = new T ();
         Run (top, errorHandler);
+
         return top;
     }
 
@@ -244,7 +135,7 @@ public class ApplicationImpl : IApplication
 
         if (Application.Driver == null)
         {
-            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
+            throw new InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
         Application.Top = view;
@@ -255,23 +146,23 @@ public class ApplicationImpl : IApplication
 
         while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
-            if (_coordinator is null)
+            if (Coordinator is null)
             {
                 throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
             }
 
-            _coordinator.RunIteration ();
+            Coordinator.RunIteration ();
         }
 
-        Logging.Information ($"Run - Calling End");
+        Logging.Information ("Run - Calling End");
         Application.End (rs);
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     public void Shutdown ()
     {
-        _coordinator?.Stop ();
-        
+        Coordinator?.Stop ();
+
         bool wasInitialized = Application.Initialized;
         Application.ResetState ();
         ConfigurationManager.PrintJsonErrors ();
@@ -286,10 +177,10 @@ public class ApplicationImpl : IApplication
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void RequestStop (Toplevel? top)
     {
-        Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
+        Logging.Logger.LogInformation ($"RequestStop '{(top is { } ? top : "null")}'");
 
         top ??= Application.Top;
 
@@ -309,38 +200,141 @@ public class ApplicationImpl : IApplication
         top.Running = false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
         if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
+
             return;
         }
 
-        _timedEvents.Add (TimeSpan.Zero,
-                              () =>
-                              {
-                                  action ();
-                                  return false;
-                              }
-                             );
+        _timedEvents.Add (
+                          TimeSpan.Zero,
+                          () =>
+                          {
+                              action ();
+
+                              return false;
+                          }
+                         );
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool IsLegacy => false;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Change the singleton implementation, should not be called except before application
+    ///     startup. This method lets you provide alternative implementations of core static gateway
+    ///     methods of <see cref="Application"/>.
+    /// </summary>
+    /// <param name="newApplication"></param>
+    public static void ChangeInstance (IApplication newApplication) { _lazyInstance = new (newApplication); }
+
+    /// <summary>
+    ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
+    ///     Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    /// </summary>
+    public static IApplication Instance => _lazyInstance.Value;
+
+    /// <inheritdoc/>
     public void LayoutAndDraw (bool forceDraw)
     {
-        Application.Top?.SetNeedsDraw();
+        Application.Top?.SetNeedsDraw ();
         Application.Top?.SetNeedsLayout ();
+    }
+
+    internal IMainLoopCoordinator? Coordinator { get; private set; }
+
+    private void CreateDriver (string? driverName)
+    {
+        // When running unit tests, always use FakeDriver unless explicitly specified
+        if (ConsoleDriver.RunningUnitTests && string.IsNullOrEmpty (driverName) && _componentFactory is null)
+        {
+            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
+            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            Coordinator.StartAsync ().Wait ();
+
+            if (Application.Driver == null)
+            {
+                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+            }
+
+            return;
+        }
+
+        PlatformID p = Environment.OSVersion.Platform;
+
+        // Check component factory type first - this takes precedence over driverName
+        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
+        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+
+        // Then check driverName
+        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsDotNet = driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
+
+        // Decide which driver to use - component factory type takes priority
+        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
+        {
+            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+        }
+        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
+        {
+            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+        }
+        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
+        {
+            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+        }
+        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
+        {
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        {
+            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+        }
+        else
+        {
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+
+        Coordinator.StartAsync ().Wait ();
+
+        if (Application.Driver == null)
+        {
+            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+        }
+    }
+
+    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
+    {
+        ConcurrentQueue<T> inputBuffer = new ();
+        ApplicationMainLoop<T> loop = new ();
+
+        IComponentFactory<T> cf;
+
+        if (_componentFactory is IComponentFactory<T> typedFactory)
+        {
+            cf = typedFactory;
+        }
+        else
+        {
+            cf = fallbackFactory ();
+        }
+
+        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 }

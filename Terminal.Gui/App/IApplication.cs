@@ -4,26 +4,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Interface for instances that provide backing functionality to static
-/// gateway class <see cref="Application"/>.
+///     Interface for instances that provide backing functionality to static
+///     gateway class <see cref="Application"/>.
 /// </summary>
 public interface IApplication
 {
-    /// <summary>
-    /// Handles recurring events. These are invoked on the main UI thread - allowing for
-    /// safe updates to <see cref="View"/> instances.
-    /// </summary>
-    ITimedEvents? TimedEvents { get; }
-
-    /// <summary>
-    /// Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
-    /// </summary>
-    IMouseGrabHandler MouseGrabHandler { get; set; }
-
-    /// <summary>
-    /// Handles mouse event state and processing.
-    /// </summary>
-    IMouse Mouse { get; }
+    /// <summary>Adds a timeout to the application.</summary>
+    /// <remarks>
+    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
+    ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
+    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    /// </remarks>
+    object AddTimeout (TimeSpan time, Func<bool> callback);
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
@@ -57,6 +49,49 @@ public interface IApplication
     [RequiresDynamicCode ("AOT")]
     public void Init (IConsoleDriver? driver = null, string? driverName = null);
 
+    /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
+    /// <param name="action">the action to be invoked on the main processing thread.</param>
+    void Invoke (Action action);
+
+    /// <summary>
+    ///     <see langword="true"/> if implementation is 'old'. <see langword="false"/> if implementation
+    ///     is cutting edge.
+    /// </summary>
+    bool IsLegacy { get; }
+
+    /// <summary>
+    ///     Handles mouse event state and processing.
+    /// </summary>
+    IMouse Mouse { get; }
+
+    /// <summary>
+    ///     Handles grabbing the mouse (only a single <see cref="View"/> can grab the mouse at once).
+    /// </summary>
+    IMouseGrabHandler MouseGrabHandler { get; set; }
+
+    /// <summary>Removes a previously scheduled timeout</summary>
+    /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
+    /// <returns>
+    ///     <see langword="true"/>
+    ///     if the timeout is successfully removed; otherwise,
+    ///     <see langword="false"/>
+    ///     .
+    ///     This method also returns
+    ///     <see langword="false"/>
+    ///     if the timeout is not found.
+    /// </returns>
+    bool RemoveTimeout (object token);
+
+    /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
+    /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
+    /// <remarks>
+    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
+    ///     <para>
+    ///         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
+    ///         property on the currently running <see cref="Toplevel"/> to false.
+    ///     </para>
+    /// </remarks>
+    void RequestStop (Toplevel? top);
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
@@ -115,24 +150,28 @@ public interface IApplication
     ///     </para>
     ///     <para>
     ///         Calling <see cref="Run(Toplevel,System.Func{System.Exception,bool})"/> is equivalent to calling
-    ///         <see cref="Application.Begin(Toplevel)"/>, followed by <see cref="Application.RunLoop(RunState)"/>, and then calling
+    ///         <see cref="Application.Begin(Toplevel)"/>, followed by <see cref="Application.RunLoop(RunState)"/>, and then
+    ///         calling
     ///         <see cref="Application.End(RunState)"/>.
     ///     </para>
     ///     <para>
     ///         Alternatively, to have a program control the main loop and process events manually, call
     ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
     ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and then
+    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and
+    ///         then
     ///         return control immediately.
     ///     </para>
-    ///     <para>When using <see cref="Run{T}"/> or
+    ///     <para>
+    ///         When using <see cref="Run{T}"/> or
     ///         <see cref="Run(System.Func{System.Exception,bool},IConsoleDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
-    ///         returns <see langword="true"/> the <see cref="Application.RunLoop(RunState)"/> will resume; otherwise this method will
+    ///         returns <see langword="true"/> the <see cref="Application.RunLoop(RunState)"/> will resume; otherwise this
+    ///         method will
     ///         exit.
     ///     </para>
     /// </remarks>
@@ -152,44 +191,9 @@ public interface IApplication
     /// </remarks>
     public void Shutdown ();
 
-    /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
-    /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
-    /// <remarks>
-    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
-    ///     <para>
-    ///         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
-    ///         property on the currently running <see cref="Toplevel"/> to false.
-    ///     </para>
-    /// </remarks>
-    void RequestStop (Toplevel? top);
-
-    /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
-    /// <param name="action">the action to be invoked on the main processing thread.</param>
-    void Invoke (Action action);
-
     /// <summary>
-    /// <see langword="true"/> if implementation is 'old'. <see langword="false"/> if implementation
-    /// is cutting edge.
+    ///     Handles recurring events. These are invoked on the main UI thread - allowing for
+    ///     safe updates to <see cref="View"/> instances.
     /// </summary>
-    bool IsLegacy { get; }
-    
-    /// <summary>Adds a timeout to the application.</summary>
-    /// <remarks>
-    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
-    ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
-    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
-    /// </remarks>
-    object AddTimeout (TimeSpan time, Func<bool> callback);
-
-    /// <summary>Removes a previously scheduled timeout</summary>
-    /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
-    /// <returns>
-    /// <see langword="true"/>
-    /// if the timeout is successfully removed; otherwise,
-    /// <see langword="false"/>
-    /// .
-    /// This method also returns
-    /// <see langword="false"/>
-    /// if the timeout is not found.</returns>
-    bool RemoveTimeout (object token);
+    ITimedEvents? TimedEvents { get; }
 }

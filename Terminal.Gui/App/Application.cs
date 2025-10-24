@@ -246,7 +246,7 @@ public static partial class Application
         Initialized = false;
 
         // Mouse
-        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
