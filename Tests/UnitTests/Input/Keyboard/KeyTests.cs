@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using Xunit.Abstractions;
 
-namespace Terminal.Gui.InputTests;
+namespace UnitTests.InputTests;
 
 public class KeyTests
 {

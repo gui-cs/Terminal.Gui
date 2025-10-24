@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ClipboardTests;
+﻿namespace UnitTests.ClipboardTests;
 
 #if RUN_CLIPBOARD_UNIT_TESTS
 public class ClipboardTests

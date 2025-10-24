@@ -1,7 +1,6 @@
 ﻿using Xunit.Abstractions;
-using static Unix.Terminal.Delegates;
 
-namespace Terminal.Gui.InputTests;
+namespace UnitTests_Parallelizable.InputTests;
 
 public class KeyBindingsTests ()
 {

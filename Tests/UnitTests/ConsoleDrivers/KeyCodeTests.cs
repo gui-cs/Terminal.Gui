@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.InputTests;
 
 public class KeyCodeTests
 {

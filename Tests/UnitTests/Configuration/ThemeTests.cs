@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 /// <summary>
 ///     Tests Settings["Theme"] and ThemeManager.Theme

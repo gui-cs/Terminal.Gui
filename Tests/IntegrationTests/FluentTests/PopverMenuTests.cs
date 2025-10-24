@@ -19,8 +19,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void EnableForDesign_CreatesMenuItems (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void EnableForDesign_CreatesMenuItems (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
                                      .Then (
@@ -51,8 +51,8 @@ public class PopoverMenuTests
     private static object o = new  ();
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Activate_Sets_Application_Navigation_Correctly (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Activate_Sets_Application_Navigation_Correctly (TestDriver d)
     {
         lock (o)
         {
@@ -99,8 +99,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void QuitKey_Hides (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void QuitKey_Hides (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
@@ -148,8 +148,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void QuitKey_Restores_Focus_Correctly (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void QuitKey_Restores_Focus_Correctly (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
@@ -196,8 +196,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
@@ -245,8 +245,8 @@ public class PopoverMenuTests
 
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Not_Active_DoesNotEat_Space (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Not_Active_DoesNotEat_Space (TestDriver d)
     {
         int spaceKeyDownCount = 0;
         View testView = new View ()
@@ -282,8 +282,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Not_Active_DoesNotEat_Enter (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Not_Active_DoesNotEat_Enter (TestDriver d)
     {
         int enterKeyDownCount = 0;
         View testView = new View ()
@@ -319,8 +319,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void Not_Active_DoesNotEat_QuitKey (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void Not_Active_DoesNotEat_QuitKey (TestDriver d)
     {
         int quitKeyDownCount = 0;
         View testView = new View ()

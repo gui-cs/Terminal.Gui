@@ -1,6 +1,6 @@
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.InputTests;
+namespace UnitTests_Parallelizable.InputTests;
 
 public class ResponderTests
 {

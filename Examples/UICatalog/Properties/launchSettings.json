@@ -4,25 +4,13 @@
       "commandName": "Project",
       "commandLineArgs": "--debug-log-level Debug"
     },
-    "UICatalog --driver NetDriver": {
+    "UICatalog --driver windows": {
       "commandName": "Project",
-      "commandLineArgs": "--driver NetDriver"
+      "commandLineArgs": "--driver windows -dl Trace"
     },
-    "UICatalog --driver WindowsDriver": {
+    "UICatalog --driver dotnet": {
       "commandName": "Project",
-      "commandLineArgs": "--driver WindowsDriver"
-    },
-    "UICatalog --driver v2": {
-      "commandName": "Project",
-      "commandLineArgs": "--driver v2 -dl Trace"
-    },
-    "UICatalog --driver v2win": {
-      "commandName": "Project",
-      "commandLineArgs": "--driver v2win -dl Trace"
-    },
-    "UICatalog --driver v2net": {
-      "commandName": "Project",
-      "commandLineArgs": "--driver v2net -dl Trace"
+      "commandLineArgs": "--driver dotnet -dl Trace"
     },
     "WSL: UICatalog": {
       "commandName": "Executable",
@@ -30,28 +18,16 @@
       "commandLineArgs": "dotnet UICatalog.dll",
       "distributionName": ""
     },
-    "WSL: UICatalog --driver NetDriver": {
+    "WSL: UICatalog --driver dotnet": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver NetDriver",
+      "commandLineArgs": "dotnet UICatalog.dll --driver dotnet",
       "distributionName": ""
     },
-    "WSL: UICatalog --driver v2": {
+    "WSL: UICatalog --driver unix": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver v2",
-      "distributionName": ""
-    },
-    "WSL: UICatalog --driver v2unix": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver v2unix",
-      "distributionName": ""
-    },
-    "WSL: UICatalog --driver v2net": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver v2net",
+      "commandLineArgs": "dotnet UICatalog.dll --driver unix",
       "distributionName": ""
     },
     "WSL-Gnome: UICatalog": {
@@ -60,45 +36,29 @@
       "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll; exec bash\"'",
       "distributionName": ""
     },
-    "WSL-Gnome: UICatalog --driver NetDriver": {
+    "WSL-Gnome: UICatalog --driver dotnet": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver NetDriver; exec bash\"'",
+      "commandLineArgs": "bash -c 'while [ ! -e \"$XDG_RUNTIME_DIR/bus\" ]; do sleep 0.1; done; gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver dotnet; exec bash\"'",
       "distributionName": ""
     },
-    "WSL-Gnome: UICatalog --driver v2": {
+    "WSL-Gnome: UICatalog --driver unix": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2; exec bash\"'",
-      "distributionName": ""
-    },
-    "WSL-Gnome: UICatalog --driver v2unix": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2unix; exec bash\"'",
-      "distributionName": ""
-    },
-    "WSL-Gnome: UICatalog --driver v2net": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver v2net; exec bash\"'",
+      "commandLineArgs": "bash -c 'dbus-run-session -- gnome-terminal --wait -- bash -l -c \"dotnet UICatalog.dll --driver unix; exec bash\"'",
       "distributionName": ""
     },
     "Benchmark All": {
       "commandName": "Project",
       "commandLineArgs": "--benchmark"
     },
-    "Benchmark All --driver NetDriver": {
+    "Benchmark All --driver dotnet": {
       "commandName": "Project",
-      "commandLineArgs": "--driver NetDriver --benchmark"
+      "commandLineArgs": "--driver dotnet --benchmark"
     },
-    "Benchmark All --driver v2win": {
+    "Benchmark All --driver windows": {
       "commandName": "Project",
-      "commandLineArgs": "--driver v2win --benchmark"
-    },
-    "Benchmark All --driver v2net": {
-      "commandName": "Project",
-      "commandLineArgs": "--driver v2net --benchmark"
+      "commandLineArgs": "--driver windows --benchmark"
     },
     "WSL: Benchmark All": {
       "commandName": "Executable",
@@ -106,22 +66,16 @@
       "commandLineArgs": "dotnet UICatalog.dll --benchmark",
       "distributionName": ""
     },
-    "WSL: Benchmark All --driver v2": {
+    "WSL: Benchmark All --driver unix": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver v2 --benchmark",
+      "commandLineArgs": "dotnet UICatalog.dll --driver unix --benchmark",
       "distributionName": ""
     },
-    "WSL: Benchmark All --driver v2unix": {
+    "WSL: Benchmark All --driver dotnet": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver v2unix --benchmark",
-      "distributionName": ""
-    },
-    "WSL: Benchmark All --driver v2net": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver v2net --benchmark",
+      "commandLineArgs": "dotnet UICatalog.dll --driver dotnet --benchmark",
       "distributionName": ""
     },
     "Docker": {
@@ -135,9 +89,9 @@
       "commandName": "Project",
       "commandLineArgs": "--disable-cm\r\n"
     },
-    "UICatalog --disable-cm --driver v2win": {
+    "UICatalog --disable-cm --driver windows": {
       "commandName": "Project",
-      "commandLineArgs": "--disable-cm --driver v2win"
+      "commandLineArgs": "--disable-cm --driver windows"
     },
     "Themes": {
       "commandName": "Project",

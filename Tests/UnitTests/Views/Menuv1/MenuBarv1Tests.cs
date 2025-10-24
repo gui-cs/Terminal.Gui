@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 public class MenuBarv1Tests (ITestOutputHelper output)

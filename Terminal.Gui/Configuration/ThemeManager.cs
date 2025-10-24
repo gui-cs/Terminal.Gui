@@ -22,18 +22,19 @@ public static class ThemeManager
     public static ThemeScope GetCurrentTheme () { return Themes! [Theme]; }
 
     /// <summary>
+    ///     INTERNAL: Getter for <see cref="Themes"/>.
     ///     Convenience method to get the themes dictionary. The themes dictionary is a dictionary of <see cref="ThemeScope"/>
     ///     objects, with the key being the name of the theme.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static ConcurrentDictionary<string, ThemeScope> GetThemes ()
+    private static ConcurrentDictionary<string, ThemeScope> GetThemes ()
     {
         if (!ConfigurationManager.IsInitialized ())
         {
             // We're being called from the module initializer.
             // We need to provide a dictionary of themes containing the hard-coded theme.
-            return HardCodedThemes ()!;
+            return GetHardCodedThemes ()!;
         }
 
         if (ConfigurationManager.Settings is null)
@@ -48,14 +49,14 @@ public static class ThemeManager
                 return (themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>)!;
             }
 
-            return HardCodedThemes ()!;
+            return GetHardCodedThemes ()!;
         }
 
         throw new InvalidOperationException ("Settings has no Themes property.");
     }
 
     /// <summary>
-    ///     Convenience method to get a list of theme names.
+    ///    INTERNAL: Convenience method to get a list of theme names.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
@@ -65,7 +66,7 @@ public static class ThemeManager
         {
             // We're being called from the module initializer.
             // We need to provide a dictionary of themes containing the hard-coded theme.
-            return HardCodedThemes ()!.Keys.ToImmutableList ();
+            return GetHardCodedThemes ()!.Keys.ToImmutableList ();
         }
 
         if (ConfigurationManager.Settings is null)
@@ -86,7 +87,7 @@ public static class ThemeManager
         }
         else
         {
-            returnConcurrentDictionary = HardCodedThemes ();
+            returnConcurrentDictionary = GetHardCodedThemes ();
         }
 
         return returnConcurrentDictionary!.Keys
@@ -121,6 +122,11 @@ public static class ThemeManager
         internal set => SetThemes (value);
     }
 
+    /// <summary>
+    ///     INTERNAL: Setter for <see cref="Themes"/>.
+    /// </summary>
+    /// <param name="dictionary"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     private static void SetThemes (ConcurrentDictionary<string, ThemeScope>? dictionary)
     {
         if (dictionary is { } && !dictionary.ContainsKey (DEFAULT_THEME_NAME))
@@ -138,7 +144,12 @@ public static class ThemeManager
         throw new InvalidOperationException ("Settings is null.");
     }
 
-    private static ConcurrentDictionary<string, ThemeScope>? HardCodedThemes ()
+    /// <summary>
+    ///     INTERNAL: Returns the hard-coded Themes dictionary.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    private static ConcurrentDictionary<string, ThemeScope>? GetHardCodedThemes ()
     {
         ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
 
@@ -151,10 +162,10 @@ public static class ThemeManager
     }
 
     /// <summary>
-    ///     Returns a dictionary of hard-coded ThemeScope properties.
+    ///     INTERNAL: Returns the ThemeScope containing the hard-coded Themes.
     /// </summary>
     /// <returns></returns>
-    private static ThemeScope? GetHardCodedThemeScope ()
+    private static ThemeScope GetHardCodedThemeScope ()
     {
         IEnumerable<KeyValuePair<string, ConfigProperty>>? hardCodedThemeProperties = ConfigurationManager.GetHardCodedConfigPropertiesByScope ("ThemeScope");
 
@@ -173,9 +184,9 @@ public static class ThemeManager
     }
 
     /// <summary>
-    ///     Since Theme is a dynamic property, we need to cache the value of the selected theme for when CM is not enabled.
+    ///     The name of the default theme ("Default").
     /// </summary>
-    internal const string DEFAULT_THEME_NAME = "Default";
+    public const string DEFAULT_THEME_NAME = "Default";
 
     /// <summary>
     ///     The currently selected theme. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Theme"]</c>.
@@ -256,13 +267,19 @@ public static class ThemeManager
     /// </summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void UpdateToCurrentValues () { Themes! [Theme].LoadCurrentValues (); }
+    internal static void UpdateToCurrentValues ()
+    {
+        // BUGBUG: This corrupts _hardCodedDefaults. See #4288
+        Themes! [Theme].UpdateToCurrentValues ();
+    }
 
     /// <summary>
-    ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
-    ///     when the module was initialized.
+    ///     INTERNAL: Loads all Themes to their hard-coded default values.
     /// </summary>
-    internal static void ResetToHardCodedDefaults ()
+    [RequiresUnreferencedCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
+    [RequiresDynamicCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
+
+    internal static void LoadHardCodedDefaults ()
     {
         if (!ConfigurationManager.IsInitialized ())
         {
@@ -288,8 +305,14 @@ public static class ThemeManager
                                                                         },
                                                                         StringComparer.InvariantCultureIgnoreCase);
 
+        // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
+        // BUGBUG: This is a partial workaround
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        SchemeManager.LoadToHardCodedDefaults ();
+
         ConfigurationManager.Settings ["Themes"].PropertyValue = hardCodedThemes;
         ConfigurationManager.Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;
+
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
@@ -302,15 +325,4 @@ public static class ThemeManager
 
     /// <summary>Raised when the selected theme has changed.</summary>
     public static event EventHandler<EventArgs<string>>? ThemeChanged;
-
-    /// <summary>
-    ///     Validates all themes in the <see cref="Themes"/> dictionary.
-    /// </summary>
-    public static void Validate ()
-    {
-        foreach (ThemeScope theme in Themes!.Values)
-        {
-            theme.Validate ();
-        }
-    }
 }

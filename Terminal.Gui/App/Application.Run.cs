@@ -6,38 +6,20 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Run (Begin, Run, End, Stop)
 {
-    private static Key _quitKey = Key.Esc; // Resources/config.json overrides
-
     /// <summary>Gets or sets the key to quit the application.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
     {
-        get => _quitKey;
-        set
-        {
-            //if (_quitKey != value)
-            {
-                KeyBindings.Replace (_quitKey, value);
-                _quitKey = value;
-            }
-        }
+        get => Keyboard.QuitKey;
+        set => Keyboard.QuitKey = value;
     }
-
-    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
     {
-        get => _arrangeKey;
-        set
-        {
-            //if (_arrangeKey != value)
-            {
-                KeyBindings.Replace (_arrangeKey, value);
-                _arrangeKey = value;
-            }
-        }
+        get => Keyboard.ArrangeKey;
+        set => Keyboard.ArrangeKey = value;
     }
 
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
@@ -333,8 +315,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <param name="errorHandler"></param>
     /// <param name="driver">
     ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
-    ///     <see langword="null"/> if <see cref="Init"/> has already been called.
+    ///     be used. Must be <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
@@ -425,9 +406,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
     ///     should only be overriden for testing.
     /// </param>
-    public static void LayoutAndDraw (bool forceDraw = false) { ApplicationImpl.Instance.LayoutAndDraw (forceDraw); }
-
-    internal static void LayoutAndDrawImpl (bool forceDraw = false)
+    public static void LayoutAndDraw (bool forceDraw = false)
     {
         List<View> tops = [.. TopLevels];
 

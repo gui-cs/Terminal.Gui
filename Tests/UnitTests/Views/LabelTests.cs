@@ -1,94 +1,10 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class LabelTests (ITestOutputHelper output)
 {
-    // Test that Title and Text are the same
-    [Fact]
-    public void Text_Mirrors_Title ()
-    {
-        var label = new Label ();
-        label.Title = "Hello";
-        Assert.Equal ("Hello", label.Title);
-        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
-
-        Assert.Equal ("Hello", label.Text);
-        Assert.Equal ("Hello", label.TextFormatter.Text);
-    }
-
-    [Fact]
-    public void Title_Mirrors_Text ()
-    {
-        var label = new Label ();
-        label.Text = "Hello";
-        Assert.Equal ("Hello", label.Text);
-        Assert.Equal ("Hello", label.TextFormatter.Text);
-
-        Assert.Equal ("Hello", label.Title);
-        Assert.Equal ("Hello", label.TitleTextFormatter.Text);
-    }
-
-    [Theory]
-    [CombinatorialData]
-    public void HotKey_Command_SetsFocus_OnNextSubView (bool hasHotKey)
-    {
-        var superView = new View { CanFocus = true };
-        var label = new Label ();
-        label.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
-        var nextSubView = new View { CanFocus = true };
-        superView.Add (label, nextSubView);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        Assert.False (label.HasFocus);
-        Assert.False (nextSubView.HasFocus);
-
-        label.InvokeCommand (Command.HotKey);
-        Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubView.HasFocus);
-    }
-
-    [Theory]
-    [CombinatorialData]
-    public void MouseClick_SetsFocus_OnNextSubView (bool hasHotKey)
-    {
-        var superView = new View { CanFocus = true, Height = 1, Width = 15 };
-        var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
-        var label = new Label { X = 2 };
-        label.HotKey = hasHotKey ? Key.X.WithAlt : Key.Empty;
-
-        var nextSubView = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
-        superView.Add (focusedView, label, nextSubView);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        Assert.False (focusedView.HasFocus);
-        Assert.False (label.HasFocus);
-        Assert.False (nextSubView.HasFocus);
-
-        label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
-        Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubView.HasFocus);
-    }
-
-    [Fact]
-    public void HotKey_Command_Does_Not_Accept ()
-    {
-        var label = new Label ();
-        var accepted = false;
-
-        label.Accepting += LabelOnAccept;
-        label.InvokeCommand (Command.HotKey);
-
-        Assert.False (accepted);
-
-        return;
-
-        void LabelOnAccept (object sender, CommandEventArgs e) { accepted = true; }
-    }
-
     [Fact]
     [AutoInitShutdown]
     public void Text_Set_With_AnchorEnd_Works ()
@@ -102,7 +18,8 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ┌────────────────────────────┐
@@ -142,7 +59,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         var expected = @"
 ┌────────────────────────────┐
@@ -168,17 +85,6 @@ public class LabelTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
-    }
-
-    [Fact]
-    public void Constructors_Defaults ()
-    {
-        var label = new Label ();
-        Assert.Equal (string.Empty, label.Text);
-        Assert.Equal (Alignment.Start, label.TextAlignment);
-        Assert.False (label.CanFocus);
-        Assert.Equal (new (0, 0, 0, 0), label.Frame);
-        Assert.Equal (KeyCode.Null, label.HotKey);
     }
 
     [Fact]
@@ -327,61 +233,6 @@ e
     }
 
     [Fact]
-    public void Label_HotKeyChanged_EventFires ()
-    {
-        var label = new Label { Text = "Yar" };
-        label.HotKey = 'Y';
-
-        object sender = null;
-        KeyChangedEventArgs args = null;
-
-        label.HotKeyChanged += (s, e) =>
-                               {
-                                   sender = s;
-                                   args = e;
-                               };
-
-        label.HotKey = Key.R;
-        Assert.Same (label, sender);
-        Assert.Equal (KeyCode.Y | KeyCode.ShiftMask, args.OldKey);
-        Assert.Equal (Key.R, args.NewKey);
-    }
-
-    [Fact]
-    public void Label_HotKeyChanged_EventFires_WithNone ()
-    {
-        var label = new Label ();
-
-        object sender = null;
-        KeyChangedEventArgs args = null;
-
-        label.HotKeyChanged += (s, e) =>
-                               {
-                                   sender = s;
-                                   args = e;
-                               };
-
-        label.HotKey = KeyCode.R;
-        Assert.Same (label, sender);
-        Assert.Equal (KeyCode.Null, args.OldKey);
-        Assert.Equal (KeyCode.R, args.NewKey);
-    }
-
-    [Fact]
-    public void TestAssignTextToLabel ()
-    {
-        View b = new Label { Text = "heya" };
-        Assert.Equal ("heya", b.Text);
-        Assert.Contains ("heya", b.TextFormatter.Text);
-        b.Text = "heyb";
-        Assert.Equal ("heyb", b.Text);
-        Assert.Contains ("heyb", b.TextFormatter.Text);
-
-        // with cast
-        Assert.Equal ("heyb", ((Label)b).Text);
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void Update_Only_On_Or_After_Initialize ()
     {
@@ -394,7 +245,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -426,7 +277,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -858,7 +709,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (40,10));
+        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
 
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -905,7 +756,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 10));
+        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -977,7 +828,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 AutoInitShutdownAttribute.FakeResize(new Size(22, count + 4));
+                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1041,7 +892,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (10, 4);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label
@@ -1128,7 +979,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 AutoInitShutdownAttribute.FakeResize(new Size(22, count + 4));
+                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1203,7 +1054,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1262,7 +1113,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
