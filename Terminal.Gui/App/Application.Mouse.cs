@@ -6,8 +6,19 @@ namespace Terminal.Gui.App;
 public static partial class Application // Mouse handling
 {
     /// <summary>
-    /// Static reference to the current <see cref="IApplication"/> <see cref="IMouse"/>.
+    ///     Gets the <see cref="IMouse"/> instance that manages mouse event handling and state.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property provides access to mouse-related functionality in a way that supports
+    ///         parallel test execution by avoiding static state.
+    ///     </para>
+    ///     <para>
+    ///         New code should use <c>Application.Mouse</c> instead of the static properties and methods
+    ///         for better testability. Legacy static properties like <see cref="IsMouseDisabled"/> and
+    ///         <see cref="GetLastMousePosition"/> are retained for backward compatibility.
+    ///     </para>
+    /// </remarks>
     public static IMouse Mouse
     {
         get => ApplicationImpl.Instance.Mouse;
