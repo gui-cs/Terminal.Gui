@@ -377,6 +377,16 @@ public partial class View // Drawing APIs
 
     private void DoDrawText (DrawContext? context = null)
     {
+        if (!NeedsDraw)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty (TextFormatter.Text))
+        {
+            TextFormatter.NeedsFormat = true;
+        }
+
         if (OnDrawingText (context))
         {
             return;
@@ -397,6 +407,9 @@ public partial class View // Drawing APIs
         }
 
         DrawText (context);
+
+        OnDrewText();
+        DrewText?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -425,11 +438,6 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to.</param>
     public void DrawText (DrawContext? context = null)
     {
-        if (!string.IsNullOrEmpty (TextFormatter.Text))
-        {
-            TextFormatter.NeedsFormat = true;
-        }
-
         var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
         // Use GetDrawRegion to get precise drawn areas
@@ -437,11 +445,6 @@ public partial class View // Drawing APIs
 
         // Report the drawn area to the context
         context?.AddDrawnRegion (textRegion);
-
-        if (!NeedsDraw)
-        {
-            return;
-        }
 
         TextFormatter?.Draw (
                              drawRect,
@@ -453,6 +456,14 @@ public partial class View // Drawing APIs
         // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.
         SetSubViewNeedsDraw ();
     }
+
+    /// <summary>
+    ///     Called when the <see cref="Text"/> of the View has been drawn.
+    /// </summary>
+    protected virtual void OnDrewText () { }
+
+    /// <summary>Raised when the <see cref="Text"/> of the View has been  drawn.</summary>
+    public event EventHandler? DrewText;
 
     #endregion DrawText
     #region DrawContent
