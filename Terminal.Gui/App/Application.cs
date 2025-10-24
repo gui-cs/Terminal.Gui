@@ -250,7 +250,7 @@ public static partial class Application
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
+        ResetMouseState ();
 
         // Keyboard
         KeyDown = null;

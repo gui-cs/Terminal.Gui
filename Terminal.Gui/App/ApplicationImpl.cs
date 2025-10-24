@@ -38,15 +38,22 @@ public class ApplicationImpl : IApplication
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
 
     /// <summary>
+    /// Handles mouse event state and processing.
+    /// </summary>
+    public IMouse Mouse { get; private set; }
+
+    /// <summary>
     /// Creates a new instance of the Application backend.
     /// </summary>
     public ApplicationImpl ()
     {
+        Mouse = new Mouse (MouseGrabHandler);
     }
 
     internal ApplicationImpl (IComponentFactory componentFactory)
     {
         _componentFactory = componentFactory;
+        Mouse = new Mouse (MouseGrabHandler);
     }
 
     /// <summary>

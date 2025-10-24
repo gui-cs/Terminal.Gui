@@ -20,6 +20,11 @@ public interface IApplication
     /// </summary>
     IMouseGrabHandler MouseGrabHandler { get; set; }
 
+    /// <summary>
+    /// Handles mouse event state and processing.
+    /// </summary>
+    IMouse Mouse { get; }
+
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
