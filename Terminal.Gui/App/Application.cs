@@ -243,6 +243,7 @@ public static partial class Application
         NotifyNewRunState = null;
         NotifyStopRunState = null;
         MouseGrabHandler = new MouseGrabHandler ();
+        // Keyboard will be lazy-initialized in ApplicationImpl on next access
         Initialized = false;
 
         // Mouse
@@ -252,15 +253,11 @@ public static partial class Application
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
 
-        // Keyboard
-        KeyDown = null;
-        KeyUp = null;
+        // Keyboard events and bindings are now managed by the Keyboard instance
+
         SizeChanging = null;
 
         Navigation = null;
-
-        KeyBindings.Clear ();
-        AddKeyBindings ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from
