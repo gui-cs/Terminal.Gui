@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Screen related stuff
+public static partial class Application // Screen related stuff; intended to hide Driver details
 {
     private static readonly object _lockScreen = new ();
     private static Rectangle? _screen;

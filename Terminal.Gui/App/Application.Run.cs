@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Run (Begin, Run, End, Stop)
+public static partial class Application // Run (Begin -> Run -> Layout/Draw -> End -> Stop)
 {
     private static Key _quitKey = Key.Esc; // Resources/config.json overrides
 
