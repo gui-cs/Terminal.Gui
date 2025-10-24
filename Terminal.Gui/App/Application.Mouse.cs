@@ -95,7 +95,7 @@ public static partial class Application // Mouse handling
 
     internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
     {
-        return Mouse.HandleMouseGrab (deepestViewUnderMouse, mouseEvent);
+        return MouseGrabHandler.HandleMouseGrab (deepestViewUnderMouse, mouseEvent);
     }
 
     /// <summary>

@@ -67,14 +67,6 @@ public interface IMouse
     void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse);
 
     /// <summary>
-    ///     Handles mouse grab logic for a mouse event.
-    /// </summary>
-    /// <param name="deepestViewUnderMouse">The deepest view under the mouse.</param>
-    /// <param name="mouseEvent">The mouse event to handle.</param>
-    /// <returns><see langword="true"/> if the event was handled by the grab handler; otherwise <see langword="false"/>.</returns>
-    bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent);
-
-    /// <summary>
     ///     INTERNAL: Resets mouse state, clearing event handlers and cached views.
     /// </summary>
     void ResetState ();

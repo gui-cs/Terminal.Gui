@@ -91,7 +91,7 @@ internal class Mouse : IMouse
             return;
         }
 
-        if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
+        if (_mouseGrabHandler.HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
         }
@@ -173,47 +173,6 @@ internal class Mouse : IMouse
                 View = deepestViewUnderMouse
             };
         }
-    }
-
-    /// <inheritdoc/>
-    public bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
-    {
-        if (_mouseGrabHandler.MouseGrabView is { })
-        {
-#if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && _mouseGrabHandler.MouseGrabView.WasDisposed)
-            {
-                throw new ObjectDisposedException (_mouseGrabHandler.MouseGrabView.GetType ().FullName);
-            }
-#endif
-
-            // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = _mouseGrabHandler.MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
-
-            var viewRelativeMouseEvent = new MouseEventArgs
-            {
-                Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.ScreenPosition,
-                View = deepestViewUnderMouse ?? _mouseGrabHandler.MouseGrabView
-            };
-
-            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (_mouseGrabHandler.MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
-            {
-                return true;
-            }
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (_mouseGrabHandler.MouseGrabView is null && deepestViewUnderMouse is Adornment)
-            {
-                // The view that grabbed the mouse has been disposed
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /// <inheritdoc/>
