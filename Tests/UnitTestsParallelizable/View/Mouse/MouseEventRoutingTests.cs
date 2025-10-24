@@ -127,7 +127,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void SubView_ReceivesMouseEvent_WithCorrectRelativeCoordinates ()
     {
         // Arrange
-        var parent = new View
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -135,7 +135,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Height = 20
         };
 
-        var child = new View
+        var subView = new View
         {
             X = 5,
             Y = 5,
@@ -143,48 +143,48 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Height = 10
         };
 
-        parent.Add (child);
+        superView.Add (subView);
 
-        Point? childReceivedPosition = null;
-        var childEventReceived = false;
+        Point? subViewReceivedPosition = null;
+        var subViewEventReceived = false;
 
-        child.MouseEvent += (sender, args) =>
+        subView.MouseEvent += (sender, args) =>
         {
-            childEventReceived = true;
-            childReceivedPosition = args.Position;
+            subViewEventReceived = true;
+            subViewReceivedPosition = args.Position;
         };
 
-        // Click at position (2, 2) relative to child (which is at 5,5 relative to parent)
+        // Click at position (2, 2) relative to subView (which is at 5,5 relative to superView)
         var mouseEvent = new MouseEventArgs
         {
-            Position = new Point (2, 2), // Relative to child
+            Position = new Point (2, 2), // Relative to subView
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        child.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.True (childEventReceived);
-        Assert.NotNull (childReceivedPosition);
-        Assert.Equal (2, childReceivedPosition.Value.X);
-        Assert.Equal (2, childReceivedPosition.Value.Y);
+        Assert.True (subViewEventReceived);
+        Assert.NotNull (subViewReceivedPosition);
+        Assert.Equal (2, subViewReceivedPosition.Value.X);
+        Assert.Equal (2, subViewReceivedPosition.Value.Y);
 
-        child.Dispose ();
-        parent.Dispose ();
+        subView.Dispose ();
+        superView.Dispose ();
     }
 
     [Fact]
     public void MouseClick_OnSubView_RaisesMouseClickEvent ()
     {
         // Arrange
-        var parent = new View
+        var superView = new View
         {
             Width = 20,
             Height = 20
         };
 
-        var child = new View
+        var subView = new View
         {
             X = 5,
             Y = 5,
@@ -192,10 +192,10 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Height = 10
         };
 
-        parent.Add (child);
+        superView.Add (subView);
 
         var clickCount = 0;
-        child.MouseClick += (sender, args) => clickCount++;
+        subView.MouseClick += (sender, args) => clickCount++;
 
         var mouseEvent = new MouseEventArgs
         {
@@ -204,13 +204,13 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Act
-        child.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouseEvent);
 
         // Assert
         Assert.Equal (1, clickCount);
 
-        child.Dispose ();
-        parent.Dispose ();
+        subView.Dispose ();
+        superView.Dispose ();
     }
 
     #endregion
@@ -430,8 +430,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     public void MouseClick_SetsFocus_BasedOnCanFocus (bool canFocus, bool expectFocus)
     {
         // Arrange
-        var parent = new View { CanFocus = true, Width = 20, Height = 20 };
-        var child = new View
+        var superView = new View { CanFocus = true, Width = 20, Height = 20 };
+        var subView = new View
         {
             X = 5,
             Y = 5,
@@ -440,8 +440,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             CanFocus = canFocus
         };
 
-        parent.Add (child);
-        parent.SetFocus (); // Give parent focus first
+        superView.Add (subView);
+        superView.SetFocus (); // Give superView focus first
 
         var mouseEvent = new MouseEventArgs
         {
@@ -450,20 +450,20 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Act
-        child.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.Equal (expectFocus, child.HasFocus);
+        Assert.Equal (expectFocus, subView.HasFocus);
 
-        child.Dispose ();
-        parent.Dispose ();
+        subView.Dispose ();
+        superView.Dispose ();
     }
 
     [Fact]
     public void MouseClick_RaisesSelecting_WhenCanFocus ()
     {
         // Arrange
-        var parent = new View { CanFocus = true, Width = 20, Height = 20 };
+        var superView = new View { CanFocus = true, Width = 20, Height = 20 };
         var view = new View
         {
             X = 5,
@@ -473,7 +473,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        parent.Add (view);
+        superView.Add (view);
 
         var selectingCount = 0;
         view.Selecting += (sender, args) => selectingCount++;
@@ -491,7 +491,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Assert.Equal (1, selectingCount);
 
         view.Dispose ();
-        parent.Dispose ();
+        superView.Dispose ();
     }
 
     #endregion
