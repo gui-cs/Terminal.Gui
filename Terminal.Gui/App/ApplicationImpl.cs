@@ -34,6 +34,11 @@ public class ApplicationImpl : IApplication
     public ITimedEvents? TimedEvents => _timedEvents;
 
     /// <summary>
+    /// Creates a new instance of the Application backend.
+    /// </summary>
+    public IMouse Mouse { get; }
+
+    /// <summary>
     ///     Handles which <see cref="View"/> (if any) has captured the mouse
     /// </summary>
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
@@ -128,10 +133,6 @@ public class ApplicationImpl : IApplication
         View.SetClipToScreen ();
         Driver?.Refresh ();
     }
-    /// <summary>
-    /// Creates a new instance of the Application backend.
-    /// </summary>
-    public IMouse Mouse { get; }
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
@@ -161,6 +162,7 @@ public class ApplicationImpl : IApplication
         Debug.Assert (Application.Popover is null);
         Application.Popover = new ();
 
+        // TODO: Move this into IKeyboard and Keyboard implementation
         // Preserve existing keyboard settings if they exist
         bool hasExistingKeyboard = _keyboard is not null;
         Key existingQuitKey = _keyboard?.QuitKey ?? Key.Esc;
