@@ -177,7 +177,7 @@ public class ApplicationImpl : IApplication
         Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
+        SynchronizationContext.SetSynchronizationContext (new ());
         Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
     }
 
@@ -297,7 +297,7 @@ public class ApplicationImpl : IApplication
             Init (driver, null);
         }
 
-        var top = new T ();
+        T top = new ();
         Run (top, errorHandler);
         return top;
     }
@@ -372,7 +372,7 @@ public class ApplicationImpl : IApplication
             return;
         }
 
-        var ev = new ToplevelClosingEventArgs (top);
+        ToplevelClosingEventArgs ev = new (top);
         top.OnClosing (ev);
 
         if (ev.Cancel)
