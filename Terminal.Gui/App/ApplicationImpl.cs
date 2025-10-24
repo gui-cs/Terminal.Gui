@@ -245,13 +245,6 @@ public class ApplicationImpl : IApplication
     /// </summary>
     public static IApplication Instance => _lazyInstance.Value;
 
-    /// <inheritdoc/>
-    public void LayoutAndDraw (bool forceDraw)
-    {
-        Application.Top?.SetNeedsDraw ();
-        Application.Top?.SetNeedsLayout ();
-    }
-
     internal IMainLoopCoordinator? Coordinator { get; private set; }
 
     private void CreateDriver (string? driverName)
