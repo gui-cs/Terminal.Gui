@@ -62,9 +62,9 @@ This delegates to the instance, allowing different instances in different test c
 
 Follow the same pattern established by `MouseGrabHandler` to refactor mouse event handling.
 
-### Step 1: Create IMouseEventHandler Interface
+### Step 1: Create IMouse Interface
 
-Create `Terminal.Gui/App/Mouse/IMouseEventHandler.cs`:
+Create `Terminal.Gui/App/Mouse/IMouse.cs`:
 
 ```csharp
 #nullable enable
@@ -73,7 +73,7 @@ namespace Terminal.Gui.App;
 /// <summary>
 /// Handles mouse event processing and state for an Application instance.
 /// </summary>
-public interface IMouseEventHandler
+public interface IMouse
 {
     /// <summary>
     /// Gets or sets the last recorded mouse position.
@@ -110,18 +110,18 @@ public interface IMouseEventHandler
 }
 ```
 
-### Step 2: Implement MouseEventHandler  
+### Step 2: Implement Mouse  
 
-Create `Terminal.Gui/App/Mouse/MouseEventHandler.cs`:
+Create `Terminal.Gui/App/Mouse/Mouse.cs`:
 
 ```csharp
 #nullable enable
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Default implementation of IMouseEventHandler.
+/// Default implementation of IMouse.
 /// </summary>
-public class MouseEventHandler : IMouseEventHandler
+public class Mouse : IMouse
 {
     public Point? LastMousePosition { get; set; }
     public bool IsMouseDisabled { get; set; }
@@ -239,8 +239,8 @@ Update `Terminal.Gui/App/IApplication.cs`:
 ```csharp
 public interface IApplication
 {
-    IMouseGrabHandler MouseGrabHandler { get; set; }
-    IMouseEventHandler MouseEventHandler { get; set; }  // NEW
+    IMouseGrab MouseGrab { get; set; }
+    IMouse Mouse { get; set; }  // NEW
     ITimedEvents? TimedEvents { get; }
     // ... other methods
 }
@@ -253,62 +253,9 @@ Update `Terminal.Gui/App/ApplicationImpl.cs`:
 ```csharp
 public class ApplicationImpl : IApplication
 {
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler();
-    public IMouseEventHandler MouseEventHandler { get; set; } = new MouseEventHandler();  // NEW
+    public IMouseGrab MouseGrab { get; set; } = new MouseGrab();  // Renamed
+    public IMouse Mouse { get; set; } = new Mouse();  // NEW
     // ... rest of implementation
-}
-```
-
-### Step 5: Update Application Static Class
-
-Update `Terminal.Gui/App/Application.Mouse.cs`:
-
-```csharp
-public static partial class Application
-{
-    // Add static gateway to instance
-    public static IMouseEventHandler MouseEventHandler
-    {
-        get => ApplicationImpl.Instance.MouseEventHandler;
-        set => ApplicationImpl.Instance.MouseEventHandler = value;
-    }
-    
-    // Update existing static properties to delegate to instance
-    internal static Point? LastMousePosition
-    {
-        get => MouseEventHandler.LastMousePosition;
-        set => MouseEventHandler.LastMousePosition = value;
-    }
-    
-    public static Point? GetLastMousePosition() => MouseEventHandler.LastMousePosition;
-    
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool IsMouseDisabled
-    {
-        get => MouseEventHandler.IsMouseDisabled;
-        set => MouseEventHandler.IsMouseDisabled = value;
-    }
-    
-    // Update RaiseMouseEvent to delegate to instance
-    internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
-    {
-        MouseEventHandler.RaiseMouseEvent (mouseEvent, Top, Popover, MouseGrabHandler);
-    }
-    
-    // Update static event to delegate to instance
-    public static event EventHandler<MouseEventArgs>? MouseEvent
-    {
-        add => MouseEventHandler.MouseEvent += value;
-        remove => MouseEventHandler.MouseEvent -= value;
-    }
-    
-    // Update internal methods to use instance
-    internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
-    {
-        return MouseEventHandler.HandleMouseGrab (deepestViewUnderMouse, mouseEvent, MouseGrabHandler);
-    }
-    
-    internal static List<View?> CachedViewsUnderMouse => MouseEventHandler.CachedViewsUnderMouse;
 }
 ```
 
@@ -317,7 +264,7 @@ public static partial class Application
 1. **True Concurrency**: Each test can create its own `ApplicationImpl` instance with isolated mouse state
 2. **No Static Pollution**: Tests don't interfere with each other's mouse event tracking
 3. **Backward Compatible**: Existing code using static `Application` methods continues to work
-4. **Testability**: Tests can inject mock `IMouseEventHandler` implementations
+4. **Testability**: Tests can inject mock `IMouse` implementations
 5. **Follows Existing Pattern**: Matches the pattern established by `MouseGrabHandler` and `TimedEvents`
 
 ## Example: Truly Concurrent Test
@@ -330,8 +277,8 @@ public void RaiseMouseEvent_WorksConcurrently ()
     var appImpl = new ApplicationImpl();
     
     // Create isolated mouse handler for this test
-    var mouseHandler = new MouseEventHandler();
-    appImpl.MouseEventHandler = mouseHandler;
+    var mouse = new Mouse();
+    appImpl.Mouse = mouse;
     
     // Create view hierarchy for this test
     var top = new Toplevel { Width = 80, Height = 25 };
@@ -351,10 +298,10 @@ public void RaiseMouseEvent_WorksConcurrently ()
     };
     
     // Use instance method - completely isolated from other tests!
-    mouseHandler.RaiseMouseEvent (pressEvent, top, null, appImpl.MouseGrabHandler);
+    mouse.RaiseMouseEvent (pressEvent, top, null, appImpl.MouseGrab);
     
     // Verify application-level routing worked
-    Assert.Equal (new Point (11, 10), mouseHandler.LastMousePosition);
+    Assert.Equal (new Point (11, 10), mouse.LastMousePosition);
     Assert.NotNull (pressEvent.View);
     
     // This test runs completely isolated from other tests!
@@ -365,9 +312,10 @@ public void RaiseMouseEvent_WorksConcurrently ()
 ## Migration Strategy
 
 ### Phase 1: Create Interfaces and Implementation (This PR)
-- [ ] Create `IMouseEventHandler` interface
-- [ ] Create `MouseEventHandler` implementation
-- [ ] Add property to `IApplication`
+- [ ] Create `IMouse` interface
+- [ ] Create `Mouse` implementation
+- [ ] Rename `IMouseGrabHandler` to `IMouseGrab`
+- [ ] Add properties to `IApplication`
 - [ ] Update `ApplicationImpl`
 - [ ] Update `Application` static class to delegate
 - [ ] All existing code continues to work unchanged
@@ -396,7 +344,7 @@ public void RaiseMouseEvent_WorksConcurrently ()
 ## Estimated Effort
 
 - Interface creation: 1 hour
-- MouseEventHandler implementation: 2-3 hours
+- Mouse implementation: 2-3 hours
 - Application updates: 1-2 hours
 - Testing: 2-3 hours
 - **Total: 6-9 hours**
@@ -405,7 +353,7 @@ public void RaiseMouseEvent_WorksConcurrently ()
 
 ### Option 1: Unified IMouse Interface
 
-Combine `IMouseGrabHandler` and `IMouseEventHandler` into a single `IMouse` interface:
+**Alternative:** Combine `IMouseGrab` and `IMouse` into a single larger `IMouse` interface:
 
 **Pros:**
 - Single interface to inject/mock for testing
@@ -417,7 +365,7 @@ Combine `IMouseGrabHandler` and `IMouseEventHandler` into a single `IMouse` inte
 **Cons:**
 - Larger interface (violates Interface Segregation Principle)
 - Breaking change to existing code using `IMouseGrabHandler`
-- Less granular control - can't swap just grab handler or event handler independently
+- Less granular control - can't swap just grab handler or main mouse independently
 - Harder to test individual aspects in isolation
 
 **Example:**
@@ -433,9 +381,9 @@ public interface IMouse
     event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
     event EventHandler<ViewEventArgs>? UnGrabbedMouse;
     
-    // From IMouseEventHandler
+    // From IMouse (main mouse handling)
     Point? LastMousePosition { get; set; }
-    bool IsMouseDisabled { get; set; }
+    bool IsMouseDisabled { get; set; };
     event EventHandler<MouseEventArgs>? MouseEvent;
     List<View?> CachedViewsUnderMouse { get; }
     void RaiseMouseEvent (MouseEventArgs mouseEvent, View? top, IPopover? popover, IMouse mouse);
@@ -445,9 +393,9 @@ public interface IMouse
 public static IMouse Mouse { get; set; }
 ```
 
-### Option 2: Two Separate Interfaces with Shorter Names
+### Option 2: Two Separate Interfaces with Shorter Names ✅ SELECTED
 
-Keep separate interfaces but use shorter names: `IMouseGrab` and `IMouseEvents`:
+Keep separate interfaces but use shorter names: `IMouseGrab` and `IMouse`:
 
 **Pros:**
 - Follows Single Responsibility Principle
@@ -455,6 +403,7 @@ Keep separate interfaces but use shorter names: `IMouseGrab` and `IMouseEvents`:
 - Granular testability - can mock/inject each independently  
 - Clear separation of concerns (grab vs routing)
 - Can evolve independently
+- `IMouse` is intuitive name for main mouse interface
 
 **Cons:**
 - Two properties to inject/configure
@@ -474,7 +423,7 @@ public interface IMouseGrab  // Rename from IMouseGrabHandler
     event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 }
 
-public interface IMouseEvents  // Or IMouseRouter
+public interface IMouse  // Main mouse event handling
 {
     Point? LastMousePosition { get; set; }
     bool IsMouseDisabled { get; set; }
@@ -485,32 +434,37 @@ public interface IMouseEvents  // Or IMouseRouter
 
 // Usage:
 public static IMouseGrab MouseGrab { get; set; }
-public static IMouseEvents MouseEvents { get; set; }
+public static IMouse Mouse { get; set; }
 ```
 
 ### Option 3: Keep Current Names, Add New Interface
 
-Keep `IMouseGrabHandler` as-is, add `IMouseEventHandler`:
+Keep `IMouseGrabHandler` as-is, add `IMouse`:
 
 **Pros:**
-- Zero breaking changes
+- Zero breaking changes (only deprecation)
 - Clear, descriptive names
-- Consistent with existing naming pattern
 - Easy migration path
 
 **Cons:**
-- Longer names (though descriptive)
-- Two properties to manage
+- `IMouseGrabHandler` is longer than needed
+- Inconsistent naming pattern
 
-This is what the current proposal uses.
+This was the initial proposal before selecting Option 2.
 
-### Recommendation: Option 2 (Two Separate Interfaces with Shorter Names)
+### Decision: Option 2 with `IMouseGrab` and `IMouse`
+
+**Selected naming:**
+- `IMouseGrab` / `MouseGrab` (renamed from `IMouseGrabHandler`)
+- `IMouse` / `Mouse` (new - main mouse event handling)
+- Future: `IKeyboardGrab` / `KeyboardGrab` (per #4315)
+- Future: `IKeyboard` / `Keyboard` (per #4315)
 
 **Rationale:**
 
 1. **Aligns with future IKeyboard work (#4315)**: 
-   - Keyboard will likely need `IKeyboardGrab` (or similar) and `IKeyboardEvents`
-   - Consistent pattern across input types
+   - Consistent pattern: `IMouseGrab`/`IMouse`, `IKeyboardGrab`/`IKeyboard`
+   - `IMouse` and `IKeyboard` are intuitive names for main interfaces
 
 2. **Follows SOLID principles**:
    - Single Responsibility: Each interface has one clear purpose
@@ -522,27 +476,21 @@ This is what the current proposal uses.
 
 4. **Non-breaking migration path**:
    - Rename `IMouseGrabHandler` → `IMouseGrab` (add obsolete attribute to old name)
-   - Add new `IMouseEvents` interface
+   - Add new `IMouse` interface
    - Existing code continues working during transition
 
 5. **Future-proof**:
-   - If touch input is added later, can have `ITouchGrab` + `ITouchEvents`
    - Pattern scales to other input types
+   - `IMouse` is clearer than `IMouseEvents` or `IMouseEventHandler`
 
-**Suggested naming:**
-- `IMouseGrab` / `MouseGrab` (renamed from `IMouseGrabHandler`)
-- `IMouseEvents` / `MouseEvents` (new)
-- `IKeyboardGrab` / `KeyboardGrab` (future, per #4315)
-- `IKeyboardEvents` / `KeyboardEvents` (future, per #4315)
-
-### Implementation with Option 2
+### Implementation with Selected Design
 
 ```csharp
 // IApplication.cs
 public interface IApplication
 {
     IMouseGrab MouseGrab { get; set; }
-    IMouseEvents MouseEvents { get; set; }
+    IMouse Mouse { get; set; }
     ITimedEvents? TimedEvents { get; }
     // ... other methods
 }
@@ -556,10 +504,10 @@ public static partial class Application
         set => ApplicationImpl.Instance.MouseGrab = value;
     }
     
-    public static IMouseEvents MouseEvents
+    public static IMouse Mouse
     {
-        get => ApplicationImpl.Instance.MouseEvents;
-        set => ApplicationImpl.Instance.MouseEvents = value;
+        get => ApplicationImpl.Instance.Mouse;
+        set => ApplicationImpl.Instance.Mouse = value;
     }
     
     // For backward compatibility during transition
@@ -577,7 +525,7 @@ public static partial class Application
 This proposal aligns with the ongoing v2 architecture migration:
 - ✅ `ITimedEvents` / `TimedEvents` (completed)
 - 🔄 `IMouseGrab` / `MouseGrab` (rename from `IMouseGrabHandler`, this proposal)
-- 🔄 `IMouseEvents` / `MouseEvents` (new, this proposal)
+- 🔄 `IMouse` / `Mouse` (new, this proposal)
 - 📝 `IKeyboardGrab` / `KeyboardGrab` (future - see issue #4315)
-- 📝 `IKeyboardEvents` / `KeyboardEvents` (future - see issue #4315)
+- 📝 `IKeyboard` / `Keyboard` (future - see issue #4315)
 - 📝 `IViewHierarchyManager` (future - for Top, Popover, Navigation)
