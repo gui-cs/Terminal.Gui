@@ -11,6 +11,12 @@ namespace Terminal.Gui.App;
 public interface IKeyboard
 {
     /// <summary>
+    /// Sets the application instance that this keyboard handler is associated with.
+    /// This provides access to application state without coupling to static Application class.
+    /// </summary>
+    IApplication? Application { get; set; }
+
+    /// <summary>
     ///     Called when the user presses a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
     ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
     ///     if the key was not handled, invokes any Application-scoped <see cref="KeyBindings"/>.

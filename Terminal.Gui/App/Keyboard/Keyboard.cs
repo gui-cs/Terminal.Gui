@@ -26,6 +26,9 @@ internal class Keyboard : IKeyboard
     private readonly Dictionary<Command, View.CommandImplementation> _commandImplementations = new ();
 
     /// <inheritdoc/>
+    public IApplication? Application { get; set; }
+
+    /// <inheritdoc/>
     public KeyBindings KeyBindings { get; internal set; } = new (null);
 
     /// <inheritdoc/>
@@ -130,23 +133,26 @@ internal class Keyboard : IKeyboard
             return true;
         }
 
-        if (Application.Popover?.DispatchKeyDown (key) is true)
+        if (Application?.Popover?.DispatchKeyDown (key) is true)
         {
             return true;
         }
 
-        if (Application.Top is null)
+        if (Application?.Top is null)
         {
-            foreach (Toplevel topLevel in Application.TopLevels.ToList ())
+            if (Application?.TopLevels is { })
             {
-                if (topLevel.NewKeyDownEvent (key))
+                foreach (Toplevel topLevel in Application.TopLevels.ToList ())
                 {
-                    return true;
-                }
+                    if (topLevel.NewKeyDownEvent (key))
+                    {
+                        return true;
+                    }
 
-                if (topLevel.Modal)
-                {
-                    break;
+                    if (topLevel.Modal)
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -170,7 +176,7 @@ internal class Keyboard : IKeyboard
     /// <inheritdoc/>
     public bool RaiseKeyUpEvent (Key key)
     {
-        if (!Application.Initialized)
+        if (Application?.Initialized != true)
         {
             return true;
         }
@@ -185,16 +191,19 @@ internal class Keyboard : IKeyboard
 
         // TODO: Add Popover support
 
-        foreach (Toplevel topLevel in Application.TopLevels.ToList ())
+        if (Application?.TopLevels is { })
         {
-            if (topLevel.NewKeyUpEvent (key))
+            foreach (Toplevel topLevel in Application.TopLevels.ToList ())
             {
-                return true;
-            }
+                if (topLevel.NewKeyUpEvent (key))
+                {
+                    return true;
+                }
 
-            if (topLevel.Modal)
-            {
-                break;
+                if (topLevel.Modal)
+                {
+                    break;
+                }
             }
         }
 
@@ -280,43 +289,43 @@ internal class Keyboard : IKeyboard
         // Things Application knows how to do
         AddCommand (
                     Command.Quit,
-                    static () =>
+                    () =>
                     {
-                        Application.RequestStop ();
+                        Application?.RequestStop ();
 
                         return true;
                     }
                    );
         AddCommand (
                     Command.Suspend,
-                    static () =>
+                    () =>
                     {
-                        Application.Driver?.Suspend ();
+                        Application?.Driver?.Suspend ();
 
                         return true;
                     }
                    );
         AddCommand (
                     Command.NextTabStop,
-                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
+                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.PreviousTabStop,
-                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
+                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.NextTabGroup,
-                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
+                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.PreviousTabGroup,
-                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
+                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.Refresh,
-                    static () =>
+                    () =>
                     {
-                        Application.LayoutAndDraw (true);
+                        Application?.LayoutAndDraw (true);
 
                         return true;
                     }
@@ -324,9 +333,9 @@ internal class Keyboard : IKeyboard
 
         AddCommand (
                     Command.Arrange,
-                    static () =>
+                    () =>
                     {
-                        View? viewToArrange = Application.Navigation?.GetFocused ();
+                        View? viewToArrange = Application?.Navigation?.GetFocused ();
 
                         // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
                         while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })

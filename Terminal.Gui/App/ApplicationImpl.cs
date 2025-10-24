@@ -48,12 +48,53 @@ public class ApplicationImpl : IApplication
         {
             if (_keyboard is null)
             {
-                _keyboard = new Keyboard ();
+                _keyboard = new Keyboard { Application = this };
             }
             return _keyboard;
         }
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
+
+    /// <inheritdoc/>
+    public IConsoleDriver? Driver
+    {
+        get => Application.Driver;
+        set => Application.Driver = value;
+    }
+
+    /// <inheritdoc/>
+    public bool Initialized
+    {
+        get => Application.Initialized;
+        set => Application.Initialized = value;
+    }
+
+    /// <inheritdoc/>
+    public ApplicationPopover? Popover
+    {
+        get => Application.Popover;
+        set => Application.Popover = value;
+    }
+
+    /// <inheritdoc/>
+    public ApplicationNavigation? Navigation
+    {
+        get => Application.Navigation;
+        set => Application.Navigation = value;
+    }
+
+    /// <inheritdoc/>
+    public Toplevel? Top
+    {
+        get => Application.Top;
+        set => Application.Top = value;
+    }
+
+    /// <inheritdoc/>
+    public ConcurrentStack<Toplevel> TopLevels => Application.TopLevels;
+
+    /// <inheritdoc/>
+    public void RequestStop () => Application.RequestStop ();
 
     /// <summary>
     /// Creates a new instance of the Application backend.
@@ -116,7 +157,7 @@ public class ApplicationImpl : IApplication
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new Keyboard ();
+        _keyboard = new Keyboard { Application = this };
 
         // Restore previously set keys if they existed and were different from defaults
         if (hasExistingKeyboard)
