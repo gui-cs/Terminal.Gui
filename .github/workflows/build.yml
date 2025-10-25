@@ -38,13 +38,13 @@ jobs:
       run: dotnet restore
 
     - name: Build Debug
-      run: dotnet build --configuration Debug --no-restore
+      run: dotnet build --configuration Debug --no-restore -p:NoWarn=0618;0612
 
     - name: Build Release Terminal.Gui
-      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force
+      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -p:NoWarn=0618;0612
 
     - name: Pack Release Terminal.Gui
-      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -p:NoWarn=0618;0612
 
     - name: Restore AOT and Self-Contained projects
       run: |
@@ -56,11 +56,11 @@ jobs:
 
     - name: Build Release AOT and Self-Contained
       run: |
-        dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release
-        dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release
+        dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release -p:NoWarn=0618;0612
+        dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release -p:NoWarn=0618;0612
 
     - name: Build Release Solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore -p:NoWarn=0618;0612
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
