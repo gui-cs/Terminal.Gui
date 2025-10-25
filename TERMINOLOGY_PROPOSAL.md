@@ -193,7 +193,7 @@ This distinction is valuable and should be preserved.
 public class RunToken { ... }
 
 // Add conversion from old to new
-public static implicit operator RunToken(RunState state) => new RunToken(state.Toplevel);
+public static implicit operator RunToken(RunState state) => new (state.Toplevel);
 
 // Mark old type obsolete
 [Obsolete("Use RunToken instead. RunState will be removed in a future version.")]
