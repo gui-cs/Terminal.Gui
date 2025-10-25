@@ -242,25 +242,21 @@ public static partial class Application
         // Run State stuff
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        MouseGrabHandler = new MouseGrabHandler ();
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
         Initialized = false;
 
         // Mouse
-        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
+        ResetMouseState ();
 
-        // Keyboard
-        KeyDown = null;
-        KeyUp = null;
+        // Keyboard events and bindings are now managed by the Keyboard instance
+
         SizeChanging = null;
 
         Navigation = null;
-
-        KeyBindings.Clear ();
-        AddKeyBindings ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from

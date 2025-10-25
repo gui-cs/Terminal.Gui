@@ -16,7 +16,7 @@ public static class With
     /// <returns></returns>
     public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
     {
-        return new (() => new T (), width, height,testDriver,logWriter);
+        return new (() => new T (), width, height, testDriver, logWriter, Timeout);
     }
 
     /// <summary>
@@ -29,7 +29,7 @@ public static class With
     /// <returns></returns>
     public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, TestDriver testDriver)
     {
-        return new (toplevelFactory, width, height, testDriver);
+        return new (toplevelFactory, width, height, testDriver, null, Timeout);
     }
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.

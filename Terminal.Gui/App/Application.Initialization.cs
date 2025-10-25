@@ -63,7 +63,11 @@ public static partial class Application // Initialization (Init/Shutdown)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
-    internal static int MainThreadId { get; set; } = -1;
+    internal static int MainThreadId
+    {
+        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
+        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+    }
 
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
@@ -143,8 +147,6 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         Debug.Assert (Popover is null);
         Popover = new ();
-
-        AddKeyBindings ();
 
         try
         {
@@ -249,7 +251,11 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
     /// </para>
     /// </remarks>
-    public static bool Initialized { get; internal set; }
+    public static bool Initialized
+    {
+        get => ApplicationImpl.Instance.Initialized;
+        internal set => ApplicationImpl.Instance.Initialized = value;
+    }
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
