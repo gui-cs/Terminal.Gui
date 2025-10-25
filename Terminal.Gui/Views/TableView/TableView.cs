@@ -943,7 +943,7 @@ public class TableView : View, IDesignable
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
-        Driver?.AddStr (new (' ', Viewport.Width));
+        AddStr (new (' ', Viewport.Width));
 
         var line = 0;
 
@@ -1310,19 +1310,19 @@ public class TableView : View, IDesignable
             {
                 // invert the color of the current cell for the first character
                 SetAttribute (new (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
-                Driver?.AddRune ((Rune)render [0]);
+                AddRune ((Rune)render [0]);
 
                 if (render.Length > 1)
                 {
                     SetAttribute (cellAttribute);
-                    Driver?.AddStr (render.Substring (1));
+                    AddStr (render.Substring (1));
                 }
             }
         }
         else
         {
             SetAttribute (cellAttribute);
-            Driver?.AddStr (render);
+            AddStr (render);
         }
     }
 
@@ -1349,10 +1349,10 @@ public class TableView : View, IDesignable
     /// <returns></returns>
     internal int GetHeaderHeightIfAny () { return ShouldRenderHeaders () ? GetHeaderHeight () : 0; }
 
-    private void AddRuneAt (IConsoleDriver d, int col, int row, Rune ch)
+    private void AddRuneAt (int col, int row, Rune ch)
     {
         Move (col, row);
-        d?.AddRune (ch);
+        AddRune (ch);
     }
 
     /// <summary>
@@ -1534,14 +1534,14 @@ public class TableView : View, IDesignable
     /// <param name="width"></param>
     private void ClearLine (int row, int width)
     {
-        if (Driver is null)
+        if (ScreenRows == 0)
         {
             return;
         }
 
         Move (0, row);
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.AddStr (new (' ', width));
+        AddStr (new (' ', width));
     }
 
     private void ClearMultiSelectedRegions (bool keepToggledSelections)
@@ -1734,7 +1734,7 @@ public class TableView : View, IDesignable
                 }
             }
 
-            AddRuneAt (Driver, c, row, rune);
+            AddRuneAt (c, row, rune);
         }
     }
 
@@ -1762,7 +1762,7 @@ public class TableView : View, IDesignable
 
             Move (current.X, row);
 
-            Driver?.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
+            AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (Style.ExpandLastColumn == false && current.IsVeryLast)
             {
@@ -1810,9 +1810,9 @@ public class TableView : View, IDesignable
                 }
             }
 
-            if (Driver is { })
+            if (ScreenRows > 0)
             {
-                AddRuneAt (Driver, c, row, rune);
+                AddRuneAt (c, row, rune);
             }
         }
     }
@@ -1906,7 +1906,7 @@ public class TableView : View, IDesignable
                 }
             }
 
-            AddRuneAt (Driver, c, row, rune);
+            AddRuneAt (c, row, rune);
         }
     }
 
@@ -1934,7 +1934,7 @@ public class TableView : View, IDesignable
         }
 
         SetAttribute (attribute.Value);
-        Driver?.AddStr (new (' ', Viewport.Width));
+        AddStr (new (' ', Viewport.Width));
 
         // Render cells for each visible header for the current row
         for (var i = 0; i < columnsToRender.Length; i++)

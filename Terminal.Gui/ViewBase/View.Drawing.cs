@@ -269,7 +269,7 @@ public partial class View // Drawing APIs
         Rectangle toClear = FrameToScreen ();
 
         Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.FillRect (toClear);
+        FillRectScreen (toClear);
         SetAttribute (prev);
         SetNeedsDraw ();
     }
@@ -364,7 +364,7 @@ public partial class View // Drawing APIs
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        Driver.FillRect (toClear);
+        FillRectScreen (toClear);
 
         // context.AddDrawnRectangle (toClear);
 
@@ -655,10 +655,10 @@ public partial class View // Drawing APIs
                 if (p.Value is { })
                 {
                     SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
-                    Driver.Move (p.Key.X, p.Key.Y);
+                    MoveToScreen (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    Driver.AddRune (p.Value.Value.Rune);
+                    AddRune (p.Value.Value.Rune);
                 }
             }
 

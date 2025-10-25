@@ -697,7 +697,7 @@ public class MenuBar : View, IDesignable
     internal Point GetScreenOffset ()
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if (Driver is null)
+        if (ScreenRows == 0)
         {
             return Point.Empty;
         }
