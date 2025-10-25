@@ -847,7 +847,7 @@ internal sealed class Menu : View
                 continue;
             }
 
-            if (ViewportToScreen (Viewport).Y + i >= ScreenRows)
+            if (ViewportToScreen (Viewport).Y + i >= Application.Screen.Height)
             {
                 break;
             }
@@ -864,10 +864,10 @@ internal sealed class Menu : View
             if (item is null && BorderStyle != LineStyle.None)
             {
                 Point s = ViewportToScreen (new Point (-1, i));
-                MoveToScreen (s.X, s.Y);
+                Driver.Move (s.X, s.Y);
                 AddRune (Glyphs.LeftTee);
             }
-            else if (Frame.X < ScreenCols)
+            else if (Frame.X < Application.Screen.Width)
             {
                 Move (0, i);
             }
@@ -882,7 +882,7 @@ internal sealed class Menu : View
                     continue;
                 }
 
-                if (ViewportToScreen (Viewport).X + p >= ScreenCols)
+                if (ViewportToScreen (Viewport).X + p >= Application.Screen.Width)
                 {
                     break;
                 }
@@ -912,7 +912,7 @@ internal sealed class Menu : View
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
                     Point s = ViewportToScreen (new Point (Frame.Width - 2, i));
-                    MoveToScreen (s.X, s.Y);
+                    Driver.Move (s.X, s.Y);
                     AddRune (Glyphs.RightTee);
                 }
 
@@ -950,9 +950,9 @@ internal sealed class Menu : View
 
             Point screen = ViewportToScreen (new Point (0, i));
 
-            if (screen.X < ScreenCols)
+            if (screen.X < Application.Screen.Width)
             {
-                MoveToScreen (screen.X + 1, screen.Y);
+                Driver.Move (screen.X + 1, screen.Y);
 
                 if (!item.IsEnabled ())
                 {
@@ -991,15 +991,15 @@ internal sealed class Menu : View
                 int col = Frame.Width - l - 3;
                 screen = ViewportToScreen (new Point (col, i));
 
-                if (screen.X < ScreenCols)
+                if (screen.X < Application.Screen.Width)
                 {
-                    MoveToScreen (screen.X, screen.Y);
+                    Driver.Move (screen.X, screen.Y);
                     AddStr (item.Help);
 
                     // The shortcut tag string
                     if (!string.IsNullOrEmpty (item.ShortcutTag))
                     {
-                        MoveToScreen (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
+                        Driver.Move (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
                         AddStr (item.ShortcutTag);
                     }
                 }

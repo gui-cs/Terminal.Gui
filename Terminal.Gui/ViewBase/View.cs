@@ -130,12 +130,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
         set => _driver = value;
     }
 
-    /// <summary>Gets the height of the screen in rows. This is a convenience property for Views that need to know screen dimensions.</summary>
-    protected int ScreenRows => Driver?.Rows ?? 0;
-
-    /// <summary>Gets the width of the screen in columns. This is a convenience property for Views that need to know screen dimensions.</summary>
-    protected int ScreenCols => Driver?.Cols ?? 0;
-
     /// <summary>Gets the screen buffer contents. This is a convenience property for Views that need direct access to the screen buffer.</summary>
     protected Cell [,]? ScreenContents => Driver?.Contents;
 

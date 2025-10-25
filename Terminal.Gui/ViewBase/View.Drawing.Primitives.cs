@@ -25,17 +25,6 @@ public partial class View
         return true;
     }
 
-    /// <summary>
-    ///     Moves the drawing cursor to the specified screen-absolute location. This is a helper for Views that need
-    ///     to position the cursor at specific screen coordinates.
-    /// </summary>
-    /// <param name="screenCol">Screen-absolute column.</param>
-    /// <param name="screenRow">Screen-absolute row.</param>
-    protected void MoveToScreen (int screenCol, int screenRow)
-    {
-        Driver?.Move (screenCol, screenRow);
-    }
-
     /// <summary>Draws the specified character at the current draw position.</summary>
     /// <param name="rune">The Rune.</param>
     public void AddRune (Rune rune)
@@ -170,21 +159,6 @@ public partial class View
         Rectangle toClear = ViewportToScreen (rect);
         Driver.FillRect (toClear, rune);
         SetClip (prevClip);
-    }
-
-    /// <summary>Fills the specified screen-absolute rectangle. This is a helper for Views that need to fill specific screen areas.</summary>
-    /// <param name="rect">The screen-absolute rectangle to fill.</param>
-    protected void FillRectScreen (Rectangle rect)
-    {
-        Driver?.FillRect (rect);
-    }
-
-    /// <summary>Fills the specified screen-absolute rectangle with a rune. This is a helper for Views that need to fill specific screen areas.</summary>
-    /// <param name="rect">The screen-absolute rectangle to fill.</param>
-    /// <param name="rune">The rune to fill with.</param>
-    protected void FillRectScreen (Rectangle rect, Rune rune)
-    {
-        Driver?.FillRect (rect, rune);
     }
 
 }

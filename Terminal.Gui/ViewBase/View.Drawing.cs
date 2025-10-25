@@ -912,4 +912,19 @@ public partial class View // Drawing APIs
     }
 
     #endregion NeedsDraw
+
+    #region Internal Drawing Helpers
+
+    // These methods are for ViewBase classes only - View subclasses should use viewport-relative methods
+    internal void MoveToScreen (int screenCol, int screenRow)
+    {
+        Driver?.Move (screenCol, screenRow);
+    }
+
+    internal void FillRectScreen (Rectangle rect)
+    {
+        Driver?.FillRect (rect);
+    }
+
+    #endregion Internal Drawing Helpers
 }
