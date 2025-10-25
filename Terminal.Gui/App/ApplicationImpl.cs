@@ -326,13 +326,13 @@ public class ApplicationImpl : IApplication
             throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
-        Application.Top = view;
+        _top = view;
 
         RunState rs = Application.Begin (view);
 
-        Application.Top.Running = true;
+        _top.Running = true;
 
-        while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
+        while (_topLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
             if (_coordinator is null)
             {
@@ -352,15 +352,8 @@ public class ApplicationImpl : IApplication
         _coordinator?.Stop ();
         
         bool wasInitialized = _initialized;
-        Application.ResetState ();
-        ConfigurationManager.PrintJsonErrors ();
-
-        if (wasInitialized)
-        {
-            bool init = _initialized;
-            Application.OnInitializedChanged (this, new (in init));
-        }
-
+        
+        // Clear instance fields before calling ResetState
         _driver = null;
         _keyboard = null;
         _initialized = false;
@@ -368,6 +361,16 @@ public class ApplicationImpl : IApplication
         _popover = null;
         _top = null;
         _topLevels.Clear ();
+        
+        Application.ResetState ();
+        ConfigurationManager.PrintJsonErrors ();
+
+        if (wasInitialized)
+        {
+            bool init = false; // Always false after shutdown
+            Application.OnInitializedChanged (this, new (in init));
+        }
+
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
