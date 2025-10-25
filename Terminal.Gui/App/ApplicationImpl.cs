@@ -43,7 +43,7 @@ public class ApplicationImpl : IApplication
         {
             if (_mouse is null)
             {
-                _mouse = new Mouse { Application = this };
+                _mouse = new MouseImpl { Application = this };
             }
             return _mouse;
         }
@@ -61,7 +61,7 @@ public class ApplicationImpl : IApplication
         {
             if (_keyboard is null)
             {
-                _keyboard = new Keyboard { Application = this };
+                _keyboard = new KeyboardImpl { Application = this };
             }
             return _keyboard;
         }
@@ -180,7 +180,7 @@ public class ApplicationImpl : IApplication
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new Keyboard { Application = this };
+        _keyboard = new KeyboardImpl { Application = this };
 
         // Restore previously set keys if they existed and were different from defaults
         if (hasExistingKeyboard)

@@ -10,12 +10,12 @@ namespace Terminal.Gui.App;
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-internal class Mouse : IMouse
+internal class MouseImpl : IMouse
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Mouse"/> class.
+    ///     Initializes a new instance of the <see cref="MouseImpl"/> class.
     /// </summary>
-    public Mouse () { }
+    public MouseImpl () { }
 
     /// <inheritdoc/>
     public IApplication? Application { get; set; }

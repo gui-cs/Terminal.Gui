@@ -18,7 +18,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_LastMousePosition_InitiallyNull ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
 
         // Act & Assert
         Assert.Null (mouse.LastMousePosition);
@@ -32,7 +32,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_LastMousePosition_CanBeSetAndRetrieved (int x, int y)
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         Point testPosition = new (x, y);
 
         // Act
@@ -47,7 +47,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_IsMouseDisabled_DefaultsFalse ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
 
         // Act & Assert
         Assert.False (mouse.IsMouseDisabled);
@@ -59,7 +59,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_IsMouseDisabled_CanBeSetAndRetrieved (bool disabled)
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
 
         // Act
         mouse.IsMouseDisabled = disabled;
@@ -72,7 +72,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_CachedViewsUnderMouse_InitiallyEmpty ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
 
         // Act & Assert
         Assert.NotNull (mouse.CachedViewsUnderMouse);
@@ -87,7 +87,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_MouseEvent_CanSubscribeAndFire ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         var eventFired = false;
         MouseEventArgs capturedArgs = null;
 
@@ -117,7 +117,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_MouseEvent_CanUnsubscribe ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         var eventCount = 0;
 
         void Handler (object sender, MouseEventArgs args) => eventCount++;
@@ -148,7 +148,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_RaiseMouseEvent_WithDisabledMouse_DoesNotFireEvent ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         var eventFired = false;
 
         mouse.MouseEvent += (sender, args) => { eventFired = true; };
@@ -177,7 +177,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_RaiseMouseEvent_CorrectlyPassesFlags (MouseFlags flags)
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         MouseFlags? capturedFlags = null;
 
         mouse.MouseEvent += (sender, args) => { capturedFlags = args.Flags; };
@@ -204,7 +204,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_ResetState_ClearsCachedViews ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         View testView = new () { Width = 10, Height = 10 };
 
         mouse.CachedViewsUnderMouse.Add (testView);
@@ -223,7 +223,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_ResetState_ClearsEventHandlers ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         var eventCount = 0;
 
         mouse.MouseEvent += (sender, args) => eventCount++;
@@ -252,7 +252,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_ResetState_DoesNotClearLastMousePosition ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         Point testPosition = new (42, 84);
 
         mouse.LastMousePosition = testPosition;
@@ -272,8 +272,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_Instances_AreIndependent ()
     {
         // Arrange
-        Mouse mouse1 = new ();
-        Mouse mouse2 = new ();
+        MouseImpl mouse1 = new ();
+        MouseImpl mouse2 = new ();
 
         // Act
         mouse1.IsMouseDisabled = true;
@@ -288,10 +288,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_Events_AreIndependent ()
     {
         // Arrange
-        Mouse mouse1 = new ();
+        MouseImpl mouse1 = new ();
         var mouse1EventCount = 0;
 
-        Mouse mouse2 = new ();
+        MouseImpl mouse2 = new ();
         var mouse2EventCount = 0;
 
         mouse1.MouseEvent += (sender, args) => mouse1EventCount++;
@@ -315,8 +315,8 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_CachedViews_AreIndependent ()
     {
         // Arrange
-        Mouse mouse1 = new ();
-        Mouse mouse2 = new ();
+        MouseImpl mouse1 = new ();
+        MouseImpl mouse2 = new ();
 
         View view1 = new ();
         View view2 = new ();
@@ -345,7 +345,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_GrabMouse_SetsMouseGrabView ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         View testView = new ();
 
         // Act
@@ -359,7 +359,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_UngrabMouse_ClearsMouseGrabView ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         View testView = new ();
         mouse.GrabMouse (testView);
 
@@ -374,7 +374,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_GrabbingMouse_CanBeCanceled ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         View testView = new ();
         var eventFired = false;
 
@@ -396,7 +396,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_GrabbedMouse_EventFired ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         View testView = new ();
         var eventFired = false;
         View? eventView = null;
@@ -419,7 +419,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     public void Mouse_UnGrabbedMouse_EventFired ()
     {
         // Arrange
-        Mouse mouse = new ();
+        MouseImpl mouse = new ();
         View testView = new ();
         mouse.GrabMouse (testView);
 
