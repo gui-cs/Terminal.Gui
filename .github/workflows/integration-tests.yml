@@ -11,9 +11,45 @@ on:
       - '**.md'
       
 jobs:
-  build_and_test_debug:
-
+  build:
+    name: Build Solution
     runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+        dotnet-quality: 'ga'
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build IntegrationTests
+      run: dotnet build Tests/IntegrationTests --configuration Debug --no-restore
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-integration-${{ runner.os }}
+        path: |
+          **/bin/Debug/**
+          **/obj/Debug/**
+        retention-days: 1
+
+  integration_tests:
+    name: Integration Tests
+    runs-on: ${{ matrix.os }}
+    needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: true
@@ -32,12 +68,14 @@ jobs:
         dotnet-version: 8.x
         dotnet-quality: 'ga'
 
-    - name: Install dependencies
-      run: |
-        dotnet restore
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts-integration-${{ runner.os }}
+        path: .
 
-    - name: Build IntegrationTests
-      run: dotnet build Tests/IntegrationTests --configuration Debug --no-restore
+    - name: Restore NuGet packages
+      run: dotnet restore
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
