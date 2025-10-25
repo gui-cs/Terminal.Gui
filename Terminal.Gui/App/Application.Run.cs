@@ -446,7 +446,9 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
                 return;
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             firstIteration = RunIteration (ref state, firstIteration);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         if (MainLoop is { })
@@ -456,7 +458,9 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
+#pragma warning disable CS0618 // Type or member is obsolete
         RunIteration (ref state, firstIteration);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>Run one application iteration.</summary>
@@ -465,6 +469,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     Set to <see langword="true"/> if this is the first run loop iteration.
     /// </param>
     /// <returns><see langword="false"/> if at least one iteration happened.</returns>
+    [Obsolete ("This method uses the legacy MainLoop architecture. Use ApplicationImpl.Coordinator?.RunIteration() or AutoInitShutdownAttribute.RunIteration() in tests instead.")]
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         // If the driver has events pending do an iteration of the driver MainLoop

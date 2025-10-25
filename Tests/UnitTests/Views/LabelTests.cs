@@ -104,7 +104,7 @@ public class LabelTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (label);
         RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (label.TextFormatter.FillRemaining);
         Assert.False (tf1.FillRemaining);

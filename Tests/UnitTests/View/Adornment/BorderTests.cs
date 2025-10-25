@@ -231,7 +231,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
 
         AutoInitShutdownAttribute.FakeResize(new Size(width, 4));
-        Application.RunIteration (ref rs, false);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)

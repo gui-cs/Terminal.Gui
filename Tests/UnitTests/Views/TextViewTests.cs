@@ -4833,7 +4833,7 @@ This is the second line.
 
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
-        Application.RunIteration (ref rs, true);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (4, 0), _textView.CursorPosition);
 
         //                                             TAB to jump between text fields.

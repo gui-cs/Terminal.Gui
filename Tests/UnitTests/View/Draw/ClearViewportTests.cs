@@ -338,7 +338,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (root);
         RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        AutoInitShutdownAttribute.RunIteration ();
 
         if (label)
         {

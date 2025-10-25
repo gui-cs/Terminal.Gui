@@ -31,11 +31,10 @@ public class WizardTests ()
         wizard.Closed += (s, e) => { closedFired = true; };
 
         RunState runstate = Application.Begin (wizard);
-        var firstIteration = true;
-        Application.RunIteration (ref runstate, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.RunIteration (ref runstate, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Application.End (runstate);
         Assert.True (finishedFired);
         Assert.True (closedFired);
@@ -44,7 +43,6 @@ public class WizardTests ()
 
         // Same test, but with two steps
         wizard = new ();
-        firstIteration = false;
         step1 = new() { Title = "step1" };
         wizard.AddStep (step1);
         var step2 = new WizardStep { Title = "step2" };
@@ -57,7 +55,7 @@ public class WizardTests ()
         wizard.Closed += (s, e) => { closedFired = true; };
 
         runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (step1.Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
@@ -77,7 +75,6 @@ public class WizardTests ()
 
         // Same test, but with two steps but the 1st one disabled
         wizard = new ();
-        firstIteration = false;
         step1 = new() { Title = "step1" };
         wizard.AddStep (step1);
         step2 = new() { Title = "step2" };
@@ -91,7 +88,7 @@ public class WizardTests ()
         wizard.Closed += (s, e) => { closedFired = true; };
 
         runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
@@ -462,9 +459,8 @@ public class WizardTests ()
         wizard.AddStep (new() { Title = stepTitle });
 
         //wizard.LayoutSubViews ();
-        var firstIteration = false;
         RunState runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
 
         // TODO: Disabled until Dim.Auto is used in Dialog
         //DriverAsserts.AssertDriverContentsWithFrameAre (
