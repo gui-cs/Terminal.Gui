@@ -11,6 +11,8 @@ on:
       - '**.md'
       
 jobs:
+  # Build job runs once per platform and uploads build artifacts
+  # This allows test jobs to skip the build step and run in parallel
   build:
     name: Build Solution
     runs-on: ${{ matrix.os }}
@@ -44,8 +46,9 @@ jobs:
         path: |
           **/bin/Debug/**
           **/obj/Debug/**
-        retention-days: 1
+        retention-days: 1  # Keep artifacts for 1 day only to minimize storage costs
 
+  # Non-parallel unit tests depend on the build job and download its artifacts
   non_parallel_unittests:
     name: Non-Parallel Unit Tests  
     runs-on: ${{ matrix.os }}
@@ -101,6 +104,7 @@ jobs:
           logs/UnitTests    
           TestResults/UnitTests/
   
+  # Parallel unit tests depend on the build job and download its artifacts
   parallel_unittests:
     name: Parallel Unit Tests  
     runs-on: ${{ matrix.os }}
