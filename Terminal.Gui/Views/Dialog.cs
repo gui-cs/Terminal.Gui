@@ -139,25 +139,33 @@ public class Dialog : Window
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
+
     // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the
     // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute.
+    private bool _drawingText;
+
     /// <inheritdoc/>
     protected override bool OnDrawingText ()
     {
-        GettingAttributeForRole += GettingAttributeForRoleHandler;
-
+        _drawingText = true;
         return false;
     }
 
     /// <inheritdoc/>
-    protected override void OnDrewText () { GettingAttributeForRole -= GettingAttributeForRoleHandler; }
-
-    private void GettingAttributeForRoleHandler (object? sender, VisualRoleEventArgs e)
+    protected override void OnDrewText ()
     {
-        if (e.Role is VisualRole.Focus && Border?.Thickness != Thickness.Empty)
+        _drawingText = false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (_drawingText && role is VisualRole.Focus && Border?.Thickness != Thickness.Empty)
         {
-            e.Result = GetScheme ().Normal;
-            e.Handled = true;
+            currentAttribute = GetScheme ().Normal;
+            return true;
         }
+
+        return false;
     }
 }
