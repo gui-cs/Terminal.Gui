@@ -7,7 +7,11 @@ public static partial class Application // Driver abstractions
     internal static bool _forceFakeConsole;
 
     /// <summary>Gets the <see cref="IConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
-    public static IConsoleDriver? Driver { get; internal set; }
+    public static IConsoleDriver? Driver
+    {
+        get => ApplicationImpl.Instance.Driver;
+        internal set => ApplicationImpl.Instance.Driver = value;
+    }
 
     // BUGBUG: Force16Colors should be nullable.
     /// <summary>

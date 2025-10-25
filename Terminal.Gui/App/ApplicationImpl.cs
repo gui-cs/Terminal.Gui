@@ -17,6 +17,12 @@ public class ApplicationImpl : IApplication
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
     private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    private IConsoleDriver? _driver;
+    private bool _initialized;
+    private ApplicationPopover? _popover;
+    private ApplicationNavigation? _navigation;
+    private Toplevel? _top;
+    private readonly ConcurrentStack<Toplevel> _topLevels = new ();
 
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
@@ -58,43 +64,43 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public IConsoleDriver? Driver
     {
-        get => Application.Driver;
-        set => Application.Driver = value;
+        get => _driver;
+        set => _driver = value;
     }
 
     /// <inheritdoc/>
     public bool Initialized
     {
-        get => Application.Initialized;
-        set => Application.Initialized = value;
+        get => _initialized;
+        set => _initialized = value;
     }
 
     /// <inheritdoc/>
     public ApplicationPopover? Popover
     {
-        get => Application.Popover;
-        set => Application.Popover = value;
+        get => _popover;
+        set => _popover = value;
     }
 
     /// <inheritdoc/>
     public ApplicationNavigation? Navigation
     {
-        get => Application.Navigation;
-        set => Application.Navigation = value;
+        get => _navigation;
+        set => _navigation = value;
     }
 
     /// <inheritdoc/>
     public Toplevel? Top
     {
-        get => Application.Top;
-        set => Application.Top = value;
+        get => _top;
+        set => _top = value;
     }
 
     /// <inheritdoc/>
-    public ConcurrentStack<Toplevel> TopLevels => Application.TopLevels;
+    public ConcurrentStack<Toplevel> TopLevels => _topLevels;
 
     /// <inheritdoc/>
-    public void RequestStop () => Application.RequestStop ();
+    public void RequestStop () => RequestStop (null);
 
     /// <summary>
     /// Creates a new instance of the Application backend.
@@ -124,7 +130,7 @@ public class ApplicationImpl : IApplication
     [RequiresDynamicCode ("AOT")]
     public void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        if (Application.Initialized)
+        if (_initialized)
         {
             Logging.Logger.LogError ("Init called multiple times without shutdown, aborting.");
 
@@ -141,11 +147,11 @@ public class ApplicationImpl : IApplication
             _driverName = Application.ForceDriver;
         }
 
-        Debug.Assert(Application.Navigation is null);
-        Application.Navigation = new ();
+        Debug.Assert(_navigation is null);
+        _navigation = new ();
 
-        Debug.Assert (Application.Popover is null);
-        Application.Popover = new ();
+        Debug.Assert (_popover is null);
+        _popover = new ();
 
         // Preserve existing keyboard settings if they exist
         bool hasExistingKeyboard = _keyboard is not null;
@@ -172,7 +178,7 @@ public class ApplicationImpl : IApplication
 
         CreateDriver (driverName ?? _driverName);
 
-        Application.Initialized = true;
+        _initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
@@ -192,9 +198,9 @@ public class ApplicationImpl : IApplication
             _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
             _coordinator.StartAsync ().Wait ();
 
-            if (Application.Driver == null)
+            if (_driver == null)
             {
-                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+                throw new ("Driver was null even after booting MainLoopCoordinator");
             }
 
             return;
@@ -242,9 +248,9 @@ public class ApplicationImpl : IApplication
 
         _coordinator.StartAsync ().Wait ();
 
-        if (Application.Driver == null)
+        if (_driver == null)
         {
-            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+            throw new ("Driver was null even after booting MainLoopCoordinator");
         }
     }
 
@@ -291,7 +297,7 @@ public class ApplicationImpl : IApplication
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
-        if (!Application.Initialized)
+        if (!_initialized)
         {
             // Init() has NOT been called. Auto-initialize as per interface contract.
             Init (driver, null);
@@ -310,12 +316,12 @@ public class ApplicationImpl : IApplication
         Logging.Information ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
-        if (!Application.Initialized)
+        if (!_initialized)
         {
             throw new NotInitializedException (nameof (Run));
         }
 
-        if (Application.Driver == null)
+        if (_driver == null)
         {
             throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
@@ -345,18 +351,23 @@ public class ApplicationImpl : IApplication
     {
         _coordinator?.Stop ();
         
-        bool wasInitialized = Application.Initialized;
+        bool wasInitialized = _initialized;
         Application.ResetState ();
         ConfigurationManager.PrintJsonErrors ();
 
         if (wasInitialized)
         {
-            bool init = Application.Initialized;
+            bool init = _initialized;
             Application.OnInitializedChanged (this, new (in init));
         }
 
-        Application.Driver = null;
+        _driver = null;
         _keyboard = null;
+        _initialized = false;
+        _navigation = null;
+        _popover = null;
+        _top = null;
+        _topLevels.Clear ();
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
@@ -365,7 +376,7 @@ public class ApplicationImpl : IApplication
     {
         Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
 
-        top ??= Application.Top;
+        top ??= _top;
 
         if (top == null)
         {
@@ -414,7 +425,7 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public void LayoutAndDraw (bool forceDraw)
     {
-        Application.Top?.SetNeedsDraw();
-        Application.Top?.SetNeedsLayout ();
+        _top?.SetNeedsDraw();
+        _top?.SetNeedsLayout ();
     }
 }
