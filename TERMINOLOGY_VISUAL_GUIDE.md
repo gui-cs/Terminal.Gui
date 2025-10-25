@@ -1,438 +1,319 @@
 # Application.Run Terminology - Visual Guide
 
-This document provides visual representations of the Application execution lifecycle to clarify the terminology.
+## The Two Problems
 
-## Current Terminology (Confusing)
+### Problem 1: RunState Sounds Like State Data
 
-### The Problem: "Run" Everywhere
+```
+Current (Confusing):
+┌─────────────────────────────────────┐
+│  RunState rs = Begin(window);      │  ← "State"? What state does it hold?
+│                                     │
+│  Application.RunLoop(rs);           │
+│                                     │
+│  Application.End(rs);               │
+└─────────────────────────────────────┘
+
+Users think: "What state information does RunState contain?"
+Reality: It's a token/handle for the Begin/End pairing
+
+
+Proposed (Clear):
+┌─────────────────────────────────────┐
+│  RunToken token = Begin(window);    │  ✅ Clear: it's a token, not state
+│                                     │
+│  Application.RunLoop(token);        │
+│                                     │
+│  Application.End(token);            │
+└─────────────────────────────────────┘
+
+Users understand: "It's a token for the Begin/End pairing"
+```
+
+### Problem 2: EndAfterFirstIteration Confuses End() with Loop Control
+
+```
+Current (Confusing):
+┌──────────────────────────────────────────┐
+│  EndAfterFirstIteration = true;          │  ← "End"? Like End() method?
+│                                          │
+│  RunState rs = Begin(window);            │
+│                                          │
+│  RunLoop(rs);  // Stops after 1 iteration│
+│                                          │
+│  End(rs);      // This is "End"          │
+└──────────────────────────────────────────┘
+
+Users think: "Does EndAfterFirstIteration call End()?"
+Reality: It controls RunLoop() behavior, not End()
+
+
+Proposed (Clear):
+┌──────────────────────────────────────────┐
+│  StopAfterFirstIteration = true;         │  ✅ Clear: controls loop stopping
+│                                          │
+│  RunToken token = Begin(window);         │
+│                                          │
+│  RunLoop(token);  // Stops after 1 iter  │
+│                                          │
+│  End(token);      // Cleanup             │
+└──────────────────────────────────────────┘
+
+Users understand: "Stop controls the loop, End cleans up"
+```
+
+## Understanding RunLoop vs RunIteration
+
+**This distinction is valuable and should be preserved:**
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Application.Run()                     │  ← High-level API
+│                  RunLoop(token)                         │
 │                                                         │
-│  "Run" means the complete lifecycle                    │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-        ┌─────────────────────────────────┐
-        │   Application.Begin(toplevel)   │  ← "Begin" what?
-        │                                 │
-        │   Returns: RunState             │  ← Sounds like state data
-        └─────────────────────────────────┘
-                          │
-                          ▼
-        ┌─────────────────────────────────┐
-        │  Application.RunLoop(runState)  │  ← "Run" again? Run vs RunLoop?
-        │                                 │
-        │  ┌───────────────────────────┐ │
-        │  │ while (running)           │ │
-        │  │   RunIteration()          │ │  ← "Run" again? What's the difference?
-        │  │     ProcessInput()        │ │
-        │  │     Layout/Draw()         │ │
-        │  └───────────────────────────┘ │
-        └─────────────────────────────────┘
-                          │
-                          ▼
-        ┌─────────────────────────────────┐
-        │   Application.End(runState)     │  ← "End" what?
-        └─────────────────────────────────┘
-
-Issues:
-❌ "Run" appears 4 times meaning different things
-❌ RunState sounds like state, but it's a token
-❌ Begin/End don't clarify what's beginning/ending
-❌ RunLoop vs RunIteration relationship unclear
-```
-
-## Proposed Terminology - Option 1: Session-Based ⭐
-
-### The Solution: Clear, Explicit Names
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                   Application.Run()                     │  ← High-level (unchanged)
+│  Starts the driver's MainLoop                           │
+│  Loops until stopped:                                   │
 │                                                         │
-│  Complete lifecycle: Begin + ProcessEvents + End       │
+│  ┌────────────────────────────────────────────────┐    │
+│  │  while (toplevel.Running)                      │    │
+│  │  {                                             │    │
+│  │      RunIteration(ref token);  ←──────────┐    │    │
+│  │      RunIteration(ref token);  ←──────────┤    │    │
+│  │      RunIteration(ref token);  ←──────────┤    │    │
+│  │      ...                                  │    │    │
+│  │  }                                        │    │    │
+│  └────────────────────────────────────────────────┘    │
+│                                                         │
 └─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-        ┌─────────────────────────────────────┐
-        │ Application.BeginSession(toplevel)  │  ✅ Clear: starting a session
-        │                                     │
-        │ Returns: ToplevelSession            │  ✅ Clear: it's a session token
-        └─────────────────────────────────────┘
-                          │
-                          ▼
-        ┌─────────────────────────────────────┐
-        │ Application.ProcessEvents(session)  │  ✅ Clear: processing events
-        │                                     │
-        │  ┌──────────────────────────────┐  │
-        │  │ while (running)              │  │
-        │  │   ProcessEventsIteration()   │  │  ✅ Clear: one iteration of processing
-        │  │     ProcessInput()           │  │
-        │  │     Layout/Draw()            │  │
-        │  └──────────────────────────────┘  │
-        └─────────────────────────────────────┘
-                          │
-                          ▼
-        ┌─────────────────────────────────────┐
-        │  Application.EndSession(session)    │  ✅ Clear: ending the session
-        └─────────────────────────────────────┘
+                                                  │
+                                                  │
+                                    ┌─────────────▼───────────────┐
+                                    │  RunIteration(ref token)    │
+                                    │                             │
+                                    │  Processes ONE iteration:   │
+                                    │   1. Process driver events  │
+                                    │   2. Layout (if needed)     │
+                                    │   3. Draw (if needed)       │
+                                    │                             │
+                                    │  Returns immediately        │
+                                    └─────────────────────────────┘
 
-Benefits:
-✅ "Session" clearly indicates bounded execution
-✅ "ProcessEvents" describes the action
-✅ BeginSession/EndSession are unambiguous
-✅ Terminology is consistent and clear
+Key Insight: 
+- RunLoop = The LOOP itself (blocking, manages iterations)
+- RunIteration = ONE iteration (immediate, processes events)
 ```
 
-## Lifecycle Comparison
-
-### Application Lifecycle (Init/Shutdown) vs Session Lifecycle (Begin/ProcessEvents/End)
+## Complete Lifecycle Visualization
 
 ```
-┌────────────────────────── Application Lifetime ──────────────────────────┐
-│                                                                           │
-│  Application.Init()          ← Initialize once per application           │
-│      ├─ Create driver                                                    │
-│      ├─ Initialize screen                                                │
-│      └─ Setup subsystems                                                 │
-│                                                                           │
-│  ┌──────────────────────── Session 1 ────────────────────────┐          │
-│  │  Application.BeginSession(window1) → session1             │          │
-│  │      ├─ Initialize window1                                │          │
-│  │      ├─ Layout window1                                    │          │
-│  │      └─ Draw window1                                      │          │
-│  │                                                            │          │
-│  │  Application.ProcessEvents(session1)                      │          │
-│  │      └─ Event loop until RequestStop()                    │          │
-│  │                                                            │          │
-│  │  Application.EndSession(session1)                         │          │
-│  │      └─ Cleanup window1                                   │          │
-│  └────────────────────────────────────────────────────────────┘          │
-│                                                                           │
-│  ┌──────────────────────── Session 2 ────────────────────────┐          │
-│  │  Application.BeginSession(dialog) → session2              │          │
-│  │  Application.ProcessEvents(session2)                      │          │
-│  │  Application.EndSession(session2)                         │          │
-│  └────────────────────────────────────────────────────────────┘          │
-│                                                                           │
-│  Application.Shutdown()      ← Cleanup once per application              │
-│      ├─ Dispose driver                                                   │
-│      └─ Restore terminal                                                 │
-│                                                                           │
-└───────────────────────────────────────────────────────────────────────────┘
-
-Key Insight: Multiple sessions within one application lifetime
-```
-
-## Event Flow During ProcessEvents
-
-### Current (Confusing)
-
-```
-RunLoop(runState)
-    │
-    └─> while (toplevel.Running)
-            │
-            ├─> RunIteration(runState)    ← What's the difference?
-            │       │
-            │       ├─> MainLoop.RunIteration()
-            │       │       └─> Process driver events
-            │       │
-            │       ├─> Layout (if needed)
-            │       └─> Draw (if needed)
-            │
-            └─> (repeat)
-```
-
-### Proposed (Clear)
-
-```
-ProcessEvents(session)
-    │
-    └─> while (toplevel.Running)
-            │
-            ├─> ProcessEventsIteration(session)  ✅ Clear: one iteration of event processing
-            │       │
-            │       ├─> MainLoop.RunIteration()
-            │       │       └─> Process driver events
-            │       │
-            │       ├─> Layout (if needed)
-            │       └─> Draw (if needed)
-            │
-            └─> (repeat)
+Application.Run(window)
+┌───────────────────────────────────────────────────────┐
+│                                                       │
+│  1. Begin(window) → RunToken                          │
+│     ┌─────────────────────────────────┐              │
+│     │ • Initialize window             │              │
+│     │ • Layout views                  │              │
+│     │ • Draw to screen                │              │
+│     └─────────────────────────────────┘              │
+│                                                       │
+│  2. RunLoop(token)                                    │
+│     ┌─────────────────────────────────┐              │
+│     │ Start driver's MainLoop         │              │
+│     │                                 │              │
+│     │ while (Running) {               │              │
+│     │   RunIteration(ref token)       │              │
+│     │     ├─ Process events           │              │
+│     │     ├─ Layout (if needed)       │              │
+│     │     └─ Draw (if needed)         │              │
+│     │ }                               │              │
+│     │                                 │              │
+│     │ Exits when:                     │              │
+│     │  - RequestStop() called         │              │
+│     │  - StopAfterFirstIteration=true │              │
+│     └─────────────────────────────────┘              │
+│                                                       │
+│  3. End(token)                                        │
+│     ┌─────────────────────────────────┐              │
+│     │ • Cleanup window                │              │
+│     │ • Dispose token                 │              │
+│     └─────────────────────────────────┘              │
+│                                                       │
+└───────────────────────────────────────────────────────┘
 ```
 
 ## Manual Control Pattern
 
-When you need fine-grained control over the event loop:
-
-### Current (Confusing)
+When you need fine-grained control:
 
 ```
-RunState rs = Begin(toplevel);        ← Begin what?
-EndAfterFirstIteration = true;        ← End what?
+┌────────────────────────────────────────────┐
+│  RunToken token = Begin(window);           │
+│  StopAfterFirstIteration = true;           │  ✅ Clear: stop after one iter
+│                                            │
+│  while (!myCondition)                      │
+│  {                                         │
+│      // Process one iteration              │
+│      RunIteration(ref token, first);       │
+│      first = false;                        │
+│                                            │
+│      // Your custom logic here             │
+│      DoCustomProcessing();                 │
+│  }                                         │
+│                                            │
+│  End(token);                               │
+└────────────────────────────────────────────┘
 
-while (!done)
-{
-    RunIteration(ref rs, first);      ← Run what? How does this relate to RunLoop?
-    first = false;
-    
-    // Custom processing
-    DoMyCustomStuff();
-}
+vs Old (Confusing):
 
-End(rs);                              ← End what?
-```
-
-### Proposed (Clear)
-
-```
-ToplevelSession session = BeginSession(toplevel);     ✅ Clear: starting a session
-StopAfterFirstIteration = true;                       ✅ Clear: stop after one iteration
-
-while (!done)
-{
-    ProcessEventsIteration(ref session, first);       ✅ Clear: process one iteration
-    first = false;
-    
-    // Custom processing
-    DoMyCustomStuff();
-}
-
-EndSession(session);                                  ✅ Clear: ending the session
+┌────────────────────────────────────────────┐
+│  RunState rs = Begin(window);              │
+│  EndAfterFirstIteration = true;            │  ❌ Confusing: sounds like End()
+│                                            │
+│  while (!myCondition)                      │
+│  {                                         │
+│      RunIteration(ref rs, first);          │
+│      first = false;                        │
+│      DoCustomProcessing();                 │
+│  }                                         │
+│                                            │
+│  End(rs);                                  │
+└────────────────────────────────────────────┘
 ```
 
 ## RequestStop Flow
 
-### Current
-
 ```
 User Action (e.g., Quit Key)
-    │
-    ▼
-Application.RequestStop(toplevel)
-    │
-    ▼
-Sets toplevel.Running = false
-    │
-    ▼
-RunLoop detects !Running
-    │
-    ▼
-RunLoop exits
-    │
-    ▼
-Application.End() cleans up
+        │
+        ▼
+┌────────────────────────┐
+│  RequestStop(window)   │  ✅ Keep: "Request" is clear
+└────────────────────────┘
+        │
+        ▼
+┌────────────────────────┐
+│  window.Running=false  │
+└────────────────────────┘
+        │
+        ▼
+┌────────────────────────┐
+│  RunLoop exits         │
+└────────────────────────┘
+        │
+        ▼
+┌────────────────────────┐
+│  End() cleans up       │
+└────────────────────────┘
 ```
 
-### Proposed (Same flow, clearer names)
+## What We're Keeping
 
 ```
-User Action (e.g., Quit Key)
-    │
-    ▼
-Application.StopProcessingEvents(toplevel)    ✅ Clear: stops event processing
-    │
-    ▼
-Sets toplevel.Running = false
-    │
-    ▼
-ProcessEvents detects !Running
-    │
-    ▼
-ProcessEvents exits
-    │
-    ▼
-Application.EndSession() cleans up
+✅ KEEP AS-IS:
+
+Begin/End
+┌──────────────────┐     ┌──────────────────┐
+│  Begin(window)   │ ... │  End(token)      │
+└──────────────────┘     └──────────────────┘
+     ↑                           ↑
+     │                           │
+  Clear, concise          Clear, concise
+  Not wordy               Not wordy
+  
+
+RequestStop
+┌─────────────────────┐
+│  RequestStop()      │
+└─────────────────────┘
+         ↑
+         │
+  "Request" appropriately
+  conveys non-blocking
+
+
+RunLoop / RunIteration
+┌─────────────────┐     ┌──────────────────┐
+│  RunLoop()      │     │  RunIteration()  │
+│  (the loop)     │     │  (one iteration) │
+└─────────────────┘     └──────────────────┘
+         ↑                       ↑
+         │                       │
+    Distinction is important and valuable
 ```
 
-## Nested Sessions (Modal Dialogs)
+## Side-by-Side Summary
 
 ```
-┌────────────── Main Window Session ──────────────┐
-│                                                  │
-│  session1 = BeginSession(mainWindow)            │
-│                                                  │
-│  ProcessEvents(session1) starts...              │
-│      │                                           │
-│      │  User clicks "Open Dialog" button        │
-│      │                                           │
-│      ├─> ┌──────── Dialog Session ──────┐      │
-│      │   │                               │      │
-│      │   │  session2 = BeginSession(dialog)     │
-│      │   │                               │      │
-│      │   │  ProcessEvents(session2)      │      │
-│      │   │  (blocks until dialog closes) │      │
-│      │   │                               │      │
-│      │   │  EndSession(session2)         │      │
-│      │   │                               │      │
-│      │   └───────────────────────────────┘      │
-│      │                                           │
-│      │  (returns to main window)                │
-│      │                                           │
-│  ...ProcessEvents continues                     │
-│                                                  │
-│  EndSession(session1)                           │
-│                                                  │
-└──────────────────────────────────────────────────┘
-
-Key Insight: Sessions can be nested (modal dialogs)
+╔═══════════════════════════════════╦═══════════════════════════════════╗
+║          CURRENT                  ║          PROPOSED                 ║
+╠═══════════════════════════════════╬═══════════════════════════════════╣
+║  RunState rs = Begin(window);     ║  RunToken token = Begin(window);  ║
+║  EndAfterFirstIteration = true;   ║  StopAfterFirstIteration = true;  ║
+║  RunLoop(rs);                     ║  RunLoop(token);                  ║
+║  End(rs);                         ║  End(token);                      ║
+║                                   ║                                   ║
+║  ❌ "State" misleading            ║  ✅ "Token" clear                 ║
+║  ❌ "End" confuses with End()     ║  ✅ "Stop" aligns with RequestStop║
+╚═══════════════════════════════════╩═══════════════════════════════════╝
 ```
 
-## Complete Example Flow
-
-### Simple Application
+## Terminology Mapping
 
 ```
-START
-  │
-  ├─> Application.Init()                     [Application Lifecycle]
-  │       └─> Initialize driver, screen
-  │
-  ├─> window = new Window()
-  │
-  ├─> Application.Run(window)                [High-level API]
-  │       │
-  │       ├─> BeginSession(window)           [Session begins]
-  │       │       └─> Initialize, layout, draw
-  │       │
-  │       ├─> ProcessEvents(session)         [Event processing]
-  │       │       └─> Loop until stopped
-  │       │
-  │       └─> EndSession(session)            [Session ends]
-  │               └─> Cleanup
-  │
-  ├─> window.Dispose()
-  │
-  └─> Application.Shutdown()                 [Application Lifecycle]
-          └─> Restore terminal
-END
-```
+CHANGE (2 names):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RunState                 →  RunToken
+EndAfterFirstIteration   →  StopAfterFirstIteration
 
-### Application with Manual Control
 
-```
-START
-  │
-  ├─> Application.Init()
-  │
-  ├─> window = new Window()
-  │
-  ├─> session = Application.BeginSession(window)    [Manual Session Control]
-  │       └─> Initialize, layout, draw
-  │
-  ├─> Application.StopAfterFirstIteration = true
-  │
-  ├─> while (!done)                                 [Custom Event Loop]
-  │       │
-  │       ├─> Application.ProcessEventsIteration(ref session, first)
-  │       │       └─> Process one iteration
-  │       │
-  │       ├─> DoCustomProcessing()
-  │       │
-  │       └─> first = false
-  │
-  ├─> Application.EndSession(session)               [Manual Session Control]
-  │       └─> Cleanup
-  │
-  ├─> window.Dispose()
-  │
-  └─> Application.Shutdown()
-END
-```
-
-## Terminology Mapping Summary
-
-### API Name Changes
-
-```
-CURRENT                          PROPOSED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Application.Run()           →    Application.Run()                    (unchanged)
-
-RunState                    →    ToplevelSession                     ✅ Clear: session token
-
-Application.Begin()         →    Application.BeginSession()          ✅ Clear: begin a session
-
-Application.RunLoop()       →    Application.ProcessEvents()         ✅ Clear: processes events
-
-Application.RunIteration()  →    Application.ProcessEventsIteration() ✅ Clear: one iteration
-
-Application.End()           →    Application.EndSession()            ✅ Clear: end the session
-
-Application.RequestStop()   →    Application.StopProcessingEvents()  ✅ Clear: stops processing
-
-EndAfterFirstIteration      →    StopAfterFirstIteration            ✅ Consistent naming
-
-NotifyNewRunState          →    NotifyNewSession                   ✅ Consistent naming
-
-NotifyStopRunState         →    NotifyStopSession                  ✅ Consistent naming
-
-RunStateEventArgs          →    ToplevelSessionEventArgs           ✅ Consistent naming
+KEEP UNCHANGED:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Begin                    →  Begin              ✅
+End                      →  End                ✅
+RequestStop              →  RequestStop        ✅
+RunLoop                  →  RunLoop            ✅
+RunIteration             →  RunIteration       ✅
+Run                      →  Run                ✅
 ```
 
 ## Benefits Visualized
 
-### Before: Confusion
-
 ```
-User thinks:
-"What's the difference between Run, RunLoop, and RunIteration?"
-"Is RunState storing state or just a handle?"
-"What am I Beginning and Ending?"
+Before:
+┌─────────────────────────────────────────┐
+│  Users think:                           │
+│  • "What state does RunState hold?"     │
+│  • "Does EndAfterFirstIteration call    │
+│     End()?"                             │
+│                                         │
+│  Result: Confusion, questions           │
+└─────────────────────────────────────────┘
 
-         ┌─────────────┐
-         │    Run()    │  ← What does "Run" mean exactly?
-         └─────────────┘
-                │
-         ┌─────────────┐
-         │   Begin()   │  ← Begin what?
-         └─────────────┘
-                │
-         ┌─────────────┐
-         │  RunLoop()  │  ← Is this the same as Run?
-         └─────────────┘
-                │
-         ┌─────────────┐
-         │    End()    │  ← End what?
-         └─────────────┘
-
-Result: User confusion, slower learning curve
+After:
+┌─────────────────────────────────────────┐
+│  Users understand:                      │
+│  • "RunToken is a token"                │
+│  • "StopAfterFirstIteration controls    │
+│     the loop"                           │
+│                                         │
+│  Result: Clear, self-documenting        │
+└─────────────────────────────────────────┘
 ```
 
-### After: Clarity
+## Summary
 
-```
-User understands:
-"Run() does the complete lifecycle"
-"BeginSession/EndSession manage a session"
-"ProcessEvents processes events until stopped"
-"ToplevelSession is a token for the session"
+**2 Changes Only:**
+- `RunState` → `RunToken` (clear it's a token)
+- `EndAfterFirstIteration` → `StopAfterFirstIteration` (clear it controls loop)
 
-         ┌─────────────────┐
-         │     Run()       │  ✅ Complete lifecycle
-         └─────────────────┘
-                │
-         ┌─────────────────┐
-         │ BeginSession()  │  ✅ Start a session
-         └─────────────────┘
-                │
-         ┌─────────────────┐
-         │ ProcessEvents() │  ✅ Process events
-         └─────────────────┘
-                │
-         ┌─────────────────┐
-         │  EndSession()   │  ✅ End the session
-         └─────────────────┘
+**Everything Else Stays:**
+- `Begin` / `End` - Clear and concise
+- `RequestStop` - Appropriately non-blocking
+- `RunLoop` / `RunIteration` - Valuable distinction
 
-Result: Clear understanding, faster learning curve
-```
+**Result:**
+- ✅ Addresses confusion at the source
+- ✅ Minimal disruption (2 names)
+- ✅ Preserves what works well
+- ✅ Respects maintainer feedback
 
-## See Also
-
-- [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) - Full proposal with rationale
-- [TERMINOLOGY_QUICK_REFERENCE.md](TERMINOLOGY_QUICK_REFERENCE.md) - Quick comparison tables
-- [TERMINOLOGY_INDUSTRY_COMPARISON.md](TERMINOLOGY_INDUSTRY_COMPARISON.md) - Industry patterns
+See [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) for complete analysis.

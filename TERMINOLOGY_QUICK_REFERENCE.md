@@ -1,258 +1,202 @@
-# Application Run Terminology - Quick Reference
+# Application.Run Terminology - Quick Reference
 
-## Current State (Confusing)
+## The Problem
 
-```
-Application.Run(toplevel)
-  ├─ Application.Begin(toplevel) → RunState
-  ├─ Application.RunLoop(RunState)
-  │   └─ Application.RunIteration()
-  └─ Application.End(RunState)
-```
+Current terminology has two specific issues:
 
-**Problems:**
-- "Run" means too many things (lifecycle, loop, method names)
-- "RunState" sounds like state data, but it's a token
-- "Begin/End" - begin/end what?
-- "RunLoop" vs "RunIteration" - relationship unclear
+1. **`RunState`** sounds like state data, but it's actually a token/handle
+2. **`EndAfterFirstIteration`** uses "End" but controls loop behavior, not lifecycle
 
-## Proposed (Clear) - Option 1: Session-Based ⭐
+## Recommended Solution
 
-```
-Application.Run(toplevel)  // High-level API (unchanged)
-  ├─ Application.BeginSession(toplevel) → ToplevelSession
-  ├─ Application.ProcessEvents(ToplevelSession)
-  │   └─ Application.ProcessEventsIteration()
-  └─ Application.EndSession(ToplevelSession)
-```
+### Minimal Changes
 
-**Benefits:**
-- "Session" clearly indicates bounded execution period
-- "ProcessEvents" describes what the loop does
-- "BeginSession/EndSession" are unambiguous pairs
-- "ToplevelSession" clearly indicates a session token
+| Current | Proposed | Why |
+|---------|----------|-----|
+| `RunState` | `RunToken` | Clear it's a token, not state data |
+| `EndAfterFirstIteration` | `StopAfterFirstIteration` | "Stop" aligns with `RequestStop`, clearly about loop control |
 
-## Proposed (Clear) - Option 2: Modal/Show
+### Keep Unchanged
 
-```
-Application.ShowModal(toplevel)  // or keep Run()
-  ├─ Application.Activate(toplevel) → ToplevelHandle
-  ├─ Application.EventLoop(ToplevelHandle)
-  │   └─ Application.ProcessEvents()
-  └─ Application.Deactivate(ToplevelHandle)
-```
+| API | Why It Works |
+|-----|--------------|
+| `Begin` / `End` | Clear, concise lifecycle pairing |
+| `RequestStop` | "Request" appropriately conveys non-blocking |
+| `RunLoop` / `RunIteration` | Distinction is important: RunLoop starts the driver's mainloop, RunIteration processes one iteration |
 
-**Benefits:**
-- Aligns with WPF/WinForms patterns
-- "Activate/Deactivate" are familiar GUI concepts
-- "EventLoop" is industry standard terminology
-
-## Proposed (Clear) - Option 3: Lifecycle
-
-```
-Application.Run(toplevel)
-  ├─ Application.Start(toplevel) → ExecutionContext
-  ├─ Application.Execute(ExecutionContext)
-  │   └─ Application.Tick()
-  └─ Application.Stop(ExecutionContext)
-```
-
-**Benefits:**
-- Explicit lifecycle phases (Start → Execute → Stop)
-- "Tick" is familiar from game development
-- Simple, clear verbs
-
-## Side-by-Side Comparison
-
-| Concept | Current | Option 1 (Session) ⭐ | Option 2 (Modal) | Option 3 (Lifecycle) |
-|---------|---------|---------------------|------------------|---------------------|
-| Complete lifecycle | `Run()` | `Run()` | `ShowModal()` or `Run()` | `Run()` |
-| Session token | `RunState` | `ToplevelSession` | `ToplevelHandle` | `ExecutionContext` |
-| Initialize | `Begin()` | `BeginSession()` | `Activate()` | `Start()` |
-| Event loop | `RunLoop()` | `ProcessEvents()` | `EventLoop()` | `Execute()` |
-| One iteration | `RunIteration()` | `ProcessEventsIteration()` | `ProcessEvents()` | `Tick()` |
-| Cleanup | `End()` | `EndSession()` | `Deactivate()` | `Stop()` |
-| Stop loop | `RequestStop()` | `StopProcessingEvents()` | `Close()` or `RequestStop()` | `RequestStop()` |
-| Stop mode flag | `EndAfterFirstIteration` | `StopAfterFirstIteration` | `SingleIteration` | `StopAfterFirstTick` |
-
-## Usage Examples
-
-### High-Level (All Options - Unchanged)
-
-```csharp
-// Simple case - most users use this
-Application.Init();
-Application.Run(myWindow);
-Application.Shutdown();
-```
-
-### Low-Level - Current (Confusing)
-
-```csharp
-Application.Init();
-
-RunState runState = Application.Begin(myWindow);  // Begin what?
-Application.RunLoop(runState);                     // Run vs RunLoop?
-Application.End(runState);                         // End what?
-
-Application.Shutdown();
-```
-
-### Low-Level - Option 1: Session-Based ⭐
-
-```csharp
-Application.Init();
-
-ToplevelSession session = Application.BeginSession(myWindow);  // Clear: starting a session
-Application.ProcessEvents(session);                             // Clear: processing events
-Application.EndSession(session);                                // Clear: ending the session
-
-Application.Shutdown();
-```
-
-### Low-Level - Option 2: Modal/Show
-
-```csharp
-Application.Init();
-
-ToplevelHandle handle = Application.Activate(myWindow);  // Clear: activating for display
-Application.EventLoop(handle);                           // Clear: running event loop
-Application.Deactivate(handle);                          // Clear: deactivating
-
-Application.Shutdown();
-```
-
-### Low-Level - Option 3: Lifecycle
-
-```csharp
-Application.Init();
-
-ExecutionContext context = Application.Start(myWindow);  // Clear: starting execution
-Application.Execute(context);                            // Clear: executing
-Application.Stop(context);                               // Clear: stopping
-
-Application.Shutdown();
-```
-
-## Manual Event Loop Control
+## Usage Comparison
 
 ### Current (Confusing)
 
 ```csharp
-RunState rs = Application.Begin(myWindow);
-Application.EndAfterFirstIteration = true;
-
-while (!done)
-{
-    Application.RunIteration(ref rs, firstIteration);  // What's RunIteration vs RunLoop?
-    firstIteration = false;
-    // Do custom processing...
-}
-
+// What is RunState? State data or a handle?
+RunState rs = Application.Begin(window);
+Application.RunLoop(rs);
 Application.End(rs);
+
+// Does this call End()? No, it controls RunLoop()
+Application.EndAfterFirstIteration = true;
 ```
 
-### Option 1: Session-Based (Clear) ⭐
+### Proposed (Clear)
 
 ```csharp
-ToplevelSession session = Application.BeginSession(myWindow);
+// Clearly a token, not state data
+RunToken token = Application.Begin(window);
+Application.RunLoop(token);
+Application.End(token);
+
+// Clearly controls loop stopping, aligns with RequestStop
 Application.StopAfterFirstIteration = true;
-
-while (!done)
-{
-    Application.ProcessEventsIteration(ref session, firstIteration);  // Clear: process one iteration
-    firstIteration = false;
-    // Do custom processing...
-}
-
-Application.EndSession(session);
 ```
 
-### Option 2: Modal/Show (Clear)
+## Understanding RunLoop vs RunIteration
+
+**Important distinction to preserve:**
+
+```
+RunLoop(token):          RunIteration(token):
+┌──────────────────┐     ┌──────────────────┐
+│ Starts driver's  │     │ Processes ONE    │
+│ MainLoop         │     │ iteration:       │
+│                  │     │  - Events        │
+│ Loops calling:   │     │  - Layout        │
+│  RunIteration()  │     │  - Draw          │
+│  RunIteration()  │     │                  │
+│  ...             │     │ Returns          │
+│                  │     │ immediately      │
+│ Until stopped    │     │                  │
+└──────────────────┘     └──────────────────┘
+```
+
+This distinction is valuable and should be kept.
+
+## Complete API Overview
+
+```
+Application.Run(window)        ← High-level: complete lifecycle
+  ├─ Application.Begin(window) → RunToken
+  │    └─ Initialize, layout, draw
+  ├─ Application.RunLoop(token)
+  │    └─ Loop: while(running) { RunIteration() }
+  └─ Application.End(token)
+       └─ Cleanup
+
+Application.RunIteration(ref token) ← Low-level: one iteration
+
+Application.RequestStop()       ← Signal loop to stop
+Application.StopAfterFirstIteration ← Mode: stop after 1 iteration
+```
+
+## Alternative Options Considered
+
+### For RunState
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **RunToken** ⭐ | Clear, concise | New term |
+| ExecutionContext | Industry standard | Longer |
+| RunHandle | Clear | Win32-ish |
+
+### For EndAfterFirstIteration
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **StopAfterFirstIteration** ⭐ | Aligns with RequestStop | Slightly longer |
+| SingleIteration | Shorter | Less obvious |
+| RunLoopOnce | Explicit | Awkward |
+
+## Migration Example
+
+### Backward Compatible Migration
 
 ```csharp
-ToplevelHandle handle = Application.Activate(myWindow);
-Application.SingleIteration = true;
+// Old code continues to work with obsolete warnings
+[Obsolete("Use RunToken instead")]
+public class RunState { ... }
 
-while (!done)
-{
-    Application.ProcessEvents(ref handle, firstIteration);  // Clear: process events
-    firstIteration = false;
-    // Do custom processing...
+[Obsolete("Use StopAfterFirstIteration instead")]
+public static bool EndAfterFirstIteration 
+{ 
+    get => StopAfterFirstIteration;
+    set => StopAfterFirstIteration = value;
 }
 
-Application.Deactivate(handle);
+// New code uses clearer names
+public class RunToken { ... }
+public static bool StopAfterFirstIteration { get; set; }
 ```
 
-### Option 3: Lifecycle (Clear)
+### User Migration
 
 ```csharp
-ExecutionContext context = Application.Start(myWindow);
-Application.StopAfterFirstTick = true;
+// Before
+RunState rs = Application.Begin(window);
+Application.EndAfterFirstIteration = true;
+Application.RunLoop(rs);
+Application.End(rs);
 
-while (!done)
-{
-    Application.Tick(ref context, firstIteration);  // Clear: one tick
-    firstIteration = false;
-    // Do custom processing...
-}
-
-Application.Stop(context);
+// After (simple find/replace)
+RunToken token = Application.Begin(window);
+Application.StopAfterFirstIteration = true;
+Application.RunLoop(token);
+Application.End(token);
 ```
 
-## Recommendation: Option 1 (Session-Based)
+## Why These Changes?
 
-**Why Session-Based wins:**
-1. ✅ Most accurate - "session" perfectly describes bounded execution
-2. ✅ Least disruptive - keeps Begin/End pattern, just clarifies it
-3. ✅ Most descriptive - "ProcessEvents" is clearer than "RunLoop"
-4. ✅ Industry standard - "session" is widely understood in software
-5. ✅ Extensible - easy to add session-related features later
+### RunState → RunToken
 
-**Implementation:**
-- Add new APIs alongside existing ones
-- Mark old APIs `[Obsolete]` with helpful messages
-- Update docs to use new terminology
-- Maintain backward compatibility indefinitely
+**Problem:** Users see "State" and think it holds state data. They ask:
+- "What state does it hold?"
+- "Can I query the state?"
+- "Is it like a state machine?"
 
-## Related Concepts
+**Solution:** "Token" clearly indicates it's an identity/handle for Begin/End pairing, like `CancellationToken`.
 
-### Application Lifecycle
+### EndAfterFirstIteration → StopAfterFirstIteration
 
-```
-Application.Init()           // Initialize the application
-  ├─ Create driver
-  ├─ Setup screen
-  └─ Initialize subsystems
+**Problem:** Users see "End" and think of `End()` method. They ask:
+- "Does this call `End()`?"
+- "Why is it called 'End' when it controls the loop?"
 
-Application.Run(toplevel)    // Run a toplevel (modal)
-  ├─ BeginSession
-  ├─ ProcessEvents
-  └─ EndSession
+**Solution:** "Stop" aligns with `RequestStop` and clearly indicates loop control, not lifecycle cleanup.
 
-Application.Shutdown()       // Shutdown the application
-  ├─ Cleanup resources
-  └─ Restore terminal
-```
+## What We're NOT Changing
 
-### Session vs Application Lifecycle
+### Begin / End
 
-| Application Lifecycle | Session Lifecycle |
-|----------------------|-------------------|
-| `Init()` - Once per app | `BeginSession()` - Per toplevel |
-| `Run()` - Can have multiple | `ProcessEvents()` - Within one session |
-| `Shutdown()` - Once per app | `EndSession()` - Per toplevel |
+✅ **Keep as-is** - Clear, concise lifecycle pairing
+- Not wordy
+- Industry standard pattern (BeginInvoke/EndInvoke, etc.)
+- Works well
 
-## Events and Notifications
+### RequestStop
 
-| Current | Proposed (Option 1) |
-|---------|---------------------|
-| `NotifyNewRunState` | `NotifyNewSession` |
-| `NotifyStopRunState` | `NotifyStopSession` |
-| `RunStateEventArgs` | `ToplevelSessionEventArgs` |
+✅ **Keep as-is** - Appropriately conveys non-blocking nature
+- "Request" indicates it doesn't block
+- Clear about what it does
+- Works well
 
-## See Also
+### RunLoop / RunIteration
 
-- [Full Proposal Document](TERMINOLOGY_PROPOSAL.md) - Detailed rationale and analysis
-- [Migration Guide](docs/migration-guide.md) - How to update your code (TODO)
-- [API Reference](docfx/api/Terminal.Gui.App.Application.yml) - API documentation
+✅ **Keep as-is** - Distinction is important and understood
+- RunLoop = starts the driver's mainloop (blocking)
+- RunIteration = processes one iteration (immediate)
+- The distinction is valuable
+- "Run" prefix is OK when the difference is clear
+
+## Summary
+
+**Changes (2 names only):**
+- `RunState` → `RunToken`
+- `EndAfterFirstIteration` → `StopAfterFirstIteration`
+
+**Benefits:**
+- ✅ Addresses the two primary sources of confusion
+- ✅ Minimal disruption
+- ✅ Backward compatible
+- ✅ Respects maintainer feedback
+- ✅ Preserves what works well
+
+See [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) for detailed analysis.
