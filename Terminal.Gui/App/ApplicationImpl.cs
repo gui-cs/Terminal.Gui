@@ -440,6 +440,9 @@ public class ApplicationImpl : IApplication
         
         bool wasInitialized = _initialized;
         
+        // Reset Screen before calling Application.ResetState to avoid circular reference
+        ResetScreen ();
+        
         // Call ResetState FIRST so it can properly dispose Popover and other resources
         // that are accessed via Application.* static properties that now delegate to instance fields
         Application.ResetState ();

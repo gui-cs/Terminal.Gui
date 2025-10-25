@@ -233,7 +233,8 @@ public static partial class Application
         }
 
         // Reset Screen to null so it will be recalculated on next access
-        // This is done by accessing the ApplicationImpl instance directly
+        // Note: ApplicationImpl.Shutdown() also calls ResetScreen() before calling this method
+        // to avoid potential circular reference issues. Calling it twice is harmless.
         if (ApplicationImpl.Instance is ApplicationImpl impl)
         {
             impl.ResetScreen ();
