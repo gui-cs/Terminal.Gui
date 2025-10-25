@@ -40,8 +40,11 @@ jobs:
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
-    - name: Build Release Terminal.Gui first
+    - name: Build Release Terminal.Gui
       run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force
+
+    - name: Pack Release Terminal.Gui
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages
 
     - name: Restore AOT and Self-Contained projects
       run: |
@@ -51,7 +54,12 @@ jobs:
     - name: Restore Solution Packages
       run: dotnet restore
 
-    - name: Build Release
+    - name: Build Release AOT and Self-Contained
+      run: |
+        dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release
+        dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release
+
+    - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore
 
     - name: Upload build artifacts
