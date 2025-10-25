@@ -232,7 +232,13 @@ public static partial class Application
             Driver = null;
         }
 
-        _screen = null;
+        // Reset Screen to null so it will be recalculated on next access
+        // Note: ApplicationImpl.Shutdown() also calls ResetScreen() before calling this method
+        // to avoid potential circular reference issues. Calling it twice is harmless.
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl.ResetScreen ();
+        }
 
         // Don't reset ForceDriver; it needs to be set before Init is called.
         //ForceDriver = string.Empty;
