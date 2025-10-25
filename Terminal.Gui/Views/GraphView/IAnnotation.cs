@@ -18,7 +18,7 @@ public interface IAnnotation
 
     /// <summary>
     ///     Called once after series have been rendered (or before if <see cref="BeforeSeries"/> is true). Use
-    ///     <see cref="View.Driver"/> to draw and <see cref="View.Viewport"/> to avoid drawing outside of graph
+    ///     methods like <see cref="View.AddStr(string)"/> and <see cref="View.AddRune(Rune)"/> to draw and <see cref="View.Viewport"/> to avoid drawing outside of graph
     /// </summary>
     /// <param name="graph"></param>
     void Render (GraphView graph);
