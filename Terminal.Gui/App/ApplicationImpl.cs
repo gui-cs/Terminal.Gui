@@ -23,6 +23,7 @@ public class ApplicationImpl : IApplication
     private ApplicationNavigation? _navigation;
     private Toplevel? _top;
     private readonly ConcurrentStack<Toplevel> _topLevels = new ();
+    private int _mainThreadId = -1;
 
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
@@ -98,6 +99,15 @@ public class ApplicationImpl : IApplication
 
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels => _topLevels;
+
+    /// <summary>
+    /// Gets or sets the main thread ID for the application.
+    /// </summary>
+    internal int MainThreadId
+    {
+        get => _mainThreadId;
+        set => _mainThreadId = value;
+    }
 
     /// <inheritdoc/>
     public void RequestStop () => RequestStop (null);
@@ -184,7 +194,7 @@ public class ApplicationImpl : IApplication
         Application.SubscribeDriverEvents ();
 
         SynchronizationContext.SetSynchronizationContext (new ());
-        Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
+        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
     }
 
     private void CreateDriver (string? driverName)
@@ -366,6 +376,7 @@ public class ApplicationImpl : IApplication
         _popover = null;
         _top = null;
         _topLevels.Clear ();
+        _mainThreadId = -1;
 
         if (wasInitialized)
         {
@@ -403,7 +414,7 @@ public class ApplicationImpl : IApplication
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (_mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
             return;

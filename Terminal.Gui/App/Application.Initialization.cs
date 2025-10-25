@@ -63,7 +63,11 @@ public static partial class Application // Initialization (Init/Shutdown)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
-    internal static int MainThreadId { get; set; } = -1;
+    internal static int MainThreadId
+    {
+        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
+        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+    }
 
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
