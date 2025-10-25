@@ -353,7 +353,12 @@ public class ApplicationImpl : IApplication
         
         bool wasInitialized = _initialized;
         
-        // Clear instance fields before calling ResetState
+        // Call ResetState FIRST so it can properly dispose Popover and other resources
+        // that are accessed via Application.* static properties that now delegate to instance fields
+        Application.ResetState ();
+        ConfigurationManager.PrintJsonErrors ();
+        
+        // Clear instance fields after ResetState has disposed everything
         _driver = null;
         _keyboard = null;
         _initialized = false;
@@ -361,9 +366,6 @@ public class ApplicationImpl : IApplication
         _popover = null;
         _top = null;
         _topLevels.Clear ();
-        
-        Application.ResetState ();
-        ConfigurationManager.PrintJsonErrors ();
 
         if (wasInitialized)
         {
