@@ -3,39 +3,52 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Implementation of core <see cref="Application"/> methods using the modern
-/// main loop architecture with component factories for different platforms.
+///     Implementation of core <see cref="Application"/> methods using the modern
+///     main loop architecture with component factories for different platforms.
 /// </summary>
 public class ApplicationImpl : IApplication
 {
-    private readonly IComponentFactory? _componentFactory;
-    private IMainLoopCoordinator? _coordinator;
-    private string? _driverName;
-    private readonly ITimedEvents _timedEvents = new TimedEvents ();
-
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
 
     /// <summary>
-    /// Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
-    /// Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    ///     Creates a new instance of the Application backend.
     /// </summary>
-    public static IApplication Instance => _lazyInstance.Value;
+    public ApplicationImpl () { }
+
+    internal ApplicationImpl (IComponentFactory componentFactory)
+    {
+        _componentFactory = componentFactory;
+    }
+
+    private readonly IComponentFactory? _componentFactory;
+    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    private string? _driverName;
 
     /// <inheritdoc/>
     public ITimedEvents? TimedEvents => _timedEvents;
 
-    internal IMainLoopCoordinator? Coordinator => _coordinator;
+    private IMouse? _mouse;
 
     /// <summary>
-    /// Handles which <see cref="View"/> (if any) has captured the mouse
+    /// Handles mouse event state and processing.
     /// </summary>
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+    public IMouse Mouse
+    {
+        get
+        {
+            if (_mouse is null)
+            {
+                _mouse = new MouseImpl { Application = this };
+            }
+            return _mouse;
+        }
+        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
+    }
 
     private IKeyboard? _keyboard;
 
@@ -48,7 +61,7 @@ public class ApplicationImpl : IApplication
         {
             if (_keyboard is null)
             {
-                _keyboard = new Keyboard { Application = this };
+                _keyboard = new KeyboardImpl { Application = this };
             }
             return _keyboard;
         }
@@ -83,6 +96,7 @@ public class ApplicationImpl : IApplication
         set => Application.Navigation = value;
     }
 
+    // TODO: Create an IViewHierarchy that encapsulates Top and TopLevels and LayoutAndDraw
     /// <inheritdoc/>
     public Toplevel? Top
     {
@@ -93,30 +107,38 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels => Application.TopLevels;
 
-    /// <inheritdoc/>
-    public void RequestStop () => Application.RequestStop ();
-
-    /// <summary>
-    /// Creates a new instance of the Application backend.
-    /// </summary>
-    public ApplicationImpl ()
+    /// <inheritdoc />
+    public void LayoutAndDraw (bool forceRedraw = false)
     {
-    }
+        List<View> tops = [.. TopLevels];
 
-    internal ApplicationImpl (IComponentFactory componentFactory)
-    {
-        _componentFactory = componentFactory;
-    }
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
+        }
 
-    /// <summary>
-    /// Change the singleton implementation, should not be called except before application
-    /// startup. This method lets you provide alternative implementations of core static gateway
-    /// methods of <see cref="Application"/>.
-    /// </summary>
-    /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication newApplication)
-    {
-        _lazyInstance = new Lazy<IApplication> (newApplication);
+        // BUGBUG: Application.Screen needs to be moved to IApplication
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Application.Screen.Size);
+
+        // BUGBUG: Application.ClearScreenNextIteration needs to be moved to IApplication
+        if (Application.ClearScreenNextIteration)
+        {
+            forceRedraw = true;
+            // BUGBUG: Application.Screen needs to be moved to IApplication
+            Application.ClearScreenNextIteration = false;
+        }
+
+        if (forceRedraw)
+        {
+            Driver?.ClearContents ();
+        }
+
+        View.SetClipToScreen ();
+        View.Draw (tops, neededLayout || forceRedraw);
+        View.SetClipToScreen ();
+        Driver?.Refresh ();
     }
 
     /// <inheritdoc/>
@@ -141,12 +163,13 @@ public class ApplicationImpl : IApplication
             _driverName = Application.ForceDriver;
         }
 
-        Debug.Assert(Application.Navigation is null);
+        Debug.Assert (Application.Navigation is null);
         Application.Navigation = new ();
 
         Debug.Assert (Application.Popover is null);
         Application.Popover = new ();
 
+        // TODO: Move this into IKeyboard and Keyboard implementation
         // Preserve existing keyboard settings if they exist
         bool hasExistingKeyboard = _keyboard is not null;
         Key existingQuitKey = _keyboard?.QuitKey ?? Key.Esc;
@@ -157,7 +180,7 @@ public class ApplicationImpl : IApplication
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new Keyboard { Application = this };
+        _keyboard = new KeyboardImpl { Application = this };
 
         // Restore previously set keys if they existed and were different from defaults
         if (hasExistingKeyboard)
@@ -179,92 +202,6 @@ public class ApplicationImpl : IApplication
 
         SynchronizationContext.SetSynchronizationContext (new ());
         Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
-    }
-
-    private void CreateDriver (string? driverName)
-    {
-        // When running unit tests, always use FakeDriver unless explicitly specified
-        if (ConsoleDriver.RunningUnitTests && 
-            string.IsNullOrEmpty (driverName) && 
-            _componentFactory is null)
-        {
-            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-            _coordinator.StartAsync ().Wait ();
-
-            if (Application.Driver == null)
-            {
-                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
-            }
-
-            return;
-        }
-
-        PlatformID p = Environment.OSVersion.Platform;
-
-        // Check component factory type first - this takes precedence over driverName
-        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
-        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
-        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-
-        // Then check driverName
-        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false);
-        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
-
-        // Decide which driver to use - component factory type takes priority
-        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
-        {
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-        }
-        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
-        {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-        }
-        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
-        {
-            _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
-        }
-        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
-        {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-        }
-        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-        {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-        }
-        else
-        {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-        }
-
-        _coordinator.StartAsync ().Wait ();
-
-        if (Application.Driver == null)
-        {
-            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
-        }
-    }
-
-    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
-    {
-        ConcurrentQueue<T> inputBuffer = new ();
-        ApplicationMainLoop<T> loop = new ();
-
-        IComponentFactory<T> cf;
-
-        if (_componentFactory is IComponentFactory<T> typedFactory)
-        {
-            cf = typedFactory;
-        }
-        else
-        {
-            cf = fallbackFactory ();
-        }
-
-        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 
     /// <summary>
@@ -294,11 +231,12 @@ public class ApplicationImpl : IApplication
         if (!Application.Initialized)
         {
             // Init() has NOT been called. Auto-initialize as per interface contract.
-            Init (driver, null);
+            Init (driver);
         }
 
         T top = new ();
         Run (top, errorHandler);
+
         return top;
     }
 
@@ -317,7 +255,7 @@ public class ApplicationImpl : IApplication
 
         if (Application.Driver == null)
         {
-            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
+            throw new InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
         Application.Top = view;
@@ -328,23 +266,23 @@ public class ApplicationImpl : IApplication
 
         while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
-            if (_coordinator is null)
+            if (Coordinator is null)
             {
                 throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
             }
 
-            _coordinator.RunIteration ();
+            Coordinator.RunIteration ();
         }
 
-        Logging.Information ($"Run - Calling End");
+        Logging.Information ("Run - Calling End");
         Application.End (rs);
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     public void Shutdown ()
     {
-        _coordinator?.Stop ();
-        
+        Coordinator?.Stop ();
+
         bool wasInitialized = Application.Initialized;
         Application.ResetState ();
         ConfigurationManager.PrintJsonErrors ();
@@ -360,10 +298,10 @@ public class ApplicationImpl : IApplication
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void RequestStop (Toplevel? top)
     {
-        Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
+        Logging.Logger.LogInformation ($"RequestStop '{(top is { } ? top : "null")}'");
 
         top ??= Application.Top;
 
@@ -383,38 +321,138 @@ public class ApplicationImpl : IApplication
         top.Running = false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
+    public void RequestStop () => Application.RequestStop ();
+
+
+    /// <inheritdoc/>
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
         if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
+
             return;
         }
 
-        _timedEvents.Add (TimeSpan.Zero,
-                              () =>
-                              {
-                                  action ();
-                                  return false;
-                              }
-                             );
+        _timedEvents.Add (
+                          TimeSpan.Zero,
+                          () =>
+                          {
+                              action ();
+
+                              return false;
+                          }
+                         );
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool IsLegacy => false;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
-    /// <inheritdoc />
-    public void LayoutAndDraw (bool forceDraw)
+    /// <summary>
+    ///     Change the singleton implementation, should not be called except before application
+    ///     startup. This method lets you provide alternative implementations of core static gateway
+    ///     methods of <see cref="Application"/>.
+    /// </summary>
+    /// <param name="newApplication"></param>
+    public static void ChangeInstance (IApplication newApplication) { _lazyInstance = new (newApplication); }
+
+    /// <summary>
+    ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
+    ///     Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    /// </summary>
+    public static IApplication Instance => _lazyInstance.Value;
+
+    internal IMainLoopCoordinator? Coordinator { get; private set; }
+
+    private void CreateDriver (string? driverName)
     {
-        Application.Top?.SetNeedsDraw();
-        Application.Top?.SetNeedsLayout ();
+        // When running unit tests, always use FakeDriver unless explicitly specified
+        if (ConsoleDriver.RunningUnitTests && string.IsNullOrEmpty (driverName) && _componentFactory is null)
+        {
+            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
+            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            Coordinator.StartAsync ().Wait ();
+
+            if (Application.Driver == null)
+            {
+                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+            }
+
+            return;
+        }
+
+        PlatformID p = Environment.OSVersion.Platform;
+
+        // Check component factory type first - this takes precedence over driverName
+        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
+        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
+        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
+
+        // Then check driverName
+        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsDotNet = driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
+
+        // Decide which driver to use - component factory type takes priority
+        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
+        {
+            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+        }
+        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
+        {
+            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+        }
+        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
+        {
+            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+        }
+        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
+        {
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        {
+            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+        }
+        else
+        {
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+
+        Coordinator.StartAsync ().Wait ();
+
+        if (Application.Driver == null)
+        {
+            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+        }
+    }
+
+    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
+    {
+        ConcurrentQueue<T> inputBuffer = new ();
+        ApplicationMainLoop<T> loop = new ();
+
+        IComponentFactory<T> cf;
+
+        if (_componentFactory is IComponentFactory<T> typedFactory)
+        {
+            cf = typedFactory;
+        }
+        else
+        {
+            cf = fallbackFactory ();
+        }
+
+        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 }

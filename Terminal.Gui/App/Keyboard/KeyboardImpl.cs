@@ -11,7 +11,7 @@ namespace Terminal.Gui.App;
 ///         See <see cref="IKeyboard"/> for usage details.
 ///     </para>
 /// </summary>
-internal class Keyboard : IKeyboard
+internal class KeyboardImpl : IKeyboard
 {
     private Key _quitKey = Key.Esc; // Resources/config.json overrides
     private Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
@@ -106,7 +106,7 @@ internal class Keyboard : IKeyboard
     /// <summary>
     ///     Initializes keyboard bindings.
     /// </summary>
-    public Keyboard ()
+    public KeyboardImpl ()
     {
         AddKeyBindings ();
     }
