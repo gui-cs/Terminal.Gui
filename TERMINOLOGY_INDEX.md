@@ -13,7 +13,20 @@ Quick overview of the proposal with key recommendations in a table format. Best 
 - Migration strategy overview
 - Quick code examples
 
-### 2. [TERMINOLOGY_BEFORE_AFTER.md](TERMINOLOGY_BEFORE_AFTER.md) 📊 **See the Difference**
+### 2. [TERMINOLOGY_DIAGRAMS.md](TERMINOLOGY_DIAGRAMS.md) 📊 **Visual Diagrams**
+Mermaid diagrams visualizing the proposal, relationships, and migration path.
+
+**Contents:**
+- Current vs Proposed terminology comparison
+- Stack relationship diagrams
+- Before/After naming patterns
+- .NET pattern consistency
+- View hierarchy and run stack
+- Usage flow examples
+- Evolution path timeline
+- Migration phases Gantt chart
+
+### 3. [TERMINOLOGY_BEFORE_AFTER.md](TERMINOLOGY_BEFORE_AFTER.md) 📝 **Code Examples**
 Side-by-side comparisons showing how the new terminology improves code clarity.
 
 **Contents:**
@@ -23,7 +36,7 @@ Side-by-side comparisons showing how the new terminology improves code clarity.
 - Consistency with .NET patterns
 - Summary comparison table
 
-### 3. [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) 📖 **Full Details**
+### 4. [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) 📖 **Full Details**
 Complete, comprehensive proposal with all analysis, rationale, and implementation details.
 
 **Contents:**
@@ -59,6 +72,7 @@ Complete, comprehensive proposal with all analysis, rationale, and implementatio
 **If you want to...**
 
 - 📋 **Get the gist quickly**: Read [TERMINOLOGY_PROPOSAL_SUMMARY.md](TERMINOLOGY_PROPOSAL_SUMMARY.md)
+- 🎨 **See visual diagrams**: Read [TERMINOLOGY_DIAGRAMS.md](TERMINOLOGY_DIAGRAMS.md)
 - 👀 **See concrete examples**: Read [TERMINOLOGY_BEFORE_AFTER.md](TERMINOLOGY_BEFORE_AFTER.md)
 - 🔍 **Understand all details**: Read [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md)
 - 💡 **Implement the changes**: See implementation checklist in [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md)

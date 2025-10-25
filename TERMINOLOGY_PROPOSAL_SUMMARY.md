@@ -54,6 +54,9 @@ var focused = Application.Current.MostFocused;
 
 ## See Also
 
+- [Visual Diagrams](TERMINOLOGY_DIAGRAMS.md) - Mermaid diagrams visualizing the proposal
 - [Full Proposal Document](TERMINOLOGY_PROPOSAL.md) - Complete analysis and implementation details
+- [Before/After Examples](TERMINOLOGY_BEFORE_AFTER.md) - Side-by-side code comparisons
+- [Documentation Index](TERMINOLOGY_INDEX.md) - Navigation guide
 - Issue #4329 - Original issue requesting terminology improvements
 - Issue #2491 - Toplevel refactoring and `IRunnable` interface work
