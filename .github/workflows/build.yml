@@ -40,10 +40,16 @@ jobs:
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
+    - name: Build Release Terminal.Gui first
+      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force
+
     - name: Restore AOT and Self-Contained projects
       run: |
         dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
         dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
+
+    - name: Restore Solution Packages
+      run: dotnet restore
 
     - name: Build Release
       run: dotnet build --configuration Release --no-restore
