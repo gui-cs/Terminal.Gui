@@ -20,8 +20,8 @@ public class WizardTests ()
     public void Finish_Button_Closes ()
     {
         // https://github.com/gui-cs/Terminal.Gui/issues/1833
-        var wizard = new Wizard ();
-        var step1 = new WizardStep { Title = "step1" };
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "step1" };
         wizard.AddStep (step1);
 
         var finishedFired = false;
@@ -45,7 +45,7 @@ public class WizardTests ()
         wizard = new ();
         step1 = new() { Title = "step1" };
         wizard.AddStep (step1);
-        var step2 = new WizardStep { Title = "step2" };
+        WizardStep step2 = new () { Title = "step2" };
         wizard.AddStep (step2);
 
         finishedFired = false;
@@ -455,7 +455,7 @@ public class WizardTests ()
                 Glyphs.LRCornerDbl
             }";
 
-        var wizard = new Wizard { Title = title, Width = width, Height = height };
+        Wizard wizard = new () { Title = title, Width = width, Height = height };
         wizard.AddStep (new() { Title = stepTitle });
 
         //wizard.LayoutSubViews ();

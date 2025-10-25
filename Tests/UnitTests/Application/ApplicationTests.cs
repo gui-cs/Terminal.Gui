@@ -584,7 +584,7 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        var top = new Toplevel ();
+        Toplevel top = new ();
         RunState rs = Application.Begin (top);
 
         var actionCalled = 0;

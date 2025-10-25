@@ -222,7 +222,7 @@ public class BorderTests (ITestOutputHelper output)
     [InlineData (10)]
     public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width)
     {
-        var win = new Window
+        Window win = new ()
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };

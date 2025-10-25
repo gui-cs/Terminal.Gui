@@ -4813,7 +4813,7 @@ This is the second line.
     public void Selected_Text_Shows ()
     {
         // Proves #3022 is fixed (TextField selected text does not show in v2)
-        var top = new Toplevel ();
+        Toplevel top = new ();
         top.Add (_textView);
         RunState rs = Application.Begin (top);
 
