@@ -13,7 +13,7 @@ namespace TerminalGuiFluentTesting;
 public class GuiTestContext : IDisposable
 {
     private readonly CancellationTokenSource _cts = new ();
-    private readonly CancellationTokenSource _hardStop = new (With.Timeout);
+    private readonly CancellationTokenSource _hardStop;
     private readonly Task _runTask;
     private Exception? _ex;
     private readonly FakeOutput _output = new ();
@@ -25,9 +25,12 @@ public class GuiTestContext : IDisposable
     private readonly TestDriver _driver;
     private bool _finished;
     private readonly FakeSizeMonitor _fakeSizeMonitor;
+    private readonly TimeSpan _timeout;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
+        _timeout = timeout ?? TimeSpan.FromSeconds (30);
+        _hardStop = new (_timeout);
         // Remove frame limit
         Application.MaximumIterationsPerSecond = ushort.MaxValue;
 
@@ -104,7 +107,7 @@ public class GuiTestContext : IDisposable
                              _cts.Token);
 
         // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
+        if (!booting.WaitAsync (_timeout).Result)
         {
             throw new TimeoutException ("Application failed to start within the allotted time.");
         }
@@ -440,7 +443,7 @@ public class GuiTestContext : IDisposable
 
         while (!condition ())
         {
-            if (sw.Elapsed > With.Timeout)
+            if (sw.Elapsed > _timeout)
             {
                 throw new TimeoutException ("Failed to reach condition within the time limit");
             }
