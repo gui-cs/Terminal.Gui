@@ -367,7 +367,7 @@ public class ApplicationImpl : IApplication
 
         if (wasInitialized)
         {
-            bool init = false; // Always false after shutdown
+            bool init = _initialized; // Will be false after clearing fields above
             Application.OnInitializedChanged (this, new (in init));
         }
 
