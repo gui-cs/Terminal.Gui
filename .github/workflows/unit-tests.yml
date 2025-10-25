@@ -11,9 +11,14 @@ on:
       - '**.md'
       
 jobs:
+  # Call the build workflow to build the solution once
+  build:
+    uses: ./.github/workflows/build.yml
+
   non_parallel_unittests:
     name: Non-Parallel Unit Tests  
     runs-on: ${{ matrix.os }}
+    needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: true
@@ -32,12 +37,14 @@ jobs:
         dotnet-version: 8.x
         dotnet-quality: 'ga'
 
-    - name: Install dependencies
-      run: |
-        dotnet restore
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: .
 
-    - name: Build Solution Debug
-      run: dotnet build --configuration Debug --no-restore
+    - name: Restore NuGet packages
+      run: dotnet restore
 
 # Test
     # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
@@ -66,6 +73,7 @@ jobs:
   parallel_unittests:
     name: Parallel Unit Tests  
     runs-on: ${{ matrix.os }}
+    needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: true
@@ -84,12 +92,14 @@ jobs:
         dotnet-version: 8.x
         dotnet-quality: 'ga'
 
-    - name: Install dependencies
-      run: |
-        dotnet restore
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: .
 
-    - name: Build Solution Debug
-      run: dotnet build --configuration Debug --no-restore
+    - name: Restore NuGet packages
+      run: dotnet restore
 
 # Test
     # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
