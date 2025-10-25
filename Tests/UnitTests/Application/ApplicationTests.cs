@@ -586,11 +586,10 @@ public class ApplicationTests
     {
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
-        var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.RunIteration (ref rs, firstIteration);
+        ApplicationImpl.Instance.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
