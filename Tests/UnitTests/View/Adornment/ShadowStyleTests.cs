@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class ShadowStyleTests (ITestOutputHelper output)
 {
@@ -160,7 +160,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 }

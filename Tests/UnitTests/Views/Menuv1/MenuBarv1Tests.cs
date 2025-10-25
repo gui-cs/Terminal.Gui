@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 public class MenuBarv1Tests (ITestOutputHelper output)
@@ -2578,11 +2578,11 @@ Edit
 
             if (i is < 0 or > 0)
             {
-                Assert.Equal (menu, Application.MouseGrabHandler.MouseGrabView);
+                Assert.Equal (menu, Application.Mouse.MouseGrabView);
             }
             else
             {
-                Assert.Equal (menuBar, Application.MouseGrabHandler.MouseGrabView);
+                Assert.Equal (menuBar, Application.Mouse.MouseGrabView);
             }
 
             Assert.Equal ("_Edit", miCurrent.Parent.Title);

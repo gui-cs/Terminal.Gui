@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui.ViewMouseTests;
+namespace UnitTests.ViewMouseTests;
 
 [Trait ("Category", "Input")]
 public class GetViewsUnderLocationTests

@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class SchemeManagerTests
 {
@@ -956,4 +956,43 @@ public class SchemeManagerTests
 
         Disable (true);
     }
+
+
+    [Fact]
+    public void AddScheme_Adds_And_Updates_Scheme ()
+    {
+        // Arrange
+        var scheme = new Scheme (new Attribute (Color.Red, Color.Green));
+        string schemeName = "CustomScheme";
+
+        // Act
+        SchemeManager.AddScheme (schemeName, scheme);
+
+        // Assert
+        Assert.Equal (scheme, SchemeManager.GetScheme (schemeName));
+
+        // Update the scheme
+        var updatedScheme = new Scheme (new Attribute (Color.Blue, Color.Yellow));
+        SchemeManager.AddScheme (schemeName, updatedScheme);
+
+        Assert.Equal (updatedScheme, SchemeManager.GetScheme (schemeName));
+
+        // Cleanup
+        SchemeManager.RemoveScheme (schemeName);
+    }
+
+    [Fact]
+    public void RemoveScheme_Removes_Custom_Scheme ()
+    {
+        var scheme = new Scheme (new Attribute (Color.Red, Color.Green));
+        string schemeName = "RemovableScheme";
+        SchemeManager.AddScheme (schemeName, scheme);
+
+        Assert.Equal (scheme, SchemeManager.GetScheme (schemeName));
+
+        SchemeManager.RemoveScheme (schemeName);
+
+        Assert.Throws<KeyNotFoundException> (() => SchemeManager.GetScheme (schemeName));
+    }
+
 }

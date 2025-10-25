@@ -2,7 +2,7 @@
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Pos;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class PosViewTests (ITestOutputHelper output)
 {

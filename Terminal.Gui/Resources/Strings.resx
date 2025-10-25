@@ -195,7 +195,7 @@
     <value>Enter Path</value>
   </data>
   <data name="fdSearchCaption" xml:space="preserve">
-    <value>Enter Search</value>
+    <value>Find</value>
   </data>
   <data name="fdSize" xml:space="preserve">
     <value>Size</value>
@@ -354,5 +354,9 @@
   </data>
   <data name="cmd.New.Help" xml:space="preserve">
     <value>New file</value>
+  </data>
+  <data name="fdTree" xml:space="preserve">
+    <value>_Tree</value>
+    <comment>Show/Hide Tree View</comment>
   </data>
 </root>

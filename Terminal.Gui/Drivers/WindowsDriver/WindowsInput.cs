@@ -61,6 +61,11 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 
     protected override bool Peek ()
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return false;
+        }
+
         const int bufferSize = 1; // We only need to check if there's at least one event
         nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
 

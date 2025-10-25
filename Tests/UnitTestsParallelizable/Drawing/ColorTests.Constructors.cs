@@ -1,4 +1,4 @@
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public partial class ColorTests
 {
