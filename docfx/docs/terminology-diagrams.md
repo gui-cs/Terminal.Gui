@@ -320,7 +320,7 @@ The proposed terminology (`Application.Current` and `Application.RunStack`) prov
 ---
 
 **See also:**
-- [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) - Complete detailed proposal
-- [TERMINOLOGY_PROPOSAL_SUMMARY.md](TERMINOLOGY_PROPOSAL_SUMMARY.md) - Quick reference
-- [TERMINOLOGY_BEFORE_AFTER.md](TERMINOLOGY_BEFORE_AFTER.md) - Code comparison examples
-- [TERMINOLOGY_INDEX.md](TERMINOLOGY_INDEX.md) - Navigation guide
+- [terminology-proposal.md](terminology-proposal.md) - Complete detailed proposal
+- [terminology-proposal-summary.md](terminology-proposal-summary.md) - Quick reference
+- [terminology-before-after.md](terminology-before-after.md) - Code comparison examples
+- [terminology-index.md](terminology-index.md) - Navigation guide
