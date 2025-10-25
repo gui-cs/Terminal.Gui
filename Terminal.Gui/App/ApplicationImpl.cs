@@ -24,6 +24,12 @@ public class ApplicationImpl : IApplication
     private Toplevel? _top;
     private readonly ConcurrentStack<Toplevel> _topLevels = new ();
     private int _mainThreadId = -1;
+    private bool _force16Colors;
+    private string _forceDriver = string.Empty;
+    private readonly List<SixelToRender> _sixel = new ();
+    private readonly object _lockScreen = new ();
+    private Rectangle? _screen;
+    private bool _clearScreenNextIteration;
 
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
@@ -92,6 +98,59 @@ public class ApplicationImpl : IApplication
     {
         get => _initialized;
         set => _initialized = value;
+    }
+
+    /// <inheritdoc/>
+    public bool Force16Colors
+    {
+        get => _force16Colors;
+        set => _force16Colors = value;
+    }
+
+    /// <inheritdoc/>
+    public string ForceDriver
+    {
+        get => _forceDriver;
+        set => _forceDriver = value;
+    }
+
+    /// <inheritdoc/>
+    public List<SixelToRender> Sixel => _sixel;
+
+    /// <inheritdoc/>
+    public Rectangle Screen
+    {
+        get
+        {
+            lock (_lockScreen)
+            {
+                if (_screen == null)
+                {
+                    _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
+                }
+
+                return _screen.Value;
+            }
+        }
+        set
+        {
+            if (value is {} && (value.X != 0 || value.Y != 0))
+            {
+                throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
+            }
+
+            lock (_lockScreen)
+            {
+                _screen = value;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public bool ClearScreenNextIteration
+    {
+        get => _clearScreenNextIteration;
+        set => _clearScreenNextIteration = value;
     }
 
     /// <inheritdoc/>
@@ -396,6 +455,10 @@ public class ApplicationImpl : IApplication
         _top = null;
         _topLevels.Clear ();
         _mainThreadId = -1;
+        _screen = null;
+        _clearScreenNextIteration = false;
+        _sixel.Clear ();
+        // Don't reset ForceDriver and Force16Colors; they need to be set before Init is called
 
         if (wasInitialized)
         {
@@ -469,15 +532,12 @@ public class ApplicationImpl : IApplication
             tops.Insert (0, visiblePopover);
         }
 
-        // BUGBUG: Application.Screen needs to be moved to IApplication
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Application.Screen.Size);
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
 
-        // BUGBUG: Application.ClearScreenNextIteration needs to be moved to IApplication
-        if (Application.ClearScreenNextIteration)
+        if (ClearScreenNextIteration)
         {
             forceRedraw = true;
-            // BUGBUG: Application.Screen needs to be moved to IApplication
-            Application.ClearScreenNextIteration = false;
+            ClearScreenNextIteration = false;
         }
 
         if (forceRedraw)
@@ -489,5 +549,16 @@ public class ApplicationImpl : IApplication
         View.Draw (tops, neededLayout || forceRedraw);
         View.SetClipToScreen ();
         _driver?.Refresh ();
+    }
+
+    /// <summary>
+    /// Resets the Screen field to null so it will be recalculated on next access.
+    /// </summary>
+    internal void ResetScreen ()
+    {
+        lock (_lockScreen)
+        {
+            _screen = null;
+        }
     }
 }

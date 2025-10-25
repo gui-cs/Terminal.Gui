@@ -232,7 +232,12 @@ public static partial class Application
             Driver = null;
         }
 
-        _screen = null;
+        // Reset Screen to null so it will be recalculated on next access
+        // This is done by accessing the ApplicationImpl instance directly
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl.ResetScreen ();
+        }
 
         // Don't reset ForceDriver; it needs to be set before Init is called.
         //ForceDriver = string.Empty;
