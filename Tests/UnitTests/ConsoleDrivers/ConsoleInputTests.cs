@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 public class ConsoleInputTests
 {
     class FakeInput : ConsoleInput<char>

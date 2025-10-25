@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.InputTests;
+﻿namespace UnitTests_Parallelizable.InputTests;
 
 public class MouseBindingTests
 {

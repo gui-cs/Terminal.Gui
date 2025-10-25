@@ -3,7 +3,7 @@ using Xunit;
 
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 /// <summary>
 /// Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.

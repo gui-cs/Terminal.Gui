@@ -1,9 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using Terminal.Gui.ConfigurationTests;
-using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ComboBoxTests (ITestOutputHelper output)
 {

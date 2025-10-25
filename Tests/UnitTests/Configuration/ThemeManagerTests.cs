@@ -2,10 +2,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 using System.Text;
+using UnitTests.ConfigurationTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class ThemeManagerTests (ITestOutputHelper output)
 {

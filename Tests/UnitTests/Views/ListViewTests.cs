@@ -5,7 +5,7 @@ using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ListViewTests (ITestOutputHelper output)
 {

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.Views;
+﻿#nullable enable
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Toplevel.Modal"/> <see cref="Window"/>. Supports a simple API for adding <see cref="Button"/>s
@@ -14,46 +15,6 @@
 /// </remarks>
 public class Dialog : Window
 {
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
-
-    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
-
-    /// <summary>
-    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 80;
-
-    /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 80;
-
-    /// <summary>
-    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
-
-    /// <summary>
-    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
-
-    private readonly List<Button> _buttons = new ();
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
     /// </summary>
@@ -67,7 +28,7 @@ public class Dialog : Window
     public Dialog ()
     {
         Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
-        ShadowStyle = DefaultShadow;
+        base.ShadowStyle = DefaultShadow;
         BorderStyle = DefaultBorderStyle;
 
         X = Pos.Center ();
@@ -82,45 +43,23 @@ public class Dialog : Window
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
     }
 
-    // BUGBUG: We override GetNormal/FocusColor because "Dialog" Scheme is goofy.
-    // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
-    // BUGBUG: Calls these methods.
-    // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
-
-    /// <inheritdoc/>
-    /// <inheritdoc/>
-    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
-    {
-        if (role == VisualRole.Normal || role == VisualRole.Focus)
-        {
-            currentAttribute = GetScheme ().Normal;
-
-            return true;
-        }
-
-        return base.OnGettingAttributeForRole (role, ref currentAttribute);
-    }
+    private readonly List<Button> _buttons = [];
 
     private bool _canceled;
 
-    /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    /// <remarks>The default value is <see langword="true"/>.</remarks>
-    public bool Canceled
+    /// <summary>
+    ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
+    ///     <see cref="Dialog"/>
+    /// </summary>
+    /// <param name="button">Button to add.</param>
+    public void AddButton (Button button)
     {
-        get
-        {
-            return _canceled;
-        }
-        set
-        {
-#if DEBUG_IDISPOSABLE
-            if (EnableDebugIDisposableAsserts && WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
-            _canceled = value;
-        }
+        // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
+        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
+        button.Y = Pos.AnchorEnd ();
+
+        _buttons.Add (button);
+        Add (button);
     }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
@@ -138,11 +77,6 @@ public class Dialog : Window
         get => _buttons.ToArray ();
         init
         {
-            if (value is null)
-            {
-                return;
-            }
-
             foreach (Button b in value)
             {
                 AddButton (b);
@@ -150,23 +84,88 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>
-    ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
-    ///     <see cref="Dialog"/>
-    /// </summary>
-    /// <param name="button">Button to add.</param>
-    public void AddButton (Button button)
+    /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
+    /// <remarks>The default value is <see langword="true"/>.</remarks>
+    public bool Canceled
     {
-        if (button is null)
+        get { return _canceled; }
+        set
         {
-            return;
+#if DEBUG_IDISPOSABLE
+            if (EnableDebugIDisposableAsserts && WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _canceled = value;
+        }
+    }
+
+    /// <summary>
+    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+
+    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+
+    /// <summary>
+    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumHeight { get; set; } = 80;
+
+    /// <summary>
+    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth { get; set; } = 80;
+
+    /// <summary>
+    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+
+
+    // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the
+    // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute.
+    private bool _drawingText;
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingText ()
+    {
+        _drawingText = true;
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDrewText ()
+    {
+        _drawingText = false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (_drawingText && role is VisualRole.Focus && Border?.Thickness != Thickness.Empty)
+        {
+            currentAttribute = GetScheme ().Normal;
+            return true;
         }
 
-        // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
-        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
-        button.Y = Pos.AnchorEnd ();
-
-        _buttons.Add (button);
-        Add (button);
+        return false;
     }
 }

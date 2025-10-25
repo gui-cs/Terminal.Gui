@@ -64,7 +64,7 @@ For **Application-scoped Key Bindings** there are two categories of Application-
 1) **Application Command Key Bindings** - Bindings for `Command`s supported by @Terminal.Gui.App.Application. For example, @Terminal.Gui.App.Application.QuitKey, which is bound to `Command.Quit` and results in @Terminal.Gui.App.Application.RequestStop(Terminal.Gui.Views.Toplevel) being called.
 2) **Application Key Bindings** - Bindings for `Command`s supported on arbitrary `Views` that are meant to be invoked regardless of which part of the application is visible/active. 
 
-Use @Terminal.Gui.App.Application.KeyBindings to add or modify Application-scoped Key Bindings.
+Use @Terminal.Gui.App.Application.Keyboard.KeyBindings to add or modify Application-scoped Key Bindings. For backward compatibility, @Terminal.Gui.App.Application.KeyBindings also provides access to the same key bindings.
 
 **View-scoped Key Bindings** also have two categories:
 
@@ -97,7 +97,7 @@ Keyboard events are retrieved from [Console Drivers](drivers.md) each iteration 
 > Not all drivers/platforms support sensing distinct KeyUp events. These drivers will simulate KeyUp events by raising KeyUp after KeyDown.
  
 
-@Terminal.Gui.App.Application.RaiseKeyDownEvent* raises @Terminal.Gui.App.Application.KeyDown and then calls @Terminal.Gui.ViewBase.View.NewKeyDownEvent* on all toplevel Views. If no View handles the key event, any Application-scoped key bindings will be invoked.
+@Terminal.Gui.App.Application.RaiseKeyDownEvent* raises @Terminal.Gui.App.Application.KeyDown and then calls @Terminal.Gui.ViewBase.View.NewKeyDownEvent* on all toplevel Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through @Terminal.Gui.App.Application.Keyboard.KeyBindings.
 
 If a view is enabled, the @Terminal.Gui.ViewBase.View.NewKeyDownEvent* method will do the following: 
 
@@ -143,11 +143,79 @@ To define application key handling logic for an entire application in cases wher
 ## Application
 
 * Implements support for `KeyBindingScope.Application`.
-* Exposes @Terminal.Gui.App.Application.KeyBindings.
-* Exposes cancelable `KeyDown/Up` events (via `Handled = true`). The `OnKey/Down/Up/` methods are public and can be used to simulate keyboard input.
+* Keyboard functionality is now encapsulated in the @Terminal.Gui.App.IKeyboard interface, accessed via @Terminal.Gui.App.Application.Keyboard.
+* @Terminal.Gui.App.Application.Keyboard provides access to @Terminal.Gui.Input.KeyBindings, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
+* For backward compatibility, @Terminal.Gui.App.Application still exposes static properties/methods that delegate to @Terminal.Gui.App.Application.Keyboard (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`, `Application.QuitKey`).
+* Exposes cancelable `KeyDown/Up` events (via `Handled = true`). The `RaiseKeyDownEvent` and `RaiseKeyUpEvent` methods are public and can be used to simulate keyboard input.
+* The @Terminal.Gui.App.IKeyboard interface enables testability with isolated keyboard instances that don't depend on static Application state.
 
 ## View
 
 * Implements support for `KeyBindings` and `HotKeyBindings`.
 * Exposes cancelable non-virtual methods for a new key event: `NewKeyDownEvent` and `NewKeyUpEvent`. These methods are called by `Application` can be called to simulate keyboard input.
 * Exposes cancelable virtual methods for a new key event: `OnKeyDown` and `OnKeyUp`. These methods are called by `NewKeyDownEvent` and `NewKeyUpEvent` and can be overridden to handle keyboard input.
+
+## IKeyboard Architecture
+
+The @Terminal.Gui.App.IKeyboard interface provides a decoupled, testable architecture for keyboard handling in Terminal.Gui. This design allows for:
+
+### Key Features
+
+1. **Decoupled State** - All keyboard-related state (key bindings, navigation keys, events) is encapsulated in @Terminal.Gui.App.IKeyboard, separate from the static @Terminal.Gui.App.Application class.
+
+2. **Dependency Injection** - The @Terminal.Gui.App.Keyboard implementation receives an @Terminal.Gui.App.IApplication reference, enabling it to interact with application state without static dependencies.
+
+3. **Testability** - Unit tests can create isolated @Terminal.Gui.App.IKeyboard instances with mock @Terminal.Gui.App.IApplication references, enabling parallel test execution without interference.
+
+4. **Backward Compatibility** - All existing @Terminal.Gui.App.Application keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`, `Application.QuitKey`) remain available and delegate to `Application.Keyboard`.
+
+### Usage Examples
+
+**Accessing keyboard functionality:**
+
+```csharp
+// Modern approach - using IKeyboard
+Application.Keyboard.KeyBindings.Add(Key.F1, Command.HotKey);
+Application.Keyboard.RaiseKeyDownEvent(Key.Enter);
+Application.Keyboard.QuitKey = Key.Q.WithCtrl;
+
+// Legacy approach - still works (delegates to Application.Keyboard)
+Application.KeyBindings.Add(Key.F1, Command.HotKey);
+Application.RaiseKeyDownEvent(Key.Enter);
+Application.QuitKey = Key.Q.WithCtrl;
+```
+
+**Testing with isolated keyboard instances:**
+
+```csharp
+// Create independent keyboard instances for parallel tests
+var keyboard1 = new Keyboard();
+keyboard1.QuitKey = Key.Q.WithCtrl;
+keyboard1.KeyBindings.Add(Key.F1, Command.HotKey);
+
+var keyboard2 = new Keyboard();
+keyboard2.QuitKey = Key.X.WithCtrl;
+keyboard2.KeyBindings.Add(Key.F2, Command.Accept);
+
+// keyboard1 and keyboard2 maintain completely separate state
+Assert.Equal(Key.Q.WithCtrl, keyboard1.QuitKey);
+Assert.Equal(Key.X.WithCtrl, keyboard2.QuitKey);
+```
+
+### Architecture Benefits
+
+- **Parallel Testing**: Multiple test methods can create and use separate @Terminal.Gui.App.IKeyboard instances simultaneously without state interference.
+- **Dependency Inversion**: @Terminal.Gui.App.Keyboard depends on @Terminal.Gui.App.IApplication interface rather than static @Terminal.Gui.App.Application class.
+- **Cleaner Code**: Keyboard functionality is organized in a dedicated interface rather than scattered across @Terminal.Gui.App.Application partial classes.
+- **Mockability**: Tests can provide mock @Terminal.Gui.App.IApplication implementations to test keyboard behavior in isolation.
+
+### Implementation Details
+
+The @Terminal.Gui.App.Keyboard class implements @Terminal.Gui.App.IKeyboard and maintains:
+
+- **KeyBindings**: Application-scoped key binding dictionary
+- **Navigation Keys**: QuitKey, ArrangeKey, NextTabKey, PrevTabKey, NextTabGroupKey, PrevTabGroupKey
+- **Events**: KeyDown, KeyUp events for application-level keyboard monitoring
+- **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
+
+The @Terminal.Gui.App.ApplicationImpl class creates and manages the @Terminal.Gui.App.IKeyboard instance, setting its `Application` property to `this` to provide the necessary @Terminal.Gui.App.IApplication reference.

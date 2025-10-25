@@ -2,7 +2,7 @@
 
 using Console = Terminal.Gui.Drivers.FakeConsole;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 public class DriverColorTests
 {

@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class FlagSelectorTests
 {

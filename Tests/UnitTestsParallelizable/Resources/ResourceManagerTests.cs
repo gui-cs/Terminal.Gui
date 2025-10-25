@@ -5,9 +5,9 @@ using System.Globalization;
 using System.Resources;
 using System.Runtime.CompilerServices;
 
-namespace Terminal.Gui.ResourcesTests;
+namespace UnitTests_Parallelizable.ResourcesTests;
 
-public class ResourceManagerTests
+public class ResourceManagerTests : UnitTests.Parallelizable.ParallelizableBase
 {
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";

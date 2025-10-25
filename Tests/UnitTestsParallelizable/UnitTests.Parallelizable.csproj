@@ -30,6 +30,7 @@
 
     <ItemGroup>
         <Compile Include="..\UnitTests\TestsAllViews.cs" Link="TestsAllViews.cs" />
+        <Compile Include="..\UnitTests\DriverAssert.cs" Link="DriverAssert.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -53,6 +54,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
         </ProjectReference>
+        <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
     </ItemGroup>
 
     <ItemGroup>
