@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Initialization (Init/Shutdown)
+public static partial class Application // Lifecycle (Init/Shutdown)
 {
 
     /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
