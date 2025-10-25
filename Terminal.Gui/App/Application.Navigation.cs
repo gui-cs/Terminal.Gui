@@ -7,7 +7,11 @@ public static partial class Application // Navigation stuff
     /// <summary>
     ///     Gets the <see cref="ApplicationNavigation"/> instance for the current <see cref="Application"/>.
     /// </summary>
-    public static ApplicationNavigation? Navigation { get; internal set; }
+    public static ApplicationNavigation? Navigation
+    {
+        get => ApplicationImpl.Instance.Navigation;
+        internal set => ApplicationImpl.Instance.Navigation = value;
+    }
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]

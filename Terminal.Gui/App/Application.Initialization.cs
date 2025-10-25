@@ -5,42 +5,10 @@ using System.Reflection;
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Lifecycle (Init/Shutdown)
+public static partial class Application // Initialization (Init/Shutdown)
 {
-    // TODO: Add to IApplication
-    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
-    /// <returns></returns>
-    [RequiresUnreferencedCode ("AOT")]
-    public static (List<Type?>, List<string?>) GetDriverTypes ()
-    {
-        // use reflection to get the list of drivers
-        List<Type?> driverTypes = new ();
 
-        // Only inspect the IConsoleDriver assembly
-        Assembly asm = typeof (IConsoleDriver).Assembly;
-
-        foreach (Type? type in asm.GetTypes ())
-        {
-            if (typeof (IConsoleDriver).IsAssignableFrom (type) && type is { IsAbstract: false, IsClass: true })
-            {
-                driverTypes.Add (type);
-            }
-        }
-
-        List<string?> driverTypeNames = driverTypes
-                                        .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
-                                        .Select (d => d!.Name)
-                                        .Union (["dotnet", "windows", "unix", "fake"])
-                                        .ToList ()!;
-
-        return (driverTypes, driverTypeNames);
-    }
-
-    // TODO: Add to IApplicationLifecycle
-    /// <summary>
-    ///     Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the
-    ///     application is closing.
-    /// </summary>
+    /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
     ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
@@ -76,60 +44,31 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         // that isn't supported by the modern application architecture
         if (driver is null)
         {
-            string driverNameToCheck = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
-
+            var driverNameToCheck = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
             if (!string.IsNullOrEmpty (driverNameToCheck))
             {
                 (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
                 Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (driverNameToCheck, StringComparison.InvariantCultureIgnoreCase));
-
+                
                 // If it's a legacy IConsoleDriver (not a Facade), use InternalInit which supports legacy drivers
                 if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
                 {
                     InternalInit (driver, driverName);
-
                     return;
                 }
             }
         }
-
+        
         // Otherwise delegate to the ApplicationImpl instance (which uses the modern architecture)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
-    // TODO: Add to IApplicationLifecycle
-    /// <summary>
-    ///     Gets whether the application has been initialized with <see cref="Init"/> and not yet shutdown with
-    ///     <see cref="Shutdown"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/>
-    ///         methods have been called.
-    ///     </para>
-    /// </remarks>
-    public static bool Initialized { get; internal set; }
+    internal static int MainThreadId
+    {
+        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
+        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+    }
 
-    // TODO: Add to IApplicationLifecycle
-    /// <summary>
-    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
-    /// </summary>
-    /// <remarks>
-    ///     Intended to support unit tests that need to know when the application has been initialized.
-    /// </remarks>
-    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
-
-    // TODO: Add to IApplicationLifecycle
-    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    /// <remarks>
-    ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
-    ///     up (Disposed)
-    ///     and terminal settings are restored.
-    /// </remarks>
-    public static void Shutdown () { ApplicationImpl.Instance.Shutdown (); }
-
-    // TODO: Add to IApplicationLifecycle
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
     // Called from:
@@ -160,7 +99,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         if (!calledViaRunT)
         {
             // Reset all class variables (Application is a singleton).
-            ResetState (true);
+            ResetState (ignoreDisposed: true);
         }
 
         // For UnitTests
@@ -185,7 +124,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
             //{
             //    (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
             //    Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
-
+                
             //    if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
             //    {
             //        // This is a legacy driver (not a ConsoleDriverFacade)
@@ -193,13 +132,12 @@ public static partial class Application // Lifecycle (Init/Shutdown)
             //        useLegacyDriver = true;
             //    }
             //}
-
+            
             //// Use the modern application architecture
             //if (!useLegacyDriver)
             {
                 ApplicationImpl.Instance.Init (driver, driverName);
                 Debug.Assert (Driver is { });
-
                 return;
             }
         }
@@ -240,14 +178,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         InitializedChanged?.Invoke (null, new (init));
     }
 
-    internal static int MainThreadId { get; set; } = -1;
-
-    // TODO: Add to IApplicationLifecycle
-    /// <summary>
-    ///     Raises the <see cref="InitializedChanged"/> event.
-    /// </summary>
-    internal static void OnInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
-
     internal static void SubscribeDriverEvents ()
     {
         ArgumentNullException.ThrowIfNull (Driver);
@@ -268,9 +198,78 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         Driver.MouseEvent -= Driver_MouseEvent;
     }
 
+    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
     private static void Driver_KeyDown (object? sender, Key e) { RaiseKeyDownEvent (e); }
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
-    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
+    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
+    /// <returns></returns>
+    [RequiresUnreferencedCode ("AOT")]
+    public static (List<Type?>, List<string?>) GetDriverTypes ()
+    {
+        // use reflection to get the list of drivers
+        List<Type?> driverTypes = new ();
+
+        // Only inspect the IConsoleDriver assembly
+        var asm = typeof (IConsoleDriver).Assembly;
+
+        foreach (Type? type in asm.GetTypes ())
+        {
+            if (typeof (IConsoleDriver).IsAssignableFrom (type) &&
+                type is { IsAbstract: false, IsClass: true })
+            {
+                driverTypes.Add (type);
+            }
+        }
+
+        List<string?> driverTypeNames = driverTypes
+                                        .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
+                                        .Select (d => d!.Name)
+                                        .Union (["dotnet", "windows", "unix", "fake"])
+                                        .ToList ()!;
+
+
+
+        return (driverTypes, driverTypeNames);
+    }
+
+    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
+    /// <remarks>
+    ///     Shutdown must be called for every call to <see cref="Init"/> or
+    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
+    ///     up (Disposed)
+    ///     and terminal settings are restored.
+    /// </remarks>
+    public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
+
+    /// <summary>
+    ///     Gets whether the application has been initialized with <see cref="Init"/> and not yet shutdown with <see cref="Shutdown"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </para>
+    /// </remarks>
+    public static bool Initialized
+    {
+        get => ApplicationImpl.Instance.Initialized;
+        internal set => ApplicationImpl.Instance.Initialized = value;
+    }
+
+    /// <summary>
+    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </summary>
+    /// <remarks>
+    ///     Intended to support unit tests that need to know when the application has been initialized.
+    /// </remarks>
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
+
+    /// <summary>
+    ///  Raises the <see cref="InitializedChanged"/> event.
+    /// </summary>
+    internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
+    {
+        Application.InitializedChanged?.Invoke (sender, e);
+    }
 }
