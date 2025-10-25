@@ -6,7 +6,6 @@ public static partial class Application // Driver abstractions
 {
     internal static bool _forceFakeConsole;
 
-    // TODO: Add to IApplication
     /// <summary>Gets the <see cref="IConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
     public static IConsoleDriver? Driver
     {
@@ -14,18 +13,18 @@ public static partial class Application // Driver abstractions
         internal set => ApplicationImpl.Instance.Driver = value;
     }
 
-    // TODO: Add to IApplication
-    // BUGBUG: Force16Colors should be nullable.
     /// <summary>
     ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
     ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool Force16Colors { get; set; }
+    public static bool Force16Colors
+    {
+        get => ApplicationImpl.Instance.Force16Colors;
+        set => ApplicationImpl.Instance.Force16Colors = value;
+    }
 
-    // TODO: Add to IApplication
-    // BUGBUG: ForceDriver should be nullable.
     /// <summary>
     ///     Forces the use of the specified driver (one of "fake", "dotnet", "windows", or "unix"). If not
     ///     specified, the driver is selected based on the platform.
@@ -35,12 +34,15 @@ public static partial class Application // Driver abstractions
     ///     with either `driver` or `driverName` specified.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static string ForceDriver { get; set; } = string.Empty;
+    public static string ForceDriver
+    {
+        get => ApplicationImpl.Instance.ForceDriver;
+        set => ApplicationImpl.Instance.ForceDriver = value;
+    }
 
-    // TODO: Add to IApplication
     /// <summary>
     /// Collection of sixel images to write out to screen when updating.
     /// Only add to this collection if you are sure terminal supports sixel format.
     /// </summary>
-    public static List<SixelToRender> Sixel { get; } = new List<SixelToRender> ();
+    public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Sixel;
 }
