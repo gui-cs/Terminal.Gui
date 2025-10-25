@@ -16,7 +16,7 @@ public static class With
     /// <returns></returns>
     public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
     {
-        return new (() => new T (), width, height,testDriver,logWriter, Timeout);
+        return new (() => new T (), width, height, testDriver, logWriter, Timeout);
     }
 
     /// <summary>
