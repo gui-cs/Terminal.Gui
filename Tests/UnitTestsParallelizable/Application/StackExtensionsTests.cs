@@ -1,6 +1,6 @@
-﻿namespace Terminal.Gui.ApplicationTests;
+﻿namespace UnitTests_Parallelizable.ApplicationTests;
 
-public class StackExtensionsTests
+public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
 {
     [Fact]
     public void Stack_Toplevels_Contains ()

@@ -17,6 +17,19 @@ public class ApplicationImpl : IApplication
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
     private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    private IConsoleDriver? _driver;
+    private bool _initialized;
+    private ApplicationPopover? _popover;
+    private ApplicationNavigation? _navigation;
+    private Toplevel? _top;
+    private readonly ConcurrentStack<Toplevel> _topLevels = new ();
+    private int _mainThreadId = -1;
+    private bool _force16Colors;
+    private string _forceDriver = string.Empty;
+    private readonly List<SixelToRender> _sixel = new ();
+    private readonly object _lockScreen = new ();
+    private Rectangle? _screen;
+    private bool _clearScreenNextIteration;
 
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
@@ -32,10 +45,149 @@ public class ApplicationImpl : IApplication
 
     internal IMainLoopCoordinator? Coordinator => _coordinator;
 
+    private IMouse? _mouse;
+
+    /// <summary>
+    /// Handles mouse event state and processing.
+    /// </summary>
+    public IMouse Mouse
+    {
+        get
+        {
+            if (_mouse is null)
+            {
+                _mouse = new MouseImpl { Application = this };
+            }
+            return _mouse;
+        }
+        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
     /// <summary>
     /// Handles which <see cref="View"/> (if any) has captured the mouse
     /// </summary>
     public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
+
+    private IKeyboard? _keyboard;
+
+    /// <summary>
+    /// Handles keyboard input and key bindings at the Application level
+    /// </summary>
+    public IKeyboard Keyboard
+    {
+        get
+        {
+            if (_keyboard is null)
+            {
+                _keyboard = new KeyboardImpl { Application = this };
+            }
+            return _keyboard;
+        }
+        set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
+    /// <inheritdoc/>
+    public IConsoleDriver? Driver
+    {
+        get => _driver;
+        set => _driver = value;
+    }
+
+    /// <inheritdoc/>
+    public bool Initialized
+    {
+        get => _initialized;
+        set => _initialized = value;
+    }
+
+    /// <inheritdoc/>
+    public bool Force16Colors
+    {
+        get => _force16Colors;
+        set => _force16Colors = value;
+    }
+
+    /// <inheritdoc/>
+    public string ForceDriver
+    {
+        get => _forceDriver;
+        set => _forceDriver = value;
+    }
+
+    /// <inheritdoc/>
+    public List<SixelToRender> Sixel => _sixel;
+
+    /// <inheritdoc/>
+    public Rectangle Screen
+    {
+        get
+        {
+            lock (_lockScreen)
+            {
+                if (_screen == null)
+                {
+                    _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
+                }
+
+                return _screen.Value;
+            }
+        }
+        set
+        {
+            if (value is {} && (value.X != 0 || value.Y != 0))
+            {
+                throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
+            }
+
+            lock (_lockScreen)
+            {
+                _screen = value;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public bool ClearScreenNextIteration
+    {
+        get => _clearScreenNextIteration;
+        set => _clearScreenNextIteration = value;
+    }
+
+    /// <inheritdoc/>
+    public ApplicationPopover? Popover
+    {
+        get => _popover;
+        set => _popover = value;
+    }
+
+    /// <inheritdoc/>
+    public ApplicationNavigation? Navigation
+    {
+        get => _navigation;
+        set => _navigation = value;
+    }
+
+    /// <inheritdoc/>
+    public Toplevel? Top
+    {
+        get => _top;
+        set => _top = value;
+    }
+
+    /// <inheritdoc/>
+    public ConcurrentStack<Toplevel> TopLevels => _topLevels;
+
+    /// <summary>
+    /// Gets or sets the main thread ID for the application.
+    /// </summary>
+    internal int MainThreadId
+    {
+        get => _mainThreadId;
+        set => _mainThreadId = value;
+    }
+
+    /// <inheritdoc/>
+    public void RequestStop () => RequestStop (null);
 
     /// <summary>
     /// Creates a new instance of the Application backend.
@@ -65,7 +217,7 @@ public class ApplicationImpl : IApplication
     [RequiresDynamicCode ("AOT")]
     public void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        if (Application.Initialized)
+        if (_initialized)
         {
             Logging.Logger.LogError ("Init called multiple times without shutdown, aborting.");
 
@@ -82,23 +234,44 @@ public class ApplicationImpl : IApplication
             _driverName = Application.ForceDriver;
         }
 
-        Debug.Assert(Application.Navigation is null);
-        Application.Navigation = new ();
+        Debug.Assert(_navigation is null);
+        _navigation = new ();
 
-        Debug.Assert (Application.Popover is null);
-        Application.Popover = new ();
+        Debug.Assert (_popover is null);
+        _popover = new ();
 
-        Application.AddKeyBindings ();
+        // Preserve existing keyboard settings if they exist
+        bool hasExistingKeyboard = _keyboard is not null;
+        Key existingQuitKey = _keyboard?.QuitKey ?? Key.Esc;
+        Key existingArrangeKey = _keyboard?.ArrangeKey ?? Key.F5.WithCtrl;
+        Key existingNextTabKey = _keyboard?.NextTabKey ?? Key.Tab;
+        Key existingPrevTabKey = _keyboard?.PrevTabKey ?? Key.Tab.WithShift;
+        Key existingNextTabGroupKey = _keyboard?.NextTabGroupKey ?? Key.F6;
+        Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
+
+        // Reset keyboard to ensure fresh state with default bindings
+        _keyboard = new KeyboardImpl { Application = this };
+
+        // Restore previously set keys if they existed and were different from defaults
+        if (hasExistingKeyboard)
+        {
+            _keyboard.QuitKey = existingQuitKey;
+            _keyboard.ArrangeKey = existingArrangeKey;
+            _keyboard.NextTabKey = existingNextTabKey;
+            _keyboard.PrevTabKey = existingPrevTabKey;
+            _keyboard.NextTabGroupKey = existingNextTabGroupKey;
+            _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
+        }
 
         CreateDriver (driverName ?? _driverName);
 
-        Application.Initialized = true;
+        _initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
-        Application.MainThreadId = Thread.CurrentThread.ManagedThreadId;
+        SynchronizationContext.SetSynchronizationContext (new ());
+        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
     }
 
     private void CreateDriver (string? driverName)
@@ -112,9 +285,9 @@ public class ApplicationImpl : IApplication
             _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
             _coordinator.StartAsync ().Wait ();
 
-            if (Application.Driver == null)
+            if (_driver == null)
             {
-                throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+                throw new ("Driver was null even after booting MainLoopCoordinator");
             }
 
             return;
@@ -162,9 +335,9 @@ public class ApplicationImpl : IApplication
 
         _coordinator.StartAsync ().Wait ();
 
-        if (Application.Driver == null)
+        if (_driver == null)
         {
-            throw new ("Application.Driver was null even after booting MainLoopCoordinator");
+            throw new ("Driver was null even after booting MainLoopCoordinator");
         }
     }
 
@@ -211,13 +384,13 @@ public class ApplicationImpl : IApplication
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
-        if (!Application.Initialized)
+        if (!_initialized)
         {
             // Init() has NOT been called. Auto-initialize as per interface contract.
             Init (driver, null);
         }
 
-        var top = new T ();
+        T top = new ();
         Run (top, errorHandler);
         return top;
     }
@@ -230,23 +403,23 @@ public class ApplicationImpl : IApplication
         Logging.Information ($"Run '{view}'");
         ArgumentNullException.ThrowIfNull (view);
 
-        if (!Application.Initialized)
+        if (!_initialized)
         {
             throw new NotInitializedException (nameof (Run));
         }
 
-        if (Application.Driver == null)
+        if (_driver == null)
         {
             throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
-        Application.Top = view;
+        _top = view;
 
         RunState rs = Application.Begin (view);
 
-        Application.Top.Running = true;
+        _top.Running = true;
 
-        while (Application.TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
+        while (_topLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
             if (_coordinator is null)
             {
@@ -265,17 +438,37 @@ public class ApplicationImpl : IApplication
     {
         _coordinator?.Stop ();
         
-        bool wasInitialized = Application.Initialized;
+        bool wasInitialized = _initialized;
+        
+        // Reset Screen before calling Application.ResetState to avoid circular reference
+        ResetScreen ();
+        
+        // Call ResetState FIRST so it can properly dispose Popover and other resources
+        // that are accessed via Application.* static properties that now delegate to instance fields
         Application.ResetState ();
         ConfigurationManager.PrintJsonErrors ();
+        
+        // Clear instance fields after ResetState has disposed everything
+        _driver = null;
+        _mouse = null;
+        _keyboard = null;
+        _initialized = false;
+        _navigation = null;
+        _popover = null;
+        _top = null;
+        _topLevels.Clear ();
+        _mainThreadId = -1;
+        _screen = null;
+        _clearScreenNextIteration = false;
+        _sixel.Clear ();
+        // Don't reset ForceDriver and Force16Colors; they need to be set before Init is called
 
         if (wasInitialized)
         {
-            bool init = Application.Initialized;
+            bool init = _initialized; // Will be false after clearing fields above
             Application.OnInitializedChanged (this, new (in init));
         }
 
-        Application.Driver = null;
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
@@ -284,14 +477,14 @@ public class ApplicationImpl : IApplication
     {
         Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
 
-        top ??= Application.Top;
+        top ??= _top;
 
         if (top == null)
         {
             return;
         }
 
-        var ev = new ToplevelClosingEventArgs (top);
+        ToplevelClosingEventArgs ev = new (top);
         top.OnClosing (ev);
 
         if (ev.Cancel)
@@ -306,7 +499,7 @@ public class ApplicationImpl : IApplication
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Application.MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (_mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
             return;
@@ -331,9 +524,44 @@ public class ApplicationImpl : IApplication
     public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
     /// <inheritdoc />
-    public void LayoutAndDraw (bool forceDraw)
+    public void LayoutAndDraw (bool forceRedraw = false)
     {
-        Application.Top?.SetNeedsDraw();
-        Application.Top?.SetNeedsLayout ();
+        List<View> tops = [.. _topLevels];
+
+        if (_popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
+        }
+
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
+
+        if (ClearScreenNextIteration)
+        {
+            forceRedraw = true;
+            ClearScreenNextIteration = false;
+        }
+
+        if (forceRedraw)
+        {
+            _driver?.ClearContents ();
+        }
+
+        View.SetClipToScreen ();
+        View.Draw (tops, neededLayout || forceRedraw);
+        View.SetClipToScreen ();
+        _driver?.Refresh ();
+    }
+
+    /// <summary>
+    /// Resets the Screen field to null so it will be recalculated on next access.
+    /// </summary>
+    internal void ResetScreen ()
+    {
+        lock (_lockScreen)
+        {
+            _screen = null;
+        }
     }
 }

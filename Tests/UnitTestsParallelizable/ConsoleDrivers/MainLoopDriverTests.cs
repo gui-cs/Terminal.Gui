@@ -2,9 +2,9 @@
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
-public class MainLoopDriverTests
+public class MainLoopDriverTests : UnitTests.Parallelizable.ParallelizableBase
 {
     public MainLoopDriverTests (ITestOutputHelper output) { ConsoleDriver.RunningUnitTests = true; }
 

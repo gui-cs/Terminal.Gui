@@ -3,7 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class KeyJsonConverterTests
 {

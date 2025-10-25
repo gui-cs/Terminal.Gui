@@ -2,7 +2,7 @@
 
 //using static Terminal.Gui.ViewTests.MenuTests;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 public class Menuv1Tests
