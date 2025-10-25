@@ -13,7 +13,7 @@ public class KeyboardTests
     public void Constructor_InitializesKeyBindings ()
     {
         // Arrange & Act
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.NotNull (keyboard.KeyBindings);
@@ -25,7 +25,7 @@ public class KeyboardTests
     public void QuitKey_DefaultValue_IsEsc ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.Esc, keyboard.QuitKey);
@@ -35,7 +35,7 @@ public class KeyboardTests
     public void QuitKey_SetValue_UpdatesKeyBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key newQuitKey = Key.Q.WithCtrl;
 
         // Act
@@ -51,7 +51,7 @@ public class KeyboardTests
     public void ArrangeKey_DefaultValue_IsCtrlF5 ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.F5.WithCtrl, keyboard.ArrangeKey);
@@ -61,7 +61,7 @@ public class KeyboardTests
     public void NextTabKey_DefaultValue_IsTab ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.Tab, keyboard.NextTabKey);
@@ -71,7 +71,7 @@ public class KeyboardTests
     public void PrevTabKey_DefaultValue_IsShiftTab ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.Tab.WithShift, keyboard.PrevTabKey);
@@ -81,7 +81,7 @@ public class KeyboardTests
     public void NextTabGroupKey_DefaultValue_IsF6 ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.F6, keyboard.NextTabGroupKey);
@@ -91,7 +91,7 @@ public class KeyboardTests
     public void PrevTabGroupKey_DefaultValue_IsShiftF6 ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.F6.WithShift, keyboard.PrevTabGroupKey);
@@ -101,7 +101,7 @@ public class KeyboardTests
     public void KeyBindings_Add_CanAddCustomBinding ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key customKey = Key.K.WithCtrl;
 
         // Act
@@ -116,7 +116,7 @@ public class KeyboardTests
     public void KeyBindings_Remove_CanRemoveBinding ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key customKey = Key.K.WithCtrl;
         keyboard.KeyBindings.Add (customKey, Command.Accept);
 
@@ -131,7 +131,7 @@ public class KeyboardTests
     public void KeyDown_Event_CanBeSubscribed ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         bool eventRaised = false;
 
         // Act
@@ -148,7 +148,7 @@ public class KeyboardTests
     public void KeyUp_Event_CanBeSubscribed ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         bool eventRaised = false;
 
         // Act
@@ -165,7 +165,7 @@ public class KeyboardTests
     public void InvokeCommand_WithInvalidCommand_ThrowsNotSupportedException ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         // Pick a command that isn't registered
         Command invalidCommand = (Command)9999;
         Key testKey = Key.A;
@@ -179,8 +179,8 @@ public class KeyboardTests
     public void Multiple_Keyboards_CanExistIndependently ()
     {
         // Arrange & Act
-        var keyboard1 = new Keyboard ();
-        var keyboard2 = new Keyboard ();
+        var keyboard1 = new KeyboardImpl ();
+        var keyboard2 = new KeyboardImpl ();
 
         keyboard1.QuitKey = Key.Q.WithCtrl;
         keyboard2.QuitKey = Key.X.WithCtrl;
@@ -195,7 +195,7 @@ public class KeyboardTests
     public void KeyBindings_Replace_UpdatesExistingBinding ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key oldKey = Key.Esc;
         Key newKey = Key.Q.WithCtrl;
 
@@ -217,7 +217,7 @@ public class KeyboardTests
     public void KeyBindings_Clear_RemovesAllBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         // Verify initial state has bindings
         Assert.True (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out _));
 
@@ -232,7 +232,7 @@ public class KeyboardTests
     public void AddKeyBindings_PopulatesDefaultBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         keyboard.KeyBindings.Clear ();
         Assert.False (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out _));
 
@@ -250,7 +250,7 @@ public class KeyboardTests
     public void KeyBindings_Add_Adds ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Act
         keyboard.KeyBindings.Add (Key.A, Command.Accept);
@@ -267,7 +267,7 @@ public class KeyboardTests
     public void KeyBindings_Remove_Removes ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         keyboard.KeyBindings.Add (Key.A, Command.Accept);
         Assert.True (keyboard.KeyBindings.TryGet (Key.A, out _));
 
@@ -282,7 +282,7 @@ public class KeyboardTests
     public void QuitKey_Default_Is_Esc ()
     {
         // Arrange & Act
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
 
         // Assert
         Assert.Equal (Key.Esc, keyboard.QuitKey);
@@ -292,7 +292,7 @@ public class KeyboardTests
     public void QuitKey_Setter_UpdatesBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key prevKey = keyboard.QuitKey;
 
         // Act - Change QuitKey
@@ -309,7 +309,7 @@ public class KeyboardTests
     public void NextTabKey_Setter_UpdatesBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key prevKey = keyboard.NextTabKey;
         Key newKey = Key.N.WithCtrl;
 
@@ -326,7 +326,7 @@ public class KeyboardTests
     public void PrevTabKey_Setter_UpdatesBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key newKey = Key.P.WithCtrl;
 
         // Act
@@ -342,7 +342,7 @@ public class KeyboardTests
     public void NextTabGroupKey_Setter_UpdatesBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key newKey = Key.PageDown.WithCtrl;
 
         // Act
@@ -359,7 +359,7 @@ public class KeyboardTests
     public void PrevTabGroupKey_Setter_UpdatesBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key newKey = Key.PageUp.WithCtrl;
 
         // Act
@@ -376,7 +376,7 @@ public class KeyboardTests
     public void ArrangeKey_Setter_UpdatesBindings ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key newKey = Key.A.WithCtrl;
 
         // Act
@@ -392,7 +392,7 @@ public class KeyboardTests
     public void KeyBindings_AddWithTarget_StoresTarget ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         var view = new View ();
 
         // Act
@@ -410,7 +410,7 @@ public class KeyboardTests
     public void InvokeCommandsBoundToKey_ReturnsNull_WhenNoBindingExists ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key unboundKey = Key.Z.WithAlt.WithCtrl;
 
         // Act
@@ -424,7 +424,7 @@ public class KeyboardTests
     public void InvokeCommandsBoundToKey_InvokesCommand_WhenBindingExists ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         // QuitKey has a bound command by default
 
         // Act
@@ -440,8 +440,8 @@ public class KeyboardTests
     public void Multiple_Keyboards_Independent_KeyBindings ()
     {
         // Arrange
-        var keyboard1 = new Keyboard ();
-        var keyboard2 = new Keyboard ();
+        var keyboard1 = new KeyboardImpl ();
+        var keyboard2 = new KeyboardImpl ();
 
         // Act
         keyboard1.KeyBindings.Add (Key.X, Command.Accept);
@@ -459,7 +459,7 @@ public class KeyboardTests
     public void KeyBindings_Replace_PreservesCommandsForNewKey ()
     {
         // Arrange
-        var keyboard = new Keyboard ();
+        var keyboard = new KeyboardImpl ();
         Key oldKey = Key.Esc;
         Key newKey = Key.Q.WithCtrl;
 

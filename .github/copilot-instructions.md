@@ -150,11 +150,43 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 5. **Documentation is the Spec** - API docs are source of truth
 
 ### Coding Conventions
-- Use explicit types (avoid `var` except for basic types like `int`, `string`)
-- Use target-typed `new()`
+
+**⚠️ CRITICAL - These rules MUST be followed in ALL new code:**
+
+#### Type Declarations and Object Creation
+- **ALWAYS use explicit types** - Never use `var` except for basic types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
+  ```csharp
+  // ✅ CORRECT - Explicit types
+  View view = new () { Width = 10 };
+  MouseEventArgs args = new () { Position = new Point(5, 5) };
+  List<View?> views = new ();
+  var count = 0;  // OK - int is a basic type
+  var name = "test";  // OK - string is a basic type
+  
+  // ❌ WRONG - Using var for non-basic types
+  var view = new View { Width = 10 };
+  var args = new MouseEventArgs { Position = new Point(5, 5) };
+  var views = new List<View?>();
+  ```
+
+- **ALWAYS use target-typed `new()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
+  ```csharp
+  // ✅ CORRECT - Target-typed new
+  View view = new () { Width = 10 };
+  MouseEventArgs args = new ();
+  
+  // ❌ WRONG - Redundant type name
+  View view = new View() { Width = 10 };
+  MouseEventArgs args = new MouseEventArgs();
+  ```
+
+#### Other Conventions
 - Follow `.editorconfig` settings (e.g., braces on new lines, spaces after keywords)
 - 4-space indentation
+- No trailing whitespace
 - See `CONTRIBUTING.md` for full guidelines
+
+**These conventions apply to ALL code - production code, test code, examples, and samples.**
 
 ## Testing Requirements
 
@@ -278,6 +310,8 @@ dotnet build --configuration Release --no-restore
 - ❌ Don't add tests to `UnitTests` if they can be parallelizable
 - ❌ Don't use `Application.Init` in new tests
 - ❌ Don't decrease code coverage
+- ❌ **Don't use `var` for non-basic types** (use explicit types)
+- ❌ **Don't use redundant type names with `new`** (use target-typed `new()`)
 - ❌ Don't add `var` everywhere (use explicit types)
 
 ## Additional Resources

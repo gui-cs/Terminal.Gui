@@ -39,6 +39,24 @@ public class ApplicationImpl : IApplication
 
     internal IMainLoopCoordinator? Coordinator => _coordinator;
 
+    private IMouse? _mouse;
+
+    /// <summary>
+    /// Handles mouse event state and processing.
+    /// </summary>
+    public IMouse Mouse
+    {
+        get
+        {
+            if (_mouse is null)
+            {
+                _mouse = new MouseImpl { Application = this };
+            }
+            return _mouse;
+        }
+        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
     /// <summary>
     /// Handles which <see cref="View"/> (if any) has captured the mouse
     /// </summary>
@@ -55,7 +73,7 @@ public class ApplicationImpl : IApplication
         {
             if (_keyboard is null)
             {
-                _keyboard = new Keyboard { Application = this };
+                _keyboard = new KeyboardImpl { Application = this };
             }
             return _keyboard;
         }
@@ -173,7 +191,7 @@ public class ApplicationImpl : IApplication
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new Keyboard { Application = this };
+        _keyboard = new KeyboardImpl { Application = this };
 
         // Restore previously set keys if they existed and were different from defaults
         if (hasExistingKeyboard)
@@ -370,6 +388,7 @@ public class ApplicationImpl : IApplication
         
         // Clear instance fields after ResetState has disposed everything
         _driver = null;
+        _mouse = null;
         _keyboard = null;
         _initialized = false;
         _navigation = null;
@@ -439,9 +458,36 @@ public class ApplicationImpl : IApplication
     public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
     /// <inheritdoc />
-    public void LayoutAndDraw (bool forceDraw)
+    public void LayoutAndDraw (bool forceRedraw = false)
     {
-        _top?.SetNeedsDraw();
-        _top?.SetNeedsLayout ();
+        List<View> tops = [.. _topLevels];
+
+        if (_popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
+        }
+
+        // BUGBUG: Application.Screen needs to be moved to IApplication
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Application.Screen.Size);
+
+        // BUGBUG: Application.ClearScreenNextIteration needs to be moved to IApplication
+        if (Application.ClearScreenNextIteration)
+        {
+            forceRedraw = true;
+            // BUGBUG: Application.Screen needs to be moved to IApplication
+            Application.ClearScreenNextIteration = false;
+        }
+
+        if (forceRedraw)
+        {
+            _driver?.ClearContents ();
+        }
+
+        View.SetClipToScreen ();
+        View.Draw (tops, neededLayout || forceRedraw);
+        View.SetClipToScreen ();
+        _driver?.Refresh ();
     }
 }

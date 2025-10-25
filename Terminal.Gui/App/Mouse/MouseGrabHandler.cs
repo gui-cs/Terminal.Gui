@@ -115,4 +115,45 @@ internal class MouseGrabHandler : IMouseGrabHandler
 
         UnGrabbedMouse?.Invoke (view, new (view));
     }
+
+    /// <inheritdoc/>
+    public bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
+    {
+        if (MouseGrabView is { })
+        {
+#if DEBUG_IDISPOSABLE
+            if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
+            {
+                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
+            }
+#endif
+
+            // If the mouse is grabbed, send the event to the view that grabbed it.
+            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
+
+            var viewRelativeMouseEvent = new MouseEventArgs
+            {
+                Position = frameLoc,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = mouseEvent.ScreenPosition,
+                View = deepestViewUnderMouse ?? MouseGrabView
+            };
+
+            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
+            {
+                return true;
+            }
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
+            {
+                // The view that grabbed the mouse has been disposed
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

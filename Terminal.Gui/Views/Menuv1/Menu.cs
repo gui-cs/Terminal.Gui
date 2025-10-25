@@ -19,7 +19,7 @@ internal sealed class Menu : View
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
-        Application.MouseGrabHandler.UnGrabbedMouse += Application_UnGrabbedMouse;
+        Application.Mouse.UnGrabbedMouse += Application_UnGrabbedMouse;
 
         // Things this view knows how to do
         AddCommand (Command.Up, () => MoveUp ());
@@ -220,7 +220,7 @@ internal sealed class Menu : View
             return;
         }
 
-        Application.MouseGrabHandler.UngrabMouse ();
+        Application.Mouse.UngrabMouse ();
         _host.CloseAllMenus ();
         Application.LayoutAndDraw (true);
 
@@ -238,7 +238,7 @@ internal sealed class Menu : View
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;
-        Application.MouseGrabHandler.UnGrabbedMouse -= Application_UnGrabbedMouse;
+        Application.Mouse.UnGrabbedMouse -= Application_UnGrabbedMouse;
         base.Dispose (disposing);
     }
 
@@ -535,7 +535,7 @@ internal sealed class Menu : View
 
     private void CloseAllMenus ()
     {
-        Application.MouseGrabHandler.UngrabMouse ();
+        Application.Mouse.UngrabMouse ();
         _host.CloseAllMenus ();
     }
 
