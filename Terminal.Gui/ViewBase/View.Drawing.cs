@@ -269,7 +269,7 @@ public partial class View // Drawing APIs
         Rectangle toClear = FrameToScreen ();
 
         Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        FillRectScreen (toClear);
+        Driver.FillRect (toClear);
         SetAttribute (prev);
         SetNeedsDraw ();
     }
@@ -364,7 +364,7 @@ public partial class View // Drawing APIs
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        FillRectScreen (toClear);
+        Driver.FillRect (toClear);
 
         // context.AddDrawnRectangle (toClear);
 
@@ -655,7 +655,7 @@ public partial class View // Drawing APIs
                 if (p.Value is { })
                 {
                     SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
-                    MoveToScreen (p.Key.X, p.Key.Y);
+                    Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddRune (p.Value.Value.Rune);
@@ -912,19 +912,4 @@ public partial class View // Drawing APIs
     }
 
     #endregion NeedsDraw
-
-    #region Internal Drawing Helpers
-
-    // These methods are for ViewBase classes only - View subclasses should use viewport-relative methods
-    internal void MoveToScreen (int screenCol, int screenRow)
-    {
-        Driver?.Move (screenCol, screenRow);
-    }
-
-    internal void FillRectScreen (Rectangle rect)
-    {
-        Driver?.FillRect (rect);
-    }
-
-    #endregion Internal Drawing Helpers
 }
