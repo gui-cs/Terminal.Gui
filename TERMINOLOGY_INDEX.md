@@ -1,0 +1,88 @@
+# Terminal.Gui Terminology Proposal - Documentation Index
+
+This directory contains a comprehensive proposal for renaming `Application.Top` and related terminology in Terminal.Gui v2.
+
+## 📚 Documents
+
+### 1. [TERMINOLOGY_PROPOSAL_SUMMARY.md](TERMINOLOGY_PROPOSAL_SUMMARY.md) ⭐ **Start Here**
+Quick overview of the proposal with key recommendations in a table format. Best for getting a high-level understanding.
+
+**Contents:**
+- Recommended changes table
+- Key benefits summary
+- Migration strategy overview
+- Quick code examples
+
+### 2. [TERMINOLOGY_BEFORE_AFTER.md](TERMINOLOGY_BEFORE_AFTER.md) 📊 **See the Difference**
+Side-by-side comparisons showing how the new terminology improves code clarity.
+
+**Contents:**
+- API naming comparisons
+- Real-world code examples
+- Documentation clarity improvements
+- Consistency with .NET patterns
+- Summary comparison table
+
+### 3. [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md) 📖 **Full Details**
+Complete, comprehensive proposal with all analysis, rationale, and implementation details.
+
+**Contents:**
+- Executive summary
+- Background and current problems
+- Detailed proposal and rationale
+- Migration strategy (5 phases)
+- Proposed API changes with code
+- Benefits, risks, and mitigations
+- Implementation checklist
+- Alternative proposals considered
+
+## 🎯 Quick Summary
+
+### Recommended Changes
+
+| Current | Proposed | Why |
+|---------|----------|-----|
+| `Application.Top` | `Application.Current` | Clear, follows .NET patterns, self-documenting |
+| `Application.TopLevels` | `Application.RunStack` | Describes structure and content accurately |
+| `Toplevel` class | Keep (for now) | Allow evolution to `IRunnable` interface |
+
+### Key Benefits
+
+1. **Clarity**: Names immediately convey their purpose
+2. **Consistency**: Aligns with .NET ecosystem patterns
+3. **Readability**: Self-documenting code
+4. **Future-proof**: Works with planned `IRunnable` interface
+5. **Compatibility**: Backward-compatible migration path
+
+## 📖 Reading Guide
+
+**If you want to...**
+
+- 📋 **Get the gist quickly**: Read [TERMINOLOGY_PROPOSAL_SUMMARY.md](TERMINOLOGY_PROPOSAL_SUMMARY.md)
+- 👀 **See concrete examples**: Read [TERMINOLOGY_BEFORE_AFTER.md](TERMINOLOGY_BEFORE_AFTER.md)
+- 🔍 **Understand all details**: Read [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md)
+- 💡 **Implement the changes**: See implementation checklist in [TERMINOLOGY_PROPOSAL.md](TERMINOLOGY_PROPOSAL.md)
+
+## 🔗 Related Issues
+
+- **Issue #4329**: Rename/Clarify `Application.Toplevels`/`Top` Terminology (this proposal)
+- **Issue #2491**: Toplevel refactoring and `IRunnable` interface work
+
+## 💭 Feedback
+
+This proposal is open for discussion and feedback from the Terminal.Gui maintainers and community. Please comment on Issue #4329 with:
+- Questions about the proposal
+- Alternative naming suggestions
+- Migration concerns
+- Implementation details
+
+## 📝 Note on Implementation
+
+This proposal focuses on **naming and terminology only**. The actual implementation (adding new properties, deprecating old ones, updating documentation) would be a separate effort pending approval of this proposal.
+
+---
+
+**Created**: October 2025  
+**Issue**: #4329  
+**Related**: #2491  
+**Status**: Proposal - Awaiting Review
