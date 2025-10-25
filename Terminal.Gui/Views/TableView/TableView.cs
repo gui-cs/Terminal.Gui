@@ -1289,11 +1289,11 @@ public class TableView : View, IDesignable
     protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args) { SelectedCellChanged?.Invoke (this, args); }
 
     /// <summary>
-    ///     Override to provide custom multi colouring to cells.  Use methods like <see cref="View.AddStr(string)"/>.
-    ///     The cursor will already be in the correct place when rendering and you
-    ///     must render the full <paramref name="render"/> or the view will not look right.  For simpler provision of color use
-    ///     <see cref="ColumnStyle.ColorGetter"/> For changing the content that is rendered use
-    ///     <see cref="ColumnStyle.RepresentationGetter"/>
+    ///     Override to provide custom multi-coloring to cells. Use methods like <see cref="View.AddStr(string)"/>.
+    ///     The cursor will already be in the correct position when rendering. You must render the full
+    ///     <paramref name="render"/> or the view will not look right. For simpler color provision use
+    ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
+    ///     <see cref="ColumnStyle.RepresentationGetter"/>.
     /// </summary>
     /// <param name="cellAttribute"></param>
     /// <param name="render"></param>
