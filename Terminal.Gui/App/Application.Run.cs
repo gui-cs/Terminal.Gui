@@ -4,40 +4,22 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Run (Begin, Run, End, Stop)
+public static partial class Application // Run (Begin -> Run -> Layout/Draw -> End -> Stop)
 {
-    private static Key _quitKey = Key.Esc; // Resources/config.json overrides
-
     /// <summary>Gets or sets the key to quit the application.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
     {
-        get => _quitKey;
-        set
-        {
-            //if (_quitKey != value)
-            {
-                KeyBindings.Replace (_quitKey, value);
-                _quitKey = value;
-            }
-        }
+        get => Keyboard.QuitKey;
+        set => Keyboard.QuitKey = value;
     }
-
-    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
     {
-        get => _arrangeKey;
-        set
-        {
-            //if (_arrangeKey != value)
-            {
-                KeyBindings.Replace (_arrangeKey, value);
-                _arrangeKey = value;
-            }
-        }
+        get => Keyboard.ArrangeKey;
+        set => Keyboard.ArrangeKey = value;
     }
 
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
@@ -89,9 +71,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         //#endif
 
         // Ensure the mouse is ungrabbed.
-        if (MouseGrabHandler.MouseGrabView is { })
+        if (Mouse.MouseGrabView is { })
         {
-            MouseGrabHandler.UngrabMouse ();
+            Mouse.UngrabMouse ();
         }
 
         var rs = new RunState (toplevel);
@@ -205,7 +187,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.OnLoaded ();
 
-        LayoutAndDraw (true);
+        ApplicationImpl.Instance.LayoutAndDraw (true);
 
         if (PositionCursor ())
         {
@@ -424,40 +406,15 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
     ///     should only be overriden for testing.
     /// </param>
-    public static void LayoutAndDraw (bool forceDraw = false)
+    public static void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. TopLevels];
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-            tops.Insert (0, visiblePopover);
-        }
-
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
-
-        if (ClearScreenNextIteration)
-        {
-            forceDraw = true;
-            ClearScreenNextIteration = false;
-        }
-
-        if (forceDraw)
-        {
-            Driver?.ClearContents ();
-        }
-
-        View.SetClipToScreen ();
-        View.Draw (tops, neededLayout || forceDraw);
-        View.SetClipToScreen ();
-        Driver?.Refresh ();
+        ApplicationImpl.Instance.LayoutAndDraw (forceRedraw);
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
-    
+
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
     internal static MainLoop? MainLoop { get; set; }
