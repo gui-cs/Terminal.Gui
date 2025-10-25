@@ -36,12 +36,14 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
 
+    # Only build IntegrationTests project - dependencies (Terminal.Gui, UnitTests, etc.) are built automatically
     - name: Build IntegrationTests
       run: dotnet build Tests/IntegrationTests --configuration Debug --no-restore
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
+        # Use workflow-specific artifact name to avoid conflicts with unit-tests workflow
         name: build-artifacts-integration-${{ runner.os }}
         path: |
           **/bin/Debug/**
