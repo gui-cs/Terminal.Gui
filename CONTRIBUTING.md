@@ -99,6 +99,49 @@ Follow the template instructions found on Github.
 * **Documentation is the Spec** - We care deeply about providing delightful developer documentation and are sticklers for grammar and clarity. If the code and the docs conflict, we are biased to believe what we wrote in the API documentation. This drives a virtuous cycle of clear thinking.
 
 **Terminal.Gui** uses a derivative of the [Microsoft C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions), with any deviations from those (somewhat older) conventions codified in the .editorconfig for the solution, as well as even more specific definitions in team-shared dotsettings files, used by ReSharper and Rider.\
+
+### Critical Coding Standards
+
+**⚠️ These rules MUST be followed in ALL new code (production, tests, examples, samples):**
+
+#### Type Declarations and Object Creation
+
+1. **ALWAYS use explicit types** - Never use `var` except for basic types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
+
+   ```csharp
+   // ✅ CORRECT - Explicit types
+   View view = new () { Width = 10 };
+   MouseEventArgs args = new () { Position = new Point(5, 5) };
+   List<View?> views = new ();
+   var count = 0;  // OK - int is a basic type
+   var name = "test";  // OK - string is a basic type
+   
+   // ❌ WRONG - Using var for non-basic types
+   var view = new View { Width = 10 };
+   var args = new MouseEventArgs { Position = new Point(5, 5) };
+   var views = new List<View?>();
+   ```
+
+2. **ALWAYS use target-typed `new()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
+
+   ```csharp
+   // ✅ CORRECT - Target-typed new
+   View view = new () { Width = 10 };
+   MouseEventArgs args = new ();
+   
+   // ❌ WRONG - Redundant type name
+   View view = new View() { Width = 10 };
+   MouseEventArgs args = new MouseEventArgs();
+   ```
+
+**Why these rules matter:**
+- Explicit types improve code readability and make the type system more apparent
+- Target-typed `new()` reduces redundancy while maintaining clarity
+- Consistency across the codebase makes it easier for all contributors to read and maintain code
+- These conventions align with modern C# best practices (C# 9.0+)
+
+### Code Formatting
+
 Before you commit code, please run the formatting rules on **only the code file(s) you have modified**, in one of the following ways, in order of most preferred to least preferred:
 
  1. `Ctrl-E-C` if using ReSharper or Rider

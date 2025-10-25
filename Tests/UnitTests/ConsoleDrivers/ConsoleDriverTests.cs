@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.Drivers.FakeConsole;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 public class ConsoleDriverTests
 {

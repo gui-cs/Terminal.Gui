@@ -84,4 +84,12 @@ public interface IMouseGrabHandler
     ///     Releases the mouse grab, so mouse events will be routed to the view under the mouse pointer.
     /// </summary>
     public void UngrabMouse ();
+
+    /// <summary>
+    ///     Handles mouse grab logic for a mouse event.
+    /// </summary>
+    /// <param name="deepestViewUnderMouse">The deepest view under the mouse.</param>
+    /// <param name="mouseEvent">The mouse event to handle.</param>
+    /// <returns><see langword="true"/> if the event was handled by the grab handler; otherwise <see langword="false"/>.</returns>
+    bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent);
 }

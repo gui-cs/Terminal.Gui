@@ -855,16 +855,16 @@ public class TextField : View, IDesignable
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (Application.MouseGrabHandler.MouseGrabView is null)
+            if (Application.Mouse.MouseGrabView is null)
             {
-                Application.MouseGrabHandler.GrabMouse (this);
+                Application.Mouse.GrabMouse (this);
             }
         }
         else if (ev.Flags == MouseFlags.Button1Released)
         {
             _isButtonReleased = true;
             _isButtonPressed = false;
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
         else if (ev.Flags == MouseFlags.Button1DoubleClicked)
         {
@@ -1007,12 +1007,12 @@ public class TextField : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        if (Application.MouseGrabHandler.MouseGrabView is { } && Application.MouseGrabHandler.MouseGrabView == this)
+        if (Application.Mouse.MouseGrabView is { } && Application.Mouse.MouseGrabView == this)
         {
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
 
-        //if (SelectedLength != 0 && !(Application.MouseGrabHandler.MouseGrabView is MenuBar))
+        //if (SelectedLength != 0 && !(Application.Mouse.MouseGrabView is MenuBar))
         //	ClearAllSelection ();
     }
 

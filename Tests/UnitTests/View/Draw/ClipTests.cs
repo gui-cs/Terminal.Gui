@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class ClipTests (ITestOutputHelper _output)

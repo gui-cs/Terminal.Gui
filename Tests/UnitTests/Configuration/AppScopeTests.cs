@@ -3,7 +3,7 @@ using System.Text.Json;
 using UnitTests;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests.ConfigurationTests;
 
 public class AppSettingsScopeTests
 {

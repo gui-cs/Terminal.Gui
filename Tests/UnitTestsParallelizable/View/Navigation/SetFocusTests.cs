@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 [Collection ("Global Test Setup")]
 public class SetFocusTests () : TestsAllViews

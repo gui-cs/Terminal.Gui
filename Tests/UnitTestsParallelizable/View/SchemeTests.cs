@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using Xunit;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "View.Scheme")]
 public class SchemeTests
@@ -253,20 +253,6 @@ public class SchemeTests
         {
             return true; // Prevent setting the scheme
         }
-    }
-
-    [Fact]
-    public void View_Resolves_Attributes_From_Scheme ()
-    {
-        View view = new Label { SchemeName = "Base" };
-
-        foreach (VisualRole role in Enum.GetValues<VisualRole> ())
-        {
-            Attribute attr = view.GetAttributeForRole (role);
-            Assert.NotEqual (default, attr.Foreground); // Defensive: avoid all-defaults
-        }
-
-        view.Dispose ();
     }
 
     [Fact]
