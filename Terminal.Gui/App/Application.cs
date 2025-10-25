@@ -242,16 +242,15 @@ public static partial class Application
         // Run State stuff
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        MouseGrabHandler = new MouseGrabHandler ();
-        // Keyboard will be lazy-initialized in ApplicationImpl on next access
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
         Initialized = false;
 
         // Mouse
-        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
+        ResetMouseState ();
 
         // Keyboard events and bindings are now managed by the Keyboard instance
 

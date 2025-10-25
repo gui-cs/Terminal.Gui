@@ -1676,15 +1676,15 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
-            if (Application.MouseGrabHandler.MouseGrabView is null)
+            if (Application.Mouse.MouseGrabView is null)
             {
-                Application.MouseGrabHandler.GrabMouse (this);
+                Application.Mouse.GrabMouse (this);
             }
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1Released))
         {
             _isButtonReleased = true;
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
@@ -1886,9 +1886,9 @@ public class TextView : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (Application.MouseGrabHandler.MouseGrabView is { } && Application.MouseGrabHandler.MouseGrabView == this)
+        if (Application.Mouse.MouseGrabView is { } && Application.Mouse.MouseGrabView == this)
         {
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
     }
 
@@ -2032,7 +2032,7 @@ public class TextView : View, IDesignable
             return null;
         }
 
-        if (Application.MouseGrabHandler.MouseGrabView == this && IsSelecting)
+        if (Application.Mouse.MouseGrabView == this && IsSelecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);

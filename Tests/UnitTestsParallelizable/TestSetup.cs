@@ -40,7 +40,7 @@ public class GlobalTestSetup : IDisposable
 
         // Public Properties
         Assert.Null (Application.Top);
-        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+        Assert.Null (Application.Mouse.MouseGrabView);
 
         // Don't check Application.ForceDriver
         // Assert.Empty (Application.ForceDriver);
