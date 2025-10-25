@@ -11,9 +11,14 @@ on:
       - '**.md'
       
 jobs:
-  build_and_test_debug:
+  # Call the build workflow to build the solution once
+  build:
+    uses: ./.github/workflows/build.yml
 
+  integration_tests:
+    name: Integration Tests
     runs-on: ${{ matrix.os }}
+    needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: true
@@ -32,12 +37,14 @@ jobs:
         dotnet-version: 8.x
         dotnet-quality: 'ga'
 
-    - name: Install dependencies
-      run: |
-        dotnet restore
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: .
 
-    - name: Build IntegrationTests
-      run: dotnet build Tests/IntegrationTests --configuration Debug --no-restore
+    - name: Restore NuGet packages
+      run: dotnet restore
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
