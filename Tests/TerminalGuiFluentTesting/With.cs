@@ -34,7 +34,7 @@ public static class With
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.
     /// </summary>
-    public static TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds (120);
+    public static TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds (30);
 
     
 }
