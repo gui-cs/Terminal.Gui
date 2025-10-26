@@ -1,234 +1,419 @@
 # Contributing to Terminal.Gui
 
-We welcome contributions from the community. See [Issues](https://github.com/gui-cs/Terminal.Gui/issues) for a list of open [bugs](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abug) and [enhancements](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement). Contributors looking for something fun to work on should look at issues tagged as:
+> **📘 This document is the single source of truth for all contributors (humans and AI agents) to Terminal.Gui.**
 
-- [good first issue](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
-- [up for grabs](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs)
-- [help wanted](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs)
+Welcome! This guide provides everything you need to know to contribute effectively to Terminal.Gui, including project structure, build instructions, coding conventions, testing requirements, and CI/CD workflows.
 
-## Forking and Submitting Changes
+## Table of Contents
 
-Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) branching model. 
+- [Project Overview](#project-overview)
+- [Building and Testing](#building-and-testing)
+- [Coding Conventions](#coding-conventions)
+- [Testing Requirements](#testing-requirements)
+- [API Documentation Requirements](#api-documentation-requirements)
+- [Pull Request Guidelines](#pull-request-guidelines)
+- [CI/CD Workflows](#cicd-workflows)
+- [Repository Structure](#repository-structure)
+- [Branching Model](#branching-model)
+- [Key Architecture Concepts](#key-architecture-concepts)
+- [What NOT to Do](#what-not-to-do)
+- [Additional Resources](#additional-resources)
 
-* The `v1_release` and `v2_release` branches are always stable, and always match the most recently released Nuget package.
-* The `v1_develop` and `v2_develop` branches are where new development and bug-fixes happen. `v2_develop` is the default Github branch.
+---
 
-### Forking Terminal.Gui
+## Project Overview
 
-1. Use GitHub to fork the `Terminal.Gui` repo to your account (https://github.com/gui-cs/Terminal.Gui/fork).
+**Terminal.Gui** is a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET. It's a large codebase (~1,050 C# files, 333MB) providing a comprehensive framework for building interactive console applications with support for keyboard and mouse input, customizable views, and a robust event system.
 
-2. Clone your fork to your local machine
+**Key characteristics:**
+- **Language**: C# (net8.0)
+- **Size**: ~496 source files in core library, ~1,050 total C# files
+- **Platform**: Cross-platform (Windows, macOS, Linux)
+- **Architecture**: Console UI toolkit with driver-based architecture
+- **Version**: v2 (Alpha), v1 (maintenance mode)
+- **Branching**: GitFlow model (v2_develop is default/active development)
 
-```
-git clone https://github.com/<yourID>/Terminal.Gui
-```
+---
 
-Now, your local repo will have an `origin` remote pointing to `https://github.com/<yourID>/Terminal.Gui`.
+## Building and Testing
 
-3. Add a remote for `upstream`: 
-```
-git remote add upstream https://github.com/gui-cs/Terminal.Gui
-```
-You now have your own fork and a local repo that references it as `origin`. Your local repo also now references the orignal Terminal.Gui repo as `upstream`. 
+### Required Tools
 
-### Starting to Make a Change
+- **.NET SDK**: 8.0.0 (see `global.json`)
+- **Runtime**: .NET 8.x (latest GA)
+- **Optional**: ReSharper/Rider for code formatting (honor `.editorconfig` and `Terminal.sln.DotSettings`)
 
-Ensure your local `v1_develop` (for v1) or `v2_develop` (for v2) branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
-```powershell
-cd ./Terminal.Gui
-git checkout v2_develop
-git pull upstream v2_develop
-```
+### Build Commands (In Order)
 
-Create a new local branch:
-```powershell
-git checkout -b my_new_branch
-```
+**ALWAYS run these commands from the repository root:**
 
-### Making Changes
-Follow all the guidelines below.
-
-* [Coding Style](#TerminalGui-Coding-Style)
-* [Unit Tests](#Unit-Tests)
-* [Sample Code](#Sample-Code)
-* API Documentation
-* etc...
-
-When you're ready, commit your changes:
-
-```powershell
-git add .
-git commit -m "Fixes #1234. Some bug"
-```
-
-### Submitting a Pull Request
-
-1. Push your local branch to your fork (`origin`):
-
-```powershell
-git push --set-upstream origin my_new_branch
-```
-
-2. Create the Pull Request:
-
-In the output of the `git push` command you'll see instructions with a link to the Pull Request:
-
-```powershell
- $ git push --set-upstream origin my_new_branch
-Enumerating objects: 8, done.
-...
-remote:
-remote: Create a pull request for 'my_new_branch' on GitHub by visiting:
-remote:      https://github.com/<yourID>/Terminal.Gui/pull/new/more_doc_fixes
-remote:
-...
-```
-
-3. Go to that URL and create the Pull Request:
-
-(in Windows Terminal, just CTRL-Click on the URL)
-
-Follow the template instructions found on Github.
-
-## Tenets for [gui-cs](www.github.com/gui-cs) Code Style (Unless you have better ones)
-
-* **Six-Year-Old Reading Level** - Our code style is biased towards code readability and away from terseness. This is *Systems Software* and needs to stand the test of time. Code should be structured and use variable names that make it readable by a 6-year-old, and comments in code are encouraged. 
-* **Consistency, Consistency, Consistency** - We adopt and document our standards for code style and then enforce them ruthlessly. For example, we require code reviews to pay attention to code style, not just functionality. 
-* **Don't be Weird** - Like all developers we have opinions, but our opinions on code style are tempered by existing standards. We are biased towards code style that used by Microsoft and other leading dotnet developers. For example, we choose 4 spaces for indentation instead of 8.
-* **Set and Forget** - We embrace and encourage the use of technology that makes it easy for contributors to apply best-practice code-style, such as ReSharper. As we do so we are mindful that tools can cause hidden issues and merge hell.
-* **Documentation is the Spec** - We care deeply about providing delightful developer documentation and are sticklers for grammar and clarity. If the code and the docs conflict, we are biased to believe what we wrote in the API documentation. This drives a virtuous cycle of clear thinking.
-
-**Terminal.Gui** uses a derivative of the [Microsoft C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions), with any deviations from those (somewhat older) conventions codified in the .editorconfig for the solution, as well as even more specific definitions in team-shared dotsettings files, used by ReSharper and Rider.\
-
-### Critical Coding Standards
-
-**⚠️ These rules MUST be followed in ALL new code (production, tests, examples, samples):**
-
-#### Type Declarations and Object Creation
-
-1. **ALWAYS use explicit types** - Never use `var` except for basic types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
-
-   ```csharp
-   // ✅ CORRECT - Explicit types
-   View view = new () { Width = 10 };
-   MouseEventArgs args = new () { Position = new Point(5, 5) };
-   List<View?> views = new ();
-   var count = 0;  // OK - int is a basic type
-   var name = "test";  // OK - string is a basic type
-   
-   // ❌ WRONG - Using var for non-basic types
-   var view = new View { Width = 10 };
-   var args = new MouseEventArgs { Position = new Point(5, 5) };
-   var views = new List<View?>();
+1. **Restore packages** (required first, ~15-20 seconds):
+   ```bash
+   dotnet restore
    ```
 
-2. **ALWAYS use target-typed `new()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
+2. **Build solution** (Debug, ~50 seconds):
+   ```bash
+   dotnet build --configuration Debug --no-restore
+   ```
+   - Expect ~326 warnings (nullable reference warnings, unused variables, etc.) - these are normal
+   - 0 errors expected
 
-   ```csharp
-   // ✅ CORRECT - Target-typed new
-   View view = new () { Width = 10 };
-   MouseEventArgs args = new ();
-   
-   // ❌ WRONG - Redundant type name
-   View view = new View() { Width = 10 };
-   MouseEventArgs args = new MouseEventArgs();
+3. **Build Release** (for packaging):
+   ```bash
+   dotnet build --configuration Release --no-restore
    ```
 
-**Why these rules matter:**
-- Explicit types improve code readability and make the type system more apparent
-- Target-typed `new()` reduces redundancy while maintaining clarity
-- Consistency across the codebase makes it easier for all contributors to read and maintain code
-- These conventions align with modern C# best practices (C# 9.0+)
+### Test Commands
+
+**Two test projects exist:**
+
+1. **Non-parallel tests** (depend on static state, ~10 min timeout):
+   ```bash
+   dotnet test Tests/UnitTests --no-build --verbosity normal
+   ```
+   - Uses `Application.Init` and static state
+   - Cannot run in parallel
+   - Includes `--blame` flags for crash diagnostics
+
+2. **Parallel tests** (can run concurrently, ~10 min timeout):
+   ```bash
+   dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+   ```
+   - No dependencies on static state
+   - **Preferred for new tests**
+
+3. **Integration tests**:
+   ```bash
+   dotnet test Tests/IntegrationTests --no-build --verbosity normal
+   ```
+
+**Important**: Tests may take significant time. CI uses blame flags for crash detection:
+```bash
+--diag:logs/UnitTests/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always
+```
+
+### Common Build Issues
+
+#### Issue: Build Warnings
+- **Expected**: ~326 warnings (nullable refs, unused vars, xUnit suggestions)
+- **Action**: Don't add new warnings; fix warnings in code you modify
+
+#### Issue: Test Timeouts
+- **Expected**: Tests can take 5-10 minutes
+- **Action**: Use appropriate timeout values (60-120 seconds for test commands)
+
+#### Issue: Restore Failures
+- **Solution**: Ensure `dotnet restore` completes before building
+- **Note**: Takes 15-20 seconds on first run
+
+#### Issue: NativeAot/SelfContained Build
+- **Solution**: Restore these projects explicitly:
+  ```bash
+  dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
+  dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
+  ```
+
+### Running Examples
+
+**UICatalog** (comprehensive demo app):
+```bash
+dotnet run --project Examples/UICatalog/UICatalog.csproj
+```
+
+---
+
+## Coding Conventions
+
+### Code Style Tenets
+
+1. **Six-Year-Old Reading Level** - Readability over terseness
+2. **Consistency, Consistency, Consistency** - Follow existing patterns ruthlessly
+3. **Don't be Weird** - Follow Microsoft/.NET conventions
+4. **Set and Forget** - Rely on automated tooling
+5. **Documentation is the Spec** - API docs are source of truth
 
 ### Code Formatting
 
-Before you commit code, please run the formatting rules on **only the code file(s) you have modified**, in one of the following ways, in order of most preferred to least preferred:
+- **Do NOT add formatting tools** - Use existing `.editorconfig` and `Terminal.sln.DotSettings`
+- Format code with:
+  1. ReSharper/Rider (`Ctrl-E-C`)
+  2. JetBrains CleanupCode CLI tool (free)
+  3. Visual Studio (`Ctrl-K-D`) as fallback
+- **Only format files you modify**
 
- 1. `Ctrl-E-C` if using ReSharper or Rider
- 2. Running the free [CleanupCode](https://www.jetbrains.com/help/resharper/CleanupCode.html) tool from JetBrains (this applies the same formatting rules as if you had used ReSharper or Rider, but is free for all users, if you don't have a license for those products)
-     - Run at the command line, from the solution root directory, as: `cleanupcode.exe relative/path/to/your/file.cs`
- 3. If you are unable to use either of those options, the last resort is to use `Ctrl-K-D` in Visual Studio (with default C# developer key bindings), to apply the subset of the formatting rules that Visual Studio can apply.
+### Critical Coding Rules
 
-## User Experience Tenets
+**⚠️ CRITICAL - These rules MUST be followed in ALL new or modified code:**
 
-**Terminal.Gui**, as a UI framework, heavily influences how console graphical user interfaces (GUIs) work. We use the following [tenets](https://ceklog.kindel.com/2020/02/10/tenets/) to guide us:
+#### Type Declarations and Object Creation
 
-*NOTE: Like all tenets, these are up for debate. If you disagree, have questions, or suggestions about these tenets and guidelines submit an Issue using the [design](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Adesign) tag.*
+- **ALWAYS use explicit types** - Never use `var` except for built-in simple types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
+  ```csharp
+  // ✅ CORRECT - Explicit types
+  View view = new () { Width = 10 };
+  MouseEventArgs args = new () { Position = new Point(5, 5) };
+  List<View?> views = new ();
+  var count = 0;  // OK - int is a built-in type
+  var name = "test";  // OK - string is a built-in type
+  
+  // ❌ WRONG - Using var for non-built-in types
+  var view = new View { Width = 10 };
+  var args = new MouseEventArgs { Position = new Point(5, 5) };
+  var views = new List<View?>();
+  ```
 
-1. **Honor What's Come Before**. The Mac and Windows OS's have well-established GUI idioms that are mostly consistent. We adhere to these versus inventing new ways for users to do things. For example, **Terminal.Gui** adopts the `ctrl/command-c`, `ctrl/command-v`, and `ctrl/command-x` keyboard shortcuts for cut, copy, and paste versus defining new shortcuts.
-2. **Consistency Matters**. Common UI idioms should be consistent across the GUI framework. For example, `ctrl/command-q` quits/exits all modal views. See [Issue #456](https://github.com/gui-cs/Terminal.Gui/issues/456) as a counter-example that should be fixed.
-3. **Honor the OS, but Work Everywhere**. **Terminal.Gui** is cross-platform, but we support taking advantage of a platform's unique advantages. For example, the Windows Console API is richer than the Unix API in terms of keyboard handling. Thus, in Windows pressing the `alt` key in a **Terminal.Gui** app will activate the `MenuBar`, but in Unix, the user has to press the full hotkey (e.g. `alt-f`) or `F9`. 
-4. **Keyboard first, Mouse also**. Users use consoles primarily with the keyboard; **Terminal.Gui** is optimized for getting stuff done without using the Mouse. However, as a GUI framework, the Mouse is essential thus we strive to ensure that everything also works via the Mouse.
+- **ALWAYS use target-typed `new()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
+  ```csharp
+  // ✅ CORRECT - Target-typed new
+  View view = new () { Width = 10 };
+  MouseEventArgs args = new ();
+  
+  // ❌ WRONG - Redundant type name
+  View view = new View() { Width = 10 };
+  MouseEventArgs args = new MouseEventArgs();
+  ```
 
-## Public API Tenets & Guidelines
+#### Other Conventions
 
-**Terminal.Gui** provides an API that is used by many. As the project evolves, contributors should follow these [tenets](https://ceklog.kindel.com/2020/02/10/tenets/) to ensure Consistency and backward compatibility.
+- Follow `.editorconfig` settings (e.g., braces on new lines, spaces after keywords)
+- 4-space indentation
+- No trailing whitespace
+- File-scoped namespaces
 
-*NOTE: Like all tenets, these are up for debate. If you disagree, have questions, or suggestions about these tenets and guidelines submit an Issue using the [design](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Adesign) tag.*
+**⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, and samples.**
 
-1. **Stand on the shoulders of giants.** Follow the [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/) where appropriate. 
-2. **Don't Break Existing Stuff.** Avoid breaking changes to user behavior or the public API; instead, figure out how to implement new functionality in a similar way. If a breaking change can't be avoided, follow the guidelines below.
-3. **Fail-fast.** Fail-fast makes bugs and failures appear sooner, leading to a higher-quality framework and API.
-4. **Standards Reduce Complexity**. We strive to adopt standard API idoms because doing so reduces complexity for users of the API. For example, see Tenet #1 above. A counterexample is [Issue #447](https://github.com/gui-cs/Terminal.Gui/issues/447).
+---
 
-### Include API Documentation
+## Testing Requirements
 
-Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui). Contributors have the responsibility of continuously improving the API Documentation.
+### Code Coverage
 
-- All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
-- Keep the `<summary></summary>` terse.
-- Use `<see cref=""/>` liberally to cross-link topics.
-- Use `<remarks></remarks>` to add more context and explanation.
-- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html).
-- Use proper English and good grammar.
+- **Never decrease code coverage** - PRs must maintain or increase coverage
+- Target: 70%+ coverage for new code
+- CI monitors coverage on each PR
 
-### Defining Events
+### Test Patterns
 
-See https://gui-cs.github.io/Terminal.Gui/docs/events.html
+- **Parallelizable tests preferred** - Add new tests to `UnitTestsParallelizable` when possible
+- **Avoid static dependencies** - Don't use `Application.Init`, `ConfigurationManager` in tests
+- **Don't use `[AutoInitShutdown]`** - Legacy pattern, being phased out
+- **Make tests granular** - Each test should cover smallest area possible
+- Follow existing test patterns in respective test projects
 
+### Test Configuration
 
-### Defining new `View` classes
+- `xunit.runner.json` - xUnit configuration
+- `coverlet.runsettings` - Coverage settings (OpenCover format)
 
-- Support parameterless constructors (see [Issue 102](Parameterless constructors #102)). Do not require callers to use a parameterized constructor except when forcing `Absolute Layout`).
-- Avoid doing initialization via constructors. Instead use a property so consumers can use object initialization (e.g. `var foo = new Foo() { a = b };`).
-- Ensure the `UICatalog` demo for the new class illustrates both `Absolutle Layout` and `Computed Layout`.
+---
 
-## Breaking Changes to User Behavior or the Public API
+## API Documentation Requirements
 
-- Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
-- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html).
+**All public APIs MUST have XML documentation:**
 
-## Unit Tests
+- Clear, concise `<summary>` tags
+- Use `<see cref=""/>` for cross-references
+- Add `<remarks>` for context
+- Include `<example>` for non-obvious usage
+- Complex topics → `docfx/docs/*.md` files
+- Proper English and grammar - Clear, concise, complete. Use imperative mood.
 
-PRs should never cause code coverage to go down. Ideally, every PR will get the project closer to 100%. PRs that include new functionality (e.g. a new control) should have at least 70% code coverage for the new functionality. 
+---
 
-**Terminal.Gui** has an automated unit or regression test suite. See the [Testing wiki](https://github.com/gui-cs/Terminal.Gui/wiki/Testing).
+## Pull Request Guidelines
 
-We analyze unit tests and code coverage on each PR push. 
+### PR Requirements
 
-The code coverage of the latest released build (on NuGet) is shown as a badge at the top of `README.md`. Here as well:
+- **Title**: "Fixes #issue. Terse description". If multiple issues, list all, separated by commas (e.g. "Fixes #123, #456. Terse description")
+- **Description**: 
+  - Include "- Fixes #issue" for each issue near the top
+  - **ALWAYS** include instructions for pulling down locally at end of Description
+  - Suggest user setup a remote named `copilot` pointing to your fork
+  - Example:
+    ```markdown
+    # To pull down this PR locally:
+    git remote add copilot <your-fork-url>
+    git fetch copilot <branch-name>
+    git checkout copilot/<branch-name>
+    ```
+- **Coding Style**: Follow all coding conventions in this document for new and modified code
+- **Tests**: Add tests for new functionality (see [Testing Requirements](#testing-requirements))
+- **Coverage**: Maintain or increase code coverage
+- **Scenarios**: Update UICatalog scenarios when adding features
+- **Warnings**: **CRITICAL - PRs must not introduce any new warnings**
+  - Any file modified in a PR that currently generates warnings **MUST** be fixed to remove those warnings
+  - Exception: Warnings caused by `[Obsolete]` attributes can remain
+  - Expected baseline: ~326 warnings (mostly nullable reference warnings, unused variables, xUnit suggestions)
+  - Action: Before submitting a PR, verify your changes don't add new warnings and fix any warnings in files you modify
 
-![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
+---
 
-The project uses Fine Code Coverage to allow easy access to code coverage info on a per-component basis.
+## CI/CD Workflows
 
-Use the following command to generate the same CC info that the Publish Github Action uses to publish the results to the badge:
+The repository uses multiple GitHub Actions workflows. What runs and when:
 
+### 1) Build Solution (`.github/workflows/build.yml`)
+
+- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`); supports `workflow_call`
+- **Runner/timeout**: `ubuntu-latest`, 10 minutes
+- **Steps**:
+  - Checkout and setup .NET 8.x GA
+  - `dotnet restore`
+  - Build Debug: `dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612`
+  - Build Release (library): `dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -property:NoWarn=0618%3B0612`
+  - Pack Release: `dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612`
+  - Restore NativeAot/SelfContained examples, then restore solution again
+  - Build Release for `Examples/NativeAot` and `Examples/SelfContained`
+  - Build Release solution
+  - Upload artifacts named `build-artifacts`, retention 1 day
+
+### 2) Build & Run Unit Tests (`.github/workflows/unit-tests.yml`)
+
+- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
+- **Process**: Calls build workflow, then runs:
+  - Non-parallel UnitTests on Ubuntu/Windows/macOS matrix with coverage and blame/diag flags; `xunit.stopOnFail=false`
+  - Parallel UnitTestsParallelizable similarly with coverage; `xunit.stopOnFail=false`
+  - Uploads logs per-OS
+
+### 3) Build & Run Integration Tests (`.github/workflows/integration-tests.yml`)
+
+- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
+- **Process**: Calls build workflow, then runs IntegrationTests on matrix with blame/diag; `xunit.stopOnFail=true`
+- Uploads logs per-OS
+
+### 4) Publish to NuGet (`.github/workflows/publish.yml`)
+
+- **Triggers**: push to `v2_release`, `v2_develop`, and tags `v*` (ignores `**.md`)
+- Uses GitVersion to compute SemVer, builds Release, packs with symbols, and pushes to NuGet.org using `NUGET_API_KEY`
+
+### 5) Build and publish API docs (`.github/workflows/api-docs.yml`)
+
+- **Triggers**: push to `v1_release` and `v2_develop`
+- Builds DocFX site on Windows and deploys to GitHub Pages when `ref_name` is `v2_release` or `v2_develop`
+
+### Replicating CI Locally
+
+```bash
+# Full CI sequence:
+dotnet restore
+dotnet build --configuration Debug --no-restore
+dotnet test Tests/UnitTests --no-build --verbosity normal
+dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+dotnet build --configuration Release --no-restore
 ```
-dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
-```
 
-Then open up the resulting `coverage.opencover.xml` file and you'll see the `sequenceCoverage` value:
+---
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<CoverageSession>
-  <Summary numSequencePoints="15817" visitedSequencePoints="7249" numBranchPoints="9379" visitedBranchPoints="3640" sequenceCoverage="45.83" branchCoverage="38.81" maxCyclomaticComplexity="10276" minCyclomaticComplexity="10276" visitedClasses="105" numClasses="141" visitedMethods="965" numMethods="1751" />
- 
-```
+## Repository Structure
 
-## Sample Code
+### Root Directory Files
 
-[UI Catalog](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog) is a great sample app for manual testing.
+- `Terminal.sln` - Main solution file
+- `Terminal.sln.DotSettings` - ReSharper code style settings
+- `.editorconfig` - Code formatting rules (111KB, extensive)
+- `global.json` - .NET SDK version pinning
+- `Directory.Build.props` - Common MSBuild properties
+- `Directory.Packages.props` - Central package version management
+- `GitVersion.yml` - Version numbering configuration
+- `CONTRIBUTING.md` - This file - contribution guidelines (source of truth)
+- `AGENTS.md` - Pointer to this file for AI agents
+- `README.md` - Project documentation
 
-When adding new functionality, fixing bugs, or changing things, please either add a new `Scenario` to **UICatalog** or update an existing `Scenario` to fully illustrate your work and provide a test-case.
+### Main Directories
+
+**`/Terminal.Gui/`** - Core library (496 C# files):
+- `App/` - Application lifecycle (`Application.cs` static class, `RunState`, `MainLoop`)
+- `Configuration/` - `ConfigurationManager` for settings
+- `Drivers/` - Console driver implementations (`IConsoleDriver`, `NetDriver`, `UnixDriver`, `WindowsDriver`)
+- `Drawing/` - Rendering system (attributes, colors, glyphs)
+- `Input/` - Keyboard and mouse input handling
+- `ViewBase/` - Core `View` class hierarchy and layout
+- `Views/` - Specific View subclasses (Window, Dialog, Button, ListView, etc.)
+- `Text/` - Text manipulation and formatting
+- `FileServices/` - File operations and services
+
+**`/Tests/`**:
+- `UnitTests/` - Non-parallel tests (use `Application.Init`, static state)
+- `UnitTestsParallelizable/` - Parallel tests (no static dependencies) - **Preferred**
+- `IntegrationTests/` - Integration tests
+- `StressTests/` - Long-running stress tests (scheduled daily)
+- `coverlet.runsettings` - Code coverage configuration
+
+**`/Examples/`**:
+- `UICatalog/` - Comprehensive demo app for manual testing
+- `Example/` - Basic example
+- `NativeAot/`, `SelfContained/` - Deployment examples
+- `ReactiveExample/`, `CommunityToolkitExample/` - Integration examples
+
+**`/docfx/`** - Documentation source:
+- `docs/` - Conceptual documentation (deep dives)
+- `api/` - Generated API docs (gitignored)
+- `docfx.json` - DocFX configuration
+
+**`/Scripts/`** - PowerShell build utilities (requires PowerShell 7.4+)
+
+**`/.github/workflows/`** - CI/CD pipelines (see [CI/CD Workflows](#cicd-workflows))
+
+---
+
+## Branching Model
+
+### GitFlow Model
+
+- `v2_develop` - Default branch, active development
+- `v2_release` - Stable releases, matches NuGet
+- `v1_develop`, `v1_release` - Legacy v1 (maintenance only)
+
+---
+
+## Key Architecture Concepts
+
+**⚠️ CRITICAL - Contributors should understand these concepts before starting work.**
+
+See `/docfx/docs/` for deep dives on:
+
+- **Application Lifecycle** - How `Application.Init`, `Application.Run`, and `Application.Shutdown` work
+- **View Hierarchy** - Understanding `View`, `Toplevel`, `Window`, and view containment
+- **Layout System** - Pos, Dim, and automatic layout
+- **Event System** - How keyboard, mouse, and application events flow
+- **Driver Architecture** - How console drivers abstract platform differences
+- **Drawing Model** - How rendering works with Attributes, Colors, and Glyphs
+
+Key documentation:
+- [View Documentation](https://gui-cs.github.io/Terminal.Gui/docs/View.html)
+- [Events Deep Dive](https://gui-cs.github.io/Terminal.Gui/docs/events.html)
+- [Layout System](https://gui-cs.github.io/Terminal.Gui/docs/layout.html)
+- [Keyboard Handling](https://gui-cs.github.io/Terminal.Gui/docs/keyboard.html)
+- [Mouse Support](https://gui-cs.github.io/Terminal.Gui/docs/mouse.html)
+- [Drivers](https://gui-cs.github.io/Terminal.Gui/docs/drivers.html)
+
+---
+
+## What NOT to Do
+
+- ❌ Don't add new linters/formatters (use existing)
+- ❌ Don't modify unrelated code
+- ❌ Don't remove/edit unrelated tests
+- ❌ Don't break existing functionality
+- ❌ Don't add tests to `UnitTests` if they can be parallelizable
+- ❌ Don't use `Application.Init` in new tests
+- ❌ Don't decrease code coverage
+- ❌ **Don't use `var` for anything but built-in simple types** (use explicit types)
+- ❌ **Don't use redundant type names with `new`** (**ALWAYS PREFER** target-typed `new ()`)
+- ❌ **Don't introduce new warnings** (fix warnings in files you modify; exception: `[Obsolete]` warnings)
+
+---
+
+## Additional Resources
+
+- **Full Documentation**: https://gui-cs.github.io/Terminal.Gui
+- **API Reference**: https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.html
+- **Deep Dives**: `/docfx/docs/` directory
+- **Getting Started**: https://gui-cs.github.io/Terminal.Gui/docs/getting-started.html
+- **Migrating from v1 to v2**: https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1.html
+- **Showcase**: https://gui-cs.github.io/Terminal.Gui/docs/showcase.html
+
+---
+
+**Thank you for contributing to Terminal.Gui!** 🎉

@@ -36,6 +36,8 @@ See the [Layout Deep Dive](layout.md) and the [Arrangement Deep Dive](arrangemen
 
 See the [Drawing Deep Dive](drawing.md).
 
+Views should use viewport-relative coordinates for all drawing operations. The `View.Move(col, row)` method positions the cursor using viewport-relative coordinates. For screen dimensions, use @Terminal.Gui.App.Application.Screen instead of accessing the driver directly.
+
 ### Navigation
 
 See the [Navigation Deep Dive](navigation.md).
