@@ -627,9 +627,8 @@ public class ApplicationTests
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
         Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
-        // TODO: Should not be possible to manually change these at whim!
-        driver.Cols = 100;
-        driver.Rows = 30;
+        // Use SetScreenSize to change screen dimensions
+        driver.SetScreenSize (100, 30);
         // IConsoleDriver.Screen isn't assignable
         //driver.Screen = new (0, 0, driver.Cols, Rows);
 

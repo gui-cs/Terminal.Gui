@@ -128,8 +128,7 @@ public class ConsoleDriverTests
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver?.Init ();
-        driver.Cols = 80;
-        driver.Rows = 25;
+        driver.SetScreenSize(80, 25);
 
         var wasTerminalResized = false;
 
@@ -144,8 +143,7 @@ public class ConsoleDriverTests
         Assert.Equal (25, driver.Rows);
         Assert.False (wasTerminalResized);
 
-        driver.Cols = 120;
-        driver.Rows = 40;
+        driver.SetScreenSize(120, 40);
 
         ((ConsoleDriver)driver).OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
         Assert.Equal (120, driver.Cols);

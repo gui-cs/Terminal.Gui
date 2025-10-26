@@ -26,8 +26,7 @@ public class ClipRegionTests
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
-        Application.Driver!.Rows = 25;
-        Application.Driver!.Cols = 80;
+        Application.Driver!.SetScreenSize (80, 25);
 
         driver.Move (0, 0);
         driver.AddRune ('x');
@@ -94,8 +93,7 @@ public class ClipRegionTests
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
-        Application.Driver!.Rows = 10;
-        Application.Driver!.Cols = 10;
+        Application.Driver!.SetScreenSize (10, 10);
 
         // positive
         Assert.True (driver.IsValidLocation (default, 0, 0));
