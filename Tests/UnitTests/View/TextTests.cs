@@ -998,7 +998,7 @@ w ";
     [SetupFakeDriver]
     public void Narrow_Wide_Runes ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (32, 32);
+        ((FakeDriver)Application.Driver!).SetBufferSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
 
         var text = $"First line{Environment.NewLine}Second line";

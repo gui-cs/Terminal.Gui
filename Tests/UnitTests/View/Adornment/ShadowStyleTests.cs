@@ -30,7 +30,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Color fg = Color.Red;
         Color bg = Color.Green;
 
@@ -100,7 +100,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Visual_Test (ShadowStyle style, string expected)
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
 
         var superView = new Toplevel
         {

@@ -3828,7 +3828,7 @@ ssb
     [SetupFakeDriver]
     public void FillRemaining_True_False ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (22, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (22, 5);
 
         Attribute [] attrs =
         {
@@ -4050,7 +4050,7 @@ Nice       Work")]
         Size tfSize = tf.FormatAndGetSize ();
         Assert.Equal (new (59, 13), tfSize);
 
-        ((IFakeConsoleDriver)Application.Driver).SetBufferSize (tfSize.Width, tfSize.Height);
+        ((FakeDriver)Application.Driver).SetBufferSize (tfSize.Width, tfSize.Height);
 
         Application.Driver.FillRect (Application.Screen, (Rune)'*');
         tf.Draw (Application.Screen, Attribute.Default, Attribute.Default);
