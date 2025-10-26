@@ -272,14 +272,6 @@ public interface IApplication
     List<CultureInfo>? SupportedCultures { get; }
 
     /// <summary>
-    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
-    /// </summary>
-    /// <remarks>
-    ///     Intended to support unit tests that need to know when the application has been initialized.
-    /// </remarks>
-    event EventHandler<EventArgs<bool>>? InitializedChanged;
-
-    /// <summary>
     ///     Resets the application state to defaults. This is called by <see cref="Shutdown"/>.
     /// </summary>
     /// <param name="ignoreDisposed">If true, will not assert that views are disposed.</param>
