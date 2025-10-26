@@ -158,7 +158,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         bool init = Initialized = true;
         
         // Raise InitializedChanged event
-        OnInitializedChanged (null, new (init));
+        OnInitializedChanged (ApplicationImpl.Instance, new (init));
     }
 
     internal static void SubscribeDriverEvents ()
