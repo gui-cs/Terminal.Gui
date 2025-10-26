@@ -102,8 +102,6 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private readonly bool _isVirtualTerminal;
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
-    private readonly uint _originalOutputConsoleMode;
-    private readonly bool _vtProcessingEnabledByThisInstance;
 
     public WindowsOutput ()
     {
@@ -116,37 +114,8 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
         // Get the standard output handle which is the current screen buffer.
         _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-        
-        if (!GetConsoleMode (_outputHandle, out uint mode))
-        {
-            throw new ApplicationException ($"Failed to get output console mode, error code: {Marshal.GetLastWin32Error ()}.");
-        }
-
-        _originalOutputConsoleMode = mode;
-
-        // Enable VT processing if not already enabled to support hyperlink detection and other VT features
-        if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
-        {
-            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-
-            if (!SetConsoleMode (_outputHandle, mode))
-            {
-                // If we can't enable VT processing, continue without it
-                Logging.Logger.LogWarning ($"Failed to enable VT processing, error code: {Marshal.GetLastWin32Error ()}. Hyperlinks and other VT features may not work.");
-                _isVirtualTerminal = false;
-                _vtProcessingEnabledByThisInstance = false;
-            }
-            else
-            {
-                _isVirtualTerminal = true;
-                _vtProcessingEnabledByThisInstance = true;
-            }
-        }
-        else
-        {
-            _isVirtualTerminal = true;
-            _vtProcessingEnabledByThisInstance = false;
-        }
+        GetConsoleMode (_outputHandle, out uint mode);
+        _isVirtualTerminal = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
 
         if (_isVirtualTerminal)
         {
@@ -554,15 +523,6 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
                 Console.ForegroundColor = _foreground;
                 Console.BackgroundColor = _background;
                 Console.Clear ();
-            }
-
-            // Restore original console mode only if we enabled VT processing
-            if (_vtProcessingEnabledByThisInstance && _outputHandle != nint.Zero && !ConsoleDriver.RunningUnitTests)
-            {
-                if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
-                {
-                    Logging.Logger.LogWarning ($"Failed to restore output console mode, error code: {Marshal.GetLastWin32Error ()}.");
-                }
             }
         }
         else
