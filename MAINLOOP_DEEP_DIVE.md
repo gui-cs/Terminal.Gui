@@ -2,20 +2,13 @@
 
 ## Executive Summary
 
-After independently analyzing the Terminal.Gui codebase, I've discovered Terminal.Gui uses a **dual-architecture system** with modern and legacy mainloop implementations. The architecture separates concerns into distinct threads and phases, with the "MainLoop" actually referring to multiple different concepts depending on context.
+After independently analyzing the Terminal.Gui codebase, Terminal.Gui uses a **modern, streamlined architecture** with a clear separation between input and UI processing threads. The "MainLoop" is implemented as `ApplicationMainLoop<T>` which coordinates event processing, layout, drawing, and timers in a single cohesive system.
 
-## Key Discovery: Two MainLoop Implementations
-
-Terminal.Gui has **TWO distinct MainLoop architectures**:
-
-1. **Modern Architecture** (`ApplicationMainLoop<T>`) - Used by v2 drivers (DotNet, Windows, Unix)
-2. **Legacy Architecture** (`MainLoop`) - Marked obsolete, used only by FakeDriver for backward compatibility
-
-This explains the confusion around terminology - "MainLoop" means different things in different contexts.
+**Update (October 2025):** The legacy MainLoop infrastructure has been completely removed, simplifying the architecture significantly.
 
 ## Architecture Overview
 
-### The Modern Architecture (v2)
+### The Modern Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -96,26 +89,50 @@ public static void Run(Toplevel view, Func<Exception, bool>? errorHandler = null
 
 **Purpose:** Prepares a Toplevel for execution but does NOT start the loop.
 
-### 3. The Loop Layer - Where Things Get Interesting
+### 3. The Application Control Loop
 
-There are actually **THREE different "loop" concepts**:
-
-#### A. The Application Loop (`while (toplevel.Running)`)
-
-**Location:** `ApplicationImpl.Run()`
+**Location:** `ApplicationImpl.Run()` and `Application.RunLoop()`
 
 ```csharp
+// ApplicationImpl.Run()
 while (_topLevels.TryPeek(out found) && found == view && view.Running)
 {
     _coordinator.RunIteration();  // Call coordinator
+}
+
+// Application.RunLoop() - for manual control
+for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
+{
+    if (EndAfterFirstIteration && !firstIteration)
+        return;
+    
+    firstIteration = RunIteration(ref state, firstIteration);
 }
 ```
 
 **Purpose:** The main control loop at the Application level. Continues until `RequestStop()` is called.
 
-**This is NOT a "RunLoop"** - it's the application's execution loop.
+**Key insight:** This is the application's execution loop.
 
-#### B. The Coordinator Iteration (`Coordinator.RunIteration()`)
+### 4. Application.RunIteration() - One Cycle
+
+**Location:** `Application.Run.cs`
+
+```csharp
+public static bool RunIteration(ref RunState state, bool firstIteration = false)
+{
+    ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
+    appImpl.Coordinator?.RunIteration();
+    
+    return false;
+}
+```
+
+**Purpose:** Process ONE iteration by delegating to the Coordinator.
+
+**Simplified:** Direct delegation - no conditional logic.
+
+### 5. The Coordinator Layer
 
 **Location:** `MainLoopCoordinator<T>.RunIteration()`
 
@@ -126,9 +143,9 @@ public void RunIteration()
 }
 ```
 
-**Purpose:** Thin wrapper that delegates to ApplicationMainLoop.
+**Purpose:** Thin wrapper that delegates to ApplicationMainLoop. Also manages the input thread lifecycle.
 
-#### C. The ApplicationMainLoop Iteration (`ApplicationMainLoop<T>.Iteration()`)
+### 6. The ApplicationMainLoop - The Real Work
 
 **Location:** `ApplicationMainLoop<T>.Iteration()` and `.IterationImpl()`
 
@@ -169,99 +186,6 @@ internal void IterationImpl()
 
 **Purpose:** This is the REAL "main loop iteration" that does all the work.
 
-### 4. The Legacy MainLoop (for FakeDriver)
-
-**Location:** `Terminal.Gui/App/MainLoop/LegacyMainLoopDriver.cs`
-
-```csharp
-[Obsolete("This class is for legacy FakeDriver compatibility only")]
-public class MainLoop : IDisposable
-{
-    internal void RunIteration()
-    {
-        RunAnsiScheduler();
-        MainLoopDriver?.Iteration();
-        TimedEvents.RunTimers();
-    }
-}
-```
-
-**Purpose:** Backward compatibility with v1 FakeDriver. Marked obsolete.
-
-**Key difference:** This is what `Application.RunLoop()` calls when using legacy drivers.
-
-### 5. Application.RunLoop() - The Misnamed Method
-
-**Location:** `Application.Run.cs`
-
-```csharp
-public static void RunLoop(RunState state)
-{
-    var firstIteration = true;
-    
-    for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
-    {
-        if (MainLoop is { })
-            MainLoop.Running = true;
-        
-        if (EndAfterFirstIteration && !firstIteration)
-            return;
-        
-        firstIteration = RunIteration(ref state, firstIteration);
-    }
-    
-    if (MainLoop is { })
-        MainLoop.Running = false;
-}
-```
-
-**Purpose:** For legacy code that manually controls the loop.
-
-**Key insight:** This is a LEGACY compatibility method that calls either:
-- Modern: The application loop (via `RunIteration`)
-- Legacy: `MainLoop.RunIteration()` when legacy driver is used
-
-**The name "RunLoop" is misleading** because:
-1. It doesn't "run" a loop - it IS a loop
-2. It's actually the application-level control loop
-3. The real "mainloop" work happens inside `RunIteration()`
-
-### 6. Application.RunIteration() - One Cycle
-
-**Location:** `Application.Run.cs`
-
-```csharp
-public static bool RunIteration(ref RunState state, bool firstIteration = false)
-{
-    // If driver has events pending, do an iteration of the driver MainLoop
-    if (MainLoop is { Running: true } && MainLoop.EventsPending())
-    {
-        if (firstIteration)
-            state.Toplevel.OnReady();
-        
-        MainLoop.RunIteration();  // LEGACY path
-        Iteration?.Invoke(null, new());
-    }
-    
-    firstIteration = false;
-    
-    if (Top is null)
-        return firstIteration;
-    
-    LayoutAndDraw(TopLevels.Any(v => v.NeedsLayout || v.NeedsDraw));
-    
-    if (PositionCursor())
-        Driver?.UpdateCursor();
-    
-    return firstIteration;
-}
-```
-
-**Purpose:** Process ONE iteration - either legacy or modern path.
-
-**Modern path:** Called by `ApplicationImpl.Run()` via coordinator
-**Legacy path:** Calls `MainLoop.RunIteration()` (obsolete)
-
 ### 7. Application.End() - Cleanup Phase
 
 **What it does:**
@@ -271,7 +195,6 @@ public static bool RunIteration(ref RunState state, bool firstIteration = false)
 4. Restores previous `Top`
 5. Clears RunState.Toplevel
 6. Disposes RunState token
-7. Forces final layout/draw
 
 **Purpose:** Balances `Begin()` - cleans up after execution.
 
@@ -347,19 +270,7 @@ Application.End() cleans up
 
 ## Key Terminology Issues Discovered
 
-### Issue 1: "RunLoop" is Ambiguous
-
-The term "RunLoop" refers to:
-1. **`Application.RunLoop()` method** - Application-level control loop (legacy compatibility)
-2. **`MainLoop` class** - Legacy main loop driver (obsolete)
-3. **`MainLoop.RunIteration()`** - Legacy iteration method
-4. **The actual application loop** - `while(toplevel.Running)`
-5. **The coordinator iteration** - `Coordinator.RunIteration()`
-6. **The main loop iteration** - `ApplicationMainLoop.Iteration()`
-
-**Problem:** Six different concepts all contain "Run" or "Loop"!
-
-### Issue 2: "RunState" Doesn't Hold State
+### Issue 1: "RunState" Doesn't Hold State
 
 `RunState` is actually a **token** or **handle** for the Begin/End pairing:
 
@@ -373,29 +284,28 @@ public class RunState : IDisposable
 
 **Purpose:** Ensures `End()` is called with the same Toplevel that `Begin()` set up.
 
-### Issue 3: "RunIteration" Has Two Paths
+**Recommendation:** Rename to `RunToken` to clarify it's a token, not state data.
 
-`Application.RunIteration()` does different things depending on the driver:
+### Issue 2: "EndAfterFirstIteration" Confuses "End" with Loop Control
 
-**Legacy path** (FakeDriver):
-```
-RunIteration() 
-    → MainLoop.EventsPending()
-    → MainLoop.RunIteration()
-    → LayoutAndDraw()
+**Current:**
+```csharp
+Application.EndAfterFirstIteration = true;  // Controls RunLoop, not End()
+RunState rs = Application.Begin(window);
+Application.RunLoop(rs);  // Stops after 1 iteration due to flag
+Application.End(rs);       // This is actual "End"
 ```
 
-**Modern path** (Normal use):
-```
-ApplicationImpl.Run()
-    → Coordinator.RunIteration()
-    → ApplicationMainLoop.Iteration()
-    → (includes LayoutAndDraw internally)
-```
+**Issue:** 
+- "End" in the flag name suggests the `End()` method
+- The flag stops the loop, not the lifecycle
+- Creates confusion about when `End()` gets called
+
+**Recommendation:** Rename to `StopAfterFirstIteration` to align with `RequestStop`.
 
 ## The True MainLoop Architecture
 
-The **actual mainloop** in modern Terminal.Gui is:
+The **actual mainloop** in Terminal.Gui is:
 
 ```
 ApplicationMainLoop<T>
@@ -472,7 +382,6 @@ Application.Run(toplevel)
         ├─> Fire OnClosed event
         ├─> Restore previous Top
         ├─> Clear & dispose RunState
-        └─> Final layout/draw
 
 Application.Shutdown()
     ├─> Coordinator.Stop()
@@ -480,64 +389,34 @@ Application.Shutdown()
     └─> Cleanup all resources
 ```
 
-## Parallel: Input Thread Flow
-
-```
-Input Thread (runs concurrently):
-
-IConsoleInput<T>.Run(token)
-    │
-    └─> while (!token.IsCancellationRequested)
-        │
-        ├─> Read from console (BLOCKING)
-        │   ├─ DotNet: Console.ReadKey()
-        │   ├─ Windows: ReadConsoleInput() API
-        │   └─ Unix: Terminal read APIs
-        │
-        ├─> Parse raw input to <T>
-        │
-        ├─> InputBuffer.Enqueue(input)  ← Thread-safe handoff
-        │
-        └─> Loop back
-```
-
 ## Summary of Discoveries
 
-### 1. Dual Architecture
-- Modern: `ApplicationMainLoop<T>` with coordinator pattern
-- Legacy: `MainLoop` class for FakeDriver only (obsolete)
+### 1. Streamlined Architecture
+- Modern only: `ApplicationMainLoop<T>` with coordinator pattern
+- Legacy removed: Cleaner, simpler codebase
 
 ### 2. Two-Thread Model
 - Input thread: Blocking console reads
 - Main UI thread: Event processing, layout, drawing
 
-### 3. The "MainLoop" Misnomer
-- There's no single "MainLoop" - it's distributed across:
-  - Application control loop (`while (toplevel.Running)`)
-  - Coordinator iteration
-  - ApplicationMainLoop iteration
-  - Legacy MainLoop (obsolete)
+### 3. Clear Iteration Hierarchy
+```
+Application.RunLoop()                   ← Application control loop (for manual control)
+    └─> Application.RunIteration()      ← One iteration
+        └─> Coordinator.RunIteration()
+            └─> ApplicationMainLoop.Iteration()
+                └─> IterationImpl()     ← The REAL mainloop work
+```
 
 ### 4. RunState is a Token
 - Not state data
 - Just a handle to pair Begin/End
 - Contains only the Toplevel reference
 
-### 5. Iteration Hierarchy
-```
-Application.RunLoop()          ← Legacy compatibility method (the LOOP)
-    └─> Application.RunIteration()  ← One iteration (modern or legacy)
-        └─> Modern: Coordinator.RunIteration()
-            └─> ApplicationMainLoop.Iteration()
-                └─> IterationImpl()  ← The REAL mainloop work
-```
-
-### 6. The Real MainLoop
-- Is `ApplicationMainLoop<T>`
-- Runs on the main thread
-- Does one iteration per call to `Iteration()`
-- Is throttled to MaximumIterationsPerSecond
-- Processes input, layouts, draws, runs timers
+### 5. Simplified Flow
+- No more conditional logic
+- Single, clear execution path
+- Easier to understand and maintain
 
 ## Terminology Recommendations Based on Analysis
 
@@ -554,19 +433,6 @@ Based on this deep dive, here are the terminology issues:
    - "End" suggests `End()` method
    - "Stop" aligns with `RequestStop()`
 
-### Less Critical (But Still Confusing)
-
-3. **`Application.RunLoop()` is misnamed**
-   - It IS a loop, not something that "runs" a loop
-   - Legacy compatibility method
-   - Better name would describe it's the application control loop
-
-4. **"MainLoop" is overloaded**
-   - `MainLoop` class (obsolete)
-   - `ApplicationMainLoop` class (modern)
-   - The loop concept itself
-   - Used in variable names throughout
-
 ### What Works Well
 
 - `Begin` / `End` - Clear lifecycle pairing
@@ -577,17 +443,16 @@ Based on this deep dive, here are the terminology issues:
 
 ## Conclusion
 
-Terminal.Gui's mainloop is actually a sophisticated multi-threaded architecture with:
+Terminal.Gui's mainloop is a sophisticated multi-threaded architecture with:
 - Separate input/UI threads
 - Thread-safe queue for handoff
 - Coordinator pattern for lifecycle management
 - Throttled iterations for performance
 - Clean separation between drivers and application logic
 
-The confusion stems from:
-1. Legacy compatibility with FakeDriver
-2. Overloaded "Run" terminology
-3. Misleading "RunState" name
-4. The term "MainLoop" meaning different things
+The architecture is now streamlined and modern, with legacy complexity removed. The remaining confusion stems from:
+1. Overloaded "Run" terminology
+2. Misleading "RunState" name
+3. The term "EndAfterFirstIteration" conflating loop control with lifecycle cleanup
 
-The modern architecture is well-designed, but the naming reflects the evolution from v1 to v2, carrying forward legacy terminology that no longer accurately describes the current implementation.
+The modern architecture is well-designed and clear. Renaming `RunState` to `RunToken` and `EndAfterFirstIteration` to `StopAfterFirstIteration` would eliminate the remaining sources of confusion.
