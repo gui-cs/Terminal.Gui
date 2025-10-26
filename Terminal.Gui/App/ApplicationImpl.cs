@@ -204,15 +204,12 @@ public class ApplicationImpl : IApplication
         }
     }
 
-    /// <inheritdoc/>
-    public event EventHandler<EventArgs<bool>>? InitializedChanged;
-
     /// <summary>
-    /// Internal helper to raise InitializedChanged event. Used by legacy Init path.
+    /// Internal helper to raise InitializedChanged event. Used by legacy Init path and modern Init path.
     /// </summary>
     internal void RaiseInitializedChanged (bool initialized)
     {
-        InitializedChanged?.Invoke (null, new (initialized));
+        Application.OnInitializedChanged (this, new (initialized));
     }
 
     /// <summary>
@@ -305,7 +302,7 @@ public class ApplicationImpl : IApplication
 
         _initialized = true;
 
-        InitializedChanged?.Invoke (this, new (true));
+        Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
 
         SynchronizationContext.SetSynchronizationContext (new ());
@@ -504,7 +501,7 @@ public class ApplicationImpl : IApplication
         if (wasInitialized)
         {
             bool init = _initialized; // Will be false after clearing fields above
-            InitializedChanged?.Invoke (this, new (in init));
+            Application.OnInitializedChanged (this, new (in init));
         }
 
         _lazyInstance = new (() => new ApplicationImpl ());
