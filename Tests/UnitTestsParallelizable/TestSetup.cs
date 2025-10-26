@@ -58,7 +58,6 @@ public class GlobalTestSetup : IDisposable
         Assert.False (Application.Initialized);
         Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
         Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
-        Assert.False (Application._forceFakeConsole);
         Assert.Equal (-1, Application.MainThreadId);
         Assert.Empty (Application.TopLevels);
         Assert.Empty (Application.CachedViewsUnderMouse);

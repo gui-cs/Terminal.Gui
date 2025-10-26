@@ -329,7 +329,6 @@ public class ApplicationTests
             Assert.False (Application.Initialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
             Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
-            Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application.TopLevels);
             Assert.Empty (Application.CachedViewsUnderMouse);
@@ -362,7 +361,6 @@ public class ApplicationTests
 
         // Set the values that can be set
         Application.Initialized = true;
-        Application._forceFakeConsole = true;
         Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();

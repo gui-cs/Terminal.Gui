@@ -101,7 +101,7 @@ public class GuiTestContext : IDisposable
                                      Logging.Logger = origLogger;
                                      _finished = true;
 
-                                     Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
+                                     Application.MaximumIterationsPerSecond = Application.DEFAULT_MAXIMUM_ITERATIONS_PER_SECOND;
                                  }
                              },
                              _cts.Token);

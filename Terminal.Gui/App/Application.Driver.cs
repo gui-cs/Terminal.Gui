@@ -6,12 +6,6 @@ public static partial class Application // Driver abstractions
 {
     internal static bool _forceFakeConsole;
 
-    // Internal helper method for ApplicationImpl.ResetState to clear this field
-    internal static void ClearForceFakeConsole ()
-    {
-        _forceFakeConsole = false;
-    }
-
     /// <summary>Gets the <see cref="IConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
     public static IConsoleDriver? Driver
     {

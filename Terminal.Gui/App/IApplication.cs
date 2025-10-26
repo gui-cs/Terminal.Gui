@@ -261,7 +261,7 @@ public interface IApplication
 
     /// <summary>
     /// Maximum number of iterations of the main loop (and hence draws)
-    /// to allow to occur per second. Defaults to <see cref="Application.DefaultMaximumIterationsPerSecond"/> which is a 40ms sleep
+    /// to allow to occur per second. Defaults to <see cref="Application.DEFAULT_MAXIMUM_ITERATIONS_PER_SECOND"/> which is a 40ms sleep
     /// after iteration (factoring in how long iteration took to run).
     /// <remarks>Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
     /// Only affects v2 drivers.</remarks>

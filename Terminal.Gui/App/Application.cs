@@ -53,7 +53,7 @@ public static partial class Application
 
     /// <summary>
     /// Maximum number of iterations of the main loop (and hence draws)
-    /// to allow to occur per second. Defaults to <see cref="DefaultMaximumIterationsPerSecond"/>> which is a 40ms sleep
+    /// to allow to occur per second. Defaults to <see cref="DEFAULT_MAXIMUM_ITERATIONS_PER_SECOND"/>> which is a 40ms sleep
     /// after iteration (factoring in how long iteration took to run).
     /// <remarks>Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
     /// Only affects v2 drivers.</remarks>
@@ -67,7 +67,7 @@ public static partial class Application
     /// <summary>
     /// Default value for <see cref="MaximumIterationsPerSecond"/>
     /// </summary>
-    public const ushort DefaultMaximumIterationsPerSecond = 25;
+    public const ushort DEFAULT_MAXIMUM_ITERATIONS_PER_SECOND = 25;
 
     /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
