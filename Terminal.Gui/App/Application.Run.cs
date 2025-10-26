@@ -472,13 +472,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("This method uses the legacy MainLoop architecture. Use ApplicationImpl.Coordinator?.RunIteration() or AutoInitShutdownAttribute.RunIteration() in tests instead.")]
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
-        // Notify Toplevel it's ready on first iteration
-        if (firstIteration)
-        {
-            state.Toplevel.OnReady ();
-        }
-
-        // Delegate to modern implementation
         ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
         appImpl.Coordinator?.RunIteration ();
 
