@@ -456,8 +456,8 @@ public class FileDialog : Dialog, IDesignable
         _btnBack.Text = GetBackButtonText ();
         _btnForward.Text = GetForwardButtonText ();
 
-        _tbPath.Caption = Style.PathCaption;
-        _tbFind.Caption = Style.SearchCaption;
+        _tbPath.Title = Style.PathCaption;
+        _tbFind.Title = Style.SearchCaption;
 
         _tbPath.Autocomplete.Scheme = new (_tbPath.GetScheme ())
         {

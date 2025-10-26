@@ -145,7 +145,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         // Caption has no effect when focused
-        tf.Caption = caption;
+        tf.Title = caption;
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
@@ -165,7 +165,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         TextField tf = GetTextFieldsInView ();
 
-        tf.Caption = caption;
+        tf.Title = caption;
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
@@ -185,7 +185,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
-        tf.Caption = "Enter txt";
+        tf.Title = "Enter txt";
         Application.RaiseKeyDownEvent ('\t');
 
         // Caption should appear when not focused and no text
@@ -212,7 +212,7 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("", output);
 
         // Caption has no effect when focused
-        tf.Caption = "Enter txt";
+        tf.Title = "Enter txt";
         Assert.True (tf.HasFocus);
         View.SetClipToScreen ();
         tf.Draw ();
@@ -224,6 +224,29 @@ public class TextFieldTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
+        Application.Top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_RendersWithHotkey_WhenNotFocused ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        tf.Draw ();
+        DriverAssert.AssertDriverContentsAre ("", output);
+
+        // Title with hotkey should be rendered with the hotkey underlined when not focused
+        tf.Title = "_Find";
+        Application.RaiseKeyDownEvent ('\t');
+
+        Assert.False (tf.HasFocus);
+        View.SetClipToScreen ();
+        tf.Draw ();
+        
+        // The hotkey character 'F' should be rendered (without the underscore in the actual text)
+        // TextFormatter will handle the hotkey rendering
+        DriverAssert.AssertDriverContentsAre ("Find", output);
         Application.Top.Dispose ();
     }
 

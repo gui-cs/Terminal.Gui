@@ -28,9 +28,6 @@ public class TextField : View, IDesignable
         _selectedStart = -1;
         _text = new ();
 
-        // TODO: Determine if this is a good choice. Previously this was hard coded to 
-        // TODO: DarkGray which was NOT a good choice.
-        CaptionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
         Height = Dim.Auto (DimAutoStyle.Text, 1);
@@ -40,8 +37,8 @@ public class TextField : View, IDesignable
         Used = true;
         WantMousePositionReports = true;
 
-        // By default, disable hotkeys (in case someome sets Title)
-        HotKeySpecifier = new ('\xffff');
+        // Enable hotkey support for Title (caption)
+        HotKeySpecifier = new ('_');
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -410,15 +407,6 @@ public class TextField : View, IDesignable
     ///     <see cref="ISuggestionGenerator"/> to enable this feature.
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
-    ///     not yet have input focus.
-    /// </summary>
-    public string Caption { get; set; }
-
-    /// <summary>Gets or sets the foreground <see cref="Color"/> to use when rendering <see cref="Caption"/>.</summary>
-    public Color CaptionColor { get; set; }
 
     /// <summary>Get the Context Menu for this view.</summary>
     [CanBeNull]
@@ -1699,25 +1687,24 @@ public class TextField : View, IDesignable
     private void RenderCaption ()
     {
         if (HasFocus
-            || Caption == null
-            || Caption.Length == 0
+            || string.IsNullOrEmpty (Title)
             || Text?.Length > 0)
         {
             return;
         }
 
-        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
-        SetAttribute (color);
+        // Get brighter color for the caption text
+        var captionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
+        var color = new Attribute (captionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
+        
+        // Create hotkey attribute for underlined hotkey character
+        var hotKeyColor = new Attribute (captionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
-        Move (0, 0);
-        string render = Caption;
-
-        if (render.GetColumns () > Viewport.Width)
-        {
-            render = render [..Viewport.Width];
-        }
-
-        AddStr (render);
+        // Use TitleTextFormatter to render the caption with hotkey support
+        TitleTextFormatter.Draw (
+            new Rectangle (0, 0, Viewport.Width, 1),
+            color,
+            hotKeyColor);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
@@ -1818,7 +1805,7 @@ public class TextField : View, IDesignable
     public bool EnableForDesign ()
     {
         Text = "This is a test.";
-        Caption = "Caption";
+        Title = "Caption";
 
         return true;
     }
