@@ -205,7 +205,7 @@ public class ApplicationImpl : IApplication
     }
 
     /// <summary>
-    /// Internal helper to raise InitializedChanged event. Used by legacy Init path and modern Init path.
+    /// Internal helper to raise InitializedChanged static event. Used by both legacy and modern Init paths.
     /// </summary>
     internal void RaiseInitializedChanged (bool initialized)
     {
