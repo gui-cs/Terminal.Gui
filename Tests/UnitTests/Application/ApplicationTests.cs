@@ -589,7 +589,7 @@ public class ApplicationTests
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        AutoInitShutdownAttribute.RunIteration ();
+        ApplicationImpl.Instance.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
