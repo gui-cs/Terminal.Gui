@@ -86,7 +86,7 @@ Or, you can use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.
 
 # Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete contribution guidelines.
 
 Debates on architecture and design can be found in Issues tagged with [design](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Av2+label%3Adesign).
 
