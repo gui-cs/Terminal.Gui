@@ -129,6 +129,9 @@ public class ApplicationImpl : IApplication
     public bool ClearScreenNextIteration { get; set; }
 
     /// <inheritdoc/>
+    public bool EndAfterFirstIteration { get; set; }
+
+    /// <inheritdoc/>
     public ApplicationPopover? Popover { get; set; }
 
     /// <inheritdoc/>
@@ -156,6 +159,11 @@ public class ApplicationImpl : IApplication
             return _supportedCultures;
         }
     }
+
+    /// <summary>
+    ///     This event is raised when the application's size changes.
+    /// </summary>
+    public event EventHandler<SizeChangedEventArgs>? SizeChanging;
 
     /// <inheritdoc/>
     public void RequestStop () { RequestStop (null); }
@@ -422,6 +430,29 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc/>
+    public bool OnSizeChanging (SizeChangedEventArgs args)
+    {
+        SizeChanging?.Invoke (null, args);
+
+        if (args.Cancel || args.Size is null)
+        {
+            return false;
+        }
+
+        Screen = new (Point.Empty, args.Size.Value);
+
+        foreach (Toplevel t in TopLevels)
+        {
+            t.OnSizeChanging (new (args.Size));
+            t.SetNeedsLayout ();
+        }
+
+        LayoutAndDraw (true);
+
+        return true;
+    }
+
+    /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
     {
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
@@ -463,9 +494,9 @@ public class ApplicationImpl : IApplication
 
         MainThreadId = -1;
 
-        // These static properties need to be reset
-        Application.EndAfterFirstIteration = false;
-        Application.ClearScreenNextIteration = false;
+        // Reset iteration flags
+        EndAfterFirstIteration = false;
+        ClearScreenNextIteration = false;
 
         // Driver stuff
         if (_driver is { })
@@ -488,12 +519,12 @@ public class ApplicationImpl : IApplication
         // Do not clear _lastMousePosition; Popovers require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
-        Application.CachedViewsUnderMouse.Clear ();
-        Application.ResetMouseState ();
+        Mouse.CachedViewsUnderMouse.Clear ();
+        Mouse.ResetState ();
 
         // Keyboard events and bindings are now managed by the Keyboard instance
 
-        Application.ClearSizeChangingEvent ();
+        SizeChanging = null;
 
         Navigation = null;
 
@@ -623,11 +654,11 @@ public class ApplicationImpl : IApplication
         return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 
-    private void Driver_KeyDown (object? sender, Key e) { Application.RaiseKeyDownEvent (e); }
-    private void Driver_KeyUp (object? sender, Key e) { Application.RaiseKeyUpEvent (e); }
-    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Application.RaiseMouseEvent (e); }
+    private void Driver_KeyDown (object? sender, Key e) { Keyboard.RaiseKeyDownEvent (e); }
+    private void Driver_KeyUp (object? sender, Key e) { Keyboard.RaiseKeyUpEvent (e); }
+    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Mouse.RaiseMouseEvent (e); }
 
-    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { Application.OnSizeChanging (e); }
+    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
 
     private static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
     {

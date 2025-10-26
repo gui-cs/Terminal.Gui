@@ -23,12 +23,31 @@ public static partial class Application // Screen related stuff; intended to hid
     ///     Event handlers can set <see cref="SizeChangedEventArgs.Cancel"/> to <see langword="true"/> to prevent
     ///     <see cref="Application"/> from changing it's size to match the new terminal size.
     /// </remarks>
-    public static event EventHandler<SizeChangedEventArgs>? SizeChanging;
+    public static event EventHandler<SizeChangedEventArgs>? SizeChanging
+    {
+        add
+        {
+            if (ApplicationImpl.Instance is ApplicationImpl impl)
+            {
+                impl.SizeChanging += value;
+            }
+        }
+        remove
+        {
+            if (ApplicationImpl.Instance is ApplicationImpl impl)
+            {
+                impl.SizeChanging -= value;
+            }
+        }
+    }
 
     // Internal helper method for ApplicationImpl.ResetState to clear this event
     internal static void ClearSizeChangingEvent ()
     {
-        SizeChanging = null;
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl.SizeChanging = null;
+        }
     }
 
     /// <summary>
@@ -39,24 +58,7 @@ public static partial class Application // Screen related stuff; intended to hid
     /// <returns><see lanword="true"/>if the size was changed.</returns>
     public static bool OnSizeChanging (SizeChangedEventArgs args)
     {
-        SizeChanging?.Invoke (null, args);
-
-        if (args.Cancel || args.Size is null)
-        {
-            return false;
-        }
-
-        Screen = new (Point.Empty, args.Size.Value);
-
-        foreach (Toplevel t in TopLevels)
-        {
-            t.OnSizeChanging (new (args.Size));
-            t.SetNeedsLayout ();
-        }
-
-        LayoutAndDraw (true);
-
-        return true;
+        return ApplicationImpl.Instance.OnSizeChanging (args);
     }
 
     /// <summary>

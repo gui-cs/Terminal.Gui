@@ -28,6 +28,14 @@ public interface IApplication
     IConsoleDriver? Driver { get; set; }
 
     /// <summary>
+    ///     This is intended for unit tests and won't stop the <see cref="Application.RunLoop"/> if set to <see langword="true"/>
+    ///     If the caller calls <see cref="Application.RunLoop"/> with the returned token from <see cref="Application.Begin"/>, setting
+    ///     this property to <see langword="true"/> will cause only one iteration of the main loop to execute. The default is
+    ///     <see langword="false"/>, which will cause the application to continue running until Application.RequestStop () is called.
+    /// </summary>
+    bool EndAfterFirstIteration { get; set; }
+
+    /// <summary>
     ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
     ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
@@ -100,6 +108,14 @@ public interface IApplication
     ///     should only be overriden for testing.
     /// </param>
     public void LayoutAndDraw (bool forceRedraw = false);
+
+    /// <summary>
+    ///     Called when the application's size changes. Sets the size of all <see cref="Toplevel"/>s and fires the
+    ///     SizeChanging event.
+    /// </summary>
+    /// <param name="args">The new size.</param>
+    /// <returns><see langword="true"/> if the size was changed.</returns>
+    bool OnSizeChanging (SizeChangedEventArgs args);
 
     /// <summary>
     ///     Maximum number of iterations of the main loop (and hence draws)

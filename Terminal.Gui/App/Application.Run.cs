@@ -398,7 +398,11 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
     ///     cause the application to continue running until Application.RequestStop () is called.
     /// </summary>
-    public static bool EndAfterFirstIteration { get; set; }
+    public static bool EndAfterFirstIteration
+    {
+        get => ApplicationImpl.Instance.EndAfterFirstIteration;
+        set => ApplicationImpl.Instance.EndAfterFirstIteration = value;
+    }
 
     /// <summary>Building block API: Runs the main loop for the created <see cref="Toplevel"/>.</summary>
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
