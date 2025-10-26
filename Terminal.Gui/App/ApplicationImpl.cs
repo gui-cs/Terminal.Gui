@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Drivers;
 
@@ -30,6 +31,12 @@ public class ApplicationImpl : IApplication
     private readonly object _lockScreen = new ();
     private Rectangle? _screen;
     private bool _clearScreenNextIteration;
+    private ushort _maximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
+    private List<CultureInfo>? _supportedCultures;
+    
+    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
+    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
+    internal Toplevel? _cachedRunStateToplevel;
 
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
@@ -177,6 +184,37 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels => _topLevels;
 
+    /// <inheritdoc/>
+    public ushort MaximumIterationsPerSecond
+    {
+        get => _maximumIterationsPerSecond;
+        set => _maximumIterationsPerSecond = value;
+    }
+
+    /// <inheritdoc/>
+    public List<CultureInfo>? SupportedCultures
+    {
+        get
+        {
+            if (_supportedCultures is null)
+            {
+                _supportedCultures = Application.GetSupportedCultures ();
+            }
+            return _supportedCultures;
+        }
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs<bool>>? InitializedChanged;
+
+    /// <summary>
+    /// Internal helper to raise InitializedChanged event. Used by legacy Init path.
+    /// </summary>
+    internal void RaiseInitializedChanged (bool initialized)
+    {
+        InitializedChanged?.Invoke (null, new (initialized));
+    }
+
     /// <summary>
     /// Gets or sets the main thread ID for the application.
     /// </summary>
@@ -267,7 +305,7 @@ public class ApplicationImpl : IApplication
 
         _initialized = true;
 
-        Application.OnInitializedChanged (this, new (true));
+        InitializedChanged?.Invoke (this, new (true));
         Application.SubscribeDriverEvents ();
 
         SynchronizationContext.SetSynchronizationContext (new ());
@@ -440,12 +478,12 @@ public class ApplicationImpl : IApplication
         
         bool wasInitialized = _initialized;
         
-        // Reset Screen before calling Application.ResetState to avoid circular reference
+        // Reset Screen before calling ResetState to avoid circular reference
         ResetScreen ();
         
         // Call ResetState FIRST so it can properly dispose Popover and other resources
         // that are accessed via Application.* static properties that now delegate to instance fields
-        Application.ResetState ();
+        ResetState ();
         ConfigurationManager.PrintJsonErrors ();
         
         // Clear instance fields after ResetState has disposed everything
@@ -466,7 +504,7 @@ public class ApplicationImpl : IApplication
         if (wasInitialized)
         {
             bool init = _initialized; // Will be false after clearing fields above
-            Application.OnInitializedChanged (this, new (in init));
+            InitializedChanged?.Invoke (this, new (in init));
         }
 
         _lazyInstance = new (() => new ApplicationImpl ());
@@ -552,6 +590,85 @@ public class ApplicationImpl : IApplication
         View.Draw (tops, neededLayout || forceRedraw);
         View.SetClipToScreen ();
         _driver?.Refresh ();
+    }
+
+    /// <inheritdoc />
+    public void ResetState (bool ignoreDisposed = false)
+    {
+        // Shutdown is the bookend for Init. As such it needs to clean up all resources
+        // Init created. Apps that do any threading will need to code defensively for this.
+        // e.g. see Issue #537
+        foreach (Toplevel? t in _topLevels)
+        {
+            t!.Running = false;
+        }
+
+        if (_popover?.GetActivePopover () is View popover)
+        {
+            // This forcefully closes the popover; invoking Command.Quit would be more graceful
+            // but since this is shutdown, doing this is ok.
+            popover.Visible = false;
+        }
+
+        _popover?.Dispose ();
+        _popover = null;
+
+        _topLevels.Clear ();
+#if DEBUG_IDISPOSABLE
+
+        // Don't dispose the Top. It's up to caller dispose it
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && _top is { })
+        {
+            Debug.Assert (_top.WasDisposed, $"Title = {_top.Title}, Id = {_top.Id}");
+
+            // If End wasn't called _cachedRunStateToplevel may be null
+            if (_cachedRunStateToplevel is { })
+            {
+                Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+                Debug.Assert (_cachedRunStateToplevel == _top);
+            }
+        }
+#endif
+        _top = null;
+        _cachedRunStateToplevel = null;
+
+        _mainThreadId = -1;
+
+        // Driver stuff
+        if (_driver is { })
+        {
+            Application.UnsubscribeDriverEvents ();
+            _driver?.End ();
+            _driver = null;
+        }
+
+        // Reset Screen to null so it will be recalculated on next access
+        ResetScreen ();
+
+        // Run State stuff - these are static events on Application class
+        Application.ClearRunStateEvents ();
+
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
+        _initialized = false;
+
+        // Mouse
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
+        // last mouse pos.
+        //_lastMousePosition = null;
+        Application.CachedViewsUnderMouse.Clear ();
+        Application.ResetMouseState ();
+
+        // Keyboard events and bindings are now managed by the Keyboard instance
+
+        Application.ClearSizeChangingEvent ();
+
+        _navigation = null;
+
+        // Reset synchronization context to allow the user to run async/await,
+        // as the main loop has been ended, the synchronization context from
+        // gui.cs does no longer process any callbacks. See #1084 for more details:
+        // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
+        SynchronizationContext.SetSynchronizationContext (null);
     }
 
     /// <summary>

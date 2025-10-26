@@ -156,7 +156,12 @@ public static partial class Application // Lifecycle (Init/Shutdown)
 
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
         bool init = Initialized = true;
-        InitializedChanged?.Invoke (null, new (init));
+        
+        // Raise InitializedChanged event via the instance
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl.RaiseInitializedChanged (init);
+        }
     }
 
     internal static void SubscribeDriverEvents ()
@@ -242,13 +247,21 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <remarks>
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
-    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
-
-    /// <summary>
-    ///  Raises the <see cref="InitializedChanged"/> event.
-    /// </summary>
-    internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged
     {
-        Application.InitializedChanged?.Invoke (sender, e);
+        add
+        {
+            if (ApplicationImpl.Instance is ApplicationImpl impl)
+            {
+                impl.InitializedChanged += value;
+            }
+        }
+        remove
+        {
+            if (ApplicationImpl.Instance is ApplicationImpl impl)
+            {
+                impl.InitializedChanged -= value;
+            }
+        }
     }
 }

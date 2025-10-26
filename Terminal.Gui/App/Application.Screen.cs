@@ -25,6 +25,12 @@ public static partial class Application // Screen related stuff; intended to hid
     /// </remarks>
     public static event EventHandler<SizeChangedEventArgs>? SizeChanging;
 
+    // Internal helper method for ApplicationImpl.ResetState to clear this event
+    internal static void ClearSizeChangingEvent ()
+    {
+        SizeChanging = null;
+    }
+
     /// <summary>
     ///     Called when the application's size changes. Sets the size of all <see cref="Toplevel"/>s and fires the
     ///     <see cref="SizeChanging"/> event.
