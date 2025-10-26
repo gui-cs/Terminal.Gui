@@ -58,7 +58,7 @@ public abstract class ConsoleDriver : IConsoleDriver
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
-    public Rectangle Screen => new (0, 0, Cols, Rows);
+    public Rectangle Screen => new (0, 0, _cols, _rows);
 
     private Region? _clip;
 
@@ -94,15 +94,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     public int Col { get; private set; }
 
     /// <summary>The number of columns visible in the terminal.</summary>
-    public virtual int Cols
-    {
-        get => _cols;
-        set
-        {
-            _cols = value;
-            ClearContents ();
-        }
-    }
+    public virtual int Cols => _cols;
 
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when
@@ -158,15 +150,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     public int Row { get; private set; }
 
     /// <summary>The number of rows visible in the terminal.</summary>
-    public virtual int Rows
-    {
-        get => _rows;
-        set
-        {
-            _rows = value;
-            ClearContents ();
-        }
-    }
+    public virtual int Rows => _rows;
 
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
@@ -580,8 +564,8 @@ public abstract class ConsoleDriver : IConsoleDriver
         set => Application.Force16Colors = value || !SupportsTrueColor;
     }
 
-    private int _cols;
-    private int _rows;
+    protected int _cols;
+    protected int _rows;
 
     /// <summary>
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
@@ -738,4 +722,9 @@ public abstract class ConsoleDriver : IConsoleDriver
         return _scheduler ??= new (GetParser ());
     }
 
+    /// <inheritdoc/>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+    }
 }

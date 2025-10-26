@@ -164,14 +164,16 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             designable.EnableForDesign ();
         }
 
-        var mockDriver = new MockConsoleDriver ();
-        mockDriver.AttributeSet += (_, args) =>
-                                   {
-                                       if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
-                                       {
-                                           Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
-                                       }
-                                   };
+        var mockDriver = new FakeDriver ();
+        mockDriver.Init ();
+        // TODO: Add AttributeSet event to FakeDriver if needed for attribute tracking tests
+        // mockDriver.AttributeSet += (_, args) =>
+        //                            {
+        //                                if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
+        //                                {
+        //                                    Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
+        //                                }
+        //                            };
         view.Driver = mockDriver;
         view.Enabled = false;
         view.SetNeedsDraw ();

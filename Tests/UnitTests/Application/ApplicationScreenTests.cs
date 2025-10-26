@@ -94,7 +94,10 @@ public class ApplicationScreenTests
         // Arrange
         Application.ResetState (true);
         Assert.Null (Application.Driver);
-        Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        var driver = new FakeDriver();
+        driver.Init();
+        driver.SetScreenSize(25, 25);
+        Application.Driver = driver;
         Application.SubscribeDriverEvents ();
         Assert.Equal (new (0, 0, 25, 25), Application.Screen);
 

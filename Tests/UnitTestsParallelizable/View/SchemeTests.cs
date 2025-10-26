@@ -63,7 +63,8 @@ public class SchemeTests
     public void GetAttribute_ReturnsCorrectAttribute_Via_Mock ()
     {
         var view = new View { SchemeName = "Base" };
-        view.Driver = new MockConsoleDriver ();
+        view.Driver = new FakeDriver ();
+        view.Driver.Init ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         // Act
@@ -103,7 +104,8 @@ public class SchemeTests
     public void SetAttributeForRole_SetsCorrectAttribute ()
     {
         var view = new View { SchemeName = "Base" };
-        view.Driver = new MockConsoleDriver ();
+        view.Driver = new FakeDriver ();
+        view.Driver.Init ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);

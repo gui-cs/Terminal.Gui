@@ -29,7 +29,7 @@ public interface IConsoleDriver
     int Col { get; }
 
     /// <summary>The number of columns visible in the terminal.</summary>
-    int Cols { get; set; }
+    int Cols { get; }
 
     // BUGBUG: This should not be publicly settable.
     /// <summary>
@@ -48,7 +48,7 @@ public interface IConsoleDriver
     int Row { get; }
 
     /// <summary>The number of rows visible in the terminal.</summary>
-    int Rows { get; set; }
+    int Rows { get; }
 
     /// <summary>The topmost row in the terminal.</summary>
     int Top { get; set; }
@@ -259,4 +259,12 @@ public interface IConsoleDriver
     /// </summary>
     /// <returns></returns>
     public AnsiRequestScheduler GetRequestScheduler ();
+
+    /// <summary>
+    ///     Sets the size of the terminal screen. Only supported by FakeDriver for testing.
+    /// </summary>
+    /// <param name="width">The new width of the screen in columns.</param>
+    /// <param name="height">The new height of the screen in rows.</param>
+    /// <exception cref="NotImplementedException">Thrown by all drivers except FakeDriver.</exception>
+    void SetScreenSize (int width, int height);
 }

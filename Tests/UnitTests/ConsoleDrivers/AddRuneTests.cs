@@ -28,8 +28,7 @@ public class AddRuneTests
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
-        driver.Rows = 25;
-        driver.Cols = 80;
+        driver.SetScreenSize(80, 25);
         driver.Init ();
         driver.AddRune (new Rune ('a'));
         Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);

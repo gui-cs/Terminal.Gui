@@ -180,12 +180,12 @@ public class FakeDriverTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void SetupFakeDriver_Driver_Is_FakeConsoleDriver ()
+    public void SetupFakeDriver_Driver_Is_FakeDriver ()
     {
         Assert.NotNull (Application.Driver);
         
-        // Should be IFakeConsoleDriver
-        Assert.IsAssignableFrom<IFakeConsoleDriver> (Application.Driver);
+        // Should be FakeDriver
+        Assert.IsAssignableFrom<FakeDriver> (Application.Driver);
         
         _output.WriteLine ($"Driver type: {Application.Driver.GetType().Name}");
     }
@@ -194,7 +194,7 @@ public class FakeDriverTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void SetupFakeDriver_Can_Set_Buffer_Size ()
     {
-        var fakeDriver = Application.Driver as IFakeConsoleDriver;
+        var fakeDriver = Application.Driver as FakeDriver;
         Assert.NotNull (fakeDriver);
 
         fakeDriver!.SetBufferSize (100, 50);
