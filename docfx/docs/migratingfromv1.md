@@ -225,7 +225,7 @@ The cursor and focus system has been redesigned in v2 to be more consistent and 
 
 ### Cursor
 
-In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was the same as `ConsoleDriver.Row`/`Col` and determined by the last call to `ConsoleDriver.Move`. `View.PositionCursor()` could be overridden by views to cause `Application` to call `ConsoleDriver.Move` on behalf of the app and to manage setting `CursorVisibility`. This API was confusing and bug-prone.
+In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was determined by the last call to the driver's Move method. `View.PositionCursor()` could be overridden by views to cause `Application` to call the driver's positioning method on behalf of the app and to manage setting `CursorVisibility`. This API was confusing and bug-prone.
 
 In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the style of cursor it wants and the Viewport-relative location:
 
@@ -237,13 +237,33 @@ In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the st
 	- If `null` the default cursor style is used.
 	- If `{}` specifies the style of cursor. See [cursor.md](cursor.md) for more.
 * `Application` now has APIs for querying available cursor styles.
-* The details in `ConsoleDriver` are no longer available to applications.	
+* The driver details are no longer directly accessible to View subclasses.	
 
 #### How to Fix (Cursor API)
 
 * Use @Terminal.Gui.ViewBase.View.CursorPosition to set the cursor position in a view. Set @Terminal.Gui.ViewBase.View.CursorPosition to `null` to hide the cursor.
 * Set @Terminal.Gui.ViewBase.View.CursorVisibility to the cursor style you want to use.
 * Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
+
+### Driver Access
+
+In v1, Views could access `Driver` directly (e.g., `Driver.Move()`, `Driver.Rows`, `Driver.Cols`). In v2, `Driver` is internal and View subclasses should not access it directly. ViewBase provides all necessary abstractions for Views to function without needing direct driver access.
+
+#### How to Fix (Driver Access)
+
+* Replace `Driver.Rows` and `Driver.Cols` with @Terminal.Gui.App.Application.Screen.Height and @Terminal.Gui.App.Application.Screen.Width
+* Replace direct `Driver.Move(screenX, screenY)` calls with @Terminal.Gui.ViewBase.View.Move using viewport-relative coordinates
+* Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
+* ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can still access Driver for framework implementation needs
+
+```diff
+- if (x >= Driver.Cols) return;
++ if (x >= Application.Screen.Width) return;
+
+- Point screenPos = ViewportToScreen(new Point(col, row));
+- Driver.Move(screenPos.X, screenPos.Y);
++ Move(col, row);  // Move handles viewport-to-screen conversion
+```
 
 ### Focus
 

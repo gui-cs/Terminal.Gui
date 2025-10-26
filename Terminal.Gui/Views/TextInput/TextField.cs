@@ -973,7 +973,7 @@ public class TextField : View, IDesignable
 
             if (col + cols <= width)
             {
-                Driver?.AddRune (Secret ? Glyphs.Dot : rune);
+                AddRune (Secret ? Glyphs.Dot : rune);
             }
 
             if (!TextModel.SetCol (ref col, width, cols))
@@ -992,7 +992,7 @@ public class TextField : View, IDesignable
         // Fill rest of line with spaces
         for (int i = col; i < width; i++)
         {
-            Driver?.AddRune ((Rune)' ');
+            AddRune ((Rune)' ');
         }
 
         PositionCursor ();
@@ -1717,7 +1717,7 @@ public class TextField : View, IDesignable
             render = render [..Viewport.Width];
         }
 
-        Driver?.AddStr (render);
+        AddStr (render);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)

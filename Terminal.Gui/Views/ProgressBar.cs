@@ -144,11 +144,11 @@ public class ProgressBar : View, IDesignable
             {
                 if (Array.IndexOf (_activityPos!, i) != -1)
                 {
-                    Driver?.AddRune (SegmentCharacter);
+                    AddRune (SegmentCharacter);
                 }
                 else
                 {
-                    Driver?.AddRune ((Rune)' ');
+                    AddRune ((Rune)' ');
                 }
             }
         }
@@ -159,12 +159,12 @@ public class ProgressBar : View, IDesignable
 
             for (i = 0; (i < mid) & (i < Viewport.Width); i++)
             {
-                Driver?.AddRune (SegmentCharacter);
+                AddRune (SegmentCharacter);
             }
 
             for (; i < Viewport.Width; i++)
             {
-                Driver?.AddRune ((Rune)' ');
+                AddRune ((Rune)' ');
             }
         }
 

@@ -375,7 +375,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
             string rl = _radioLabels [i];
             SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            Driver?.AddStr ($"{(i == _selected ? Glyphs.Selected : Glyphs.UnSelected)} ");
+            AddStr ($"{(i == _selected ? Glyphs.Selected : Glyphs.UnSelected)} ");
             TextFormatter.FindHotKey (rl, HotKeySpecifier, out int hotPos, out Key hotKey);
 
             if (hotPos != -1 && hotKey != Key.Empty)
