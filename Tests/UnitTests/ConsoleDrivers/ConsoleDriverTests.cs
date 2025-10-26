@@ -50,8 +50,8 @@ public class ConsoleDriverTests
     public void Init_Inits (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        MainLoop ml = driver.Init ();
-        Assert.NotNull (ml);
+        driver.Init ();
+        // Note: MainLoop is no longer returned from Init() as part of legacy MainLoop removal
         Assert.NotNull (driver.Clipboard);
         Console.ForegroundColor = ConsoleColor.Red;
         Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);

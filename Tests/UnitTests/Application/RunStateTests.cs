@@ -45,7 +45,6 @@ public class RunStateTests
 #endif
 
         Assert.Null (Application.Top);
-    //    Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 

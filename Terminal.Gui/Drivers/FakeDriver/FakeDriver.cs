@@ -91,9 +91,7 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
     }
 
-    private FakeMainLoop? _mainLoopDriver;
-
-    public override MainLoop Init ()
+    public override void Init ()
     {
         FakeConsole.MockKeyPresses.Clear ();
 
@@ -102,12 +100,6 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
         ResizeScreen ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
-        //ClearContents ();
-
-        _mainLoopDriver = new FakeMainLoop (this);
-        _mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;
-
-        return new MainLoop (_mainLoopDriver);
     }
 
     public override bool UpdateScreen ()
@@ -345,24 +337,6 @@ public class FakeDriver : ConsoleDriver
     }
 
     private CursorVisibility _savedCursorVisibility;
-
-    private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
-    {
-        if (consoleKeyInfo.Key == ConsoleKey.Packet)
-        {
-            consoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
-        }
-
-        KeyCode map = MapKey (consoleKeyInfo);
-
-        if (IsValidInput (map, out map))
-        {
-            OnKeyDown (new (map));
-            OnKeyUp (new (map));
-        }
-
-        //OnKeyPressed (new KeyEventArgs (map));
-    }
 
     /// <inheritdoc/>
     public override bool GetCursorVisibility (out CursorVisibility visibility)
