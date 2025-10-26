@@ -187,7 +187,7 @@ public class SpinnerView : View, IDesignable
         if (Sequence is { Length: > 0 } && _currentIdx < Sequence.Length)
         {
             Move (Viewport.X, Viewport.Y);
-            Driver?.AddStr (Sequence [_currentIdx]);
+            AddStr (Sequence [_currentIdx]);
         }
     }
 

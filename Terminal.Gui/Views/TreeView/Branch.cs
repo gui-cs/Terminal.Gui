@@ -454,7 +454,7 @@ internal class Branch<T> where T : class
     /// <param name="driver"></param>
     /// <param name="x"></param>
     /// <returns></returns>
-    internal bool IsHitOnExpandableSymbol (IConsoleDriver driver, int x)
+    internal bool IsHitOnExpandableSymbol (int x)
     {
         // if leaf node then we cannot expand
         if (!CanExpand ())
