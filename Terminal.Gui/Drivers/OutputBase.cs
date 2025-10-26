@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Terminal.Gui.Drivers;
@@ -15,6 +16,13 @@ public abstract class OutputBase
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
+
+    // Regex pattern for detecting URLs (http, https, ftp, ftps)
+    // Stops at ANSI escape sequence markers (ESC character 0x1B) to avoid matching across escape sequences
+    private static readonly Regex UrlRegex = new Regex(
+        @"\b(?:https?|ftps?)://[^\s<>""{}|\\^`\[\]\x1B]+",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
 
     /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
@@ -136,7 +144,9 @@ public abstract class OutputBase
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                Write (output);
+                // Wrap URLs with OSC 8 hyperlink sequences
+                StringBuilder processed = WrapUrlsWithHyperlinks(output);
+                Write (processed);
             }
         }
 
@@ -166,10 +176,58 @@ public abstract class OutputBase
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
         SetCursorPositionImpl (lastCol, row);
-        Write (output);
+        
+        // Wrap URLs with OSC 8 hyperlink sequences
+        StringBuilder processed = WrapUrlsWithHyperlinks(output);
+        Write (processed);
+        
         output.Clear ();
         lastCol += outputWidth;
         outputWidth = 0;
+    }
+
+    /// <summary>
+    /// Detects URLs in the output and wraps them with OSC 8 hyperlink sequences.
+    /// </summary>
+    /// <param name="output">The output text that may contain URLs</param>
+    /// <returns>A new StringBuilder with URLs wrapped in OSC 8 sequences</returns>
+    private StringBuilder WrapUrlsWithHyperlinks(StringBuilder output)
+    {
+        string text = output.ToString();
+        
+        // Check if there are any URLs to wrap
+        if (!UrlRegex.IsMatch(text))
+        {
+            return output;
+        }
+
+        StringBuilder result = new StringBuilder(text.Length + 100); // Extra space for OSC sequences
+        int lastIndex = 0;
+
+        foreach (Match match in UrlRegex.Matches(text))
+        {
+            // Add text before the URL
+            if (match.Index > lastIndex)
+            {
+                result.Append(text.Substring(lastIndex, match.Index - lastIndex));
+            }
+
+            // Wrap URL with OSC 8 hyperlink
+            string url = match.Value;
+            result.Append(EscSeqUtils.OSC_StartHyperlink(url));
+            result.Append(url);
+            result.Append(EscSeqUtils.OSC_EndHyperlink());
+
+            lastIndex = match.Index + match.Length;
+        }
+
+        // Add remaining text after last URL
+        if (lastIndex < text.Length)
+        {
+            result.Append(text.Substring(lastIndex));
+        }
+
+        return result;
     }
 
     /// <summary>
