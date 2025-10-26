@@ -251,17 +251,11 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     {
         add
         {
-            if (ApplicationImpl.Instance is ApplicationImpl impl)
-            {
-                impl.InitializedChanged += value;
-            }
+            ApplicationImpl.Instance.InitializedChanged += value;
         }
         remove
         {
-            if (ApplicationImpl.Instance is ApplicationImpl impl)
-            {
-                impl.InitializedChanged -= value;
-            }
+            ApplicationImpl.Instance.InitializedChanged -= value;
         }
     }
 }
