@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
+using System.Resources;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Drivers;
 
@@ -31,7 +33,7 @@ public class ApplicationImpl : IApplication
     private readonly object _lockScreen = new ();
     private Rectangle? _screen;
     private bool _clearScreenNextIteration;
-    private ushort _maximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
+    private ushort _maximumIterationsPerSecond = 25; // Default value for MaximumIterationsPerSecond
     private List<CultureInfo>? _supportedCultures;
     
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
@@ -198,7 +200,7 @@ public class ApplicationImpl : IApplication
         {
             if (_supportedCultures is null)
             {
-                _supportedCultures = Application.GetSupportedCultures ();
+                _supportedCultures = GetSupportedCultures ();
             }
             return _supportedCultures;
         }
@@ -266,7 +268,7 @@ public class ApplicationImpl : IApplication
 
         if (string.IsNullOrWhiteSpace (_driverName))
         {
-            _driverName = Application.ForceDriver;
+            _driverName = _forceDriver;
         }
 
         Debug.Assert(_navigation is null);
@@ -303,7 +305,7 @@ public class ApplicationImpl : IApplication
         _initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
-        Application.SubscribeDriverEvents ();
+        SubscribeDriverEvents ();
 
         SynchronizationContext.SetSynchronizationContext (new ());
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -534,7 +536,7 @@ public class ApplicationImpl : IApplication
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Application.Top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (_top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
             return;
@@ -639,7 +641,7 @@ public class ApplicationImpl : IApplication
         // Driver stuff
         if (_driver is { })
         {
-            Application.UnsubscribeDriverEvents ();
+            UnsubscribeDriverEvents ();
             _driver?.End ();
             _driver = null;
         }
@@ -685,5 +687,79 @@ public class ApplicationImpl : IApplication
         {
             _screen = null;
         }
+    }
+
+    private void SubscribeDriverEvents ()
+    {
+        if (_driver is null)
+        {
+            throw new ArgumentNullException (nameof (_driver));
+        }
+
+        _driver.SizeChanged += Driver_SizeChanged;
+        _driver.KeyDown += Driver_KeyDown;
+        _driver.KeyUp += Driver_KeyUp;
+        _driver.MouseEvent += Driver_MouseEvent;
+    }
+
+    private void UnsubscribeDriverEvents ()
+    {
+        if (_driver is null)
+        {
+            throw new ArgumentNullException (nameof (_driver));
+        }
+
+        _driver.SizeChanged -= Driver_SizeChanged;
+        _driver.KeyDown -= Driver_KeyDown;
+        _driver.KeyUp -= Driver_KeyUp;
+        _driver.MouseEvent -= Driver_MouseEvent;
+    }
+
+    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { Application.OnSizeChanging (e); }
+    private void Driver_KeyDown (object? sender, Key e) { Application.RaiseKeyDownEvent (e); }
+    private void Driver_KeyUp (object? sender, Key e) { Application.RaiseKeyUpEvent (e); }
+    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Application.RaiseMouseEvent (e); }
+
+    private static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
+    {
+        ResourceManager rm = new (typeof (Strings));
+
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+        return cultures.Where (
+                               cultureInfo =>
+                                   !cultureInfo.Equals (CultureInfo.InvariantCulture)
+                                   && rm.GetResourceSet (cultureInfo, true, false) is { }
+                              )
+                       .ToList ();
+    }
+
+    // BUGBUG: This does not return en-US even though it's supported by default
+    private static List<CultureInfo> GetSupportedCultures ()
+    {
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+        // Get the assembly
+        var assembly = Assembly.GetExecutingAssembly ();
+
+        //Find the location of the assembly
+        string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
+
+        // Find the resource file name of the assembly
+        var resourceFilename = $"{assembly.GetName ().Name}.resources.dll";
+
+        if (cultures.Length > 1 && Directory.Exists (Path.Combine (assemblyLocation, "pt-PT")))
+        {
+            // Return all culture for which satellite folder found with culture code.
+            return cultures.Where (
+                                   cultureInfo =>
+                                       Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
+                                       && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+                                  )
+                           .ToList ();
+        }
+
+        // It's called from a self-contained single-file and get available cultures from the embedded resources strings.
+        return GetAvailableCulturesFromEmbeddedResources ();
     }
 }
