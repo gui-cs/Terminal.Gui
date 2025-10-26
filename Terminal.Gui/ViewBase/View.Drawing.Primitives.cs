@@ -25,20 +25,6 @@ public partial class View
         return true;
     }
 
-    /// <summary>
-    ///     Moves the drawing cursor to the specified screen-absolute location.
-    ///     This is a helper for Views that have already converted viewport coordinates to screen coordinates.
-    /// </summary>
-    /// <param name="screenPoint">Screen-absolute coordinates.</param>
-    /// <remarks>
-    ///     Most Views should use <see cref="Move(int, int)"/> which takes viewport-relative coordinates.
-    ///     This method is for special cases where screen coordinates have already been calculated.
-    /// </remarks>
-    protected void MoveToScreenPosition (Point screenPoint)
-    {
-        Driver?.Move (screenPoint.X, screenPoint.Y);
-    }
-
     /// <summary>Draws the specified character at the current draw position.</summary>
     /// <param name="rune">The Rune.</param>
     public void AddRune (Rune rune)
