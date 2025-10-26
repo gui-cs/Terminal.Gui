@@ -46,6 +46,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     {
         NotifyNewRunState = null;
         NotifyStopRunState = null;
+        Iteration = null;
     }
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
