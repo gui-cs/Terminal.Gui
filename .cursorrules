@@ -1,48 +1,5 @@
 # Terminal.Gui - Cursor AI Rules
 
-This project uses comprehensive AI agent instructions. See:
-- `.github/copilot-instructions.md` - Complete onboarding guide (primary reference)
-- `AGENTS.md` - General AI agent guidelines
+> **📘 Source of Truth: [CONTRIBUTING.md](CONTRIBUTING.md)**
 
-## Quick Reference
-
-### Project Type
-- .NET 8.0 cross-platform console UI toolkit
-- 496 source files in core library
-- GitFlow branching (v2_develop = default)
-
-### Essential Commands
-
-```bash
-# Always run from repo root in this order:
-dotnet restore                                              # First! (~15-20s)
-dotnet build --configuration Debug --no-restore            # ~50s, expect ~326 warnings
-dotnet test Tests/UnitTestsParallelizable --no-build       # Preferred test suite
-dotnet run --project Examples/UICatalog/UICatalog.csproj   # Demo app
-```
-
-### Code Style (Enforced)
-- **DO**: Use explicit types (avoid `var`), target-typed `new()`, 4-space indent
-- **DO**: Format only files you modify (ReSharper/Rider `Ctrl-E-C` or `Ctrl-K-D`)
-- **DO**: Follow `.editorconfig` and `Terminal.sln.DotSettings`
-- **DON'T**: Add new linters, modify unrelated code, decrease test coverage
-
-### Testing Rules
-- Add new tests to `Tests/UnitTestsParallelizable/` (preferred)
-- Avoid `Application.Init` and static dependencies in tests
-- Don't use `[AutoInitShutdown]` attribute (legacy)
-- Maintain 70%+ code coverage on new code
-
-### API Documentation (Required)
-- All public APIs need XML docs (`<summary>`, `<remarks>`, `<example>`)
-- Use `<see cref=""/>` for cross-references
-- Complex topics → `docfx/docs/*.md`
-
-### Common Issues
-- ~326 build warnings are normal (nullable refs, etc.)
-- Tests can take 5-10 minutes
-- Run `dotnet restore` before any build
-- Read `.github/copilot-instructions.md` for full troubleshooting
-
----
-**See `.github/copilot-instructions.md` for complete instructions**
+This project uses [CONTRIBUTING.md](CONTRIBUTING.md) as the single source of truth for contribution guidelines. AI agents, including CoPilot and Cursor **MUST** follow the guidelines in [CONTRIBUTING.md](CONTRIBUTING.md)/

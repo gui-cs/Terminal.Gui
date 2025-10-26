@@ -89,7 +89,7 @@ public class ClockView : View
         Add(timeLabel);
         
         // Update every second
-        timerToken = Application.MainLoop.AddTimeout(
+        timerToken = Application.AddTimeout(
             TimeSpan.FromSeconds(1), 
             UpdateTime
         );
@@ -105,7 +105,7 @@ public class ClockView : View
     {
         if (disposing && timerToken != null)
         {
-            Application.MainLoop.RemoveTimeout(timerToken);
+            Application.RemoveTimeout(timerToken);
         }
         base.Dispose(disposing);
     }
@@ -220,7 +220,7 @@ Task.Run(() =>
 ### ❌ Don't: Forget to clean up timers
 ```csharp
 // Memory leak - timer keeps running after view is disposed
-Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
+Application.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
 ```
 
 ### ✅ Do: Remove timers in Dispose
@@ -229,7 +229,7 @@ protected override void Dispose(bool disposing)
 {
     if (disposing && timerToken != null)
     {
-        Application.MainLoop.RemoveTimeout(timerToken);
+        Application.RemoveTimeout(timerToken);
     }
     base.Dispose(disposing);
 }
