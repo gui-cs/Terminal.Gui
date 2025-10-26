@@ -177,7 +177,7 @@ public class TextValidateField : View, IDesignable
         if (_provider is null)
         {
             Move (0, 0);
-            Driver?.AddStr ("Error: ITextValidateProvider not set!");
+            AddStr ("Error: ITextValidateProvider not set!");
 
             return true;
         }
@@ -194,7 +194,7 @@ public class TextValidateField : View, IDesignable
 
         for (var i = 0; i < marginLeft; i++)
         {
-            Driver?.AddRune ((Rune)' ');
+            AddRune ((Rune)' ');
         }
 
         // Content
@@ -203,7 +203,7 @@ public class TextValidateField : View, IDesignable
         // Content
         for (var i = 0; i < _provider.DisplayText.Length; i++)
         {
-            Driver?.AddRune ((Rune)_provider.DisplayText [i]);
+            AddRune ((Rune)_provider.DisplayText [i]);
         }
 
         // Right Margin
@@ -211,7 +211,7 @@ public class TextValidateField : View, IDesignable
 
         for (var i = 0; i < marginRight; i++)
         {
-            Driver?.AddRune ((Rune)' ');
+            AddRune ((Rune)' ');
         }
 
         return true;
