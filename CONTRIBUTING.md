@@ -241,6 +241,11 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 - **Tests**: Add tests for new functionality (see [Testing Requirements](#testing-requirements))
 - **Coverage**: Maintain or increase code coverage
 - **Scenarios**: Update UICatalog scenarios when adding features
+- **Warnings**: **CRITICAL - PRs must not introduce any new warnings**
+  - Any file modified in a PR that currently generates warnings **MUST** be fixed to remove those warnings
+  - Exception: Warnings caused by `[Obsolete]` attributes can remain
+  - Expected baseline: ~326 warnings (mostly nullable reference warnings, unused variables, xUnit suggestions)
+  - Action: Before submitting a PR, verify your changes don't add new warnings and fix any warnings in files you modify
 
 ---
 
@@ -396,6 +401,7 @@ Key documentation:
 - ❌ Don't decrease code coverage
 - ❌ **Don't use `var` for anything but built-in simple types** (use explicit types)
 - ❌ **Don't use redundant type names with `new`** (**ALWAYS PREFER** target-typed `new ()`)
+- ❌ **Don't introduce new warnings** (fix warnings in files you modify; exception: `[Obsolete]` warnings)
 
 ---
 

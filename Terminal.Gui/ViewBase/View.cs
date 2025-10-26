@@ -130,6 +130,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         set => _driver = value;
     }
 
+    /// <summary>Gets the screen buffer contents. This is a convenience property for Views that need direct access to the screen buffer.</summary>
+    protected Cell [,]? ScreenContents => Driver?.Contents;
+
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
     ///     <para>
