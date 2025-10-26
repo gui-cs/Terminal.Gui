@@ -259,4 +259,12 @@ public interface IConsoleDriver
     /// </summary>
     /// <returns></returns>
     public AnsiRequestScheduler GetRequestScheduler ();
+
+    /// <summary>
+    ///     Sets the size of the terminal screen. Only supported by FakeDriver for testing.
+    /// </summary>
+    /// <param name="width">The new width of the screen in columns.</param>
+    /// <param name="height">The new height of the screen in rows.</param>
+    /// <exception cref="NotImplementedException">Thrown by all drivers except FakeDriver.</exception>
+    void SetScreenSize (int width, int height);
 }

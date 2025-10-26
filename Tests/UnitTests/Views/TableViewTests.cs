@@ -2206,7 +2206,7 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
+        Application.Driver!.SetScreenSize (100, 100);
         var tv = new TableView ();
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 6);

@@ -36,6 +36,9 @@ public class FakeDriverInputTests (ITestOutputHelper output)
         var driver = new FakeDriver ();
         driver.Init ();
 
+        // Clear any previous state from other tests
+        FakeConsole.MockKeyPresses.Clear ();
+
         // Act - Push multiple keys
         FakeConsole.PushMockKeyPress (KeyCode.A);
         FakeConsole.PushMockKeyPress (KeyCode.B);

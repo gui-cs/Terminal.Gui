@@ -378,6 +378,12 @@ public class FakeDriver : ConsoleDriver
     /// <inheritdoc />
     internal override IAnsiResponseParser GetParser () => _parser;
 
+    /// <inheritdoc/>
+    public override void SetScreenSize (int width, int height)
+    {
+        SetBufferSize (width, height);
+    }
+
     public void SetBufferSize (int width, int height)
     {
         FakeConsole.SetBufferSize (width, height);

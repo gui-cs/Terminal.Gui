@@ -424,6 +424,12 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public AnsiRequestScheduler GetRequestScheduler () { return _ansiRequestScheduler; }
 
     /// <inheritdoc/>
+    public void SetScreenSize (int width, int height)
+    {
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+    }
+
+    /// <inheritdoc/>
     public void Refresh ()
     {
         // No need we will always draw when dirty

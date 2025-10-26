@@ -738,4 +738,9 @@ public abstract class ConsoleDriver : IConsoleDriver
         return _scheduler ??= new (GetParser ());
     }
 
+    /// <inheritdoc/>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+    }
 }
