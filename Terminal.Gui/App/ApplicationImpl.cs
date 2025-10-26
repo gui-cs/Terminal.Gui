@@ -499,7 +499,7 @@ public class ApplicationImpl : IApplication
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (_mainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (Application.Top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
             return;

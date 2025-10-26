@@ -17,9 +17,7 @@ public class ApplicationStressTests : TestsAllViews
 
     private const int NUM_PASSES = 50;
     private const int NUM_INCREMENTS = 500;
-    
-    // Use longer timeout when running under debugger to account for slower iterations
-    private static readonly int POLL_MS = System.Diagnostics.Debugger.IsAttached ? 500 : 100;
+    private const int POLL_MS = 100;
 
     /// <summary>
     /// Stress test for Application.Invoke to verify that invocations from background threads
@@ -79,6 +77,13 @@ public class ApplicationStressTests : TestsAllViews
                 while (_tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
                 {
                     int tbNow = _tbCounter;
+
+                    // Wait for Application.Top to be running to ensure timed events can be processed
+                    while (Application.Top is null || Application.Top is { Running: false })
+                    {
+                        Thread.Sleep (1);
+                    }
+
                     _wakeUp.Wait (pollMs);
 
                     if (_tbCounter != tbNow)
