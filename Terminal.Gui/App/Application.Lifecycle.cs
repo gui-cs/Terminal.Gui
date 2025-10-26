@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Initialization (Init/Shutdown)
+public static partial class Application // Lifecycle (Init/Shutdown)
 {
 
     /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
@@ -24,7 +24,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     The <see cref="Run{T}"/> function combines
     ///     <see cref="Init(IConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
-    ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
+    ///     call. An application can use <see cref="Run{T}"/> without explicitly calling
     ///     <see cref="Init(IConsoleDriver,string)"/>.
     /// </para>
     /// <param name="driver">
@@ -63,7 +63,11 @@ public static partial class Application // Initialization (Init/Shutdown)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
-    internal static int MainThreadId { get; set; } = -1;
+    internal static int MainThreadId
+    {
+        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
+        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+    }
 
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
@@ -114,28 +118,9 @@ public static partial class Application // Initialization (Init/Shutdown)
         // or go through the modern application architecture
         if (Driver is null)
         {
-            //// Try to find a legacy IConsoleDriver type that matches the driver name
-            //bool useLegacyDriver = false;
-            //if (!string.IsNullOrEmpty (ForceDriver))
-            //{
-            //    (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
-            //    Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
-                
-            //    if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
-            //    {
-            //        // This is a legacy driver (not a ConsoleDriverFacade)
-            //        Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
-            //        useLegacyDriver = true;
-            //    }
-            //}
-            
-            //// Use the modern application architecture
-            //if (!useLegacyDriver)
-            {
-                ApplicationImpl.Instance.Init (driver, driverName);
-                Debug.Assert (Driver is { });
-                return;
-            }
+            ApplicationImpl.Instance.Init (driver, driverName);
+            Debug.Assert (Driver is { });
+            return;
         }
 
         Debug.Assert (Navigation is null);
@@ -199,7 +184,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
-    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
+    /// <summary>Gets a list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
     public static (List<Type?>, List<string?>) GetDriverTypes ()
@@ -225,8 +210,6 @@ public static partial class Application // Initialization (Init/Shutdown)
                                         .Union (["dotnet", "windows", "unix", "fake"])
                                         .ToList ()!;
 
-
-
         return (driverTypes, driverTypeNames);
     }
 
@@ -247,7 +230,11 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
     /// </para>
     /// </remarks>
-    public static bool Initialized { get; internal set; }
+    public static bool Initialized
+    {
+        get => ApplicationImpl.Instance.Initialized;
+        internal set => ApplicationImpl.Instance.Initialized = value;
+    }
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.

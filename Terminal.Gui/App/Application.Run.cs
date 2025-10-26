@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Run (Begin, Run, End, Stop)
+public static partial class Application // Run (Begin -> Run -> Layout/Draw -> End -> Stop)
 {
     /// <summary>Gets or sets the key to quit the application.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -61,19 +61,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-        //#if DEBUG_IDISPOSABLE
-        //        Debug.Assert (!toplevel.WasDisposed);
-
-        //        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-        //        {
-        //            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-        //        }
-        //#endif
-
         // Ensure the mouse is ungrabbed.
-        if (MouseGrabHandler.MouseGrabView is { })
+        if (Mouse.MouseGrabView is { })
         {
-            MouseGrabHandler.UngrabMouse ();
+            Mouse.UngrabMouse ();
         }
 
         var rs = new RunState (toplevel);
@@ -130,11 +121,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                     TopLevels.Push (toplevel);
                 }
             }
-
-            //if (TopLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
-            //{
-            //    throw new ArgumentException ("There are duplicates Toplevel IDs");
-            //}
         }
 
         if (Top is null)
@@ -174,11 +160,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             toplevel.EndInit (); // Calls Layout
         }
 
-        // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
-        // can update their state appropriately.
-        // BUGBUG: DO NOT DO THIS. Leave this commented out until we can figure out how to do this right
-        //Apply ();
-
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
         {
@@ -187,7 +168,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.OnLoaded ();
 
-        LayoutAndDraw (true);
+        ApplicationImpl.Instance.LayoutAndDraw (true);
 
         if (PositionCursor ())
         {
@@ -402,44 +383,19 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
     ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>
-    /// <param name="forceDraw">
+    /// <param name="forceRedraw">
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
     ///     should only be overriden for testing.
     /// </param>
-    public static void LayoutAndDraw (bool forceDraw = false)
+    public static void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. TopLevels];
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-            tops.Insert (0, visiblePopover);
-        }
-
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
-
-        if (ClearScreenNextIteration)
-        {
-            forceDraw = true;
-            ClearScreenNextIteration = false;
-        }
-
-        if (forceDraw)
-        {
-            Driver?.ClearContents ();
-        }
-
-        View.SetClipToScreen ();
-        View.Draw (tops, neededLayout || forceDraw);
-        View.SetClipToScreen ();
-        Driver?.Refresh ();
+        ApplicationImpl.Instance.LayoutAndDraw (forceRedraw);
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
-    
+
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
     internal static MainLoop? MainLoop { get; set; }
@@ -492,35 +448,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <returns><see langword="false"/> if at least one iteration happened.</returns>
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
-        // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop is { Running: true } && MainLoop.EventsPending ())
-        {
-            // Notify Toplevel it's ready
-            if (firstIteration)
-            {
-                state.Toplevel.OnReady ();
-            }
+        ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
+        appImpl.Coordinator?.RunIteration ();
 
-            MainLoop.RunIteration ();
-
-            Iteration?.Invoke (null, new ());
-        }
-
-        firstIteration = false;
-
-        if (Top is null)
-        {
-            return firstIteration;
-        }
-
-        LayoutAndDraw (TopLevels.Any (v => v.NeedsLayout || v.NeedsDraw));
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
-
-        return firstIteration;
+        return false;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
@@ -534,14 +465,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     </para>
     /// </remarks>
     public static void RequestStop (Toplevel? top = null) { ApplicationImpl.Instance.RequestStop (top); }
-
-    internal static void OnNotifyStopRunState (Toplevel top)
-    {
-        if (EndAfterFirstIteration)
-        {
-            NotifyStopRunState?.Invoke (top, new (top));
-        }
-    }
 
     /// <summary>
     ///     Building block API: completes the execution of a <see cref="Toplevel"/> that was started with

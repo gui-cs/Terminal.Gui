@@ -50,8 +50,8 @@ public partial class Border : Adornment
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
 
-        Application.MouseGrabHandler.GrabbingMouse += Application_GrabbingMouse;
-        Application.MouseGrabHandler.UnGrabbingMouse += Application_UnGrabbingMouse;
+        Application.Mouse.GrabbingMouse += Application_GrabbingMouse;
+        Application.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
 
         ThicknessChanged += OnThicknessChanged;
     }

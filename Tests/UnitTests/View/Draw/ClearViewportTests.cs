@@ -321,7 +321,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     {
         ConfigurationManager.Enable (ConfigLocations.LibraryResources);
 
-        var root = new View { Width = 20, Height = 10 };
+        View root = new () { Width = 20, Height = 10 };
 
         string text = new ('c', 100);
 
@@ -335,10 +335,10 @@ public class ClearViewportTests (ITestOutputHelper output)
 
         root.Add (v);
 
-        var top = new Toplevel ();
+        Toplevel top = new ();
         top.Add (root);
         RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        AutoInitShutdownAttribute.RunIteration ();
 
         if (label)
         {

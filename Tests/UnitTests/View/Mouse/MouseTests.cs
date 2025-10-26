@@ -96,7 +96,7 @@ public class MouseTests : TestsAllViews
 
         view.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -126,7 +126,7 @@ public class MouseTests : TestsAllViews
 
         view.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -156,7 +156,7 @@ public class MouseTests : TestsAllViews
 
         view.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -377,7 +377,7 @@ public class MouseTests : TestsAllViews
 
     //    testView.Dispose ();
 
-    //    // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+    //    // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
     //    Application.ResetState (true);
 
     //}
@@ -442,7 +442,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -504,7 +504,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -567,7 +567,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -631,7 +631,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
     private class MouseEventTestView : View

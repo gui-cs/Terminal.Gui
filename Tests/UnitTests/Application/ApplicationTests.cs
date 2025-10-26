@@ -309,7 +309,7 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
-            Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+            Assert.Null (Application.Mouse.MouseGrabView);
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
@@ -574,7 +574,7 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
-        Assert.Null (Application.MouseGrabHandler.MouseGrabView); // public
+        Assert.Null (Application.Mouse.MouseGrabView); // public
         Application.Top!.Dispose ();
     }
 
@@ -584,13 +584,12 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        var top = new Toplevel ();
+        Toplevel top = new ();
         RunState rs = Application.Begin (top);
-        var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.RunIteration (ref rs, firstIteration);
+        ApplicationImpl.Instance.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
@@ -932,7 +931,7 @@ public class ApplicationTests
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
-        Assert.Equal (w.Border, Application.MouseGrabHandler.MouseGrabView);
+        Assert.Equal (w.Border, Application.Mouse.MouseGrabView);
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.

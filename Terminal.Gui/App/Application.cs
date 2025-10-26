@@ -232,7 +232,13 @@ public static partial class Application
             Driver = null;
         }
 
-        _screen = null;
+        // Reset Screen to null so it will be recalculated on next access
+        // Note: ApplicationImpl.Shutdown() also calls ResetScreen() before calling this method
+        // to avoid potential circular reference issues. Calling it twice is harmless.
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl.ResetScreen ();
+        }
 
         // Don't reset ForceDriver; it needs to be set before Init is called.
         //ForceDriver = string.Empty;
@@ -242,16 +248,15 @@ public static partial class Application
         // Run State stuff
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        MouseGrabHandler = new MouseGrabHandler ();
-        // Keyboard will be lazy-initialized in ApplicationImpl on next access
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
         Initialized = false;
 
         // Mouse
-        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
+        ResetMouseState ();
 
         // Keyboard events and bindings are now managed by the Keyboard instance
 

@@ -83,7 +83,7 @@ public static partial class Application // Keyboard handling
 
     internal static void AddKeyBindings ()
     {
-        if (Keyboard is Keyboard keyboard)
+        if (Keyboard is KeyboardImpl keyboard)
         {
             keyboard.AddKeyBindings ();
         }
