@@ -81,7 +81,7 @@ When measuring the screen space taken up by a `string` you can use the extension
 + myString.GetColumns();
 ```
 
-## `View Life Cycle Management
+## View Life Cycle Management
 
 In v1, @Terminal.Gui.View was derived from `Responder` which supported `IDisposable`. In v2, `Responder` has been removed and @Terminal.Gui.View is the base-class supporting `IDisposable`. 
 
@@ -187,7 +187,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 + Application.KeyDown(object? sender, Key e)
 ```
 
-## **@"Terminal.Gui.Input.Command" has been expanded and simplified
+## @Terminal.Gui.Input.Command has been expanded and simplified
 
 In v1, the `Command` enum had duplicate entries and inconsistent naming. In v2 it has been both expanded and simplified.
 
@@ -225,7 +225,7 @@ The cursor and focus system has been redesigned in v2 to be more consistent and 
 
 ### Cursor
 
-In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was the same as `ConsoleDriver.Row`/`Col` and determined by the last call to `ConsoleDriver.Move`. `View.PositionCursor()` could be overridden by views to cause `Application` to call `ConsoleDriver.Move` on behalf of the app and to manage setting `CursorVisibility`. This API was confusing and bug-prone.
+In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was determined by the last call to the driver's Move method. `View.PositionCursor()` could be overridden by views to cause `Application` to call the driver's positioning method on behalf of the app and to manage setting `CursorVisibility`. This API was confusing and bug-prone.
 
 In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the style of cursor it wants and the Viewport-relative location:
 
@@ -237,13 +237,33 @@ In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the st
 	- If `null` the default cursor style is used.
 	- If `{}` specifies the style of cursor. See [cursor.md](cursor.md) for more.
 * `Application` now has APIs for querying available cursor styles.
-* The details in `ConsoleDriver` are no longer available to applications.	
+* The driver details are no longer directly accessible to View subclasses.	
 
 #### How to Fix (Cursor API)
 
 * Use @Terminal.Gui.ViewBase.View.CursorPosition to set the cursor position in a view. Set @Terminal.Gui.ViewBase.View.CursorPosition to `null` to hide the cursor.
 * Set @Terminal.Gui.ViewBase.View.CursorVisibility to the cursor style you want to use.
 * Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
+
+### Driver Access
+
+In v1, Views could access `Driver` directly (e.g., `Driver.Move()`, `Driver.Rows`, `Driver.Cols`). In v2, `Driver` is internal and View subclasses should not access it directly. ViewBase provides all necessary abstractions for Views to function without needing direct driver access.
+
+#### How to Fix (Driver Access)
+
+* Replace `Driver.Rows` and `Driver.Cols` with @Terminal.Gui.App.Application.Screen.Height and @Terminal.Gui.App.Application.Screen.Width
+* Replace direct `Driver.Move(screenX, screenY)` calls with @Terminal.Gui.ViewBase.View.Move using viewport-relative coordinates
+* Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
+* ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can still access Driver for framework implementation needs
+
+```diff
+- if (x >= Driver.Cols) return;
++ if (x >= Application.Screen.Width) return;
+
+- Point screenPos = ViewportToScreen(new Point(col, row));
+- Driver.Move(screenPos.X, screenPos.Y);
++ Move(col, row);  // Move handles viewport-to-screen conversion
+```
 
 ### Focus
 
@@ -286,7 +306,7 @@ In v2, this is made consistent and configurable:
 - `Key.CursorDown` - Operates identically to `Application.NextTabStopKey`.
 - `Key.CursorLeft` - Operates identically to `Application.PrevTabStopKey`.
 - `Key.CursorUp` - Operates identically to `Application.PrevTabStopKey`.
-- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view which is a `TabGroup`` will gain focus.
+- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view which is a `TabGroup` will gain focus.
 - `Application.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `Application.NextTabGroupKey`.
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators)
@@ -316,7 +336,7 @@ Alternatively, if you want to have key events as well as mouse events to fire an
 
 Previously events in Terminal.Gui used a mixture of `Action` (no arguments), `Action<string>` (or other raw datatype) and `Action<EventArgs>`. Now all events use the `EventHandler<EventArgs>` [standard .net design pattern](https://learn.microsoft.com/en-us/dotnet/csharp/event-pattern#event-delegate-signatures).
 
-For example, `event Action`<long> TimeoutAdded` has become `event EventHandler<TimeoutEventArgs> TimeoutAdded`
+For example, `event Action<long> TimeoutAdded` has become `event EventHandler<TimeoutEventArgs> TimeoutAdded`
 
 This change was made for the following reasons:
 
@@ -436,16 +456,25 @@ Additionally, the `Toggle` event was renamed `CheckStateChanging` and made cance
 +cb.AdvanceCheckState ();
 ```
 
-## `MainLoop` is no longer accessible from `Application`
+## `MainLoop` has been removed from `Application`
 
-In v1, you could add timeouts via `Application.MainLoop.AddTimeout` among other things.  In v2, the `MainLoop` object is internal to `Application` and methods previously accessed via `MainLoop` can now be accessed directly via `Application`
+In v1, you could add timeouts via `Application.MainLoop.AddTimeout` and access the `MainLoop` object directly. In v2, the legacy `MainLoop` class has been completely removed as part of the architectural modernization. Timeout functionality and other features previously accessed via `MainLoop` are now available directly through `Application` or `ApplicationImpl`.
 
 ### How to Fix
+
+Replace any `Application.MainLoop` references:
 
 ```diff
 - Application.MainLoop.AddTimeout (TimeSpan time, Func<MainLoop, bool> callback)
 + Application.AddTimeout (TimeSpan time, Func<bool> callback)
 ```
+
+```diff
+- Application.MainLoop.Wakeup ()
++ // No replacement needed - wakeup is handled automatically by the modern architecture
+```
+
+**Note**: The legacy `MainLoop` infrastructure (including `IMainLoopDriver` and `FakeMainLoop`) has been removed. The modern v2 architecture uses `ApplicationImpl`, `MainLoopCoordinator`, and `ApplicationMainLoop` instead.
 
 ## `SendSubViewXXX` renamed and corrected
 

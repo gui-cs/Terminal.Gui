@@ -61,15 +61,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-        //#if DEBUG_IDISPOSABLE
-        //        Debug.Assert (!toplevel.WasDisposed);
-
-        //        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-        //        {
-        //            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-        //        }
-        //#endif
-
         // Ensure the mouse is ungrabbed.
         if (Mouse.MouseGrabView is { })
         {
@@ -130,11 +121,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
                     TopLevels.Push (toplevel);
                 }
             }
-
-            //if (TopLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
-            //{
-            //    throw new ArgumentException ("There are duplicates Toplevel IDs");
-            //}
         }
 
         if (Top is null)
@@ -173,11 +159,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
             toplevel.BeginInit ();
             toplevel.EndInit (); // Calls Layout
         }
-
-        // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
-        // can update their state appropriately.
-        // BUGBUG: DO NOT DO THIS. Leave this commented out until we can figure out how to do this right
-        //Apply ();
 
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
@@ -391,18 +372,12 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <param name="action">the action to be invoked on the main processing thread.</param>
     public static void Invoke (Action action) { ApplicationImpl.Instance.Invoke (action); }
 
-    // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
-    // is ProgressBarStyles, and it's not clear it needs to.
-
-    /// <summary>Wakes up the running application that might be waiting on input.</summary>
-    public static void Wakeup () { MainLoop?.Wakeup (); }
-
     /// <summary>
     ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
     ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
     ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>
-    /// <param name="forceDraw">
+    /// <param name="forceRedraw">
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
     ///     should only be overriden for testing.
     /// </param>
@@ -414,10 +389,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
-
-    /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
-    /// <value>The main loop.</value>
-    internal static MainLoop? MainLoop { get; set; }
 
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
@@ -436,22 +407,12 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            if (MainLoop is { })
-            {
-                MainLoop.Running = true;
-            }
-
             if (EndAfterFirstIteration && !firstIteration)
             {
                 return;
             }
 
             firstIteration = RunIteration (ref state, firstIteration);
-        }
-
-        if (MainLoop is { })
-        {
-            MainLoop.Running = false;
         }
 
         // Run one last iteration to consume any outstanding input events from Driver
@@ -467,35 +428,10 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <returns><see langword="false"/> if at least one iteration happened.</returns>
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
-        // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop is { Running: true } && MainLoop.EventsPending ())
-        {
-            // Notify Toplevel it's ready
-            if (firstIteration)
-            {
-                state.Toplevel.OnReady ();
-            }
+        ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
+        appImpl.Coordinator?.RunIteration ();
 
-            MainLoop.RunIteration ();
-
-            Iteration?.Invoke (null, new ());
-        }
-
-        firstIteration = false;
-
-        if (Top is null)
-        {
-            return firstIteration;
-        }
-
-        LayoutAndDraw (TopLevels.Any (v => v.NeedsLayout || v.NeedsDraw));
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
-
-        return firstIteration;
+        return false;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
@@ -509,14 +445,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     </para>
     /// </remarks>
     public static void RequestStop (Toplevel? top = null) { ApplicationImpl.Instance.RequestStop (top); }
-
-    internal static void OnNotifyStopRunState (Toplevel top)
-    {
-        if (EndAfterFirstIteration)
-        {
-            NotifyStopRunState?.Invoke (top, new (top));
-        }
-    }
 
     /// <summary>
     ///     Building block API: completes the execution of a <see cref="Toplevel"/> that was started with
