@@ -18,9 +18,13 @@ public abstract class OutputBase
     private TextStyle _redrawTextStyle = TextStyle.None;
 
     // Regex pattern for detecting URLs (http, https, ftp, ftps)
-    // Stops at ANSI escape sequence markers (ESC character 0x1B) to avoid matching across escape sequences
+    // Matches common URL characters but stops at:
+    // - Whitespace
+    // - ANSI escape sequences (ESC character 0x1B)
+    // - Common sentence-ending punctuation when at end (!, ?, ., ,)
+    // Based on RFC 3986 with practical adjustments for terminal display
     private static readonly Regex UrlRegex = new Regex(
-        @"\b(?:https?|ftps?)://[^\s<>""{}|\\^`\[\]\x1B]+",
+        @"\b(?:https?|ftps?)://[^\s<>""{}|\\^`\[\]\x1B]+[^\s<>""{}|\\^`\[\]\x1B.!?,;:)]",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
