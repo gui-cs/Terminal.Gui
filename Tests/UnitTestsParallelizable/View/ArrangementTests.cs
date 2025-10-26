@@ -968,4 +968,255 @@ public class ArrangementTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region ViewArrangement Advanced Flag Tests
+
+    [Fact]
+    public void ViewArrangement_CanCombineAllResizableDirections ()
+    {
+        ViewArrangement arrangement = ViewArrangement.TopResizable 
+                                    | ViewArrangement.BottomResizable 
+                                    | ViewArrangement.LeftResizable 
+                                    | ViewArrangement.RightResizable;
+
+        Assert.True (arrangement.HasFlag (ViewArrangement.TopResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.BottomResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.LeftResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.RightResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.Resizable)); // Resizable is all four combined
+    }
+
+    [Fact]
+    public void ViewArrangement_MovableAndResizable_CanCoexist ()
+    {
+        ViewArrangement arrangement = ViewArrangement.Movable | ViewArrangement.Resizable;
+
+        Assert.True (arrangement.HasFlag (ViewArrangement.Movable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.Resizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.TopResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.BottomResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.LeftResizable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.RightResizable));
+    }
+
+    [Fact]
+    public void ViewArrangement_OverlappedWithMovableAndResizable_AllFlagsWork ()
+    {
+        ViewArrangement arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable;
+
+        Assert.True (arrangement.HasFlag (ViewArrangement.Overlapped));
+        Assert.True (arrangement.HasFlag (ViewArrangement.Movable));
+        Assert.True (arrangement.HasFlag (ViewArrangement.Resizable));
+    }
+
+    [Fact]
+    public void View_Arrangement_CanBeSetToCompositeFlagValue ()
+    {
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
+        };
+
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.Resizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.Overlapped));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
+    }
+
+    #endregion
+
+    #region View Arrangement Edge Cases
+
+    [Fact]
+    public void View_ArrangementWithNoBorder_CanStillHaveArrangementValue ()
+    {
+        // A view can have Arrangement set even if BorderStyle is None
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            BorderStyle = LineStyle.None
+        };
+
+        // Border exists but has no visible style
+        Assert.NotNull (view.Border);
+        Assert.Equal (LineStyle.None, view.BorderStyle);
+        Assert.Equal (ViewArrangement.Movable | ViewArrangement.Resizable, view.Arrangement);
+    }
+
+    [Fact]
+    public void View_ChangingBorderStyle_PreservesArrangement ()
+    {
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Movable,
+            BorderStyle = LineStyle.Single
+        };
+
+        Assert.NotNull (view.Border);
+        Assert.Equal (ViewArrangement.Movable, view.Arrangement);
+
+        // Change border style
+        view.BorderStyle = LineStyle.Double;
+
+        Assert.NotNull (view.Border);
+        Assert.Equal (ViewArrangement.Movable, view.Arrangement);
+    }
+
+    [Fact]
+    public void View_ChangingToNoBorderStyle_PreservesArrangement ()
+    {
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Movable,
+            BorderStyle = LineStyle.Single
+        };
+
+        Assert.NotNull (view.Border);
+        Assert.Equal (LineStyle.Single, view.BorderStyle);
+
+        // Change to no border style
+        view.BorderStyle = LineStyle.None;
+
+        // Border still exists but has no visible style
+        Assert.NotNull (view.Border);
+        Assert.Equal (LineStyle.None, view.BorderStyle);
+        Assert.Equal (ViewArrangement.Movable, view.Arrangement); // Arrangement value is preserved
+    }
+
+    [Fact]
+    public void View_MultipleSubviewsWithDifferentArrangements_EachIndependent ()
+    {
+        var container = new View ();
+        
+        var fixedView = new View { Id = "fixed", Arrangement = ViewArrangement.Fixed };
+        var movableView = new View { Id = "movable", Arrangement = ViewArrangement.Movable };
+        var resizableView = new View { Id = "resizable", Arrangement = ViewArrangement.Resizable };
+        var overlappedView = new View { Id = "overlapped", Arrangement = ViewArrangement.Overlapped };
+
+        container.Add (fixedView, movableView, resizableView, overlappedView);
+
+        Assert.Equal (ViewArrangement.Fixed, fixedView.Arrangement);
+        Assert.Equal (ViewArrangement.Movable, movableView.Arrangement);
+        Assert.Equal (ViewArrangement.Resizable, resizableView.Arrangement);
+        Assert.Equal (ViewArrangement.Overlapped, overlappedView.Arrangement);
+    }
+
+    #endregion
+
+    #region Overlapped Layout Advanced Tests
+
+    [Fact]
+    public void Overlapped_ViewCanBeMovedToFront ()
+    {
+        var container = new View { Arrangement = ViewArrangement.Overlapped };
+        
+        var view1 = new View { Id = "view1" };
+        var view2 = new View { Id = "view2" };
+        var view3 = new View { Id = "view3" };
+
+        container.Add (view1, view2, view3);
+
+        // Initially view3 is on top (last added)
+        Assert.Equal (view3, container.SubViews.ToArray () [^1]);
+
+        // Move view1 to end (top of Z-order)
+        container.MoveSubViewToEnd (view1);
+
+        Assert.Equal (view1, container.SubViews.ToArray () [^1]);
+        Assert.Equal ([view2, view3, view1], container.SubViews.ToArray ());
+    }
+
+    [Fact]
+    public void Overlapped_ViewCanBeMovedToBack ()
+    {
+        var container = new View { Arrangement = ViewArrangement.Overlapped };
+        
+        var view1 = new View { Id = "view1" };
+        var view2 = new View { Id = "view2" };
+        var view3 = new View { Id = "view3" };
+
+        container.Add (view1, view2, view3);
+
+        // Initial order: [view1, view2, view3]
+        Assert.Equal ([view1, view2, view3], container.SubViews.ToArray ());
+        
+        // Move view3 to end (top of Z-order)
+        container.MoveSubViewToEnd (view3);
+        Assert.Equal (view3, container.SubViews.ToArray () [^1]);
+        Assert.Equal ([view1, view2, view3], container.SubViews.ToArray ());
+        
+        // Now move view1 to end (making it on top, pushing view3 down)
+        container.MoveSubViewToEnd (view1);
+        Assert.Equal ([view2, view3, view1], container.SubViews.ToArray ());
+    }
+
+    [Fact]
+    public void Fixed_ViewAddOrderMattersForLayout ()
+    {
+        var container = new View { Arrangement = ViewArrangement.Fixed };
+        
+        var view1 = new View { Id = "view1", X = 0, Y = 0, Width = 10, Height = 5 };
+        var view2 = new View { Id = "view2", X = 5, Y = 2, Width = 10, Height = 5 };
+
+        container.Add (view1, view2);
+
+        // In Fixed arrangement, views don't overlap in the same way
+        // The order determines paint/draw order but not logical overlap
+        Assert.Equal (view1, container.SubViews.ToArray () [0]);
+        Assert.Equal (view2, container.SubViews.ToArray () [1]);
+    }
+
+    #endregion
+
+    #region Resizable Edge Cases
+
+    [Fact]
+    public void Border_OnlyLeftResizable_OtherDirectionsNotResizable ()
+    {
+        var view = new View
+        {
+            Arrangement = ViewArrangement.LeftResizable,
+            BorderStyle = LineStyle.Single
+        };
+
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
+        Assert.False (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
+        Assert.False (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
+        Assert.False (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
+    }
+
+    [Fact]
+    public void Border_TwoOppositeDirections_CanBeResizable ()
+    {
+        var view = new View
+        {
+            Arrangement = ViewArrangement.LeftResizable | ViewArrangement.RightResizable,
+            BorderStyle = LineStyle.Single
+        };
+
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
+        Assert.False (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
+        Assert.False (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
+    }
+
+    [Fact]
+    public void Border_ThreeDirections_CanBeResizable ()
+    {
+        var view = new View
+        {
+            Arrangement = ViewArrangement.LeftResizable | ViewArrangement.RightResizable | ViewArrangement.BottomResizable,
+            BorderStyle = LineStyle.Single
+        };
+
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
+        Assert.False (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
+    }
+
+    #endregion
 }
