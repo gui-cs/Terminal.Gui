@@ -47,7 +47,6 @@ public class GlobalTestSetup : IDisposable
         // Don't check Application.Force16Colors
         //Assert.False (Application.Force16Colors);
         Assert.Null (Application.Driver);
-        Assert.Null (Application.MainLoop);
         Assert.False (Application.EndAfterFirstIteration);
         Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
         Assert.Equal (Key.Tab, Application.NextTabKey);

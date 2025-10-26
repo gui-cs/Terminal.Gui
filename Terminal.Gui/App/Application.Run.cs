@@ -372,12 +372,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <param name="action">the action to be invoked on the main processing thread.</param>
     public static void Invoke (Action action) { ApplicationImpl.Instance.Invoke (action); }
 
-    // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
-    // is ProgressBarStyles, and it's not clear it needs to.
-
-    /// <summary>Wakes up the running application that might be waiting on input.</summary>
-    public static void Wakeup () { MainLoop?.Wakeup (); }
-
     /// <summary>
     ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
     ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
@@ -396,10 +390,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <remarks>See also <see cref="Timeout"/></remarks>
     public static event EventHandler<IterationEventArgs>? Iteration;
 
-    /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
-    /// <value>The main loop.</value>
-    internal static MainLoop? MainLoop { get; set; }
-
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
     ///     cause the application to continue running until Application.RequestStop () is called.
@@ -417,22 +407,12 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            if (MainLoop is { })
-            {
-                MainLoop.Running = true;
-            }
-
             if (EndAfterFirstIteration && !firstIteration)
             {
                 return;
             }
 
             firstIteration = RunIteration (ref state, firstIteration);
-        }
-
-        if (MainLoop is { })
-        {
-            MainLoop.Running = false;
         }
 
         // Run one last iteration to consume any outstanding input events from Driver
