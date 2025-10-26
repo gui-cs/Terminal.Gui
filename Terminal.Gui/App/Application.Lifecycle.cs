@@ -131,7 +131,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
 
         try
         {
-            MainLoop = Driver!.Init ();
+            Driver!.Init ();
             SubscribeDriverEvents ();
         }
         catch (InvalidOperationException ex)

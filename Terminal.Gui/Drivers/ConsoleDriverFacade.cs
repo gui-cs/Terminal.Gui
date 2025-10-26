@@ -365,7 +365,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     /// <summary>Initializes the driver</summary>
     /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
-    public MainLoop Init () { throw new NotSupportedException (); }
+    public void Init () { throw new NotSupportedException (); }
 
     /// <summary>Ends the execution of the console driver.</summary>
     public void End ()

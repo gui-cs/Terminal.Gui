@@ -427,9 +427,9 @@ public class FileDialog : Dialog, IDesignable
             Move (0, Viewport.Height / 2);
 
             SetAttribute (new (Color.Red, GetAttributeForRole (VisualRole.Normal).Background));
-            Driver!.AddStr (new (' ', feedbackPadLeft));
-            Driver.AddStr (_feedback);
-            Driver.AddStr (new (' ', feedbackPadRight));
+            AddStr (new (' ', feedbackPadLeft));
+            AddStr (_feedback);
+            AddStr (new (' ', feedbackPadRight));
         }
 
         return true;
@@ -507,7 +507,7 @@ public class FileDialog : Dialog, IDesignable
             _allowedTypeMenuBar.DrawingContent += (s, e) =>
                                                   {
                                                       _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
-                                                      Driver!.AddRune (Glyphs.DownArrow);
+                                                      AddRune (Glyphs.DownArrow);
                                                   };
 
             Add (_allowedTypeMenuBar);

@@ -658,7 +658,7 @@ public partial class View // Drawing APIs
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    Driver.AddRune (p.Value.Value.Rune);
+                    AddRune (p.Value.Value.Rune);
                 }
             }
 

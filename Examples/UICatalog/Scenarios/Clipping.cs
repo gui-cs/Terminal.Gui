@@ -100,7 +100,6 @@ public class Clipping : Scenario
                                  {
                                      tiledProgressBar1.Pulse ();
                                      tiledProgressBar2.Pulse ();
-                                     Application.Wakeup ();
                                  };
 
         progressTimer.Start ();

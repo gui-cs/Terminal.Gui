@@ -216,9 +216,6 @@ public static partial class Application
         Top = null;
         _cachedRunStateToplevel = null;
 
-        // MainLoop stuff
-        MainLoop?.Dispose ();
-        MainLoop = null;
         MainThreadId = -1;
         Iteration = null;
         EndAfterFirstIteration = false;

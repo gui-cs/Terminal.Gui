@@ -86,6 +86,11 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     {
         base.Dispose ();
 
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         // Disable mouse events first
         Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
