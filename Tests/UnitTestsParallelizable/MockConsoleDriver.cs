@@ -155,7 +155,7 @@ internal class MockConsoleDriver : IConsoleDriver
     public void UpdateCursor () {}
 
     /// <inheritdoc />
-    public MainLoop Init () { return null!; }
+    public void Init () { }
 
     /// <inheritdoc />
     public void End () {  }
