@@ -84,8 +84,6 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     /// <inheritdoc/>
     public override void Dispose ()
     {
-        Logging.Logger.LogInformation ($"Disposing {nameof (NetInput)}");
-
         base.Dispose ();
 
         if (ConsoleDriver.RunningUnitTests)
