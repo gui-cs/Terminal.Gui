@@ -441,13 +441,13 @@ public class Slider<T> : View, IOrientation
     private void MoveAndAdd (int x, int y, Rune rune)
     {
         Move (x, y);
-        Driver?.AddRune (rune);
+        AddRune (rune);
     }
 
     private void MoveAndAdd (int x, int y, string str)
     {
         Move (x, y);
-        Driver?.AddStr (str);
+        AddStr (str);
     }
 
     /// <summary>Sets the dimensions of the Slider to the ideal values.</summary>
