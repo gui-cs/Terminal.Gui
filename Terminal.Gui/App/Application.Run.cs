@@ -472,35 +472,17 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("This method uses the legacy MainLoop architecture. Use ApplicationImpl.Coordinator?.RunIteration() or AutoInitShutdownAttribute.RunIteration() in tests instead.")]
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
-        // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop is { Running: true } && MainLoop.EventsPending ())
+        // Notify Toplevel it's ready on first iteration
+        if (firstIteration)
         {
-            // Notify Toplevel it's ready
-            if (firstIteration)
-            {
-                state.Toplevel.OnReady ();
-            }
-
-            MainLoop.RunIteration ();
-
-            Iteration?.Invoke (null, new ());
+            state.Toplevel.OnReady ();
         }
 
-        firstIteration = false;
+        // Delegate to modern implementation
+        ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
+        appImpl.Coordinator?.RunIteration ();
 
-        if (Top is null)
-        {
-            return firstIteration;
-        }
-
-        LayoutAndDraw (TopLevels.Any (v => v.NeedsLayout || v.NeedsDraw));
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
-
-        return firstIteration;
+        return false;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
