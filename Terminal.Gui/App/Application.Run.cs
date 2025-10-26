@@ -61,15 +61,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-        //#if DEBUG_IDISPOSABLE
-        //        Debug.Assert (!toplevel.WasDisposed);
-
-        //        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-        //        {
-        //            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-        //        }
-        //#endif
-
         // Ensure the mouse is ungrabbed.
         if (Mouse.MouseGrabView is { })
         {
@@ -130,11 +121,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
                     TopLevels.Push (toplevel);
                 }
             }
-
-            //if (TopLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
-            //{
-            //    throw new ArgumentException ("There are duplicates Toplevel IDs");
-            //}
         }
 
         if (Top is null)
@@ -173,11 +159,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
             toplevel.BeginInit ();
             toplevel.EndInit (); // Calls Layout
         }
-
-        // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
-        // can update their state appropriately.
-        // BUGBUG: DO NOT DO THIS. Leave this commented out until we can figure out how to do this right
-        //Apply ();
 
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
@@ -402,7 +383,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
     ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>
-    /// <param name="forceDraw">
+    /// <param name="forceRedraw">
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
     ///     should only be overriden for testing.
     /// </param>
@@ -489,14 +470,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     </para>
     /// </remarks>
     public static void RequestStop (Toplevel? top = null) { ApplicationImpl.Instance.RequestStop (top); }
-
-    internal static void OnNotifyStopRunState (Toplevel top)
-    {
-        if (EndAfterFirstIteration)
-        {
-            NotifyStopRunState?.Invoke (top, new (top));
-        }
-    }
 
     /// <summary>
     ///     Building block API: completes the execution of a <see cref="Toplevel"/> that was started with
