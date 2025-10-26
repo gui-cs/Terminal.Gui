@@ -102,6 +102,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private readonly bool _isVirtualTerminal;
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
+    private readonly uint _originalOutputConsoleMode;
 
     public WindowsOutput ()
     {
@@ -114,8 +115,34 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
         // Get the standard output handle which is the current screen buffer.
         _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-        GetConsoleMode (_outputHandle, out uint mode);
-        _isVirtualTerminal = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
+        
+        if (!GetConsoleMode (_outputHandle, out uint mode))
+        {
+            throw new ApplicationException ($"Failed to get output console mode, error code: {Marshal.GetLastWin32Error ()}.");
+        }
+
+        _originalOutputConsoleMode = mode;
+
+        // Enable VT processing if not already enabled to support hyperlink detection and other VT features
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
+        {
+            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+            if (!SetConsoleMode (_outputHandle, mode))
+            {
+                // If we can't enable VT processing, continue without it
+                Logging.Logger.LogWarning ($"Failed to enable VT processing, error code: {Marshal.GetLastWin32Error ()}. Hyperlinks and other VT features may not work.");
+                _isVirtualTerminal = false;
+            }
+            else
+            {
+                _isVirtualTerminal = true;
+            }
+        }
+        else
+        {
+            _isVirtualTerminal = true;
+        }
 
         if (_isVirtualTerminal)
         {
@@ -523,6 +550,12 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
                 Console.ForegroundColor = _foreground;
                 Console.BackgroundColor = _background;
                 Console.Clear ();
+            }
+
+            // Restore original console mode
+            if (_outputHandle != nint.Zero && !ConsoleDriver.RunningUnitTests)
+            {
+                SetConsoleMode (_outputHandle, _originalOutputConsoleMode);
             }
         }
         else
