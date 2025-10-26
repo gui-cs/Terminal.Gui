@@ -338,24 +338,6 @@ public class FakeDriver : ConsoleDriver
 
     private CursorVisibility _savedCursorVisibility;
 
-    private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
-    {
-        if (consoleKeyInfo.Key == ConsoleKey.Packet)
-        {
-            consoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
-        }
-
-        KeyCode map = MapKey (consoleKeyInfo);
-
-        if (IsValidInput (map, out map))
-        {
-            OnKeyDown (new (map));
-            OnKeyUp (new (map));
-        }
-
-        //OnKeyPressed (new KeyEventArgs (map));
-    }
-
     /// <inheritdoc/>
     public override bool GetCursorVisibility (out CursorVisibility visibility)
     {

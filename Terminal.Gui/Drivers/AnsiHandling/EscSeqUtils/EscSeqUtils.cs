@@ -931,7 +931,7 @@ public static class EscSeqUtils
             _isButtonClicked = false;
             _isButtonDoubleClicked = true;
 
-            Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
+            ApplicationImpl.Instance.TimedEvents?.Add (TimeSpan.Zero,
                                           () =>
                                           {
                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
@@ -970,7 +970,7 @@ public static class EscSeqUtils
                 mouseFlags.Add (GetButtonClicked (buttonState));
                 _isButtonClicked = true;
 
-                Application.MainLoop?.TimedEvents.Add (TimeSpan.Zero,
+                ApplicationImpl.Instance.TimedEvents?.Add (TimeSpan.Zero,
                                               () =>
                                               {
                                                   Task.Run (async () => await ProcessButtonClickedAsync ());

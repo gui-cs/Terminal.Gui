@@ -14,7 +14,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     public void AllViews_Center_Properly (Type viewType)
     {
         // Required for spinner view that wants to register timeouts
-        Application.MainLoop = new (new FakeMainLoop (Application.Driver));
 
         var view = CreateInstanceIfNotGeneric (viewType);
 
