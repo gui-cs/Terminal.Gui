@@ -29,7 +29,7 @@ public interface IConsoleDriver
     int Col { get; }
 
     /// <summary>The number of columns visible in the terminal.</summary>
-    int Cols { get; set; }
+    int Cols { get; }
 
     // BUGBUG: This should not be publicly settable.
     /// <summary>
@@ -48,7 +48,7 @@ public interface IConsoleDriver
     int Row { get; }
 
     /// <summary>The number of rows visible in the terminal.</summary>
-    int Rows { get; set; }
+    int Rows { get; }
 
     /// <summary>The topmost row in the terminal.</summary>
     int Top { get; set; }

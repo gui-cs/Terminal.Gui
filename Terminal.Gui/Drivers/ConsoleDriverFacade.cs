@@ -113,11 +113,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public int Col => _outputBuffer.Col;
 
     /// <summary>The number of columns visible in the terminal.</summary>
-    public int Cols
-    {
-        get => _outputBuffer.Cols;
-        set => _outputBuffer.Cols = value;
-    }
+    public int Cols => _outputBuffer.Cols;
 
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal.
@@ -143,11 +139,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public int Row => _outputBuffer.Row;
 
     /// <summary>The number of rows visible in the terminal.</summary>
-    public int Rows
-    {
-        get => _outputBuffer.Rows;
-        set => _outputBuffer.Rows = value;
-    }
+    public int Rows => _outputBuffer.Rows;
 
     /// <summary>The topmost row in the terminal.</summary>
     public int Top

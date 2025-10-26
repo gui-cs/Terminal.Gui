@@ -51,8 +51,8 @@ public class FakeDriver : ConsoleDriver
         // FakeDriver implies UnitTests
         RunningUnitTests = true;
 
-        base.Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
-        base.Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
+        _cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+        _rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 
         if (FakeBehaviors.UseFakeClipboard)
         {
@@ -95,8 +95,8 @@ public class FakeDriver : ConsoleDriver
     {
         FakeConsole.MockKeyPresses.Clear ();
 
-        Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
-        Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
+        _cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+        _rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
         FakeConsole.Clear ();
         ResizeScreen ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
@@ -387,8 +387,9 @@ public class FakeDriver : ConsoleDriver
     public void SetBufferSize (int width, int height)
     {
         FakeConsole.SetBufferSize (width, height);
-        Cols = width;
-        Rows = height;
+        _cols = width;
+        _rows = height;
+        ClearContents ();
         SetWindowSize (width, height);
         ProcessResize ();
     }
@@ -400,8 +401,6 @@ public class FakeDriver : ConsoleDriver
         if (width != Cols || height != Rows)
         {
             SetBufferSize (width, height);
-            Cols = width;
-            Rows = height;
         }
 
         ProcessResize ();
