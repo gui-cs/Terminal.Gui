@@ -98,6 +98,7 @@ public class FakeDriver : ConsoleDriver
         _cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
         _rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
         FakeConsole.Clear ();
+        ClearContents ();
         ResizeScreen ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
     }

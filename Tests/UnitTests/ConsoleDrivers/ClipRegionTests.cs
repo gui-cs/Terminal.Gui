@@ -25,8 +25,9 @@ public class ClipRegionTests
     public void AddRune_Is_Clipped (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
+        driver.SetScreenSize (80, 25);
         Application.Init (driver);
-        Application.Driver!.SetScreenSize (80, 25);
 
         driver.Move (0, 0);
         driver.AddRune ('x');
