@@ -91,9 +91,7 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
     }
 
-    private FakeMainLoop? _mainLoopDriver;
-
-    public override MainLoop Init ()
+    public override void Init ()
     {
         FakeConsole.MockKeyPresses.Clear ();
 
@@ -102,12 +100,6 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
         ResizeScreen ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
-        //ClearContents ();
-
-        _mainLoopDriver = new FakeMainLoop (this);
-        _mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;
-
-        return new MainLoop (_mainLoopDriver);
     }
 
     public override bool UpdateScreen ()
