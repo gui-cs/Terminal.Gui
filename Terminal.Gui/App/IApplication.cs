@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
@@ -19,20 +20,12 @@ public interface IApplication
     object AddTimeout (TimeSpan time, Func<bool> callback);
 
     /// <summary>
-    /// Handles keyboard input and key bindings at the Application level.
+    ///     Gets or sets whether the screen will be cleared, and all Views redrawn, during the next Application iteration.
     /// </summary>
-    IKeyboard Keyboard { get; set; }
-
-    /// <summary>
-    ///     Handles mouse event state and processing.
-    /// </summary>
-    IMouse Mouse { get; set; }
+    bool ClearScreenNextIteration { get; set; }
 
     /// <summary>Gets or sets the console driver being used.</summary>
     IConsoleDriver? Driver { get; set; }
-
-    /// <summary>Gets or sets whether the application has been initialized.</summary>
-    bool Initialized { get; set; }
 
     /// <summary>
     ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
@@ -46,48 +39,6 @@ public interface IApplication
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     string ForceDriver { get; set; }
-
-    /// <summary>
-    /// Collection of sixel images to write out to screen when updating.
-    /// Only add to this collection if you are sure terminal supports sixel format.
-    /// </summary>
-    List<SixelToRender> Sixel { get; }
-
-    /// <summary>
-    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IConsoleDriver"/>.
-    /// </summary>
-    Rectangle Screen { get; set; }
-
-    /// <summary>
-    ///     Gets or sets whether the screen will be cleared, and all Views redrawn, during the next Application iteration.
-    /// </summary>
-    bool ClearScreenNextIteration { get; set; }
-
-    /// <summary>Gets or sets the popover manager.</summary>
-    ApplicationPopover? Popover { get; set; }
-
-    /// <summary>Gets or sets the navigation manager.</summary>
-    ApplicationNavigation? Navigation { get; set; }
-
-    /// <summary>Gets the currently active Toplevel.</summary>
-    Toplevel? Top { get; set; }
-
-    /// <summary>Gets the stack of all Toplevels.</summary>
-    System.Collections.Concurrent.ConcurrentStack<Toplevel> TopLevels { get; }
-
-    /// <summary>Requests that the application stop running.</summary>
-    void RequestStop ();
-
-    /// <summary>
-    ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
-    ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
-    ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
-    /// </summary>
-    /// <param name="forceRedraw">
-    ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
-    ///     should only be overriden for testing.
-    /// </param>
-    public void LayoutAndDraw (bool forceRedraw = false);
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
@@ -121,6 +72,9 @@ public interface IApplication
     [RequiresDynamicCode ("AOT")]
     public void Init (IConsoleDriver? driver = null, string? driverName = null);
 
+    /// <summary>Gets or sets whether the application has been initialized.</summary>
+    bool Initialized { get; set; }
+
     /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
     void Invoke (Action action);
@@ -130,6 +84,45 @@ public interface IApplication
     ///     is cutting edge.
     /// </summary>
     bool IsLegacy { get; }
+
+    /// <summary>
+    ///     Handles keyboard input and key bindings at the Application level.
+    /// </summary>
+    IKeyboard Keyboard { get; set; }
+
+    /// <summary>
+    ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
+    ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
+    ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
+    /// </summary>
+    /// <param name="forceRedraw">
+    ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
+    ///     should only be overriden for testing.
+    /// </param>
+    public void LayoutAndDraw (bool forceRedraw = false);
+
+    /// <summary>
+    ///     Maximum number of iterations of the main loop (and hence draws)
+    ///     to allow to occur per second. Defaults to <see cref="Application.DEFAULT_MAXIMUM_ITERATIONS_PER_SECOND"/> which is
+    ///     a 40ms sleep
+    ///     after iteration (factoring in how long iteration took to run).
+    ///     <remarks>
+    ///         Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
+    ///         Only affects v2 drivers.
+    ///     </remarks>
+    /// </summary>
+    ushort MaximumIterationsPerSecond { get; set; }
+
+    /// <summary>
+    ///     Handles mouse event state and processing.
+    /// </summary>
+    IMouse Mouse { get; set; }
+
+    /// <summary>Gets or sets the navigation manager.</summary>
+    ApplicationNavigation? Navigation { get; set; }
+
+    /// <summary>Gets or sets the popover manager.</summary>
+    ApplicationPopover? Popover { get; set; }
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
@@ -144,6 +137,9 @@ public interface IApplication
     /// </returns>
     bool RemoveTimeout (object token);
 
+    /// <summary>Requests that the application stop running.</summary>
+    void RequestStop ();
+
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
     /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
     /// <remarks>
@@ -154,6 +150,12 @@ public interface IApplication
     ///     </para>
     /// </remarks>
     void RequestStop (Toplevel? top);
+
+    /// <summary>
+    ///     Resets the application state to defaults. This is called by <see cref="Shutdown"/>.
+    /// </summary>
+    /// <param name="ignoreDisposed">If true, will not assert that views are disposed.</param>
+    void ResetState (bool ignoreDisposed = false);
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
@@ -198,7 +200,7 @@ public interface IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new();
+        where T : Toplevel, new ();
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
     /// <remarks>
@@ -244,6 +246,14 @@ public interface IApplication
     /// </param>
     public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null);
 
+    /// <summary>
+    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the
+    ///     <see cref="IConsoleDriver"/>.
+    ///     Setting the position is not supported and may throw <see cref="NotImplementedException"/>. The size may be set
+    ///     but will not persist if the terminal is resized and will not impact the actual terminal size.
+    /// </summary>
+    Rectangle Screen { get; set; }
+
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
@@ -254,26 +264,23 @@ public interface IApplication
     public void Shutdown ();
 
     /// <summary>
-    ///     Handles recurring events. These are invoked on the main UI thread - allowing for
-    ///     safe updates to <see cref="View"/> instances.
+    ///     Collection of sixel images to write out to screen when updating.
+    ///     Only add to this collection if you are sure terminal supports sixel format.
     /// </summary>
-    ITimedEvents? TimedEvents { get; }
-
-    /// <summary>
-    /// Maximum number of iterations of the main loop (and hence draws)
-    /// to allow to occur per second. Defaults to <see cref="Application.DEFAULT_MAXIMUM_ITERATIONS_PER_SECOND"/> which is a 40ms sleep
-    /// after iteration (factoring in how long iteration took to run).
-    /// <remarks>Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
-    /// Only affects v2 drivers.</remarks>
-    /// </summary>
-    ushort MaximumIterationsPerSecond { get; set; }
+    List<SixelToRender> Sixel { get; }
 
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     List<CultureInfo>? SupportedCultures { get; }
 
     /// <summary>
-    ///     Resets the application state to defaults. This is called by <see cref="Shutdown"/>.
+    ///     Handles recurring events. These are invoked on the main UI thread - allowing for
+    ///     safe updates to <see cref="View"/> instances.
     /// </summary>
-    /// <param name="ignoreDisposed">If true, will not assert that views are disposed.</param>
-    void ResetState (bool ignoreDisposed = false);
+    ITimedEvents? TimedEvents { get; }
+
+    /// <summary>Gets the currently active Toplevel.</summary>
+    Toplevel? Top { get; set; }
+
+    /// <summary>Gets the stack of all Toplevels.</summary>
+    ConcurrentStack<Toplevel> TopLevels { get; }
 }

@@ -6,58 +6,45 @@ using System.Globalization;
 using System.Reflection;
 using System.Resources;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
-/// Implementation of core <see cref="Application"/> methods using the modern
-/// main loop architecture with component factories for different platforms.
+///     Implementation of core <see cref="Application"/> methods using the modern
+///     main loop architecture with component factories for different platforms.
 /// </summary>
 public class ApplicationImpl : IApplication
 {
-    private readonly IComponentFactory? _componentFactory;
-    private IMainLoopCoordinator? _coordinator;
-    private string? _driverName;
-    private readonly ITimedEvents _timedEvents = new TimedEvents ();
-    private IConsoleDriver? _driver;
-    private bool _initialized;
-    private ApplicationPopover? _popover;
-    private ApplicationNavigation? _navigation;
-    private Toplevel? _top;
-    private readonly ConcurrentStack<Toplevel> _topLevels = new ();
-    private int _mainThreadId = -1;
-    private bool _force16Colors;
-    private string _forceDriver = string.Empty;
-    private readonly List<SixelToRender> _sixel = new ();
-    private readonly object _lockScreen = new ();
-    private Rectangle? _screen;
-    private bool _clearScreenNextIteration;
-    private ushort _maximumIterationsPerSecond = 25; // Default value for MaximumIterationsPerSecond
-    private List<CultureInfo>? _supportedCultures;
-    
-    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
-    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
-    internal Toplevel? _cachedRunStateToplevel;
-
     // Private static readonly Lazy instance of Application
     private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
 
     /// <summary>
-    /// Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
-    /// Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    ///     Creates a new instance of the Application backend.
     /// </summary>
-    public static IApplication Instance => _lazyInstance.Value;
+    public ApplicationImpl () { }
+
+    internal ApplicationImpl (IComponentFactory componentFactory) { _componentFactory = componentFactory; }
+
+    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
+    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
+    internal Toplevel? _cachedRunStateToplevel;
+    private readonly IComponentFactory? _componentFactory;
+    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    private readonly object _lockScreen = new ();
+    private string? _driverName;
+    private IConsoleDriver? _driver;
+    private Rectangle? _screen;
+    private List<CultureInfo>? _supportedCultures;
+
+    private IMouse? _mouse;
+
+    private IKeyboard? _keyboard;
 
     /// <inheritdoc/>
     public ITimedEvents? TimedEvents => _timedEvents;
 
-    internal IMainLoopCoordinator? Coordinator => _coordinator;
-
-    private IMouse? _mouse;
-
     /// <summary>
-    /// Handles mouse event state and processing.
+    ///     Handles mouse event state and processing.
     /// </summary>
     public IMouse Mouse
     {
@@ -67,20 +54,14 @@ public class ApplicationImpl : IApplication
             {
                 _mouse = new MouseImpl { Application = this };
             }
+
             return _mouse;
         }
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
     /// <summary>
-    /// Handles which <see cref="View"/> (if any) has captured the mouse
-    /// </summary>
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
-
-    private IKeyboard? _keyboard;
-
-    /// <summary>
-    /// Handles keyboard input and key bindings at the Application level
+    ///     Handles keyboard input and key bindings at the Application level
     /// </summary>
     public IKeyboard Keyboard
     {
@@ -90,6 +71,7 @@ public class ApplicationImpl : IApplication
             {
                 _keyboard = new KeyboardImpl { Application = this };
             }
+
             return _keyboard;
         }
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
@@ -103,28 +85,16 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc/>
-    public bool Initialized
-    {
-        get => _initialized;
-        set => _initialized = value;
-    }
+    public bool Initialized { get; set; }
 
     /// <inheritdoc/>
-    public bool Force16Colors
-    {
-        get => _force16Colors;
-        set => _force16Colors = value;
-    }
+    public bool Force16Colors { get; set; }
 
     /// <inheritdoc/>
-    public string ForceDriver
-    {
-        get => _forceDriver;
-        set => _forceDriver = value;
-    }
+    public string ForceDriver { get; set; } = string.Empty;
 
     /// <inheritdoc/>
-    public List<SixelToRender> Sixel => _sixel;
+    public List<SixelToRender> Sixel { get; } = [];
 
     /// <inheritdoc/>
     public Rectangle Screen
@@ -143,9 +113,9 @@ public class ApplicationImpl : IApplication
         }
         set
         {
-            if (value is {} && (value.X != 0 || value.Y != 0))
+            if (value is { } && (value.X != 0 || value.Y != 0))
             {
-                throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
+                throw new NotImplementedException ("Screen locations other than 0, 0 are not yet supported");
             }
 
             lock (_lockScreen)
@@ -156,42 +126,22 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc/>
-    public bool ClearScreenNextIteration
-    {
-        get => _clearScreenNextIteration;
-        set => _clearScreenNextIteration = value;
-    }
+    public bool ClearScreenNextIteration { get; set; }
 
     /// <inheritdoc/>
-    public ApplicationPopover? Popover
-    {
-        get => _popover;
-        set => _popover = value;
-    }
+    public ApplicationPopover? Popover { get; set; }
 
     /// <inheritdoc/>
-    public ApplicationNavigation? Navigation
-    {
-        get => _navigation;
-        set => _navigation = value;
-    }
+    public ApplicationNavigation? Navigation { get; set; }
 
     /// <inheritdoc/>
-    public Toplevel? Top
-    {
-        get => _top;
-        set => _top = value;
-    }
+    public Toplevel? Top { get; set; }
 
     /// <inheritdoc/>
-    public ConcurrentStack<Toplevel> TopLevels => _topLevels;
+    public ConcurrentStack<Toplevel> TopLevels { get; } = new ();
 
     /// <inheritdoc/>
-    public ushort MaximumIterationsPerSecond
-    {
-        get => _maximumIterationsPerSecond;
-        set => _maximumIterationsPerSecond = value;
-    }
+    public ushort MaximumIterationsPerSecond { get; set; } = 25;
 
     /// <inheritdoc/>
     public List<CultureInfo>? SupportedCultures
@@ -202,59 +152,20 @@ public class ApplicationImpl : IApplication
             {
                 _supportedCultures = GetSupportedCultures ();
             }
+
             return _supportedCultures;
         }
     }
 
-    /// <summary>
-    /// Internal helper to raise InitializedChanged static event. Used by both legacy and modern Init paths.
-    /// </summary>
-    internal void RaiseInitializedChanged (bool initialized)
-    {
-        Application.OnInitializedChanged (this, new (initialized));
-    }
-
-    /// <summary>
-    /// Gets or sets the main thread ID for the application.
-    /// </summary>
-    internal int MainThreadId
-    {
-        get => _mainThreadId;
-        set => _mainThreadId = value;
-    }
-
     /// <inheritdoc/>
-    public void RequestStop () => RequestStop (null);
-
-    /// <summary>
-    /// Creates a new instance of the Application backend.
-    /// </summary>
-    public ApplicationImpl ()
-    {
-    }
-
-    internal ApplicationImpl (IComponentFactory componentFactory)
-    {
-        _componentFactory = componentFactory;
-    }
-
-    /// <summary>
-    /// Change the singleton implementation, should not be called except before application
-    /// startup. This method lets you provide alternative implementations of core static gateway
-    /// methods of <see cref="Application"/>.
-    /// </summary>
-    /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication newApplication)
-    {
-        _lazyInstance = new Lazy<IApplication> (newApplication);
-    }
+    public void RequestStop () { RequestStop (null); }
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        if (_initialized)
+        if (Initialized)
         {
             Logging.Logger.LogError ("Init called multiple times without shutdown, aborting.");
 
@@ -268,17 +179,17 @@ public class ApplicationImpl : IApplication
 
         if (string.IsNullOrWhiteSpace (_driverName))
         {
-            _driverName = _forceDriver;
+            _driverName = ForceDriver;
         }
 
-        Debug.Assert(_navigation is null);
-        _navigation = new ();
+        Debug.Assert (Navigation is null);
+        Navigation = new ();
 
-        Debug.Assert (_popover is null);
-        _popover = new ();
+        Debug.Assert (Popover is null);
+        Popover = new ();
 
         // Preserve existing keyboard settings if they exist
-        bool hasExistingKeyboard = _keyboard is not null;
+        bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Key.Esc;
         Key existingArrangeKey = _keyboard?.ArrangeKey ?? Key.F5.WithCtrl;
         Key existingNextTabKey = _keyboard?.NextTabKey ?? Key.Tab;
@@ -302,25 +213,340 @@ public class ApplicationImpl : IApplication
 
         CreateDriver (driverName ?? _driverName);
 
-        _initialized = true;
+        Initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
         SubscribeDriverEvents ();
 
         SynchronizationContext.SetSynchronizationContext (new ());
-        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+        MainThreadId = Thread.CurrentThread.ManagedThreadId;
+    }
+
+    /// <summary>
+    ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
+    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
+    /// </summary>
+    /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+
+    /// <summary>
+    ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
+    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
+    /// </summary>
+    /// <param name="errorHandler"></param>
+    /// <param name="driver">
+    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
+    ///     be used. Must be <see langword="null"/> if <see cref="Init"/> has already been called.
+    /// </param>
+    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+        where T : Toplevel, new ()
+    {
+        if (!Initialized)
+        {
+            // Init() has NOT been called. Auto-initialize as per interface contract.
+            Init (driver);
+        }
+
+        T top = new ();
+        Run (top, errorHandler);
+
+        return top;
+    }
+
+    /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
+    /// <param name="view">The <see cref="Toplevel"/> to run as a modal.</param>
+    /// <param name="errorHandler">Handler for any unhandled exceptions.</param>
+    public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
+    {
+        Logging.Information ($"Run '{view}'");
+        ArgumentNullException.ThrowIfNull (view);
+
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Run));
+        }
+
+        if (_driver == null)
+        {
+            throw new InvalidOperationException ("Driver was inexplicably null when trying to Run view");
+        }
+
+        Top = view;
+
+        RunState rs = Application.Begin (view);
+
+        Top.Running = true;
+
+        while (TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
+        {
+            if (Coordinator is null)
+            {
+                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
+            }
+
+            Coordinator.RunIteration ();
+        }
+
+        Logging.Information ("Run - Calling End");
+        Application.End (rs);
+    }
+
+    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
+    public void Shutdown ()
+    {
+        Coordinator?.Stop ();
+
+        bool wasInitialized = Initialized;
+
+        // Reset Screen before calling ResetState to avoid circular reference
+        ResetScreen ();
+
+        // Call ResetState FIRST so it can properly dispose Popover and other resources
+        // that are accessed via Application.* static properties that now delegate to instance fields
+        ResetState ();
+        ConfigurationManager.PrintJsonErrors ();
+
+        // Clear instance fields after ResetState has disposed everything
+        _driver = null;
+        _mouse = null;
+        _keyboard = null;
+        Initialized = false;
+        Navigation = null;
+        Popover = null;
+        Top = null;
+        TopLevels.Clear ();
+        MainThreadId = -1;
+        _screen = null;
+        ClearScreenNextIteration = false;
+        Sixel.Clear ();
+
+        // Don't reset ForceDriver and Force16Colors; they need to be set before Init is called
+
+        if (wasInitialized)
+        {
+            bool init = Initialized; // Will be false after clearing fields above
+            Application.OnInitializedChanged (this, new (in init));
+        }
+
+        _lazyInstance = new (() => new ApplicationImpl ());
+    }
+
+    /// <inheritdoc/>
+    public void RequestStop (Toplevel? top)
+    {
+        Logging.Logger.LogInformation ($"RequestStop '{(top is { } ? top : "null")}'");
+
+        top ??= Top;
+
+        if (top == null)
+        {
+            return;
+        }
+
+        ToplevelClosingEventArgs ev = new (top);
+        top.OnClosing (ev);
+
+        if (ev.Cancel)
+        {
+            return;
+        }
+
+        top.Running = false;
+    }
+
+    /// <inheritdoc/>
+    public void Invoke (Action action)
+    {
+        // If we are already on the main UI thread
+        if (Top is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action ();
+
+            return;
+        }
+
+        _timedEvents.Add (
+                          TimeSpan.Zero,
+                          () =>
+                          {
+                              action ();
+
+                              return false;
+                          }
+                         );
+    }
+
+    /// <inheritdoc/>
+    public bool IsLegacy => false;
+
+    /// <inheritdoc/>
+    public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
+
+    /// <inheritdoc/>
+    public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
+
+    /// <inheritdoc/>
+    public void LayoutAndDraw (bool forceRedraw = false)
+    {
+        List<View> tops = [.. TopLevels];
+
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
+        }
+
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
+
+        if (ClearScreenNextIteration)
+        {
+            forceRedraw = true;
+            ClearScreenNextIteration = false;
+        }
+
+        if (forceRedraw)
+        {
+            _driver?.ClearContents ();
+        }
+
+        View.SetClipToScreen ();
+        View.Draw (tops, neededLayout || forceRedraw);
+        View.SetClipToScreen ();
+        _driver?.Refresh ();
+    }
+
+    /// <inheritdoc/>
+    public void ResetState (bool ignoreDisposed = false)
+    {
+        // Shutdown is the bookend for Init. As such it needs to clean up all resources
+        // Init created. Apps that do any threading will need to code defensively for this.
+        // e.g. see Issue #537
+        foreach (Toplevel? t in TopLevels)
+        {
+            t!.Running = false;
+        }
+
+        if (Popover?.GetActivePopover () is View popover)
+        {
+            // This forcefully closes the popover; invoking Command.Quit would be more graceful
+            // but since this is shutdown, doing this is ok.
+            popover.Visible = false;
+        }
+
+        Popover?.Dispose ();
+        Popover = null;
+
+        TopLevels.Clear ();
+#if DEBUG_IDISPOSABLE
+
+        // Don't dispose the Top. It's up to caller dispose it
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Top is { })
+        {
+            Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
+
+            // If End wasn't called _cachedRunStateToplevel may be null
+            if (_cachedRunStateToplevel is { })
+            {
+                Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+                Debug.Assert (_cachedRunStateToplevel == Top);
+            }
+        }
+#endif
+        Top = null;
+        _cachedRunStateToplevel = null;
+
+        MainThreadId = -1;
+
+        // These static properties need to be reset
+        Application.EndAfterFirstIteration = false;
+        Application.ClearScreenNextIteration = false;
+
+        // Driver stuff
+        if (_driver is { })
+        {
+            UnsubscribeDriverEvents ();
+            _driver?.End ();
+            _driver = null;
+        }
+
+        // Reset Screen to null so it will be recalculated on next access
+        ResetScreen ();
+
+        // Run State stuff - these are static events on Application class
+        Application.ClearRunStateEvents ();
+
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
+        Initialized = false;
+
+        // Mouse
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
+        // last mouse pos.
+        //_lastMousePosition = null;
+        Application.CachedViewsUnderMouse.Clear ();
+        Application.ResetMouseState ();
+
+        // Keyboard events and bindings are now managed by the Keyboard instance
+
+        Application.ClearSizeChangingEvent ();
+
+        Navigation = null;
+
+        // Reset SupportedCultures so it's re-cached on next access
+        _supportedCultures = null;
+
+        // Reset synchronization context to allow the user to run async/await,
+        // as the main loop has been ended, the synchronization context from
+        // gui.cs does no longer process any callbacks. See #1084 for more details:
+        // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
+        SynchronizationContext.SetSynchronizationContext (null);
+    }
+
+    /// <summary>
+    ///     Change the singleton implementation, should not be called except before application
+    ///     startup. This method lets you provide alternative implementations of core static gateway
+    ///     methods of <see cref="Application"/>.
+    /// </summary>
+    /// <param name="newApplication"></param>
+    public static void ChangeInstance (IApplication newApplication) { _lazyInstance = new (newApplication); }
+
+    /// <summary>
+    ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
+    ///     Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
+    /// </summary>
+    public static IApplication Instance => _lazyInstance.Value;
+
+    internal IMainLoopCoordinator? Coordinator { get; private set; }
+
+    /// <summary>
+    ///     Gets or sets the main thread ID for the application.
+    /// </summary>
+    internal int MainThreadId { get; set; } = -1;
+
+    /// <summary>
+    ///     Resets the Screen field to null so it will be recalculated on next access.
+    /// </summary>
+    internal void ResetScreen ()
+    {
+        lock (_lockScreen)
+        {
+            _screen = null;
+        }
     }
 
     private void CreateDriver (string? driverName)
     {
         // When running unit tests, always use FakeDriver unless explicitly specified
-        if (ConsoleDriver.RunningUnitTests && 
-            string.IsNullOrEmpty (driverName) && 
-            _componentFactory is null)
+        if (ConsoleDriver.RunningUnitTests && string.IsNullOrEmpty (driverName) && _componentFactory is null)
         {
             Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-            _coordinator.StartAsync ().Wait ();
+            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            Coordinator.StartAsync ().Wait ();
 
             if (_driver == null)
             {
@@ -340,37 +566,37 @@ public class ApplicationImpl : IApplication
 
         // Then check driverName
         bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsDotNet = (driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false);
+        bool nameIsDotNet = driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
 
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
         else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
         {
-            _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
         }
         else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
         {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
         else
         {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }
 
-        _coordinator.StartAsync ().Wait ();
+        Coordinator.StartAsync ().Wait ();
 
         if (_driver == null)
         {
@@ -397,296 +623,51 @@ public class ApplicationImpl : IApplication
         return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
     }
 
-    /// <summary>
-    ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
-    /// </summary>
-    /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    private void Driver_KeyDown (object? sender, Key e) { Application.RaiseKeyDownEvent (e); }
+    private void Driver_KeyUp (object? sender, Key e) { Application.RaiseKeyUpEvent (e); }
+    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Application.RaiseMouseEvent (e); }
 
-    /// <summary>
-    ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
-    /// </summary>
-    /// <param name="errorHandler"></param>
-    /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used. Must be <see langword="null"/> if <see cref="Init"/> has already been called.
-    /// </param>
-    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new()
+    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { Application.OnSizeChanging (e); }
+
+    private static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
     {
-        if (!_initialized)
-        {
-            // Init() has NOT been called. Auto-initialize as per interface contract.
-            Init (driver, null);
-        }
+        ResourceManager rm = new (typeof (Strings));
 
-        T top = new ();
-        Run (top, errorHandler);
-        return top;
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+        return cultures.Where (cultureInfo =>
+                                   !cultureInfo.Equals (CultureInfo.InvariantCulture)
+                                   && rm.GetResourceSet (cultureInfo, true, false) is { }
+                              )
+                       .ToList ();
     }
 
-    /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
-    /// <param name="view">The <see cref="Toplevel"/> to run as a modal.</param>
-    /// <param name="errorHandler">Handler for any unhandled exceptions.</param>
-    public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
+    // BUGBUG: This does not return en-US even though it's supported by default
+    private static List<CultureInfo> GetSupportedCultures ()
     {
-        Logging.Information ($"Run '{view}'");
-        ArgumentNullException.ThrowIfNull (view);
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
 
-        if (!_initialized)
+        // Get the assembly
+        var assembly = Assembly.GetExecutingAssembly ();
+
+        //Find the location of the assembly
+        string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
+
+        // Find the resource file name of the assembly
+        var resourceFilename = $"{assembly.GetName ().Name}.resources.dll";
+
+        if (cultures.Length > 1 && Directory.Exists (Path.Combine (assemblyLocation, "pt-PT")))
         {
-            throw new NotInitializedException (nameof (Run));
+            // Return all culture for which satellite folder found with culture code.
+            return cultures.Where (cultureInfo =>
+                                       Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
+                                       && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+                                  )
+                           .ToList ();
         }
 
-        if (_driver == null)
-        {
-            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
-        }
-
-        _top = view;
-
-        RunState rs = Application.Begin (view);
-
-        _top.Running = true;
-
-        while (_topLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
-        {
-            if (_coordinator is null)
-            {
-                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
-            }
-
-            _coordinator.RunIteration ();
-        }
-
-        Logging.Information ($"Run - Calling End");
-        Application.End (rs);
-    }
-
-    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    public void Shutdown ()
-    {
-        _coordinator?.Stop ();
-        
-        bool wasInitialized = _initialized;
-        
-        // Reset Screen before calling ResetState to avoid circular reference
-        ResetScreen ();
-        
-        // Call ResetState FIRST so it can properly dispose Popover and other resources
-        // that are accessed via Application.* static properties that now delegate to instance fields
-        ResetState ();
-        ConfigurationManager.PrintJsonErrors ();
-        
-        // Clear instance fields after ResetState has disposed everything
-        _driver = null;
-        _mouse = null;
-        _keyboard = null;
-        _initialized = false;
-        _navigation = null;
-        _popover = null;
-        _top = null;
-        _topLevels.Clear ();
-        _mainThreadId = -1;
-        _screen = null;
-        _clearScreenNextIteration = false;
-        _sixel.Clear ();
-        // Don't reset ForceDriver and Force16Colors; they need to be set before Init is called
-
-        if (wasInitialized)
-        {
-            bool init = _initialized; // Will be false after clearing fields above
-            Application.OnInitializedChanged (this, new (in init));
-        }
-
-        _lazyInstance = new (() => new ApplicationImpl ());
-    }
-
-    /// <inheritdoc />
-    public void RequestStop (Toplevel? top)
-    {
-        Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
-
-        top ??= _top;
-
-        if (top == null)
-        {
-            return;
-        }
-
-        ToplevelClosingEventArgs ev = new (top);
-        top.OnClosing (ev);
-
-        if (ev.Cancel)
-        {
-            return;
-        }
-
-        top.Running = false;
-    }
-
-    /// <inheritdoc />
-    public void Invoke (Action action)
-    {
-        // If we are already on the main UI thread
-        if (_top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
-        {
-            action ();
-            return;
-        }
-
-        _timedEvents.Add (TimeSpan.Zero,
-                              () =>
-                              {
-                                  action ();
-                                  return false;
-                              }
-                             );
-    }
-
-    /// <inheritdoc />
-    public bool IsLegacy => false;
-
-    /// <inheritdoc />
-    public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
-
-    /// <inheritdoc />
-    public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
-
-    /// <inheritdoc />
-    public void LayoutAndDraw (bool forceRedraw = false)
-    {
-        List<View> tops = [.. _topLevels];
-
-        if (_popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-            tops.Insert (0, visiblePopover);
-        }
-
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
-
-        if (ClearScreenNextIteration)
-        {
-            forceRedraw = true;
-            ClearScreenNextIteration = false;
-        }
-
-        if (forceRedraw)
-        {
-            _driver?.ClearContents ();
-        }
-
-        View.SetClipToScreen ();
-        View.Draw (tops, neededLayout || forceRedraw);
-        View.SetClipToScreen ();
-        _driver?.Refresh ();
-    }
-
-    /// <inheritdoc />
-    public void ResetState (bool ignoreDisposed = false)
-    {
-        // Shutdown is the bookend for Init. As such it needs to clean up all resources
-        // Init created. Apps that do any threading will need to code defensively for this.
-        // e.g. see Issue #537
-        foreach (Toplevel? t in _topLevels)
-        {
-            t!.Running = false;
-        }
-
-        if (_popover?.GetActivePopover () is View popover)
-        {
-            // This forcefully closes the popover; invoking Command.Quit would be more graceful
-            // but since this is shutdown, doing this is ok.
-            popover.Visible = false;
-        }
-
-        _popover?.Dispose ();
-        _popover = null;
-
-        _topLevels.Clear ();
-#if DEBUG_IDISPOSABLE
-
-        // Don't dispose the Top. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && _top is { })
-        {
-            Debug.Assert (_top.WasDisposed, $"Title = {_top.Title}, Id = {_top.Id}");
-
-            // If End wasn't called _cachedRunStateToplevel may be null
-            if (_cachedRunStateToplevel is { })
-            {
-                Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-                Debug.Assert (_cachedRunStateToplevel == _top);
-            }
-        }
-#endif
-        _top = null;
-        _cachedRunStateToplevel = null;
-
-        _mainThreadId = -1;
-        
-        // These static properties need to be reset
-        Application.EndAfterFirstIteration = false;
-        Application.ClearScreenNextIteration = false;
-        Application.ClearForceFakeConsole ();
-
-        // Driver stuff
-        if (_driver is { })
-        {
-            UnsubscribeDriverEvents ();
-            _driver?.End ();
-            _driver = null;
-        }
-
-        // Reset Screen to null so it will be recalculated on next access
-        ResetScreen ();
-
-        // Run State stuff - these are static events on Application class
-        Application.ClearRunStateEvents ();
-
-        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
-        _initialized = false;
-
-        // Mouse
-        // Do not clear _lastMousePosition; Popovers require it to stay set with
-        // last mouse pos.
-        //_lastMousePosition = null;
-        Application.CachedViewsUnderMouse.Clear ();
-        Application.ResetMouseState ();
-
-        // Keyboard events and bindings are now managed by the Keyboard instance
-
-        Application.ClearSizeChangingEvent ();
-
-        _navigation = null;
-
-        // Reset SupportedCultures so it's re-cached on next access
-        _supportedCultures = null;
-
-        // Reset synchronization context to allow the user to run async/await,
-        // as the main loop has been ended, the synchronization context from
-        // gui.cs does no longer process any callbacks. See #1084 for more details:
-        // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
-        SynchronizationContext.SetSynchronizationContext (null);
-    }
-
-    /// <summary>
-    /// Resets the Screen field to null so it will be recalculated on next access.
-    /// </summary>
-    internal void ResetScreen ()
-    {
-        lock (_lockScreen)
-        {
-            _screen = null;
-        }
+        // It's called from a self-contained single-file and get available cultures from the embedded resources strings.
+        return GetAvailableCulturesFromEmbeddedResources ();
     }
 
     private void SubscribeDriverEvents ()
@@ -713,53 +694,5 @@ public class ApplicationImpl : IApplication
         _driver.KeyDown -= Driver_KeyDown;
         _driver.KeyUp -= Driver_KeyUp;
         _driver.MouseEvent -= Driver_MouseEvent;
-    }
-
-    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { Application.OnSizeChanging (e); }
-    private void Driver_KeyDown (object? sender, Key e) { Application.RaiseKeyDownEvent (e); }
-    private void Driver_KeyUp (object? sender, Key e) { Application.RaiseKeyUpEvent (e); }
-    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Application.RaiseMouseEvent (e); }
-
-    private static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
-    {
-        ResourceManager rm = new (typeof (Strings));
-
-        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
-
-        return cultures.Where (
-                               cultureInfo =>
-                                   !cultureInfo.Equals (CultureInfo.InvariantCulture)
-                                   && rm.GetResourceSet (cultureInfo, true, false) is { }
-                              )
-                       .ToList ();
-    }
-
-    // BUGBUG: This does not return en-US even though it's supported by default
-    private static List<CultureInfo> GetSupportedCultures ()
-    {
-        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
-
-        // Get the assembly
-        var assembly = Assembly.GetExecutingAssembly ();
-
-        //Find the location of the assembly
-        string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
-
-        // Find the resource file name of the assembly
-        var resourceFilename = $"{assembly.GetName ().Name}.resources.dll";
-
-        if (cultures.Length > 1 && Directory.Exists (Path.Combine (assemblyLocation, "pt-PT")))
-        {
-            // Return all culture for which satellite folder found with culture code.
-            return cultures.Where (
-                                   cultureInfo =>
-                                       Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
-                                       && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
-                                  )
-                           .ToList ();
-        }
-
-        // It's called from a self-contained single-file and get available cultures from the embedded resources strings.
-        return GetAvailableCulturesFromEmbeddedResources ();
     }
 }
