@@ -633,6 +633,11 @@ public class ApplicationImpl : IApplication
         _cachedRunStateToplevel = null;
 
         _mainThreadId = -1;
+        
+        // These static properties need to be reset
+        Application.EndAfterFirstIteration = false;
+        Application.ClearScreenNextIteration = false;
+        Application.ClearForceFakeConsole ();
 
         // Driver stuff
         if (_driver is { })
@@ -663,6 +668,9 @@ public class ApplicationImpl : IApplication
         Application.ClearSizeChangingEvent ();
 
         _navigation = null;
+
+        // Reset SupportedCultures so it's re-cached on next access
+        _supportedCultures = null;
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from
