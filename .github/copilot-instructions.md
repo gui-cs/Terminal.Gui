@@ -1,5 +1,7 @@
 # Terminal.Gui - CoPilot AI Rules
 
-> **📘 Source of Truth: [CONTRIBUTING.md](CONTRIBUTING.md)**
+> **📘 Source of Truth: [../CONTRIBUTING.md](../CONTRIBUTING.md)**
 
-This project uses [CONTRIBUTING.md](CONTRIBUTING.md) as the single source of truth for contribution guidelines. AI agents, including CoPilot and Cursor **MUST** follow the guidelines in [CONTRIBUTING.md](CONTRIBUTING.md)/
+This project uses [../CONTRIBUTING.md](../CONTRIBUTING.md) as the single source of truth for contribution guidelines. AI agents, including CoPilot and Cursor **MUST** follow the guidelines in [../CONTRIBUTING.md](CONTRIBUTING.md)/
+
+**CRITICAL** - CoPilot you MUST internalize [../CONTRIBUTING.md](../CONTRIBUTING.md) and follow the guidance for any work you do on Terminal.Gui. This includes Github Copilot in Agent mode. 

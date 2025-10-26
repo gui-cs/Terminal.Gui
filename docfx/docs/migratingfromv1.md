@@ -81,7 +81,7 @@ When measuring the screen space taken up by a `string` you can use the extension
 + myString.GetColumns();
 ```
 
-## `View Life Cycle Management
+## View Life Cycle Management
 
 In v1, @Terminal.Gui.View was derived from `Responder` which supported `IDisposable`. In v2, `Responder` has been removed and @Terminal.Gui.View is the base-class supporting `IDisposable`. 
 
@@ -187,7 +187,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 + Application.KeyDown(object? sender, Key e)
 ```
 
-## **@"Terminal.Gui.Input.Command" has been expanded and simplified
+## @Terminal.Gui.Input.Command has been expanded and simplified
 
 In v1, the `Command` enum had duplicate entries and inconsistent naming. In v2 it has been both expanded and simplified.
 
@@ -306,7 +306,7 @@ In v2, this is made consistent and configurable:
 - `Key.CursorDown` - Operates identically to `Application.NextTabStopKey`.
 - `Key.CursorLeft` - Operates identically to `Application.PrevTabStopKey`.
 - `Key.CursorUp` - Operates identically to `Application.PrevTabStopKey`.
-- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view which is a `TabGroup`` will gain focus.
+- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view which is a `TabGroup` will gain focus.
 - `Application.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `Application.NextTabGroupKey`.
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators)
@@ -336,7 +336,7 @@ Alternatively, if you want to have key events as well as mouse events to fire an
 
 Previously events in Terminal.Gui used a mixture of `Action` (no arguments), `Action<string>` (or other raw datatype) and `Action<EventArgs>`. Now all events use the `EventHandler<EventArgs>` [standard .net design pattern](https://learn.microsoft.com/en-us/dotnet/csharp/event-pattern#event-delegate-signatures).
 
-For example, `event Action`<long> TimeoutAdded` has become `event EventHandler<TimeoutEventArgs> TimeoutAdded`
+For example, `event Action<long> TimeoutAdded` has become `event EventHandler<TimeoutEventArgs> TimeoutAdded`
 
 This change was made for the following reasons:
 
