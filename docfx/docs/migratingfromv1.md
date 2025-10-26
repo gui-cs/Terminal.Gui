@@ -456,16 +456,25 @@ Additionally, the `Toggle` event was renamed `CheckStateChanging` and made cance
 +cb.AdvanceCheckState ();
 ```
 
-## `MainLoop` is no longer accessible from `Application`
+## `MainLoop` has been removed from `Application`
 
-In v1, you could add timeouts via `Application.MainLoop.AddTimeout` among other things.  In v2, the `MainLoop` object is internal to `Application` and methods previously accessed via `MainLoop` can now be accessed directly via `Application`
+In v1, you could add timeouts via `Application.MainLoop.AddTimeout` and access the `MainLoop` object directly. In v2, the legacy `MainLoop` class has been completely removed as part of the architectural modernization. Timeout functionality and other features previously accessed via `MainLoop` are now available directly through `Application` or `ApplicationImpl`.
 
 ### How to Fix
+
+Replace any `Application.MainLoop` references:
 
 ```diff
 - Application.MainLoop.AddTimeout (TimeSpan time, Func<MainLoop, bool> callback)
 + Application.AddTimeout (TimeSpan time, Func<bool> callback)
 ```
+
+```diff
+- Application.MainLoop.Wakeup ()
++ // No replacement needed - wakeup is handled automatically by the modern architecture
+```
+
+**Note**: The legacy `MainLoop` infrastructure (including `IMainLoopDriver` and `FakeMainLoop`) has been removed. The modern v2 architecture uses `ApplicationImpl`, `MainLoopCoordinator`, and `ApplicationMainLoop` instead.
 
 ## `SendSubViewXXX` renamed and corrected
 
