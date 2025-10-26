@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using TerminalGuiFluentTesting;
 using Xunit.Sdk;
 
 namespace UnitTests;
@@ -10,8 +9,7 @@ namespace UnitTests;
 ///     FakeDriver(). The driver is set up with 25 rows and columns.
 /// </summary>
 /// <remarks>
-///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
-///     On After, sets Configuration.Locations to ConfigLocations.All.
+///     This attribute uses the built-in FakeDriver from Terminal.Gui.Drivers namespace.
 /// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
@@ -36,9 +34,10 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Application.ResetState (true);
         Assert.Null (Application.Driver);
 
-        var ff = new FakeDriverFactory ();
-        var driver = ff.Create ();
-
+        // Use the built-in FakeDriver from the library
+        var driver = new FakeDriver ();
+        driver.Init ();
+        
         Application.Driver = driver;
         driver.SetBufferSize (25, 25);
 
