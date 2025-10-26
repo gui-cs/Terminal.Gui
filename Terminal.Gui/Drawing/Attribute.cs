@@ -44,6 +44,17 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     public TextStyle Style { get; init; } = TextStyle.None;
 
     /// <summary>
+    ///     Gets the hyperlink URL for this attribute. If set, text will be rendered as a clickable hyperlink
+    ///     using OSC 8 escape sequences in terminals that support it (Windows Terminal, iTerm2, etc.).
+    /// </summary>
+    /// <remarks>
+    ///     Set to <see langword="null"/> or empty string for non-hyperlink text.
+    ///     The URL should be a valid absolute URL (e.g., "https://github.com").
+    /// </remarks>
+    [JsonIgnore]
+    public string? HyperlinkUrl { get; init; }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with default values.
     /// </summary>
     public Attribute () { this = Default; }
@@ -173,11 +184,12 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     {
         return Foreground.Equals (other.Foreground)
                && Background.Equals (other.Background)
-               && Style == other.Style;
+               && Style == other.Style
+               && HyperlinkUrl == other.HyperlinkUrl;
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (Foreground, Background, Style); }
+    public override int GetHashCode () { return HashCode.Combine (Foreground, Background, Style, HyperlinkUrl); }
 
     /// <inheritdoc/>
     public override string ToString ()

@@ -16,6 +16,9 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
+    // Current hyperlink URL being rendered, for emitting OSC 8 sequences when URL changes.
+    private string? _currentHyperlinkUrl = null;
+
     /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
@@ -92,6 +95,24 @@ public abstract class OutputBase
 
                     Attribute attr = buffer.Contents [row, col].Attribute.Value;
 
+                    // Handle hyperlink URL changes - emit OSC 8 sequences
+                    if (attr.HyperlinkUrl != _currentHyperlinkUrl)
+                    {
+                        // End previous hyperlink if there was one
+                        if (_currentHyperlinkUrl is not null)
+                        {
+                            output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                        }
+
+                        // Start new hyperlink if URL is present
+                        if (!string.IsNullOrEmpty (attr.HyperlinkUrl))
+                        {
+                            output.Append (EscSeqUtils.OSC_StartHyperlink (attr.HyperlinkUrl));
+                        }
+
+                        _currentHyperlinkUrl = attr.HyperlinkUrl;
+                    }
+
                     // Performance: Only send the escape sequence if the attribute has changed.
                     if (attr != redrawAttr)
                     {
@@ -138,6 +159,15 @@ public abstract class OutputBase
                 SetCursorPositionImpl (lastCol, row);
                 Write (output);
             }
+        }
+
+        // End any open hyperlink at the end of rendering
+        if (_currentHyperlinkUrl is not null)
+        {
+            var finalOutput = new StringBuilder ();
+            finalOutput.Append (EscSeqUtils.OSC_EndHyperlink ());
+            Write (finalOutput);
+            _currentHyperlinkUrl = null;
         }
 
         foreach (SixelToRender s in Application.Sixel)
