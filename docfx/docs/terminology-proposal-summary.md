@@ -1,5 +1,7 @@
 # Terminology Proposal Summary
 
+> **Updated October 2025**: Proposal validated against current modernized codebase (post-MainLoop removal).
+
 This is a brief summary of the [full terminology proposal](terminology-proposal.md).
 
 ## Recommended Changes

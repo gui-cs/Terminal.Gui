@@ -1,5 +1,7 @@
 # Terminal.Gui Terminology Proposal - Documentation Index
 
+> **Updated October 2025**: Proposal validated and updated to reflect recent architectural modernizations, including removal of legacy MainLoop infrastructure.
+
 This directory contains a comprehensive proposal for renaming `Application.Top` and related terminology in Terminal.Gui v2.
 
 ## 📚 Documents

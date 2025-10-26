@@ -1,5 +1,7 @@
 # Terminology Proposal: Renaming Application.Top and Toplevel
 
+> **Note**: This proposal has been updated (October 2025) to reflect recent architectural improvements in Terminal.Gui v2, including the removal of legacy MainLoop infrastructure and modernization of the application event loop. The proposal remains valid and relevant with the current codebase.
+
 ## Executive Summary
 
 This document proposes new, clearer terminology to replace the confusing `Application.Top` and `Toplevel` naming in Terminal.Gui v2. The goal is to establish intuitive names that accurately represent the concepts while maintaining backward compatibility during migration.
@@ -15,11 +17,13 @@ This document proposes new, clearer terminology to replace the confusing `Applic
 
 ### Current Usage Patterns
 
-Based on code analysis:
-- `Application.Top` - The currently active/running view with its own event loop
-- `Application.TopLevels` - Internal stack of all active "runnable" views
+Based on current code analysis (as of October 2025):
+- `Application.Top` - The currently active/running view with its own run loop
+- `Application.TopLevels` - Internal stack of all active "runnable" views  
 - `Toplevel` class - Base class for views that can run independently (Window, Dialog, etc.)
 - Modal vs Non-modal - Views that can be "run" either as overlays or embedded
+
+**Recent Modernization**: Terminal.Gui v2 has completed modernization of its application infrastructure, removing legacy MainLoop code and consolidating around `ApplicationImpl.Coordinator` for event loop management. The terminology confusion addressed in this proposal remains relevant to the current codebase.
 
 ## Proposed Terminology
 
