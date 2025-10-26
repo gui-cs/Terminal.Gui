@@ -291,6 +291,8 @@ Application.Init();
 
 Terminal.Gui v1 drivers that implement `IConsoleDriver` but not `IConsoleDriverFacade` are still supported through a legacy compatibility layer. However, they do not benefit from the v2 architecture improvements (multi-threading, component separation, etc.).
 
+**Note**: The legacy `MainLoop` infrastructure (including the `MainLoop` class, `IMainLoopDriver` interface, and `FakeMainLoop`) has been removed in favor of the modern architecture. All drivers now use the `MainLoopCoordinator` and `ApplicationMainLoop` system exclusively.
+
 ## See Also
 
 - @Terminal.Gui.Drivers - API Reference

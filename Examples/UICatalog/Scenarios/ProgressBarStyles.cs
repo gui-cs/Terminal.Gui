@@ -198,7 +198,6 @@ public class ProgressBarStyles : Scenario
                                                                       button.Enabled = true;
                                                                   }
 
-                                                                  Application.Wakeup ();
                                                               },
                                                               null,
                                                               0,
@@ -282,7 +281,6 @@ public class ProgressBarStyles : Scenario
                                      marqueesBlocksPB.Text = marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
                                      marqueesBlocksPB.Pulse ();
                                      marqueesContinuousPB.Pulse ();
-                                     Application.Wakeup ();
                                  },
                                  null,
                                  0,
