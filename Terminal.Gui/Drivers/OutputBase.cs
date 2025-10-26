@@ -143,7 +143,7 @@ public abstract class OutputBase
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                // Wrap URLs with OSC 8 hyperlink sequences
+                // Wrap URLs with OSC 8 hyperlink sequences (handles ANSI escape sequences properly)
                 StringBuilder processed = WrapUrlsWithHyperlinks(output);
                 Write (processed);
             }
@@ -176,7 +176,7 @@ public abstract class OutputBase
     {
         SetCursorPositionImpl (lastCol, row);
         
-        // Wrap URLs with OSC 8 hyperlink sequences
+        // Wrap URLs with OSC 8 hyperlink sequences (handles ANSI escape sequences properly)
         StringBuilder processed = WrapUrlsWithHyperlinks(output);
         Write (processed);
         
@@ -187,46 +187,150 @@ public abstract class OutputBase
 
     /// <summary>
     /// Detects URLs in the output and wraps them with OSC 8 hyperlink sequences.
+    /// Handles ANSI escape sequences properly by stripping them before detection,
+    /// then reconstructing the output with both ANSI and OSC 8 sequences.
     /// </summary>
-    /// <param name="output">The output text that may contain URLs</param>
+    /// <param name="output">The output text that may contain URLs and ANSI escape sequences</param>
     /// <returns>A new StringBuilder with URLs wrapped in OSC 8 sequences</returns>
     private StringBuilder WrapUrlsWithHyperlinks(StringBuilder output)
     {
         string text = output.ToString();
         
-        // Check if there are any URLs to wrap
-        if (!UrlRegex.IsMatch(text))
+        // Strip ANSI escape sequences to detect URLs in plain text
+        string plainText = StripAnsiEscapeSequences(text);
+        
+        // Check if there are any URLs to wrap in the plain text
+        if (!UrlRegex.IsMatch(plainText))
         {
             return output;
         }
 
-        StringBuilder result = new StringBuilder(text.Length + 100); // Extra space for OSC sequences
-        int lastIndex = 0;
-
-        foreach (Match match in UrlRegex.Matches(text))
+        // Find URLs in plain text
+        List<(int start, int end, string url)> urls = new List<(int, int, string)>();
+        foreach (Match match in UrlRegex.Matches(plainText))
         {
-            // Add text before the URL
-            if (match.Index > lastIndex)
+            urls.Add((match.Index, match.Index + match.Length, match.Value));
+        }
+
+        if (urls.Count == 0)
+        {
+            return output;
+        }
+
+        // Build a mapping from plain text positions to original text positions
+        List<int> plainToOriginal = BuildPositionMapping(text);
+        
+        // Reconstruct output with OSC 8 sequences inserted at correct positions
+        StringBuilder result = new StringBuilder(text.Length + urls.Count * 100);
+        int textPos = 0;
+        
+        foreach (var (start, end, url) in urls)
+        {
+            // Map plain text positions to original text positions
+            int originalStart = plainToOriginal[start];
+            int originalEnd = plainToOriginal[end];
+            
+            // Add text before URL
+            if (originalStart > textPos)
             {
-                result.Append(text.Substring(lastIndex, match.Index - lastIndex));
+                result.Append(text.Substring(textPos, originalStart - textPos));
             }
-
-            // Wrap URL with OSC 8 hyperlink
-            string url = match.Value;
+            
+            // Add OSC 8 start, URL text, OSC 8 end
             result.Append(EscSeqUtils.OSC_StartHyperlink(url));
-            result.Append(url);
+            result.Append(text.Substring(originalStart, originalEnd - originalStart));
             result.Append(EscSeqUtils.OSC_EndHyperlink());
-
-            lastIndex = match.Index + match.Length;
+            
+            textPos = originalEnd;
         }
-
-        // Add remaining text after last URL
-        if (lastIndex < text.Length)
+        
+        // Add remaining text
+        if (textPos < text.Length)
         {
-            result.Append(text.Substring(lastIndex));
+            result.Append(text.Substring(textPos));
         }
-
+        
         return result;
+    }
+
+    /// <summary>
+    /// Strips ANSI escape sequences from text to get plain text for URL detection.
+    /// </summary>
+    private static string StripAnsiEscapeSequences(string text)
+    {
+        // Match CSI sequences (ESC [ ... letter), OSC sequences (ESC ] ... ST), and other escape sequences
+        return Regex.Replace(text, @"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1B\\))", "");
+    }
+
+    /// <summary>
+    /// Builds a mapping from plain text character positions to original text positions (with escape sequences).
+    /// </summary>
+    private static List<int> BuildPositionMapping(string text)
+    {
+        List<int> mapping = new List<int>();
+        int plainPos = 0;
+        bool inEscape = false;
+        bool inCSI = false;
+        bool inOSC = false;
+        
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+            
+            if (inEscape)
+            {
+                if (inCSI)
+                {
+                    // CSI sequence ends with a letter in range @-~
+                    if (c >= '@' && c <= '~')
+                    {
+                        inCSI = false;
+                        inEscape = false;
+                    }
+                }
+                else if (inOSC)
+                {
+                    // OSC sequence ends with ST (ESC \) or BEL (0x07)
+                    if (c == 0x07 || (c == '\\' && i > 0 && text[i-1] == '\x1B'))
+                    {
+                        inOSC = false;
+                        inEscape = false;
+                    }
+                }
+                else
+                {
+                    // Check what type of escape sequence
+                    if (c == '[')
+                    {
+                        inCSI = true;
+                    }
+                    else if (c == ']')
+                    {
+                        inOSC = true;
+                    }
+                    else if (c >= '@' && c <= '_')
+                    {
+                        // Single-character escape sequence
+                        inEscape = false;
+                    }
+                }
+            }
+            else if (c == '\x1B')
+            {
+                inEscape = true;
+            }
+            else
+            {
+                // Regular character - add mapping
+                mapping.Add(i);
+                plainPos++;
+            }
+        }
+        
+        // Add final position for end-of-string calculations
+        mapping.Add(text.Length);
+        
+        return mapping;
     }
 
     /// <summary>
