@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11018.127 d18.0
+VisualStudioVersion = 18.0.11018.127
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "Terminal.Gui\Terminal.Gui.csproj", "{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}"
 EndProject
@@ -32,7 +32,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
-		.github\workflows\build-release.yml = .github\workflows\build-release.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
 		.github\workflows\check-duplicates.yml = .github\workflows\check-duplicates.yml
 		copilot-instructions.md = copilot-instructions.md
 		GitVersion.yml = GitVersion.yml
@@ -47,6 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		.github\CODEOWNERS = .github\CODEOWNERS
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
 		CONTRIBUTING.md = CONTRIBUTING.md
+		.github\copilot-instructions.md = .github\copilot-instructions.md
 		README.md = README.md
 	EndProjectSection
 EndProject
