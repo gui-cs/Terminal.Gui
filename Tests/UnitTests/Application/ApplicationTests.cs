@@ -584,13 +584,12 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        var top = new Toplevel ();
+        Toplevel top = new ();
         RunState rs = Application.Begin (top);
-        var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.RunIteration (ref rs, firstIteration);
+        ApplicationImpl.Instance.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();

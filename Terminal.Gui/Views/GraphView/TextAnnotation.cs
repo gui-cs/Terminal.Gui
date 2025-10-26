@@ -68,11 +68,11 @@ public class TextAnnotation : IAnnotation
 
         if (Text.Length < availableWidth)
         {
-            graph.Driver?.AddStr (Text);
+            graph.AddStr (Text);
         }
         else
         {
-            graph.Driver?.AddStr (Text.Substring (0, availableWidth));
+            graph.AddStr (Text.Substring (0, availableWidth));
         }
     }
 }

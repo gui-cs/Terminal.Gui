@@ -151,7 +151,7 @@ When `Application.Shutdown()` is called:
 
 ### IConsoleDriver
 
-The main driver interface that applications interact with. Provides:
+The main driver interface that the framework uses internally. Provides:
 
 - **Screen Management**: `Screen`, `Cols`, `Rows`, `Contents`
 - **Drawing Operations**: `AddRune()`, `AddStr()`, `Move()`, `FillRect()`
@@ -160,6 +160,12 @@ The main driver interface that applications interact with. Provides:
 - **Clipping**: `Clip` property
 - **Events**: `KeyDown`, `KeyUp`, `MouseEvent`, `SizeChanged`
 - **Platform Features**: `SupportsTrueColor`, `Force16Colors`, `Clipboard`
+
+**Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
+- Use @Terminal.Gui.App.Application.Screen to get screen dimensions
+- Use @Terminal.Gui.ViewBase.View.Move for positioning (with viewport-relative coordinates)
+- Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
+- ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
 
 ### IConsoleDriverFacade
 
@@ -215,18 +221,23 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 - Captures output for verification
 - Always used when `Application._forceFakeConsole` is true
 
-## Example: Accessing Driver Components
+## Example: Checking Driver Capabilities
 
 ```csharp
 Application.Init();
 
-// Access the driver
-IConsoleDriver driver = Application.Driver;
+// The driver is internal - access through Application properties
+// Check screen dimensions
+var screenWidth = Application.Screen.Width;
+var screenHeight = Application.Screen.Height;
 
-// Check if it's a v2 driver with facade
-if (driver is IConsoleDriverFacade facade)
+// Check if 24-bit color is supported
+bool supportsTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+
+// Access advanced components (for framework/infrastructure code only)
+if (Application.Driver is IConsoleDriverFacade facade)
 {
-    // Access individual components
+    // Access individual components for advanced scenarios
     IInputProcessor inputProcessor = facade.InputProcessor;
     IOutputBuffer outputBuffer = facade.OutputBuffer;
     IWindowSizeMonitor sizeMonitor = facade.WindowSizeMonitor;
@@ -238,6 +249,11 @@ if (driver is IConsoleDriverFacade facade)
     };
 }
 ```
+
+**Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
+- `View.Move(col, row)` for positioning
+- `View.AddRune()` and `View.AddStr()` for drawing
+- `Application.Screen` for screen dimensions
 
 ## Custom Drivers
 

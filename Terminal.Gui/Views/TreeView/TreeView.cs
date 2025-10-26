@@ -1065,7 +1065,7 @@ public class TreeView<T> : View, ITreeView where T : class
                 return false;
             }
 
-            bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (Driver, me.Position.X);
+            bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (me.Position.X);
 
             // If we are already selected (double click)
             if (Equals (SelectedObject, clickedBranch.Model))
@@ -1157,7 +1157,7 @@ public class TreeView<T> : View, ITreeView where T : class
         if (TreeBuilder is null)
         {
             Move (0, 0);
-            Driver?.AddStr (NoBuilderError);
+            AddStr (NoBuilderError);
 
             return true;
         }
@@ -1179,7 +1179,7 @@ public class TreeView<T> : View, ITreeView where T : class
                 // Else clear the line to prevent stale symbols due to scrolling etc
                 Move (0, line);
                 SetAttribute (GetAttributeForRole (VisualRole.Normal));
-                Driver?.AddStr (new (' ', Viewport.Width));
+                AddStr (new (' ', Viewport.Width));
             }
         }
 
