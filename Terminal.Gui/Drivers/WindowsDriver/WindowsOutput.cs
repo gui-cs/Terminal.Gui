@@ -103,6 +103,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
     private readonly uint _originalOutputConsoleMode;
+    private readonly bool _vtProcessingEnabledByThisInstance;
 
     public WindowsOutput ()
     {
@@ -133,15 +134,18 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
                 // If we can't enable VT processing, continue without it
                 Logging.Logger.LogWarning ($"Failed to enable VT processing, error code: {Marshal.GetLastWin32Error ()}. Hyperlinks and other VT features may not work.");
                 _isVirtualTerminal = false;
+                _vtProcessingEnabledByThisInstance = false;
             }
             else
             {
                 _isVirtualTerminal = true;
+                _vtProcessingEnabledByThisInstance = true;
             }
         }
         else
         {
             _isVirtualTerminal = true;
+            _vtProcessingEnabledByThisInstance = false;
         }
 
         if (_isVirtualTerminal)
@@ -552,10 +556,13 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
                 Console.Clear ();
             }
 
-            // Restore original console mode
-            if (_outputHandle != nint.Zero && !ConsoleDriver.RunningUnitTests)
+            // Restore original console mode only if we enabled VT processing
+            if (_vtProcessingEnabledByThisInstance && _outputHandle != nint.Zero && !ConsoleDriver.RunningUnitTests)
             {
-                SetConsoleMode (_outputHandle, _originalOutputConsoleMode);
+                if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
+                {
+                    Logging.Logger.LogWarning ($"Failed to restore output console mode, error code: {Marshal.GetLastWin32Error ()}.");
+                }
             }
         }
         else
