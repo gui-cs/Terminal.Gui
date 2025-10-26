@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -7,6 +8,14 @@ namespace UnitTests.ApplicationTests;
 /// <summary>Tests MainLoop using the FakeMainLoop.</summary>
 public class MainLoopTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public MainLoopTests (ITestOutputHelper output)
+    {
+        _output = output;
+        ConsoleDriver.RunningUnitTests = true;
+    }
+
     private static Button btn;
     private static string cancel;
     private static string clickMe;
@@ -706,6 +715,95 @@ public class MainLoopTests
         Assert.True (ml.TimedEvents.Remove (a));
 
         Assert.Equal (10, functionCalled);
+    }
+
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void Application_Invoke_Run_TimedEvents (string driverName)
+    {
+        // Arrange
+        Application.Init (driverName: driverName);
+        var functionCalled = 0;
+        var stopwatch = new Stopwatch ();
+
+        // Act
+        Application.Invoke (() =>
+                            {
+                                // Stop the stopwatch *after* the function is called.
+                                functionCalled++;
+                                stopwatch.Stop ();
+                                Application.RequestStop ();
+                            });
+
+        // Start timing just before running the application loop.
+        stopwatch.Start ();
+        Application.Run ();
+
+        // Assert
+        Assert.NotNull (Application.Top);
+        Application.Top.Dispose ();
+        Application.Shutdown ();
+        Assert.Equal (1, functionCalled);
+
+        // Output the elapsed time for this test case.
+        // ReSharper disable once Xunit.XunitTestWithConsoleOutput
+        // ReSharper disable once LocalizableElement
+        Console.WriteLine ($"[{driverName}] Duration: {stopwatch.Elapsed.TotalMilliseconds:F2} ms");
+
+        // Output elapsed duration to xUnit's test output
+        _output.WriteLine ($"[{driverName}] Duration: {stopwatch.Elapsed.TotalMilliseconds:F2} ms");
+    }
+
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void Application_AddTimeout_Run_TimedEvents (string driverName)
+    {
+        // Arrange
+        Application.Init (driverName: driverName);
+        var functionCalled = 0;
+        var stopwatch = new Stopwatch ();
+
+        // Act
+        bool Function ()
+        {
+            functionCalled++;
+
+            if (functionCalled == 10 && Application.Top is { Running: true })
+            {
+                stopwatch.Stop ();
+                Application.RequestStop ();
+
+                return false;
+            }
+
+            return true;
+        }
+
+        Application.AddTimeout (TimeSpan.FromMilliseconds (1), Function);
+
+        // Start timing just before running the application loop.
+        stopwatch.Start ();
+        Application.Run ();
+
+        // Assert
+        Assert.NotNull (Application.Top);
+        Application.Top.Dispose ();
+        Application.Shutdown ();
+        Assert.Equal (10, functionCalled);
+
+        // Output the elapsed time for this test case.
+        // ReSharper disable once Xunit.XunitTestWithConsoleOutput
+        // ReSharper disable once LocalizableElement
+        Console.WriteLine ($"[{driverName}] Duration: {stopwatch.Elapsed.TotalMilliseconds:F2} ms");
+
+        // Output elapsed duration to xUnit's test output
+        _output.WriteLine ($"[{driverName}] Duration: {stopwatch.Elapsed.TotalMilliseconds:F2} ms");
     }
 
     public static IEnumerable<object []> TestAddTimeout
