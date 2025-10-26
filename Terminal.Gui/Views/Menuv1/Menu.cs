@@ -863,8 +863,7 @@ internal sealed class Menu : View
 
             if (item is null && BorderStyle != LineStyle.None)
             {
-                Point s = ViewportToScreen (new Point (-1, i));
-                Driver.Move (s.X, s.Y);
+                Move (-1, i);
                 AddRune (Glyphs.LeftTee);
             }
             else if (Frame.X < Application.Screen.Width)
@@ -911,8 +910,7 @@ internal sealed class Menu : View
             {
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
-                    Point s = ViewportToScreen (new Point (Frame.Width - 2, i));
-                    Driver.Move (s.X, s.Y);
+                    Move (Frame.Width - 2, i);
                     AddRune (Glyphs.RightTee);
                 }
 
@@ -952,7 +950,7 @@ internal sealed class Menu : View
 
             if (screen.X < Application.Screen.Width)
             {
-                Driver.Move (screen.X + 1, screen.Y);
+                Move (1, i);
 
                 if (!item.IsEnabled ())
                 {
@@ -993,13 +991,13 @@ internal sealed class Menu : View
 
                 if (screen.X < Application.Screen.Width)
                 {
-                    Driver.Move (screen.X, screen.Y);
+                    Move (col, i);
                     AddStr (item.Help);
 
                     // The shortcut tag string
                     if (!string.IsNullOrEmpty (item.ShortcutTag))
                     {
-                        Driver.Move (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
+                        Move (col + l - item.ShortcutTag.GetColumns (), i);
                         AddStr (item.ShortcutTag);
                     }
                 }
