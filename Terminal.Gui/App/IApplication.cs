@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Terminal.Gui.App;
 
@@ -257,4 +258,30 @@ public interface IApplication
     ///     safe updates to <see cref="View"/> instances.
     /// </summary>
     ITimedEvents? TimedEvents { get; }
+
+    /// <summary>
+    /// Maximum number of iterations of the main loop (and hence draws)
+    /// to allow to occur per second. Defaults to <see cref="Application.DefaultMaximumIterationsPerSecond"/> which is a 40ms sleep
+    /// after iteration (factoring in how long iteration took to run).
+    /// <remarks>Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
+    /// Only affects v2 drivers.</remarks>
+    /// </summary>
+    ushort MaximumIterationsPerSecond { get; set; }
+
+    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
+    List<CultureInfo>? SupportedCultures { get; }
+
+    /// <summary>
+    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </summary>
+    /// <remarks>
+    ///     Intended to support unit tests that need to know when the application has been initialized.
+    /// </remarks>
+    event EventHandler<EventArgs<bool>>? InitializedChanged;
+
+    /// <summary>
+    ///     Resets the application state to defaults. This is called by <see cref="Shutdown"/>.
+    /// </summary>
+    /// <param name="ignoreDisposed">If true, will not assert that views are disposed.</param>
+    void ResetState (bool ignoreDisposed = false);
 }

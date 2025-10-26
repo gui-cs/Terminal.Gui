@@ -22,10 +22,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         set => Keyboard.ArrangeKey = value;
     }
 
-    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
-    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
-    private static Toplevel? _cachedRunStateToplevel;
-
     /// <summary>
     ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
     ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
@@ -44,6 +40,13 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     when the application is done.
     /// </remarks>
     public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
+
+    // Internal helper methods for ApplicationImpl.ResetState to clear these events
+    internal static void ClearRunStateEvents ()
+    {
+        NotifyNewRunState = null;
+        NotifyStopRunState = null;
+    }
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
     /// <returns>
@@ -70,21 +73,21 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         var rs = new RunState (toplevel);
 
 #if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
+        if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top) && ApplicationImpl.Instance is ApplicationImpl appImpl)
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
-            Debug.Assert (Top == _cachedRunStateToplevel);
+            Debug.Assert (Top == appImpl._cachedRunStateToplevel);
         }
 #endif
 
         lock (TopLevels)
         {
-            if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
+            if (Top is { } && toplevel != Top && !TopLevels.Contains (Top) && ApplicationImpl.Instance is ApplicationImpl impl)
             {
                 // If Top was already disposed and isn't on the Toplevels Stack,
                 // clean it up here if is the same as _cachedRunStateToplevel
-                if (Top == _cachedRunStateToplevel)
+                if (Top == impl._cachedRunStateToplevel)
                 {
                     Top = null;
                 }
@@ -493,7 +496,10 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
             Top.SetFocus ();
         }
 
-        _cachedRunStateToplevel = runState.Toplevel;
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl._cachedRunStateToplevel = runState.Toplevel;
+        }
 
         runState.Toplevel = null;
         runState.Dispose ();
