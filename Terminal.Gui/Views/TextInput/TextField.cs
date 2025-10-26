@@ -1693,6 +1693,13 @@ public class TextField : View, IDesignable
             return;
         }
 
+        // Ensure TitleTextFormatter has the current Title text
+        // (should already be set by the Title property setter, but being defensive)
+        if (TitleTextFormatter.Text != Title)
+        {
+            TitleTextFormatter.Text = Title;
+        }
+
         // Get brighter color for the caption text
         var captionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
         var color = new Attribute (captionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
