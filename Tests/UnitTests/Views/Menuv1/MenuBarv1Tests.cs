@@ -623,7 +623,6 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
@@ -815,7 +814,6 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
