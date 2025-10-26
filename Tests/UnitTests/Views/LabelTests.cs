@@ -91,20 +91,20 @@ public class LabelTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Label_Draw_Fill_Remaining ()
     {
-        var tfSize = new Size (80, 1);
+        Size tfSize = new (80, 1);
 
-        var label = new Label { Text = "This label needs to be cleared before rewritten.", Width = tfSize.Width, Height = tfSize.Height };
+        Label label = new () { Text = "This label needs to be cleared before rewritten.", Width = tfSize.Width, Height = tfSize.Height };
 
-        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize };
+        TextFormatter tf1 = new () { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize };
         tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
 
-        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize, FillRemaining = true };
+        TextFormatter tf2 = new () { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
 
-        var top = new Toplevel ();
+        Toplevel top = new ();
         top.Add (label);
         RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (label.TextFormatter.FillRemaining);
         Assert.False (tf1.FillRemaining);
