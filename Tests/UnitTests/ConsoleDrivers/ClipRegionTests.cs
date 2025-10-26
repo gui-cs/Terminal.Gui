@@ -63,6 +63,7 @@ public class ClipRegionTests
     public void Clip_Set_To_Empty_AllInvalid (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
         Application.Init (driver);
 
         // Define a clip rectangle
@@ -93,8 +94,9 @@ public class ClipRegionTests
     public void IsValidLocation (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
+        driver.SetScreenSize (10, 10);
         Application.Init (driver);
-        Application.Driver!.SetScreenSize (10, 10);
 
         // positive
         Assert.True (driver.IsValidLocation (default, 0, 0));
