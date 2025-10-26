@@ -550,8 +550,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     #region Setup & Teardown
 
     /// <summary>Initializes the driver</summary>
-    /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
-    public abstract MainLoop Init ();
+    public abstract void Init ();
 
     /// <summary>Ends the execution of the console driver.</summary>
     public abstract void End ();
