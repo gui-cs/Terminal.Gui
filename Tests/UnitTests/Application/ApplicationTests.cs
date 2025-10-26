@@ -159,7 +159,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -316,7 +315,6 @@ public class ApplicationTests
             // Don't check Application.Force16Colors
             //Assert.False (Application.Force16Colors);
             Assert.Null (Application.Driver);
-            Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
 
             // Commented out because if CM changed the defaults, those changes should
@@ -472,7 +470,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -486,7 +483,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -522,14 +518,12 @@ public class ApplicationTests
         Application.End (runstate);
 
         Assert.NotNull (Application.Top);
-        Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
 
         topLevel.Dispose ();
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -584,13 +578,12 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Invoke_Adds_Idle ()
     {
-        var top = new Toplevel ();
+        Toplevel top = new ();
         RunState rs = Application.Begin (top);
-        var firstIteration = false;
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        Application.RunIteration (ref rs, firstIteration);
+        ApplicationImpl.Instance.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
@@ -677,7 +670,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -701,7 +693,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -735,7 +726,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -753,7 +743,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -775,7 +764,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
 
         a.After (null);
@@ -794,7 +782,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -813,7 +800,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -830,7 +816,6 @@ public class ApplicationTests
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -850,7 +835,6 @@ public class ApplicationTests
         top.Dispose ();
         Application.Shutdown ();
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -873,7 +857,6 @@ public class ApplicationTests
         top.Dispose ();
         Application.Shutdown ();
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -893,7 +876,6 @@ public class ApplicationTests
         top.Dispose ();
         Application.Shutdown ();
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 

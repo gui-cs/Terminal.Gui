@@ -750,7 +750,7 @@ public class ListView : View, IDesignable
             {
                 for (var c = 0; c < f.Width; c++)
                 {
-                    Driver?.AddRune ((Rune)' ');
+                    AddRune ((Rune)' ');
                 }
             }
             else
@@ -766,11 +766,11 @@ public class ListView : View, IDesignable
 
                 if (_allowsMarking)
                 {
-                    Driver?.AddRune (
+                    AddRune (
                                     _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
                                     AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                    );
-                    Driver?.AddRune ((Rune)' ');
+                    AddRune ((Rune)' ');
                 }
 
                 Source.Render (this, isSelected, item, col, row, f.Width - col, start);

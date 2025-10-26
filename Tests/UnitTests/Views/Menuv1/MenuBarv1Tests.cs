@@ -467,7 +467,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Button.DefaultShadow = ShadowStyle.None;
 
         Toplevel top = new ();
-        var win = new Window ();
+        Window win = new ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
         AutoInitShutdownAttribute.FakeResize(new Size(40, 15))    ;
@@ -503,8 +503,8 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             "Save As",
             "Delete"
         };
-        var dialog = new Dialog { X = 2, Y = 2, Width = 15, Height = 4 };
-        var menu = new MenuBar { X = Pos.Center (), Width = 10 };
+        Dialog dialog = new () { X = 2, Y = 2, Width = 15, Height = 4 };
+        MenuBar menu = new () { X = Pos.Center (), Width = 10 };
 
         menu.Menus = new MenuBarItem []
         {
@@ -572,7 +572,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         }
 
         RunState rsDialog = Application.Begin (dialog);
-        Application.RunIteration (ref rsDialog);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
 
@@ -598,7 +598,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         Assert.Equal ("File", menu.Menus [0].Title);
         menu.OpenMenu ();
-        Application.RunIteration (ref rsDialog);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -623,9 +623,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
-        bool firstIteration = true;
-        Application.RunIteration (ref rsDialog, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -654,13 +652,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
             Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
-            Application.RunIteration (ref rsDialog);
+            AutoInitShutdownAttribute.RunIteration ();
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
         AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
         menu.OpenMenu ();
-        Application.RunIteration (ref rsDialog);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -816,7 +814,6 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
