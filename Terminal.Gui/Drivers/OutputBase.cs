@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+#nullable enable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Abstract base class to assist with implementing <see cref="IConsoleOutput"/>.
+///     Abstract base class to assist with implementing <see cref="IConsoleOutput"/>.
 /// </summary>
 public abstract class OutputBase
 {
@@ -16,6 +11,13 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
+    /// <summary>
+    ///     Changes the visibility of the cursor in the terminal to the specified <paramref name="visibility"/> e.g.
+    ///     the flashing indicator, invisible, box indicator etc.
+    /// </summary>
+    /// <param name="visibility"></param>
+    public abstract void SetCursorVisibility (CursorVisibility visibility);
+
     /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
@@ -23,13 +25,6 @@ public abstract class OutputBase
         {
             return;
         }
-
-        //if (Console.WindowHeight < 1
-        //    || buffer.Contents.Length != buffer.Rows * buffer.Cols
-        //    || buffer.Rows != Console.WindowHeight)
-        //{
-        //    //     return;
-        //}
 
         var top = 0;
         var left = 0;
@@ -42,16 +37,11 @@ public abstract class OutputBase
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
-        const int maxCharsPerRune = 2;
-        Span<char> runeBuffer = stackalloc char [maxCharsPerRune];
+        const int MAX_CHARS_PER_RUNE = 2;
+        Span<char> runeBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
 
         for (int row = top; row < rows; row++)
         {
-            //if (Console.WindowHeight < 1)
-            //{
-            //    return;
-            //}
-
             if (!SetCursorPositionImpl (0, row))
             {
                 return;
@@ -90,16 +80,21 @@ public abstract class OutputBase
                         lastCol = col;
                     }
 
-                    Attribute attr = buffer.Contents [row, col].Attribute.Value;
+                    Attribute? attribute = buffer.Contents [row, col].Attribute;
 
-                    // Performance: Only send the escape sequence if the attribute has changed.
-                    if (attr != redrawAttr)
+                    if (attribute is { })
                     {
-                        redrawAttr = attr;
+                        Attribute attr = attribute.Value;
 
-                        AppendOrWriteAttribute (output, attr, _redrawTextStyle);
+                        // Performance: Only send the escape sequence if the attribute has changed.
+                        if (attr != redrawAttr)
+                        {
+                            redrawAttr = attr;
 
-                        _redrawTextStyle = attr.Style;
+                            AppendOrWriteAttribute (output, attr, _redrawTextStyle);
+
+                            _redrawTextStyle = attr.Style;
+                        }
                     }
 
                     outputWidth++;
@@ -120,8 +115,6 @@ public abstract class OutputBase
                         // For now, we just ignore the list of CMs.
                         //foreach (var combMark in Contents [row, col].CombiningMarks) {
                         //	output.Append (combMark);
-                        //}
-                        // WriteToConsole (output, ref lastCol, row, ref outputWidth);
                     }
                     else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
                     {
@@ -136,7 +129,10 @@ public abstract class OutputBase
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                Write (output);
+
+                // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+                Write (processed);
             }
         }
 
@@ -154,32 +150,19 @@ public abstract class OutputBase
     }
 
     /// <summary>
-    /// Changes the color and text style of the console to the given <paramref name="attr"/> and <paramref name="redrawTextStyle"/>.
-    /// If command can be buffered in line with other output (e.g. CSI sequence) then it should be appended to <paramref name="output"/>
-    /// otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method)
+    ///     Changes the color and text style of the console to the given <paramref name="attr"/> and
+    ///     <paramref name="redrawTextStyle"/>.
+    ///     If command can be buffered in line with other output (e.g. CSI sequence) then it should be appended to
+    ///     <paramref name="output"/>
+    ///     otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method)
     /// </summary>
     /// <param name="output"></param>
     /// <param name="attr"></param>
     /// <param name="redrawTextStyle"></param>
     protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
 
-    private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
-    {
-        SetCursorPositionImpl (lastCol, row);
-        Write (output);
-        output.Clear ();
-        lastCol += outputWidth;
-        outputWidth = 0;
-    }
-
     /// <summary>
-    /// Output the contents of the <paramref name="output"/> to the console.
-    /// </summary>
-    /// <param name="output"></param>
-    protected abstract void Write (StringBuilder output);
-
-    /// <summary>
-    /// When overriden in derived class, positions the terminal output cursor to the specified point on the screen.
+    ///     When overriden in derived class, positions the terminal output cursor to the specified point on the screen.
     /// </summary>
     /// <param name="screenPositionX">Column to move cursor to</param>
     /// <param name="screenPositionY">Row to move cursor to</param>
@@ -187,9 +170,21 @@ public abstract class OutputBase
     protected abstract bool SetCursorPositionImpl (int screenPositionX, int screenPositionY);
 
     /// <summary>
-    /// Changes the visibility of the cursor in the terminal to the specified <paramref name="visibility"/> e.g.
-    /// the flashing indicator, invisible, box indicator etc.
+    ///     Output the contents of the <paramref name="output"/> to the console.
     /// </summary>
-    /// <param name="visibility"></param>
-    public abstract void SetCursorVisibility (CursorVisibility visibility);
+    /// <param name="output"></param>
+    protected abstract void Write (StringBuilder output);
+
+    private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+    {
+        SetCursorPositionImpl (lastCol, row);
+
+        // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+        StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+        Write (processed);
+
+        output.Clear ();
+        lastCol += outputWidth;
+        outputWidth = 0;
+    }
 }

@@ -2076,4 +2076,58 @@ public static class EscSeqUtils
     public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
 
     #endregion
+
+    #region OSC 8 Hyperlinks
+
+    /// <summary>
+    ///     OSC (Operating System Command) escape sequence prefix.
+    /// </summary>
+    /// <remarks>
+    ///     OSC sequences are used for operating system-specific commands like setting window title,
+    ///     hyperlinks (OSC 8), and other terminal emulator features.
+    /// </remarks>
+    public const string OSC = "\u001B]";
+
+    /// <summary>
+    ///     String Terminator (ST) - terminates OSC sequences.
+    /// </summary>
+    /// <remarks>
+    ///     Can also be represented as BEL (0x07) in some terminals, but ST is more modern.
+    /// </remarks>
+    public const string ST = "\u001B\\";
+
+    /// <summary>
+    ///     Starts a hyperlink using OSC 8 escape sequence.
+    /// </summary>
+    /// <param name="url">The URL to link to (e.g., "https://github.com").</param>
+    /// <param name="id">Optional hyperlink ID for matching start/end pairs. Use null for automatic matching.</param>
+    /// <returns>The OSC 8 start sequence.</returns>
+    /// <remarks>
+    ///     OSC 8 format: ESC ] 8 ; params ; URL ST
+    ///     Supported in Windows Terminal, iTerm2, and other modern terminals.
+    ///     Must be followed by visible text, then terminated with <see cref="OSC_EndHyperlink"/>.
+    /// </remarks>
+    public static string OSC_StartHyperlink (string url, string? id = null)
+    {
+        // Format: ESC ] 8 ; params ; URL ST
+        // params can include "id=value" for matching start/end
+        string parameters = string.IsNullOrEmpty (id) ? "" : $"id={id}";
+        return $"{OSC}8;{parameters};{url}{ST}";
+    }
+
+    /// <summary>
+    ///     Ends a hyperlink using OSC 8 escape sequence.
+    /// </summary>
+    /// <returns>The OSC 8 end sequence.</returns>
+    /// <remarks>
+    ///     This terminates the hyperlink started by <see cref="OSC_StartHyperlink"/>.
+    ///     Format: ESC ] 8 ; ; ST (empty URL ends the hyperlink).
+    /// </remarks>
+    public static string OSC_EndHyperlink ()
+    {
+        // Format: ESC ] 8 ; ; ST (empty URL ends hyperlink)
+        return $"{OSC}8;;{ST}";
+    }
+
+    #endregion
 }

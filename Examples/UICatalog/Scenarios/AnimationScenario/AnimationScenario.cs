@@ -40,7 +40,10 @@ public class AnimationScenario : Scenario
 
         var lbl2 = new Label
         {
-            X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
+            // This ensures the URL that has an underscore is drawn correctly
+            HotKeySpecifier = new Rune ('\xFFFF'),
+            X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), 
+            Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
         };
         win.Add (lbl2);
 
