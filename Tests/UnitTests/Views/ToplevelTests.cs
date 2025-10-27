@@ -403,7 +403,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         Application.Driver?.SetScreenSize (301, 10);
+                                         Application.Driver?.SetScreenSize (30, 10);
                                      }
                                      else if (iterations == 1)
                                      {
