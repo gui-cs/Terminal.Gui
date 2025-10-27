@@ -216,7 +216,7 @@ public interface IConsoleDriver
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
+    /// <remarks>This is only implemented in UnixDriver.</remarks>
     void Suspend ();
 
     /// <summary>

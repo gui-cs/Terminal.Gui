@@ -25,7 +25,7 @@ public class ApplicationImplTests
             m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
             m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of <IInputProcessor> ());
             m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
-            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (),It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IWindowSizeMonitor> ());
+            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (),It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
 
             return new (m.Object);
         }
@@ -38,7 +38,7 @@ public class ApplicationImplTests
             m.Setup (f => f.CreateInput ()).Returns (winInput.Object);
             m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<WindowsConsole.InputRecord>> ())).Returns (Mock.Of<IInputProcessor> ());
             m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
-            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IWindowSizeMonitor> ());
+            m.Setup (f => f.CreateWindowSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
             return new (m.Object);
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.Drivers;
 
-internal class FakeWindowSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer outputBuffer) : IWindowSizeMonitor
+internal class FakeWindowSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer outputBuffer) : IConsoleSizeMonitor
 {
     private Size _lastSize = new (0, 0);
 

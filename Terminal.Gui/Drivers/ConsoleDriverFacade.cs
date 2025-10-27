@@ -18,7 +18,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public IInputProcessor InputProcessor { get; }
     public IOutputBuffer OutputBuffer => _outputBuffer;
 
-    public IWindowSizeMonitor WindowSizeMonitor { get; }
+    public IConsoleSizeMonitor WindowSizeMonitor { get; }
 
 
     public ConsoleDriverFacade (
@@ -26,7 +26,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         IOutputBuffer outputBuffer,
         IConsoleOutput output,
         AnsiRequestScheduler ansiRequestScheduler,
-        IWindowSizeMonitor windowSizeMonitor
+        IConsoleSizeMonitor windowSizeMonitor
     )
     {
         InputProcessor = inputProcessor;
@@ -380,7 +380,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
 
     /// <summary>Initializes the driver</summary>
-    /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
     public void Init () { throw new NotSupportedException (); }
 
     /// <summary>Ends the execution of the console driver.</summary>

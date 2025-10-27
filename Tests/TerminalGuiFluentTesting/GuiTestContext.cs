@@ -958,7 +958,7 @@ internal class FakeWindowsComponentFactory : WindowsComponentFactory
     public override IConsoleOutput CreateOutput () { return _output; }
 
     /// <inheritdoc/>
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
+    public override IConsoleSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }
 
 internal class FakeNetComponentFactory : NetComponentFactory
@@ -981,5 +981,5 @@ internal class FakeNetComponentFactory : NetComponentFactory
     public override IConsoleOutput CreateOutput () { return _output; }
 
     /// <inheritdoc/>
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
+    public override IConsoleSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }

@@ -3,7 +3,7 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Not to be confused with <see cref="NetEvents.MouseButtonState"/>
+///     Not to be confused with NetEvents.MouseButtonState/>
 /// </summary>
 internal class MouseButtonStateEx
 {

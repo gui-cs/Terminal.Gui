@@ -2096,6 +2096,7 @@ public static class EscSeqUtils
     /// </remarks>
     public const string ST = "\u001B\\";
 
+#nullable enable
     /// <summary>
     ///     Starts a hyperlink using OSC 8 escape sequence.
     /// </summary>
@@ -2114,6 +2115,7 @@ public static class EscSeqUtils
         string parameters = string.IsNullOrEmpty (id) ? "" : $"id={id}";
         return $"{OSC}8;{parameters};{url}{ST}";
     }
+#nullable restore
 
     /// <summary>
     ///     Ends a hyperlink using OSC 8 escape sequence.

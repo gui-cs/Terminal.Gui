@@ -48,7 +48,7 @@ public interface IApplicationMainLoop<T> : IDisposable
     /// <summary>
     ///     Gets the class responsible for determining the current console size
     /// </summary>
-    public IWindowSizeMonitor WindowSizeMonitor { get; }
+    public IConsoleSizeMonitor WindowSizeMonitor { get; }
 
     /// <summary>
     ///     Initializes the loop with a buffer from which data can be read

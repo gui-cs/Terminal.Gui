@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Stores the desired output state for the whole application. This is updated during
-///     draw operations before being flushed to the console as part of <see cref="MainLoop{T}"/>
+///     draw operations before being flushed to the console as part of the main loop./>
 ///     operation
 /// </summary>
 public class OutputBuffer : IOutputBuffer
@@ -15,7 +15,7 @@ public class OutputBuffer : IOutputBuffer
     ///     UpdateScreen is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    public Cell [,] Contents { get; set; } = new Cell[0, 0];
+    public Cell [,]? Contents { get; set; } = new Cell[0, 0];
 
     private int _cols;
     private int _rows;

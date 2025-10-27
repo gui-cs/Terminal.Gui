@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 ///     Interface for classes responsible for reporting the current
 ///     size of the terminal window.
 /// </summary>
-public interface IWindowSizeMonitor
+public interface IConsoleSizeMonitor
 {
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     event EventHandler<SizeChangedEventArgs>? SizeChanged;

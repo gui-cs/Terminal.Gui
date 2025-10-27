@@ -1,21 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿#nullable enable
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal class WindowSizeMonitor : IWindowSizeMonitor
+internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer outputBuffer) : IConsoleSizeMonitor
 {
-    private readonly IConsoleOutput _consoleOut;
-    private readonly IOutputBuffer _outputBuffer;
     private Size _lastSize = new (0, 0);
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
-    public event EventHandler<SizeChangedEventArgs> SizeChanged;
-
-    public WindowSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer outputBuffer)
-    {
-        _consoleOut = consoleOut;
-        _outputBuffer = outputBuffer;
-    }
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc/>
     public bool Poll ()
@@ -25,12 +18,12 @@ internal class WindowSizeMonitor : IWindowSizeMonitor
             return false;
         }
 
-        Size size = _consoleOut.GetWindowSize ();
+        Size size = consoleOut.GetWindowSize ();
 
         if (size != _lastSize)
         {
             Logging.Logger.LogInformation ($"Console size changes from '{_lastSize}' to {size}");
-            _outputBuffer.SetWindowSize (size.Width, size.Height);
+            outputBuffer.SetWindowSize (size.Width, size.Height);
             _lastSize = size;
             SizeChanged?.Invoke (this, new (size));
 

@@ -41,11 +41,11 @@ public interface IComponentFactory<T> : IComponentFactory
     IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
 
     /// <summary>
-    /// Creates <see cref="IWindowSizeMonitor"/> class for the current driver implementation i.e. the class responsible for
+    /// Creates <see cref="IConsoleSizeMonitor"/> class for the current driver implementation i.e. the class responsible for
     /// reporting the current size of the terminal window.
     /// </summary>
     /// <param name="consoleOutput"></param>
     /// <param name="outputBuffer"></param>
     /// <returns></returns>
-    IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer);
+    IConsoleSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer);
 }

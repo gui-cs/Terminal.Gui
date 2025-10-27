@@ -24,7 +24,7 @@ public class WindowSizeMonitorTests
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
 
-        var monitor = new WindowSizeMonitor (consoleOutput.Object, outputBuffer);
+        var monitor = new ConsoleSizeMonitor (consoleOutput.Object, outputBuffer);
 
         var result = new List<SizeChangedEventArgs> ();
         monitor.SizeChanged += (s, e) => { result.Add (e);};
@@ -57,7 +57,7 @@ public class WindowSizeMonitorTests
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
 
-        var monitor = new WindowSizeMonitor (consoleOutput.Object, outputBuffer);
+        var monitor = new ConsoleSizeMonitor (consoleOutput.Object, outputBuffer);
 
         var result = new List<SizeChangedEventArgs> ();
         monitor.SizeChanged += (s, e) => { result.Add (e); };

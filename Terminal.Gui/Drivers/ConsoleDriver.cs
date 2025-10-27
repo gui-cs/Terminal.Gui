@@ -562,7 +562,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     #endregion Cursor Handling
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
+    /// <remarks>This is only implemented in the Unix driver.</remarks>
     public abstract void Suspend ();
 
     /// <summary>Sets the position of the terminal cursor to <see cref="Col"/> and <see cref="Row"/>.</summary>

@@ -27,7 +27,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     private IInputProcessor? _inputProcessor;
     private IConsoleOutput? _out;
     private AnsiRequestScheduler? _ansiRequestScheduler;
-    private IWindowSizeMonitor? _windowSizeMonitor;
+    private IConsoleSizeMonitor? _windowSizeMonitor;
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -74,7 +74,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public IWindowSizeMonitor WindowSizeMonitor
+    public IConsoleSizeMonitor WindowSizeMonitor
     {
         get => _windowSizeMonitor ?? throw new NotInitializedException (nameof (WindowSizeMonitor));
         private set => _windowSizeMonitor = value;
