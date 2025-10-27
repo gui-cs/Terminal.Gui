@@ -145,7 +145,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         // Caption has no effect when focused
-        tf.Caption = caption;
+        tf.Title = caption;
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
@@ -165,7 +165,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         TextField tf = GetTextFieldsInView ();
 
-        tf.Caption = caption;
+        tf.Title = caption;
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
@@ -185,7 +185,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
-        tf.Caption = "Enter txt";
+        tf.Title = "Enter txt";
         Application.RaiseKeyDownEvent ('\t');
 
         // Caption should appear when not focused and no text
@@ -212,7 +212,7 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("", output);
 
         // Caption has no effect when focused
-        tf.Caption = "Enter txt";
+        tf.Title = "Enter txt";
         Assert.True (tf.HasFocus);
         View.SetClipToScreen ();
         tf.Draw ();
@@ -224,6 +224,104 @@ public class TextFieldTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
+        Application.Top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_RendersAsCaption_WithCorrectAttributes ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        // Set a title (caption)
+        tf.Title = "Enter text";
+        
+        // Remove focus so caption appears
+        Application.RaiseKeyDownEvent ('\t');
+        Assert.False (tf.HasFocus);
+
+        View.SetClipToScreen ();
+        tf.Draw ();
+        
+        // Verify the caption text is rendered
+        DriverAssert.AssertDriverContentsAre ("Enter text", output);
+
+        // Verify the caption uses dimmed color attribute
+        Attribute captionAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background);
+
+        // All characters in "Enter text" should have the caption attribute
+        DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
+
+        Application.Top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_WithHotkey_RendersUnderlined ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        // Title with hotkey should be rendered with the hotkey underlined when not focused
+        tf.Title = "_Find";
+        
+        // Remove focus so caption appears
+        Application.RaiseKeyDownEvent ('\t');
+        Assert.False (tf.HasFocus);
+
+        View.SetClipToScreen ();
+        tf.Draw ();
+        
+        // The hotkey character 'F' should be rendered (without the underscore in the actual text)
+        DriverAssert.AssertDriverContentsAre ("Find", output);
+
+        // Verify the hotkey character 'F' has underline style
+        Attribute captionAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background);
+        Attribute hotkeyAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background,
+            tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+
+        // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
+        DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
+
+        Application.Top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_WithHotkey_MiddleCharacter_RendersUnderlined ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        // Title with hotkey in middle of text
+        tf.Title = "Enter _Text";
+        
+        // Remove focus so caption appears
+        Application.RaiseKeyDownEvent ('\t');
+        Assert.False (tf.HasFocus);
+
+        View.SetClipToScreen ();
+        tf.Draw ();
+        
+        // The underscore should not be rendered, 'T' should be underlined
+        DriverAssert.AssertDriverContentsAre ("Enter Text", output);
+
+        // Verify the hotkey character 'T' has underline style
+        Attribute captionAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background);
+        Attribute hotkeyAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background,
+            tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+
+        // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
+        DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
+
         Application.Top.Dispose ();
     }
 

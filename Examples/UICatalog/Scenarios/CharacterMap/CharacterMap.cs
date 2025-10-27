@@ -85,7 +85,7 @@ public class CharacterMap : Scenario
             X = Pos.Right (jumpLabel) + 1,
             Y = Pos.Y (_charMap),
             Width = 17,
-            Caption = "e.g. 01BE3 or ✈"
+            Title = "e.g. 01BE3 or ✈"
 
             //SchemeName = "Dialog"
         };
