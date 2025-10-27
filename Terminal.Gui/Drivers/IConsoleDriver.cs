@@ -200,6 +200,22 @@ public interface IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     bool SetCursorVisibility (CursorVisibility visibility);
 
+    /// <summary>
+    ///     Sets the screen (terminal) size. This method is primarily used for testing with <see cref="FakeDriver"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only <see cref="FakeDriver"/> implements this method. Other drivers throw <see cref="NotImplementedException"/>.
+    ///     </para>
+    ///     <para>
+    ///         When implemented, this method updates <see cref="Cols"/> and <see cref="Rows"/>, clears the contents buffer,
+    ///         and fires the <see cref="SizeChanged"/> event.
+    ///     </para>
+    /// </remarks>
+    /// <param name="width">The new width (columns).</param>
+    /// <param name="height">The new height (rows).</param>
+    void SetScreenSize (int width, int height);
+
     /// <summary>The event fired when the terminal is resized.</summary>
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 

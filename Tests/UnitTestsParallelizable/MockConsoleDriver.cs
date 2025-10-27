@@ -146,6 +146,9 @@ internal class MockConsoleDriver : IConsoleDriver
     public bool SetCursorVisibility (CursorVisibility visibility) { throw new NotImplementedException (); }
 
     /// <inheritdoc />
+    public void SetScreenSize (int width, int height) { throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes."); }
+
+    /// <inheritdoc />
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc />

@@ -317,6 +317,20 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         return true;
     }
 
+    /// <summary>
+    ///     Sets the screen (terminal) size. This method is only supported by FakeDriver.
+    /// </summary>
+    /// <remarks>
+    ///     This is a pass-through to the underlying driver. Only FakeDriver implements this; other drivers throw <see cref="NotImplementedException"/>.
+    /// </remarks>
+    /// <param name="width">The new width (columns).</param>
+    /// <param name="height">The new height (rows).</param>
+    /// <exception cref="NotImplementedException">Thrown by all drivers except FakeDriver.</exception>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+    }
+
     /// <inheritdoc/>
     public bool GetCursorVisibility (out CursorVisibility current)
     {

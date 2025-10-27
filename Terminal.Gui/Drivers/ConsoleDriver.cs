@@ -531,6 +531,20 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
+    /// <summary>
+    ///     Sets the screen (terminal) size. This method is primarily used for testing with <see cref="FakeDriver"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Only <see cref="FakeDriver"/> implements this method. Other drivers throw <see cref="NotImplementedException"/>.
+    /// </remarks>
+    /// <param name="width">The new width (columns).</param>
+    /// <param name="height">The new height (rows).</param>
+    /// <exception cref="NotImplementedException">Thrown by all drivers except <see cref="FakeDriver"/>.</exception>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+    }
+
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 

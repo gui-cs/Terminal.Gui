@@ -155,25 +155,50 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool AutoInit { get; }
 
     /// <summary>
-    /// 'Resizes' the application and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
+    /// 'Resizes' the application screen and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
+    /// with FakeDriver (the default).
     /// </summary>
-    /// <param name="size"></param>
+    /// <param name="size">The new screen size.</param>
+    /// <remarks>
+    ///     This method works with both the library FakeDriver and the fluent testing FakeConsoleDriver.
+    ///     It uses <see cref="IConsoleDriver.SetScreenSize"/> when available, or manipulates the buffer/monitor directly.
+    /// </remarks>
     public static void FakeResize (Size size)
     {
-        var d = (IConsoleDriverFacade)Application.Driver!;
-        d.OutputBuffer.SetWindowSize (size.Width, size.Height);
-        
-        // Handle both FakeSizeMonitor (from test project) and FakeWindowSizeMonitor (from main library)
-        if (d.WindowSizeMonitor is FakeSizeMonitor fakeSizeMonitor)
+        if (Application.Driver is null)
         {
-            fakeSizeMonitor.RaiseSizeChanging (size);
-        }
-        else if (d.WindowSizeMonitor is FakeWindowSizeMonitor fakeWindowSizeMonitor)
-        {
-            // For FakeWindowSizeMonitor, use the RaiseSizeChanging method
-            fakeWindowSizeMonitor.RaiseSizeChanging (size);
+            return;
         }
 
+        // Try the library FakeDriver first - it has SetScreenSize implemented
+        if (Application.Driver is FakeDriver fakeDriver)
+        {
+            fakeDriver.SetScreenSize (size.Width, size.Height);
+            Application.LayoutAndDraw (true);
+            return;
+        }
+
+        // For fluent testing FakeConsoleDriver (through facade), manipulate buffer and monitor directly
+        if (Application.Driver is IConsoleDriverFacade facade)
+        {
+            facade.OutputBuffer.SetWindowSize (size.Width, size.Height);
+            
+            // Raise the size changing event through the monitor
+            if (facade.WindowSizeMonitor is FakeSizeMonitor fakeSizeMonitor)
+            {
+                fakeSizeMonitor.RaiseSizeChanging (size);
+            }
+            else if (facade.WindowSizeMonitor is FakeWindowSizeMonitor fakeWindowSizeMonitor)
+            {
+                fakeWindowSizeMonitor.RaiseSizeChanging (size);
+            }
+
+            Application.LayoutAndDraw (true);
+            return;
+        }
+
+        // Fallback: try SetScreenSize through interface (will throw if not supported)
+        Application.Driver.SetScreenSize (size.Width, size.Height);
         Application.LayoutAndDraw (true);
     }
 

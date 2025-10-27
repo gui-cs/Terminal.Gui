@@ -51,6 +51,16 @@ internal class FakeConsoleDriver : ConsoleDriverFacade<ConsoleKeyInfo>, IFakeCon
         OutputBuffer.SetWindowSize (width, height);
     }
 
+    /// <summary>
+    ///     Sets the screen size for testing purposes.
+    /// </summary>
+    /// <param name="width">The new width (columns).</param>
+    /// <param name="height">The new height (rows).</param>
+    public override void SetScreenSize (int width, int height)
+    {
+        SetBufferSize (width, height);
+    }
+
     public IConsoleOutput ConsoleOutput { get; }
     public ConcurrentQueue<ConsoleKeyInfo> InputBuffer { get; }
     public new OutputBuffer OutputBuffer { get; }

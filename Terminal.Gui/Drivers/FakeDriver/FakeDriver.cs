@@ -401,6 +401,20 @@ public class FakeDriver : ConsoleDriver
         ProcessResize ();
     }
 
+    /// <summary>
+    ///     Sets the screen (terminal) size for testing purposes.
+    /// </summary>
+    /// <remarks>
+    ///     This method updates <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>,
+    ///     resizes the internal buffers, clears contents, and fires the <see cref="ConsoleDriver.SizeChanged"/> event.
+    /// </remarks>
+    /// <param name="width">The new width (columns).</param>
+    /// <param name="height">The new height (rows).</param>
+    public override void SetScreenSize (int width, int height)
+    {
+        SetWindowSize (width, height);
+    }
+
     public void SetWindowPosition (int left, int top)
     {
         if (Left > 0 || Top > 0)
