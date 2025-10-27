@@ -63,11 +63,6 @@ public class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    /// <summary>
-    /// Handles which <see cref="View"/> (if any) has captured the mouse
-    /// </summary>
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
-
     private IKeyboard? _keyboard;
 
     /// <summary>
@@ -177,6 +172,10 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels => _topLevels;
 
+    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
+    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
+    internal static Toplevel? CachedRunStateToplevel { get; set; }
+
     /// <summary>
     /// Gets or sets the main thread ID for the application.
     /// </summary>
@@ -231,7 +230,7 @@ public class ApplicationImpl : IApplication
 
         if (string.IsNullOrWhiteSpace (_driverName))
         {
-            _driverName = Application.ForceDriver;
+            _driverName = ForceDriver;
         }
 
         Debug.Assert (_navigation is null);
@@ -264,7 +263,7 @@ public class ApplicationImpl : IApplication
         }
 
         CreateDriver (driverName ?? _driverName);
-        Application.Screen = Driver!.Screen;
+        Screen = Driver!.Screen;
         _initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
@@ -441,6 +440,7 @@ public class ApplicationImpl : IApplication
         _initialized = false;
         _navigation = null;
         _popover = null;
+        CachedRunStateToplevel = null;
         _top = null;
         _topLevels.Clear ();
         _mainThreadId = -1;
@@ -485,7 +485,7 @@ public class ApplicationImpl : IApplication
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Application.Top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (Top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
             return;
