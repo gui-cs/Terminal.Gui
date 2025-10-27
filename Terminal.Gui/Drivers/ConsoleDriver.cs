@@ -57,7 +57,24 @@ public abstract class ConsoleDriver : IConsoleDriver
     internal bool []? _dirtyLines;
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
-    /// <summary>Gets the location and size of the terminal screen.</summary>
+    /// <summary>
+    ///     Gets the location and size of the terminal screen. This is the single source of truth for
+    ///     the available drawing area.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The screen rectangle always has origin (0,0) and size determined by <see cref="Cols"/> and <see cref="Rows"/>.
+    ///         When the terminal is resized, <see cref="Cols"/> and <see cref="Rows"/> are updated, and the
+    ///         <see cref="SizeChanged"/> event is fired.
+    ///     </para>
+    ///     <para>
+    ///         In production drivers (WindowsDriver, UnixDriver, DotNetDriver), this reflects the actual terminal size.
+    ///         In <see cref="FakeDriver"/>, this can be controlled programmatically via <c>SetBufferSize</c> for testing.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="Cols"/>
+    /// <seealso cref="Rows"/>
+    /// <seealso cref="SizeChanged"/>
     public Rectangle Screen => new (0, 0, Cols, Rows);
 
     private Region? _clip;
@@ -93,7 +110,25 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// </summary>
     public int Col { get; private set; }
 
-    /// <summary>The number of columns visible in the terminal.</summary>
+    /// <summary>
+    ///     Gets or sets the number of columns visible in the terminal. This property, along with <see cref="Rows"/>,
+    ///     defines the dimensions of the <see cref="Screen"/> rectangle.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         In production drivers, this value reflects the actual terminal width and is updated when
+    ///         the terminal is resized. In <see cref="FakeDriver"/>, this can be set programmatically
+    ///         via <c>SetBufferSize</c> or <c>SetWindowSize</c> for testing.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Warning:</strong> Setting this property directly clears the contents buffer.
+    ///         Prefer using resize methods (<c>SetBufferSize</c> in FakeDriver) that properly handle
+    ///         the resize sequence including firing <see cref="SizeChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="Rows"/>
+    /// <seealso cref="Screen"/>
+    /// <seealso cref="SizeChanged"/>
     public virtual int Cols
     {
         get => _cols;
@@ -157,7 +192,25 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// </summary>
     public int Row { get; private set; }
 
-    /// <summary>The number of rows visible in the terminal.</summary>
+    /// <summary>
+    ///     Gets or sets the number of rows visible in the terminal. This property, along with <see cref="Cols"/>,
+    ///     defines the dimensions of the <see cref="Screen"/> rectangle.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         In production drivers, this value reflects the actual terminal height and is updated when
+    ///         the terminal is resized. In <see cref="FakeDriver"/>, this can be set programmatically
+    ///         via <c>SetBufferSize</c> or <c>SetWindowSize</c> for testing.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Warning:</strong> Setting this property directly clears the contents buffer.
+    ///         Prefer using resize methods (<c>SetBufferSize</c> in FakeDriver) that properly handle
+    ///         the resize sequence including firing <see cref="SizeChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="Cols"/>
+    /// <seealso cref="Screen"/>
+    /// <seealso cref="SizeChanged"/>
     public virtual int Rows
     {
         get => _rows;
@@ -508,8 +561,27 @@ public abstract class ConsoleDriver : IConsoleDriver
         }
     }
 
-    /// <summary>Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.</summary>
-    /// <param name="args"></param>
+    /// <summary>
+    ///     Called when the terminal screen size changes. This method fires the <see cref="SizeChanged"/> event,
+    ///     notifying subscribers that <see cref="Screen"/>, <see cref="Cols"/>, and <see cref="Rows"/> have changed.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is typically called internally by the driver when it detects a terminal resize.
+    ///         For <see cref="FakeDriver"/>, it is called by <c>SetBufferSize</c> and <c>SetWindowSize</c> methods.
+    ///     </para>
+    ///     <para>
+    ///         <strong>For driver implementations:</strong> Call this method after updating <see cref="Cols"/> and
+    ///         <see cref="Rows"/> to notify the application that the screen dimensions have changed.
+    ///     </para>
+    ///     <para>
+    ///         <strong>For application code:</strong> Subscribe to the <see cref="SizeChanged"/> event to respond
+    ///         to screen size changes rather than calling this method directly.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args">Event arguments containing the new screen size.</param>
+    /// <seealso cref="SizeChanged"/>
+    /// <seealso cref="Screen"/>
     public void OnSizeChanged (SizeChangedEventArgs args) { SizeChanged?.Invoke (this, args); }
 
     /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
@@ -531,7 +603,32 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
-    /// <summary>The event fired when the terminal is resized.</summary>
+    /// <summary>
+    ///     Event fired when the terminal screen is resized. Provides the new screen dimensions via
+    ///     <see cref="SizeChangedEventArgs"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is raised by <see cref="OnSizeChanged"/> when the driver detects or is notified
+    ///         of a terminal size change. At the time this event fires, <see cref="Cols"/>, <see cref="Rows"/>,
+    ///         and <see cref="Screen"/> have already been updated to reflect the new dimensions.
+    ///     </para>
+    ///     <para>
+    ///         <strong>In production drivers:</strong> This event fires when the OS notifies the driver of a
+    ///         terminal window resize (e.g., SIGWINCH on Unix, WINDOW_BUFFER_SIZE_EVENT on Windows).
+    ///     </para>
+    ///     <para>
+    ///         <strong>In FakeDriver:</strong> This event fires when test code calls <c>SetBufferSize</c> or
+    ///         <c>SetWindowSize</c>, allowing tests to simulate and verify resize behavior.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Usage in Application:</strong> <see cref="Application"/> subscribes to this event
+    ///         during initialization and propagates resize notifications to top-level views, triggering layout
+    ///         and redraw operations.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="OnSizeChanged"/>
+    /// <seealso cref="Screen"/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     #endregion Cursor Handling

@@ -378,6 +378,46 @@ public class FakeDriver : ConsoleDriver
     /// <inheritdoc />
     internal override IAnsiResponseParser GetParser () => _parser;
 
+    /// <summary>
+    ///     Sets the size of the fake console screen/buffer for testing purposes. This method updates
+    ///     the driver's dimensions (<see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>),
+    ///     clears the contents, and fires the <see cref="ConsoleDriver.SizeChanged"/> event.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is intended for use in unit tests to simulate terminal resize events.
+    ///         For FakeDriver, the buffer size and window size are always the same (there is no scrollback).
+    ///     </para>
+    ///     <para>
+    ///         When called, this method:
+    ///         <list type="number">
+    ///             <item>Updates the <see cref="FakeConsole"/> buffer size</item>
+    ///             <item>Sets <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/> to the new dimensions</item>
+    ///             <item>Updates the window size to match</item>
+    ///             <item>Clears the screen contents</item>
+    ///             <item>Fires the <see cref="ConsoleDriver.SizeChanged"/> event</item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <strong>Thread Safety:</strong> This method is not thread-safe. Tests using this method
+    ///         should ensure they are not accessing the driver concurrently.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Relationship to Screen property:</strong> After calling this method, 
+    ///         <see cref="ConsoleDriver.Screen"/> will return a rectangle with origin (0,0) and size (width, height).
+    ///     </para>
+    /// </remarks>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <example>
+    ///     <code>
+    ///     // Simulate a terminal resize to 120x30
+    ///     var driver = new FakeDriver();
+    ///     driver.SetBufferSize(120, 30);
+    ///     Assert.Equal(120, driver.Cols);
+    ///     Assert.Equal(30, driver.Rows);
+    ///     </code>
+    /// </example>
     public void SetBufferSize (int width, int height)
     {
         FakeConsole.SetBufferSize (width, height);
@@ -387,6 +427,24 @@ public class FakeDriver : ConsoleDriver
         ProcessResize ();
     }
 
+    /// <summary>
+    ///     Sets the window size of the fake console. For FakeDriver, this is functionally equivalent to
+    ///     <see cref="SetBufferSize"/> as the fake console does not support scrollback (window size == buffer size).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method exists for API compatibility with real console drivers, but in FakeDriver,
+    ///         the window size and buffer size are always kept in sync. Calling this method will update
+    ///         both the window and buffer to the specified size.
+    ///     </para>
+    ///     <para>
+    ///         Prefer using <see cref="SetBufferSize"/> for clarity in test code, as it more accurately
+    ///         describes what's happening (setting the entire screen size for the fake driver).
+    ///     </para>
+    /// </remarks>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <seealso cref="SetBufferSize"/>
     public void SetWindowSize (int width, int height)
     {
         FakeConsole.SetWindowSize (width, height);

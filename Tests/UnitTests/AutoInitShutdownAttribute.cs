@@ -155,9 +155,55 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool AutoInit { get; }
 
     /// <summary>
-    /// 'Resizes' the application and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
+    ///     Simulates a terminal resize in tests that use <see cref="AutoInitShutdownAttribute"/>.
+    ///     This method updates the driver's output buffer size, triggers size change events,
+    ///     and forces a layout/draw cycle.
     /// </summary>
-    /// <param name="size"></param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is designed for use in unit tests to simulate terminal resize events.
+    ///         It works with both the fluent testing infrastructure (<see cref="FakeSizeMonitor"/>) and
+    ///         the library's built-in <see cref="FakeWindowSizeMonitor"/>.
+    ///     </para>
+    ///     <para>
+    ///         The method performs the following operations:
+    ///         <list type="number">
+    ///             <item>Updates the output buffer size via <see cref="IOutputBuffer.SetWindowSize"/></item>
+    ///             <item>Raises the size changing event through the appropriate size monitor</item>
+    ///             <item>Forces a layout and draw cycle via <see cref="Application.LayoutAndDraw"/></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <strong>Thread Safety:</strong> This method is not thread-safe. Tests using FakeResize
+    ///         should not run in parallel if they share driver state.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Requirements:</strong> Your test must use <see cref="AutoInitShutdownAttribute"/>
+    ///         with autoInit=true for this method to work correctly.
+    ///     </para>
+    /// </remarks>
+    /// <param name="size">The new terminal size (width, height).</param>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if <see cref="Application.Driver"/> is null or not initialized.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     [Fact]
+    ///     [AutoInitShutdown]
+    ///     public void TestResize()
+    ///     {
+    ///         // Initial size is 80x25
+    ///         Assert.Equal(80, Application.Driver.Cols);
+    ///         
+    ///         // Simulate resize to 120x30
+    ///         AutoInitShutdownAttribute.FakeResize(new Size(120, 30));
+    ///         
+    ///         // Verify new size
+    ///         Assert.Equal(120, Application.Driver.Cols);
+    ///         Assert.Equal(30, Application.Driver.Rows);
+    ///     }
+    ///     </code>
+    /// </example>
     public static void FakeResize (Size size)
     {
         var d = (IConsoleDriverFacade)Application.Driver!;
