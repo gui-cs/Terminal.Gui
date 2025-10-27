@@ -68,7 +68,7 @@ public class TextInputControls : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Bottom (textField),
             Width = Dim.Percent (50) - 1,
-            Caption = "TextField with caption"
+            Title = "TextField with caption"
         };
 
         win.Add (textField);

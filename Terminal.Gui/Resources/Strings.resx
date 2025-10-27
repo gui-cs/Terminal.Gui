@@ -192,10 +192,7 @@
     <value>Modified</value>
   </data>
   <data name="fdPathCaption" xml:space="preserve">
-    <value>Enter Path</value>
-  </data>
-  <data name="fdSearchCaption" xml:space="preserve">
-    <value>Find</value>
+    <value>_Enter Path</value>
   </data>
   <data name="fdSize" xml:space="preserve">
     <value>Size</value>
@@ -358,5 +355,8 @@
   <data name="fdTree" xml:space="preserve">
     <value>_Tree</value>
     <comment>Show/Hide Tree View</comment>
+  </data>
+  <data name="fdSearchCaption" xml:space="preserve">
+    <value>_Find</value>
   </data>
 </root>
