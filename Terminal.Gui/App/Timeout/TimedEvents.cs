@@ -55,7 +55,13 @@ public class TimedEvents : ITimedEvents
     {
         // Convert Stopwatch ticks to TimeSpan ticks (100-nanosecond units)
         // Stopwatch.Frequency gives ticks per second, so we need to scale appropriately
-        return Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency;
+        // To avoid overflow, we perform the operation in double precision first and then cast to long.
+        var ticks = (long)((double)Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency);
+
+        // Ensure ticks is positive and not overflowed (very unlikely now)
+        Debug.Assert (ticks > 0);
+
+        return ticks;
     }
 
     /// <inheritdoc/>
