@@ -37,9 +37,6 @@ public class TextField : View, IDesignable
         Used = true;
         WantMousePositionReports = true;
 
-        // Enable hotkey support for Title (caption)
-        HotKeySpecifier = new ('_');
-
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
@@ -320,6 +317,30 @@ public class TextField : View, IDesignable
                         return true;
                     }
                    );
+
+        AddCommand (
+                    Command.HotKey,
+                    ctx =>
+                    {
+                        if (RaiseHandlingHotKey (ctx) is true)
+                        {
+                            return true;
+                        }
+
+                        // If we have focus, then ignore the hotkey because the user
+                        // means to enter it
+                        if (HasFocus)
+                        {
+                            return false;
+                        }
+
+                        // This is what the default HotKey handler does:
+                        SetFocus ();
+
+                        // Always return true on hotkey, even if SetFocus fails because 
+                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
+                        return true;
+                    });
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
@@ -1699,18 +1720,20 @@ public class TextField : View, IDesignable
             TitleTextFormatter.Text = Title;
         }
 
-        Attribute captionAttribute = new Attribute (
-                                                    GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-                                                    GetAttributeForRole (VisualRole.Editable).Background);
-        Attribute hotKeyAttribute = new Attribute (
-                                                   GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-                                                   GetAttributeForRole (VisualRole.Editable).Background,
-                                                   GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+        var captionAttribute = new Attribute (
+                                              GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                              GetAttributeForRole (VisualRole.Editable).Background);
+
+        var hotKeyAttribute = new Attribute (
+                                             GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                             GetAttributeForRole (VisualRole.Editable).Background,
+                                             GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // Use TitleTextFormatter to render the caption with hotkey support
-        TitleTextFormatter.Draw (ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
-                                                  captionAttribute,
-                                                  hotKeyAttribute);
+        TitleTextFormatter.Draw (
+                                 ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
+                                 captionAttribute,
+                                 hotKeyAttribute);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
