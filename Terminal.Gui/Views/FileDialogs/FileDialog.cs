@@ -148,7 +148,7 @@ public class FileDialog : Dialog, IDesignable
                                      e.Handled = true;
                                  };
 
-        _tbPath = new () { Width = Dim.Fill (),/* CaptionColor = new (Color.Black)*/ };
+        _tbPath = new () { Width = Dim.Fill () };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -248,7 +248,6 @@ public class FileDialog : Dialog, IDesignable
             X = 0,
             Width = Dim.Fill (),
             Y = Pos.AnchorEnd (),
-            HotKey = Key.F.WithAlt,
             Id = "_tbFind",
         };
 

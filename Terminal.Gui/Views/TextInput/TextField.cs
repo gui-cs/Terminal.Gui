@@ -908,7 +908,7 @@ public class TextField : View, IDesignable
         _isDrawing = true;
 
         // Cache attributes as GetAttributeForRole might raise events
-        Attribute selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
+        var selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
         Attribute readonlyAttribute = GetAttributeForRole (VisualRole.ReadOnly);
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Editable);
 
@@ -931,7 +931,7 @@ public class TextField : View, IDesignable
             {
                 // Disabled
                 SetAttributeForRole (VisualRole.Disabled);
-            } 
+            }
             else if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
             {
                 // Selected text
@@ -1144,7 +1144,6 @@ public class TextField : View, IDesignable
     /////     </remarks>
     ///// </summary>
     //public event EventHandler<StateEventArgs<string>> TextChanged;
-
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
@@ -1700,18 +1699,18 @@ public class TextField : View, IDesignable
             TitleTextFormatter.Text = Title;
         }
 
-        // Get brighter color for the caption text
-        var captionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
-        var color = new Attribute (captionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
-        
-        // Create hotkey attribute for underlined hotkey character
-        var hotKeyColor = new Attribute (captionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+        Attribute captionAttribute = new Attribute (
+                                                    GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                                    GetAttributeForRole (VisualRole.Editable).Background);
+        Attribute hotKeyAttribute = new Attribute (
+                                                   GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                                   GetAttributeForRole (VisualRole.Editable).Background,
+                                                   GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // Use TitleTextFormatter to render the caption with hotkey support
-        TitleTextFormatter.Draw (
-            new Rectangle (0, 0, Viewport.Width, 1),
-            color,
-            hotKeyColor);
+        TitleTextFormatter.Draw (ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
+                                                  captionAttribute,
+                                                  hotKeyAttribute);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
@@ -1808,7 +1807,7 @@ public class TextField : View, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Text = "This is a test.";
