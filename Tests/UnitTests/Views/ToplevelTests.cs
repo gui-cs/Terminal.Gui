@@ -1,6 +1,4 @@
-﻿using UnitTests;
-
-namespace UnitTests.ViewsTests;
+﻿namespace UnitTests.ViewsTests;
 
 public class ToplevelTests
 {
@@ -285,7 +283,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         AutoInitShutdownAttribute.FakeResize(new Size(15, 7));
+                                         Application.Driver?.SetScreenSize (15, 7);
 
                                          // Don't use MessageBox here; it's too complicated for this unit test; just use Window
                                          testWindow = new ()
@@ -405,7 +403,7 @@ public class ToplevelTests
 
                                      if (iterations == 0)
                                      {
-                                         AutoInitShutdownAttribute.FakeResize(new Size(30, 10));
+                                         Application.Driver?.SetScreenSize (301, 10);
                                      }
                                      else if (iterations == 1)
                                      {
@@ -507,10 +505,10 @@ public class ToplevelTests
         top.BeginInit ();
         top.EndInit ();
 
-        Exception exception = Record.Exception (() => ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (0, 10));
+        Exception exception = Record.Exception (() => Application.Driver!.SetScreenSize (0, 10));
         Assert.Null (exception);
 
-        exception = Record.Exception (() => ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 0));
+        exception = Record.Exception (() => Application.Driver!.SetScreenSize (10, 0));
         Assert.Null (exception);
     }
 
@@ -596,7 +594,8 @@ public class ToplevelTests
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable };
         RunState rsTop = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 10));
+        Application.Driver?.SetScreenSize (40, 10);
+
         RunState rsWindow = Application.Begin (window);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -619,7 +618,7 @@ public class ToplevelTests
         Assert.Equal (new (-11, -4, 20, 3), window.Frame);
 
         // Changes Top size to same size as Dialog more menu and scroll bar
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 3));
+        Application.Driver?.SetScreenSize (20, 3);
 
         Application.RaiseMouseEvent (
                                      new ()
@@ -632,7 +631,7 @@ public class ToplevelTests
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
         // Changes Top size smaller than Dialog size
-        AutoInitShutdownAttribute.FakeResize(new Size(19, 2));
+        Application.Driver?.SetScreenSize (19, 2);
 
         Application.RaiseMouseEvent (
                                      new ()

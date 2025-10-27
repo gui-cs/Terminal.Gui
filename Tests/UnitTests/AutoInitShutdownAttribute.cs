@@ -107,7 +107,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
 
         // Force the ConfigurationManager to reset to its hardcoded defaults
-        CM.Disable(true);
+        CM.Disable (true);
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -138,12 +138,14 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 #endif
             if (_driverType == null)
             {
-                Application.Top = null;
-                Application.TopLevels.Clear ();
+                Application.Init (null, "fake");
+                //Application.Driver!.SetScreenSize (80, 25);
+                //Application.Top = null;
+                //Application.TopLevels.Clear ();
 
-                var fa = new FakeApplicationFactory ();
-                _v2Cleanup = fa.SetupFakeApplication ();
-                AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+                //var fa = new FakeApplicationFactory ();
+                //_v2Cleanup = fa.SetupFakeApplication ();
+                //Application.Driver!.SetScreenSize (80,25));
             }
             else
             {
@@ -155,43 +157,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool AutoInit { get; }
 
     /// <summary>
-    /// 'Resizes' the application and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
-    /// </summary>
-    /// <param name="size"></param>
-    public static void FakeResize (Size size)
-    {
-        var d = (IConsoleDriverFacade)Application.Driver!;
-        
-        // Use SetScreenSize if available (for FakeDriver), otherwise fall back to SetWindowSize
-        if (d.OutputBuffer is FakeDriver fakeDriver)
-        {
-            fakeDriver.SetScreenSize (size.Width, size.Height);
-        }
-        else
-        {
-            d.OutputBuffer.SetWindowSize (size.Width, size.Height);
-        }
-        
-        // Handle both FakeSizeMonitor (from test project) and FakeWindowSizeMonitor (from main library)
-        if (d.WindowSizeMonitor is FakeSizeMonitor fakeSizeMonitor)
-        {
-            fakeSizeMonitor.RaiseSizeChanging (size);
-        }
-        else if (d.WindowSizeMonitor is FakeWindowSizeMonitor fakeWindowSizeMonitor)
-        {
-            // For FakeWindowSizeMonitor, use the RaiseSizeChanging method
-            fakeWindowSizeMonitor.RaiseSizeChanging (size);
-        }
-
-        Application.LayoutAndDraw (true);
-    }
-
-    /// <summary>
     /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
     /// </summary>
     public static void RunIteration ()
     {
-        var a = (ApplicationImpl)ApplicationImpl.Instance;
+        ApplicationImpl a = (ApplicationImpl)ApplicationImpl.Instance;
         a.Coordinator?.RunIteration ();
     }
 }

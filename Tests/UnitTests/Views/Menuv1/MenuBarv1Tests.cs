@@ -470,7 +470,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Window win = new ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 15))    ;
+        Application.Driver!.SetScreenSize (40, 15);
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
 
@@ -656,7 +656,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+        Application.Driver!.SetScreenSize (20, 15);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -689,7 +689,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+        Application.Driver!.SetScreenSize (40, 15);
 
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
@@ -836,7 +836,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+        Application.Driver!.SetScreenSize (20, 15);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -907,7 +907,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(7, 5));
+        Application.Driver!.SetScreenSize (7, 5);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -923,7 +923,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(7, 3));
+        Application.Driver!.SetScreenSize (7, 3);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -981,7 +981,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(3, 2));
+        Application.Driver!.SetScreenSize (3, 2);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -994,7 +994,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(3, 1));
+        Application.Driver!.SetScreenSize (3, 1);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -1628,7 +1628,7 @@ wo
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
+        Application.Driver!.SetScreenSize (40, 8);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1740,7 +1740,7 @@ wo
 
         Application.AddTimeout (TimeSpan.Zero, () =>
                                                        {
-                                                           AutoInitShutdownAttribute.FakeResize(new Size (40, 8));
+                                                           Application.Driver!.SetScreenSize (40, 8);
 
                                                            DriverAssert.AssertDriverContentsWithFrameAre (
                                                                 @"
@@ -1854,7 +1854,7 @@ wo
             ]
         };
         win.Add (menu);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
+        Application.Driver!.SetScreenSize (40, 8);
         RunState rs = Application.Begin (win);
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -1941,7 +1941,7 @@ wo
     [AutoInitShutdown]
     public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
     {
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
+        Application.Driver!.SetScreenSize (40, 8);
 
         Application.AddTimeout (TimeSpan.Zero, () =>
                                                        {
@@ -2897,7 +2897,7 @@ Edit
                                                       output
                                                      );
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+        Application.Driver!.SetScreenSize (20, 15);
 
         AutoInitShutdownAttribute.RunIteration ();
 

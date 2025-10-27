@@ -97,7 +97,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(width, 5));
+        Application.Driver!.SetScreenSize (width, 5);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -230,7 +230,7 @@ public class BorderTests (ITestOutputHelper output)
 
         RunState rs = Application.Begin (win);
 
-        AutoInitShutdownAttribute.FakeResize(new Size(width, 4));
+        Application.Driver!.SetScreenSize (width, 4);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -364,7 +364,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(width, 4));
+        Application.Driver!.SetScreenSize (width, 4);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -487,7 +487,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, height));
+        Application.Driver!.SetScreenSize (20, height);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -549,7 +549,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(width, 3));
+        Application.Driver!.SetScreenSize (width, 3);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -727,13 +727,13 @@ public class BorderTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single};
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(5, 5));
+        Application.Driver!.SetScreenSize (5, 5);
         AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
@@ -761,7 +761,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
+        Application.Driver!.SetScreenSize (10, 4);
         AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
@@ -784,7 +784,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(3, 3));
+        Application.Driver!.SetScreenSize (3, 3);
         AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"

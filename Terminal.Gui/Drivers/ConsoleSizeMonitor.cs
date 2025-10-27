@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer outputBuffer) : IConsoleSizeMonitor
+/// <inheritdoc />
+internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer _) : IConsoleSizeMonitor
 {
-    private Size _lastSize = new (0, 0);
+    private Size _lastSize = Size.Empty;
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
@@ -18,12 +19,11 @@ internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer outp
             return false;
         }
 
-        Size size = consoleOut.GetWindowSize ();
+        Size size = consoleOut.GetSize ();
 
         if (size != _lastSize)
         {
             Logging.Logger.LogInformation ($"Console size changes from '{_lastSize}' to {size}");
-            outputBuffer.SetWindowSize (size.Width, size.Height);
             _lastSize = size;
             SizeChanged?.Invoke (this, new (size));
 

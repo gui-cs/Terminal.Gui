@@ -2059,21 +2059,21 @@ public static class EscSeqUtils
     /// <summary>
     ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars
     ///     https://terminalguide.namepad.de/seq/csi_st-18/
-    ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
+    ///     The terminator indicating a reply to <see cref="CSI_ReportWindowSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
-    public static readonly AnsiEscapeSequence CSI_ReportTerminalSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
+    public static readonly AnsiEscapeSequence CSI_ReportWindowSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
 
 
     /// <summary>
-    ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
+    ///     The terminator indicating a reply to <see cref="CSI_ReportWindowSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
+    public const string CSI_ReportWindowSizeInChars_Terminator = "t";
 
     /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the terminal
+    ///     The value of the response to <see cref="CSI_ReportWindowSizeInChars"/> indicating value 1 and 2 are the terminal
     ///     size in chars.
     /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
+    public const string CSI_ReportWindowSizeInChars_ResponseValue = "8";
 
     #endregion
 

@@ -27,7 +27,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     private IInputProcessor? _inputProcessor;
     private IConsoleOutput? _out;
     private AnsiRequestScheduler? _ansiRequestScheduler;
-    private IConsoleSizeMonitor? _windowSizeMonitor;
+    private IConsoleSizeMonitor? _consoleSizeMonitor;
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -74,10 +74,10 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public IConsoleSizeMonitor WindowSizeMonitor
+    public IConsoleSizeMonitor ConsoleSizeMonitor
     {
-        get => _windowSizeMonitor ?? throw new NotInitializedException (nameof (WindowSizeMonitor));
-        private set => _windowSizeMonitor = value;
+        get => _consoleSizeMonitor ?? throw new NotInitializedException (nameof (ConsoleSizeMonitor));
+        private set => _consoleSizeMonitor = value;
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
-        WindowSizeMonitor = componentFactory.CreateWindowSizeMonitor (Out, OutputBuffer);
+        ConsoleSizeMonitor = componentFactory.CreateConsoleSizeMonitor (Out, OutputBuffer);
     }
 
     /// <inheritdoc/>
@@ -152,7 +152,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
                                      || AnySubViewsNeedDrawn (Application.Top)
                                      || (Application.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (Application.Mouse.MouseGrabView));
 
-            bool sizeChanged = WindowSizeMonitor.Poll ();
+            bool sizeChanged = ConsoleSizeMonitor.Poll ();
 
             if (needsDrawOrLayout || sizeChanged)
             {

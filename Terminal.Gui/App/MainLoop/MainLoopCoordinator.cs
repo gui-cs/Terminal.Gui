@@ -149,7 +149,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                            _loop.OutputBuffer,
                            _output,
                            _loop.AnsiRequestScheduler,
-                           _loop.WindowSizeMonitor);
+                           _loop.ConsoleSizeMonitor);
 
             Application.Driver = _facade;
 

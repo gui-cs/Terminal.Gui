@@ -47,7 +47,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         Assert.Equal (25, Application.Driver.Rows);
 
         // Resize to 100x30
-        AutoInitShutdownAttribute.FakeResize (new (100, 30));
+        Application.Driver?.SetScreenSize (100, 30);
 
         // Verify new size
         Assert.Equal (100, Application.Driver.Cols);
@@ -178,24 +178,24 @@ public class FakeDriverTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void SetupFakeDriver_Driver_Is_FakeConsoleDriver ()
+    public void SetupFakeDriver_Driver_Is_IConsoleDriver ()
     {
         Assert.NotNull (Application.Driver);
 
-        // Should be IFakeConsoleDriver
-        Assert.IsAssignableFrom<IFakeConsoleDriver> (Application.Driver);
+        // Should be IConsoleDriver
+        Assert.IsAssignableFrom<IConsoleDriver> (Application.Driver);
 
         _output.WriteLine ($"Driver type: {Application.Driver.GetType ().Name}");
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void SetupFakeDriver_Can_Set_Buffer_Size ()
+    public void SetupFakeDriver_Can_Set_Screen_Size ()
     {
-        var fakeDriver = Application.Driver as IFakeConsoleDriver;
+        IConsoleDriver fakeDriver = Application.Driver;
         Assert.NotNull (fakeDriver);
 
-        fakeDriver!.SetBufferSize (100, 50);
+        fakeDriver!.SetScreenSize (100, 50);
 
         Assert.Equal (100, Application.Driver!.Cols);
         Assert.Equal (50, Application.Driver.Rows);
@@ -279,7 +279,6 @@ public class FakeDriverTests (ITestOutputHelper output)
 
         Application.Begin (Application.Top);
 
-        AutoInitShutdownAttribute.FakeResize (new (80, 25));
         AutoInitShutdownAttribute.RunIteration ();
 
         // Check initial size
@@ -288,7 +287,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         Assert.Equal (25, initialFrame.Height);
 
         // Resize
-        AutoInitShutdownAttribute.FakeResize (new (100, 40));
+        Application.Driver?.SetScreenSize (100, 40);
 
         // Check new size
         Assert.Equal (100, view.Frame.Width);
@@ -390,7 +389,7 @@ public class FakeDriverTests (ITestOutputHelper output)
 
         foreach (Size size in sizes)
         {
-            AutoInitShutdownAttribute.FakeResize (size);
+            Application.Driver!.SetScreenSize (size.Width, size.Height);
             AutoInitShutdownAttribute.RunIteration ();
 
             Assert.Equal (size.Width, Application.Driver!.Cols);
@@ -436,7 +435,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         Application.Driver.FillRect (new (0, 0, 10, 5), (Rune)'A');
 
         // Resize
-        AutoInitShutdownAttribute.FakeResize (new (100, 30));
+        Application.Driver?.SetScreenSize (100, 30);
 
         // Verify new size
         Assert.Equal (100, Application.Driver.Cols);
@@ -451,7 +450,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         Application.Driver.FillRect (new (0, 0, 20, 10), (Rune)'B');
 
         // Resize back
-        AutoInitShutdownAttribute.FakeResize (new (80, 25));
+        Application.Driver?.SetScreenSize (80, 25);
 
         // Verify size is back
         Assert.Equal (80, Application.Driver.Cols);
@@ -480,7 +479,7 @@ public class FakeDriverTests (ITestOutputHelper output)
                                            };
 
         // Trigger resize using FakeResize which uses SetScreenSize internally
-        AutoInitShutdownAttribute.FakeResize (new (100, 30));
+        Application.Driver?.SetScreenSize (100, 30);
 
         // Verify event fired
         Assert.True (screenChangedFired);
@@ -503,7 +502,7 @@ public class FakeDriverTests (ITestOutputHelper output)
                                            };
 
         // Use FakeResize helper
-        AutoInitShutdownAttribute.FakeResize (new (120, 40));
+        Application.Driver?.SetScreenSize (120, 40);
 
         // Verify event fired
         Assert.True (screenChangedFired);
@@ -531,7 +530,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         Application.Driver.SizeChanged += (sender, args) => { screenChangedFired = true; };
 
         // Trigger resize using FakeResize
-        AutoInitShutdownAttribute.FakeResize (new (90, 35));
+        Application.Driver?.SetScreenSize (90, 35);
 
         // Both events should fire for compatibility
         Assert.True (sizeChangedFired);

@@ -10,7 +10,8 @@ public class ThicknessTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void DrawTests ()
     {
-        AutoInitShutdownAttribute.FakeResize(new Size(60, 60));
+        Application.Driver?.SetScreenSize (60, 40);
+
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (5, 5, 40, 15);
 
@@ -119,13 +120,14 @@ public class ThicknessTests (ITestOutputHelper output)
     public void DrawTests_Ruler ()
     {
         // Add a frame so we can see the ruler
-        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single};
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         var top = new Toplevel ();
         top.Add (f);
         RunState rs = Application.Begin (top);
 
-        AutoInitShutdownAttribute.FakeResize(new Size(45, 20));
+        Application.Driver?.SetScreenSize (45, 20);
+
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (2, 2, 40, 15);
 

@@ -1,22 +1,18 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.DrawingTests;
 
-public class RulerTests
+public class RulerTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public RulerTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void Draw_Default ()
     {
-        AutoInitShutdownAttribute.FakeResize(new Size(25, 25));
+        Application.Driver?.SetScreenSize (25, 25);
 
         var r = new Ruler ();
         r.Draw (Point.Empty);
-        DriverAssert.AssertDriverContentsWithFrameAre (@"", _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
     }
 
     [Fact]
@@ -34,7 +30,7 @@ public class RulerTests
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
 |123456789|1234",
-                                                       _output
+                                                       output
                                                       );
 
         // Postive offset
@@ -45,7 +41,7 @@ public class RulerTests
 |123456789|1234
  |123456789|1234
 ",
-                                              _output
+                                              output
                                              );
 
         // Negative offset
@@ -57,7 +53,7 @@ public class RulerTests
  |123456789|1234
 123456789|1234
 ",
-                                              _output
+                                              output
                                              );
     }
 
@@ -89,7 +85,7 @@ public class RulerTests
 2
 3
 4",
-                                                       _output
+                                                       output
                                                       );
 
         r.Draw (new (1, 1));
@@ -112,7 +108,7 @@ public class RulerTests
 32
 43
  4",
-                                                       _output
+                                                       output
                                                       );
 
         // Negative offset
@@ -136,7 +132,7 @@ public class RulerTests
 324
 43 
  4 ",
-                                                       _output
+                                                       output
                                                       );
     }
 }

@@ -22,5 +22,5 @@ public interface IConsoleDriverFacade
     ///     Interface for classes responsible for reporting the current
     ///     size of the terminal window.
     /// </summary>
-    IConsoleSizeMonitor WindowSizeMonitor { get; }
+    IConsoleSizeMonitor ConsoleSizeMonitor { get; }
 }

@@ -32,7 +32,14 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc />
     public override IConsoleOutput CreateOutput ()
     {
-        return _output ?? new FakeConsoleOutput ();
+        if (_output is { })
+        {
+            return _output;
+        }
+        FakeConsoleOutput output = new FakeConsoleOutput ();
+        //output.SetConsoleSize (80, 25);
+
+        return output;
     }
 
     /// <inheritdoc />
@@ -42,8 +49,9 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     }
 
     /// <inheritdoc />
-    public override IConsoleSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        return new FakeWindowSizeMonitor(consoleOutput, outputBuffer);
+        outputBuffer.SetSize(consoleOutput.GetSize().Width, consoleOutput.GetSize().Height);
+        return new ConsoleSizeMonitor (consoleOutput, outputBuffer);
     }
 }

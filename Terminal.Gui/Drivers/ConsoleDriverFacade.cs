@@ -18,7 +18,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public IInputProcessor InputProcessor { get; }
     public IOutputBuffer OutputBuffer => _outputBuffer;
 
-    public IConsoleSizeMonitor WindowSizeMonitor { get; }
+    public IConsoleSizeMonitor ConsoleSizeMonitor { get; }
 
 
     public ConsoleDriverFacade (
@@ -26,7 +26,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         IOutputBuffer outputBuffer,
         IConsoleOutput output,
         AnsiRequestScheduler ansiRequestScheduler,
-        IConsoleSizeMonitor windowSizeMonitor
+        IConsoleSizeMonitor sizeMonitor
     )
     {
         InputProcessor = inputProcessor;
@@ -42,8 +42,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                          MouseEvent?.Invoke (s, e);
                                      };
 
-        WindowSizeMonitor = windowSizeMonitor;
-        windowSizeMonitor.SizeChanged += (_,e) => 
+        ConsoleSizeMonitor = sizeMonitor;
+        sizeMonitor.SizeChanged += (_, e) =>
         {
             SizeChanged?.Invoke (this, e);
         };
@@ -93,7 +93,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                 return Rectangle.Empty;
             }
 
-            return new (new (0, 0), _output.GetWindowSize ());
+            return new (0, 0, _outputBuffer.Cols, _outputBuffer.Rows);
         }
     }
 
@@ -105,7 +105,9 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
     public virtual void SetScreenSize (int width, int height)
     {
-        throw new NotSupportedException ("SetScreenSize is only supported by FakeDriver for test scenarios.");
+        _outputBuffer.SetSize (width, height);
+        _output.SetSize (width, height);
+        SizeChanged?.Invoke(this, new (new (width, height)));
     }
 
     /// <summary>

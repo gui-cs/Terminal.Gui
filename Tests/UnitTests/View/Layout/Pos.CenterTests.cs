@@ -35,7 +35,7 @@ public class PosCenterTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, height));
+        Application.Driver!.SetScreenSize (20, height);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -182,7 +182,7 @@ public class PosCenterTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        AutoInitShutdownAttribute.FakeResize(new Size(width, 7));
+        Application.Driver!.SetScreenSize (width, 7);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 

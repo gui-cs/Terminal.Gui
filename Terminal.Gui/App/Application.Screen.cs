@@ -28,7 +28,6 @@ public static partial class Application // Screen related stuff; intended to hid
     /// <param name="screen">The new screen size and position.</param>
     public static void RaiseScreenChangedEvent (Rectangle screen)
     {
-
         Screen = new (Point.Empty, screen.Size);
 
         ScreenChanged?.Invoke (ApplicationImpl.Instance, new (screen));

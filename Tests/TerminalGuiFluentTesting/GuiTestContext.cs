@@ -24,7 +24,7 @@ public class GuiTestContext : IDisposable
     private readonly StringBuilder _logsSb;
     private readonly TestDriver _driver;
     private bool _finished;
-    private readonly FakeSizeMonitor _fakeSizeMonitor;
+    private readonly ConsoleSizeMonitor _fakeSizeMonitor;
     private readonly TimeSpan _timeout;
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
@@ -43,7 +43,7 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
-        _fakeSizeMonitor = new ();
+        _fakeSizeMonitor = new (_output, _output.LastBuffer!);
 
         IComponentFactory cf = driver == TestDriver.DotNet
                                    ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
@@ -238,11 +238,7 @@ public class GuiTestContext : IDisposable
         return WaitIteration (
                               () =>
                               {
-                                  _output.Size = new (width, height);
-                                  _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
-
-                                  var d = (IConsoleDriverFacade)Application.Driver!;
-                                  d.OutputBuffer.SetWindowSize (width, height);
+                                  Application.Driver!.SetScreenSize(width, height);
                               });
     }
 
@@ -938,48 +934,27 @@ public class GuiTestContext : IDisposable
     public Point GetCursorPosition () { return _output.CursorPosition; }
 }
 
-internal class FakeWindowsComponentFactory : WindowsComponentFactory
+internal class FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, ConsoleSizeMonitor fakeSizeMonitor)
+    : WindowsComponentFactory
 {
-    private readonly FakeWindowsInput _winInput;
-    private readonly FakeOutput _output;
-    private readonly FakeSizeMonitor _fakeSizeMonitor;
-
-    public FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
-    {
-        _winInput = winInput;
-        _output = output;
-        _fakeSizeMonitor = fakeSizeMonitor;
-    }
+    /// <inheritdoc/>
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return winInput; }
 
     /// <inheritdoc/>
-    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return _winInput; }
+    public override IConsoleOutput CreateOutput () { return output; }
 
     /// <inheritdoc/>
-    public override IConsoleOutput CreateOutput () { return _output; }
-
-    /// <inheritdoc/>
-    public override IConsoleSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return fakeSizeMonitor; }
 }
 
-internal class FakeNetComponentFactory : NetComponentFactory
+internal class FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, ConsoleSizeMonitor fakeSizeMonitor) : NetComponentFactory
 {
-    private readonly FakeNetInput _netInput;
-    private readonly FakeOutput _output;
-    private readonly FakeSizeMonitor _fakeSizeMonitor;
-
-    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
-    {
-        _netInput = netInput;
-        _output = output;
-        _fakeSizeMonitor = fakeSizeMonitor;
-    }
+    /// <inheritdoc/>
+    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return netInput; }
 
     /// <inheritdoc/>
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return _netInput; }
+    public override IConsoleOutput CreateOutput () { return output; }
 
     /// <inheritdoc/>
-    public override IConsoleOutput CreateOutput () { return _output; }
-
-    /// <inheritdoc/>
-    public override IConsoleSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return fakeSizeMonitor; }
 }

@@ -40,26 +40,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-        // Check if this is a request for a legacy driver (like FakeDriver)
-        // that isn't supported by the modern application architecture
-        if (driver is null)
-        {
-            var driverNameToCheck = string.IsNullOrWhiteSpace (driverName) ? ForceDriver : driverName;
-            if (!string.IsNullOrEmpty (driverNameToCheck))
-            {
-                (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
-                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (driverNameToCheck, StringComparison.InvariantCultureIgnoreCase));
-
-                // If it's a legacy IConsoleDriver (not a Facade), use InternalInit which supports legacy drivers
-                if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
-                {
-                    InternalInit (driver, driverName);
-                    return;
-                }
-            }
-        }
-
-        // Otherwise delegate to the ApplicationImpl instance (which uses the modern architecture)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
@@ -67,96 +47,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     {
         get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
         set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
-    }
-
-    // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
-    //
-    // Called from:
-    //
-    // Init() - When the user wants to use the default Toplevel. calledViaRunT will be false, causing all state to be reset.
-    // Run<T>() - When the user wants to use a custom Toplevel. calledViaRunT will be true, enabling Run<T>() to be called without calling Init first.
-    // Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
-    //
-    // calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    internal static void InternalInit (
-        IConsoleDriver? driver = null,
-        string? driverName = null,
-        bool calledViaRunT = false
-    )
-    {
-        if (Initialized && driver is null)
-        {
-            return;
-        }
-
-        if (Initialized)
-        {
-            throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
-        }
-
-        if (!calledViaRunT)
-        {
-            // Reset all class variables (Application is a singleton).
-            ResetState (ignoreDisposed: true);
-        }
-
-        // For UnitTests
-        if (driver is { })
-        {
-            Driver = driver;
-        }
-
-        // Ignore Configuration for ForceDriver if driverName is specified
-        if (!string.IsNullOrEmpty (driverName))
-        {
-            ForceDriver = driverName;
-        }
-
-        // Check if we need to use a legacy driver (like FakeDriver)
-        // or go through the modern application architecture
-        if (Driver is null)
-        {
-            ApplicationImpl.Instance.Init (driver, driverName);
-            Debug.Assert (Driver is { });
-            return;
-        }
-
-        Debug.Assert (Navigation is null);
-        Navigation = new ();
-
-        Debug.Assert (Popover is null);
-        Popover = new ();
-
-        try
-        {
-            Driver!.Init ();
-            SubscribeDriverEvents ();
-        }
-        catch (InvalidOperationException ex)
-        {
-            // This is a case where the driver is unable to initialize the console.
-            // This can happen if the console is already in use by another process or
-            // if running in unit tests.
-            // In this case, we want to throw a more specific exception.
-            throw new InvalidOperationException (
-                                                 "Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.",
-                                                 ex
-                                                );
-        }
-
-        SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
-
-        // TODO: This is probably not needed
-        if (Popover.GetActivePopover () is View popover)
-        {
-            popover.Visible = false;
-        }
-
-        MainThreadId = Thread.CurrentThread.ManagedThreadId;
-        bool init = Initialized = true;
-        InitializedChanged?.Invoke (null, new (init));
     }
 
     internal static void SubscribeDriverEvents ()

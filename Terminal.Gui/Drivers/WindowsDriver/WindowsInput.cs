@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿#nullable enable
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using static Terminal.Gui.Drivers.WindowsConsole;
 
@@ -66,13 +67,13 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
             return false;
         }
 
-        const int bufferSize = 1; // We only need to check if there's at least one event
-        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
+        const int BUFFER_SIZE = 1; // We only need to check if there's at least one event
+        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
 
         try
         {
             // Use PeekConsoleInput to inspect the input buffer without removing events
-            if (PeekConsoleInput (_inputHandle, pRecord, bufferSize, out uint numberOfEventsRead))
+            if (PeekConsoleInput (_inputHandle, pRecord, BUFFER_SIZE, out uint numberOfEventsRead))
             {
                 // Return true if there's at least one event in the buffer
                 return numberOfEventsRead > 0;
@@ -86,7 +87,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
         catch (Exception ex)
         {
             // Optionally log the exception
-            Console.WriteLine ($"Error in Peek: {ex.Message}");
+            Console.WriteLine (@$"Error in Peek: {ex.Message}");
 
             return false;
         }
@@ -99,15 +100,15 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 
     protected override IEnumerable<InputRecord> Read ()
     {
-        const int bufferSize = 1;
-        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
+        const int BUFFER_SIZE = 1;
+        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
 
         try
         {
             ReadConsoleInput (
                               _inputHandle,
                               pRecord,
-                              bufferSize,
+                              BUFFER_SIZE,
                               out uint numberEventsRead);
 
             return numberEventsRead == 0

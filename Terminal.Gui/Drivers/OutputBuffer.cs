@@ -365,7 +365,7 @@ public class OutputBuffer : IOutputBuffer
     }
 
     /// <inheritdoc/>
-    public void SetWindowSize (int cols, int rows)
+    public void SetSize (int cols, int rows)
     {
         Cols = cols;
         Rows = rows;

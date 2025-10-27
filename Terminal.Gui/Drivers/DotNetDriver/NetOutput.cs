@@ -35,7 +35,7 @@ public class NetOutput : OutputBase, IConsoleOutput
 
 
     /// <inheritdoc/>
-    public Size GetWindowSize ()
+    public Size GetSize ()
     {
         if (ConsoleDriver.RunningUnitTests)
         {
@@ -48,6 +48,12 @@ public class NetOutput : OutputBase, IConsoleOutput
 
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
+
+    /// <inheritdoc />
+    public void SetSize (int width, int height)
+    {
+        throw new NotImplementedException ();
+    }
 
     private Point? _lastCursorPosition;
 

@@ -44,7 +44,9 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     when the application is done.
     /// </remarks>
 #pragma warning disable CS0067 // Event is never used
+#pragma warning disable CS0414 // Event is never used
     public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
+#pragma warning restore CS0414 // Event is never used
 #pragma warning restore CS0067 // Event is never used
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>

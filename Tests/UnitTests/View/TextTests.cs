@@ -121,7 +121,7 @@ Y
         top.Add (win);
 
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(15, 15))   ;
+        Application.Driver!.SetScreenSize (15, 15);
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
         Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
@@ -386,7 +386,7 @@ Y
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(4, 10));
+        Application.Driver!.SetScreenSize (4, 10);
 
         Assert.Equal (5, text.Length);
 
@@ -511,7 +511,7 @@ w ";
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 20));
+        Application.Driver!.SetScreenSize (20, 20);
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -599,7 +599,7 @@ w ";
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(22, 22));
+        Application.Driver!.SetScreenSize (22, 22);
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -783,7 +783,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size(width + 2, 6));
+        Application.Driver!.SetScreenSize (width + 2, 6);
 
         // frame.Width is width + border wide (20 + 2) and 6 high
 
@@ -913,7 +913,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(9, height + 2));
+        Application.Driver!.SetScreenSize (9, height + 2);
 
         if (autoSize)
         {
@@ -998,7 +998,7 @@ w ";
     [SetupFakeDriver]
     public void Narrow_Wide_Runes ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (32, 32);
+        Application.Driver!.SetScreenSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
 
         var text = $"First line{Environment.NewLine}Second line";
