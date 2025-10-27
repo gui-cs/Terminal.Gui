@@ -401,4 +401,151 @@ public class FakeDriverTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region Resize Behavior Tests
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Resize_Fires_SizeChanged_Event ()
+    {
+        // Track if the event was fired
+        bool eventFired = false;
+        Size? newSize = null;
+
+        // Subscribe to the SizeChanged event
+        Application.Driver!.SizeChanged += (sender, args) =>
+        {
+            eventFired = true;
+            newSize = args.Size;
+        };
+
+        // Perform a resize
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
+        // Verify the event was fired with correct size
+        Assert.True (eventFired, "SizeChanged event should have been fired");
+        Assert.NotNull (newSize);
+        Assert.Equal (100, newSize.Value.Width);
+        Assert.Equal (30, newSize.Value.Height);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Resize_Updates_Screen_Property ()
+    {
+        // Initial screen size
+        var initialScreen = Application.Screen;
+        Assert.Equal (new Rectangle (0, 0, 80, 25), initialScreen);
+
+        // Resize to 120x40
+        AutoInitShutdownAttribute.FakeResize (new Size (120, 40));
+
+        // Verify Screen property is updated
+        var newScreen = Application.Screen;
+        Assert.Equal (new Rectangle (0, 0, 120, 40), newScreen);
+        
+        // Verify it matches driver's reported size
+        Assert.Equal (Application.Driver!.Cols, newScreen.Width);
+        Assert.Equal (Application.Driver.Rows, newScreen.Height);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Resize_Clears_Contents ()
+    {
+        Application.Top = new Toplevel ();
+        
+        var label = new Label { Text = "Test Content", X = 0, Y = 0 };
+        Application.Top!.Add (label);
+        
+        Application.Begin (Application.Top);
+        AutoInitShutdownAttribute.RunIteration ();
+
+        // Get initial contents
+        var driver = Application.Driver!;
+        var initialContents = driver.Contents;
+        Assert.NotNull (initialContents);
+        
+        int initialRows = initialContents.GetLength (0);
+        int initialCols = initialContents.GetLength (1);
+
+        // Resize
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
+        // Verify contents buffer was resized
+        var newContents = driver.Contents;
+        Assert.NotNull (newContents);
+        
+        int newRows = newContents.GetLength (0);
+        int newCols = newContents.GetLength (1);
+        
+        Assert.NotEqual (initialRows, newRows);
+        Assert.NotEqual (initialCols, newCols);
+        Assert.Equal (30, newRows);
+        Assert.Equal (100, newCols);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Multiple_Resize_Events_All_Fire ()
+    {
+        int eventCount = 0;
+        List<Size> eventSizes = new ();
+
+        // Subscribe to the SizeChanged event
+        Application.Driver!.SizeChanged += (sender, args) =>
+        {
+            eventCount++;
+            if (args.Size.HasValue)
+            {
+                eventSizes.Add (args.Size.Value);
+            }
+        };
+
+        // Perform multiple resizes
+        var sizes = new[] 
+        { 
+            new Size (90, 27),
+            new Size (110, 35),
+            new Size (95, 28)
+        };
+
+        foreach (var size in sizes)
+        {
+            AutoInitShutdownAttribute.FakeResize (size);
+        }
+
+        // Verify all events were fired
+        Assert.Equal (sizes.Length, eventCount);
+        Assert.Equal (sizes.Length, eventSizes.Count);
+        
+        for (int i = 0; i < sizes.Length; i++)
+        {
+            Assert.Equal (sizes [i], eventSizes [i]);
+        }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Resize_To_Same_Size_Still_Fires_Event ()
+    {
+        int eventCount = 0;
+
+        // Subscribe to the SizeChanged event
+        Application.Driver!.SizeChanged += (sender, args) =>
+        {
+            eventCount++;
+        };
+
+        // Get current size
+        var currentSize = new Size (Application.Driver.Cols, Application.Driver.Rows);
+
+        // Resize to the same size
+        AutoInitShutdownAttribute.FakeResize (currentSize);
+
+        // Event should still fire even though size hasn't changed
+        Assert.Equal (1, eventCount);
+    }
+
+    #endregion
 }
