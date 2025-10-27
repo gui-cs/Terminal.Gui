@@ -32,7 +32,7 @@ public class CheckBox : View
         // Hotkey - Advance state and raise Select event - DO NOT raise Accept
         AddCommand (Command.HotKey, ctx =>
                                     {
-                                        if (RaiseHandlingHotKey () is true)
+                                        if (RaiseHandlingHotKey (ctx) is true)
                                         {
                                             return true;
                                         }
