@@ -37,8 +37,9 @@ public class TextField : View, IDesignable
         Used = true;
         WantMousePositionReports = true;
 
-        // Enable hotkey support for Title (caption)
-        HotKeySpecifier = new ('_');
+        // Disable hotkey functionality (Title is only used as caption/placeholder, not as a hotkey)
+        // But we still render hotkey formatting (underline) in RenderCaption
+        HotKeySpecifier = new ('\xffff');
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -1699,6 +1700,10 @@ public class TextField : View, IDesignable
             TitleTextFormatter.Text = Title;
         }
 
+        // Temporarily enable hotkey formatting for visual display (but not for actual hotkey functionality)
+        Rune savedHotKeySpecifier = TitleTextFormatter.HotKeySpecifier;
+        TitleTextFormatter.HotKeySpecifier = new ('_');
+
         Attribute captionAttribute = new Attribute (
                                                     GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
                                                     GetAttributeForRole (VisualRole.Editable).Background);
@@ -1711,6 +1716,9 @@ public class TextField : View, IDesignable
         TitleTextFormatter.Draw (ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
                                                   captionAttribute,
                                                   hotKeyAttribute);
+
+        // Restore the original HotKeySpecifier
+        TitleTextFormatter.HotKeySpecifier = savedHotKeySpecifier;
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
