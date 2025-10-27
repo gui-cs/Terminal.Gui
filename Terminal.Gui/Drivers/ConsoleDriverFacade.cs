@@ -55,7 +55,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         if (FakeDriver.FakeBehaviors.UseFakeClipboard)
         {
-            Clipboard = new FakeDriver.FakeClipboard (
+            Clipboard = new FakeClipboard (
                 FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
                 FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 
@@ -78,7 +78,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         }
         else
         {
-            Clipboard = new FakeDriver.FakeClipboard ();
+            Clipboard = new FakeClipboard ();
         }
     }
 
@@ -120,7 +120,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>Get the operating system clipboard.</summary>
-    public IClipboard Clipboard { get; private set; } = new FakeDriver.FakeClipboard ();
+    public IClipboard Clipboard { get; private set; } = new FakeClipboard ();
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -390,25 +390,19 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
-    /// <param name="c">C.</param>
-    public Attribute SetAttribute (Attribute c) { return _outputBuffer.CurrentAttribute = c; }
+    /// <param name="newAttribute">C.</param>
+    /// <returns>The previously set Attribute.</returns>
+    public Attribute SetAttribute (Attribute newAttribute)
+    {
+        Attribute currentAttribute = _outputBuffer.CurrentAttribute;
+        _outputBuffer.CurrentAttribute = newAttribute;
+
+        return currentAttribute;
+    }
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return _outputBuffer.CurrentAttribute; }
-
-    /// <summary>Makes an <see cref="Attribute"/>.</summary>
-    /// <param name="foreground">The foreground color.</param>
-    /// <param name="background">The background color.</param>
-    /// <returns>The attribute for the foreground and background colors.</returns>
-    public Attribute MakeColor (in Color foreground, in Color background)
-    {
-        // TODO: what even is this? why Attribute constructor wants to call Driver method which must return an instance of Attribute? ?!?!?!
-        return new (
-                    foreground,
-                    background
-                   );
-    }
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;

@@ -628,20 +628,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return CurrentAttribute; }
-
-    /// <summary>Makes an <see cref="Attribute"/>.</summary>
-    /// <param name="foreground">The foreground color.</param>
-    /// <param name="background">The background color.</param>
-    /// <returns>The attribute for the foreground and background colors.</returns>
-    public virtual Attribute MakeColor (in Color foreground, in Color background)
-    {
-        // Encode the colors into the int value.
-        return new (
-                    foreground,
-                    background
-                   );
-    }
-
+    
     #endregion Color Handling
 
     #region Mouse Handling

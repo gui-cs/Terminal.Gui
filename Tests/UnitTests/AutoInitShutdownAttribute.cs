@@ -26,7 +26,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="useFakeClipboard">
-    ///     If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. Only valid if
+    ///     If true, will force the use of <see cref="FakeClipboard"/>. Only valid if
     ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">

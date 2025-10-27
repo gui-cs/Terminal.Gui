@@ -7,7 +7,6 @@ namespace UnitTests.DriverTests;
 
 public class EscSeqUtilsTests
 {
-    private bool _actionStarted;
     private MouseFlags _arg1;
     private Point _arg2;
     private string _c1Control, _code, _terminating;
@@ -1577,6 +1576,5 @@ public class EscSeqUtilsTests
     {
         _arg1 = arg1;
         _arg2 = arg2;
-        _actionStarted = true;
     }
 }

@@ -451,7 +451,7 @@ public class UICatalog
             scenario.StartBenchmark ();
         }
 
-        Application.Init (driverName: _forceDriver);
+        Application.ForceDriver = _forceDriver!;
 
         scenario.Main ();
 

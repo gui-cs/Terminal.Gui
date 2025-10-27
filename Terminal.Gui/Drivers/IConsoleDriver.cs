@@ -240,12 +240,6 @@ public interface IConsoleDriver
     /// <returns>The current attribute.</returns>
     Attribute GetAttribute ();
 
-    /// <summary>Makes an <see cref="Attribute"/>.</summary>
-    /// <param name="foreground">The foreground color.</param>
-    /// <param name="background">The background color.</param>
-    /// <returns>The attribute for the foreground and background colors.</returns>
-    Attribute MakeColor (in Color foreground, in Color background);
-
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<MouseEventArgs>? MouseEvent;
 

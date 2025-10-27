@@ -699,7 +699,6 @@ public class ToplevelTests
 
         Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
-        var firstIteration = false;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (window.Border, Application.Mouse.MouseGrabView);
 
@@ -711,7 +710,6 @@ public class ToplevelTests
                                          ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                      });
 
-        firstIteration = false;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (window.Border, Application.Mouse.MouseGrabView);
         Assert.Equal (new (1, 1, 10, 3), window.Frame);

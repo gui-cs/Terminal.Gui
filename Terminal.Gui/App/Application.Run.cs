@@ -43,7 +43,9 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
     ///     when the application is done.
     /// </remarks>
+#pragma warning disable CS0067 // Event is never used
     public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
+#pragma warning restore CS0067 // Event is never used
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
     /// <returns>
