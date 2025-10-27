@@ -94,7 +94,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             return false;
         }
 
-        if (RaiseHandlingHotKey () == true)
+        if (RaiseHandlingHotKey (ctx) == true)
         {
             return true;
         }
