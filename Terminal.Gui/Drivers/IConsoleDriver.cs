@@ -213,12 +213,6 @@ public interface IConsoleDriver
     /// The event fired when the screen changes (size, position, etc.).
     /// <see cref="Screen"/> is the source of truth for screen dimensions.
     /// </summary>
-    event EventHandler<SizeChangedEventArgs>? ScreenChanged;
-
-    /// <summary>
-    /// The event fired when the terminal is resized.
-    /// </summary>
-    [Obsolete ("Use ScreenChanged instead. This event is deprecated and will be removed in a future version.")]
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>

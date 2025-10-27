@@ -32,7 +32,7 @@ public class FakeApplicationFactory
         // Handle different facade types - cast to common interface instead
         var d = (IConsoleDriverFacade)Application.Driver!;
 
-        sizeMonitor.SizeChanging += (_, e) =>
+        sizeMonitor.SizeChanged += (_, e) =>
                                     {
                                         if (e.Size != null)
                                         {

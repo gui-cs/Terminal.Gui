@@ -428,7 +428,7 @@ public class FakeDriver : ConsoleDriver
     {
         ResizeScreen ();
         ClearContents ();
-        OnScreenChanged (new SizeChangedEventArgs (new (Cols, Rows)));
+        OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 
     public virtual void ResizeScreen ()

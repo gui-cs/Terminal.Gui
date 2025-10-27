@@ -149,10 +149,6 @@ internal class MockConsoleDriver : IConsoleDriver
     public bool SetCursorVisibility (CursorVisibility visibility) { throw new NotImplementedException (); }
 
     /// <inheritdoc />
-    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
-
-    /// <inheritdoc />
-    [Obsolete ("Use ScreenChanged instead.")]
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc />

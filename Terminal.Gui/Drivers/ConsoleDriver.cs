@@ -522,28 +522,16 @@ public abstract class ConsoleDriver : IConsoleDriver
     }
 
     /// <summary>
-    /// Called when the terminal screen changes (size, position, etc.). Fires the <see cref="ScreenChanged"/> event.
+    /// Called when the terminal screen changes (size, position, etc.). Fires the <see cref="SizeChanged"/> event.
     /// <see cref="Screen"/> reflects the source of truth for screen dimensions.
     /// <see cref="Cols"/> and <see cref="Rows"/> are derived from <see cref="Screen"/> and are read-only.
     /// </summary>
     /// <param name="args">Event arguments containing the new screen size.</param>
-    public void OnScreenChanged (SizeChangedEventArgs args) 
+    public void OnSizeChanged (SizeChangedEventArgs args) 
     { 
-        ScreenChanged?.Invoke (this, args);
-        // Also fire the obsolete event for backwards compatibility
         SizeChanged?.Invoke (this, args);
     }
 
-    /// <summary>
-    /// Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.
-    /// </summary>
-    /// <param name="args">Event arguments containing the new size.</param>
-    [Obsolete ("Use OnScreenChanged instead. This method is deprecated and will be removed in a future version.")]
-    public void OnSizeChanged (SizeChangedEventArgs args) 
-    { 
-        // Forward to the new method
-        OnScreenChanged (args);
-    }
 
     /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
     public void Refresh ()
@@ -569,12 +557,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <see cref="Screen"/> is the source of truth for screen dimensions.
     /// <see cref="Cols"/> and <see cref="Rows"/> are read-only and derived from <see cref="Screen"/>.
     /// </summary>
-    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
-
-    /// <summary>
-    /// The event fired when the terminal is resized.
-    /// </summary>
-    [Obsolete ("Use ScreenChanged instead. This event is deprecated and will be removed in a future version.")]
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     #endregion Cursor Handling

@@ -13,10 +13,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <summary>
     /// The event fired when the screen changes (size, position, etc.).
     /// </summary>
-    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
-
-    /// <summary>The event fired when the terminal is resized.</summary>
-    [Obsolete ("Use ScreenChanged instead. This event is deprecated and will be removed in a future version.")]
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
@@ -47,9 +43,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                      };
 
         WindowSizeMonitor = windowSizeMonitor;
-        windowSizeMonitor.SizeChanging += (_,e) => 
+        windowSizeMonitor.SizeChanged += (_,e) => 
         {
-            ScreenChanged?.Invoke (this, e);
             SizeChanged?.Invoke (this, e);
         };
 

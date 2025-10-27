@@ -257,7 +257,7 @@ public static partial class Application
 
         // Keyboard events and bindings are now managed by the Keyboard instance
 
-        SizeChanging = null;
+        ScreenChanged = null;
 
         Navigation = null;
 

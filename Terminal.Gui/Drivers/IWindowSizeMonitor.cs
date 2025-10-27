@@ -9,10 +9,10 @@ namespace Terminal.Gui.Drivers;
 public interface IWindowSizeMonitor
 {
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
-    event EventHandler<SizeChangedEventArgs>? SizeChanging;
+    event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>
-    ///     Examines the current size of the terminal and raises <see cref="SizeChanging"/> if it is different
+    ///     Examines the current size of the terminal and raises <see cref="SizeChanged"/> if it is different
     ///     from last inspection.
     /// </summary>
     /// <returns></returns>

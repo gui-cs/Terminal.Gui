@@ -476,7 +476,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         bool screenChangedFired = false;
         Size? newSize = null;
 
-        Application.Driver!.ScreenChanged += (sender, args) =>
+        Application.Driver!.SizeChanged += (sender, args) =>
         {
             screenChangedFired = true;
             newSize = args.Size;
@@ -499,7 +499,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         bool screenChangedFired = false;
         Size? eventSize = null;
 
-        Application.Driver!.ScreenChanged += (sender, args) =>
+        Application.Driver!.SizeChanged += (sender, args) =>
         {
             screenChangedFired = true;
             eventSize = args.Size;
@@ -534,7 +534,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         };
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        Application.Driver.ScreenChanged += (sender, args) =>
+        Application.Driver.SizeChanged += (sender, args) =>
         {
             screenChangedFired = true;
         };

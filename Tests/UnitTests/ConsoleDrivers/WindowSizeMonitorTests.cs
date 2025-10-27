@@ -27,7 +27,7 @@ public class WindowSizeMonitorTests
         var monitor = new WindowSizeMonitor (consoleOutput.Object, outputBuffer);
 
         var result = new List<SizeChangedEventArgs> ();
-        monitor.SizeChanging += (s, e) => { result.Add (e);};
+        monitor.SizeChanged += (s, e) => { result.Add (e);};
 
         Assert.Empty (result);
         monitor.Poll ();
@@ -60,7 +60,7 @@ public class WindowSizeMonitorTests
         var monitor = new WindowSizeMonitor (consoleOutput.Object, outputBuffer);
 
         var result = new List<SizeChangedEventArgs> ();
-        monitor.SizeChanging += (s, e) => { result.Add (e); };
+        monitor.SizeChanged += (s, e) => { result.Add (e); };
 
         // First poll always raises event because going from unknown size i.e. 0,0
         Assert.Empty (result);

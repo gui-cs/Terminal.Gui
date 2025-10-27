@@ -49,7 +49,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
             {
                 (List<Type?> drivers, List<string?> driverTypeNames) = GetDriverTypes ();
                 Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (driverNameToCheck, StringComparison.InvariantCultureIgnoreCase));
-                
+
                 // If it's a legacy IConsoleDriver (not a Facade), use InternalInit which supports legacy drivers
                 if (driverType is { } && !typeof (IConsoleDriverFacade).IsAssignableFrom (driverType))
                 {
@@ -58,7 +58,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
                 }
             }
         }
-        
+
         // Otherwise delegate to the ApplicationImpl instance (which uses the modern architecture)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
@@ -163,7 +163,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     {
         ArgumentNullException.ThrowIfNull (Driver);
 
-        Driver.ScreenChanged += Driver_SizeChanged;
+        Driver.SizeChanged += Driver_SizeChanged;
         Driver.KeyDown += Driver_KeyDown;
         Driver.KeyUp += Driver_KeyUp;
         Driver.MouseEvent += Driver_MouseEvent;
@@ -173,13 +173,16 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     {
         ArgumentNullException.ThrowIfNull (Driver);
 
-        Driver.ScreenChanged -= Driver_SizeChanged;
+        Driver.SizeChanged -= Driver_SizeChanged;
         Driver.KeyDown -= Driver_KeyDown;
         Driver.KeyUp -= Driver_KeyUp;
         Driver.MouseEvent -= Driver_MouseEvent;
     }
 
-    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
+    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e)
+    {
+        RaiseScreenChangedEvent (new Rectangle (new (0, 0), e.Size!.Value));
+    }
     private static void Driver_KeyDown (object? sender, Key e) { RaiseKeyDownEvent (e); }
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
