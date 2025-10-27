@@ -37,9 +37,8 @@ public class TextField : View, IDesignable
         Used = true;
         WantMousePositionReports = true;
 
-        // Disable hotkey functionality (Title is only used as caption/placeholder, not as a hotkey)
-        // But we still render hotkey formatting (underline) in RenderCaption
-        HotKeySpecifier = new ('\xffff');
+        // Enable hotkey support for Title (caption) - but only Alt+key, not bare key
+        HotKeySpecifier = new ('_');
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -401,6 +400,95 @@ public class TextField : View, IDesignable
 
         CreateContextMenu ();
         KeyBindings.Add (ContextMenu.Key, Command.Context);
+    }
+
+    /// <summary>
+    ///     Overrides the default hotkey behavior to only bind Alt+key, not the bare key.
+    ///     This allows users to type normally without hotkey interception.
+    /// </summary>
+    public override bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, object? context = null)
+    {
+        if (HotKey == hotKey)
+        {
+            return false;
+        }
+
+        Key newKey = hotKey;
+        Key baseKey = newKey.NoAlt.NoShift.NoCtrl;
+
+        if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune)))
+        {
+            throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
+        }
+
+        if (newKey != baseKey)
+        {
+            if (newKey.IsCtrl)
+            {
+                throw new ArgumentException (@$"HotKey does not support CtrlMask ({hotKey}).");
+            }
+
+            // Strip off the shift mask if it's A...Z
+            if (baseKey.IsKeyCodeAtoZ)
+            {
+                newKey = newKey.NoShift;
+            }
+
+            // Strip off the Alt mask
+            newKey = newKey.NoAlt;
+        }
+
+        // Remove base version
+        if (HotKeyBindings.TryGet (prevHotKey, out _))
+        {
+            HotKeyBindings.Remove (prevHotKey);
+        }
+
+        // Remove the Alt version
+        if (HotKeyBindings.TryGet (prevHotKey.WithAlt, out _))
+        {
+            HotKeyBindings.Remove (prevHotKey.WithAlt);
+        }
+
+        if (HotKey.IsKeyCodeAtoZ)
+        {
+            // Remove the shift version
+            if (HotKeyBindings.TryGet (prevHotKey.WithShift, out _))
+            {
+                HotKeyBindings.Remove (prevHotKey.WithShift);
+            }
+
+            // Remove alt | shift version
+            if (HotKeyBindings.TryGet (prevHotKey.WithShift.WithAlt, out _))
+            {
+                HotKeyBindings.Remove (prevHotKey.WithShift.WithAlt);
+            }
+        }
+
+        // Add only Alt+key binding (not the bare key) for TextField
+        if (newKey != Key.Empty)
+        {
+            KeyBinding keyBinding = new ()
+            {
+                Commands = [Command.HotKey],
+                Key = newKey,
+                Data = context
+            };
+
+            // Only add Alt+key bindings, NOT the base key
+            // This allows normal typing without hotkey interception
+            HotKeyBindings.Remove (newKey.WithAlt);
+            HotKeyBindings.Add (newKey.WithAlt, keyBinding);
+
+            // If the Key is A..Z, also add Alt+Shift
+            if (newKey.IsKeyCodeAtoZ)
+            {
+                HotKeyBindings.Remove (newKey.WithShift.WithAlt);
+                HotKeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -1700,10 +1788,6 @@ public class TextField : View, IDesignable
             TitleTextFormatter.Text = Title;
         }
 
-        // Temporarily enable hotkey formatting for visual display (but not for actual hotkey functionality)
-        Rune savedHotKeySpecifier = TitleTextFormatter.HotKeySpecifier;
-        TitleTextFormatter.HotKeySpecifier = new ('_');
-
         Attribute captionAttribute = new Attribute (
                                                     GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
                                                     GetAttributeForRole (VisualRole.Editable).Background);
@@ -1716,9 +1800,6 @@ public class TextField : View, IDesignable
         TitleTextFormatter.Draw (ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
                                                   captionAttribute,
                                                   hotKeyAttribute);
-
-        // Restore the original HotKeySpecifier
-        TitleTextFormatter.HotKeySpecifier = savedHotKeySpecifier;
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
