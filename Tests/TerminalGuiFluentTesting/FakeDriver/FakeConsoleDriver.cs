@@ -34,17 +34,7 @@ internal class FakeConsoleDriver : ConsoleDriverFacade<ConsoleKeyInfo>, IFakeCon
         OutputBuffer = outputBuffer;
         ConsoleOutput = fakeOutput1 = fakeOutput;
 
-        SizeChanged += (_, e) =>
-                       {
-                           if (e.Size != null)
-                           {
-                               Size s = e.Size.Value;
-                               fakeOutput1.Size = s;
-                               OutputBuffer.SetWindowSize (s.Width, s.Height);
-                           }
-                       };
-        
-        // Also subscribe to ScreenChanged to handle the new event
+        // Subscribe to ScreenChanged event
         ScreenChanged += (_, e) =>
                          {
                              if (e.Size != null)

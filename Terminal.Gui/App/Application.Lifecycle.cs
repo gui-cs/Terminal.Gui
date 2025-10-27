@@ -163,7 +163,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     {
         ArgumentNullException.ThrowIfNull (Driver);
 
-        Driver.SizeChanged += Driver_SizeChanged;
+        Driver.ScreenChanged += Driver_SizeChanged;
         Driver.KeyDown += Driver_KeyDown;
         Driver.KeyUp += Driver_KeyUp;
         Driver.MouseEvent += Driver_MouseEvent;
@@ -173,7 +173,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     {
         ArgumentNullException.ThrowIfNull (Driver);
 
-        Driver.SizeChanged -= Driver_SizeChanged;
+        Driver.ScreenChanged -= Driver_SizeChanged;
         Driver.KeyDown -= Driver_KeyDown;
         Driver.KeyUp -= Driver_KeyUp;
         Driver.MouseEvent -= Driver_MouseEvent;
