@@ -441,7 +441,7 @@ public class FakeDriverTests (ITestOutputHelper output)
         bool eventFired = false;
         Size? newSize = null;
 
-        // Subscribe to SizeChanged which forwards to ScreenChanged in ConsoleDriver
+        // Subscribe to deprecated SizeChanged event (which forwards to the new ScreenChanged event)
         Application.Driver!.SizeChanged += (sender, args) =>
         {
             eventFired = true;
@@ -473,8 +473,8 @@ public class FakeDriverTests (ITestOutputHelper output)
         AutoInitShutdownAttribute.RunIteration ();
 
         // Act - Perform multiple resizes
-        var sizes = new[] 
-        { 
+        var sizes = new[]
+        {
             new Size (100, 30),
             new Size (80, 25),
             new Size (120, 40),
