@@ -401,4 +401,103 @@ public class FakeDriverTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region ScreenChanged Event Tests
+
+    [Fact]
+    [AutoInitShutdown]
+    public void SetScreenSize_Fires_ScreenChanged_Event ()
+    {
+        // Arrange
+        bool eventFired = false;
+        Size? newSize = null;
+
+        if (Application.Driver is FakeDriver fakeDriver)
+        {
+            ((ConsoleDriver)fakeDriver).ScreenChanged += (sender, args) =>
+            {
+                eventFired = true;
+                newSize = args.Size;
+            };
+
+            // Act
+            fakeDriver.SetScreenSize (100, 40);
+
+            // Assert
+            Assert.True (eventFired);
+            Assert.NotNull (newSize);
+            Assert.Equal (100, newSize.Value.Width);
+            Assert.Equal (40, newSize.Value.Height);
+            Assert.Equal (100, Application.Driver!.Cols);
+            Assert.Equal (40, Application.Driver.Rows);
+        }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeResize_Fires_ScreenChanged_Event_And_Updates_Screen ()
+    {
+        // Arrange
+        bool eventFired = false;
+        Size? newSize = null;
+
+        // Subscribe to SizeChanged which forwards to ScreenChanged in ConsoleDriver
+        Application.Driver!.SizeChanged += (sender, args) =>
+        {
+            eventFired = true;
+            newSize = args.Size;
+        };
+
+        // Act
+        AutoInitShutdownAttribute.FakeResize (new Size (90, 35));
+
+        // Assert
+        Assert.True (eventFired);
+        Assert.NotNull (newSize);
+        Assert.Equal (90, newSize.Value.Width);
+        Assert.Equal (35, newSize.Value.Height);
+        Assert.Equal (90, Application.Driver.Cols);
+        Assert.Equal (35, Application.Driver.Rows);
+        Assert.Equal (new Rectangle (0, 0, 90, 35), Application.Screen);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Multiple_Resizes_Maintain_Buffer_Integrity ()
+    {
+        // Arrange
+        Application.Top = new Toplevel ();
+        var label = new Label { Text = "Test Label", X = 5, Y = 5 };
+        Application.Top.Add (label);
+        Application.Begin (Application.Top);
+        AutoInitShutdownAttribute.RunIteration ();
+
+        // Act - Perform multiple resizes
+        var sizes = new[] 
+        { 
+            new Size (100, 30),
+            new Size (80, 25),
+            new Size (120, 40),
+            new Size (60, 20),
+            new Size (100, 30)
+        };
+
+        foreach (Size size in sizes)
+        {
+            AutoInitShutdownAttribute.FakeResize (size);
+            AutoInitShutdownAttribute.RunIteration ();
+
+            // Assert - Buffer should be properly sized after each resize
+            Assert.Equal (size.Width, Application.Driver!.Cols);
+            Assert.Equal (size.Height, Application.Driver.Rows);
+            Assert.NotNull (Application.Driver.Contents);
+            Assert.Equal (size.Height, Application.Driver.Contents.GetLength (0));
+            Assert.Equal (size.Width, Application.Driver.Contents.GetLength (1));
+
+            // Verify the view is still properly laid out
+            Assert.True (label.IsInitialized);
+        }
+    }
+
+    #endregion
 }

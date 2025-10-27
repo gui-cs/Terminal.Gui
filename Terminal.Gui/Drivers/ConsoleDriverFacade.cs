@@ -328,7 +328,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <exception cref="NotImplementedException">Thrown by all drivers except FakeDriver.</exception>
     public virtual void SetScreenSize (int width, int height)
     {
-        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for test scenarios.");
     }
 
     /// <inheritdoc/>

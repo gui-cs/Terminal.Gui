@@ -553,7 +553,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <exception cref="NotImplementedException">Thrown by all drivers except <see cref="FakeDriver"/>.</exception>
     public virtual void SetScreenSize (int width, int height)
     {
-        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
+        throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for test scenarios.");
     }
 
     /// <summary>
