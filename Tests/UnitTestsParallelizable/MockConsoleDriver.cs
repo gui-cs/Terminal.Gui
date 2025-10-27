@@ -2,6 +2,27 @@
 using System.Text;
 
 
+/// <summary>
+///     Minimal mock <see cref="IConsoleDriver"/> implementation for parallelizable unit tests.
+///     This is a lightweight stub that provides just enough driver functionality for tests that need
+///     to set driver properties but don't need full Application initialization or I/O simulation.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <strong>Purpose:</strong> This mock is specifically designed for tests in the
+///         UnitTestsParallelizable project that need to test view behavior in isolation without
+///         the overhead of full driver initialization. It's intentionally minimal and thread-safe.
+///     </para>
+///     <para>
+///         <strong>Not a replacement for FakeDriver:</strong> For tests that need full Application
+///         initialization, event firing, input simulation, or output verification, use
+///         <see cref="FakeDriver"/> in the UnitTests project with <see cref="AutoInitShutdownAttribute"/>.
+///     </para>
+///     <para>
+///         <strong>Thread Safety:</strong> Each test creates its own instance, making it safe for
+///         parallel test execution.
+///     </para>
+/// </remarks>
 internal class MockConsoleDriver : IConsoleDriver
 {
     public event EventHandler<Attribute>? AttributeSet;
