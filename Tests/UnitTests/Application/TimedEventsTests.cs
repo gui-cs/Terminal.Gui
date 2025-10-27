@@ -92,9 +92,12 @@ public class TimedEventsTests
             return false;
         });
 
+        Assert.True (timedEvents.Timeouts.Keys [0] > 0);
+
         // Should execute on first RunTimers call
         timedEvents.RunTimers ();
 
+        Assert.Empty (timedEvents.Timeouts);
         Assert.True (executed);
     }
 
