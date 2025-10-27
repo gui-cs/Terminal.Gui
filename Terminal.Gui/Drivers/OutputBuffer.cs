@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Stores the desired output state for the whole application. This is updated during
-///     draw operations before being flushed to the console as part of the main loop./>
+///     draw operations before being flushed to the console as part of the main loop.
 ///     operation
 /// </summary>
 public class OutputBuffer : IOutputBuffer

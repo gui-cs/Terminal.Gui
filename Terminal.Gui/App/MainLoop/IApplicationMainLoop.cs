@@ -11,7 +11,7 @@ namespace Terminal.Gui.App;
 ///     <list type="bullet">
 ///         <item>Processing input events from the console</item>
 ///         <item>Running user timeout callbacks</item>
-///         <item>Detecting UIgit ls-remote --heads copilot | Select-String -Pattern "fakedriver" changes that need redrawing</item>
+///         <item>Detecting UI changes that need redrawing</item>
 ///         <item>Rendering UI updates to the console</item>
 ///     </list>
 /// </remarks>
