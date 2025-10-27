@@ -264,7 +264,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will result in <see cref="NeedsLayout"/> and <see cref="NeedsDraw"/> to be set,
     ///         resulting in the
-    ///         view being laid out and redrawn as appropriate in the next iteration .
+    ///         view being laid out and redrawn as appropriate in the next iteration.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
