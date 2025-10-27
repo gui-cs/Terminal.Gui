@@ -500,7 +500,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     public void SetSize (int width, int height)
     {
-        throw new NotImplementedException ();
+        // Do Nothing.
     }
 
     private bool _isDisposed;

@@ -52,7 +52,7 @@ public class NetOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     public void SetSize (int width, int height)
     {
-        throw new NotImplementedException ();
+        // Do Nothing.
     }
 
     private Point? _lastCursorPosition;
