@@ -10,7 +10,41 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
-/// <summary>Implements a mock IConsoleDriver for unit testing</summary>
+/// <summary>
+///     Implements a mock <see cref="IConsoleDriver"/> for unit testing. This driver simulates console behavior
+///     without requiring a real terminal, allowing for deterministic testing of Terminal.Gui applications.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="FakeDriver"/> extends the legacy <see cref="ConsoleDriver"/> base class and is designed
+///         for backward compatibility with existing tests. It provides programmatic control over console state,
+///         including screen size, keyboard input, and output verification.
+///     </para>
+///     <para>
+///         <strong>Key Features:</strong>
+///     </para>
+///     <list type="bullet">
+///         <item>Programmatic screen resizing via <see cref="SetBufferSize"/> and <see cref="SetWindowSize"/></item>
+///         <item>Keyboard input simulation via <see cref="FakeConsole.PushMockKeyPress"/></item>
+///         <item>Mouse input simulation via <see cref="FakeConsole"/> methods</item>
+///         <item>Output verification via <see cref="ConsoleDriver.Contents"/> buffer inspection</item>
+///         <item>Event firing for resize, keyboard, and mouse events</item>
+///     </list>
+///     <para>
+///         <strong>Usage:</strong> Most tests should use <see cref="AutoInitShutdownAttribute"/> which automatically
+///         initializes Application with FakeDriver. For more control, create and configure FakeDriver instances directly.
+///     </para>
+///     <para>
+///         <strong>Thread Safety:</strong> FakeDriver is not thread-safe. Tests using this driver should not run
+///         in parallel with other tests that access driver state.
+///     </para>
+///     <para>
+///         For detailed usage examples and patterns, see the README.md file in this directory.
+///     </para>
+/// </remarks>
+/// <seealso cref="AutoInitShutdownAttribute"/>
+/// <seealso cref="FakeConsole"/>
+/// <seealso cref="FakeComponentFactory"/>
 public class FakeDriver : ConsoleDriver
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

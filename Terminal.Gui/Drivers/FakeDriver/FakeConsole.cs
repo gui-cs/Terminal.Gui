@@ -5,7 +5,48 @@
 namespace Terminal.Gui.Drivers;
 
 #pragma warning disable RCS1138 // Add summary to documentation comment.
-/// <summary></summary>
+/// <summary>
+///     Static mock console implementation that simulates the .NET Console API for testing purposes.
+///     Used by <see cref="FakeDriver"/> to provide input/output simulation without requiring a real terminal.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="FakeConsole"/> provides static properties and methods that mirror the standard
+///         <see cref="System.Console"/> API. It maintains internal state for window size, cursor position,
+///         colors, and buffered input/output.
+///     </para>
+///     <para>
+///         <strong>Key Capabilities:</strong>
+///     </para>
+///     <list type="bullet">
+///         <item>Simulating keyboard input via <see cref="PushMockKeyPress"/></item>
+///         <item>Tracking cursor position and visibility</item>
+///         <item>Managing console colors (foreground/background)</item>
+///         <item>Simulating window and buffer size operations</item>
+///         <item>Recording output for verification</item>
+///     </list>
+///     <para>
+///         <strong>Thread Safety:</strong> This class maintains static state and is not thread-safe.
+///         Tests should not run in parallel if they access FakeConsole.
+///     </para>
+///     <para>
+///         <strong>Usage:</strong> Most tests don't need to interact with FakeConsole directly.
+///         <see cref="FakeDriver"/> uses it internally, and <see cref="AutoInitShutdownAttribute"/>
+///         handles setup/teardown. However, tests can use <see cref="PushMockKeyPress"/> to
+///         simulate keyboard input.
+///     </para>
+/// </remarks>
+/// <example>
+///     <code>
+///     // Simulate keyboard input
+///     FakeConsole.PushMockKeyPress(new ConsoleKeyInfo('a', ConsoleKey.A, false, false, false));
+///     FakeConsole.PushMockKeyPress(new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false));
+///     
+///     // The input will be processed by FakeDriver when Application.Run or RunIteration is called
+///     </code>
+/// </example>
+/// <seealso cref="FakeDriver"/>
+/// <seealso cref="AutoInitShutdownAttribute"/>
 public static class FakeConsole
 {
 #pragma warning restore RCS1138 // Add summary to documentation comment.
