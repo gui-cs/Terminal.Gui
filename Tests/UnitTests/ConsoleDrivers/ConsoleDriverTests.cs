@@ -147,7 +147,7 @@ public class ConsoleDriverTests
         driver.Cols = 120;
         driver.Rows = 40;
 
-        ((ConsoleDriver)driver).OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
+        ((ConsoleDriver)driver).OnScreenChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
         Assert.Equal (120, driver.Cols);
         Assert.Equal (40, driver.Rows);
         Assert.True (wasTerminalResized);

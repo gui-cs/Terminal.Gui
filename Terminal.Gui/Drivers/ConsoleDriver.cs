@@ -508,9 +508,20 @@ public abstract class ConsoleDriver : IConsoleDriver
         }
     }
 
+    /// <summary>
+    ///     Called when the terminal screen size changes. Fires the <see cref="ScreenChanged"/> event.
+    /// </summary>
+    /// <param name="args">The event arguments containing the new screen size.</param>
+    /// <remarks>
+    ///     This method should be called by driver implementations when the screen dimensions change.
+    ///     The event allows the application to respond to terminal resize operations and update layout accordingly.
+    /// </remarks>
+    public void OnScreenChanged (SizeChangedEventArgs args) { ScreenChanged?.Invoke (this, args); }
+
     /// <summary>Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.</summary>
     /// <param name="args"></param>
-    public void OnSizeChanged (SizeChangedEventArgs args) { SizeChanged?.Invoke (this, args); }
+    [Obsolete ("Use OnScreenChanged instead. This method will be removed in a future version.")]
+    public void OnSizeChanged (SizeChangedEventArgs args) { OnScreenChanged (args); }
 
     /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
     public void Refresh ()
@@ -545,8 +556,28 @@ public abstract class ConsoleDriver : IConsoleDriver
         throw new NotImplementedException ("SetScreenSize is only supported by FakeDriver for testing purposes.");
     }
 
+    /// <summary>
+    ///     The event fired when the screen (terminal) dimensions change.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is raised when the terminal window is resized by the user or when
+    ///         <see cref="SetScreenSize"/> is called (FakeDriver only).
+    ///     </para>
+    ///     <para>
+    ///         Consumers of this event should update their layout and redraw as needed to accommodate
+    ///         the new screen dimensions available via <see cref="Screen"/>, <see cref="Cols"/>, and <see cref="Rows"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
+
     /// <summary>The event fired when the terminal is resized.</summary>
-    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
+    [Obsolete ("Use ScreenChanged instead. This event will be removed in a future version.")]
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged
+    {
+        add => ScreenChanged += value;
+        remove => ScreenChanged -= value;
+    }
 
     #endregion Cursor Handling
 

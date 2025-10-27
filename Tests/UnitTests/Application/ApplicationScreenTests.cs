@@ -89,7 +89,7 @@ public class ApplicationScreenTests
     }
 
     [Fact]
-    public void Screen_Changes_OnSizeChanged_Without_Call_Application_Init ()
+    public void Screen_Changes_OnScreenChanged_Without_Call_Application_Init ()
     {
         // Arrange
         Application.ResetState (true);

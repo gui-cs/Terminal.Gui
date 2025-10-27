@@ -99,6 +99,7 @@ public class FakeDriver : ConsoleDriver
         Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
         FakeConsole.Clear ();
         ResizeScreen ();
+        ClearContents (); // Ensure Contents and _dirtyLines are allocated before any rendering
         CurrentAttribute = new Attribute (Color.White, Color.Black);
     }
 
@@ -406,7 +407,7 @@ public class FakeDriver : ConsoleDriver
     /// </summary>
     /// <remarks>
     ///     This method updates <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>,
-    ///     resizes the internal buffers, clears contents, and fires the <see cref="ConsoleDriver.SizeChanged"/> event.
+    ///     resizes the internal buffers, clears contents, and fires the <see cref="ConsoleDriver.ScreenChanged"/> event.
     /// </remarks>
     /// <param name="width">The new width (columns).</param>
     /// <param name="height">The new height (rows).</param>
@@ -430,7 +431,7 @@ public class FakeDriver : ConsoleDriver
     {
         ResizeScreen ();
         ClearContents ();
-        OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
+        OnScreenChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 
     public virtual void ResizeScreen ()
