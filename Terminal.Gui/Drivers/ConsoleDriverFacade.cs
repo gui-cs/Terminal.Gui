@@ -10,7 +10,13 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
+    /// <summary>
+    /// The event fired when the screen changes (size, position, etc.).
+    /// </summary>
+    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
+
     /// <summary>The event fired when the terminal is resized.</summary>
+    [Obsolete ("Use ScreenChanged instead. This event is deprecated and will be removed in a future version.")]
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
@@ -41,7 +47,11 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                      };
 
         WindowSizeMonitor = windowSizeMonitor;
-        windowSizeMonitor.SizeChanging += (_,e) => SizeChanged?.Invoke (this, e);
+        windowSizeMonitor.SizeChanging += (_,e) => 
+        {
+            ScreenChanged?.Invoke (this, e);
+            SizeChanged?.Invoke (this, e);
+        };
 
         CreateClipboard ();
     }
@@ -90,6 +100,17 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
             return new (new (0, 0), _output.GetWindowSize ());
         }
+    }
+
+    /// <summary>
+    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
+    /// </summary>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotSupportedException ("SetScreenSize is only supported by FakeDriver for test scenarios.");
     }
 
     /// <summary>

@@ -161,7 +161,16 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     public static void FakeResize (Size size)
     {
         var d = (IConsoleDriverFacade)Application.Driver!;
-        d.OutputBuffer.SetWindowSize (size.Width, size.Height);
+        
+        // Use SetScreenSize if available (for FakeDriver), otherwise fall back to SetWindowSize
+        if (d.OutputBuffer is FakeDriver fakeDriver)
+        {
+            fakeDriver.SetScreenSize (size.Width, size.Height);
+        }
+        else
+        {
+            d.OutputBuffer.SetWindowSize (size.Width, size.Height);
+        }
         
         // Handle both FakeSizeMonitor (from test project) and FakeWindowSizeMonitor (from main library)
         if (d.WindowSizeMonitor is FakeSizeMonitor fakeSizeMonitor)

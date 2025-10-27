@@ -60,6 +60,19 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <summary>Gets the location and size of the terminal screen.</summary>
     public Rectangle Screen => new (0, 0, Cols, Rows);
 
+    /// <summary>
+    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
+    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    /// <see cref="Cols"/> and <see cref="Rows"/> are read-only and derived from <see cref="Screen"/>.
+    /// </summary>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotSupportedException ("SetScreenSize is only supported by FakeDriver for test scenarios.");
+    }
+
     private Region? _clip;
 
     /// <summary>
@@ -508,9 +521,29 @@ public abstract class ConsoleDriver : IConsoleDriver
         }
     }
 
-    /// <summary>Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.</summary>
-    /// <param name="args"></param>
-    public void OnSizeChanged (SizeChangedEventArgs args) { SizeChanged?.Invoke (this, args); }
+    /// <summary>
+    /// Called when the terminal screen changes (size, position, etc.). Fires the <see cref="ScreenChanged"/> event.
+    /// <see cref="Screen"/> reflects the source of truth for screen dimensions.
+    /// <see cref="Cols"/> and <see cref="Rows"/> are derived from <see cref="Screen"/> and are read-only.
+    /// </summary>
+    /// <param name="args">Event arguments containing the new screen size.</param>
+    public void OnScreenChanged (SizeChangedEventArgs args) 
+    { 
+        ScreenChanged?.Invoke (this, args);
+        // Also fire the obsolete event for backwards compatibility
+        SizeChanged?.Invoke (this, args);
+    }
+
+    /// <summary>
+    /// Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.
+    /// </summary>
+    /// <param name="args">Event arguments containing the new size.</param>
+    [Obsolete ("Use OnScreenChanged instead. This method is deprecated and will be removed in a future version.")]
+    public void OnSizeChanged (SizeChangedEventArgs args) 
+    { 
+        // Forward to the new method
+        OnScreenChanged (args);
+    }
 
     /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
     public void Refresh ()
@@ -531,7 +564,17 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
-    /// <summary>The event fired when the terminal is resized.</summary>
+    /// <summary>
+    /// The event fired when the screen changes (size, position, etc.).
+    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    /// <see cref="Cols"/> and <see cref="Rows"/> are read-only and derived from <see cref="Screen"/>.
+    /// </summary>
+    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
+
+    /// <summary>
+    /// The event fired when the terminal is resized.
+    /// </summary>
+    [Obsolete ("Use ScreenChanged instead. This event is deprecated and will be removed in a future version.")]
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     #endregion Cursor Handling

@@ -99,6 +99,7 @@ public class FakeDriver : ConsoleDriver
         Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
         FakeConsole.Clear ();
         ResizeScreen ();
+        ClearContents ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
     }
 
@@ -378,6 +379,17 @@ public class FakeDriver : ConsoleDriver
     /// <inheritdoc />
     internal override IAnsiResponseParser GetParser () => _parser;
 
+    /// <summary>
+    /// Sets the screen size for testing purposes. Only available in FakeDriver.
+    /// This method updates the driver's dimensions and triggers the ScreenChanged event.
+    /// </summary>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    public override void SetScreenSize (int width, int height)
+    {
+        SetBufferSize (width, height);
+    }
+
     public void SetBufferSize (int width, int height)
     {
         FakeConsole.SetBufferSize (width, height);
@@ -416,7 +428,7 @@ public class FakeDriver : ConsoleDriver
     {
         ResizeScreen ();
         ClearContents ();
-        OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
+        OnScreenChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 
     public virtual void ResizeScreen ()

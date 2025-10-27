@@ -27,6 +27,9 @@ internal class MockConsoleDriver : IConsoleDriver
     public Rectangle Screen => _screen;
 
     /// <inheritdoc />
+    public void SetScreenSize (int width, int height) { throw new NotSupportedException ("SetScreenSize is only supported by FakeDriver for test scenarios."); }
+
+    /// <inheritdoc />
     public Region? Clip
     {
         get => _clip;
@@ -146,6 +149,10 @@ internal class MockConsoleDriver : IConsoleDriver
     public bool SetCursorVisibility (CursorVisibility visibility) { throw new NotImplementedException (); }
 
     /// <inheritdoc />
+    public event EventHandler<SizeChangedEventArgs>? ScreenChanged;
+
+    /// <inheritdoc />
+    [Obsolete ("Use ScreenChanged instead.")]
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc />
