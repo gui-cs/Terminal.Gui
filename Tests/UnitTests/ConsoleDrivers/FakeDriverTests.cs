@@ -1,3 +1,4 @@
+using System.Text;
 using UnitTests;
 using Xunit;
 
@@ -398,6 +399,152 @@ public class FakeDriverTests (ITestOutputHelper output)
             Assert.Equal (size.Width, Application.Driver!.Cols);
             Assert.Equal (size.Height, Application.Driver.Rows);
         }
+    }
+
+    #endregion
+
+    #region Buffer and Fill Tests
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Can_Fill_Rectangle ()
+    {
+        // Verify driver is initialized with buffers
+        Assert.NotNull (Application.Driver);
+        Assert.NotNull (Application.Driver!.Contents);
+        
+        // Fill a rectangle
+        var rect = new Rectangle (5, 5, 10, 5);
+        Application.Driver.FillRect (rect, (Rune)'X');
+        
+        // Verify the rectangle was filled
+        for (int row = rect.Y; row < rect.Y + rect.Height; row++)
+        {
+            for (int col = rect.X; col < rect.X + rect.Width; col++)
+            {
+                Assert.Equal ((Rune)'X', Application.Driver.Contents [row, col].Rune);
+            }
+        }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeDriver_Buffer_Integrity_After_Multiple_Resizes ()
+    {
+        // Start with default size
+        Assert.Equal (80, Application.Driver!.Cols);
+        Assert.Equal (25, Application.Driver.Rows);
+
+        // Fill with a pattern
+        Application.Driver.FillRect (new Rectangle (0, 0, 10, 5), (Rune)'A');
+
+        // Resize
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
+        // Verify new size
+        Assert.Equal (100, Application.Driver.Cols);
+        Assert.Equal (30, Application.Driver.Rows);
+        
+        // Verify buffer is clean (no stale runes from previous size)
+        Assert.NotNull (Application.Driver.Contents);
+        Assert.Equal (30, Application.Driver.Contents!.GetLength (0));
+        Assert.Equal (100, Application.Driver.Contents.GetLength (1));
+
+        // Fill with new pattern
+        Application.Driver.FillRect (new Rectangle (0, 0, 20, 10), (Rune)'B');
+
+        // Resize back
+        AutoInitShutdownAttribute.FakeResize (new Size (80, 25));
+
+        // Verify size is back
+        Assert.Equal (80, Application.Driver.Cols);
+        Assert.Equal (25, Application.Driver.Rows);
+        
+        // Verify buffer dimensions match
+        Assert.Equal (25, Application.Driver.Contents.GetLength (0));
+        Assert.Equal (80, Application.Driver.Contents.GetLength (1));
+    }
+
+    #endregion
+
+    #region ScreenChanged Event Tests
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ScreenChanged_Event_Fires_On_SetScreenSize ()
+    {
+        bool screenChangedFired = false;
+        Size? newSize = null;
+
+        Application.Driver!.ScreenChanged += (sender, args) =>
+        {
+            screenChangedFired = true;
+            newSize = args.Size;
+        };
+
+        // Trigger resize using FakeResize which uses SetScreenSize internally
+        AutoInitShutdownAttribute.FakeResize (new Size (100, 30));
+
+        // Verify event fired
+        Assert.True (screenChangedFired);
+        Assert.NotNull (newSize);
+        Assert.Equal (100, newSize!.Value.Width);
+        Assert.Equal (30, newSize.Value.Height);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void FakeResize_Triggers_ScreenChanged_And_Updates_Application_Screen ()
+    {
+        bool screenChangedFired = false;
+        Size? eventSize = null;
+
+        Application.Driver!.ScreenChanged += (sender, args) =>
+        {
+            screenChangedFired = true;
+            eventSize = args.Size;
+        };
+
+        // Use FakeResize helper
+        AutoInitShutdownAttribute.FakeResize (new Size (120, 40));
+
+        // Verify event fired
+        Assert.True (screenChangedFired);
+        Assert.NotNull (eventSize);
+        Assert.Equal (120, eventSize!.Value.Width);
+        Assert.Equal (40, eventSize.Value.Height);
+
+        // Verify Application.Screen was updated
+        Assert.Equal (new Rectangle (0, 0, 120, 40), Application.Screen);
+        Assert.Equal (120, Application.Driver.Cols);
+        Assert.Equal (40, Application.Driver.Rows);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void SizeChanged_Event_Still_Fires_For_Compatibility ()
+    {
+        bool sizeChangedFired = false;
+        bool screenChangedFired = false;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        Application.Driver!.SizeChanged += (sender, args) =>
+        {
+            sizeChangedFired = true;
+        };
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        Application.Driver.ScreenChanged += (sender, args) =>
+        {
+            screenChangedFired = true;
+        };
+
+        // Trigger resize using FakeResize
+        AutoInitShutdownAttribute.FakeResize (new Size (90, 35));
+
+        // Both events should fire for compatibility
+        Assert.True (sizeChangedFired);
+        Assert.True (screenChangedFired);
     }
 
     #endregion
