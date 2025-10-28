@@ -24,7 +24,7 @@ public class GuiTestContext : IDisposable
     private readonly StringBuilder _logsSb;
     private readonly TestDriver _driver;
     private bool _finished;
-    private readonly ConsoleSizeMonitor _fakeSizeMonitor;
+    private readonly FakeSizeMonitor _fakeSizeMonitor;
     private readonly TimeSpan _timeout;
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
@@ -934,7 +934,7 @@ public class GuiTestContext : IDisposable
     public Point GetCursorPosition () { return _output.CursorPosition; }
 }
 
-internal class FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, ConsoleSizeMonitor fakeSizeMonitor)
+internal class FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
     : WindowsComponentFactory
 {
     /// <inheritdoc/>
@@ -944,10 +944,14 @@ internal class FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutpu
     public override IConsoleOutput CreateOutput () { return output; }
 
     /// <inheritdoc/>
-    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return fakeSizeMonitor; }
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        outputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
+        return fakeSizeMonitor;
+    }
 }
 
-internal class FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, ConsoleSizeMonitor fakeSizeMonitor) : NetComponentFactory
+internal class FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor) : NetComponentFactory
 {
     /// <inheritdoc/>
     public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return netInput; }
@@ -956,5 +960,9 @@ internal class FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output
     public override IConsoleOutput CreateOutput () { return output; }
 
     /// <inheritdoc/>
-    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return fakeSizeMonitor; }
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        outputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
+        return fakeSizeMonitor;
+    }
 }

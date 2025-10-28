@@ -88,7 +88,7 @@ public record struct Thickness
     /// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in screen coordinates.</param>
     /// <param name="diagnosticFlags"></param>
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
-    /// <param name="driver">Optional driver. If not specified, <see cref="driver"/> will be used.</param>
+    /// <param name="driver">Optional driver. If not specified, <see cref="Application.Driver"/> will be used.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
     public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null, IConsoleDriver? driver = null)
     {

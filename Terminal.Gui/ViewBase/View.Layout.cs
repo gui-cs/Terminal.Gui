@@ -882,12 +882,12 @@ public partial class View // Layout APIs
 
                 if (current.Margin is { SubViews.Count: > 0 })
                 {
-                    current.Margin.SetNeedsLayout ();
+                    current.Margin!.SetNeedsLayout ();
                 }
 
                 if (current.Border is { SubViews.Count: > 0 })
                 {
-                    current.Border.SetNeedsLayout ();
+                    current.Border!.SetNeedsLayout ();
                 }
 
                 if (current.Padding is { SubViews.Count: > 0 })

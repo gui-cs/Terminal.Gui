@@ -174,7 +174,8 @@ public class ApplicationImpl : IApplication
 
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
     // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
-    internal static Toplevel? CachedRunStateToplevel { get; set; }
+    /// <inheritdoc />
+    public Toplevel? CachedRunStateToplevel { get; set; }
 
     /// <summary>
     /// Gets or sets the main thread ID for the application.

@@ -22,13 +22,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         set => Keyboard.ArrangeKey = value;
     }
 
-
-    internal static Toplevel? CachedRunStateToplevel
-    {
-        get => ApplicationImpl.CachedRunStateToplevel;
-        private set => ApplicationImpl.CachedRunStateToplevel = value;
-    }
-
     /// <summary>
     ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
     ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.

@@ -124,8 +124,8 @@ Y
         Application.Driver!.SetScreenSize (15, 15);
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Border.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Margin!.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Border!.Frame);
         Assert.Equal (new (1, 1, 13, 13), win.Padding.Frame);
 
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);

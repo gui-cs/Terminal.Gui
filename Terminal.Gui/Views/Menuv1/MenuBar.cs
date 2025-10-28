@@ -1441,8 +1441,8 @@ public class MenuBar : View, IDesignable
 
             if (SuperView is { })
             {
-                locationOffset.X += SuperView.Border.Thickness.Left;
-                locationOffset.Y += SuperView.Border.Thickness.Top;
+                locationOffset.X += SuperView.Border!.Thickness.Left;
+                locationOffset.Y += SuperView.Border!.Thickness.Top;
             }
 
             int cx = me.Position.X - locationOffset.X;

@@ -32,14 +32,7 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc />
     public override IConsoleOutput CreateOutput ()
     {
-        if (_output is { })
-        {
-            return _output;
-        }
-        FakeConsoleOutput output = new FakeConsoleOutput ();
-        //output.SetConsoleSize (80, 25);
-
-        return output;
+        return _output ?? new FakeConsoleOutput ();
     }
 
     /// <inheritdoc />

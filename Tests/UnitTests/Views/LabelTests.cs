@@ -326,8 +326,8 @@ e
     public void With_Top_Margin_Without_Top_Border ()
     {
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin.Thickness = new (0, 1, 0, 0);
-        label.Border.Thickness = new (1, 0, 1, 1);
+        label.Margin!.Thickness = new (0, 1, 0, 0);
+        label.Border!.Thickness = new (1, 0, 1, 1);
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -351,7 +351,7 @@ e
     public void Without_Top_Border ()
     {
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border.Thickness = new (1, 0, 1, 1);
+        label.Border!.Thickness = new (1, 0, 1, 1);
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);

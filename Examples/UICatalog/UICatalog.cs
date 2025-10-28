@@ -517,7 +517,7 @@ public class UICatalog
 
         if (benchmarkWindow.Border is { })
         {
-            benchmarkWindow.Border.Thickness = new (0, 0, 0, 0);
+            benchmarkWindow.Border!.Thickness = new (0, 0, 0, 0);
         }
 
         TableView resultsTableView = new ()

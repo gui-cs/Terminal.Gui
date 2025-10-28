@@ -138,13 +138,13 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 #endif
             if (_driverType == null)
             {
-                Application.Init (null, "fake");
+                //Application.Init (null, "fake");
                 //Application.Driver!.SetScreenSize (80, 25);
                 //Application.Top = null;
                 //Application.TopLevels.Clear ();
 
-                //var fa = new FakeApplicationFactory ();
-                //_v2Cleanup = fa.SetupFakeApplication ();
+                var fa = new FakeApplicationFactory ();
+                _v2Cleanup = fa.SetupFakeApplication ();
                 //Application.Driver!.SetScreenSize (80,25));
             }
             else

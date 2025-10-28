@@ -190,7 +190,7 @@ public class ClipTests (ITestOutputHelper _output)
                    """
         };
         frameView.Border!.LineStyle = LineStyle.Single;
-        frameView.Border.Thickness = new (1, 0, 0, 0);
+        frameView.Border!.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
         View.SetClipToScreen ();

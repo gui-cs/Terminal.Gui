@@ -790,7 +790,7 @@ Item 6",
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (new (1), lv.Border.Thickness);
+        Assert.Equal (new (1), lv.Border!.Thickness);
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal ("", lv.Text);
 

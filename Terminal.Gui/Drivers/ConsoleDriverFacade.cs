@@ -45,7 +45,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         ConsoleSizeMonitor = sizeMonitor;
         sizeMonitor.SizeChanged += (_, e) =>
         {
-            SetScreenSize(e.Size.Value.Width, e.Size.Value.Height);
+            SetScreenSize(e.Size!.Value.Width, e.Size.Value.Height);
             //SizeChanged?.Invoke (this, e);
         };
 
