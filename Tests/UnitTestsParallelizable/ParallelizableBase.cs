@@ -20,11 +20,10 @@ public abstract class ParallelizableBase
     /// <param name="width">Width of the driver buffer</param>
     /// <param name="height">Height of the driver buffer</param>
     /// <returns>A configured IFakeConsoleDriver instance</returns>
-    protected static IFakeConsoleDriver CreateFakeDriver (int width = 25, int height = 25)
+    protected static IConsoleDriver CreateFakeDriver (int width = 25, int height = 25)
     {
-        var factory = new FakeDriverFactory ();
-        IFakeConsoleDriver driver = factory.Create ();
-        driver.SetBufferSize (width, height);
+        IConsoleDriver driver = new FakeDriver ();
+        driver.SetScreenSize (width, height);
         return driver;
     }
 }

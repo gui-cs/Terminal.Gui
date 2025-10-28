@@ -688,7 +688,7 @@ public partial class Border
                 break;
 
             case ViewArrangement.BottomResizable:
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
                 break;
 
             case ViewArrangement.LeftResizable:
@@ -705,12 +705,12 @@ public partial class Border
                 break;
 
             case ViewArrangement.RightResizable:
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
+                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.RightResizable:
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
+                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.LeftResizable:
@@ -723,7 +723,7 @@ public partial class Border
                     Parent.X = parentLoc.X - _startGrabPoint.X;
                 }
 
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
@@ -736,7 +736,7 @@ public partial class Border
                     Parent.Y = parentLoc.Y - _startGrabPoint.Y;
                 }
 
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
+                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:

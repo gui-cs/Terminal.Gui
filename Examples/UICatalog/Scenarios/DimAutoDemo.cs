@@ -56,7 +56,7 @@ public class DimAutoDemo : Scenario
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
             Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10)
         };
-        dimAutoFrameView.Margin.Thickness = new Thickness (1);
+        dimAutoFrameView.Margin!.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
         var textEdit = new TextView

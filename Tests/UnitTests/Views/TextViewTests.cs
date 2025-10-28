@@ -5262,7 +5262,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(15, 15));
+        Application.Driver!.SetScreenSize (15, 15);
         AutoInitShutdownAttribute.RunIteration ();
 
         //this passes
@@ -5340,7 +5340,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size (15, 15));
+        Application.Driver!.SetScreenSize (15, 15);
         AutoInitShutdownAttribute.RunIteration ();
 
         //this passes
@@ -5453,7 +5453,7 @@ This is the second line.
                                                        _output
                                                       );
 
-        AutoInitShutdownAttribute.FakeResize(new Size (6, 25));
+        Application.Driver!.SetScreenSize (6, 25);
         tv.SetRelativeLayout (Application.Screen.Size);
         tv.Draw ();
         Assert.Equal (new (4, 2), tv.CursorPosition);

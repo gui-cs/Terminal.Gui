@@ -337,7 +337,7 @@ public class Shortcuts : Scenario
 
         if (framedShortcut.CommandView.Margin is { })
         {
-            framedShortcut.CommandView.Margin.SchemeName = framedShortcut.CommandView.SchemeName = "Error";
+            framedShortcut.CommandView.Margin!.SchemeName = framedShortcut.CommandView.SchemeName = "Error";
             framedShortcut.HelpView.Margin!.SchemeName = framedShortcut.HelpView.SchemeName = "Dialog";
             framedShortcut.KeyView.Margin!.SchemeName = framedShortcut.KeyView.SchemeName = "Menu";
         }
