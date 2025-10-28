@@ -56,7 +56,7 @@ public abstract class OutputBase
 
                 for (; col < cols; col++)
                 {
-                    if (!buffer.Contents [row, col].IsDirty)
+                    if (!buffer.Contents! [row, col].IsDirty)
                     {
                         if (output.Length > 0)
                         {

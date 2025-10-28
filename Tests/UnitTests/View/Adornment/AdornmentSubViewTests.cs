@@ -19,9 +19,9 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Width = 10,
             Height = 10
         };
-        Application.Top.Margin.Thickness = new Thickness (viewMargin);
+        Application.Top.Margin!.Thickness = new Thickness (viewMargin);
         // Turn of TransparentMouse for the test
-        Application.Top.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        Application.Top.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
         var subView = new View ()
         {
@@ -30,11 +30,11 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Width = 5,
             Height = 5
         };
-        subView.Margin.Thickness = new Thickness (subViewMargin);
+        subView.Margin!.Thickness = new Thickness (subViewMargin);
         // Turn of TransparentMouse for the test
-        subView.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        subView.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
-        Application.Top.Margin.Add (subView);
+        Application.Top.Margin!.Add (subView);
         Application.Top.Layout ();
 
         var foundView = View.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ();

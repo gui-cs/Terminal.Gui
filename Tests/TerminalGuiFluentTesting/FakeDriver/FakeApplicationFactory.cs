@@ -16,11 +16,11 @@ public class FakeApplicationFactory
         var cts = new CancellationTokenSource ();
         var fakeInput = new FakeNetInput (cts.Token);
         FakeOutput output = new ();
-        output.Size = new (25, 25);
+        output.Size = new (80, 25);
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        var sizeMonitor = new FakeSizeMonitor ();
+        var sizeMonitor = new FakeSizeMonitor (output, output.LastBuffer!);
 
         var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
@@ -32,13 +32,13 @@ public class FakeApplicationFactory
         // Handle different facade types - cast to common interface instead
         var d = (IConsoleDriverFacade)Application.Driver!;
 
-        sizeMonitor.SizeChanging += (_, e) =>
+        sizeMonitor.SizeChanged += (_, e) =>
                                     {
                                         if (e.Size != null)
                                         {
                                             Size s = e.Size.Value;
                                             output.Size = s;
-                                            d.OutputBuffer.SetWindowSize (s.Width, s.Height);
+                                            d.OutputBuffer.SetSize (s.Width, s.Height);
                                         }
                                     };
 

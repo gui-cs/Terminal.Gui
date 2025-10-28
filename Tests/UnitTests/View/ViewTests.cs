@@ -456,7 +456,7 @@ public class ViewTests
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

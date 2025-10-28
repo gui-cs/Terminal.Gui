@@ -63,11 +63,6 @@ public class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    /// <summary>
-    /// Handles which <see cref="View"/> (if any) has captured the mouse
-    /// </summary>
-    public IMouseGrabHandler MouseGrabHandler { get; set; } = new MouseGrabHandler ();
-
     private IKeyboard? _keyboard;
 
     /// <summary>
@@ -134,7 +129,7 @@ public class ApplicationImpl : IApplication
         }
         set
         {
-            if (value is {} && (value.X != 0 || value.Y != 0))
+            if (value is { } && (value.X != 0 || value.Y != 0))
             {
                 throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
             }
@@ -176,6 +171,11 @@ public class ApplicationImpl : IApplication
 
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels => _topLevels;
+
+    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
+    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
+    /// <inheritdoc />
+    public Toplevel? CachedRunStateToplevel { get; set; }
 
     /// <summary>
     /// Gets or sets the main thread ID for the application.
@@ -231,10 +231,10 @@ public class ApplicationImpl : IApplication
 
         if (string.IsNullOrWhiteSpace (_driverName))
         {
-            _driverName = Application.ForceDriver;
+            _driverName = ForceDriver;
         }
 
-        Debug.Assert(_navigation is null);
+        Debug.Assert (_navigation is null);
         _navigation = new ();
 
         Debug.Assert (_popover is null);
@@ -264,7 +264,7 @@ public class ApplicationImpl : IApplication
         }
 
         CreateDriver (driverName ?? _driverName);
-
+        Screen = Driver!.Screen;
         _initialized = true;
 
         Application.OnInitializedChanged (this, new (true));
@@ -276,23 +276,6 @@ public class ApplicationImpl : IApplication
 
     private void CreateDriver (string? driverName)
     {
-        // When running unit tests, always use FakeDriver unless explicitly specified
-        if (ConsoleDriver.RunningUnitTests && 
-            string.IsNullOrEmpty (driverName) && 
-            _componentFactory is null)
-        {
-            Logging.Logger.LogDebug ("Unit test safeguard: forcing FakeDriver (RunningUnitTests=true, driverName=null, componentFactory=null)");
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-            _coordinator.StartAsync ().Wait ();
-
-            if (_driver == null)
-            {
-                throw new ("Driver was null even after booting MainLoopCoordinator");
-            }
-
-            return;
-        }
-
         PlatformID p = Environment.OSVersion.Platform;
 
         // Check component factory type first - this takes precedence over driverName
@@ -310,7 +293,10 @@ public class ApplicationImpl : IApplication
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            FakeConsoleOutput fakeOutput = new ();
+            fakeOutput.SetConsoleSize (80, 25);
+
+            _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
@@ -410,7 +396,7 @@ public class ApplicationImpl : IApplication
 
         if (_driver == null)
         {
-            throw new  InvalidOperationException ("Driver was inexplicably null when trying to Run view");
+            throw new InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
         _top = view;
@@ -437,17 +423,17 @@ public class ApplicationImpl : IApplication
     public void Shutdown ()
     {
         _coordinator?.Stop ();
-        
+
         bool wasInitialized = _initialized;
-        
+
         // Reset Screen before calling Application.ResetState to avoid circular reference
         ResetScreen ();
-        
+
         // Call ResetState FIRST so it can properly dispose Popover and other resources
         // that are accessed via Application.* static properties that now delegate to instance fields
         Application.ResetState ();
         ConfigurationManager.PrintJsonErrors ();
-        
+
         // Clear instance fields after ResetState has disposed everything
         _driver = null;
         _mouse = null;
@@ -455,6 +441,7 @@ public class ApplicationImpl : IApplication
         _initialized = false;
         _navigation = null;
         _popover = null;
+        CachedRunStateToplevel = null;
         _top = null;
         _topLevels.Clear ();
         _mainThreadId = -1;
@@ -475,7 +462,7 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public void RequestStop (Toplevel? top)
     {
-        Logging.Logger.LogInformation ($"RequestStop '{(top is {} ? top : "null")}'");
+        Logging.Logger.LogInformation ($"RequestStop '{(top is { } ? top : "null")}'");
 
         top ??= _top;
 
@@ -499,7 +486,7 @@ public class ApplicationImpl : IApplication
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Application.Top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (Top is { Running: true } && _mainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action ();
             return;

@@ -130,9 +130,9 @@ public class LineCanvasExperiment : Scenario
         //    //Scheme = Colors.Schemes ["Error"],
         //    SuperViewRendersLineCanvas = true
         //};
-        //marginWindow.Margin.Scheme = Colors.Schemes ["Error"];
-        //marginWindow.Margin.Thickness = new (1);
-        //marginWindow.Border.Thickness = new (1, 2, 1, 1);
+        //marginWindow.Margin!.Scheme = Colors.Schemes ["Error"];
+        //marginWindow.Margin!.Thickness = new (1);
+        //marginWindow.Border!.Thickness = new (1, 2, 1, 1);
 
         //frame1.Add (marginWindow);
 

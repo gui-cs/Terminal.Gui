@@ -121,7 +121,7 @@ internal class UnixOutput : OutputBase, IConsoleOutput
     }
 
     /// <inheritdoc />
-    public Size GetWindowSize ()
+    public Size GetSize ()
     {
         if (ConsoleDriver.RunningUnitTests)
         {
@@ -166,6 +166,12 @@ internal class UnixOutput : OutputBase, IConsoleOutput
     public void SetCursorPosition (int col, int row)
     {
         SetCursorPositionImpl (col, row);
+    }
+
+    /// <inheritdoc />
+    public void SetSize (int width, int height)
+    {
+        // Do nothing
     }
 
     /// <inheritdoc />

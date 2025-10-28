@@ -533,7 +533,7 @@ public static class ConsoleKeyMapping
 
     /// <summary>
     ///     Get the output character from the <see cref="GetConsoleKeyInfoFromKeyCode"/>, with the correct
-    ///     <see cref="ConsoleKey"/> and the scan code used on <see cref="WindowsDriver"/>.
+    ///     <see cref="ConsoleKey"/> and the scan code used on Windows.
     /// </summary>
     /// <param name="unicodeChar">The unicode character.</param>
     /// <param name="modifiers">The modifiers keys.</param>
