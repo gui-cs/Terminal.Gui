@@ -210,14 +210,14 @@ public class Shortcut : View, IOrientation, IDesignable
                 case 0:
                 case 1:
                     // Scrunch it by removing both margins
-                    HelpView.Margin.Thickness = new (t.Right - 1, t.Top, t.Left - 1, t.Bottom);
+                    HelpView.Margin!.Thickness = new (t.Right - 1, t.Top, t.Left - 1, t.Bottom);
 
                     break;
 
                 case 2:
 
                     // Scrunch just the right margin
-                    HelpView.Margin.Thickness = new (t.Right, t.Top, t.Left - 1, t.Bottom);
+                    HelpView.Margin!.Thickness = new (t.Right, t.Top, t.Left - 1, t.Bottom);
 
                     break;
             }
@@ -225,7 +225,7 @@ public class Shortcut : View, IOrientation, IDesignable
         else
         {
             // Reset to default
-            HelpView.Margin.Thickness = GetMarginThickness ();
+            HelpView.Margin!.Thickness = GetMarginThickness ();
         }
     }
 
@@ -471,9 +471,9 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (CommandView.Margin is { })
         {
-            CommandView.Margin.Thickness = GetMarginThickness ();
+            CommandView.Margin!.Thickness = GetMarginThickness ();
             // strip off ViewportSettings.TransparentMouse
-            CommandView.Margin.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
+            CommandView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
 
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -533,9 +533,9 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (HelpView.Margin is { })
         {
-            HelpView.Margin.Thickness = GetMarginThickness ();
+            HelpView.Margin!.Thickness = GetMarginThickness ();
             // strip off ViewportSettings.TransparentMouse
-            HelpView.Margin.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
+            HelpView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -666,9 +666,9 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (KeyView.Margin is { })
         {
-            KeyView.Margin.Thickness = GetMarginThickness ();
+            KeyView.Margin!.Thickness = GetMarginThickness ();
             // strip off ViewportSettings.TransparentMouse
-            KeyView.Margin.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
+            KeyView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);

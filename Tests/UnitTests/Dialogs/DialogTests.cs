@@ -20,7 +20,7 @@ public class DialogTests (ITestOutputHelper output)
 
         // We test with one button first, but do this to get the width right for 2
         int width = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}".Length;
-        AutoInitShutdownAttribute.FakeResize (new (width, 1));
+        Driver?.SetScreenSize (width, 1);
 
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
@@ -163,7 +163,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {btn3} {btn4} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
+        Driver?.SetScreenSize (buttonRow.Length, 3);
 
         // Default - Center
         (runState, Dialog dlg) = BeginButtonTestDialog (
@@ -255,7 +255,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = string.Empty;
 
         var width = 30;
-        AutoInitShutdownAttribute.FakeResize (new (width, 1));
+        Driver?.SetScreenSize (width, 1);
 
         // Default - Center
         buttonRow =
@@ -351,7 +351,7 @@ public class DialogTests (ITestOutputHelper output)
         //                         123456                          1234567
         var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.Length;
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 1));
+        Driver?.SetScreenSize (buttonRow.Length, 1);
 
         // Default - Center
         (runState, Dialog dlg) = BeginButtonTestDialog (
@@ -446,7 +446,7 @@ public class DialogTests (ITestOutputHelper output)
         //                         123456                           123456
         var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.GetColumns ();
-        AutoInitShutdownAttribute.FakeResize (new (width, 3));
+        Driver?.SetScreenSize (width, 3);
 
         // Default - Center
         (runState, Dialog dlg) = BeginButtonTestDialog (
@@ -531,7 +531,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}  {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}  {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize (new (width, 1));
+        Driver?.SetScreenSize (width, 1);
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -595,7 +595,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
         width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize (new (width, 1));
+        Driver?.SetScreenSize (width, 1);
 
         (runState, dlg) = BeginButtonTestDialog (
                                                  title,
@@ -675,7 +675,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {btn3} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
+        Driver?.SetScreenSize (buttonRow.Length, 3);
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -758,7 +758,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
+        Driver?.SetScreenSize (buttonRow.Length, 3);
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -837,7 +837,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
+        Driver?.SetScreenSize (buttonRow.Length, 3);
 
         // Default (Center)
         Button button1 = new () { Text = btn1Text };
@@ -957,7 +957,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Dialog_In_Window_With_Size_One_Button_Aligns ()
     {
-        AutoInitShutdownAttribute.FakeResize (new (20, 5));
+        Driver?.SetScreenSize (20, 5);
 
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
@@ -1062,7 +1062,7 @@ public class DialogTests (ITestOutputHelper output)
                 )]
     public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height, string expected)
     {
-        AutoInitShutdownAttribute.FakeResize (new (20, height));
+        Driver?.SetScreenSize (20, height);
         var win = new Window ();
 
         int iterations = -1;
@@ -1109,7 +1109,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Dialog_Opened_From_Another_Dialog ()
     {
-        AutoInitShutdownAttribute.FakeResize (new (30, 10));
+        Driver?.SetScreenSize (30, 10);
 
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
@@ -1251,7 +1251,7 @@ public class DialogTests (ITestOutputHelper output)
             Height = Dim.Percent (85)
         };
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize (new (100, 100));
+        Driver?.SetScreenSize (100, 100);
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 7;
@@ -1265,7 +1265,7 @@ public class DialogTests (ITestOutputHelper output)
     {
         var d = new Dialog { X = 1, Y = 1 };
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize (new (100, 100));
+        Driver?.SetScreenSize (100, 100);
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 1;
@@ -1287,7 +1287,7 @@ public class DialogTests (ITestOutputHelper output)
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize (new (20, 10));
+        Driver?.SetScreenSize (20, 10);
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         Assert.Equal (new (expected, expected), d.Frame.Location);
@@ -1321,7 +1321,7 @@ public class DialogTests (ITestOutputHelper output)
             Y = 1
         };
 
-        AutoInitShutdownAttribute.FakeResize (new (20, 20));
+        Driver?.SetScreenSize (20, 20);
 
         var iterations = 0;
 
@@ -1340,7 +1340,7 @@ public class DialogTests (ITestOutputHelper output)
                          else if (iterations == 2)
                          {
                              // Mouse click outside of dialog
-                             RaiseMouseEvent (new() { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
+                             RaiseMouseEvent (new () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
                          }
                      };
 
@@ -1370,7 +1370,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
 
         int width = buttonRow.Length;
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 10));
+        Driver?.SetScreenSize (buttonRow.Length, 10);
 
         (runState, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -1435,7 +1435,7 @@ public class DialogTests (ITestOutputHelper output)
         };
 
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize (new (100, 100));
+        Driver?.SetScreenSize (100, 100);
 
         // Default size is Percent(85) 
         Assert.Equal (new ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
@@ -1451,7 +1451,7 @@ public class DialogTests (ITestOutputHelper output)
         var d = new Dialog { Width = 50, Height = 50 };
 
         Begin (d);
-        AutoInitShutdownAttribute.FakeResize (new (100, 100));
+        Driver?.SetScreenSize (100, 100);
 
         // Default size is Percent(85) 
         Assert.Equal (new (50, 50), d.Frame.Size);
@@ -1468,9 +1468,9 @@ public class DialogTests (ITestOutputHelper output)
 
         var buttonRow = $"{Glyphs.VLine}        {Glyphs.VLine}";
         int width = buttonRow.Length;
-        AutoInitShutdownAttribute.FakeResize (new (buttonRow.Length, 3));
+        Driver?.SetScreenSize (buttonRow.Length, 3);
 
-        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, []);
+        (runState, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center);
 
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 

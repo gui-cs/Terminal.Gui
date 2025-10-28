@@ -533,7 +533,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         Assert.Equal (Orientation.Vertical, rg.Orientation);
         Assert.Equal (2, rg.RadioLabels.Length);

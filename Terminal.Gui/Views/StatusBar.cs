@@ -71,7 +71,7 @@ public class StatusBar : Bar, IDesignable
 
             if (barItem.Border is { })
             {
-                barItem.Border.Thickness = index == SubViews.Count - 1 ? new Thickness (0, 0, 0, 0) : new Thickness (0, 0, 1, 0);
+                barItem.Border!.Thickness = index == SubViews.Count - 1 ? new Thickness (0, 0, 0, 0) : new Thickness (0, 0, 1, 0);
             }
 
             if (barItem is Shortcut shortcut)

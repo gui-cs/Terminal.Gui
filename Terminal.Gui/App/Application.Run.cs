@@ -22,10 +22,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         set => Keyboard.ArrangeKey = value;
     }
 
-    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
-    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
-    private static Toplevel? _cachedRunStateToplevel;
-
     /// <summary>
     ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
     ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
@@ -43,7 +39,11 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
     ///     when the application is done.
     /// </remarks>
+#pragma warning disable CS0067 // Event is never used
+#pragma warning disable CS0414 // Event is never used
     public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
+#pragma warning restore CS0414 // Event is never used
+#pragma warning restore CS0067 // Event is never used
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
     /// <returns>
@@ -74,7 +74,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
-            Debug.Assert (Top == _cachedRunStateToplevel);
+            Debug.Assert (Top == CachedRunStateToplevel);
         }
 #endif
 
@@ -84,7 +84,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
             {
                 // If Top was already disposed and isn't on the Toplevels Stack,
                 // clean it up here if is the same as _cachedRunStateToplevel
-                if (Top == _cachedRunStateToplevel)
+                if (Top == CachedRunStateToplevel)
                 {
                     Top = null;
                 }
@@ -493,7 +493,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
             Top.SetFocus ();
         }
 
-        _cachedRunStateToplevel = runState.Toplevel;
+        CachedRunStateToplevel = runState.Toplevel;
 
         runState.Toplevel = null;
         runState.Dispose ();

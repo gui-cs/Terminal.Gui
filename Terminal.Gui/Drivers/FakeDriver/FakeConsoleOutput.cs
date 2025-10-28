@@ -1,33 +1,28 @@
 #nullable enable
-using System;
-using System.Text;
-
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Fake console output for testing that captures what would be written to the console.
+///     Fake console output for testing that captures what would be written to the console.
 /// </summary>
 public class FakeConsoleOutput : OutputBase, IConsoleOutput
 {
     private readonly StringBuilder _output = new ();
     private int _cursorLeft;
     private int _cursorTop;
-    private Size _windowSize = new (80, 25);
+    private Size _consoleSize = new (80, 25);
 
     /// <summary>
-    /// Gets the captured output as a string.
+    ///     Gets the captured output as a string.
     /// </summary>
     public string Output => _output.ToString ();
 
-    /// <summary>
-    /// Clears the captured output.
-    /// </summary>
-    public void ClearOutput () => _output.Clear ();
-
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row)
+    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
+
+    /// <inheritdoc />
+    public void SetSize (int width, int height)
     {
-        SetCursorPositionImpl (col, row);
+        _consoleSize = new (width, height);
     }
 
     /// <inheritdoc/>
@@ -35,30 +30,25 @@ public class FakeConsoleOutput : OutputBase, IConsoleOutput
     {
         _cursorLeft = col;
         _cursorTop = row;
+
         return true;
     }
 
     /// <summary>
-    /// Sets the fake window size.
+    ///     Sets the fake window size.
     /// </summary>
-    public void SetWindowSize (int width, int height)
-    {
-        _windowSize = new Size (width, height);
-    }
+    public void SetConsoleSize (int width, int height) { _consoleSize = new (width, height); }
 
     /// <summary>
-    /// Gets the current cursor position.
+    ///     Gets the current cursor position.
     /// </summary>
-    public (int left, int top) GetCursorPosition () => (_cursorLeft, _cursorTop);
+    public (int left, int top) GetCursorPosition () { return (_cursorLeft, _cursorTop); }
 
     /// <inheritdoc/>
-    public Size GetWindowSize () => _windowSize;
+    public Size GetSize () { return _consoleSize; }
 
     /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text)
-    {
-        _output.Append (text);
-    }
+    public void Write (ReadOnlySpan<char> text) { _output.Append (text); }
 
     /// <inheritdoc/>
     public override void SetCursorVisibility (CursorVisibility visibility)
@@ -80,9 +70,5 @@ public class FakeConsoleOutput : OutputBase, IConsoleOutput
     }
 
     /// <inheritdoc/>
-    protected override void Write (StringBuilder output)
-    {
-        _output.Append (output);
-    }
-
+    protected override void Write (StringBuilder output) { _output.Append (output); }
 }
