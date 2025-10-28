@@ -88,13 +88,16 @@ public record struct Thickness
     /// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in screen coordinates.</param>
     /// <param name="diagnosticFlags"></param>
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
+    /// <param name="driver">Optional driver. If not specified, <see cref="Application.Driver"/> will be used.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
-    public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null)
+    public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null, IConsoleDriver? driver = null)
     {
         if (rect.Size.Width < 1 || rect.Size.Height < 1)
         {
             return Rectangle.Empty;
         }
+
+        driver ??= Application.Driver;
 
         var clearChar = (Rune)' ';
         Rune leftChar = clearChar;
@@ -118,71 +121,71 @@ public record struct Thickness
         // Draw the Top side
         if (Top > 0)
         {
-            Application.Driver?.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
+            driver?.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
         }
 
         // Draw the Left side
         // Draw the Left side
         if (Left > 0)
         {
-            Application.Driver?.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
+            driver?.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
         }
 
         // Draw the Right side
         if (Right > 0)
         {
-            Application.Driver?.FillRect (
-                                          rect with
-                                          {
-                                              X = Math.Max (0, rect.X + rect.Width - Right),
-                                              Width = Math.Min (rect.Width, Right)
-                                          },
-                                          rightChar
-                                         );
+            driver?.FillRect (
+                              rect with
+                              {
+                                  X = Math.Max (0, rect.X + rect.Width - Right),
+                                  Width = Math.Min (rect.Width, Right)
+                              },
+                              rightChar
+                             );
         }
 
         // Draw the Bottom side
         if (Bottom > 0)
         {
-            Application.Driver?.FillRect (
-                                          rect with
-                                          {
-                                              Y = rect.Y + Math.Max (0, rect.Height - Bottom),
-                                              Height = Bottom
-                                          },
-                                          bottomChar
-                                         );
+            driver?.FillRect (
+                              rect with
+                              {
+                                  Y = rect.Y + Math.Max (0, rect.Height - Bottom),
+                                  Height = Bottom
+                              },
+                              bottomChar
+                             );
         }
 
         if (diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler))
         {
             // PERF: This can almost certainly be simplified down to a single point offset and fewer calls to Draw
             // Top
-            var hruler = new Ruler { Length = rect.Width, Orientation = Orientation.Horizontal };
+            Ruler hRuler = new () { Length = rect.Width, Orientation = Orientation.Horizontal };
 
             if (Top > 0)
             {
-                hruler.Draw (rect.Location);
+                hRuler.Draw (rect.Location, driver: driver);
             }
 
             //Left
-            var vruler = new Ruler { Length = rect.Height - 2, Orientation = Orientation.Vertical };
+            Ruler vRuler = new () { Length = rect.Height - 2, Orientation = Orientation.Vertical };
 
             if (Left > 0)
             {
-                vruler.Draw (rect.Location with { Y = rect.Y + 1 }, 1);
+                vRuler.Draw (rect.Location with { Y = rect.Y + 1 }, 1, driver);
             }
 
             // Bottom
             if (Bottom > 0)
             {
-                hruler.Draw (rect.Location with { Y = rect.Y + rect.Height - 1 });
+                hRuler.Draw (rect.Location with { Y = rect.Y + rect.Height - 1 }, driver: driver);
             }
 
             // Right
             if (Right > 0)
             {
-                vruler.Draw (new (rect.X + rect.Width - 1, rect.Y + 1), 1);
+                vRuler.Draw (new (rect.X + rect.Width - 1, rect.Y + 1), 1, driver);
             }
         }
 
@@ -191,7 +194,7 @@ public record struct Thickness
             // Draw the diagnostics label on the bottom
             string text = label is null ? string.Empty : $"{label} {this}";
 
-            var tf = new TextFormatter
+            TextFormatter tf = new ()
             {
                 Text = text,
                 Alignment = Alignment.Center,
@@ -200,9 +203,9 @@ public record struct Thickness
                 ConstrainToHeight = 1
             };
 
-            if (Application.Driver?.CurrentAttribute is { })
+            if (driver?.CurrentAttribute is { })
             {
-                tf.Draw (rect, Application.Driver!.CurrentAttribute, Application.Driver!.CurrentAttribute, rect);
+                tf.Draw (rect, driver!.CurrentAttribute, driver!.CurrentAttribute, rect, driver);
             }
         }
 
@@ -242,7 +245,7 @@ public record struct Thickness
     /// <returns></returns>
     public Region AsRegion (Rectangle rect)
     {
-        Region region = new Region (rect);
+        var region = new Region (rect);
         region.Exclude (GetInside (rect));
 
         return region;

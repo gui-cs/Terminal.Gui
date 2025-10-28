@@ -28,9 +28,6 @@ public class TextField : View, IDesignable
         _selectedStart = -1;
         _text = new ();
 
-        // TODO: Determine if this is a good choice. Previously this was hard coded to 
-        // TODO: DarkGray which was NOT a good choice.
-        CaptionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
         Height = Dim.Auto (DimAutoStyle.Text, 1);
@@ -39,9 +36,6 @@ public class TextField : View, IDesignable
         CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
-
-        // By default, disable hotkeys (in case someome sets Title)
-        HotKeySpecifier = new ('\xffff');
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -324,6 +318,30 @@ public class TextField : View, IDesignable
                     }
                    );
 
+        AddCommand (
+                    Command.HotKey,
+                    ctx =>
+                    {
+                        if (RaiseHandlingHotKey (ctx) is true)
+                        {
+                            return true;
+                        }
+
+                        // If we have focus, then ignore the hotkey because the user
+                        // means to enter it
+                        if (HasFocus)
+                        {
+                            return false;
+                        }
+
+                        // This is what the default HotKey handler does:
+                        SetFocus ();
+
+                        // Always return true on hotkey, even if SetFocus fails because 
+                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
+                        return true;
+                    });
+
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
@@ -410,15 +428,6 @@ public class TextField : View, IDesignable
     ///     <see cref="ISuggestionGenerator"/> to enable this feature.
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
-    ///     not yet have input focus.
-    /// </summary>
-    public string Caption { get; set; }
-
-    /// <summary>Gets or sets the foreground <see cref="Color"/> to use when rendering <see cref="Caption"/>.</summary>
-    public Color CaptionColor { get; set; }
 
     /// <summary>Get the Context Menu for this view.</summary>
     [CanBeNull]
@@ -920,7 +929,7 @@ public class TextField : View, IDesignable
         _isDrawing = true;
 
         // Cache attributes as GetAttributeForRole might raise events
-        Attribute selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
+        var selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
         Attribute readonlyAttribute = GetAttributeForRole (VisualRole.ReadOnly);
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Editable);
 
@@ -943,7 +952,7 @@ public class TextField : View, IDesignable
             {
                 // Disabled
                 SetAttributeForRole (VisualRole.Disabled);
-            } 
+            }
             else if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
             {
                 // Selected text
@@ -1156,7 +1165,6 @@ public class TextField : View, IDesignable
     /////     </remarks>
     ///// </summary>
     //public event EventHandler<StateEventArgs<string>> TextChanged;
-
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
@@ -1699,25 +1707,33 @@ public class TextField : View, IDesignable
     private void RenderCaption ()
     {
         if (HasFocus
-            || Caption == null
-            || Caption.Length == 0
+            || string.IsNullOrEmpty (Title)
             || Text?.Length > 0)
         {
             return;
         }
 
-        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
-        SetAttribute (color);
-
-        Move (0, 0);
-        string render = Caption;
-
-        if (render.GetColumns () > Viewport.Width)
+        // Ensure TitleTextFormatter has the current Title text
+        // (should already be set by the Title property setter, but being defensive)
+        if (TitleTextFormatter.Text != Title)
         {
-            render = render [..Viewport.Width];
+            TitleTextFormatter.Text = Title;
         }
 
-        AddStr (render);
+        var captionAttribute = new Attribute (
+                                              GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                              GetAttributeForRole (VisualRole.Editable).Background);
+
+        var hotKeyAttribute = new Attribute (
+                                             GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                             GetAttributeForRole (VisualRole.Editable).Background,
+                                             GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+
+        // Use TitleTextFormatter to render the caption with hotkey support
+        TitleTextFormatter.Draw (
+                                 ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
+                                 captionAttribute,
+                                 hotKeyAttribute);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
@@ -1814,11 +1830,11 @@ public class TextField : View, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Text = "This is a test.";
-        Caption = "Caption";
+        Title = "Caption";
 
         return true;
     }

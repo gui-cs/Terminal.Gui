@@ -95,7 +95,7 @@ internal class ShadowView : View
         {
             for (int c = Math.Max (0, screen.X + 1); c < screen.X + screen.Width; c++)
             {
-                Driver.Move (c, r);
+                Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
                 if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
@@ -129,7 +129,7 @@ internal class ShadowView : View
         {
             for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
             {
-                Driver.Move (c, r);
+                Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
                 if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))

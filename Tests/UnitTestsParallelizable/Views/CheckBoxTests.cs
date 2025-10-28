@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class CheckBoxTests (ITestOutputHelper output)
+public class CheckBoxTests ()
 {
     [Theory]
     [InlineData ("01234", 0, 0, 0, 0)]
