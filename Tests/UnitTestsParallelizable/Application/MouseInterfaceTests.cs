@@ -1,3 +1,4 @@
+#nullable enable
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
@@ -89,7 +90,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         // Arrange
         MouseImpl mouse = new ();
         var eventFired = false;
-        MouseEventArgs capturedArgs = null;
+        MouseEventArgs? capturedArgs = null;
 
         mouse.MouseEvent += (sender, args) =>
         {
@@ -120,7 +121,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         MouseImpl mouse = new ();
         var eventCount = 0;
 
-        void Handler (object sender, MouseEventArgs args) => eventCount++;
+        void Handler (object? sender, MouseEventArgs args) => eventCount++;
 
         mouse.MouseEvent += Handler;
 

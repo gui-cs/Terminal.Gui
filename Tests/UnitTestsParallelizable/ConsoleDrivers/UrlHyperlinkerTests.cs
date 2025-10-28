@@ -2,7 +2,7 @@
 using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests_Parallelizable.ConoleDriverTests;
 
 public class Osc8UrlLinkerTests (ITestOutputHelper output)
 {
