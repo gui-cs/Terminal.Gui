@@ -16,9 +16,9 @@ public abstract class ComponentFactory<T> : IComponentFactory<T>
     public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
 
     /// <inheritdoc />
-    public virtual IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    public virtual IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        return new WindowSizeMonitor (consoleOutput, outputBuffer);
+        return new ConsoleSizeMonitor (consoleOutput, outputBuffer);
     }
 
     /// <inheritdoc />

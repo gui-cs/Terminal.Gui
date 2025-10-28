@@ -119,7 +119,7 @@ public class ToScreenTests ()
             Height = 1
         };
 
-        view.Border.Add (subviewOfBorder);
+        view.Border!.Add (subviewOfBorder);
         view.BeginInit ();
         view.EndInit ();
 

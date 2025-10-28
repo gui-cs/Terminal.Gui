@@ -178,10 +178,10 @@ public class ViewportSettings : Scenario
         buttonAnchored.Accepting += (sender, args) => MessageBox.Query ("Hi", $"You pressed {((Button)sender)?.Text}", "_Ok");
 
         view.Margin!.Data = "Margin";
-        view.Margin.Thickness = new (0);
+        view.Margin!.Thickness = new (0);
 
         view.Border!.Data = "Border";
-        view.Border.Thickness = new (3);
+        view.Border!.Thickness = new (3);
 
         view.Padding.Data = "Padding";
 

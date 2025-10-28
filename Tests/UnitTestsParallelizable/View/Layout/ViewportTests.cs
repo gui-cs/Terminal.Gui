@@ -55,7 +55,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = 10,
             Width = 10,
         };
-        superSuperView.Border.Thickness = new Thickness (borderThickness);
+        superSuperView.Border!.Thickness = new Thickness (borderThickness);
 
         var superView = new View ()
         {
@@ -64,7 +64,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        superView.Border.Thickness = new Thickness (borderThickness);
+        superView.Border!.Thickness = new Thickness (borderThickness);
 
         superSuperView.Add (superView);
 
@@ -113,7 +113,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = 10,
             Width = 10,
         };
-        superSuperView.Border.Thickness = new Thickness (borderThickness);
+        superSuperView.Border!.Thickness = new Thickness (borderThickness);
 
         var superView = new View ()
         {
@@ -122,7 +122,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        superView.Border.Thickness = new Thickness (borderThickness);
+        superView.Border!.Thickness = new Thickness (borderThickness);
 
         superSuperView.Add (superView);
 
@@ -133,7 +133,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = Dim.Fill (),
             Width = Dim.Fill ()
         };
-        view.Border.Thickness = new Thickness (borderThickness);
+        view.Border!.Thickness = new Thickness (borderThickness);
 
         superView.Add (view);
         superSuperView.BeginInit ();
@@ -328,7 +328,7 @@ public class ViewportTests (ITestOutputHelper output)
         };
         view.BeginInit ();
         view.EndInit ();
-        view.Margin.Thickness = new (adornmentThickness);
+        view.Margin!.Thickness = new (adornmentThickness);
 
         Assert.Equal (expectedOffset, view.GetViewportOffsetFromFrame ().X);
     }

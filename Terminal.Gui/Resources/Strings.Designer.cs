@@ -628,7 +628,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter Path.
+        ///   Looks up a localized string similar to _Enter Path.
         /// </summary>
         internal static string fdPathCaption {
             get {
@@ -682,7 +682,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Find.
+        ///   Looks up a localized string similar to _Find.
         /// </summary>
         internal static string fdSearchCaption {
             get {

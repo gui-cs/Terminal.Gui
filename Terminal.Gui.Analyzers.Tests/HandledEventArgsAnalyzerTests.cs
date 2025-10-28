@@ -1,7 +1,8 @@
-﻿using Terminal.Gui.Input;
+﻿using Terminal.Gui.Analyzers;
+using Terminal.Gui.Input;
 using Terminal.Gui.Views;
 
-namespace Terminal.Gui.Analyzers.Tests;
+namespace Analyzers.Tests;
 
 public class HandledEventArgsAnalyzerTests
 {
