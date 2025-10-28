@@ -1,6 +1,8 @@
 # Terminology Proposal: Renaming Application.Top and Toplevel
 
-> **Note**: This proposal has been updated (October 2025) to reflect recent architectural improvements in Terminal.Gui v2, including the removal of legacy MainLoop infrastructure and modernization of the application event loop. The proposal remains valid and relevant with the current codebase.
+> **Note**: This proposal has been updated (October 2025) to reflect recent architectural improvements in Terminal.Gui v2, including the removal of legacy MainLoop infrastructure, driver architecture refactoring (FakeDriver consolidation), and modernization of the application event loop. The proposal remains valid and relevant with the current codebase.
+>
+> **Latest Validation**: October 28, 2025 - Verified against recent changes including driver architecture improvements and test infrastructure modernization.
 
 ## Executive Summary
 
@@ -17,13 +19,19 @@ This document proposes new, clearer terminology to replace the confusing `Applic
 
 ### Current Usage Patterns
 
-Based on current code analysis (as of October 2025):
+Based on current code analysis (as of October 28, 2025):
 - `Application.Top` - The currently active/running view with its own run loop
 - `Application.TopLevels` - Internal stack of all active "runnable" views  
+- `Application.CachedRunStateToplevel` - Internal caching mechanism for RunState management (added recently)
 - `Toplevel` class - Base class for views that can run independently (Window, Dialog, etc.)
 - Modal vs Non-modal - Views that can be "run" either as overlays or embedded
 
-**Recent Modernization**: Terminal.Gui v2 has completed modernization of its application infrastructure, removing legacy MainLoop code and consolidating around `ApplicationImpl.Coordinator` for event loop management. The terminology confusion addressed in this proposal remains relevant to the current codebase.
+**Recent Architectural Updates**: 
+- Terminal.Gui v2 has completed modernization of its application infrastructure
+- Legacy MainLoop code removed, consolidated around `ApplicationImpl.Coordinator`
+- Driver architecture refactored with FakeDriver consolidation into the main library
+- Test infrastructure modernized
+- The terminology confusion addressed in this proposal remains relevant with current codebase
 
 ## Proposed Terminology
 

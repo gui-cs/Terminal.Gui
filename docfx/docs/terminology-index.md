@@ -1,6 +1,8 @@
 # Terminal.Gui Terminology Proposal - Documentation Index
 
-> **Updated October 2025**: Proposal validated and updated to reflect recent architectural modernizations, including removal of legacy MainLoop infrastructure.
+> **Updated October 2025**: Proposal validated and updated to reflect recent architectural modernizations, including removal of legacy MainLoop infrastructure, driver architecture refactoring, and test infrastructure improvements.
+>
+> **Latest Validation**: October 28, 2025 - Verified against current codebase including FakeDriver consolidation and recent API refinements.
 
 This directory contains a comprehensive proposal for renaming `Application.Top` and related terminology in Terminal.Gui v2.
 

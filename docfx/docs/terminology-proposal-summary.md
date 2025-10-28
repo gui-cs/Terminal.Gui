@@ -1,6 +1,8 @@
 # Terminology Proposal Summary
 
-> **Updated October 2025**: Proposal validated against current modernized codebase (post-MainLoop removal).
+> **Updated October 2025**: Proposal validated against current modernized codebase (post-MainLoop removal, driver refactoring).
+> 
+> **Latest Validation**: October 28, 2025 - Confirmed accurate with recent driver architecture improvements and test infrastructure updates.
 
 This is a brief summary of the [full terminology proposal](terminology-proposal.md).
 
