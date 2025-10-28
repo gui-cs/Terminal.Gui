@@ -51,7 +51,7 @@ public class WindowTests (ITestOutputHelper output)
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
+        Application.Driver!.SetScreenSize (20, 10);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -68,7 +68,7 @@ public class WindowTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 20));
+        Application.Driver!.SetScreenSize (40, 20);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -95,7 +95,7 @@ public class WindowTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
+        Application.Driver!.SetScreenSize (20, 10);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -168,8 +168,8 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
 
         // Rect with values
-        using var windowWithFrame1234 = new Window ( );
-        windowWithFrame1234.Frame = new  (1, 2, 3, 4);
+        using var windowWithFrame1234 = new Window ();
+        windowWithFrame1234.Frame = new (1, 2, 3, 4);
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);

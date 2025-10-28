@@ -31,7 +31,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     public ConcurrentQueue<T> InputBuffer { get; }
 
     /// <inheritdoc />
-    public string DriverName { get; init; }
+    public string? DriverName { get; init; }
 
     /// <inheritdoc/>
     public IAnsiResponseParser GetParser () { return Parser; }
@@ -166,7 +166,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// <param name="input"></param>
     protected abstract void ProcessAfterParsing (T input);
 
-    internal char _highSurrogate = '\0';
+    private char _highSurrogate = '\0';
 
     /// <inheritdoc />
     public bool IsValidInput (Key key, out Key result)

@@ -206,15 +206,15 @@ public static partial class Application
             Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
 
             // If End wasn't called _cachedRunStateToplevel may be null
-            if (_cachedRunStateToplevel is { })
+            if (CachedRunStateToplevel is { })
             {
-                Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-                Debug.Assert (_cachedRunStateToplevel == Top);
+                Debug.Assert (CachedRunStateToplevel.WasDisposed);
+                Debug.Assert (CachedRunStateToplevel == Top);
             }
         }
 #endif
         Top = null;
-        _cachedRunStateToplevel = null;
+        CachedRunStateToplevel = null;
 
         MainThreadId = -1;
         Iteration = null;
@@ -257,7 +257,7 @@ public static partial class Application
 
         // Keyboard events and bindings are now managed by the Keyboard instance
 
-        SizeChanging = null;
+        ScreenChanged = null;
 
         Navigation = null;
 

@@ -236,14 +236,14 @@ public class SetFocusTests () : TestsAllViews
         };
         borderSubView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
 
-        view.Border.Add (borderSubView);
+        view.Border!.Add (borderSubView);
 
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.False (borderSubView.HasFocus);
 
-        view.Border.CanFocus = true;
+        view.Border!.CanFocus = true;
         subViewSubView1.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.False (subView.HasFocus);
@@ -252,47 +252,47 @@ public class SetFocusTests () : TestsAllViews
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border.CanFocus = false;
+        view.Border!.CanFocus = false;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border.HasFocus);
+        Assert.False (view.Border!.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border.CanFocus = true;
+        view.Border!.CanFocus = true;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border.HasFocus);
+        Assert.False (view.Border!.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border.SetFocus ();
+        view.Border!.SetFocus ();
         Assert.True (view.HasFocus);
-        Assert.True (view.Border.HasFocus);
+        Assert.True (view.Border!.HasFocus);
         Assert.False (subView.HasFocus);
         Assert.True (borderSubView.HasFocus);
         Assert.True (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border.CanFocus = false;
+        view.Border!.CanFocus = false;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border.HasFocus);
+        Assert.False (view.Border!.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border.CanFocus = true;
+        view.Border!.CanFocus = true;
         subViewSubView1.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.False (subView.HasFocus);
-        Assert.True (view.Border.HasFocus);
+        Assert.True (view.Border!.HasFocus);
         Assert.True (borderSubView.HasFocus);
         Assert.True (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
@@ -301,7 +301,7 @@ public class SetFocusTests () : TestsAllViews
         subView.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border.HasFocus);
+        Assert.False (view.Border!.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);

@@ -17,4 +17,12 @@ public static partial class Application // Toplevel handling
         get => ApplicationImpl.Instance.Top;
         internal set => ApplicationImpl.Instance.Top = value;
     }
+
+    internal static Toplevel? CachedRunStateToplevel
+    {
+        get => ApplicationImpl.Instance.CachedRunStateToplevel;
+        private set => ApplicationImpl.Instance.CachedRunStateToplevel = value;
+    }
+
+
 }

@@ -1,12 +1,10 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.DrawingTests;
 
 public class StraightLineExtensionsTests (ITestOutputHelper output)
 {
     [Fact]
-    [AutoInitShutdown]
     public void LineCanvasIntegrationTest ()
     {
         var lc = new LineCanvas ();
@@ -146,7 +144,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     #region Parallel Tests
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_HorizontalLines_LeftOnly ()
     {
         // x=1 to x=10
@@ -165,7 +162,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_HorizontalLines_RightOnly ()
     {
         // x=1 to x=10
@@ -185,7 +181,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_HorizontalLines_HorizontalSplit ()
     {
         // x=1 to x=10
@@ -213,7 +208,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_HorizontalLines_CoverCompletely ()
     {
         // x=1 to x=10
@@ -228,7 +222,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_VerticalLines_TopOnly ()
     {
         // y=1 to y=10
@@ -247,7 +240,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_HorizontalLines_BottomOnly ()
     {
         // y=1 to y=10
@@ -267,7 +259,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_VerticalLines_VerticalSplit ()
     {
         // y=1 to y=10
@@ -295,7 +286,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludeParallel_VerticalLines_CoverCompletely ()
     {
         // y=1 to y=10
@@ -314,7 +304,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     #region Perpendicular Intersection Tests
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_Splits ()
     {
         // x=1 to x=10
@@ -342,7 +331,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_ClipLeft ()
     {
         // x=1 to x=10
@@ -363,7 +351,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_ClipRight ()
     {
         // x=1 to x=10
@@ -384,7 +371,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_MissLeft ()
     {
         // x=1 to x=10
@@ -401,7 +387,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_MissRight ()
     {
         // x=1 to x=10
@@ -418,7 +403,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_ClipTop ()
     {
         // y=1 to y=10
@@ -439,7 +423,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_ClipBottom ()
     {
         // y=1 to y=10
@@ -460,7 +443,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_MissTop ()
     {
         // y=1 to y=10
@@ -477,7 +459,6 @@ public class StraightLineExtensionsTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_MissBottom ()
     {
         // y=1 to y=10

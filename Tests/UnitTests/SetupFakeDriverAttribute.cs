@@ -36,11 +36,10 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Application.ResetState (true);
         Assert.Null (Application.Driver);
 
-        var ff = new FakeDriverFactory ();
-        var driver = ff.Create ();
+        var driver = new FakeDriver ();
 
         Application.Driver = driver;
-        driver.SetBufferSize (25, 25);
+        driver.SetScreenSize (25, 25);
 
         Assert.Equal (new (0, 0, 25, 25), Application.Screen);
         // Ensures subscribing events, at least for the SizeChanged event

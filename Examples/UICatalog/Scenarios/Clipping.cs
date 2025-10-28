@@ -151,7 +151,7 @@ public class Clipping : Scenario
         //tiled.Padding.Thickness = new (1);
         //tiled.Padding.Diagnostics =  ViewDiagnosticFlags.Thickness;
 
-        //tiled.Margin.Thickness = new (1);
+        //tiled.Margin!.Thickness = new (1);
 
         FrameView fv = new ()
         {

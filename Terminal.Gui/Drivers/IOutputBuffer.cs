@@ -97,7 +97,7 @@ public interface IOutputBuffer
     /// </summary>
     /// <param name="cols"></param>
     /// <param name="rows"></param>
-    void SetWindowSize (int cols, int rows);
+    void SetSize (int cols, int rows);
 
     /// <summary>
     ///     Fills the given <paramref name="rect"/> with the given
