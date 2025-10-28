@@ -74,6 +74,11 @@ public interface IApplication
     /// <summary>Gets the stack of all Toplevels.</summary>
     System.Collections.Concurrent.ConcurrentStack<Toplevel> TopLevels { get; }
 
+    /// <summary>
+    /// Caches the Toplevel associated with the current RunState.
+    /// </summary>
+    Toplevel? CachedRunStateToplevel { get; set; }
+
     /// <summary>Requests that the application stop running.</summary>
     void RequestStop ();
 

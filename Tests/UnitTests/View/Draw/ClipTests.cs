@@ -171,7 +171,7 @@ public class ClipTests (ITestOutputHelper _output)
     [Trait ("Category", "Unicode")]
     public void Clipping_Wide_Runes ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (30, 1);
+        Application.Driver!.SetScreenSize (30, 1);
 
         var top = new View
         {
@@ -190,7 +190,7 @@ public class ClipTests (ITestOutputHelper _output)
                    """
         };
         frameView.Border!.LineStyle = LineStyle.Single;
-        frameView.Border.Thickness = new (1, 0, 0, 0);
+        frameView.Border!.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
         View.SetClipToScreen ();

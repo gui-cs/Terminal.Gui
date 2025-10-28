@@ -15,6 +15,15 @@ public interface IConsoleDriver
     Rectangle Screen { get; }
 
     /// <summary>
+    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
+    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    /// </summary>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
+    void SetScreenSize (int width, int height);
+
+    /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
@@ -200,11 +209,14 @@ public interface IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     bool SetCursorVisibility (CursorVisibility visibility);
 
-    /// <summary>The event fired when the terminal is resized.</summary>
+    /// <summary>
+    /// The event fired when the screen changes (size, position, etc.).
+    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    /// </summary>
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
+    /// <remarks>This is only implemented in UnixDriver.</remarks>
     void Suspend ();
 
     /// <summary>
@@ -227,12 +239,6 @@ public interface IConsoleDriver
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
     Attribute GetAttribute ();
-
-    /// <summary>Makes an <see cref="Attribute"/>.</summary>
-    /// <param name="foreground">The foreground color.</param>
-    /// <param name="background">The background color.</param>
-    /// <returns>The attribute for the foreground and background colors.</returns>
-    Attribute MakeColor (in Color foreground, in Color background);
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<MouseEventArgs>? MouseEvent;

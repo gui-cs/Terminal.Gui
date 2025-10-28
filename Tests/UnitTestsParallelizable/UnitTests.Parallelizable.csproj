@@ -31,6 +31,7 @@
     <ItemGroup>
         <Compile Include="..\UnitTests\TestsAllViews.cs" Link="TestsAllViews.cs" />
         <Compile Include="..\UnitTests\DriverAssert.cs" Link="DriverAssert.cs" />
+        <Compile Include="..\UnitTests\OutputAssert.cs" Link="OutputAssert.cs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -76,9 +76,9 @@ public class GetViewsUnderLocationTests
             Frame = new (frameX, frameY, 10, 10)
         };
         Application.Top.Margin!.Thickness = new (marginThickness);
-        Application.Top.Margin.Id = "Margin";
+        Application.Top.Margin!.Id = "Margin";
         Application.Top.Border!.Thickness = new (borderThickness);
-        Application.Top.Border.Id = "Border";
+        Application.Top.Border!.Id = "Border";
         Application.Top.Padding!.Thickness = new (paddingThickness);
         Application.Top.Padding.Id = "Padding";
 
@@ -353,9 +353,9 @@ public class GetViewsUnderLocationTests
             Width = 10, Height = 10
         };
         Application.Top.Margin!.Thickness = new (1);
-        Application.Top.Margin.Id = "Margin";
+        Application.Top.Margin!.Id = "Margin";
         Application.Top.Border!.Thickness = new (1);
-        Application.Top.Border.Id = "Border";
+        Application.Top.Border!.Id = "Border";
         Application.Top.Padding!.Thickness = new (1);
         Application.Top.Padding.Id = "Padding";
 
@@ -401,7 +401,7 @@ public class GetViewsUnderLocationTests
             Width = 5, Height = 5
         };
         subview.Border!.Thickness = new (1);
-        subview.Border.Id = "border";
+        subview.Border!.Id = "border";
         Application.Top.Add (subview);
 
         List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
@@ -438,8 +438,8 @@ public class GetViewsUnderLocationTests
             Width = 5, Height = 5
         };
         subview.Border!.Thickness = new (1);
-        subview.Border.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
-        subview.Border.Id = "border";
+        subview.Border!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        subview.Border!.Id = "border";
         Application.Top.Add (subview);
 
         List<View?> viewsUnderMouse = View.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
@@ -786,14 +786,14 @@ public class GetViewsUnderLocationTests
         Application.TopLevels.Push (secondaryToplevel);
         Application.Top = secondaryToplevel;
 
-        secondaryToplevel.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        secondaryToplevel.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
         List<View?> found = View.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v == secondaryToplevel);
         Assert.Contains (found, v => v == secondaryToplevel.Margin);
         Assert.DoesNotContain (found, v => v?.Id == topToplevel.Id);
 
-        secondaryToplevel.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        secondaryToplevel.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         found = View.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (found, v => v == secondaryToplevel);
         Assert.DoesNotContain (found, v => v == secondaryToplevel.Margin);
