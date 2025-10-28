@@ -48,7 +48,7 @@ After independently analyzing the Terminal.Gui codebase, Terminal.Gui uses a **m
 │                                                                  │
 │  IConsoleInput<T>          IConsoleOutput                       │
 │  IInputProcessor           OutputBuffer                         │
-│  IComponentFactory<T>      IWindowSizeMonitor                   │
+│  IComponentFactory<T>      IConsoleSizeMonitor                  │
 │                                                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -171,7 +171,7 @@ internal void IterationImpl()
     
     // 2. Check if any views need layout or drawing
     bool needsDrawOrLayout = AnySubViewsNeedDrawn(...);
-    bool sizeChanged = WindowSizeMonitor.Poll();
+    bool sizeChanged = ConsoleSizeMonitor.Poll();
     
     if (needsDrawOrLayout || sizeChanged)
     {
@@ -218,7 +218,7 @@ IConsoleInput<T>.Run(CancellationToken)
 **Platform-specific implementations:**
 - `NetInput` (DotNet driver) - Uses `Console.ReadKey()`
 - `WindowsInput` - Uses Win32 API `ReadConsoleInput()`
-- `UnixDriver.UnixInput` - Uses Unix terminal APIs
+- `UnixInput` (Unix driver) - Uses Unix terminal APIs
 
 ### Main UI Thread (Foreground)
 
@@ -314,7 +314,7 @@ ApplicationMainLoop<T>
     ├─ OutputBuffer (buffered drawing)
     ├─ ConsoleOutput (writes to terminal)
     ├─ TimedEvents (timeout callbacks)
-    ├─ WindowSizeMonitor (detects resizing)
+    ├─ ConsoleSizeMonitor (detects terminal resizing)
     └─ ToplevelTransitionManager (handles Top changes)
 ```
 
