@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class LayoutTests (ITestOutputHelper output) : TestsAllViews
 {
@@ -12,7 +12,6 @@ public class LayoutTests (ITestOutputHelper output) : TestsAllViews
     {
 
         // Required for spinner view that wants to register timeouts
-        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
 
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 

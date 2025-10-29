@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 public class MenuBarv1Tests (ITestOutputHelper output)
@@ -467,10 +467,10 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Button.DefaultShadow = ShadowStyle.None;
 
         Toplevel top = new ();
-        var win = new Window ();
+        Window win = new ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 15))    ;
+        Application.Driver!.SetScreenSize (40, 15);
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
 
@@ -503,8 +503,8 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             "Save As",
             "Delete"
         };
-        var dialog = new Dialog { X = 2, Y = 2, Width = 15, Height = 4 };
-        var menu = new MenuBar { X = Pos.Center (), Width = 10 };
+        Dialog dialog = new () { X = 2, Y = 2, Width = 15, Height = 4 };
+        MenuBar menu = new () { X = Pos.Center (), Width = 10 };
 
         menu.Menus = new MenuBarItem []
         {
@@ -572,7 +572,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         }
 
         RunState rsDialog = Application.Begin (dialog);
-        Application.RunIteration (ref rsDialog);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
 
@@ -598,7 +598,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         Assert.Equal ("File", menu.Menus [0].Title);
         menu.OpenMenu ();
-        Application.RunIteration (ref rsDialog);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -623,9 +623,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
-        bool firstIteration = true;
-        Application.RunIteration (ref rsDialog, firstIteration);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -654,13 +652,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
             Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
-            Application.RunIteration (ref rsDialog);
+            AutoInitShutdownAttribute.RunIteration ();
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+        Application.Driver!.SetScreenSize (20, 15);
         menu.OpenMenu ();
-        Application.RunIteration (ref rsDialog);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -691,7 +689,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+        Application.Driver!.SetScreenSize (40, 15);
 
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
@@ -816,7 +814,6 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (items [0], menu.Menus [0].Title);
 
@@ -839,7 +836,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+        Application.Driver!.SetScreenSize (20, 15);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -910,7 +907,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(7, 5));
+        Application.Driver!.SetScreenSize (7, 5);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -926,7 +923,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(7, 3));
+        Application.Driver!.SetScreenSize (7, 3);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -984,7 +981,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(3, 2));
+        Application.Driver!.SetScreenSize (3, 2);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -997,7 +994,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        AutoInitShutdownAttribute.FakeResize(new Size(3, 1));
+        Application.Driver!.SetScreenSize (3, 1);
         menu.OpenMenu ();
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -1631,7 +1628,7 @@ wo
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
+        Application.Driver!.SetScreenSize (40, 8);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1743,7 +1740,7 @@ wo
 
         Application.AddTimeout (TimeSpan.Zero, () =>
                                                        {
-                                                           AutoInitShutdownAttribute.FakeResize(new Size (40, 8));
+                                                           Application.Driver!.SetScreenSize (40, 8);
 
                                                            DriverAssert.AssertDriverContentsWithFrameAre (
                                                                 @"
@@ -1857,7 +1854,7 @@ wo
             ]
         };
         win.Add (menu);
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
+        Application.Driver!.SetScreenSize (40, 8);
         RunState rs = Application.Begin (win);
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -1944,7 +1941,7 @@ wo
     [AutoInitShutdown]
     public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
     {
-        AutoInitShutdownAttribute.FakeResize(new Size(40, 8));
+        Application.Driver!.SetScreenSize (40, 8);
 
         Application.AddTimeout (TimeSpan.Zero, () =>
                                                        {
@@ -2578,11 +2575,11 @@ Edit
 
             if (i is < 0 or > 0)
             {
-                Assert.Equal (menu, Application.MouseGrabHandler.MouseGrabView);
+                Assert.Equal (menu, Application.Mouse.MouseGrabView);
             }
             else
             {
-                Assert.Equal (menuBar, Application.MouseGrabHandler.MouseGrabView);
+                Assert.Equal (menuBar, Application.Mouse.MouseGrabView);
             }
 
             Assert.Equal ("_Edit", miCurrent.Parent.Title);
@@ -2900,7 +2897,7 @@ Edit
                                                       output
                                                      );
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 15));
+        Application.Driver!.SetScreenSize (20, 15);
 
         AutoInitShutdownAttribute.RunIteration ();
 

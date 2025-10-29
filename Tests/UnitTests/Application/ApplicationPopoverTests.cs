@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.ApplicationTests;
+﻿#nullable enable
+namespace UnitTests.ApplicationTests;
 
 public class ApplicationPopoverTests
 {
@@ -276,7 +277,7 @@ public class ApplicationPopoverTests
         public PopoverTestClass ()
         {
             CanFocus = true;
-            AddCommand (Command.New, NewCommandHandler);
+            AddCommand (Command.New, NewCommandHandler!);
             HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
 
             return;

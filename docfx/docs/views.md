@@ -628,33 +628,6 @@ TextView provides a fully featured multi-line text
 It supports word wrap and history for undo.
 ```
 
-## [TileView](~/api/Terminal.Gui.Views.TileView.yml)
-
-A [View](~/api/Terminal.Gui.ViewBase.View.yml) consisting of a moveable bar that divides the display area into resizeable [TileView.Tiles](~/api/Terminal.Gui.Views.TileView.Tiles.yml).
-
-```text
-│
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-                         │
-```
-
 ## [TimeField](~/api/Terminal.Gui.Views.TimeField.yml)
 
 Provides time editing functionality with mouse support

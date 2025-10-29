@@ -451,10 +451,9 @@ internal class Branch<T> where T : class
     ///     Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing
     ///     expansion symbols or leaf node etc.
     /// </summary>
-    /// <param name="driver"></param>
     /// <param name="x"></param>
     /// <returns></returns>
-    internal bool IsHitOnExpandableSymbol (IConsoleDriver driver, int x)
+    internal bool IsHitOnExpandableSymbol (int x)
     {
         // if leaf node then we cannot expand
         if (!CanExpand ())

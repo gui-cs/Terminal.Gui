@@ -185,7 +185,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
         Branch<T> branch = RowToBranch (hit.Value.Y);
 
-        if (branch.IsHitOnExpandableSymbol (Application.Driver, offsetX.Value))
+        if (branch.IsHitOnExpandableSymbol (offsetX.Value))
         {
             T m = branch.Model;
 

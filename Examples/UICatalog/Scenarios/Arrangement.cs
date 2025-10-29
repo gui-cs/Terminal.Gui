@@ -99,7 +99,6 @@ public class Arrangement : Scenario
 
                              progressBar.Fraction += 0.01f;
 
-                             Application.Wakeup ();
 
                              progressBar.SetNeedsDraw ();
                          };

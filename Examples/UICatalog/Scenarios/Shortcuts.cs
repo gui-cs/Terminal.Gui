@@ -382,7 +382,6 @@ public class Shortcuts : Scenario
 
                                  pb.Fraction += 0.01f;
 
-                                 Application.Wakeup ();
 
                                  pb.SetNeedsDraw ();
                              }

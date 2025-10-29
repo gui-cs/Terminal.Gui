@@ -179,8 +179,6 @@ public static partial class Application
     // starts running and after Shutdown returns.
     internal static void ResetState (bool ignoreDisposed = false)
     {
-        Navigation = new ();
-
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
@@ -208,19 +206,16 @@ public static partial class Application
             Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
 
             // If End wasn't called _cachedRunStateToplevel may be null
-            if (_cachedRunStateToplevel is { })
+            if (CachedRunStateToplevel is { })
             {
-                Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-                Debug.Assert (_cachedRunStateToplevel == Top);
+                Debug.Assert (CachedRunStateToplevel.WasDisposed);
+                Debug.Assert (CachedRunStateToplevel == Top);
             }
         }
 #endif
         Top = null;
-        _cachedRunStateToplevel = null;
+        CachedRunStateToplevel = null;
 
-        // MainLoop stuff
-        MainLoop?.Dispose ();
-        MainLoop = null;
         MainThreadId = -1;
         Iteration = null;
         EndAfterFirstIteration = false;
@@ -234,7 +229,13 @@ public static partial class Application
             Driver = null;
         }
 
-        _screen = null;
+        // Reset Screen to null so it will be recalculated on next access
+        // Note: ApplicationImpl.Shutdown() also calls ResetScreen() before calling this method
+        // to avoid potential circular reference issues. Calling it twice is harmless.
+        if (ApplicationImpl.Instance is ApplicationImpl impl)
+        {
+            impl.ResetScreen ();
+        }
 
         // Don't reset ForceDriver; it needs to be set before Init is called.
         //ForceDriver = string.Empty;
@@ -244,25 +245,21 @@ public static partial class Application
         // Run State stuff
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        MouseGrabHandler = new MouseGrabHandler ();
+        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
         Initialized = false;
 
         // Mouse
-        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // Do not clear _lastMousePosition; Popovers require it to stay set with
         // last mouse pos.
         //_lastMousePosition = null;
         CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
+        ResetMouseState ();
 
-        // Keyboard
-        KeyDown = null;
-        KeyUp = null;
-        SizeChanging = null;
+        // Keyboard events and bindings are now managed by the Keyboard instance
+
+        ScreenChanged = null;
 
         Navigation = null;
-
-        KeyBindings.Clear ();
-        AddKeyBindings ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from

@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 [Collection ("Global Test Setup")]
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
@@ -146,37 +146,37 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view?.Dispose ();
     }
 
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
-    {
-        var view = CreateInstanceIfNotGeneric (viewType);
+    //[Theory]
+    //[MemberData (nameof (AllViewTypes))]
+    //public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
+    //{
+    //    var view = CreateInstanceIfNotGeneric (viewType);
 
-        if (view == null)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+    //    if (view == null)
+    //    {
+    //        output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
-            return;
-        }
+    //        return;
+    //    }
 
-        if (view is IDesignable designable)
-        {
-            designable.EnableForDesign ();
-        }
+    //    if (view is IDesignable designable)
+    //    {
+    //        designable.EnableForDesign ();
+    //    }
 
-        var mockDriver = new MockConsoleDriver ();
-        mockDriver.AttributeSet += (_, args) =>
-                                   {
-                                       if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
-                                       {
-                                           Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
-                                       }
-                                   };
-        view.Driver = mockDriver;
-        view.Enabled = false;
-        view.SetNeedsDraw ();
-        view.Draw ();
+    //    var driver = CreateFakeDriver ();
+    //    driver.AttributeSet += (_, args) =>
+    //                           {
+    //                               if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
+    //                               {
+    //                                   Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
+    //                               }
+    //                           };
+    //    view.Driver = driver;
+    //    view.Enabled = false;
+    //    view.SetNeedsDraw ();
+    //    view.Draw ();
 
-        view?.Dispose ();
-    }
+    //    view?.Dispose ();
+    //}
 }

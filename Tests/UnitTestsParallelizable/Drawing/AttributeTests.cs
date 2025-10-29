@@ -1,6 +1,6 @@
 ﻿// Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class AttributeTests
 {
@@ -215,24 +215,6 @@ public class AttributeTests
 
         Assert.Equal (attr1, attr2);
         Assert.Equal (attr1.GetHashCode (), attr2.GetHashCode ());
-    }
-
-    [Fact]
-    public void Implicit_Assign ()
-    {
-        var driver = new FakeDriver ();
-        driver.Init ();
-
-        var attr = new Attribute ();
-
-        var value = 42;
-        var fg = new Color ();
-        fg = new (Color.Red);
-
-        var bg = new Color ();
-        bg = new (Color.Blue);
-
-        driver.End ();
     }
 
     [Fact]

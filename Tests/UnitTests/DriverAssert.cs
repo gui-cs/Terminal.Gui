@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
@@ -9,8 +10,9 @@ namespace UnitTests;
 /// </summary>
 internal partial class DriverAssert
 {
-    private const char SpaceChar = ' ';
-    private static readonly Rune SpaceRune = (Rune)SpaceChar;
+    private const char SPACE_CHAR = ' ';
+    private static readonly Rune _spaceRune = (Rune)SPACE_CHAR;
+
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
     ///     Verifies <paramref name="expectedAttributes"/> are found at the locations specified by
@@ -28,7 +30,7 @@ internal partial class DriverAssert
     public static void AssertDriverAttributesAre (
         string expectedLook,
         ITestOutputHelper output,
-        IConsoleDriver driver = null,
+        IConsoleDriver? driver = null,
         params Attribute [] expectedAttributes
     )
     {
@@ -42,7 +44,7 @@ internal partial class DriverAssert
         expectedLook = expectedLook.Trim ();
         driver ??= Application.Driver;
 
-        Cell [,] contents = driver!.Contents;
+        Cell [,] contents = driver!.Contents!;
 
         var line = 0;
 
@@ -107,7 +109,6 @@ internal partial class DriverAssert
 
                     //            // get the index of the actual attribute in `expectedAttributes`
 
-
                     //            if (index == -1)
                     //            {
                     //                sb.Append ("x:x ");
@@ -146,7 +147,7 @@ internal partial class DriverAssert
     public static void AssertDriverContentsAre (
         string expectedLook,
         ITestOutputHelper output,
-        IConsoleDriver driver = null,
+        IConsoleDriver? driver = null,
         bool ignoreLeadingWhitespace = false
     )
     {
@@ -192,18 +193,19 @@ internal partial class DriverAssert
     public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,
         ITestOutputHelper output,
-        IConsoleDriver driver = null
+        IConsoleDriver? driver = null
     )
     {
-        List<List<Rune>> lines = new ();
+        List<List<Rune>> lines = [];
         var sb = new StringBuilder ();
         driver ??= Application.Driver;
+
         int x = -1;
         int y = -1;
         int w = -1;
         int h = -1;
 
-        Cell [,] contents = driver.Contents;
+        Cell [,] contents = driver!.Contents!;
 
         for (var rowIndex = 0; rowIndex < driver.Rows; rowIndex++)
         {
@@ -211,9 +213,9 @@ internal partial class DriverAssert
 
             for (var colIndex = 0; colIndex < driver.Cols; colIndex++)
             {
-                Rune runeAtCurrentLocation = contents [rowIndex, colIndex].Rune;
+                Rune runeAtCurrentLocation = contents! [rowIndex, colIndex].Rune;
 
-                if (runeAtCurrentLocation != SpaceRune)
+                if (runeAtCurrentLocation != _spaceRune)
                 {
                     if (x == -1)
                     {
@@ -222,7 +224,7 @@ internal partial class DriverAssert
 
                         for (var i = 0; i < colIndex; i++)
                         {
-                            runes.InsertRange (i, [SpaceRune]);
+                            runes.InsertRange (i, [_spaceRune]);
                         }
                     }
 
@@ -330,7 +332,6 @@ internal partial class DriverAssert
         return new (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
     }
 
-
     /// <summary>
     ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
     ///     expected colors are not used then the failure will output both the colors that were found to be used and which of
@@ -338,17 +339,17 @@ internal partial class DriverAssert
     /// </summary>
     /// <param name="driver">if null uses <see cref="Application.Driver"/></param>
     /// <param name="expectedColors"></param>
-    internal static void AssertDriverUsedColors (IConsoleDriver driver = null, params Attribute [] expectedColors)
+    internal static void AssertDriverUsedColors (IConsoleDriver? driver = null, params Attribute [] expectedColors)
     {
         driver ??= Application.Driver;
-        Cell [,] contents = driver.Contents;
+        Cell [,] contents = driver?.Contents!;
 
         List<Attribute> toFind = expectedColors.ToList ();
 
         // Contents 3rd column is an Attribute
         HashSet<Attribute> colorsUsed = new ();
 
-        for (var r = 0; r < driver.Rows; r++)
+        for (var r = 0; r < driver!.Rows; r++)
         {
             for (var c = 0; c < driver.Cols; c++)
             {
@@ -381,10 +382,8 @@ internal partial class DriverAssert
         throw new (sb.ToString ());
     }
 
-
     [GeneratedRegex ("^\\s+", RegexOptions.Multiline)]
     private static partial Regex LeadingWhitespaceRegEx ();
-
 
     [GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
     private static partial Regex TrailingWhiteSpaceRegEx ();

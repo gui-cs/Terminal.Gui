@@ -2,11 +2,8 @@
 
 namespace Terminal.Gui.App;
 
-public static partial class Application // Screen related stuff
+public static partial class Application // Screen related stuff; intended to hide Driver details
 {
-    private static readonly object _lockScreen = new ();
-    private static Rectangle? _screen;
-
     /// <summary>
     ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IConsoleDriver"/>.
     /// </summary>
@@ -17,65 +14,31 @@ public static partial class Application // Screen related stuff
     /// </remarks>
     public static Rectangle Screen
     {
-        get
-        {
-            lock (_lockScreen)
-            {
-                if (_screen == null)
-                {
-                    _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
-                }
-
-                return _screen.Value;
-            }
-        }
-        set
-        {
-            if (value is {} && (value.X != 0 || value.Y != 0))
-            {
-                throw new NotImplementedException ($"Screen locations other than 0, 0 are not yet supported");
-            }
-
-            lock (_lockScreen)
-            {
-                _screen = value;
-            }
-        }
+        get => ApplicationImpl.Instance.Screen;
+        set => ApplicationImpl.Instance.Screen = value;
     }
 
     /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
-    /// <remarks>
-    ///     Event handlers can set <see cref="SizeChangedEventArgs.Cancel"/> to <see langword="true"/> to prevent
-    ///     <see cref="Application"/> from changing it's size to match the new terminal size.
-    /// </remarks>
-    public static event EventHandler<SizeChangedEventArgs>? SizeChanging;
+    public static event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
 
     /// <summary>
-    ///     Called when the application's size changes. Sets the size of all <see cref="Toplevel"/>s and fires the
-    ///     <see cref="SizeChanging"/> event.
+    ///     Called when the application's size has changed. Sets the size of all <see cref="Toplevel"/>s and fires the
+    ///     <see cref="ScreenChanged"/> event.
     /// </summary>
-    /// <param name="args">The new size.</param>
-    /// <returns><see lanword="true"/>if the size was changed.</returns>
-    public static bool OnSizeChanging (SizeChangedEventArgs args)
+    /// <param name="screen">The new screen size and position.</param>
+    public static void RaiseScreenChangedEvent (Rectangle screen)
     {
-        SizeChanging?.Invoke (null, args);
+        Screen = new (Point.Empty, screen.Size);
 
-        if (args.Cancel || args.Size is null)
-        {
-            return false;
-        }
-
-        Screen = new (Point.Empty, args.Size.Value);
+        ScreenChanged?.Invoke (ApplicationImpl.Instance, new (screen));
 
         foreach (Toplevel t in TopLevels)
         {
-            t.OnSizeChanging (new (args.Size));
+            t.OnSizeChanging (new (screen.Size));
             t.SetNeedsLayout ();
         }
 
         LayoutAndDraw (true);
-
-        return true;
     }
 
     /// <summary>
@@ -85,5 +48,9 @@ public static partial class Application // Screen related stuff
     ///     This is typical set to true when a View's <see cref="View.Frame"/> changes and that view has no
     ///     SuperView (e.g. when <see cref="Application.Top"/> is moved or resized.
     /// </remarks>
-    internal static bool ClearScreenNextIteration { get; set; }
+    internal static bool ClearScreenNextIteration
+    {
+        get => ApplicationImpl.Instance.ClearScreenNextIteration;
+        set => ApplicationImpl.Instance.ClearScreenNextIteration = value;
+    }
 }

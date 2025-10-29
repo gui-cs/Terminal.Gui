@@ -31,7 +31,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         AddCommand (
                     Command.HotKey,
-                    ctx =>
+                    (ctx) =>
                     {
                         // Logging.Debug ($"{Title} - Command.HotKey");
 

@@ -60,6 +60,19 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <summary>Gets the location and size of the terminal screen.</summary>
     public Rectangle Screen => new (0, 0, Cols, Rows);
 
+    /// <summary>
+    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
+    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    /// <see cref="Cols"/> and <see cref="Rows"/> are read-only and derived from <see cref="Screen"/>.
+    /// </summary>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        throw new NotSupportedException ("SetScreenSize is only supported by FakeDriver for test scenarios.");
+    }
+
     private Region? _clip;
 
     /// <summary>
@@ -508,9 +521,17 @@ public abstract class ConsoleDriver : IConsoleDriver
         }
     }
 
-    /// <summary>Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.</summary>
-    /// <param name="args"></param>
-    public void OnSizeChanged (SizeChangedEventArgs args) { SizeChanged?.Invoke (this, args); }
+    /// <summary>
+    /// Called when the terminal screen changes (size, position, etc.). Fires the <see cref="SizeChanged"/> event.
+    /// <see cref="Screen"/> reflects the source of truth for screen dimensions.
+    /// <see cref="Cols"/> and <see cref="Rows"/> are derived from <see cref="Screen"/> and are read-only.
+    /// </summary>
+    /// <param name="args">Event arguments containing the new screen size.</param>
+    public void OnSizeChanged (SizeChangedEventArgs args) 
+    { 
+        SizeChanged?.Invoke (this, args);
+    }
+
 
     /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
     public void Refresh ()
@@ -531,13 +552,17 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
-    /// <summary>The event fired when the terminal is resized.</summary>
+    /// <summary>
+    /// The event fired when the screen changes (size, position, etc.).
+    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    /// <see cref="Cols"/> and <see cref="Rows"/> are read-only and derived from <see cref="Screen"/>.
+    /// </summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     #endregion Cursor Handling
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
+    /// <remarks>This is only implemented in the Unix driver.</remarks>
     public abstract void Suspend ();
 
     /// <summary>Sets the position of the terminal cursor to <see cref="Col"/> and <see cref="Row"/>.</summary>
@@ -550,8 +575,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     #region Setup & Teardown
 
     /// <summary>Initializes the driver</summary>
-    /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
-    public abstract MainLoop Init ();
+    public abstract void Init ();
 
     /// <summary>Ends the execution of the console driver.</summary>
     public abstract void End ();
@@ -604,20 +628,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return CurrentAttribute; }
-
-    /// <summary>Makes an <see cref="Attribute"/>.</summary>
-    /// <param name="foreground">The foreground color.</param>
-    /// <param name="background">The background color.</param>
-    /// <returns>The attribute for the foreground and background colors.</returns>
-    public virtual Attribute MakeColor (in Color foreground, in Color background)
-    {
-        // Encode the colors into the int value.
-        return new (
-                    foreground,
-                    background
-                   );
-    }
-
+    
     #endregion Color Handling
 
     #region Mouse Handling

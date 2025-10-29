@@ -950,7 +950,7 @@ public class TableView : View, IDesignable
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
-        Driver?.AddStr (new (' ', Viewport.Width));
+        AddStr (new (' ', Viewport.Width));
 
         var line = 0;
 
@@ -1296,12 +1296,11 @@ public class TableView : View, IDesignable
     protected virtual void OnActivatedCellChanged (SelectedCellChangedEventArgs args) { SelectedCellChanged?.Invoke (this, args); }
 
     /// <summary>
-    ///     Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to with
-    ///     <see cref="IConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and
-    ///     you
-    ///     must render the full <paramref name="render"/> or the view will not look right.  For simpler provision of color use
-    ///     <see cref="ColumnStyle.ColorGetter"/> For changing the content that is rendered use
-    ///     <see cref="ColumnStyle.RepresentationGetter"/>
+    ///     Override to provide custom multi-coloring to cells. Use methods like <see cref="View.AddStr(string)"/>.
+    ///     The cursor will already be in the correct position when rendering. You must render the full
+    ///     <paramref name="render"/> or the view will not look right. For simpler color provision use
+    ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
+    ///     <see cref="ColumnStyle.RepresentationGetter"/>.
     /// </summary>
     /// <param name="cellAttribute"></param>
     /// <param name="render"></param>
@@ -1317,19 +1316,19 @@ public class TableView : View, IDesignable
             {
                 // invert the color of the current cell for the first character
                 SetAttribute (new (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
-                Driver?.AddRune ((Rune)render [0]);
+                AddRune ((Rune)render [0]);
 
                 if (render.Length > 1)
                 {
                     SetAttribute (cellAttribute);
-                    Driver?.AddStr (render.Substring (1));
+                    AddStr (render.Substring (1));
                 }
             }
         }
         else
         {
             SetAttribute (cellAttribute);
-            Driver?.AddStr (render);
+            AddStr (render);
         }
     }
 
@@ -1356,10 +1355,10 @@ public class TableView : View, IDesignable
     /// <returns></returns>
     internal int GetHeaderHeightIfAny () { return ShouldRenderHeaders () ? GetHeaderHeight () : 0; }
 
-    private void AddRuneAt (IConsoleDriver d, int col, int row, Rune ch)
+    private void AddRuneAt (int col, int row, Rune ch)
     {
         Move (col, row);
-        d?.AddRune (ch);
+        AddRune (ch);
     }
 
     /// <summary>
@@ -1541,14 +1540,14 @@ public class TableView : View, IDesignable
     /// <param name="width"></param>
     private void ClearLine (int row, int width)
     {
-        if (Driver is null)
+        if (Application.Screen.Height == 0)
         {
             return;
         }
 
         Move (0, row);
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.AddStr (new (' ', width));
+        AddStr (new (' ', width));
     }
 
     private void ClearMultiSelectedRegions (bool keepToggledSelections)
@@ -1741,7 +1740,7 @@ public class TableView : View, IDesignable
                 }
             }
 
-            AddRuneAt (Driver, c, row, rune);
+            AddRuneAt (c, row, rune);
         }
     }
 
@@ -1769,7 +1768,7 @@ public class TableView : View, IDesignable
 
             Move (current.X, row);
 
-            Driver?.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
+            AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (Style.ExpandLastColumn == false && current.IsVeryLast)
             {
@@ -1817,9 +1816,9 @@ public class TableView : View, IDesignable
                 }
             }
 
-            if (Driver is { })
+            if (Application.Screen.Height > 0)
             {
-                AddRuneAt (Driver, c, row, rune);
+                AddRuneAt (c, row, rune);
             }
         }
     }
@@ -1913,7 +1912,7 @@ public class TableView : View, IDesignable
                 }
             }
 
-            AddRuneAt (Driver, c, row, rune);
+            AddRuneAt (c, row, rune);
         }
     }
 
@@ -1941,7 +1940,7 @@ public class TableView : View, IDesignable
         }
 
         SetAttribute (attribute.Value);
-        Driver?.AddStr (new (' ', Viewport.Width));
+        AddStr (new (' ', Viewport.Width));
 
         // Render cells for each visible header for the current row
         for (var i = 0; i < columnsToRender.Length; i++)

@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using UnitTests;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests

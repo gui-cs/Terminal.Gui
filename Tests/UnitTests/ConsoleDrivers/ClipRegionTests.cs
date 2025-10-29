@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.DriverTests;
+namespace UnitTests.DriverTests;
 
 public class ClipRegionTests
 {
@@ -15,119 +15,96 @@ public class ClipRegionTests
         this._output = output;
     }
 
-    [Theory]
-    [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void AddRune_Is_Clipped (Type driverType)
+    [Fact]
+    public void AddRune_Is_Clipped ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        Application.Init (driver);
-        Application.Driver!.Rows = 25;
-        Application.Driver!.Cols = 80;
+        Application.Init (null, "fake");
 
-        driver.Move (0, 0);
-        driver.AddRune ('x');
-        Assert.Equal ((Rune)'x', driver.Contents [0, 0].Rune);
+        Application.Driver!.Move (0, 0);
+        Application.Driver!.AddRune ('x');
+        Assert.Equal ((Rune)'x', Application.Driver!.Contents! [0, 0].Rune);
 
-        driver.Move (5, 5);
-        driver.AddRune ('x');
-        Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
+        Application.Driver?.Move (5, 5);
+        Application.Driver?.AddRune ('x');
+        Assert.Equal ((Rune)'x', Application.Driver!.Contents [5, 5].Rune);
 
         // Clear the contents
-        driver.FillRect (new Rectangle (0, 0, driver.Rows, driver.Cols), ' ');
-        Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+        Application.Driver?.FillRect (new Rectangle (0, 0, Application.Driver.Rows, Application.Driver.Cols), ' ');
+        Assert.Equal ((Rune)' ', Application.Driver?.Contents [0, 0].Rune);
 
         // Setup the region with a single rectangle, fill screen with 'x'
-        driver.Clip = new (new Rectangle (5, 5, 5, 5));
-        driver.FillRect (new Rectangle (0, 0, driver.Rows, driver.Cols), 'x');
-        Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents [4, 9].Rune);
-        Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
-        Assert.Equal ((Rune)'x', driver.Contents [9, 9].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents [10, 10].Rune);
+        Application.Driver!.Clip = new (new Rectangle (5, 5, 5, 5));
+        Application.Driver.FillRect (new Rectangle (0, 0, Application.Driver.Rows, Application.Driver.Cols), 'x');
+        Assert.Equal ((Rune)' ', Application.Driver?.Contents [0, 0].Rune);
+        Assert.Equal ((Rune)' ', Application.Driver?.Contents [4, 9].Rune);
+        Assert.Equal ((Rune)'x', Application.Driver?.Contents [5, 5].Rune);
+        Assert.Equal ((Rune)'x', Application.Driver?.Contents [9, 9].Rune);
+        Assert.Equal ((Rune)' ', Application.Driver?.Contents [10, 10].Rune);
 
         Application.Shutdown ();
     }
 
-    [Theory]
-    [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void Clip_Set_To_Empty_AllInvalid (Type driverType)
+    [Fact]
+    public void Clip_Set_To_Empty_AllInvalid ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        Application.Init (driver);
+        Application.Init (null, "fake");
 
         // Define a clip rectangle
-        driver.Clip = new (Rectangle.Empty);
+        Application.Driver!.Clip = new (Rectangle.Empty);
 
         // negative
-        Assert.False (driver.IsValidLocation (default, 4, 5));
-        Assert.False (driver.IsValidLocation (default, 5, 4));
-        Assert.False (driver.IsValidLocation (default, 10, 9));
-        Assert.False (driver.IsValidLocation (default, 9, 10));
-        Assert.False (driver.IsValidLocation (default, -1, 0));
-        Assert.False (driver.IsValidLocation (default, 0, -1));
-        Assert.False (driver.IsValidLocation (default, -1, -1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows - 1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows - 1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows));
+        Assert.False (Application.Driver.IsValidLocation (default, 4, 5));
+        Assert.False (Application.Driver.IsValidLocation (default, 5, 4));
+        Assert.False (Application.Driver.IsValidLocation (default, 10, 9));
+        Assert.False (Application.Driver.IsValidLocation (default, 9, 10));
+        Assert.False (Application.Driver.IsValidLocation (default, -1, 0));
+        Assert.False (Application.Driver.IsValidLocation (default, 0, -1));
+        Assert.False (Application.Driver.IsValidLocation (default, -1, -1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows - 1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows - 1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows));
 
         Application.Shutdown ();
     }
 
-    [Theory]
-    [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void IsValidLocation (Type driverType)
+    [Fact]
+    public void IsValidLocation ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        Application.Init (driver);
+        Application.Init (null, "fake");
         Application.Driver!.Rows = 10;
         Application.Driver!.Cols = 10;
 
         // positive
-        Assert.True (driver.IsValidLocation (default, 0, 0));
-        Assert.True (driver.IsValidLocation (default, 1, 1));
-        Assert.True (driver.IsValidLocation (default, driver.Cols - 1, driver.Rows - 1));
+        Assert.True (Application.Driver.IsValidLocation (default, 0, 0));
+        Assert.True (Application.Driver.IsValidLocation (default, 1, 1));
+        Assert.True (Application.Driver.IsValidLocation (default, Application.Driver.Cols - 1, Application.Driver.Rows - 1));
 
         // negative
-        Assert.False (driver.IsValidLocation (default, -1, 0));
-        Assert.False (driver.IsValidLocation (default, 0, -1));
-        Assert.False (driver.IsValidLocation (default, -1, -1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows - 1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows - 1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows));
+        Assert.False (Application.Driver.IsValidLocation (default, -1, 0));
+        Assert.False (Application.Driver.IsValidLocation (default, 0, -1));
+        Assert.False (Application.Driver.IsValidLocation (default, -1, -1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows - 1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows - 1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows));
 
         // Define a clip rectangle
-        driver.Clip = new(new Rectangle(5, 5, 5, 5));
+        Application.Driver.Clip = new (new Rectangle (5, 5, 5, 5));
 
         // positive
-        Assert.True (driver.IsValidLocation (default, 5, 5));
-        Assert.True (driver.IsValidLocation (default, 9, 9));
+        Assert.True (Application.Driver.IsValidLocation (default, 5, 5));
+        Assert.True (Application.Driver.IsValidLocation (default, 9, 9));
 
         // negative
-        Assert.False (driver.IsValidLocation (default, 4, 5));
-        Assert.False (driver.IsValidLocation (default, 5, 4));
-        Assert.False (driver.IsValidLocation (default, 10, 9));
-        Assert.False (driver.IsValidLocation (default, 9, 10));
-        Assert.False (driver.IsValidLocation (default, -1, 0));
-        Assert.False (driver.IsValidLocation (default, 0, -1));
-        Assert.False (driver.IsValidLocation (default, -1, -1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows - 1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows - 1));
-        Assert.False (driver.IsValidLocation (default, driver.Cols, driver.Rows));
+        Assert.False (Application.Driver.IsValidLocation (default, 4, 5));
+        Assert.False (Application.Driver.IsValidLocation (default, 5, 4));
+        Assert.False (Application.Driver.IsValidLocation (default, 10, 9));
+        Assert.False (Application.Driver.IsValidLocation (default, 9, 10));
+        Assert.False (Application.Driver.IsValidLocation (default, -1, 0));
+        Assert.False (Application.Driver.IsValidLocation (default, 0, -1));
+        Assert.False (Application.Driver.IsValidLocation (default, -1, -1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows - 1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows - 1));
+        Assert.False (Application.Driver.IsValidLocation (default, Application.Driver.Cols, Application.Driver.Rows));
 
         Application.Shutdown ();
     }

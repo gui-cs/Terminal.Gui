@@ -40,14 +40,13 @@ public class GlobalTestSetup : IDisposable
 
         // Public Properties
         Assert.Null (Application.Top);
-        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+        Assert.Null (Application.Mouse.MouseGrabView);
 
         // Don't check Application.ForceDriver
         // Assert.Empty (Application.ForceDriver);
         // Don't check Application.Force16Colors
         //Assert.False (Application.Force16Colors);
         Assert.Null (Application.Driver);
-        Assert.Null (Application.MainLoop);
         Assert.False (Application.EndAfterFirstIteration);
         Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
         Assert.Equal (Key.Tab, Application.NextTabKey);

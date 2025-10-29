@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class NeedsDrawTests ()
@@ -39,7 +39,7 @@ public class NeedsDrawTests ()
 
         RunState runState = Application.Begin (top);
 
-        AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+        Application.Driver!.SetScreenSize (80,25);
 
         top.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 80, 25), top.NeedsDrawRect); };
 

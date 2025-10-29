@@ -53,21 +53,21 @@ public class SixelSupportDetector
 
     private void TryComputeResolution (SixelSupportResult result, Action<SixelSupportResult> resultCallback)
     {
-        string windowSize;
+        string consoleSize;
         string sizeInChars;
 
         QueueRequest (
                       EscSeqUtils.CSI_RequestWindowSizeInPixels,
                       r1 =>
                       {
-                          windowSize = r1;
+                          consoleSize = r1;
 
                           QueueRequest (
-                                        EscSeqUtils.CSI_ReportTerminalSizeInChars,
+                                        EscSeqUtils.CSI_ReportWindowSizeInChars,
                                         r2 =>
                                         {
                                             sizeInChars = r2;
-                                            ComputeResolution (result, windowSize, sizeInChars);
+                                            ComputeResolution (result, consoleSize, sizeInChars);
                                             resultCallback (result);
                                         },
                                         () => resultCallback (result));
@@ -75,11 +75,11 @@ public class SixelSupportDetector
                       () => resultCallback (result));
     }
 
-    private void ComputeResolution (SixelSupportResult result, string windowSize, string sizeInChars)
+    private void ComputeResolution (SixelSupportResult result, string consoleSize, string sizeInChars)
     {
         // Fallback to window size in pixels and characters
         // Example [4;600;1200t
-        Match pixelMatch = Regex.Match (windowSize, @"\[\d+;(\d+);(\d+)t$");
+        Match pixelMatch = Regex.Match (consoleSize, @"\[\d+;(\d+);(\d+)t$");
 
         // Example [8;30;120t
         Match charMatch = Regex.Match (sizeInChars, @"\[\d+;(\d+);(\d+)t$");

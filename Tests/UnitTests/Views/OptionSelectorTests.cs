@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class OptionSelectorTests (ITestOutputHelper output)
 {
@@ -427,7 +427,7 @@ public class OptionSelectorTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         Assert.Equal (Orientation.Vertical, rg.Orientation);
         Assert.Equal (2, rg.RadioLabels.Length);

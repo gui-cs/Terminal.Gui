@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui.ViewMouseTests;
+namespace UnitTests_Parallelizable.ViewMouseTests;
 
 [Trait ("Category", "Input")]
 public class GetViewsUnderLocationTests
@@ -128,14 +128,14 @@ public class GetViewsUnderLocationTests
             containedType = view.GetType ();
         }
 
-        if (view.Margin.Contains (new (testX, testY)))
+        if (view.Margin!.Contains (new (testX, testY)))
         {
-            containedType = view.Margin.GetType ();
+            containedType = view.Margin!.GetType ();
         }
 
-        if (view.Border.Contains (new (testX, testY)))
+        if (view.Border!.Contains (new (testX, testY)))
         {
-            containedType = view.Border.GetType ();
+            containedType = view.Border!.GetType ();
         }
 
         if (view.Padding.Contains (new (testX, testY)))
