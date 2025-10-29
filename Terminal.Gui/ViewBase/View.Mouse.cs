@@ -752,6 +752,7 @@ public partial class View // Mouse APIs
                                                              value,
                                                              null,
                                                              null,
+                                                             newValue => _highlightStates = newValue,
                                                              OnHighlightStatesChanged,
                                                              HighlightStatesChanged,
                                                              out MouseState finalValue);

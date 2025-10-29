@@ -532,7 +532,7 @@ public class Images : Scenario
             // Application.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
             // Application.Driver?.AddStr (_encodedSixelData);
 
-            // Works in NetDriver but results in screen flicker when moving mouse but vanish instantly
+            // Works in DotNetDriver but results in screen flicker when moving mouse but vanish instantly
             // Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
             // Console.Write (_encodedSixelData);
         }

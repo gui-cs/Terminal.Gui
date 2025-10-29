@@ -113,7 +113,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a value in the <see cref="StandardColor"/> enum.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in StandardColor colorName) : this ((int)colorName) { }
+    public Color (in StandardColor colorName) : this (StandardColors.GetArgb (colorName)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See

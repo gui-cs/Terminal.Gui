@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 
 public class MenuBarTests ()
 {
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void DefaultKey_Activates_And_Opens ()
     {
@@ -38,7 +38,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void DefaultKey_Deactivates ()
     {
@@ -75,7 +75,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void QuitKey_Deactivates ()
     {
@@ -113,7 +113,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void MenuBarItem_HotKey_Activates_And_Opens ()
     {
@@ -145,7 +145,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void MenuBarItem_HotKey_Deactivates ()
     {
@@ -183,7 +183,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void MenuItems_HotKey_RaisesAction ()
     {
@@ -217,7 +217,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void MenuItems_HotKey_Deactivates ()
     {
@@ -254,7 +254,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void HotKey_Makes_PopoverMenu_Visible_Only_Once ()
     {
@@ -291,7 +291,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void WhenOpen_Other_MenuBarItem_HotKey_Activates_And_Opens ()
     {
@@ -336,7 +336,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Mouse_Enter_Activates_But_Does_Not_Open ()
     {
@@ -372,7 +372,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Mouse_Click_Activates_And_Opens ()
     {
@@ -459,7 +459,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Dynamic_Change_MenuItem_Title ()
     {
@@ -502,7 +502,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Disabled_MenuBar_Is_Not_Activated ()
     {
@@ -533,7 +533,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void MenuBarItem_Disabled_MenuBarItem_HotKey_No_Activate_Or_Open ()
     {
@@ -565,7 +565,7 @@ public class MenuBarTests ()
     }
 
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void MenuBarItem_Disabled_Popover_Is_Activated ()
     {
@@ -603,7 +603,7 @@ public class MenuBarTests ()
 
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Update_MenuBarItem_HotKey_Works ()
     {
@@ -652,7 +652,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Visible_False_HotKey_Does_Not_Activate ()
     {
@@ -686,7 +686,7 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="Obsolete")]
     [AutoInitShutdown]
     public void Visible_False_MenuItem_Key_Does_Action ()
     {

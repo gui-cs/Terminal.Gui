@@ -1,5 +1,9 @@
 // Alias Console to MockConsole so we don't accidentally use Console
 
+using System.Numerics;
+using Terminal.Gui.Drivers;
+using UnitTests;
+
 namespace Terminal.Gui.ApplicationTests;
 
 /// <summary>These tests focus on Application.RunState and the various ways it can be changed.</summary>
@@ -16,11 +20,9 @@ public class RunStateTests
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void Begin_End_Cleans_Up_RunState ()
     {
-        // Setup Mock driver
-        Init ();
-
         // Test null Toplevel
         Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
 
@@ -30,7 +32,9 @@ public class RunStateTests
         Application.End (rs);
 
         Assert.NotNull (Application.Top);
-        Assert.NotNull (Application.MainLoop);
+
+        // v2 does not use main loop, it uses MainLoop<T> and its internal
+        //Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
 
         top.Dispose ();
@@ -41,7 +45,7 @@ public class RunStateTests
 #endif
 
         Assert.Null (Application.Top);
-        Assert.Null (Application.MainLoop);
+    //    Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
@@ -83,13 +87,6 @@ public class RunStateTests
         Assert.Equal (top, rs.Toplevel);
     }
 
-    private void Init ()
-    {
-        Application.Init (new FakeDriver ());
-        Assert.NotNull (Application.Driver);
-        Assert.NotNull (Application.MainLoop);
-        Assert.NotNull (SynchronizationContext.Current);
-    }
 
     private void Shutdown ()
     {

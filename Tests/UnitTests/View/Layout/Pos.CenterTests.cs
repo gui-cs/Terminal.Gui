@@ -35,8 +35,8 @@ public class PosCenterTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, height);
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.FakeResize(new Size(20, height));
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (height)
@@ -182,8 +182,8 @@ public class PosCenterTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (width, 7);
-        Application.RunIteration (ref rs, firstIteration);
+        AutoInitShutdownAttribute.FakeResize(new Size(width, 7));
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)

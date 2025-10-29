@@ -6,11 +6,10 @@ public class CanFocusTests
 {
     // TODO: Figure out what this test is supposed to be testing
     [Fact]
+    [AutoInitShutdown]
     public void CanFocus_Faced_With_Container_Before_Run ()
     {
-        Application.Init (new FakeDriver ());
-
-        Toplevel t = new ();
+        using Toplevel t = new ();
 
         var w = new Window ();
         var f = new FrameView ();

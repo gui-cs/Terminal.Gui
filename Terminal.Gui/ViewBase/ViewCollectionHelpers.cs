@@ -10,7 +10,7 @@ internal static class ViewCollectionHelpers
             // The list parameter might be the live `_subviews`, so freeze it under a lock
             lock (list)
             {
-                return [.. list]; // C# 12 slice copy (= new List<View>(list).ToArray())
+                return list.ToArray (); // It’s slightly less “fancy C# 12”, but much safer in multithreaded code
             }
         }
 

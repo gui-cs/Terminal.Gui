@@ -25,19 +25,15 @@ public partial class View
         get => _schemeName;
         set
         {
-            bool changed = CWPPropertyHelper.ChangeProperty (
-                                                             ref _schemeName,
-                                                             value,
-                                                             OnSchemeNameChanging,
-                                                             SchemeNameChanging,
-                                                             OnSchemeNameChanged,
-                                                             SchemeNameChanged,
-                                                             out string? finalValue);
-
-            //if (changed)
-            //{
-            //    _schemeName = finalValue;
-            //}
+            CWPPropertyHelper.ChangeProperty (
+                                              ref _schemeName,
+                                              value,
+                                              OnSchemeNameChanging,
+                                              SchemeNameChanging,
+                                              newValue => _schemeName = newValue,
+                                              OnSchemeNameChanged,
+                                              SchemeNameChanged,
+                                              out string? _);
         }
     }
 
@@ -99,49 +95,7 @@ public partial class View
     ///     Gets whether a Scheme has been explicitly set for this View, or if it will inherit the Scheme from its
     ///     <see cref="SuperView"/>.
     /// </summary>
-    public bool HasScheme => _scheme is { } || !string.IsNullOrEmpty (_schemeName);
-
-    private bool? _invertFocusAttribute;
-
-    /// <summary>
-    ///     Gets or sets whether this View should automatically invert the Normal and Focus attributes.
-    ///     When true, Normal attributes will be displayed as Focus attributes and vice versa.
-    /// </summary>
-    public bool? InvertFocusAttribute
-    {
-        get => _invertFocusAttribute;
-        set => CWPPropertyHelper.ChangeProperty<bool?> (
-                                                 ref _invertFocusAttribute,
-                                                 value,
-                                                 OnInvertFocusAttributeChanging,
-                                                 InvertFocusAttributeChanging,
-                                                 OnInvertFocusAttributeChanged,
-                                                 InvertFocusAttributeChanged,
-                                                 out bool? _);
-    }
-
-    /// <summary>
-    ///     Called before <see cref="InvertFocusAttribute"/> changes, allowing subclasses to cancel or modify the change.
-    /// </summary>
-    /// <param name="args">The event arguments containing the current and proposed new value.</param>
-    /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnInvertFocusAttributeChanging (ValueChangingEventArgs<bool?> args) { return false; }
-
-    /// <summary>
-    ///     Called after <see cref="InvertFocusAttribute"/> changes, allowing subclasses to react to the change.
-    /// </summary>
-    /// <param name="args">The event arguments containing the old and new value.</param>
-    protected virtual void OnInvertFocusAttributeChanged (ValueChangedEventArgs<bool?> args) { SetNeedsDraw (); }
-
-    /// <summary>
-    ///     Raised before <see cref="InvertFocusAttribute"/> changes, allowing handlers to modify or cancel the change.
-    /// </summary>
-    public event EventHandler<ValueChangingEventArgs<bool?>>? InvertFocusAttributeChanging;
-
-    /// <summary>
-    ///     Raised after <see cref="InvertFocusAttribute"/>, notifying handlers of the completed change.
-    /// </summary>
-    public event EventHandler<ValueChangedEventArgs<bool?>>? InvertFocusAttributeChanged;
+    public bool HasScheme => _scheme is { };
 
     /// <summary>
     ///     Gets the scheme for the <see cref="View"/>. If the scheme has not been explicitly set
@@ -171,16 +125,16 @@ public partial class View
         ResultEventArgs<Scheme?> args = new ();
 
         return CWPWorkflowHelper.ExecuteWithResult (
-                                                    args =>
+                                                    resultEventArgs =>
                                                     {
                                                         bool cancelled = OnGettingScheme (out Scheme? newScheme);
-                                                        args.Result = newScheme;
+                                                        resultEventArgs.Result = newScheme;
 
                                                         return cancelled;
                                                     },
                                                     GettingScheme,
                                                     args,
-                                                    DefaultAction);
+                                                    DefaultAction)!;
 
         Scheme DefaultAction ()
         {
@@ -194,7 +148,7 @@ public partial class View
                 return SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
             }
 
-            return _scheme ?? SchemeManager.GetScheme (SchemeName!);
+            return _scheme!;
         }
     }
 
@@ -254,16 +208,15 @@ public partial class View
     /// </example>
     public bool SetScheme (Scheme? scheme)
     {
-        bool changed = CWPPropertyHelper.ChangeProperty (
-                                                         ref _scheme,
-                                                         scheme,
-                                                         OnSettingScheme,
-                                                         SchemeChanging,
-                                                         OnSchemeChanged,
-                                                         SchemeChanged,
-                                                         out Scheme? _);
-
-        return changed;
+        return CWPPropertyHelper.ChangeProperty (
+                                                 ref _scheme,
+                                                 scheme,
+                                                 OnSettingScheme,
+                                                 SchemeChanging,
+                                                 newValue => _scheme = newValue,
+                                                 OnSchemeChanged,
+                                                 SchemeChanged,
+                                                 out Scheme? _);
     }
 
     /// <summary>

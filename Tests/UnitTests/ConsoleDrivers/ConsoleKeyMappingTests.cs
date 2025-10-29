@@ -1,5 +1,5 @@
 
-namespace Terminal.Gui.ConsoleDriverTests;
+namespace Terminal.Gui.DriverTests;
 
 public class ConsoleKeyMappingTests
 {

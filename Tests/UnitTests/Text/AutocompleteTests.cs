@@ -10,6 +10,7 @@ public class AutocompleteTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void CursorLeft_CursorRight_Mouse_Button_Pressed_Does_Not_Show_Popup ()
     {
+        AutoInitShutdownAttribute.FakeResize (new Size (50,5));
         var tv = new TextView { Width = 50, Height = 5, Text = "This a long line and against TextView." };
 
         var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
@@ -26,7 +27,7 @@ public class AutocompleteTests (ITestOutputHelper output)
         {
             Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
             top.SetNeedsDraw ();
-            Application.RunIteration (ref rs);
+            AutoInitShutdownAttribute.RunIteration ();
 
             if (i < 4 || i > 5)
             {
@@ -54,7 +55,7 @@ This a long line and against TextView.
                                       )
                     );
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -66,7 +67,7 @@ This a long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.G));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -77,7 +78,7 @@ This ag long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -88,7 +89,7 @@ This ag long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -99,7 +100,7 @@ This ag long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -111,7 +112,7 @@ This ag long line and against TextView.",
         {
             Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
             top.SetNeedsDraw ();
-            Application.RunIteration (ref rs);
+            AutoInitShutdownAttribute.RunIteration ();
 
             DriverAssert.AssertDriverContentsWithFrameAre (
                                                            @"
@@ -123,7 +124,7 @@ This ag long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -135,7 +136,7 @@ This a long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.N));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -146,7 +147,7 @@ This an long line and against TextView.
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         top.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

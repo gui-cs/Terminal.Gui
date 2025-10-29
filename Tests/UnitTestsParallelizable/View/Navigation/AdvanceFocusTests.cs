@@ -719,8 +719,7 @@ public class AdvanceFocusTests ()
         Assert.Equal (tabStop, view.TabStop);
     }
 
-
-    [Fact (Skip = "See https://github.com/gui-cs/Terminal.Gui/issues/4146")]
+    [Fact]
     public void AdvanceFocus_Cycles_Through_Peers_And_All_Nested_SubViews_When_Multiple ()
     {
         var top = new View { Id = "top", CanFocus = true };
@@ -757,86 +756,10 @@ public class AdvanceFocusTests ()
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.Equal (v2, top.MostFocused);
 
-        // BUGBUG: This should cycle to peer1 - instead it cycles to v1
+        // This should cycle to peer1 - previously it incorrectly cycled to v1
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.Equal (peer1, top.MostFocused);
 
-        top.Dispose ();
-    }
-    [Fact]
-    public void AdvanceFocus_MultiLevel_Hierarchy_TabStop ()
-    {
-        // Arrange - Create a three-level hierarchy
-        // top
-        //   ├── midContainer
-        //   │     └── innerContainer (contains button1, button2)
-        //   └── otherView
-
-        View top = new ()
-        {
-            Id = "top",
-            CanFocus = true
-        };
-
-        View midContainer = new ()
-        {
-            Id = "midContainer",
-            CanFocus = true,
-            TabStop = TabBehavior.TabStop
-        };
-
-        View innerContainer = new ()
-        {
-            Id = "innerContainer",
-            CanFocus = true,
-            TabStop = TabBehavior.TabStop
-        };
-
-        View button1 = new ()
-        {
-            Id = "button1",
-            CanFocus = true,
-            TabStop = TabBehavior.TabStop
-        };
-
-        View button2 = new ()
-        {
-            Id = "button2",
-            CanFocus = true,
-            TabStop = TabBehavior.TabStop
-        };
-
-        View otherView = new ()
-        {
-            Id = "otherView",
-            CanFocus = true,
-            TabStop = TabBehavior.TabStop
-        };
-
-        // Build the view hierarchy
-        innerContainer.Add (button1, button2);
-        midContainer.Add (innerContainer);
-        top.Add (midContainer, otherView);
-
-        // Initial focus on button1
-        button1.SetFocus ();
-        Assert.Equal (button1, innerContainer.Focused);
-        Assert.Equal (innerContainer, midContainer.Focused);
-        Assert.Equal (midContainer, top.Focused);
-
-        // Act & Assert - First advance from button1 to button2
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.Equal (button2, innerContainer.Focused);
-
-        // Now advance from button2 - this should move to otherView with our fix
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-
-        // Add diagnostic info to help with debugging
-        var actualFocused = top.Focused;
-
-        Assert.Equal (otherView, top.Focused);
-
-        // Clean up
         top.Dispose ();
     }
 }

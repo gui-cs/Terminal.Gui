@@ -102,7 +102,8 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ┌────────────────────────────┐
@@ -116,7 +117,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.Text = "Say Hello 你 changed";
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 ┌────────────────────────────┐
@@ -142,7 +143,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         var expected = @"
 ┌────────────────────────────┐
@@ -156,7 +157,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.Text = "Say Hello 你 changed";
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = @"
 ┌────────────────────────────┐
@@ -204,6 +205,8 @@ public class LabelTests (ITestOutputHelper output)
         Assert.False (tf1.FillRemaining);
         Assert.True (tf2.FillRemaining);
 
+        AutoInitShutdownAttribute.RunIteration ();
+
         tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
 
         tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
@@ -250,7 +253,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 16, 1), label.Frame);
 
@@ -271,7 +274,7 @@ Demo Simple Rune
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.NotNull (label.Width);
         Assert.NotNull (label.Height);
 
@@ -307,7 +310,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 デ
@@ -392,7 +395,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -424,7 +427,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -478,7 +481,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
@@ -502,7 +505,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 6, 2), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (top);
@@ -856,7 +859,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
+        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
 
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -903,7 +906,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
+        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -975,7 +978,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
+                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1039,7 +1042,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
+        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label
@@ -1126,7 +1129,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
+                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1201,7 +1204,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1224,7 +1227,7 @@ e
         Assert.Equal (10, text.Length);
 
         //label.Width = Dim.Fill () - text.Length;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
@@ -1260,7 +1263,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
+        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1283,7 +1286,7 @@ e
         Assert.Equal (10, text.Length);
 
         //label.Width = Dim.Fill () - text.Length;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);

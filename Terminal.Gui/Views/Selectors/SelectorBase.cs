@@ -425,7 +425,7 @@ public abstract class SelectorBase : View, IOrientation
                 SubViews.ElementAt (i).X = 0;
                 SubViews.ElementAt (i).Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Margin!.Thickness = new (0);
-                SubViews.ElementAt (i).Width = Dim.Func (() => Math.Max (Viewport.Width, maxNaturalCheckBoxWidth));
+                SubViews.ElementAt (i).Width = Dim.Func (_ => Math.Max (Viewport.Width, maxNaturalCheckBoxWidth));
             }
             else
             {

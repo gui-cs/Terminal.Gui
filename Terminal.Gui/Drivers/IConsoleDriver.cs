@@ -4,8 +4,8 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui ConsoleDriver implementations.</summary>
 /// <remarks>
-///     There are currently four implementations: - <see cref="CursesDriver"/> (for Unix and Mac) -
-///     <see cref="WindowsDriver"/> - <see cref="NetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
+///     There are currently four implementations: - <see cref="UnixDriver"/> (for Unix and Mac) -
+///     <see cref="WindowsDriver"/> - <see cref="DotNetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
 ///     for unit testing.
 /// </remarks>
 public interface IConsoleDriver
@@ -206,7 +206,7 @@ public interface IConsoleDriver
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
+    /// <remarks>This is only implemented in <see cref="UnixDriver"/>.</remarks>
     void Suspend ();
 
     /// <summary>
@@ -250,14 +250,6 @@ public interface IConsoleDriver
     ///     complete.
     /// </remarks>
     event EventHandler<Key>? KeyUp;
-
-    /// <summary>Simulates a key press.</summary>
-    /// <param name="keyChar">The key character.</param>
-    /// <param name="key">The key.</param>
-    /// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-    /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-    /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-    void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution
