@@ -13,7 +13,7 @@ namespace TerminalGuiFluentTesting;
 public class GuiTestContext : IDisposable
 {
     private readonly CancellationTokenSource _cts = new ();
-    private readonly CancellationTokenSource _hardStop = new (With.Timeout);
+    private readonly CancellationTokenSource _hardStop;
     private readonly Task _runTask;
     private Exception? _ex;
     private readonly FakeOutput _output = new ();
@@ -25,9 +25,12 @@ public class GuiTestContext : IDisposable
     private readonly TestDriver _driver;
     private bool _finished;
     private readonly FakeSizeMonitor _fakeSizeMonitor;
+    private readonly TimeSpan _timeout;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
+        _timeout = timeout ?? TimeSpan.FromSeconds (30);
+        _hardStop = new (_timeout);
         // Remove frame limit
         Application.MaximumIterationsPerSecond = ushort.MaxValue;
 
@@ -40,7 +43,7 @@ public class GuiTestContext : IDisposable
         _winInput = new (_cts.Token);
 
         _output.Size = new (width, height);
-        _fakeSizeMonitor = new ();
+        _fakeSizeMonitor = new (_output, _output.LastBuffer!);
 
         IComponentFactory cf = driver == TestDriver.DotNet
                                    ? new FakeNetComponentFactory (_netInput, _output, _fakeSizeMonitor)
@@ -104,7 +107,7 @@ public class GuiTestContext : IDisposable
                              _cts.Token);
 
         // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (10)).Result)
+        if (!booting.WaitAsync (_timeout).Result)
         {
             throw new TimeoutException ("Application failed to start within the allotted time.");
         }
@@ -235,11 +238,7 @@ public class GuiTestContext : IDisposable
         return WaitIteration (
                               () =>
                               {
-                                  _output.Size = new (width, height);
-                                  _fakeSizeMonitor.RaiseSizeChanging (_output.Size);
-
-                                  var d = (IConsoleDriverFacade)Application.Driver!;
-                                  d.OutputBuffer.SetWindowSize (width, height);
+                                  Application.Driver!.SetScreenSize(width, height);
                               });
     }
 
@@ -440,7 +439,7 @@ public class GuiTestContext : IDisposable
 
         while (!condition ())
         {
-            if (sw.Elapsed > With.Timeout)
+            if (sw.Elapsed > _timeout)
             {
                 throw new TimeoutException ("Failed to reach condition within the time limit");
             }
@@ -935,48 +934,35 @@ public class GuiTestContext : IDisposable
     public Point GetCursorPosition () { return _output.CursorPosition; }
 }
 
-internal class FakeWindowsComponentFactory : WindowsComponentFactory
+internal class FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
+    : WindowsComponentFactory
 {
-    private readonly FakeWindowsInput _winInput;
-    private readonly FakeOutput _output;
-    private readonly FakeSizeMonitor _fakeSizeMonitor;
+    /// <inheritdoc/>
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return winInput; }
 
-    public FakeWindowsComponentFactory (FakeWindowsInput winInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
+    /// <inheritdoc/>
+    public override IConsoleOutput CreateOutput () { return output; }
+
+    /// <inheritdoc/>
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        _winInput = winInput;
-        _output = output;
-        _fakeSizeMonitor = fakeSizeMonitor;
+        outputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
+        return fakeSizeMonitor;
     }
-
-    /// <inheritdoc/>
-    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return _winInput; }
-
-    /// <inheritdoc/>
-    public override IConsoleOutput CreateOutput () { return _output; }
-
-    /// <inheritdoc/>
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }
 
-internal class FakeNetComponentFactory : NetComponentFactory
+internal class FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor) : NetComponentFactory
 {
-    private readonly FakeNetInput _netInput;
-    private readonly FakeOutput _output;
-    private readonly FakeSizeMonitor _fakeSizeMonitor;
+    /// <inheritdoc/>
+    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return netInput; }
 
-    public FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, FakeSizeMonitor fakeSizeMonitor)
+    /// <inheritdoc/>
+    public override IConsoleOutput CreateOutput () { return output; }
+
+    /// <inheritdoc/>
+    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        _netInput = netInput;
-        _output = output;
-        _fakeSizeMonitor = fakeSizeMonitor;
+        outputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
+        return fakeSizeMonitor;
     }
-
-    /// <inheritdoc/>
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return _netInput; }
-
-    /// <inheritdoc/>
-    public override IConsoleOutput CreateOutput () { return _output; }
-
-    /// <inheritdoc/>
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer) { return _fakeSizeMonitor; }
 }

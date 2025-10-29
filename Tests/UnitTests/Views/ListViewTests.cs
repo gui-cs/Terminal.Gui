@@ -5,7 +5,7 @@ using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ListViewTests (ITestOutputHelper output)
 {
@@ -58,7 +58,7 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(12, 12));
+        Application.Driver!.SetScreenSize (12, 12);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (-1, lv.SelectedItem);
@@ -790,7 +790,7 @@ Item 6",
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (new (1), lv.Border.Thickness);
+        Assert.Equal (new (1), lv.Border!.Thickness);
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal ("", lv.Text);
 

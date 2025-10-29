@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Intrinsics;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class AdvanceFocusTests ()
 {

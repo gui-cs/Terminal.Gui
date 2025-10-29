@@ -17,7 +17,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents, Application.MouseGrabHandler);
+        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents, Application.Mouse);
         MouseBindings = new ();
 
         // In-line with Keyboard:
@@ -401,9 +401,9 @@ public partial class View // Mouse APIs
         mouseEvent.Handled = false;
 
         // If the user has just pressed the mouse, grab the mouse and set focus
-        if (Application.MouseGrabHandler.MouseGrabView != this)
+        if (Application.Mouse.MouseGrabView != this)
         {
-            Application.MouseGrabHandler.GrabMouse (this);
+            Application.Mouse.GrabMouse (this);
 
             if (!HasFocus && CanFocus)
             {
@@ -452,7 +452,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, the mouse  <see langword="false"/> otherwise.</returns>
     internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
-        if (Application.MouseGrabHandler.MouseGrabView == this)
+        if (Application.Mouse.MouseGrabView == this)
         {
             //Logging.Debug ($"{Id} - {MouseState}");
             MouseState &= ~MouseState.Pressed;
@@ -470,7 +470,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if processing should stop; <see langword="false"/> otherwise.</returns>
     internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
     {
-        if (Application.MouseGrabHandler.MouseGrabView != this || !mouseEvent.IsSingleClicked)
+        if (Application.Mouse.MouseGrabView != this || !mouseEvent.IsSingleClicked)
         {
             return false;
         }
@@ -478,7 +478,7 @@ public partial class View // Mouse APIs
         Logging.Debug ($"{mouseEvent.Flags};{mouseEvent.Position}");
 
         // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
-        Application.MouseGrabHandler.UngrabMouse ();
+        Application.Mouse.UngrabMouse ();
 
         // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
         // TODO: There may be perf gains if we don't unset these flags here

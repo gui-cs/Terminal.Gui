@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class DrawTests (ITestOutputHelper output)
@@ -32,7 +32,7 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4)) ;
+        Application.Driver!.SetScreenSize (10, 4);
 
         const string expectedOutput = """
 
@@ -75,7 +75,7 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (viewRight, viewBottom);
 
         var rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(7, 7));
+        Application.Driver!.SetScreenSize (7, 7);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -616,7 +616,7 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
+        Application.Driver!.SetScreenSize (10, 4);
 
 
         var expected = """

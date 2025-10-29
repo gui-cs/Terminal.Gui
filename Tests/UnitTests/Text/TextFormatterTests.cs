@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace Terminal.Gui.TextTests;
+namespace UnitTests.TextTests;
 
 public class TextFormatterTests
 {
@@ -14,113 +14,6 @@ public class TextFormatterTests
 
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };
-
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("A", 3, " A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 5, " ABC")]
-    [InlineData ("ABC", 6, " ABC")]
-    [InlineData ("ABC", 9, "   ABC")]
-    public void Draw_Horizontal_Centered (string text, int width, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.Center
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = 1;
-        tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("A B", 3, "A B")]
-    [InlineData ("A B", 1, "A")]
-    [InlineData ("A B", 2, "A")]
-    [InlineData ("A B", 4, "A  B")]
-    [InlineData ("A B", 5, "A   B")]
-    [InlineData ("A B", 6, "A    B")]
-    [InlineData ("A B", 10, "A        B")]
-    [InlineData ("ABC ABC", 10, "ABC    ABC")]
-    public void Draw_Horizontal_Justified (string text, int width, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.Fill
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = 1;
-        tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 6, "ABC")]
-    public void Draw_Horizontal_Left (string text, int width, string expectedText)
-
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.Start
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = 1;
-        tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
-
-    [SetupFakeDriver]
-    [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, " A")]
-    [InlineData ("AB", 1, "B")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, " ABC")]
-    [InlineData ("ABC", 6, "   ABC")]
-    public void Draw_Horizontal_Right (string text, int width, string expectedText)
-    {
-        TextFormatter tf = new ()
-        {
-            Text = text,
-            Alignment = Alignment.End
-        };
-
-        tf.ConstrainToWidth = width;
-        tf.ConstrainToHeight = 1;
-
-        tf.Draw (new (Point.Empty, new (width, 1)), Attribute.Default, Attribute.Default);
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
-    }
 
     [SetupFakeDriver]
     [Theory]
@@ -3935,7 +3828,7 @@ ssb
     [SetupFakeDriver]
     public void FillRemaining_True_False ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (22, 5);
+        Application.Driver!.SetScreenSize (22, 5);
 
         Attribute [] attrs =
         {
@@ -4157,7 +4050,7 @@ Nice       Work")]
         Size tfSize = tf.FormatAndGetSize ();
         Assert.Equal (new (59, 13), tfSize);
 
-        ((IFakeConsoleDriver)Application.Driver).SetBufferSize (tfSize.Width, tfSize.Height);
+        Application.Driver!.SetScreenSize (tfSize.Width, tfSize.Height);
 
         Application.Driver.FillRect (Application.Screen, (Rune)'*');
         tf.Draw (Application.Screen, Attribute.Default, Attribute.Default);

@@ -79,12 +79,12 @@ public class Margin : Adornment
 
             if (view.Margin?.GetCachedClip () != null)
             {
-                view.Margin.NeedsDraw = true;
+                view.Margin!.NeedsDraw = true;
                 Region? saved = GetClip ();
-                View.SetClip (view.Margin.GetCachedClip ());
-                view.Margin.Draw ();
+                View.SetClip (view.Margin!.GetCachedClip ());
+                view.Margin!.Draw ();
                 View.SetClip (saved);
-                view.Margin.ClearCachedClip ();
+                view.Margin!.ClearCachedClip ();
             }
 
             view.NeedsDraw = false;
@@ -292,14 +292,14 @@ public class Margin : Adornment
             {
                 case ShadowStyle.Transparent:
                     // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).Y + 1 : 0;
+                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
 
                     break;
 
                 case ShadowStyle.Opaque:
                     // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).Y + 1 : 0;
-                    _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).X + 1 : 0;
+                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
+                    _bottomShadow.X = Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).X + 1 : 0;
 
                     break;
 

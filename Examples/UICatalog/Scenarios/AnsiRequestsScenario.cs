@@ -112,7 +112,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
                                                       break;
                                                   case "CSI_ReportTerminalSizeInChars":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_ReportTerminalSizeInChars;
+                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_ReportWindowSizeInChars;
 
                                                       break;
                                                   case "CSI_RequestCursorPositionReport":

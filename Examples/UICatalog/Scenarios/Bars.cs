@@ -40,7 +40,7 @@ public class Bars : Scenario
             SchemeName = "Toplevel",
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border.Thickness = new (0, 1, 0, 0);
+        eventLog.Border!.Thickness = new (0, 1, 0, 0);
         Application.Top.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()

@@ -1,6 +1,4 @@
-using UnitTests;
-
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class ViewCommandTests
 {

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.InputTests;
+namespace UnitTests_Parallelizable.InputTests;
 
 public class KeyTests
 {
@@ -573,4 +573,22 @@ public class KeyTests
         Key b = Key.A;
         Assert.False (a.Equals (b));
     }
+
+
+    [Fact]
+    public void KeyPressed_Handled_True_Cancels_KeyPress ()
+    {
+        var r = new View ();
+        var args = new Key { KeyCode = KeyCode.Null };
+
+        Assert.False (r.NewKeyDownEvent (args));
+        Assert.False (args.Handled);
+
+        r.KeyDown += (s, a) => a.Handled = true;
+        Assert.True (r.NewKeyDownEvent (args));
+        Assert.True (args.Handled);
+
+        r.Dispose ();
+    }
+
 }

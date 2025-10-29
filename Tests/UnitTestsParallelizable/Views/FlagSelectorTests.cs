@@ -1,8 +1,4 @@
-using System.Collections.ObjectModel;
-using Terminal.Gui.Views;
-using Xunit.Abstractions;
-
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class FlagSelectorTests
 {

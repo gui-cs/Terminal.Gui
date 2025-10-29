@@ -1,7 +1,6 @@
-﻿using Moq;
-using UnitTests;
+﻿using Timeout = Terminal.Gui.App.Timeout;
 
-namespace Terminal.Gui.ViewMouseTests;
+namespace UnitTests.ViewMouseTests;
 
 [Trait ("Category", "Input")]
 public class MouseTests : TestsAllViews
@@ -44,8 +43,8 @@ public class MouseTests : TestsAllViews
             Height = 10,
             Arrangement = ViewArrangement.Movable
         };
-        testView.Margin.Thickness = new (marginThickness);
-        testView.Border.Thickness = new (borderThickness);
+        testView.Margin!.Thickness = new (marginThickness);
+        testView.Border!.Thickness = new (borderThickness);
         testView.Padding.Thickness = new (paddingThickness);
 
         var top = new Toplevel ();
@@ -62,6 +61,51 @@ public class MouseTests : TestsAllViews
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
         top.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_False_Button_Press_Release_DoesNotClick (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEventArgs ();
+
+        var view = new View
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = false
+        };
+
+        var clickedCount = 0;
+
+        view.Activating += (s, e) => clickedCount++;
+
+        me.Flags = pressed;
+        view.NewMouseEvent (me);
+        Assert.Equal (0, clickedCount);
+        me.Handled = false;
+
+        me.Flags = pressed;
+        view.NewMouseEvent (me);
+        Assert.Equal (0, clickedCount);
+        me.Handled = false;
+
+        me.Flags = released;
+        view.NewMouseEvent (me);
+        Assert.Equal (0, clickedCount);
+        me.Handled = false;
+
+        me.Flags = clicked;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, clickedCount);
+
+        view.Dispose ();
+
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -87,7 +131,7 @@ public class MouseTests : TestsAllViews
 
         view.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -137,7 +181,7 @@ public class MouseTests : TestsAllViews
         Application.RaiseMouseEvent (me);
         Assert.Equal (1, activatingCount);
 
-        Assert.Null (Application.MouseGrabHandler.MouseGrabView);
+        Assert.Null (Application.Mouse.MouseGrabView);
 
         me = new ()
         {
@@ -562,7 +606,7 @@ public class MouseTests : TestsAllViews
 
     //    testView.Dispose ();
 
-    //    // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+    //    // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
     //    Application.ResetState (true);
 
     //}
@@ -627,7 +671,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -689,7 +733,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 
@@ -752,10 +796,9 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
-
 
     [Theory]
     [InlineData (0)]
@@ -816,9 +859,10 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
+
     private class MouseEventTestView : View
     {
         public int MouseEnterCount { get; private set; }

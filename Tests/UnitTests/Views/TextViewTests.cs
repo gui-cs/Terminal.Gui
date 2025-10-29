@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TextViewTests
 {
@@ -4813,7 +4813,7 @@ This is the second line.
     public void Selected_Text_Shows ()
     {
         // Proves #3022 is fixed (TextField selected text does not show in v2)
-        var top = new Toplevel ();
+        Toplevel top = new ();
         top.Add (_textView);
         RunState rs = Application.Begin (top);
 
@@ -4833,7 +4833,7 @@ This is the second line.
 
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
-        Application.RunIteration (ref rs, true);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (4, 0), _textView.CursorPosition);
 
         //                                             TAB to jump between text fields.
@@ -5262,7 +5262,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(15, 15));
+        Application.Driver!.SetScreenSize (15, 15);
         AutoInitShutdownAttribute.RunIteration ();
 
         //this passes
@@ -5340,7 +5340,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size (15, 15));
+        Application.Driver!.SetScreenSize (15, 15);
         AutoInitShutdownAttribute.RunIteration ();
 
         //this passes
@@ -5453,7 +5453,7 @@ This is the second line.
                                                        _output
                                                       );
 
-        AutoInitShutdownAttribute.FakeResize(new Size (6, 25));
+        Application.Driver!.SetScreenSize (6, 25);
         tv.SetRelativeLayout (Application.Screen.Size);
         tv.Draw ();
         Assert.Equal (new (4, 2), tv.CursorPosition);

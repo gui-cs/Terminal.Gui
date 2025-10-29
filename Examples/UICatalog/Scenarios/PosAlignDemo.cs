@@ -248,13 +248,13 @@ public sealed class PosAlignDemo : Scenario
         {
             addedViewsUpDown.X = Pos.Align (_horizAligner.Alignment);
             addedViewsUpDown.Y = Pos.Top (alignRadioGroup);
-            addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
+            addedViewsUpDown.Border!.Thickness = new (0, 1, 0, 0);
         }
         else
         {
             addedViewsUpDown.X = Pos.Left (alignRadioGroup);
             addedViewsUpDown.Y = Pos.Align (_vertAligner.Alignment);
-            addedViewsUpDown.Border.Thickness = new (1, 0, 0, 0);
+            addedViewsUpDown.Border!.Thickness = new (1, 0, 0, 0);
         }
 
         addedViewsUpDown.ValueChanging += (s, e) =>
@@ -319,7 +319,7 @@ public sealed class PosAlignDemo : Scenario
                                         aligner.Alignment,
                                         aligner.AlignmentModes,
                                         posAlign!.GroupId);
-                    view.Margin.Thickness = new (_leftMargin, view.Margin.Thickness.Top, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
+                    view.Margin!.Thickness = new (_leftMargin, view.Margin!.Thickness.Top, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
                 }
                 else
                 {
@@ -330,7 +330,7 @@ public sealed class PosAlignDemo : Scenario
                                         aligner.AlignmentModes,
                                         posAlign!.GroupId);
 
-                    view.Margin.Thickness = new (view.Margin.Thickness.Left, _topMargin, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
+                    view.Margin!.Thickness = new (view.Margin!.Thickness.Left, _topMargin, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
                 }
             }
         }
