@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics;
 
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Focus and cross-view navigation management (TabStop, TabIndex, etc...)
