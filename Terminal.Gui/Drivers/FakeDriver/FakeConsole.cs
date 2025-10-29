@@ -32,10 +32,10 @@ public static class FakeConsole
 #pragma warning disable RCS1138 // Add summary to documentation comment.
 
     /// <summary>Specifies the initial console width.</summary>
-    public const int WIDTH = 80;
+    public const int WIDTH = 0;
 
     /// <summary>Specifies the initial console height.</summary>
-    public const int HEIGHT = 25;
+    public const int HEIGHT = 0;
 
     /// <summary></summary>
     public static int WindowWidth { get; set; } = WIDTH;
@@ -971,7 +971,7 @@ public static class FakeConsole
     /// <summary></summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    public static void SetWindowSize (int width, int height)
+    public static void SetConsoleSize (int width, int height)
     {
         WindowWidth = width;
         WindowHeight = height;

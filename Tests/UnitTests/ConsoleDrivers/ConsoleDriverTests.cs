@@ -160,7 +160,7 @@ public class ConsoleDriverTests
     //		{
     //			var win = new Window ();
     //			Application.Begin (win);
-    //			AutoInitShutdownAttribute.FakeResize(new Size ( (20, 8);
+    //			Application.Driver!.SetScreenSize ( (20, 8);
 
     //			System.Threading.Tasks.Task.Run (() => {
     //				System.Threading.Tasks.Task.Delay (500).Wait ();

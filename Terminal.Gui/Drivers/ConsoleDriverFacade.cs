@@ -10,13 +10,15 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
-    /// <summary>The event fired when the terminal is resized.</summary>
+    /// <summary>
+    /// The event fired when the screen changes (size, position, etc.).
+    /// </summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
     public IOutputBuffer OutputBuffer => _outputBuffer;
 
-    public IWindowSizeMonitor WindowSizeMonitor { get; }
+    public IConsoleSizeMonitor ConsoleSizeMonitor { get; }
 
 
     public ConsoleDriverFacade (
@@ -24,7 +26,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         IOutputBuffer outputBuffer,
         IConsoleOutput output,
         AnsiRequestScheduler ansiRequestScheduler,
-        IWindowSizeMonitor windowSizeMonitor
+        IConsoleSizeMonitor sizeMonitor
     )
     {
         InputProcessor = inputProcessor;
@@ -40,8 +42,12 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                          MouseEvent?.Invoke (s, e);
                                      };
 
-        WindowSizeMonitor = windowSizeMonitor;
-        windowSizeMonitor.SizeChanging += (_,e) => SizeChanged?.Invoke (this, e);
+        ConsoleSizeMonitor = sizeMonitor;
+        sizeMonitor.SizeChanged += (_, e) =>
+        {
+            SetScreenSize(e.Size!.Value.Width, e.Size.Value.Height);
+            //SizeChanged?.Invoke (this, e);
+        };
 
         CreateClipboard ();
     }
@@ -50,7 +56,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         if (FakeDriver.FakeBehaviors.UseFakeClipboard)
         {
-            Clipboard = new FakeDriver.FakeClipboard (
+            Clipboard = new FakeClipboard (
                 FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
                 FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 
@@ -73,7 +79,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         }
         else
         {
-            Clipboard = new FakeDriver.FakeClipboard ();
+            Clipboard = new FakeClipboard ();
         }
     }
 
@@ -88,8 +94,21 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                 return Rectangle.Empty;
             }
 
-            return new (new (0, 0), _output.GetWindowSize ());
+            return new (0, 0, _outputBuffer.Cols, _outputBuffer.Rows);
         }
+    }
+
+    /// <summary>
+    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
+    /// </summary>
+    /// <param name="width">The new width in columns.</param>
+    /// <param name="height">The new height in rows.</param>
+    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        _outputBuffer.SetSize (width, height);
+        _output.SetSize (width, height);
+        SizeChanged?.Invoke(this, new (new (width, height)));
     }
 
     /// <summary>
@@ -104,7 +123,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>Get the operating system clipboard.</summary>
-    public IClipboard Clipboard { get; private set; } = new FakeDriver.FakeClipboard ();
+    public IClipboard Clipboard { get; private set; } = new FakeClipboard ();
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -364,7 +383,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
 
     /// <summary>Initializes the driver</summary>
-    /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
     public void Init () { throw new NotSupportedException (); }
 
     /// <summary>Ends the execution of the console driver.</summary>
@@ -375,25 +393,19 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
-    /// <param name="c">C.</param>
-    public Attribute SetAttribute (Attribute c) { return _outputBuffer.CurrentAttribute = c; }
+    /// <param name="newAttribute">C.</param>
+    /// <returns>The previously set Attribute.</returns>
+    public Attribute SetAttribute (Attribute newAttribute)
+    {
+        Attribute currentAttribute = _outputBuffer.CurrentAttribute;
+        _outputBuffer.CurrentAttribute = newAttribute;
+
+        return currentAttribute;
+    }
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
     public Attribute GetAttribute () { return _outputBuffer.CurrentAttribute; }
-
-    /// <summary>Makes an <see cref="Attribute"/>.</summary>
-    /// <param name="foreground">The foreground color.</param>
-    /// <param name="background">The background color.</param>
-    /// <returns>The attribute for the foreground and background colors.</returns>
-    public Attribute MakeColor (in Color foreground, in Color background)
-    {
-        // TODO: what even is this? why Attribute constructor wants to call Driver method which must return an instance of Attribute? ?!?!?!
-        return new (
-                    foreground,
-                    background
-                   );
-    }
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;

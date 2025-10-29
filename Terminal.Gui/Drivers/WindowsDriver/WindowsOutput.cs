@@ -356,7 +356,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private Size? _lastWindowSizeBeforeMaximized;
     private bool _lockResize;
 
-    public Size GetWindowSize ()
+    public Size GetSize ()
     {
         if (_lockResize)
         {
@@ -495,6 +495,12 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         {
             SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
         }
+    }
+
+    /// <inheritdoc />
+    public void SetSize (int width, int height)
+    {
+        // Do Nothing.
     }
 
     private bool _isDisposed;

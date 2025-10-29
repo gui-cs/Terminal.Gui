@@ -218,24 +218,6 @@ public class AttributeTests
     }
 
     [Fact]
-    public void Implicit_Assign ()
-    {
-        var driver = new FakeDriver ();
-        driver.Init ();
-
-        var attr = new Attribute ();
-
-        var value = 42;
-        var fg = new Color ();
-        fg = new (Color.Red);
-
-        var bg = new Color ();
-        bg = new (Color.Blue);
-
-        driver.End ();
-    }
-
-    [Fact]
     public void InequalityOperator_ShouldReturnFalseForEqualAttributes ()
     {
         // Arrange
