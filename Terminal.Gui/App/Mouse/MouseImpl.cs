@@ -371,11 +371,11 @@ internal class MouseImpl : IMouse
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
-                View = deepestViewUnderMouse ?? MouseGrabView
+                View = MouseGrabView // Always set to the grab view. See Issue #4370
             };
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
+            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true || viewRelativeMouseEvent.IsSingleClicked)
             {
                 return true;
             }
