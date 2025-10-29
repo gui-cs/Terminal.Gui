@@ -409,5 +409,55 @@ public class ApplicationMouseTests
         top.Dispose ();
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void MouseGrab_EventSentToGrabView_HasCorrectView ()
+    {
+        // BEFORE FIX: viewRelativeMouseEvent.View = deepestViewUnderMouse ?? MouseGrabView (potentially targetView).
+        // AFTER FIX: viewRelativeMouseEvent.View = MouseGrabView (always the grab view).
+        // Test fails before fix (receivedView == targetView), passes after fix (receivedView == grabView).
+
+        var grabView = new View
+        {
+            Id = "grab",
+            X = 0,
+            Y = 0,
+            Width = 5,
+            Height = 5
+        };
+
+        var targetView = new View
+        {
+            Id = "target",
+            X = 0,
+            Y = 0,
+            Width = 5,
+            Height = 5
+        };
+
+        View? receivedView = null;
+        grabView.MouseEvent += (_, e) => receivedView = e.View;
+
+        var top = new Toplevel { Width = 20, Height = 10 };
+        top.Add (grabView);
+        top.Add (targetView); // deepestViewUnderMouse = targetView
+        Application.Begin (top);
+
+        Application.Mouse.GrabMouse (grabView);
+        Assert.Equal (grabView, Application.Mouse.MouseGrabView);
+
+        Application.RaiseMouseEvent (new MouseEventArgs
+        {
+            ScreenPosition = new (2, 2), // Inside both views
+            Flags = MouseFlags.Button1Clicked
+        });
+
+        // EXPECTED: Event sent to grab view has View == grabView.
+        Assert.Equal (grabView, receivedView);
+
+        Application.Mouse.UngrabMouse ();
+        top.Dispose ();
+    }
+
     #endregion
 }

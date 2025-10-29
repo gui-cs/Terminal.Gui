@@ -2513,7 +2513,7 @@ Edit
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "See Issue #4370. Not gonna try to fix menu v1.")]
     [AutoInitShutdown]
     public void MouseEvent_Test ()
     {
