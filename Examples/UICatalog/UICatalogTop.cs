@@ -96,9 +96,9 @@ public class UICatalogTop : Toplevel
 
     private readonly MenuBarv2? _menuBar;
     private CheckBox? _force16ColorsMenuItemCb;
-    private OptionSelector? _themesRg;
-    private OptionSelector? _topSchemeRg;
-    private OptionSelector? _logLevelRg;
+    private OptionSelector? _themesSelector;
+    private OptionSelector? _topSchemesSelector;
+    private OptionSelector? _logLevelSelector;
     private FlagSelector<ViewDiagnosticFlags>? _diagnosticFlagsSelector;
     private CheckBox? _disableMouseCb;
 
@@ -126,13 +126,13 @@ public class UICatalogTop : Toplevel
                                           [
                                               new MenuItemv2 (
                                                               "_Documentation",
-                                                              "",
+                                                              "API docs",
                                                               () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
                                                               Key.F1
                                                              ),
                                               new MenuItemv2 (
                                                               "_README",
-                                                              "",
+                                                              "Project readme",
                                                               () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
                                                               Key.F2
                                                              ),
@@ -163,7 +163,10 @@ public class UICatalogTop : Toplevel
             _force16ColorsMenuItemCb = new ()
             {
                 Title = "Force _16 Colors",
-                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked
+                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                // Best practice for CheckBoxes in menus is to disable focus and highlight states
+                CanFocus = false,
+                HighlightStates = MouseState.None
             };
 
             _force16ColorsMenuItemCb.CheckedStateChanging += (sender, args) =>
@@ -194,23 +197,25 @@ public class UICatalogTop : Toplevel
 
             if (ConfigurationManager.IsEnabled)
             {
-                _themesRg = new ()
+                _themesSelector = new ()
                 {
-                    HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
+                   // HighlightStates = MouseState.In,
+                   CanFocus = true,
+                  // InvertFocusAttribute = true
                 };
 
-                _themesRg.SelectedItemChanged += (_, args) =>
+                _themesSelector.ValueChanged += (_, args) =>
                                                  {
-                                                     if (args.SelectedItem is null)
+                                                     if (args.Value is null)
                                                      {
                                                          return;
                                                      }
-                                                     ThemeManager.Theme = ThemeManager.GetThemeNames () [args.SelectedItem!.Value];
+                                                     ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
                                                  };
 
                 var menuItem = new MenuItemv2
                 {
-                    CommandView = _themesRg,
+                    CommandView = _themesSelector,
                     HelpText = "Cycle Through Themes",
                     Key = Key.T.WithCtrl
                 };
@@ -218,18 +223,18 @@ public class UICatalogTop : Toplevel
 
                 menuItems.Add (new Line ());
 
-                _topSchemeRg = new ()
+                _topSchemesSelector = new ()
                 {
-                    HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
+                  //  HighlightStates = MouseState.In,
                 };
 
-                _topSchemeRg.SelectedItemChanged += (_, args) =>
+                _topSchemesSelector.ValueChanged += (_, args) =>
                                                     {
-                                                        if (args.SelectedItem is null)
+                                                        if (args.Value is null)
                                                         {
                                                             return;
                                                         }
-                                                        CachedTopLevelScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [args.SelectedItem!.Value];
+                                                        CachedTopLevelScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [(int)args.Value];
                                                         SchemeName = CachedTopLevelScheme;
                                                         SetNeedsDraw ();
                                                     };
@@ -241,7 +246,7 @@ public class UICatalogTop : Toplevel
                                    [
                                        new ()
                                        {
-                                           CommandView = _topSchemeRg,
+                                           CommandView = _topSchemesSelector,
                                            HelpText = "Cycle Through schemes",
                                            Key = Key.S.WithCtrl
                                        }
@@ -269,12 +274,12 @@ public class UICatalogTop : Toplevel
 
             _diagnosticFlagsSelector = new ()
             {
-                CanFocus = true,
-                Styles = FlagSelectorStyles.ShowNone,
-                HighlightStates = Terminal.Gui.ViewBase.MouseState.None,
+                Styles = SelectorStyles.ShowNoneFlag,
+                CanFocus = true
+
             };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
-            _diagnosticFlagsSelector.AssignHotKeysToCheckBoxes = true;
+            _diagnosticFlagsSelector.AssignHotKeys = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
             _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
                                                      {
@@ -294,7 +299,10 @@ public class UICatalogTop : Toplevel
             _disableMouseCb = new ()
             {
                 Title = "_Disable Mouse",
-                CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked
+                CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
+                // Best practice for CheckBoxes in menus is to disable focus and highlight states
+                CanFocus = false,
+                HighlightStates = MouseState.None
             };
 
             _disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
@@ -315,17 +323,17 @@ public class UICatalogTop : Toplevel
 
             LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
 
-            _logLevelRg = new ()
+            _logLevelSelector = new ()
             {
-                AssignHotKeysToCheckBoxes = true,
-                Options = Enum.GetNames<LogLevel> (),
-                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-                HighlightStates = Terminal.Gui.ViewBase.MouseState.In
+                AssignHotKeys = true,
+                Labels = Enum.GetNames<LogLevel> (),
+                Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
+               // HighlightStates = MouseState.In,
             };
 
-            _logLevelRg.SelectedItemChanged += (_, args) =>
+            _logLevelSelector.ValueChanged += (_, args) =>
             {
-                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem!.Value])! };
+                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.Value!.Value])! };
 
                 UICatalog.LogLevelSwitch.MinimumLevel =
                     UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
@@ -334,7 +342,7 @@ public class UICatalogTop : Toplevel
             menuItems.Add (
                            new MenuItemv2
                            {
-                               CommandView = _logLevelRg,
+                               CommandView = _logLevelSelector,
                                HelpText = "Cycle Through Log Levels",
                                Key = Key.L.WithCtrl
                            });
@@ -356,27 +364,27 @@ public class UICatalogTop : Toplevel
 
     private void UpdateThemesMenu ()
     {
-        if (_themesRg is null)
+        if (_themesSelector is null)
         {
             return;
         }
 
-        _themesRg.SelectedItem = null;
-        _themesRg.AssignHotKeysToCheckBoxes = true;
-        _themesRg.UsedHotKeys.Clear ();
-        _themesRg.Options = ThemeManager.GetThemeNames ();
-        _themesRg.SelectedItem =ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+        _themesSelector.Value = null;
+        _themesSelector.AssignHotKeys = true;
+        _themesSelector.UsedHotKeys.Clear ();
+        _themesSelector.Labels = ThemeManager.GetThemeNames ();
+        _themesSelector.Value = ThemeManager.GetThemeNames().IndexOf(ThemeManager.GetCurrentThemeName());
 
-        if (_topSchemeRg is null)
+        if (_topSchemesSelector is null)
         {
             return;
         }
 
-        _topSchemeRg.AssignHotKeysToCheckBoxes = true;
-        _topSchemeRg.UsedHotKeys.Clear ();
-        int? selectedScheme = _topSchemeRg.SelectedItem;
-        _topSchemeRg.Options = SchemeManager.GetSchemeNames ();
-        _topSchemeRg.SelectedItem = selectedScheme;
+        _topSchemesSelector.AssignHotKeys = true;
+        _topSchemesSelector.UsedHotKeys.Clear ();
+        int? selectedScheme = _topSchemesSelector.Value;
+        _topSchemesSelector.Labels = SchemeManager.GetSchemeNames ();
+        _topSchemesSelector.Value = selectedScheme;
 
         if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))
         {
@@ -387,7 +395,7 @@ public class UICatalogTop : Toplevel
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
         {
-            _topSchemeRg.SelectedItem = newSelectedItem;
+            _topSchemesSelector.Value = newSelectedItem;
         }
     }
 
