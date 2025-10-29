@@ -238,11 +238,11 @@ public class Shortcut : View, IDesignable
     private void AddCommands ()
     {
         // Accept (Enter key) -
-        //AddCommand (Command.Accept, DispatchCommand);
+        AddCommand (Command.Accept, DispatchCommand);
         // Hotkey -
-        //AddCommand (Command.HotKey, DispatchCommand);
+        AddCommand (Command.HotKey, DispatchCommand);
         // Activate (Space key or click) -
-        // AddCommand (Command.Activate, DispatchCommand);
+        AddCommand (Command.Activate, DispatchCommand);
     }
 
     /// <inheritdoc />
