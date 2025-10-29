@@ -4,8 +4,8 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
-// DoubleClick - Focus, Activate, and Accept the item under the mouse.
-// Click - Focus, Activate, and do NOT Accept the item under the mouse.
+// DoubleClick - Focus, Select, and Accept the item under the mouse.
+// Click - Focus, Select, and do NOT Accept the item under the mouse.
 // CanFocus - Not Focused:
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Focus item. If item is not active, make Active. Do NOT Accept.
@@ -13,8 +13,8 @@ namespace Terminal.Gui.Views;
 //  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
 // Focused:
-//  Space key - If focused item is Active, move focus to and Acivate next. Else, Activate current. Do NOT Accept.
-//  Enter key - Activate and Accept the focused item.
+//  Space key - If focused item is Active, move focus to and Acivate next. Else, Select current. Do NOT Accept.
+//  Enter key - Select and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - If item is not active, make Active. Do NOT Accept.
 
@@ -42,7 +42,7 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         if (!CanFocus)
         {
-            if (RaiseActivating (args.Context) is true)
+            if (RaiseSelecting (args.Context) is true)
             {
                 return true;
             }
@@ -53,7 +53,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             if (Value is null)
             {
-                if (RaiseActivating (args.Context) is true)
+                if (RaiseSelecting (args.Context) is true)
                 {
                     return true;
                 }
@@ -67,9 +67,9 @@ public class OptionSelector : SelectorBase, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnActivating (CommandEventArgs args)
+    protected override bool OnSelecting (CommandEventArgs args)
     {
-        if (base.OnActivating (args) is true)
+        if (base.OnSelecting (args) is true)
         {
             return true;
         }
@@ -120,12 +120,12 @@ public class OptionSelector : SelectorBase, IDesignable
 
         checkbox.RadioStyle = true;
 
-        checkbox.Activating += OnCheckboxOnActivating;
+        checkbox.Selecting += OnCheckboxOnSelecting;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
 
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
+    private void OnCheckboxOnSelecting (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -151,13 +151,13 @@ public class OptionSelector : SelectorBase, IDesignable
 
         if (checkbox.CanFocus)
         {
-            // For Activate, if the view is focusable and SetFocus succeeds, by defition,
+            // For Select, if the view is focusable and SetFocus succeeds, by defition,
             // the event is handled. So return what SetFocus returns.
             checkbox.SetFocus ();
         }
 
-        // Activating doesn't normally propogate, so we do it here
-        if (InvokeCommand (Command.Activate, args.Context) is true)
+        // Selecting doesn't normally propogate, so we do it here
+        if (InvokeCommand (Command.Select, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
             args.Handled = true;

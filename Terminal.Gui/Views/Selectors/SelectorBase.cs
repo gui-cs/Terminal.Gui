@@ -82,17 +82,17 @@ public abstract class SelectorBase : View, IOrientation
         {
             if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
             {
-                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
-                return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
+                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+                return Focused?.InvokeCommand (Command.Select, args.Context) is true;
             }
         }
         return base.OnHandlingHotKey (args);
     }
 
     /// <inheritdoc />
-    protected override bool OnActivating (CommandEventArgs args)
+    protected override bool OnSelecting (CommandEventArgs args)
     {
-        return base.OnActivating (args);
+        return base.OnSelecting (args);
     }
 
     private int? _value;
@@ -443,15 +443,6 @@ public abstract class SelectorBase : View, IOrientation
     /// <exception cref="InvalidOperationException"></exception>
     public abstract void UpdateChecked ();
 
-    /// <inheritdoc />
-    protected override void OnHighlightStatesChanged (ValueChangedEventArgs<MouseState> args)
-    {
-        foreach (CheckBox checkbox in SubViews.OfType<CheckBox> ())
-        {
-            //   checkbox.HighlightStates = HighlightStates;
-        }
-        base.OnHighlightStatesChanged (args);
-    }
 
     /// <summary>
     ///     Gets or sets whether double-clicking on an Item will cause the <see cref="View.Accepting"/> event to be
