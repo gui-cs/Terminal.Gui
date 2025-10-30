@@ -198,7 +198,9 @@ public class OptionSelector : SelectorBase, IDesignable
 
 
     /// <summary>
-    /// 
+    ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
+    ///     to the current <see cref="Value"/> is checked. Throws <see cref="InvalidOperationException"/>
+    ///     if a checkbox's Data property is not set.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     public override void UpdateChecked ()

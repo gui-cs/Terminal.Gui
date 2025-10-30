@@ -13,7 +13,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private static partial bool WriteConsole (
         nint hConsoleOutput,
         ReadOnlySpan<char> lpBuffer,
-        uint numberOfCharsToWritten,
+        uint numberOfCharsToWrite,
         out uint lpNumberOfCharsWritten,
         nint lpReserved
     );
