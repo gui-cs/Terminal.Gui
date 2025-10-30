@@ -17,7 +17,6 @@ public class Shortcuts : Scenario
 
         app.Loaded += App_Loaded;
 
-        Key originalQuitKey = Application.QuitKey;
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
