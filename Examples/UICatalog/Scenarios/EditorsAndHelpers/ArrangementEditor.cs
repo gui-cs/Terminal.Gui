@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using Terminal.Gui.ViewBase;
-
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -20,9 +16,9 @@ public sealed class ArrangementEditor : EditorBase
         Add (_arrangementSelector);
     }
 
-    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new()
+    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new ()
     {
-        Orientation = Orientation.Vertical,
+        Orientation = Orientation.Vertical
     };
 
     protected override void OnViewToEditChanged ()
@@ -57,19 +53,9 @@ public sealed class ArrangementEditor : EditorBase
                 ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
             }
 
-            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable))
-            {
-                ViewToEdit.BorderStyle = LineStyle.Double;
-            }
-            else
-            {
-                ViewToEdit.BorderStyle = LineStyle.Single;
-            }
+            ViewToEdit.BorderStyle = ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable) ? LineStyle.Double : LineStyle.Single;
         }
     }
 
-    private void ArrangementEditor_Initialized (object? sender, EventArgs e)
-    {
-        _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
-    }
+    private void ArrangementEditor_Initialized (object? sender, EventArgs e) { _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged; }
 }
