@@ -78,13 +78,10 @@ public abstract class SelectorBase : View, IOrientation
             return base.OnHandlingHotKey (args);
         }
 
-        if (HasFocus || !CanFocus)
+        if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
         {
-            if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
-            {
-                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
-                return Focused?.InvokeCommand (Command.Select, args.Context) is true;
-            }
+            // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+            return Focused?.InvokeCommand (Command.Select, args.Context) is true;
         }
         return base.OnHandlingHotKey (args);
     }
