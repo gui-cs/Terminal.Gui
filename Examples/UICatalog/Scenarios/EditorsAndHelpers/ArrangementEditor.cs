@@ -72,32 +72,4 @@ public sealed class ArrangementEditor : EditorBase
     {
         _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
     }
-
-    private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<uint?> e)
-    {
-        if (ViewToEdit is { } && e.Value is {})
-        {
-            ViewToEdit.Arrangement = (ViewArrangement)e.Value;
-
-            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
-            {
-                ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
-                ViewToEdit.SchemeName = "Toplevel";
-            }
-            else
-            {
-                ViewToEdit.ShadowStyle = ShadowStyle.None;
-                ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
-            }
-
-            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable))
-            {
-                ViewToEdit.BorderStyle = LineStyle.Double;
-            }
-            else
-            {
-                ViewToEdit.BorderStyle = LineStyle.Single;
-            }
-        }
-    }
 }
