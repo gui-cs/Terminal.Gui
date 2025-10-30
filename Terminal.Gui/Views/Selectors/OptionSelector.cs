@@ -241,7 +241,6 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         set
         {
-            int? prevValue = Value;
             if (value == -1)
             {
                 Value = null;
