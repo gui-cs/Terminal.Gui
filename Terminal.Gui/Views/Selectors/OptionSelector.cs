@@ -49,18 +49,15 @@ public class OptionSelector : SelectorBase, IDesignable
 //            Cycle ();
   //          return true;
         }
-        else if (!HasFocus)
+        else if (!HasFocus && Value is null)
         {
-            if (Value is null)
+            if (RaiseSelecting (args.Context) is true)
             {
-                if (RaiseSelecting (args.Context) is true)
-                {
-                    return true;
-                }
-                SetFocus ();
-                Value = Values? [0];
                 return true;
             }
+            SetFocus ();
+            Value = Values? [0];
+            return true;
         }
 
         return false;
@@ -186,7 +183,7 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         else
         {
-            Value = Values! [++valueIndex];
+            Value = Values! [valueIndex + 1];
         }
 
         if (HasFocus)
@@ -241,7 +238,6 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         set
         {
-            int? prevValue = Value;
             if (value == -1)
             {
                 Value = null;
