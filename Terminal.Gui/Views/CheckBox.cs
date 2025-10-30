@@ -36,6 +36,7 @@ public class CheckBox : View
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
         // The default Accept handler does that.
+        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -49,7 +50,7 @@ public class CheckBox : View
         if (InvokeCommand (Command.Select, args.Context) is true)
         {
             // Default behavior for View is to set Focus on hotkey. We need to return
-            // true here to indiciate Activate was handled. That will prevent the default
+            // true here to indicate Activate was handled. That will prevent the default
             // behavior from setting focus, so we do it here.
             SetFocus ();
             return true;
