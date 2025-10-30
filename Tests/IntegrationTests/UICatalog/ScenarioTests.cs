@@ -162,7 +162,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = ["Percent", "AnchorEnd", "Center", "Absolute"];
         List<string> dimNames = ["Auto", "Percent", "Fill", "Absolute"];
 
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         var top = new Toplevel ();
 
@@ -604,8 +604,8 @@ public class ScenarioTests : TestsAllViews
         void LayoutCompleteHandler (object? sender, LayoutEventArgs args) { UpdateTitle (curView); }
     }
 
-    
-    [Fact(Skip = "This test seems to exercise FakeConsole.PushMockKeyPress - which is broken")]
+
+    [Fact (Skip = "This test seems to exercise FakeConsole.PushMockKeyPress - which is broken")]
     public void Run_Generic ()
     {
         ConfigurationManager.Disable (resetToHardCodedDefaults: true);

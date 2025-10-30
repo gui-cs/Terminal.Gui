@@ -270,11 +270,13 @@ public class ApplicationTests
     [Fact]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
     {
+        ConsoleDriver.RunningUnitTests = true;
         Application.Init ();
 
         Assert.NotNull (Application.Driver);
 
         Application.Shutdown ();
+        ConsoleDriver.RunningUnitTests = false;
     }
 
     [Theory]
@@ -395,7 +397,7 @@ public class ApplicationTests
         // Verify initial state is per spec
         //Pre_Init_State ();
 
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         // Verify post-Init state is correct
         //Post_Init_State ();
@@ -472,7 +474,7 @@ public class ApplicationTests
     public void Init_Unbalanced_Throws2 ()
     {
         // Now try the other way
-        Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
+        Assert.Throws<InvalidOperationException> (() => Application.Init (null, "fake"));
         Application.Shutdown ();
 
         Assert.Null (Application.Top);
@@ -544,7 +546,7 @@ public class ApplicationTests
             Application.QuitKey = Key.Q;
             Assert.Equal (Key.Q, Application.QuitKey);
 
-            Application.Init (new FakeDriver ());
+            Application.Init (null, "fake");
 
             Assert.Equal (Key.Q, Application.QuitKey);
         }

@@ -4,12 +4,12 @@
 
 namespace Terminal.Gui.Drivers;
 
-#pragma warning disable RCS1138 // Add summary to documentation comment.
-/// <summary></summary>
+/// <summary>
+///     Mock implementation of the .NET Console API for use in tests. Used by
+///     <exception cref="FakeDriver"></exception>.
+/// </summary>
 public static class FakeConsole
 {
-#pragma warning restore RCS1138 // Add summary to documentation comment.
-
     //
     // Summary:
     //	Gets or sets the width of the console window.
@@ -721,16 +721,16 @@ public static class FakeConsole
     public static void PushMockKeyPress (KeyCode key)
     {
         MockKeyPresses.Push (
-                             new ConsoleKeyInfo (
-                                                 (char)(key
-                                                        & ~KeyCode.CtrlMask
-                                                        & ~KeyCode.ShiftMask
-                                                        & ~KeyCode.AltMask),
-                                                 ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
-                                                 key.HasFlag (KeyCode.ShiftMask),
-                                                 key.HasFlag (KeyCode.AltMask),
-                                                 key.HasFlag (KeyCode.CtrlMask)
-                                                )
+                             new (
+                                  (char)(key
+                                         & ~KeyCode.CtrlMask
+                                         & ~KeyCode.ShiftMask
+                                         & ~KeyCode.AltMask),
+                                  ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
+                                  key.HasFlag (KeyCode.ShiftMask),
+                                  key.HasFlag (KeyCode.AltMask),
+                                  key.HasFlag (KeyCode.CtrlMask)
+                                 )
                             );
     }
 

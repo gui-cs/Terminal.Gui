@@ -1,15 +1,28 @@
 #nullable enable
+using System;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Fake console output for testing that captures what would be written to the console.
 /// </summary>
-public class FakeConsoleOutput : OutputBase, IConsoleOutput
+public class FakeOutput : OutputBase, IConsoleOutput
 {
     private readonly StringBuilder _output = new ();
     private int _cursorLeft;
     private int _cursorTop;
     private Size _consoleSize = new (80, 25);
+
+    public FakeOutput ()
+    {
+        LastBuffer = new OutputBuffer ();
+        LastBuffer.SetSize (80, 25);
+    }
+
+    /// <summary>
+    ///     Gets or sets the last output buffer written.
+    /// </summary>
+    public IOutputBuffer? LastBuffer { get; set; }
 
     /// <summary>
     ///     Gets the captured output as a string.
@@ -35,22 +48,31 @@ public class FakeConsoleOutput : OutputBase, IConsoleOutput
     }
 
     /// <summary>
-    ///     Sets the fake window size.
+    /// The last value set by calling <see cref="SetCursorPosition"/>
     /// </summary>
-    public void SetConsoleSize (int width, int height) { _consoleSize = new (width, height); }
-
-    /// <summary>
-    ///     Gets the current cursor position.
-    /// </summary>
-    public (int left, int top) GetCursorPosition () { return (_cursorLeft, _cursorTop); }
+    public Point CursorPosition
+    {
+        get => new (_cursorLeft, _cursorTop);
+        private set => throw new NotImplementedException ();
+    }
 
     /// <inheritdoc/>
     public Size GetSize () { return _consoleSize; }
 
     /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text) { _output.Append (text); }
+    public void Write (ReadOnlySpan<char> text)
+    {
+        _output.Append (text);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IConsoleDriver"/>
+    public override void Write (IOutputBuffer buffer)
+    {
+        LastBuffer = buffer;
+        base.Write (buffer);
+    }
+
+    /// <inheritdoc cref="IConsoleDriver"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         // Capture but don't act on it in fake output

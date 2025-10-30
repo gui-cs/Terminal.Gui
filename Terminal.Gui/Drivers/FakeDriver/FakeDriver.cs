@@ -9,7 +9,9 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
-/// <summary>Implements a mock IConsoleDriver for unit testing</summary>
+/// <summary>
+///     Implements a mock IConsoleDriver for testing.
+/// </summary>
 public class FakeDriver : ConsoleDriver
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -95,7 +97,7 @@ public class FakeDriver : ConsoleDriver
         //Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
         FakeConsole.Clear ();
 
-        SetScreenSize (80,25);
+        SetScreenSize (80, 25);
         ResizeScreen ();
         ClearContents ();
         CurrentAttribute = new (Color.White, Color.Black);
@@ -373,7 +375,6 @@ public class FakeDriver : ConsoleDriver
     }
 
     #endregion
-
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

@@ -10,7 +10,7 @@ public class SyncrhonizationContextTests
     public void SynchronizationContext_CreateCopy ()
     {
         ConsoleDriver.RunningUnitTests = true;
-        Application.Init (null, "fake");
+        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -19,29 +19,23 @@ public class SyncrhonizationContextTests
 
         Assert.NotEqual (context, contextCopy);
         Application.Shutdown ();
+        ConsoleDriver.RunningUnitTests = false;
     }
 
     private object _lockPost = new ();
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>), "windows")]
-    [InlineData (typeof (ConsoleDriverFacade<ConsoleKeyInfo>), "dotnet")]
-    [InlineData (typeof (ConsoleDriverFacade<char>), "unix")]
-    public void SynchronizationContext_Post (Type driverType, string driverName = null)
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)
         {
             ConsoleDriver.RunningUnitTests = true;
 
-            if (driverType.Name.Contains ("ConsoleDriverFacade"))
-            {
-                Application.Init (driverName: driverName);
-            }
-            else
-            {
-                Application.Init (driverName: driverType.Name);
-            }
+            Application.Init (null, driverName: driverName);
 
             SynchronizationContext context = SynchronizationContext.Current;
 
@@ -85,6 +79,8 @@ public class SyncrhonizationContextTests
             {
                 Application.Shutdown ();
             }
+            ConsoleDriver.RunningUnitTests = false;
+
         }
     }
 
@@ -121,5 +117,7 @@ public class SyncrhonizationContextTests
         Application.Run ().Dispose ();
         Assert.True (success);
         Application.Shutdown ();
+        ConsoleDriver.RunningUnitTests = false;
+
     }
 }

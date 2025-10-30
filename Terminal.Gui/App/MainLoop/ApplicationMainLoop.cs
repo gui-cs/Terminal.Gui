@@ -114,6 +114,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
+        OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
         ConsoleSizeMonitor = componentFactory.CreateConsoleSizeMonitor (Out, OutputBuffer);
     }
 

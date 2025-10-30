@@ -14,10 +14,10 @@ internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer _) :
     /// <inheritdoc/>
     public bool Poll ()
     {
-        if (ConsoleDriver.RunningUnitTests)
-        {
-            return false;
-        }
+        //if (ConsoleDriver.RunningUnitTests)
+        //{
+        //    return false;
+        //}
 
         Size size = consoleOut.GetSize ();
 

@@ -12,8 +12,8 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     [return: MarshalAs (UnmanagedType.Bool)]
     private static partial bool WriteConsole (
         nint hConsoleOutput,
-        ReadOnlySpan<char> lpbufer,
-        uint numberOfCharsToWriten,
+        ReadOnlySpan<char> lpBuffer,
+        uint numberOfCharsToWritten,
         out uint lpNumberOfCharsWritten,
         nint lpReserved
     );
@@ -29,7 +29,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private static partial nint CreateConsoleScreenBuffer (
         DesiredAccess dwDesiredAccess,
         ShareMode dwShareMode,
-        nint secutiryAttributes,
+        nint securityAttributes,
         uint flags,
         nint screenBufferData
     );
@@ -150,7 +150,10 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
             // Force 16 colors if not in virtual terminal mode.
             Application.Force16Colors = true;
+
         }
+
+        GetSize ();
     }
 
     private void CreateScreenBuffer ()
@@ -203,6 +206,11 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
     internal Size SetConsoleWindow (short cols, short rows)
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return new (cols, rows);
+        }
+
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
@@ -316,7 +324,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         if (_force16Colors && !_isVirtualTerminal)
         {
             var a = str.ToCharArray ();
-            WriteConsole (_screenBuffer,a ,(uint)a.Length, out _, nint.Zero);
+            WriteConsole (_screenBuffer, a, (uint)a.Length, out _, nint.Zero);
         }
         else
         {
