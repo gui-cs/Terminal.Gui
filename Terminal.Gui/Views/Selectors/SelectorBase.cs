@@ -348,6 +348,24 @@ public abstract class SelectorBase : View, IOrientation
         {
             string label = subView.Title ?? string.Empty;
 
+            // Check if there's already a hotkey defined
+            if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
+            {
+                // Label already has a hotkey - preserve it if available
+                if (!UsedHotKeys.Contains (existingHotKey))
+                {
+                    subView.HotKey = existingHotKey;
+                    UsedHotKeys.Add (existingHotKey);
+                    continue; // Keep existing hotkey specifier in label
+                }
+                else
+                {
+                    // Existing hotkey is already used, remove it and assign new one
+                    label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
+                }
+            }
+
+            // Assign a new hotkey
             Rune [] runes = label.EnumerateRunes ().ToArray ();
 
             for (var i = 0; i < runes.Count (); i++)
@@ -363,11 +381,6 @@ public abstract class SelectorBase : View, IOrientation
                 if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsControl (newKey.AsRune))
                 {
                     continue;
-                }
-
-                if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key hotKey))
-                {
-                    label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
                 }
 
                 subView.Title = label.Insert (i, HotKeySpecifier.ToString ());

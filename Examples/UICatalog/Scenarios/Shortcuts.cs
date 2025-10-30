@@ -323,7 +323,7 @@ public class Shortcuts : Scenario
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
-        framedShortcut.Border.Settings = BorderSettings.Title;
+        framedShortcut.Border!.Settings = BorderSettings.Title;
         //framedShortcut.Orientation = Orientation.Horizontal;
 
         if (framedShortcut.Padding is { })

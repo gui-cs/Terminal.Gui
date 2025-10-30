@@ -233,17 +233,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
             return Value.Value;
         }
-        set
-        {
-            if (value == -1)
-            {
-                Value = null;
-            }
-            else
-            {
-                Value = value;
-            }
-        }
+        set => Value = value == -1 ? null : value;
     }
 
     /// <inheritdoc />
@@ -287,15 +277,23 @@ public class OptionSelector : SelectorBase, IDesignable
     /// </remarks>
     public int Cursor
     {
-        get
+        get => !CanFocus ? 0 : SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+        set
         {
             if (!CanFocus)
             {
-                return 0;
+                return;
             }
-            return SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+
+            CheckBox [] checkBoxes = SubViews.OfType<CheckBox> ().ToArray ();
+
+            if (value < 0 || value >= checkBoxes.Length)
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @"Cursor index is out of range");
+            }
+
+            checkBoxes [value].SetFocus ();
         }
-        set => throw new NotImplementedException ();
     }
 
     /// <inheritdoc/>
