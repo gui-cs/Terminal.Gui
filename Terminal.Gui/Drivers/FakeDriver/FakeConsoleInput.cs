@@ -8,13 +8,13 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeConsoleInput : ConsoleInput<ConsoleKeyInfo>
 {
-    private readonly ConcurrentQueue<ConsoleKeyInfo>? _predefinedInput;
+    private readonly FakeInput<ConsoleKeyInfo>? _predefinedInput;
 
     /// <summary>
     /// Creates a new FakeConsoleInput with optional predefined input.
     /// </summary>
     /// <param name="predefinedInput">Optional queue of predefined input to return.</param>
-    public FakeConsoleInput (ConcurrentQueue<ConsoleKeyInfo>? predefinedInput = null)
+    public FakeConsoleInput (FakeInput<ConsoleKeyInfo>? predefinedInput = null)
     {
         _predefinedInput = predefinedInput;
     }
@@ -22,7 +22,7 @@ public class FakeConsoleInput : ConsoleInput<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override bool Peek ()
     {
-        if (_predefinedInput != null && !_predefinedInput.IsEmpty)
+        if (_predefinedInput is { InputBuffer.IsEmpty: false })
         {
             return true;
         }
@@ -34,7 +34,7 @@ public class FakeConsoleInput : ConsoleInput<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override IEnumerable<ConsoleKeyInfo> Read ()
     {
-        if (_predefinedInput != null && _predefinedInput.TryDequeue (out ConsoleKeyInfo key))
+        if (_predefinedInput is { InputBuffer: { } } && _predefinedInput.InputBuffer.TryDequeue (out ConsoleKeyInfo key))
         {
             yield return key;
         }

@@ -9,15 +9,15 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
 {
-    private readonly ConcurrentQueue<ConsoleKeyInfo>? _predefinedInput;
-    private readonly FakeConsoleOutput? _output;
+    private readonly FakeInput<ConsoleKeyInfo>? _predefinedInput;
+    private readonly FakeOutput? _output;
 
     /// <summary>
     /// Creates a new FakeComponentFactory with optional predefined input and output capture.
     /// </summary>
     /// <param name="predefinedInput">Optional queue of predefined input events to simulate.</param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
-    public FakeComponentFactory (ConcurrentQueue<ConsoleKeyInfo>? predefinedInput = null, FakeConsoleOutput? output = null)
+    public FakeComponentFactory (FakeInput<ConsoleKeyInfo>? predefinedInput = null, FakeOutput? output = null)
     {
         _predefinedInput = predefinedInput;
         _output = output;
@@ -32,7 +32,7 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc />
     public override IConsoleOutput CreateOutput ()
     {
-        return _output ?? new FakeConsoleOutput ();
+        return _output ?? new FakeOutput ();
     }
 
     /// <inheritdoc />
@@ -44,7 +44,6 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc />
     public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        outputBuffer.SetSize(consoleOutput.GetSize().Width, consoleOutput.GetSize().Height);
         return new ConsoleSizeMonitor (consoleOutput, outputBuffer);
     }
 }
