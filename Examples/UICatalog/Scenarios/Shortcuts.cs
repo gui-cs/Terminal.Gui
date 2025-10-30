@@ -543,25 +543,21 @@ public class Shortcuts : Scenario
         {
             var max = 0;
 
-            IEnumerable<View> toAlign = Application.Top!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _));
-            IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
+            IEnumerable<Shortcut> toAlign = Application.Top!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _)).Cast<Shortcut>();
+            IEnumerable<Shortcut> enumerable = toAlign as Shortcut [] ?? toAlign.ToArray ();
 
             if (align)
             {
                 max = (from Shortcut? peer in enumerable
-                       select peer.Key.ToString ().GetColumns ()).Prepend (max)
-                                                                 .Max ();
+                       select peer!.Key.ToString ().GetColumns ()).Prepend (max)
+                                                                  .Max ();
 
-                foreach (View view in enumerable)
-                {
-                    var peer = (Shortcut)view;
-                    max = Math.Max (max, peer.KeyView.Text.GetColumns ());
-                }
+                max = enumerable.Select (peer => peer.KeyView.Text.GetColumns ()).Prepend (max).Max ();
             }
 
-            foreach (View view in enumerable)
+            foreach (Shortcut shortcut in enumerable)
             {
-                var peer = (Shortcut)view;
+                Shortcut peer = shortcut;
                 peer.MinimumKeyTextSize = max;
             }
         }
