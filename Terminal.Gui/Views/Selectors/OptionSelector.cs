@@ -49,18 +49,15 @@ public class OptionSelector : SelectorBase, IDesignable
 //            Cycle ();
   //          return true;
         }
-        else if (!HasFocus)
+        else if (!HasFocus && Value is null)
         {
-            if (Value is null)
+            if (RaiseSelecting (args.Context) is true)
             {
-                if (RaiseSelecting (args.Context) is true)
-                {
-                    return true;
-                }
-                SetFocus ();
-                Value = Values? [0];
                 return true;
             }
+            SetFocus ();
+            Value = Values? [0];
+            return true;
         }
 
         return false;
