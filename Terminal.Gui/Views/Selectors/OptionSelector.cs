@@ -177,14 +177,9 @@ public class OptionSelector : SelectorBase, IDesignable
     private void Cycle ()
     {
         int valueIndex = Values.IndexOf (v => v == Value);
-        if (valueIndex == Values?.Count () - 1)
-        {
-            Value = Values! [0];
-        }
-        else
-        {
-            Value = Values! [valueIndex + 1];
-        }
+        Value = valueIndex == Values?.Count () - 1
+            ? Values! [0]
+            : Values! [valueIndex + 1];
 
         if (HasFocus)
         {
