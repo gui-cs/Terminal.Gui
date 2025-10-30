@@ -186,7 +186,7 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         else
         {
-            Value = Values! [++valueIndex];
+            Value = Values! [valueIndex + 1];
         }
 
         if (HasFocus)
