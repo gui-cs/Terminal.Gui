@@ -26,7 +26,7 @@ public enum SelectorStyles
     ///     cause all flags to be set. Unchecking the "All" checkbox will set the value to 0.
     ///     Valid only for <see cref="FlagSelector"/> and <see cref="FlagSelector{TFlagsEnum}"/>
     /// </summary>
-    ShowAllFLag = 0b_0000_0010,
+    ShowAllFlag = 0b_0000_0010,
 
     // TODO: Make the TextField a TextValidateField so it can be editable and validate the value.
     /// <summary>
@@ -38,5 +38,5 @@ public enum SelectorStyles
     /// <summary>
     ///     All styles.
     /// </summary>
-    All = ShowNoneFlag | ShowAllFLag | ShowValue
+    All = ShowNoneFlag | ShowAllFlag | ShowValue
 }
