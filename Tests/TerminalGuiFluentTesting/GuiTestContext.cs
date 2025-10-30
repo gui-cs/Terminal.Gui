@@ -21,8 +21,8 @@ public partial class GuiTestContext : IDisposable
     internal readonly FakeOutput _output = new ();
     internal FakeWindowsInput? _winInput;
     internal FakeNetInput? _netInput;
+    internal FakeUnixInput? _unixInput;
     internal FakeInput<ConsoleKeyInfo>? _fakeInput;
-    //internal FakeUnixInput? _unixInput;
     internal View? _lastView;
     private readonly object _logsLock = new ();
     private StringBuilder? _logsSb;
@@ -161,6 +161,7 @@ public partial class GuiTestContext : IDisposable
 
         _netInput = new (_cts.Token);
         _winInput = new (_cts.Token);
+        _unixInput = new (_cts.Token);
         _fakeInput = new (_cts.Token);
 
         // Only set size if explicitly provided (width and height > 0)
@@ -183,7 +184,7 @@ public partial class GuiTestContext : IDisposable
 
                 break;
             case TestDriver.Unix:
-                cf = new UnixComponentFactory ();
+                cf = new FakeUnixComponentFactory (_unixInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Fake:
