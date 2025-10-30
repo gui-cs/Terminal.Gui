@@ -13,7 +13,7 @@ public enum SelectorStyles
     None = 0b_0000_0000,
 
     /// <summary>
-    ///     Show the `None` checkbox. This will add a checkbox with the title "None" that when checked will cause the value ot
+    ///     Show the `None` checkbox. This will add a checkbox with the title "None" that when checked will cause the value to
     ///     be set to 0.
     ///     The `None` checkbox will be added even if the flags do not contain a value of 0.
     ///     Valid only for <see cref="FlagSelector"/> and <see cref="FlagSelector{TFlagsEnum}"/>
