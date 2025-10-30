@@ -245,9 +245,13 @@ public abstract class SelectorBase : View, IOrientation
     }
 
     /// <summary>
-    ///     Gets the list of hotkeys already used by the labels or that should not be used if
-    ///     <see cref="AssignHotKeys"/>
-    ///     is enabled.
+    ///     Gets or sets the set of hotkeys that are already used by labels or should not be used when
+    ///     <see cref="AssignHotKeys"/> is enabled.
+    ///     <para>
+    ///         This property is used to ensure that automatically assigned hotkeys do not conflict with
+    ///         hotkeys used elsewhere in the application. Set <see cref="UsedHotKeys"/> before setting
+    ///         <see cref="Labels"/> if there are hotkeys that may conflict with other views.
+    ///     </para>
     /// </summary>
     public HashSet<Key> UsedHotKeys { get; set; } = [];
 
