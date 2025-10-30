@@ -455,6 +455,261 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
         Assert.Equal (CheckState.UnChecked, selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag2").CheckedState);
     }
+
+    #region FlagSelector-Specific Tests (Non-Base Class Functionality)
+
+    [Fact]
+    public void Value_MultipleFlags_CombinesCorrectly ()
+    {
+        var selector = new FlagSelector ();
+        selector.Values = [1, 2, 4];
+        selector.Labels = ["Flag1", "Flag2", "Flag3"];
+
+        selector.Value = 1 | 4; // Flags 1 and 3
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Equal (CheckState.Checked, checkBoxes [0].CheckedState); // Flag 1
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].CheckedState); // Flag 2
+        Assert.Equal (CheckState.Checked, checkBoxes [2].CheckedState); // Flag 3
+    }
+
+    [Fact]
+    public void Value_AllFlags_UpdatesCorrectly ()
+    {
+        var selector = new FlagSelector ();
+        selector.Values = [1, 2, 4];
+        selector.Labels = ["Flag1", "Flag2", "Flag3"];
+
+        selector.Value = 1 | 2 | 4; // All flags
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.True (checkBoxes.All (cb => cb.CheckedState == CheckState.Checked));
+    }
+
+    [Fact]
+    public void Value_ToggleFlag_AddsAndRemovesCorrectly ()
+    {
+        var selector = new FlagSelector ();
+        selector.Values = [1, 2, 4];
+        selector.Labels = ["Flag1", "Flag2", "Flag3"];
+
+        selector.Value = 1; // Start with Flag 1
+        Assert.Equal (1, selector.Value);
+
+        // Toggle checkbox to add Flag 2
+        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        flag2Checkbox.CheckedState = CheckState.Checked;
+
+        Assert.Equal (1 | 2, selector.Value);
+
+        // Toggle checkbox to remove Flag 1
+        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        flag1Checkbox.CheckedState = CheckState.UnChecked;
+
+        Assert.Equal (2, selector.Value);
+    }
+
+    [Fact]
+    public void Value_SetToZero_ChecksNoneFlag ()
+    {
+        var selector = new FlagSelector ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        selector.Values = [1, 2];
+        selector.Labels = ["Flag1", "Flag2"];
+
+        selector.Value = 0;
+
+        CheckBox? noneCheckBox = selector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => cb.Title == "None");
+        Assert.NotNull (noneCheckBox);
+        Assert.Equal (CheckState.Checked, noneCheckBox.CheckedState);
+
+        // All other flags should be unchecked
+        Assert.True (selector.SubViews.OfType<CheckBox> ()
+                             .Where (cb => (int)cb.Data! != 0)
+                             .All (cb => cb.CheckedState == CheckState.UnChecked));
+    }
+
+    [Fact]
+    public void Value_SetToNull_UnchecksAllIncludingNone ()
+    {
+        var selector = new FlagSelector ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        selector.Values = [1, 2];
+        selector.Labels = ["Flag1", "Flag2"];
+        selector.Value = 1;
+
+        selector.Value = null;
+
+        Assert.True (selector.SubViews.OfType<CheckBox> ()
+                             .All (cb => cb.CheckedState == CheckState.UnChecked));
+    }
+
+    [Fact]
+    public void ToggleNoneFlag_UnchecksAllOtherFlags ()
+    {
+        var selector = new FlagSelector ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        selector.Values = [1, 2];
+        selector.Labels = ["Flag1", "Flag2"];
+        selector.Value = 1 | 2; // Start with all flags set
+
+        CheckBox? noneCheckBox = selector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => cb.Title == "None");
+        Assert.NotNull (noneCheckBox);
+
+        noneCheckBox.CheckedState = CheckState.Checked;
+
+        Assert.Equal (0, selector.Value);
+        Assert.True (selector.SubViews.OfType<CheckBox> ()
+                             .Where (cb => (int)cb.Data! != 0)
+                             .All (cb => cb.CheckedState == CheckState.UnChecked));
+    }
+
+    [Fact]
+    public void ToggleAnyFlag_UnchecksNoneFlag ()
+    {
+        var selector = new FlagSelector ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        selector.Values = [1, 2];
+        selector.Labels = ["Flag1", "Flag2"];
+        selector.Value = 0; // Start with None
+
+        CheckBox? noneCheckBox = selector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => cb.Title == "None");
+        Assert.NotNull (noneCheckBox);
+        Assert.Equal (CheckState.Checked, noneCheckBox.CheckedState);
+
+        // Toggle a flag
+        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        flag1CheckBox.CheckedState = CheckState.Checked;
+
+        Assert.Equal (1, selector.Value);
+        Assert.Equal (CheckState.UnChecked, noneCheckBox.CheckedState);
+    }
+
+    [Fact]
+    public void NoneFlag_WithoutShowNoneFlag_IsNotCreated ()
+    {
+        var selector = new FlagSelector ();
+        selector.Styles = SelectorStyles.None; // No ShowNoneFlag
+        selector.Values = [1, 2];
+        selector.Labels = ["Flag1", "Flag2"];
+
+        CheckBox? noneCheckBox = selector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => cb.Title == "None");
+        Assert.Null (noneCheckBox);
+        Assert.Equal (2, selector.SubViews.OfType<CheckBox> ().Count ());
+    }
+
+    [Fact]
+    public void NoneFlag_AlreadyInValues_IsNotDuplicated ()
+    {
+        var selector = new FlagSelector ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        selector.Values = [0, 1, 2]; // 0 already included
+        selector.Labels = ["None", "Flag1", "Flag2"];
+
+        // Should only have one "None" checkbox
+        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => (int)cb.Data! == 0));
+    }
+
+    [Fact]
+    public void Mouse_DoubleClick_TogglesAndAccepts ()
+    {
+        var selector = new FlagSelector { DoubleClickAccepts = true };
+        selector.Values = [1, 2];
+        selector.Labels = ["Flag1", "Flag2"];
+        selector.Layout ();
+
+        var acceptCount = 0;
+        selector.Accepting += (s, e) => acceptCount++;
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
+        // When Values is set, SelectorBase.Value defaults to the first value (1 in this case)
+        // So the first checkbox (Data == 1) will be checked
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState); // FIXED: Was UnChecked
+        Assert.Equal (1, selector.Value); // Verify Value is set to first value
+
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
+
+        Assert.Equal (1, acceptCount);
+        // After double-clicking on an already-checked flag checkbox, it should still be checked (flags don't uncheck on double-click in FlagSelector)
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+    }
+
+    [Fact]
+    public void UpdateChecked_PreventsConcurrentModification ()
+    {
+        var selector = new FlagSelector ();
+        selector.Values = [1, 2, 4];
+        selector.Labels = ["Flag1", "Flag2", "Flag3"];
+        selector.Value = 1;
+
+        // This should not cause recursion or errors
+        var exception = Record.Exception (() =>
+        {
+            CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+            checkBox.CheckedState = CheckState.Checked; // This triggers UpdateChecked internally
+        });
+
+        Assert.Null (exception);
+        Assert.Equal (1 | 2, selector.Value);
+    }
+
+    #endregion
+
+    #region FlagSelector<T> Specific Tests
+
+    [Fact]
+    public void Generic_Value_SetWithEnum_UpdatesCorrectly ()
+    {
+        var selector = new FlagSelector<SelectorStyles> ();
+
+        selector.Value = SelectorStyles.ShowNoneFlag | SelectorStyles.ShowValue;
+
+        Assert.True ((selector.Value & SelectorStyles.ShowNoneFlag) == SelectorStyles.ShowNoneFlag);
+        Assert.True ((selector.Value & SelectorStyles.ShowValue) == SelectorStyles.ShowValue);
+        // SelectorStyles.None is 0, so checking (value & 0) == 0 will always be true
+        // What we actually want to check is that the value is NOT zero (i.e., not None)
+        Assert.True (selector.Value != SelectorStyles.None);
+    }
+
+    [Fact]
+    public void Generic_AutomaticallyPopulatesFromEnum ()
+    {
+        var selector = new FlagSelector<SelectorStyles> ();
+
+        // Should auto-populate from enum
+        Assert.NotNull (selector.Values);
+        Assert.NotNull (selector.Labels);
+        Assert.Equal (Enum.GetValues<SelectorStyles> ().Length, selector.Values.Count);
+    }
+
+    [Fact]
+    public void Generic_NullValue_UnchecksAll ()
+    {
+        var selector = new FlagSelector<SelectorStyles> ();
+        selector.Value = SelectorStyles.ShowNoneFlag;
+
+        selector.Value = null;
+
+        Assert.Null (selector.Value);
+        Assert.True (selector.SubViews.OfType<CheckBox> ()
+                             .All (cb => cb.CheckedState == CheckState.UnChecked));
+    }
+
+    [Fact]
+    public void Generic_AllFlagsValue_ChecksAll ()
+    {
+        var selector = new FlagSelector<SelectorStyles> ();
+
+        selector.Value = SelectorStyles.All;
+
+        // All non-None flags should be checked
+        Assert.True (selector.SubViews.OfType<CheckBox> ()
+                             .Where (cb => (int)cb.Data! != 0)
+                             .All (cb => cb.CheckedState == CheckState.Checked));
+    }
+
+    #endregion
 }
 
 
