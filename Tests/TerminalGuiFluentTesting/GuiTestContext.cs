@@ -22,7 +22,7 @@ public partial class GuiTestContext : IDisposable
     internal FakeWindowsInput? _winInput;
     internal FakeNetInput? _netInput;
     internal FakeUnixInput? _unixInput;
-    internal FakeFakeConsoleInput? _fakeInput;
+    internal FakeFakeInput? _fakeInput;
     internal View? _lastView;
     private readonly object _logsLock = new ();
     private StringBuilder? _logsSb;
