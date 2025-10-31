@@ -373,18 +373,7 @@ public class CharacterMap : Scenario
         selector.Value = null;
         _charMap!.ShowUnicodeCategory = null;
 
-        selector.ValueChanged += (s, e) =>
-                                 {
-                                     int? idx = e.Value;
-                                     if (idx is null)
-                                     {
-                                         _charMap.ShowUnicodeCategory = null;
-                                     }
-                                     else
-                                     {
-                                         _charMap.ShowUnicodeCategory = (UnicodeCategory)idx;
-                                     }
-                                 };
+        selector.ValueChanged += (_, e) => _charMap.ShowUnicodeCategory = e.Value;
 
         return new () { CommandView = selector };
     }

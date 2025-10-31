@@ -524,7 +524,7 @@ public class SelectorBaseTests
 
         Assert.NotEqual (oldCount, selector.SubViews.Count);
         Assert.Equal (3, selector.SubViews.OfType<CheckBox> ().Count ());
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Any (cb => cb.Title == "New1"));
+        Assert.Contains (selector.SubViews.OfType<CheckBox> (), cb => cb.Title == "New1");
     }
 
     [Fact]

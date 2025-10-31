@@ -29,10 +29,10 @@ public class FlagSelectorTests
         flagSelector.Labels = flags.Values.ToList ();
         flagSelector.Value = 1;
 
-        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == 1);
+        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == 2);
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
     }
 
@@ -120,10 +120,10 @@ public class FlagSelectorTests
 
         flagSelector.Value = SelectorStyles.ShowNoneFlag;
 
-        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
+        var checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == Convert.ToInt32 (SelectorStyles.ShowValue));
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowValue));
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
     }
 
@@ -301,7 +301,7 @@ public class FlagSelectorTests
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -319,7 +319,7 @@ public class FlagSelectorTests
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]

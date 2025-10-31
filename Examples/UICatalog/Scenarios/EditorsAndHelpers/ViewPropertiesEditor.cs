@@ -59,7 +59,7 @@ public class ViewPropertiesEditor : EditorBase
                                             {
                                                 if (ViewToEdit is IOrientation orientatedView)
                                                 {
-                                                    orientatedView.Orientation = (Orientation)_orientationOptionSelector.Value!;
+                                                    orientatedView.Orientation = _orientationOptionSelector.Value!.Value;
                                                 }
                                             };
         Add (label, _orientationOptionSelector);
