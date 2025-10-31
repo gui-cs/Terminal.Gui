@@ -111,7 +111,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
         Value = (int)checkbox.Data!;
-        args.Handled = true;
+        args.Handled = false; // Do not set to false; let Accepting propagate
     }
 
     private int? _value;
