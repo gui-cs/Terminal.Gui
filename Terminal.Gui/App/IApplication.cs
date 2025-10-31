@@ -79,8 +79,13 @@ public interface IApplication
     /// </summary>
     Toplevel? CachedRunStateToplevel { get; set; }
 
-    /// <summary>Requests that the application stop running.</summary>
+    /// <summary>Requests that the currently running Top stop running.</summary>
     void RequestStop ();
+
+    /// <summary>
+    ///     Set to true to cause the session to stop running after first iteration.
+    /// </summary>
+    bool StopAfterFirstIteration { get; set; }
 
     /// <summary>
     ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that

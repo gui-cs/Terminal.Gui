@@ -27,7 +27,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
     ///     when the application is done.
     /// </remarks>
@@ -35,7 +35,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <summary>Notify that an existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
     /// <remarks>
-    ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
     ///     when the application is done.
     /// </remarks>
@@ -394,7 +394,11 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
     ///     cause the application to continue running until Application.RequestStop () is called.
     /// </summary>
-    public static bool EndAfterFirstIteration { get; set; }
+    public static bool StopAfterFirstIteration
+    {
+        get => ApplicationImpl.Instance.StopAfterFirstIteration;
+        set => ApplicationImpl.Instance.StopAfterFirstIteration = value;
+    }
 
     /// <summary>Building block API: Runs the main loop for the created <see cref="Toplevel"/>.</summary>
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
@@ -407,7 +411,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            if (EndAfterFirstIteration && !firstIteration)
+            if (StopAfterFirstIteration && !firstIteration)
             {
                 return;
             }

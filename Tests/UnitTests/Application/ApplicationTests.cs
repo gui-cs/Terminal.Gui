@@ -313,7 +313,7 @@ public class ApplicationTests
             // Don't check Application.Force16Colors
             //Assert.False (Application.Force16Colors);
             Assert.Null (Application.Driver);
-            Assert.False (Application.EndAfterFirstIteration);
+            Assert.False (Application.StopAfterFirstIteration);
 
             // Commented out because if CM changed the defaults, those changes should
             // persist across Inits.
@@ -370,7 +370,7 @@ public class ApplicationTests
         Application.Force16Colors = true;
 
         //Application.ForceDriver = "driver";
-        Application.EndAfterFirstIteration = true;
+        Application.StopAfterFirstIteration = true;
         Application.PrevTabGroupKey = Key.A;
         Application.NextTabGroupKey = Key.B;
         Application.QuitKey = Key.C;

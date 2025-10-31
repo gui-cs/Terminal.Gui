@@ -61,7 +61,7 @@ if (string.IsNullOrEmpty (viewName))
 ViewDemoWindow.ViewName = viewName;
 
 // Force 16 colors and end after first iteration
-Application.EndAfterFirstIteration = true;
+Application.StopAfterFirstIteration = true;
 
 var demoWindow = Application.Run<ViewDemoWindow> ();
 string? output = demoWindow.Output?.Trim ();
