@@ -19,6 +19,16 @@ namespace UnitTests;
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
     private IDisposable? _appDispose = null!;
+    public override void Before (MethodInfo methodUnderTest)
+    {
+        Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
+        Assert.Null (_appDispose);
+        var appFactory = new FakeApplicationFactory ();
+        _appDispose = appFactory.SetupFakeApplication ();
+
+        base.Before (methodUnderTest);
+    }
 
     public override void After (MethodInfo methodUnderTest)
     {
@@ -26,19 +36,9 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         _appDispose?.Dispose ();
         _appDispose = null;
+        Application.ResetState (true);
 
         base.After (methodUnderTest);
     }
 
-    public override void Before (MethodInfo methodUnderTest)
-    {
-        Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-
-        Assert.Null (_appDispose);
-
-        var appFactory = new FakeApplicationFactory ();
-        _appDispose = appFactory.SetupFakeApplication ();
-
-        base.Before (methodUnderTest);
-    }
 }

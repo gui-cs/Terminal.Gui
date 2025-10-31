@@ -27,6 +27,11 @@
 		<Optimize>true</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Input\Mouse\**" />
+	  <EmbeddedResource Remove="Input\Mouse\**" />
+	  <None Remove="Input\Mouse\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="Moq" />
@@ -57,9 +62,6 @@
 		<Using Include="System.Drawing" />
 		<Using Include="Terminal.Gui" />
 		<Using Include="Xunit" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Input\Mouse\" />
 	</ItemGroup>
 	<PropertyGroup Label="FineCodeCoverage">
 		<Enabled>
