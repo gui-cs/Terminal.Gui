@@ -1,32 +1,42 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Fake console input for testing that does not produce any input events.
+/// Fake console input for testing that can return predefined input or wait indefinitely.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class FakeInput<T> (CancellationToken hardStopToken) : IConsoleInput<T>
+public class FakeInput : ConsoleInput<ConsoleKeyInfo>, IFakeInput
 {
-    private readonly CancellationTokenSource _timeoutCts = new (TimeSpan.FromSeconds (30));
-
-    // Create a timeout-based cancellation token too to prevent tests ever fully hanging
-
-    /// <inheritdoc/>
-    public void Dispose () { }
-
-    /// <inheritdoc/>
-    public void Initialize (ConcurrentQueue<T> inputBuffer) { InputBuffer = inputBuffer; }
+    private readonly FakeConsoleInput<ConsoleKeyInfo>? _predefinedInput;
 
     /// <summary>
-    ///     Gets or sets the input buffer.
+    /// Creates a new FakeConsoleInput with optional predefined input.
     /// </summary>
-    public ConcurrentQueue<T>? InputBuffer { get; set; }
+    /// <param name="predefinedInput">Optional queue of predefined input to return.</param>
+    public FakeInput (FakeConsoleInput<ConsoleKeyInfo>? predefinedInput = null)
+    {
+        _predefinedInput = predefinedInput;
+    }
 
     /// <inheritdoc/>
-    public void Run (CancellationToken token)
+    protected override bool Peek ()
     {
-        // Blocks until either the token or the hardStopToken is cancelled.
-        WaitHandle.WaitAny ([token.WaitHandle, hardStopToken.WaitHandle, _timeoutCts.Token.WaitHandle]);
+        if (_predefinedInput is { InputBuffer.IsEmpty: false })
+        {
+            return true;
+        }
+
+        // No input available
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<ConsoleKeyInfo> Read ()
+    {
+        if (_predefinedInput is { InputBuffer: { } } && _predefinedInput.InputBuffer.TryDequeue (out ConsoleKeyInfo key))
+        {
+            yield return key;
+        }
     }
 }
