@@ -307,6 +307,59 @@ public class ApplicationImplTests
         ApplicationImpl.ChangeInstance (orig);
     }
 
+
+    [Fact]
+    public void InitRunShutdown_StopAfterFirstIteration_Stops ()
+    {
+        IApplication orig = ApplicationImpl.Instance;
+
+        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl.ChangeInstance (v2);
+
+        Assert.Null (Application.Top);
+        Assert.Null (Application.Driver);
+
+        v2.Init (null, "fake");
+
+        Toplevel top = new Window ();
+
+        var closedCount = 0;
+
+        top.Closed
+            += (_, a) => { closedCount++; };
+
+        var unloadedCount = 0;
+
+        top.Unloaded
+            += (_, a) => { unloadedCount++; };
+
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 Assert.Fail(@"Didn't stop after first iteration.");
+                                                 return false;
+                                             }
+                                            );
+
+        Assert.Equal (0, closedCount);
+        Assert.Equal (0, unloadedCount);
+
+        v2.StopAfterFirstIteration = true;
+        v2.Run (top);
+
+        Assert.Equal (1, closedCount);
+        Assert.Equal (1, unloadedCount);
+
+        Application.Top?.Dispose ();
+        v2.Shutdown ();
+        Assert.Equal (1, closedCount);
+        Assert.Equal (1, unloadedCount);
+
+        ApplicationImpl.ChangeInstance (orig);
+    }
+
+
     [Fact]
     public void InitRunShutdown_End_Is_Called ()
     {

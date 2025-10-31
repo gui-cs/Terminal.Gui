@@ -1,4 +1,4 @@
 ﻿namespace TerminalGuiFluentTesting;
 
-internal class FakeNetInput (CancellationToken hardStopToken) : FakeInput<ConsoleKeyInfo> (hardStopToken), INetInput
+internal class FakeNetInput (CancellationToken hardStopToken) : FakeConsoleInput<ConsoleKeyInfo> (hardStopToken), INetInput
 { }

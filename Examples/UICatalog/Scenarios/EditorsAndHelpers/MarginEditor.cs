@@ -47,10 +47,7 @@ public class MarginEditor : AdornmentEditor
             _optionsShadow.Value = ((Margin)AdornmentToEdit).ShadowStyle;
         }
 
-        _optionsShadow.ValueChanged += (_, args) =>
-                                        {
-                                            ((Margin)AdornmentToEdit!).ShadowStyle = (ShadowStyle)args.Value!;
-                                        };
+        _optionsShadow.ValueChanged += (_, args) => ((Margin)AdornmentToEdit!).ShadowStyle = args.Value!.Value;
 
         Add (_optionsShadow);
 

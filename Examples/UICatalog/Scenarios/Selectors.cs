@@ -195,7 +195,7 @@ public sealed class Selectors : Scenario
 
         return;
 
-        void OrientationSelectorOnSelectedItemChanged (object? sender, EventArgs<int?> e)
+        void OrientationSelectorOnSelectedItemChanged (object? sender, EventArgs<Orientation?> e)
         {
             if (sender is not OptionSelector<Orientation> s)
             {
@@ -209,7 +209,7 @@ public sealed class Selectors : Scenario
             }
         }
 
-        void StylesSelectorOnValueChanged (object? sender, EventArgs<int?> e)
+        void StylesSelectorOnValueChanged (object? sender, EventArgs<SelectorStyles?> e)
         {
             if (sender is not FlagSelector<SelectorStyles> s)
             {

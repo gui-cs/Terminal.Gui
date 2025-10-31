@@ -70,7 +70,7 @@ public class BorderEditor : AdornmentEditor
 
         return;
 
-        void OnRbBorderStyleOnValueChanged (object? s, EventArgs<int?> args)
+        void OnRbBorderStyleOnValueChanged (object? s, EventArgs<LineStyle?> args)
         {
             LineStyle prevBorderStyle = AdornmentToEdit!.BorderStyle;
 

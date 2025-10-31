@@ -263,10 +263,10 @@ public class ProgressBarStyles : Scenario
                                            return;
                                        }
 
-                                       blocksPB.ProgressBarFormat = (ProgressBarFormat)e.Value.Value;
-                                       continuousPB.ProgressBarFormat = (ProgressBarFormat)e.Value.Value;
-                                       marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.Value.Value;
-                                       marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.Value.Value;
+                                       blocksPB.ProgressBarFormat = e.Value.Value;
+                                       continuousPB.ProgressBarFormat = e.Value.Value;
+                                       marqueesBlocksPB.ProgressBarFormat = e.Value.Value;
+                                       marqueesContinuousPB.ProgressBarFormat = e.Value.Value;
 
                                    };
 

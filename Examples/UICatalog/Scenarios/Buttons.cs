@@ -328,7 +328,7 @@ public class Buttons : Scenario
                                             return;
                                         }
 
-                                        Alignment newValue = (Alignment)args.Value.Value;
+                                        Alignment newValue = args.Value.Value;
                                         moveBtn.TextAlignment = newValue;
                                         sizeBtn.TextAlignment = newValue;
                                         moveBtnA.TextAlignment = newValue;
