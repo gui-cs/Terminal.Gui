@@ -1,3 +1,4 @@
+#nullable enable
 namespace UnitTests_Parallelizable.ViewsTests;
 
 /// <summary>

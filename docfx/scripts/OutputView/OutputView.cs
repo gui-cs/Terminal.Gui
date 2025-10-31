@@ -13,7 +13,6 @@ ConfigurationManager.RuntimeConfig = """
                                              {   
                                                  "Default": {
                                                      "Window.DefaultShadow": "None",
-                                                     "CheckBox.DefaultHighlightStyle": "None",
                                                      "Dialog.DefaultShadow": "None",
                                                      "Button.DefaultShadow": "None",
                                                      "Menuv2.DefaultBorderStyle": "Single"

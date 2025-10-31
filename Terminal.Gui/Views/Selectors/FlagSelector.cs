@@ -111,6 +111,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
         Value = (int)checkbox.Data!;
+        args.Handled = true;
     }
 
     private int? _value;

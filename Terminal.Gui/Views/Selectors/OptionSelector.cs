@@ -21,6 +21,8 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Provides a user interface for displaying and selecting a single item from a list of options.
 ///     Each option is represented by a checkbox, but only one can be selected at a time.
+///     <see cref="OptionSelector{TEnum}"/> provides a type-safe version where a <see langword="enum"/> can be
+///     provided.
 /// </summary>
 public class OptionSelector : SelectorBase, IDesignable
 {
@@ -166,6 +168,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
         Value = (int)checkbox.Data!;
+        args.Handled = true;
     }
 
     private void Cycle ()
@@ -188,7 +191,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
     /// <summary>
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
-    ///     to the current <see cref="Value"/> is checked. Throws <see cref="InvalidOperationException"/>
+    ///     to the current <see cref="SelectorBase.Value"/> is checked. Throws <see cref="InvalidOperationException"/>
     ///     if a checkbox's Data property is not set.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
