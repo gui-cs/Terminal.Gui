@@ -50,16 +50,16 @@ public partial class GuiTestContext
         {
             case TestDriver.Windows:
 
-                _winInput.InputBuffer!.Enqueue (
-                                                new ()
-                                                {
-                                                    EventType = WindowsConsole.EventType.Mouse,
-                                                    MouseEvent = new ()
-                                                    {
-                                                        ButtonState = btn,
-                                                        MousePosition = new ((short)screenX, (short)screenY)
-                                                    }
-                                                });
+                _winInput!.InputBuffer!.Enqueue (
+                                                 new ()
+                                                 {
+                                                     EventType = WindowsConsole.EventType.Mouse,
+                                                     MouseEvent = new ()
+                                                     {
+                                                         ButtonState = btn,
+                                                         MousePosition = new ((short)screenX, (short)screenY)
+                                                     }
+                                                 });
 
                 _winInput.InputBuffer.Enqueue (
                                                new ()
@@ -91,6 +91,43 @@ public partial class GuiTestContext
                 }
 
                 return WaitIteration ();
+
+            case TestDriver.Unix:
+
+                int unixButton = btn switch
+                                {
+                                    WindowsConsole.ButtonState.Button1Pressed => 0,
+                                    WindowsConsole.ButtonState.Button2Pressed => 1,
+                                    WindowsConsole.ButtonState.Button3Pressed => 2,
+                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
+                                };
+
+                foreach (ConsoleKeyInfo k in NetSequences.Click (unixButton, screenX, screenY))
+                {
+                    SendUnixKey (k.KeyChar, false);
+                }
+
+                return WaitIteration ();
+
+            case TestDriver.Fake:
+
+                int fakeButton = btn switch
+                                {
+                                    WindowsConsole.ButtonState.Button1Pressed => 0,
+                                    WindowsConsole.ButtonState.Button2Pressed => 1,
+                                    WindowsConsole.ButtonState.Button3Pressed => 2,
+                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
+                                };
+
+                foreach (ConsoleKeyInfo k in NetSequences.Click (fakeButton, screenX, screenY))
+                {
+                    SendFakeKey (k, false);
+                }
+
+                return WaitIteration ();
+
             default:
                 throw new ArgumentOutOfRangeException ();
         }
@@ -108,6 +145,20 @@ public partial class GuiTestContext
                 foreach (ConsoleKeyInfo k in NetSequences.Down)
                 {
                     SendNetKey (k);
+                }
+
+                break;
+            case TestDriver.Unix:
+                foreach (ConsoleKeyInfo k in NetSequences.Down)
+                {
+                    SendUnixKey (k.KeyChar);
+                }
+
+                break;
+            case TestDriver.Fake:
+                foreach (ConsoleKeyInfo k in NetSequences.Down)
+                {
+                    SendFakeKey (k);
                 }
 
                 break;
@@ -140,6 +191,24 @@ public partial class GuiTestContext
                 WaitIteration ();
 
                 break;
+            case TestDriver.Unix:
+                foreach (ConsoleKeyInfo k in NetSequences.Right)
+                {
+                    SendUnixKey (k.KeyChar);
+                }
+
+                WaitIteration ();
+
+                break;
+            case TestDriver.Fake:
+                foreach (ConsoleKeyInfo k in NetSequences.Right)
+                {
+                    SendFakeKey (k);
+                }
+
+                WaitIteration ();
+
+                break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
@@ -167,6 +236,20 @@ public partial class GuiTestContext
                 }
 
                 break;
+            case TestDriver.Unix:
+                foreach (ConsoleKeyInfo k in NetSequences.Left)
+                {
+                    SendUnixKey (k.KeyChar);
+                }
+
+                break;
+            case TestDriver.Fake:
+                foreach (ConsoleKeyInfo k in NetSequences.Left)
+                {
+                    SendFakeKey (k);
+                }
+
+                break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
@@ -191,6 +274,20 @@ public partial class GuiTestContext
                 foreach (ConsoleKeyInfo k in NetSequences.Up)
                 {
                     SendNetKey (k);
+                }
+
+                break;
+            case TestDriver.Unix:
+                foreach (ConsoleKeyInfo k in NetSequences.Up)
+                {
+                    SendUnixKey (k.KeyChar);
+                }
+
+                break;
+            case TestDriver.Fake:
+                foreach (ConsoleKeyInfo k in NetSequences.Up)
+                {
+                    SendFakeKey (k);
                 }
 
                 break;
@@ -224,6 +321,14 @@ public partial class GuiTestContext
                 break;
             case TestDriver.DotNet:
                 SendNetKey (new ('\r', ConsoleKey.Enter, false, false, false));
+
+                break;
+            case TestDriver.Unix:
+                SendUnixKey ('\r');
+
+                break;
+            case TestDriver.Fake:
+                SendFakeKey (new ('\r', ConsoleKey.Enter, false, false, false));
 
                 break;
             default:
@@ -261,6 +366,20 @@ public partial class GuiTestContext
                 SendNetKey (new ('\u001b', ConsoleKey.None, false, false, false));
 
                 break;
+            case TestDriver.Unix:
+
+                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
+                // even though you would think it would be Escape - it isn't
+                SendUnixKey ('\u001b');
+
+                break;
+            case TestDriver.Fake:
+
+                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
+                // even though you would think it would be Escape - it isn't
+                SendFakeKey (new ('\u001b', ConsoleKey.None, false, false, false));
+
+                break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
@@ -296,6 +415,19 @@ public partial class GuiTestContext
                 SendNetKey (new ('\t', ConsoleKey.None, false, false, false));
 
                 break;
+            case TestDriver.Unix:
+
+                SendUnixKey ('\t');
+
+                break;
+            case TestDriver.Fake:
+
+                // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
+                // even though you would think it would be Tab - it isn't
+                SendFakeKey (new ('\t', ConsoleKey.None, false, false, false));
+
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException ();
         }
@@ -339,6 +471,26 @@ public partial class GuiTestContext
         if (wait)
         {
             WaitUntil (() => _netInput.InputBuffer.IsEmpty);
+        }
+    }
+
+    private void SendUnixKey (char ch, bool wait = true)
+    {
+        _unixInput.InputBuffer!.Enqueue (ch);
+
+        if (wait)
+        {
+            WaitUntil (() => _unixInput.InputBuffer.IsEmpty);
+        }
+    }
+
+    private void SendFakeKey (ConsoleKeyInfo consoleKeyInfo, bool wait = true)
+    {
+        _fakeInput.InputBuffer!.Enqueue (consoleKeyInfo);
+
+        if (wait)
+        {
+            WaitUntil (() => _fakeInput.InputBuffer.IsEmpty);
         }
     }
 

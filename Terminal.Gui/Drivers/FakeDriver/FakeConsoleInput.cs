@@ -1,42 +1,32 @@
-#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Fake console input for testing that can return predefined input or wait indefinitely.
+///     Fake console input for testing that does not produce any input events.
 /// </summary>
-public class FakeConsoleInput : ConsoleInput<ConsoleKeyInfo>
+/// <typeparam name="T"></typeparam>
+public class FakeConsoleInput<T> (CancellationToken hardStopToken) : IConsoleInput<T>
 {
-    private readonly FakeInput<ConsoleKeyInfo>? _predefinedInput;
+    private readonly CancellationTokenSource _timeoutCts = new (TimeSpan.FromSeconds (30));
+
+    // Create a timeout-based cancellation token too to prevent tests ever fully hanging
+
+    /// <inheritdoc/>
+    public void Dispose () { }
+
+    /// <inheritdoc/>
+    public void Initialize (ConcurrentQueue<T> inputBuffer) { InputBuffer = inputBuffer; }
 
     /// <summary>
-    /// Creates a new FakeConsoleInput with optional predefined input.
+    ///     Gets or sets the input buffer.
     /// </summary>
-    /// <param name="predefinedInput">Optional queue of predefined input to return.</param>
-    public FakeConsoleInput (FakeInput<ConsoleKeyInfo>? predefinedInput = null)
-    {
-        _predefinedInput = predefinedInput;
-    }
+    public ConcurrentQueue<T>? InputBuffer { get; set; }
 
     /// <inheritdoc/>
-    protected override bool Peek ()
+    public void Run (CancellationToken token)
     {
-        if (_predefinedInput is { InputBuffer.IsEmpty: false })
-        {
-            return true;
-        }
-
-        // No input available
-        return false;
-    }
-
-    /// <inheritdoc/>
-    protected override IEnumerable<ConsoleKeyInfo> Read ()
-    {
-        if (_predefinedInput is { InputBuffer: { } } && _predefinedInput.InputBuffer.TryDequeue (out ConsoleKeyInfo key))
-        {
-            yield return key;
-        }
+        // Blocks until either the token or the hardStopToken is cancelled.
+        WaitHandle.WaitAny ([token.WaitHandle, hardStopToken.WaitHandle, _timeoutCts.Token.WaitHandle]);
     }
 }

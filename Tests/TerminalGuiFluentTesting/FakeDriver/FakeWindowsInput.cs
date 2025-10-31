@@ -1,5 +1,5 @@
 ﻿
 namespace TerminalGuiFluentTesting;
 
-internal class FakeWindowsInput (CancellationToken hardStopToken) : FakeInput<WindowsConsole.InputRecord> (hardStopToken), IWindowsInput
+internal class FakeWindowsInput (CancellationToken hardStopToken) : FakeConsoleInput<WindowsConsole.InputRecord> (hardStopToken), IWindowsInput
 { }
