@@ -9,8 +9,8 @@ public class TestDrivers : IEnumerable<object []>
     {
         yield return [TestDriver.Windows];
         yield return [TestDriver.DotNet];
-       // yield return [TestDriver.Unix];
-        //yield return [TestDriver.Fake];
+        yield return [TestDriver.Unix];
+        yield return [TestDriver.Fake];
     }
 
     IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();
