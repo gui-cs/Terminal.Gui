@@ -247,7 +247,7 @@ public class MessageBoxes : Scenario
                                                    btns.Add ($"_{NumberToWords.Convert (i)}");
                                                }
 
-                                               if (styleRadioGroup.SelectedItem == 0)
+                                               if (styleRadioGroup.Value == 0)
                                                {
                                                    buttonPressedLabel.Text =
                                                        $"{MessageBox.Query (

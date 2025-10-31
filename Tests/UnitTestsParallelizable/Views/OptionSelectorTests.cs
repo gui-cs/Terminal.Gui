@@ -120,7 +120,7 @@ public class OptionSelectorTests
     }
 
     [Fact]
-    public void HotKey_No_SelectedItem_Selects_First ()
+    public void HotKey_No_Value_Selects_First ()
     {
         var superView = new View
         {
@@ -133,16 +133,16 @@ public class OptionSelectorTests
             HotKey = Key.G.WithAlt,
             RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
         };
-        selector.SelectedItem = -1;
+        selector.Value = null;
 
         superView.Add (selector);
 
         Assert.False (selector.HasFocus);
-        Assert.Equal (-1, selector.SelectedItem);
+        Assert.Null (selector.Value);
 
         selector.NewKeyDownEvent (Key.G.WithAlt);
 
-        Assert.Equal (0, selector.SelectedItem);
+        Assert.Equal (0, selector.Value);
         Assert.Equal (selector.SubViews.OfType<CheckBox> ().First (), superView.MostFocused);
     }
 

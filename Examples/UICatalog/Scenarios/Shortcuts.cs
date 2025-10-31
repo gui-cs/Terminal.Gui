@@ -211,12 +211,12 @@ public class Shortcuts : Scenario
             },
         };
 
-        ((OptionSelector)optionSelectorShortcut.CommandView).SelectedItemChanged += (o, args) =>
+        ((OptionSelector)optionSelectorShortcut.CommandView).ValueChanged += (o, args) =>
                                                                                 {
                                                                                     if (o is { })
                                                                                     {
                                                                                         eventSource.Add (
-                                                                                                         $"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
+                                                                                                         $"ValueChanged: {o.GetType ().Name} - {args.Value}");
                                                                                         eventLog.MoveDown ();
                                                                                     }
                                                                                 };

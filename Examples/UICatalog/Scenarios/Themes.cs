@@ -30,19 +30,19 @@ public sealed class Themes : Scenario
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             RadioLabels= options,
-            SelectedItem = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
+            Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
         };
         themeOptionSelector.Border!.Thickness = new (0, 1, 0, 0);
         themeOptionSelector.Margin!.Thickness = new (0, 0, 1, 0);
 
-        themeOptionSelector.SelectedItemChanged += (sender, args) =>
+        themeOptionSelector.ValueChanged += (sender, args) =>
                                              {
                                                  OptionSelector? optionSelector = sender as OptionSelector;
                                                  if (optionSelector is null)
                                                  {
                                                      return;
                                                  }
-                                                 var newTheme = optionSelector!.RadioLabels! [(int)args.SelectedItem!] as string;
+                                                 var newTheme = optionSelector!.RadioLabels! [(int)args.Value!] as string;
                                                  // strip off the leading underscore
                                                  ThemeManager.Theme = newTheme!.Substring (1);
                                                  ConfigurationManager.Apply ();

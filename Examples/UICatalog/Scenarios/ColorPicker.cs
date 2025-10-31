@@ -131,20 +131,20 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (_demoView),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            RadioLabels = new []
-            {
+            RadioLabels =
+            [
                 "_RGB",
                 "_HSV",
                 "H_SL",
                 "_16 Colors"
-            },
-            SelectedItem = (int)foregroundColorPicker.Style.ColorModel,
+            ],
+            Value = (int)foregroundColorPicker.Style.ColorModel,
         };
 
-        osColorModel.SelectedItemChanged += (_, e) =>
+        osColorModel.ValueChanged += (_, e) =>
                                             {
                                                 // 16 colors
-                                                if (e.SelectedItem == 3)
+                                                if (e.Value == 3)
                                                 {
 
                                                     foregroundColorPicker16.Visible = true;
@@ -161,12 +161,17 @@ public class ColorPickers : Scenario
                                                 {
                                                     foregroundColorPicker16.Visible = false;
                                                     foregroundColorPicker.Visible = true;
-                                                    foregroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
-                                                    foregroundColorPicker.ApplyStyleChanges ();
 
-                                                    backgroundColorPicker16.Visible = false;
-                                                    backgroundColorPicker.Visible = true;
-                                                    backgroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
+                                                    if (e.Value is { })
+                                                    {
+                                                        foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                                                        foregroundColorPicker.ApplyStyleChanges ();
+
+                                                        backgroundColorPicker16.Visible = false;
+                                                        backgroundColorPicker.Visible = true;
+                                                        backgroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                                                    }
+
                                                     backgroundColorPicker.ApplyStyleChanges ();
 
 

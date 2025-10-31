@@ -46,8 +46,6 @@ public class OptionSelector : SelectorBase, IDesignable
             {
                 return true;
             }
-//            Cycle ();
-  //          return true;
         }
         else if (!HasFocus && Value is null)
         {
@@ -82,8 +80,6 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
             Cycle ();
-
-            return false;
         }
         else
         {
@@ -98,8 +94,6 @@ public class OptionSelector : SelectorBase, IDesignable
             {
                 UpdateChecked ();
             }
-
-            return false;
         }
 
         return false;
@@ -219,52 +213,6 @@ public class OptionSelector : SelectorBase, IDesignable
         get => Labels?.ToArray () ?? [];
         set => Labels = value;
     }
-
-    /// <summary>Gets or sets the selected radio label index.</summary>
-    /// <value>The index. -1 if no item is selected.</value>
-    public int SelectedItem
-    {
-        get
-        {
-            if (Value is null)
-            {
-                return -1;
-            }
-
-            return Value.Value;
-        }
-        set => Value = value == -1 ? null : value;
-    }
-
-    /// <inheritdoc />
-    protected override void OnValueChanged (int? value, int? previousValue)
-    {
-        int newValue = -1;
-        int prevValue = -1;
-
-        // Verify at most one is checked
-        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
-
-        if (value is { })
-        {
-            newValue = value.Value;
-        }
-
-        if (previousValue is { })
-        {
-            prevValue = previousValue.Value;
-        }
-
-        OnSelectedItemChanged (newValue, prevValue);
-        SelectedItemChanged?.Invoke (this, new (newValue, prevValue));
-    }
-
-    /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
-    /// <param name="selectedItem"></param>
-    /// <param name="previousSelectedItem"></param>
-    protected virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem) { }
-    /// <summary>Raised when the selected radio label has changed.</summary>
-    public event EventHandler<SelectedItemChangedArgs>? SelectedItemChanged;
 
     /// <summary>
     ///     Gets or sets the <see cref="RadioLabels"/> index for the cursor. The cursor may or may not be the selected

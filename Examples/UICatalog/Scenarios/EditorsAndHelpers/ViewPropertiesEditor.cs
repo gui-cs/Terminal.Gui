@@ -55,11 +55,11 @@ public class ViewPropertiesEditor : EditorBase
             Orientation = Orientation.Horizontal
         };
 
-        _orientationOptionSelector.SelectedItemChanged += (s, selected) =>
+        _orientationOptionSelector.ValueChanged += (s, selected) =>
                                             {
                                                 if (ViewToEdit is IOrientation orientatedView)
                                                 {
-                                                    orientatedView.Orientation = (Orientation)_orientationOptionSelector.SelectedItem!;
+                                                    orientatedView.Orientation = (Orientation)_orientationOptionSelector.Value!;
                                                 }
                                             };
         Add (label, _orientationOptionSelector);
@@ -113,7 +113,7 @@ public class ViewPropertiesEditor : EditorBase
 
             if (ViewToEdit is IOrientation orientatedView)
             {
-                _orientationOptionSelector!.SelectedItem = (int)orientatedView.Orientation;
+                _orientationOptionSelector!.Value = orientatedView.Orientation;
                 _orientationOptionSelector.Enabled = true;
             }
             else

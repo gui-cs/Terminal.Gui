@@ -247,7 +247,7 @@ public class Buttons : Scenario
         {
             X = 4,
             Y = Pos.Bottom (label) + 1,
-            SelectedItem = 2,
+            Value = Alignment.Center,
             AssignHotKeys = true,
             Title = "_9 OptionSelector",
             BorderStyle = LineStyle.Dotted,

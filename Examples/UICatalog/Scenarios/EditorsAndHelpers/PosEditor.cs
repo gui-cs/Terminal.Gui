@@ -44,7 +44,7 @@ public class PosEditor : EditorBase
 
         try
         {
-            _posOptionSelector!.SelectedItem = _posNames.IndexOf (_posNames.First (s => pos.ToString ().Contains (s)));
+            _posOptionSelector!.Value = _posNames.IndexOf (_posNames.First (s => pos.ToString ().Contains (s)));
         }
         catch (InvalidOperationException e)
         {
@@ -92,7 +92,7 @@ public class PosEditor : EditorBase
         };
         Add (label);
         _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
-        _posOptionSelector.SelectedItemChanged += OnOptionSelectorOnSelectedItemChanged;
+        _posOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
 
         _valueEdit = new ()
         {
@@ -121,7 +121,7 @@ public class PosEditor : EditorBase
         Add (_posOptionSelector);
     }
 
-    private void OnOptionSelectorOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { PosChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { PosChanged (); }
 
     // These need to have same order 
     private readonly List<string> _posNames = ["Absolute", "Align", "AnchorEnd", "Center", "Func", "Percent"];
@@ -136,7 +136,7 @@ public class PosEditor : EditorBase
 
         try
         {
-            Pos? pos = _posOptionSelector!.SelectedItem switch
+            Pos? pos = _posOptionSelector!.Value switch
                        {
                            0 => Pos.Absolute (_value),
                            1 => Pos.Align (Alignment.Start),

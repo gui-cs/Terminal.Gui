@@ -230,38 +230,6 @@ public class ToolsView : Window
     public event Action<RegionDrawStyles>? SetStyle;
 }
 
-public class RegionOpSelector : View
-{
-    private readonly OptionSelector<RegionOp> _optionSelector;
-
-    public RegionOpSelector ()
-    {
-        Width = Dim.Auto ();
-        Height = Dim.Auto ();
-
-        BorderStyle = LineStyle.Single;
-        Border!.Thickness = new (0, 1, 0, 0);
-        Title = "RegionOp";
-
-        _optionSelector = new ()
-        {
-            X = 0,
-            Y = 0,
-            AssignHotKeys = true
-        };
-        _optionSelector.ValueChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.Value!); };
-        base.Add (_optionSelector);
-    }
-
-    public event EventHandler<RegionOp>? SelectedItemChanged;
-
-    public RegionOp SelectedItem
-    {
-        get => (RegionOp)_optionSelector.SelectedItem;
-        set => _optionSelector.SelectedItem = (int)value;
-    }
-}
-
 public class AttributeView : View
 {
     public event EventHandler<Attribute?>? ValueChanged;

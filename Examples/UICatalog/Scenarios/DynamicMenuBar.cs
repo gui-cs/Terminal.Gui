@@ -361,7 +361,7 @@ public class DynamicMenuBar : Scenario
             CkbNullCheck.CheckedState = menuItem.AllowNullChecked ? CheckState.Checked : CheckState.UnChecked;
             TextHelp.Enabled = CkbSubMenu.CheckedState == CheckState.UnChecked;
             TextAction.Enabled = CkbSubMenu.CheckedState == CheckState.UnChecked;
-            OsChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
+            OsChkStyle.Value = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
             TextShortcutKey.Text = menuItem?.ShortcutTag ?? "";
 
             TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.Checked && CkbSubMenu.CheckedState == CheckState.UnChecked
@@ -434,8 +434,8 @@ public class DynamicMenuBar : Scenario
                     HotKey = TextHotKey.Text,
                     IsTopLevel = CkbIsTopLevel?.CheckedState == CheckState.Checked,
                     HasSubMenu = CkbSubMenu?.CheckedState == CheckState.Checked,
-                    CheckStyle = OsChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
-                                 OsChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
+                    CheckStyle = OsChkStyle.Value == 0 ? MenuItemCheckStyle.NoCheck :
+                                 OsChkStyle.Value == 1 ? MenuItemCheckStyle.Checked :
                                  MenuItemCheckStyle.Radio,
                     ShortcutKey = TextShortcutKey.Text,
                     AllowNullChecked = CkbNullCheck?.CheckedState == CheckState.Checked,
@@ -484,7 +484,7 @@ public class DynamicMenuBar : Scenario
             TextHotKey.Text = "";
             CkbIsTopLevel.CheckedState = CheckState.UnChecked;
             CkbSubMenu.CheckedState = CheckState.UnChecked;
-            OsChkStyle.SelectedItem = (int)MenuItemCheckStyle.NoCheck;
+            OsChkStyle.Value = (int)MenuItemCheckStyle.NoCheck;
             TextShortcutKey.Text = "";
         }
 
@@ -829,9 +829,9 @@ public class DynamicMenuBar : Scenario
                                          HotKey = frmMenuDetails.TextHotKey.Text,
                                          IsTopLevel = frmMenuDetails.CkbIsTopLevel?.CheckedState == CheckState.Checked,
                                          HasSubMenu = frmMenuDetails.CkbSubMenu?.CheckedState == CheckState.Checked,
-                                         CheckStyle = frmMenuDetails.OsChkStyle.SelectedItem == 0
+                                         CheckStyle = frmMenuDetails.OsChkStyle.Value == 0
                                                           ? MenuItemCheckStyle.NoCheck
-                                                          : frmMenuDetails.OsChkStyle.SelectedItem == 1
+                                                          : frmMenuDetails.OsChkStyle.Value == 1
                                                               ? MenuItemCheckStyle.Checked
                                                               : MenuItemCheckStyle.Radio,
                                          ShortcutKey = frmMenuDetails.TextShortcutKey.Text

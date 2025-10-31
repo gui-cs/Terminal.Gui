@@ -44,7 +44,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            _dimOptionSelector!.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
+            _dimOptionSelector!.Value = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
         }
         catch (InvalidOperationException e)
         {
@@ -93,7 +93,7 @@ public class DimEditor : EditorBase
         };
         Add (label);
         _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
-        _dimOptionSelector.SelectedItemChanged += OnOptionSelectorOnSelectedItemChanged;
+        _dimOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
@@ -121,7 +121,7 @@ public class DimEditor : EditorBase
 
     }
 
-    private void OnOptionSelectorOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { DimChanged (); }
 
     // These need to have same order 
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent",];
@@ -136,7 +136,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            Dim? dim = _dimOptionSelector!.SelectedItem switch
+            Dim? dim = _dimOptionSelector!.Value switch
             {
                 0 => Dim.Absolute (_value),
                 1 => Dim.Auto (),

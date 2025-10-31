@@ -21,7 +21,7 @@ public class BorderEditor : AdornmentEditor
     private void BorderEditor_AdornmentChanged (object? sender, EventArgs e)
     {
         _ckbTitle!.CheckedState = ((Border)AdornmentToEdit!).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
-        _osBorderStyle!.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
+        _osBorderStyle!.Value = ((Border)AdornmentToEdit).LineStyle;
         _ckbGradient!.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
     }
 
@@ -31,16 +31,16 @@ public class BorderEditor : AdornmentEditor
         {
             X = 0,
 
-            Y = Pos.Bottom (SubViews.ToArray() [^1]),
+            Y = Pos.Bottom (SubViews.ToArray () [^1]),
             Width = Dim.Fill (),
-            SelectedItem = (int)(((Border)AdornmentToEdit!)?.LineStyle ?? LineStyle.None),
+            Value = ((Border)AdornmentToEdit!)?.LineStyle ?? LineStyle.None,
             BorderStyle = LineStyle.Single,
             Title = "Border St_yle",
             SuperViewRendersLineCanvas = true,
         };
         Add (_osBorderStyle);
 
-        _osBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
+        _osBorderStyle.ValueChanged += OnRbBorderStyleOnValueChanged;
 
         _ckbTitle = new ()
         {
@@ -70,10 +70,14 @@ public class BorderEditor : AdornmentEditor
 
         return;
 
-        void OnRbBorderStyleOnSelectedItemChanged (object? s, SelectedItemChangedArgs args)
+        void OnRbBorderStyleOnValueChanged (object? s, EventArgs<int?> args)
         {
             LineStyle prevBorderStyle = AdornmentToEdit!.BorderStyle;
-            ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.SelectedItem!;
+
+            if (args.Value is { })
+            {
+                ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.Value;
+            }
 
             if (((Border)AdornmentToEdit).LineStyle == LineStyle.None)
             {

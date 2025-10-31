@@ -410,14 +410,14 @@ public class Images : Scenario
 
         _osPaletteBuilder = new ()
         {
-            RadioLabels = new []
-            {
+            RadioLabels =
+            [
                 "Popularity",
                 "Median Cut"
-            },
+            ],
             X = Pos.Right (_sixelView) + 2,
             Y = Pos.Bottom (l1),
-            SelectedItem = 1
+            Value = 1
         };
 
         _popularityThreshold = new ()
@@ -470,7 +470,7 @@ public class Images : Scenario
 
     private IPaletteBuilder GetPaletteBuilder ()
     {
-        switch (_osPaletteBuilder.SelectedItem)
+        switch (_osPaletteBuilder.Value)
         {
             case 0: return new PopularityPaletteWithThreshold (GetDistanceAlgorithm (), _popularityThreshold.Value);
             case 1: return new MedianCutPaletteBuilder (GetDistanceAlgorithm ());
@@ -480,7 +480,7 @@ public class Images : Scenario
 
     private IColorDistance GetDistanceAlgorithm ()
     {
-        switch (_osDistanceAlgorithm.SelectedItem)
+        switch (_osDistanceAlgorithm.Value)
         {
             case 0: return new EuclideanColorDistance ();
             case 1: return new CIE76ColorDistance ();

@@ -503,7 +503,7 @@ public class TextAlignmentAndDirection : Scenario
 
         justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.Result != CheckState.Checked);
 
-        justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
+        justifyOptions.ValueChanged += (_, _) => { ToggleJustify (false, true); };
 
         app.Add (justifyOptions);
 
@@ -551,7 +551,7 @@ public class TextAlignmentAndDirection : Scenario
             RadioLabels = directionsEnum.Select (e => e.ToString ()).ToArray ()
         };
 
-        directionOptions.SelectedItemChanged += (s, ev) =>
+        directionOptions.ValueChanged += (s, ev) =>
                                                 {
                                                     bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
 
@@ -560,9 +560,9 @@ public class TextAlignmentAndDirection : Scenario
                                                         ToggleJustify (true);
                                                     }
 
-                                                    foreach (View v in multiLineLabels)
+                                                    foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
                                                     {
-                                                        v.TextDirection = (TextDirection)ev.SelectedItem;
+                                                        v.TextDirection = (TextDirection)ev.Value!.Value;
                                                     }
 
                                                     if (justChecked)
@@ -612,7 +612,7 @@ public class TextAlignmentAndDirection : Scenario
 
                     if (TextFormatter.IsVerticalDirection (t.TextDirection))
                     {
-                        switch (justifyOptions.SelectedItem)
+                        switch (justifyOptions.Value)
                         {
                             case 0:
                                 t.VerticalTextAlignment = Alignment.Fill;
@@ -630,7 +630,7 @@ public class TextAlignmentAndDirection : Scenario
                     }
                     else
                     {
-                        switch (justifyOptions.SelectedItem)
+                        switch (justifyOptions.Value)
                         {
                             case 0:
                                 t.TextAlignment = Alignment.Fill;

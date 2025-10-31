@@ -284,9 +284,9 @@ public class ScenarioTests : TestsAllViews
                                                   curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem]);
                                               };
 
-        xOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        xOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
-        xText.TextChanged += (s, args) =>
+        xText.TextChanged += (_, _) =>
                               {
                                   try
                                   {
@@ -294,10 +294,12 @@ public class ScenarioTests : TestsAllViews
                                       DimPosChanged (curView);
                                   }
                                   catch
-                                  { }
+                                  {
+                                      // ignored
+                                  }
                               };
 
-        yText.TextChanged += (s, e) =>
+        yText.TextChanged += (_, _) =>
                               {
                                   try
                                   {
@@ -305,12 +307,14 @@ public class ScenarioTests : TestsAllViews
                                       DimPosChanged (curView);
                                   }
                                   catch
-                                  { }
+                                  {
+                                      // ignored
+                                  }
                               };
 
-        yOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        yOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
-        wOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        wOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
         wText.TextChanged += (s, args) =>
                               {
@@ -334,7 +338,7 @@ public class ScenarioTests : TestsAllViews
                                   { }
                               };
 
-        hOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        hOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
         top.Add (leftPane, settingsPane, hostPane);
 
@@ -383,7 +387,7 @@ public class ScenarioTests : TestsAllViews
 
             try
             {
-                switch (xOptionSelector.SelectedItem)
+                switch (xOptionSelector.Value)
                 {
                     case 0:
                         view.X = Pos.Percent (xVal);
@@ -403,7 +407,7 @@ public class ScenarioTests : TestsAllViews
                         break;
                 }
 
-                switch (yOptionSelector.SelectedItem)
+                switch (yOptionSelector.Value)
                 {
                     case 0:
                         view.Y = Pos.Percent (yVal);
@@ -423,7 +427,7 @@ public class ScenarioTests : TestsAllViews
                         break;
                 }
 
-                switch (wOptionSelector.SelectedItem)
+                switch (wOptionSelector.Value)
                 {
                     case 0:
                         view.Width = Dim.Percent (wVal);
@@ -439,7 +443,7 @@ public class ScenarioTests : TestsAllViews
                         break;
                 }
 
-                switch (hOptionSelector.SelectedItem)
+                switch (hOptionSelector.Value)
                 {
                     case 0:
                         view.Height = Dim.Percent (hVal);
@@ -470,8 +474,8 @@ public class ScenarioTests : TestsAllViews
 
             try
             {
-                xOptionSelector.SelectedItem = posNames.IndexOf (posNames.First (s => x.Contains (s)));
-                yOptionSelector.SelectedItem = posNames.IndexOf (posNames.First (s => y.Contains (s)));
+                xOptionSelector.Value = posNames.IndexOf (posNames.First (s => x.Contains (s)));
+                yOptionSelector.Value = posNames.IndexOf (posNames.First (s => y.Contains (s)));
             }
             catch (InvalidOperationException e)
             {
@@ -485,8 +489,8 @@ public class ScenarioTests : TestsAllViews
             var w = view.Width!.ToString ();
             var h = view.Height!.ToString ();
 
-            wOptionSelector.SelectedItem = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
-            hOptionSelector.SelectedItem = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
+            wOptionSelector.Value = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
+            hOptionSelector.Value = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
 
             wText.Text = $"{view.Frame.Width}";
             hText.Text = $"{view.Frame.Height}";
