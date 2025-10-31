@@ -8,7 +8,7 @@ public class ApplicationPopoverTests
     {
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         // Act
         Assert.NotNull (Application.Popover);
@@ -22,7 +22,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         // Act
         Assert.NotNull (Application.Popover);
@@ -39,7 +39,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
         Assert.NotNull (Application.Popover);
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -62,7 +62,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
         Application.Iteration += (s, a) => Application.RequestStop ();
 
         var top = new Toplevel ();
@@ -91,7 +91,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         PopoverTestClass popover = new ();
 
@@ -109,7 +109,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         PopoverTestClass popover = new ();
 
@@ -132,7 +132,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         PopoverTestClass popover = new ();
 
@@ -155,7 +155,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
         Application.Top = new Toplevel ();
         PopoverTestClass popover = new ();
 
@@ -174,7 +174,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
         Application.Top = new Toplevel () { Id = "initialTop" };
         PopoverTestClass popover = new ();
         int keyDownEvents = 0;
@@ -215,7 +215,7 @@ public class ApplicationPopoverTests
         Application.ResetState (true);
         // Arrange
         Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
         Application.Top = new ()
         {
             Frame = new (0, 0, 10, 10),

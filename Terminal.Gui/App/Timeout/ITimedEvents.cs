@@ -23,7 +23,7 @@ public interface ITimedEvents
 
     /// <summary>
     ///     Invoked when a new timeout is added. To be used in the case when
-    ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
+    ///     <see cref="Application.StopAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
     event EventHandler<TimeoutEventArgs>? Added;
 

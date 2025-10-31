@@ -243,17 +243,17 @@ public class Buttons : Scenario
         };
         main.Add (label);
 
-        var radioGroup = new RadioGroup
+        OptionSelector<Alignment> osAlignment = new ()
         {
             X = 4,
             Y = Pos.Bottom (label) + 1,
-            SelectedItem = 2,
-            RadioLabels = new [] { "_Start", "_End", "_Center", "_Fill" },
-            Title = "_9 RadioGroup",
+            Value = Alignment.Center,
+            AssignHotKeys = true,
+            Title = "_9 OptionSelector",
             BorderStyle = LineStyle.Dotted,
             // CanFocus = false
         };
-        main.Add (radioGroup);
+        main.Add (osAlignment);
 
         // Demo changing hotkey
         string MoveHotkey (string txt)
@@ -292,7 +292,7 @@ public class Buttons : Scenario
         var moveHotKeyBtn = new Button
         {
             X = 2,
-            Y = Pos.Bottom (radioGroup) + 1,
+            Y = Pos.Bottom (osAlignment) + 1,
             Width = Dim.Width (computedFrame) - 2,
             SchemeName = "TopLevel",
             Text = mhkb
@@ -309,7 +309,7 @@ public class Buttons : Scenario
         var moveUnicodeHotKeyBtn = new Button
         {
             X = Pos.Left (absoluteFrame) + 1,
-            Y = Pos.Bottom (radioGroup) + 1,
+            Y = Pos.Bottom (osAlignment) + 1,
             Width = Dim.Width (absoluteFrame) - 2,
             SchemeName = "TopLevel",
             Text = muhkb
@@ -321,48 +321,21 @@ public class Buttons : Scenario
                                        };
         main.Add (moveUnicodeHotKeyBtn);
 
-        radioGroup.SelectedItemChanged += (s, args) =>
-                                          {
-                                              switch (args.SelectedItem)
-                                              {
-                                                  case 0:
-                                                      moveBtn.TextAlignment = Alignment.Start;
-                                                      sizeBtn.TextAlignment = Alignment.Start;
-                                                      moveBtnA.TextAlignment = Alignment.Start;
-                                                      sizeBtnA.TextAlignment = Alignment.Start;
-                                                      moveHotKeyBtn.TextAlignment = Alignment.Start;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Start;
+        osAlignment.ValueChanged += (s, args) =>
+                                    {
+                                        if (args.Value is null)
+                                        {
+                                            return;
+                                        }
 
-                                                      break;
-                                                  case 1:
-                                                      moveBtn.TextAlignment = Alignment.End;
-                                                      sizeBtn.TextAlignment = Alignment.End;
-                                                      moveBtnA.TextAlignment = Alignment.End;
-                                                      sizeBtnA.TextAlignment = Alignment.End;
-                                                      moveHotKeyBtn.TextAlignment = Alignment.End;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.End;
-
-                                                      break;
-                                                  case 2:
-                                                      moveBtn.TextAlignment = Alignment.Center;
-                                                      sizeBtn.TextAlignment = Alignment.Center;
-                                                      moveBtnA.TextAlignment = Alignment.Center;
-                                                      sizeBtnA.TextAlignment = Alignment.Center;
-                                                      moveHotKeyBtn.TextAlignment = Alignment.Center;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Center;
-
-                                                      break;
-                                                  case 3:
-                                                      moveBtn.TextAlignment = Alignment.Fill;
-                                                      sizeBtn.TextAlignment = Alignment.Fill;
-                                                      moveBtnA.TextAlignment = Alignment.Fill;
-                                                      sizeBtnA.TextAlignment = Alignment.Fill;
-                                                      moveHotKeyBtn.TextAlignment = Alignment.Fill;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Fill;
-
-                                                      break;
-                                              }
-                                          };
+                                        Alignment newValue = (Alignment)args.Value.Value;
+                                        moveBtn.TextAlignment = newValue;
+                                        sizeBtn.TextAlignment = newValue;
+                                        moveBtnA.TextAlignment = newValue;
+                                        sizeBtnA.TextAlignment = newValue;
+                                        moveHotKeyBtn.TextAlignment = newValue;
+                                        moveUnicodeHotKeyBtn.TextAlignment = newValue;
+                                    };
 
         label = new ()
         {

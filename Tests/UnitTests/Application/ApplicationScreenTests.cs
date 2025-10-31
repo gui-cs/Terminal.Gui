@@ -16,7 +16,7 @@ public class ApplicationScreenTests
     {
         // Arrange
         Application.ResetState (true);
-        Application.Init ();
+        Application.Init (null, "fake");
 
         // Act
         Application.ClearScreenNextIteration = true;

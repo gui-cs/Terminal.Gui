@@ -64,6 +64,7 @@ public class ApplicationImpl : IApplication
     }
 
     private IKeyboard? _keyboard;
+    private bool _stopAfterFirstIteration;
 
     /// <summary>
     /// Handles keyboard input and key bindings at the Application level
@@ -189,6 +190,13 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public void RequestStop () => RequestStop (null);
 
+    /// <inheritdoc />
+    public bool StopAfterFirstIteration
+    {
+        get => _stopAfterFirstIteration;
+        set => _stopAfterFirstIteration = value;
+    }
+
     /// <summary>
     /// Creates a new instance of the Application backend.
     /// </summary>
@@ -293,9 +301,7 @@ public class ApplicationImpl : IApplication
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
-            FakeConsoleOutput fakeOutput = new ();
-            fakeOutput.SetConsoleSize (80, 25);
-
+            FakeOutput fakeOutput = new ();
             _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
@@ -312,18 +318,41 @@ public class ApplicationImpl : IApplication
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            if (ConsoleDriver.RunningUnitTests)
+            {
+                FakeOutput fakeOutput = new ();
+                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
+            }
+            else
+            {
+                _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            }
         }
         else
         {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            if (ConsoleDriver.RunningUnitTests)
+            {
+                FakeOutput fakeOutput = new ();
+                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
+            }
+            else
+            {
+                _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            }
         }
 
         _coordinator.StartAsync ().Wait ();
 
+
         if (_driver == null)
         {
             throw new ("Driver was null even after booting MainLoopCoordinator");
+        }
+
+        if (!ConsoleDriver.RunningUnitTests && _driver.Screen.IsEmpty)
+        {
+            throw new InvalidOperationException (
+                                                 "Driver.Screen is empty after Init. The driver should set the screen size during Init.");
         }
     }
 
@@ -405,6 +434,7 @@ public class ApplicationImpl : IApplication
 
         _top.Running = true;
 
+        bool firstIteration = true;
         while (_topLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
             if (_coordinator is null)
@@ -413,6 +443,11 @@ public class ApplicationImpl : IApplication
             }
 
             _coordinator.RunIteration ();
+            if (StopAfterFirstIteration && firstIteration)
+            {
+                Logging.Information ("Run - Stopping after first iteration as requested");
+                view.Running = false;
+            }
         }
 
         Logging.Information ($"Run - Calling End");

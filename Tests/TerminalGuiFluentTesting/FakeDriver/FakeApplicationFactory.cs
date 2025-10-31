@@ -16,11 +16,11 @@ public class FakeApplicationFactory
         var cts = new CancellationTokenSource ();
         var fakeInput = new FakeNetInput (cts.Token);
         FakeOutput output = new ();
-        output.Size = new (80, 25);
+        output.SetSize (80, 25);
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        var sizeMonitor = new FakeSizeMonitor (output, output.LastBuffer!);
+        ConsoleSizeMonitor sizeMonitor = new (output, output.LastBuffer!);
 
         var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 
@@ -33,14 +33,14 @@ public class FakeApplicationFactory
         var d = (IConsoleDriverFacade)Application.Driver!;
 
         sizeMonitor.SizeChanged += (_, e) =>
-                                    {
-                                        if (e.Size != null)
-                                        {
-                                            Size s = e.Size.Value;
-                                            output.Size = s;
-                                            d.OutputBuffer.SetSize (s.Width, s.Height);
-                                        }
-                                    };
+                                   {
+                                       if (e.Size != null)
+                                       {
+                                           Size s = e.Size.Value;
+                                           output.SetSize (s.Width, s.Height);
+                                           d.OutputBuffer.SetSize (s.Width, s.Height);
+                                       }
+                                   };
 
         return new FakeApplicationLifecycle (origApp, cts);
     }

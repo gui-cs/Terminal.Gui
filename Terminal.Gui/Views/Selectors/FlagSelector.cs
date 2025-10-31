@@ -111,6 +111,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
         Value = (int)checkbox.Data!;
+        args.Handled = false; // Do not set to false; let Accepting propagate
     }
 
     private int? _value;
@@ -145,20 +146,26 @@ public class FlagSelector : SelectorBase, IDesignable
         }
     }
 
+    private void UncheckNone ()
+    {
+        // Uncheck ONLY the None checkbox (Data == 0)
+        _updatingChecked = true;
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
+        {
+            cb.CheckedState = CheckState.UnChecked;
+        }
+        _updatingChecked = false;
+    }
+
     private void UncheckAll ()
     {
+        // Uncheck all NON-None checkboxes (Data != 0)
+        _updatingChecked = true;
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? default!) != default!))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
-    }
-
-    private void UncheckNone ()
-    {
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! != 0))
-        {
-            cb.CheckedState = (Value != 0) ? CheckState.UnChecked : CheckState.Checked;
-        }
+        _updatingChecked = false;
     }
 
     private bool _updatingChecked = false;

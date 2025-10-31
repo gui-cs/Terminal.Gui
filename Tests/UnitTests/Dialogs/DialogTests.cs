@@ -1208,7 +1208,7 @@ public class DialogTests (ITestOutputHelper output)
                                  break;
                              case 7:
 
-                                 DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+                                 DriverAssert.AssertDriverContentsWithFrameAre (expected!, output);
 
                                  Assert.False (btn3!.NewKeyDownEvent (Key.Space));
 

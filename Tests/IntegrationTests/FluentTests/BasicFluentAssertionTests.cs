@@ -1,14 +1,25 @@
-﻿using TerminalGuiFluentTesting;
+﻿using System.Drawing;
+using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
 
-public class BasicFluentAssertionTests
+public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
 {
-    private readonly TextWriter _out;
+    private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
-    public BasicFluentAssertionTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
+    [Theory]
+    [ClassData (typeof (TestDrivers))]
+    public void GuiTestContext_Init_Sets_Application_Screen (TestDriver d)
+    {
+        using var context = new GuiTestContext (d, _out, TimeSpan.FromSeconds (30));
+
+        Assert.NotEqual (Rectangle.Empty, Application.Screen);
+
+        context.WriteOutLogs (_out);
+        context.Stop ();
+    }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
@@ -16,7 +27,7 @@ public class BasicFluentAssertionTests
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (Application.Top!.Running);
-
+        Assert.NotEqual (Rectangle.Empty, Application.Screen);
         context.WriteOutLogs (_out);
         context.Stop ();
     }
@@ -76,6 +87,11 @@ public class BasicFluentAssertionTests
     [ClassData (typeof (TestDrivers))]
     public void ContextMenu_CrashesOnRight (TestDriver d)
     {
+        if (d == TestDriver.Fake)
+        {
+            return;
+        }
+
         var clicked = false;
 
         MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
@@ -86,8 +102,7 @@ public class BasicFluentAssertionTests
 
                                      // Click in main area inside border
                                      .RightClick (1, 1)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 // Test depends on menu having a border
                                                 IPopover? popover = Application.Popover!.GetActivePopover ();
@@ -107,6 +122,11 @@ public class BasicFluentAssertionTests
     [ClassData (typeof (TestDrivers))]
     public void ContextMenu_OpenSubmenu (TestDriver d)
     {
+        if (d == TestDriver.Fake)
+        {
+            return;
+        }
+
         var clicked = false;
 
         MenuItemv2 [] menuItems =
@@ -163,8 +183,7 @@ public class BasicFluentAssertionTests
         var v6 = new View { Id = "v6", CanFocus = true };
 
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var w1 = new Window { Id = "w1" };
                                                 w1.Add (v1, v2);

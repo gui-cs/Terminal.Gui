@@ -120,7 +120,7 @@ public class OptionSelectorTests
     }
 
     [Fact]
-    public void HotKey_No_SelectedItem_Selects_First ()
+    public void HotKey_No_Value_Selects_First ()
     {
         var superView = new View
         {
@@ -131,18 +131,18 @@ public class OptionSelectorTests
         var selector = new OptionSelector
         {
             HotKey = Key.G.WithAlt,
-            RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
+            Labels = ["_Left", "_Right", "Cen_tered", "_Justified"]
         };
-        selector.SelectedItem = -1;
+        selector.Value = null;
 
         superView.Add (selector);
 
         Assert.False (selector.HasFocus);
-        Assert.Equal (-1, selector.SelectedItem);
+        Assert.Null (selector.Value);
 
         selector.NewKeyDownEvent (Key.G.WithAlt);
 
-        Assert.Equal (0, selector.SelectedItem);
+        Assert.Equal (0, selector.Value);
         Assert.Equal (selector.SubViews.OfType<CheckBox> ().First (), superView.MostFocused);
     }
 
@@ -300,7 +300,7 @@ public class OptionSelectorTests
         Assert.Equal (CheckState.Checked, selectedCheckBox.CheckedState);
 
         CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ()
-            .First (cb => (int)cb.Data == 0); // Index 0 corresponds to value 0
+            .First (cb => (int)cb.Data! == 0); // Index 0 corresponds to value 0
         Assert.Equal (CheckState.UnChecked, unselectedCheckBox.CheckedState);
     }
 
@@ -327,5 +327,121 @@ public class OptionSelectorTests
 
         Assert.True (selector.HasFocus);
         Assert.Equal (1, selector.Value);
+    }
+
+    [Fact]
+    public void Cursor_Get_ReturnsCorrectIndex ()
+    {
+        var optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2", "Option3"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        // Set focus to second checkbox
+        CheckBox secondCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ToArray () [1];
+        secondCheckBox.SetFocus ();
+
+        Assert.Equal (1, optionSelector.Cursor);
+
+        // Set focus to third checkbox
+        CheckBox thirdCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ToArray () [2];
+        thirdCheckBox.SetFocus ();
+
+        Assert.Equal (2, optionSelector.Cursor);
+    }
+
+    [Fact]
+    public void Cursor_Get_WhenNotFocusable_ReturnsZero ()
+    {
+        var optionSelector = new OptionSelector
+        {
+            CanFocus = false
+        };
+        List<string> options = ["Option1", "Option2", "Option3"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        Assert.Equal (0, optionSelector.Cursor);
+    }
+
+    [Fact]
+    public void Cursor_Set_ShouldMoveFocusToCorrectCheckBox ()
+    {
+        var optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2", "Option3"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        // Set cursor to second checkbox
+        optionSelector.Cursor = 1;
+
+        CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.True (checkBoxes [1].HasFocus);
+        Assert.Equal (1, optionSelector.Cursor);
+
+        // Set cursor to third checkbox
+        optionSelector.Cursor = 2;
+
+        Assert.True (checkBoxes [2].HasFocus);
+        Assert.Equal (2, optionSelector.Cursor);
+    }
+
+    [Fact]
+    public void Cursor_Set_OutOfRange_ShouldThrow ()
+    {
+        var optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2", "Option3"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        Assert.Throws<ArgumentOutOfRangeException> (() => optionSelector.Cursor = -1);
+        Assert.Throws<ArgumentOutOfRangeException> (() => optionSelector.Cursor = 3);
+    }
+
+    [Fact]
+    public void Cursor_Set_WhenNotFocusable_DoesNothing ()
+    {
+        var optionSelector = new OptionSelector
+        {
+            CanFocus = false
+        };
+        List<string> options = ["Option1", "Option2", "Option3"];
+
+        optionSelector.Labels = options;
+        optionSelector.Layout ();
+
+        // Should not throw
+        optionSelector.Cursor = 1;
+
+        // Verify nothing changed
+        Assert.Equal (0, optionSelector.Cursor);
+        Assert.False (optionSelector is { } && optionSelector.SubViews.OfType<CheckBox> ().Any (cb => cb.HasFocus));
+    }
+
+    [Fact]
+    public void Cursor_DoesNotChangeValue ()
+    {
+        var optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2", "Option3"];
+
+        optionSelector.Labels = options;
+        optionSelector.Value = 0; // First option is selected
+        optionSelector.Layout ();
+
+        // Move cursor to second checkbox
+        optionSelector.Cursor = 1;
+
+        // Value should not change, only focus moves
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (1, optionSelector.Cursor);
+
+        CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Equal (CheckState.Checked, checkBoxes [0].CheckedState);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].CheckedState);
+        Assert.True (checkBoxes [1].HasFocus);
     }
 }

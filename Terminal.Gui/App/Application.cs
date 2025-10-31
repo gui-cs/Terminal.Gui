@@ -218,7 +218,7 @@ public static partial class Application
 
         MainThreadId = -1;
         Iteration = null;
-        EndAfterFirstIteration = false;
+        StopAfterFirstIteration = false;
         ClearScreenNextIteration = false;
 
         // Driver stuff
