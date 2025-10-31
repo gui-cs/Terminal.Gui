@@ -8,7 +8,7 @@ namespace Terminal.Gui.Drivers;
 ///     draw operations before being flushed to the console as part of the main loop.
 ///     operation
 /// </summary>
-public class OutputBuffer : IOutputBuffer
+public class OutputBufferImpl : IOutputBuffer
 {
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when

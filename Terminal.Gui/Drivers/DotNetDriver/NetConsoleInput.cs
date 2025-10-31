@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
 /// </summary>
-public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
+public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
 {
     private readonly NetWinVTConsole _adjustConsole;
 
@@ -14,11 +14,11 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     ///     console mode settings that enable virtual input (mouse
     ///     reporting etc).
     /// </summary>
-    public NetInput ()
+    public NetConsoleInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetInput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (NetConsoleInput)}");
 
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }
@@ -53,7 +53,7 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     /// <inheritdoc/>
     protected override bool Peek ()
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return false;
         }
@@ -72,7 +72,7 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
 
     private void FlushConsoleInput ()
     {
-        if (!ConsoleDriver.RunningUnitTests)
+        if (!ConsoleDriverImpl.RunningUnitTests)
         {
             while (Console.KeyAvailable)
             {
@@ -86,7 +86,7 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     {
         base.Dispose ();
 
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }

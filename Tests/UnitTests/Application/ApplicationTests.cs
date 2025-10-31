@@ -11,7 +11,7 @@ public class ApplicationTests
     public ApplicationTests (ITestOutputHelper output)
     {
         _output = output;
-        ConsoleDriver.RunningUnitTests = true;
+        ConsoleDriverImpl.RunningUnitTests = true;
 
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
@@ -270,17 +270,17 @@ public class ApplicationTests
     [Fact]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
     {
-        ConsoleDriver.RunningUnitTests = true;
+        ConsoleDriverImpl.RunningUnitTests = true;
         Application.Init ();
 
         Assert.NotNull (Application.Driver);
 
         Application.Shutdown ();
-        ConsoleDriver.RunningUnitTests = false;
+        ConsoleDriverImpl.RunningUnitTests = false;
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
 
     //[InlineData (typeof (DotNetDriver))]
     //[InlineData (typeof (WindowsDriver))]
@@ -419,7 +419,7 @@ public class ApplicationTests
     public void Shutdown_Alone_Does_Nothing () { Application.Shutdown (); }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
 
     //[InlineData (typeof (DotNetDriver))]
     //[InlineData (typeof (WindowsDriver))]
@@ -673,13 +673,13 @@ public class ApplicationTests
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
         // Using another type not derived from Toplevel will throws at compile time
-        Application.Run<Window> (null, new FakeDriver ());
+        Application.Run<Window> (null, new FakeConsoleDriver ());
         Assert.True (Application.Top is Window);
 
         Application.Top!.Dispose ();
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
-        Application.Run<Dialog> (null, new FakeDriver ());
+        Application.Run<Dialog> (null, new FakeConsoleDriver ());
         Assert.True (Application.Top is Dialog);
 
         Application.Top!.Dispose ();
@@ -786,7 +786,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         Application.Run<Toplevel> ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
+        Assert.Equal (typeof (FakeConsoleDriver), Application.Driver?.GetType ());
 
         Application.Top!.Dispose ();
         Application.Shutdown ();
@@ -802,7 +802,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-        Application.Run<Toplevel> (null, new FakeDriver ());
+        Application.Run<Toplevel> (null, new FakeConsoleDriver ());
 
         Application.Top!.Dispose ();
         Application.Shutdown ();
@@ -969,7 +969,7 @@ public class ApplicationTests
     [Fact]
     public void Run_Creates_Top_Without_Init ()
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1002,7 +1002,7 @@ public class ApplicationTests
     [Fact]
     public void Run_T_Creates_Top_Without_Init ()
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1038,7 +1038,7 @@ public class ApplicationTests
         // The Application.Run(new(Toplevel)) must always call Application.Init() first because
         // the new(Toplevel) may be a derived class that is possible using Application static
         // properties that is only available after the Application.Init was called
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
 
         Assert.Null (Application.Top);
 

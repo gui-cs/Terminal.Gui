@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Fake console output for testing that captures what would be written to the console.
 /// </summary>
-public class FakeOutput : OutputBase, IConsoleOutput
+public class FakeConsoleOutput : ConsoleOutputBase, IConsoleOutput
 {
     private readonly StringBuilder _output = new ();
     private int _cursorLeft;
@@ -16,9 +16,9 @@ public class FakeOutput : OutputBase, IConsoleOutput
     /// <summary>
     /// 
     /// </summary>
-    public FakeOutput ()
+    public FakeConsoleOutput ()
     {
-        LastBuffer = new OutputBuffer ();
+        LastBuffer = new OutputBufferImpl ();
         LastBuffer.SetSize (80, 25);
     }
 

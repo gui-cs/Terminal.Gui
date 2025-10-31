@@ -5,7 +5,7 @@ using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
-internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
+internal class WindowsConsoleInput : ConsoleInputImpl<InputRecord>, IWindowsConsoleInput
 {
     private readonly nint _inputHandle;
 
@@ -39,11 +39,11 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
 
-    public WindowsInput ()
+    public WindowsConsoleInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleInput)}");
 
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }
@@ -62,7 +62,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 
     protected override bool Peek ()
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return false;
         }
@@ -127,7 +127,7 @@ internal class WindowsInput : ConsoleInput<InputRecord>, IWindowsInput
 
     public override void Dispose ()
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }

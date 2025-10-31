@@ -3,7 +3,9 @@ using TerminalGuiFluentTesting;
 
 namespace Terminal.Gui.Drivers;
 
-#pragma warning disable CS1591
+/// <summary>
+///     Provides methods to create and manage a fake application for testing purposes.
+/// </summary>
 public class FakeApplicationFactory
 {
     /// <summary>
@@ -14,13 +16,13 @@ public class FakeApplicationFactory
     public IDisposable SetupFakeApplication ()
     {
         var cts = new CancellationTokenSource ();
-        var fakeInput = new FakeNetInput (cts.Token);
-        FakeOutput output = new ();
+        var fakeInput = new NoOpNetInput (cts.Token);
+        FakeConsoleOutput output = new ();
         output.SetSize (80, 25);
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        ConsoleSizeMonitor sizeMonitor = new (output);
+        ConsoleSizeMonitorImpl sizeMonitor = new (output);
 
         var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 

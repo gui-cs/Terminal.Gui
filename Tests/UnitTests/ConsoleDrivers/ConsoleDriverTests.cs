@@ -12,12 +12,12 @@ public class ConsoleDriverTests
 
     public ConsoleDriverTests (ITestOutputHelper output)
     {
-        ConsoleDriver.RunningUnitTests = true;
+        ConsoleDriverImpl.RunningUnitTests = true;
         _output = output;
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -41,7 +41,7 @@ public class ConsoleDriverTests
     // public void FakeDriver_MockKeyPresses (Type driverType)
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -118,7 +118,7 @@ public class ConsoleDriverTests
     //}
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -147,7 +147,7 @@ public class ConsoleDriverTests
         driver.Cols = 120;
         driver.Rows = 40;
 
-        ((ConsoleDriver)driver).OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
+        ((ConsoleDriverImpl)driver).OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
         Assert.Equal (120, driver.Cols);
         Assert.Equal (40, driver.Rows);
         Assert.True (wasTerminalResized);
@@ -240,7 +240,7 @@ public class ConsoleDriverTests
     public void Application_Init_Without_Params_Uses_FakeDriver_When_RunningUnitTests ()
     {
         // Arrange
-        ConsoleDriver.RunningUnitTests = true;
+        ConsoleDriverImpl.RunningUnitTests = true;
         Application.ResetState (true);
 
         // Act

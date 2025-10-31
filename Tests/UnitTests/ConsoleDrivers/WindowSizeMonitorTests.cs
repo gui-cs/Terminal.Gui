@@ -4,7 +4,7 @@ namespace UnitTests.DriverTests;
 
 public class WindowSizeMonitorTests
 {
-    public WindowSizeMonitorTests () { ConsoleDriver.RunningUnitTests = false; }
+    public WindowSizeMonitorTests () { ConsoleDriverImpl.RunningUnitTests = false; }
 
     [Fact]
     public void TestWindowSizeMonitor_RaisesEventWhenChanges ()
@@ -22,7 +22,7 @@ public class WindowSizeMonitorTests
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
 
-        var monitor = new ConsoleSizeMonitor (consoleOutput.Object);
+        var monitor = new ConsoleSizeMonitorImpl (consoleOutput.Object);
 
         List<SizeChangedEventArgs> result = new ();
         monitor.SizeChanged += (s, e) => { result.Add (e); };
@@ -57,7 +57,7 @@ public class WindowSizeMonitorTests
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
 
-        var monitor = new ConsoleSizeMonitor (consoleOutput.Object);
+        var monitor = new ConsoleSizeMonitorImpl (consoleOutput.Object);
 
         List<SizeChangedEventArgs> result = new ();
         monitor.SizeChanged += (s, e) => { result.Add (e); };

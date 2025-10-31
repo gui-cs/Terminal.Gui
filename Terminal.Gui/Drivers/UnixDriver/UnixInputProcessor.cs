@@ -3,9 +3,9 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Input processor for <see cref="UnixInput"/>, deals in <see cref="char"/> stream.
+///     Input processor for <see cref="UnixConsoleInput"/>, deals in <see cref="char"/> stream.
 /// </summary>
-internal class UnixInputProcessor : InputProcessor<char>
+internal class UnixInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc />
     public UnixInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter ())

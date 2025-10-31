@@ -168,11 +168,11 @@ public class FakeDriverTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void SetupFakeDriver_Initializes_Driver_With_25x25 ()
+    public void SetupFakeDriver_Initializes_Driver_With_80x25 ()
     {
         Assert.NotNull (Application.Driver);
-        Assert.Equal (new (0, 0, 25, 25), Application.Screen);
-        Assert.Equal (25, Application.Driver.Cols);
+        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
+        Assert.Equal (80, Application.Driver.Cols);
         Assert.Equal (25, Application.Driver.Rows);
     }
 

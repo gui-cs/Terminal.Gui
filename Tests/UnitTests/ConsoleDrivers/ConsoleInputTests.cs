@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace UnitTests.DriverTests;
 public class ConsoleInputTests
 {
-    class FakeInput : ConsoleInput<char>
+    class FakeInput : ConsoleInputImpl<char>
     {
         private readonly string [] _reads;
 

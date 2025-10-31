@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <inheritdoc />
-internal class ConsoleSizeMonitor (IConsoleOutput consoleOut) : IConsoleSizeMonitor
+internal class ConsoleSizeMonitorImpl (IConsoleOutput consoleOut) : IConsoleSizeMonitor
 {
     private Size _lastSize = Size.Empty;
 

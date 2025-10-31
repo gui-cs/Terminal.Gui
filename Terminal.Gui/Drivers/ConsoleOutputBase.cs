@@ -4,7 +4,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Abstract base class to assist with implementing <see cref="IConsoleOutput"/>.
 /// </summary>
-public abstract class OutputBase
+public abstract class ConsoleOutputBase
 {
     private CursorVisibility? _cachedCursorVisibility;
 
@@ -21,7 +21,7 @@ public abstract class OutputBase
     /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }

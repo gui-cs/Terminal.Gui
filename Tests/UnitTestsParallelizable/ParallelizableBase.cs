@@ -22,7 +22,7 @@ public abstract class ParallelizableBase
     /// <returns>A configured IFakeConsoleDriver instance</returns>
     protected static IConsoleDriver CreateFakeDriver (int width = 25, int height = 25)
     {
-        IConsoleDriver driver = new FakeDriver ();
+        IConsoleDriver driver = new FakeConsoleDriver ();
         driver.SetScreenSize (width, height);
         return driver;
     }

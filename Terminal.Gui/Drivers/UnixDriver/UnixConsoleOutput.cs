@@ -3,7 +3,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixOutput : OutputBase, IConsoleOutput
+internal class UnixConsoleOutput : ConsoleOutputBase, IConsoleOutput
 {
     [StructLayout (LayoutKind.Sequential)]
     private struct WinSize
@@ -112,7 +112,7 @@ internal class UnixOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     public void Write (ReadOnlySpan<char> text)
     {
-        if (!ConsoleDriver.RunningUnitTests)
+        if (!ConsoleDriverImpl.RunningUnitTests)
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
             // Write to stdout (fd 1)
@@ -123,7 +123,7 @@ internal class UnixOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     public Size GetSize ()
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             // For unit tests, we return a default size.
             return Size.Empty;

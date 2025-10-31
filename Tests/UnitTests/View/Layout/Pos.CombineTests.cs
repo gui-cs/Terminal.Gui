@@ -16,7 +16,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [TestRespondersDisposed]
     public void PosCombine_Will_Throws ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (new FakeConsoleDriver ());
 
         Toplevel t = new ();
 
@@ -82,7 +82,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [Fact]
     public void PosCombine_Refs_SuperView_Throws ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (new FakeConsoleDriver ());
 
         var top = new Toplevel ();
         var w = new Window { X = Pos.Left (top) + 2, Y = Pos.Top (top) + 2 };

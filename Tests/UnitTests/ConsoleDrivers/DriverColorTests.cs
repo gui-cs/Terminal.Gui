@@ -6,10 +6,10 @@ namespace UnitTests.DriverTests;
 
 public class DriverColorTests
 {
-    public DriverColorTests () { ConsoleDriver.RunningUnitTests = true; }
+    public DriverColorTests () { ConsoleDriverImpl.RunningUnitTests = true; }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -27,7 +27,7 @@ public class DriverColorTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -55,7 +55,7 @@ public class DriverColorTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver), false)]
+    [InlineData (typeof (FakeConsoleDriver), false)]
     //[InlineData (typeof (DotNetDriver), true)]
 
     //[InlineData (typeof (ANSIDriver), true)]

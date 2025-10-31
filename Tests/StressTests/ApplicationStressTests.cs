@@ -7,7 +7,7 @@ public class ApplicationStressTests : TestsAllViews
 {
     public ApplicationStressTests (ITestOutputHelper output)
     {
-        ConsoleDriver.RunningUnitTests = true;
+        ConsoleDriverImpl.RunningUnitTests = true;
     }
 
     private static volatile int _tbCounter;
@@ -34,7 +34,7 @@ public class ApplicationStressTests : TestsAllViews
     /// </para>
     /// </remarks>
     [Theory]
-    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (FakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver), Skip = "System.IO.IOException: The handle is invalid")]
     //[InlineData (typeof (ANSIDriver))]
     //[InlineData (typeof (WindowsDriver))]

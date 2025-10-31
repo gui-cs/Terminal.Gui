@@ -1,33 +1,42 @@
-#nullable enable
+﻿#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Fake console input for testing that does not produce any input events.
+///     Implements a fake console input for testing purposes. It will return predefined input if provided.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class FakeConsoleInput<T> (CancellationToken hardStopToken) : IConsoleInput<T>
+public class FakeConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
 {
-    private readonly CancellationTokenSource _timeoutCts = new (TimeSpan.FromSeconds (30));
-
-    // Create a timeout-based cancellation token too to prevent tests ever fully hanging
-
-    /// <inheritdoc/>
-    public void Dispose () { }
-
-    /// <inheritdoc/>
-    public void Initialize (ConcurrentQueue<T> inputBuffer) { InputBuffer = inputBuffer; }
+    private readonly ConcurrentQueue<ConsoleKeyInfo>? _predefinedInput;
 
     /// <summary>
-    ///     Gets or sets the input buffer.
+    /// Creates a new FakeConsoleInput with optional predefined input.
     /// </summary>
-    public ConcurrentQueue<T>? InputBuffer { get; set; }
+    /// <param name="predefinedInput">Optional queue of predefined input to return.</param>
+    public FakeConsoleInput (ConcurrentQueue<ConsoleKeyInfo>? predefinedInput = null)
+    {
+        _predefinedInput = predefinedInput;
+    }
 
     /// <inheritdoc/>
-    public void Run (CancellationToken token)
+    protected override bool Peek ()
     {
-        // Blocks until either the token or the hardStopToken is cancelled.
-        WaitHandle.WaitAny ([token.WaitHandle, hardStopToken.WaitHandle, _timeoutCts.Token.WaitHandle]);
+        if (_predefinedInput is { IsEmpty: false })
+        {
+            return true;
+        }
+
+        // No input available
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override IEnumerable<ConsoleKeyInfo> Read ()
+    {
+        if (_predefinedInput is { } && _predefinedInput.TryDequeue (out ConsoleKeyInfo key))
+        {
+            yield return key;
+        }
     }
 }

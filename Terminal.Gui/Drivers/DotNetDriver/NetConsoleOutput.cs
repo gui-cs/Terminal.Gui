@@ -6,16 +6,16 @@ namespace Terminal.Gui.Drivers;
 ///     Implementation of <see cref="IConsoleOutput"/> that uses native dotnet
 ///     methods e.g. <see cref="System.Console"/>
 /// </summary>
-public class NetOutput : OutputBase, IConsoleOutput
+public class NetConsoleOutput : ConsoleOutputBase, IConsoleOutput
 {
     private readonly bool _isWinPlatform;
 
     /// <summary>
-    ///     Creates a new instance of the <see cref="NetOutput"/> class.
+    ///     Creates a new instance of the <see cref="NetConsoleOutput"/> class.
     /// </summary>
-    public NetOutput ()
+    public NetConsoleOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (NetConsoleOutput)}");
 
         Console.OutputEncoding = Encoding.UTF8;
 
@@ -37,7 +37,7 @@ public class NetOutput : OutputBase, IConsoleOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             // For unit tests, we return a default size.
             return Size.Empty;

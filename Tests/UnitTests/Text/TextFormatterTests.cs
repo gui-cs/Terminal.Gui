@@ -3590,7 +3590,7 @@ public class TextFormatterTests
     [TestRespondersDisposed]
     public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (new FakeConsoleDriver ());
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
@@ -3799,7 +3799,7 @@ ssb
                 )]
     public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
         driver.Init ();
 
         var text = "Les Mise\u0328\u0301rables";
@@ -3927,7 +3927,7 @@ Nice       Work")]
         string expected
     )
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
         driver.Init ();
 
         var text = "This is a \tTab";
@@ -3966,7 +3966,7 @@ Nice       Work")]
         string expected
     )
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
         driver.Init ();
 
         var text = "This is a \tTab";
@@ -4006,7 +4006,7 @@ Nice       Work")]
         string expected
     )
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
         driver.Init ();
 
         var text = "This is a \tTab";
