@@ -424,7 +424,7 @@ A Progress Bar view that can indicate progress of an activity visually.
 ▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌
 ```
 
-## [RadioGroup](~/api/Terminal.Gui.Views.RadioGroup.yml)
+## [OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)
 
 Displays a list of mutually-exclusive items. Each items can have its own hotkey.
 
