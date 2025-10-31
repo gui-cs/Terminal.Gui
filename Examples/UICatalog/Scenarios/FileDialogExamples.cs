@@ -64,7 +64,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _osCaption = new () { X = x, Y = y };
-        _osCaption.RadioLabels = ["_Ok", "O_pen", "_Save"];
+        _osCaption.Labels = ["_Ok", "O_pen", "_Save"];
         win.Add (_osCaption);
 
         y = 0;
@@ -76,7 +76,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
         _osOpenMode = new () { X = x, Y = y };
-        _osOpenMode.RadioLabels = ["_File", "D_irectory", "_Mixed"];
+        _osOpenMode.Labels = ["_File", "D_irectory", "_Mixed"];
         win.Add (_osOpenMode);
 
         y = 0;
@@ -88,7 +88,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
         _osIcons = new () { X = x, Y = y };
-        _osIcons.RadioLabels = ["_None", "_Unicode", "Nerd_*"];
+        _osIcons.Labels = ["_None", "_Unicode", "Nerd_*"];
         win.Add (_osIcons);
 
         win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
@@ -103,7 +103,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
         _osAllowedTypes = new () { X = x, Y = y };
-        _osAllowedTypes.RadioLabels = ["An_y", "Cs_v (Recommended)", "Csv (S_trict)"];
+        _osAllowedTypes.Labels = ["An_y", "Cs_v (Recommended)", "Csv (S_trict)"];
         win.Add (_osAllowedTypes);
 
         y = 5;
@@ -166,7 +166,7 @@ public class FileDialogExamples : Scenario
             var fd = new FileDialog
             {
                 OpenMode = Enum.Parse<OpenMode> (
-                                                 _osOpenMode.RadioLabels
+                                                 _osOpenMode.Labels
                                                             .Select (l => TextFormatter.FindHotKey (l, _osOpenMode.HotKeySpecifier, out int hotPos, out Key _)
 
                                                                               // Remove the hotkey specifier at the found position
@@ -181,7 +181,7 @@ public class FileDialogExamples : Scenario
             };
 
             fd.Style.OkButtonText =
-                _osCaption.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier (l, 0, _osCaption.HotKeySpecifier)).ToArray ()
+                _osCaption.Labels.Select (l => TextFormatter.RemoveHotKeySpecifier (l, 0, _osCaption.HotKeySpecifier)).ToArray ()
                     [_osCaption.Value!.Value];
 
             // If Save style dialog then give them an overwrite prompt

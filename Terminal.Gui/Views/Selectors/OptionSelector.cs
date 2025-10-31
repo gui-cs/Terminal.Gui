@@ -206,16 +206,7 @@ public class OptionSelector : SelectorBase, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the list of labels for each value.
-    /// </summary>
-    public string [] RadioLabels
-    {
-        get => Labels?.ToArray () ?? [];
-        set => Labels = value;
-    }
-
-    /// <summary>
-    ///     Gets or sets the <see cref="RadioLabels"/> index for the cursor. The cursor may or may not be the selected
+    ///     Gets or sets the <see cref="SelectorBase.Labels"/> index for the cursor. The cursor may or may not be the selected
     ///     RadioItem.
     /// </summary>
     /// <remarks>

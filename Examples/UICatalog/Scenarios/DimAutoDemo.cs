@@ -165,7 +165,7 @@ public class DimAutoDemo : Scenario
 
         var optionSelector = new OptionSelector ()
         {
-            RadioLabels = ["One", "Two", "Three"],
+            Labels = ["One", "Two", "Three"],
             X = 0,
             Y = Pos.AnchorEnd (),
             Title = "Radios",

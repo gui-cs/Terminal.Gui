@@ -131,7 +131,7 @@ public class OptionSelectorTests
         var selector = new OptionSelector
         {
             HotKey = Key.G.WithAlt,
-            RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
+            Labels = ["_Left", "_Right", "Cen_tered", "_Justified"]
         };
         selector.Value = null;
 

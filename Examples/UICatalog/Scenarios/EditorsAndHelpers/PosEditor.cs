@@ -91,7 +91,7 @@ public class PosEditor : EditorBase
             Text = $"{Title}:"
         };
         Add (label);
-        _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
+        _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _radioItems };
         _posOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
 
         _valueEdit = new ()

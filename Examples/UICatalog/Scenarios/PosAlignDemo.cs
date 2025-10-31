@@ -362,7 +362,7 @@ public sealed class PosAlignDemo : Scenario
 
         OptionSelector widthAlignOptionSelector = new ()
         {
-            RadioLabels = Enum.GetNames<Alignment> (),
+            Labels = Enum.GetNames<Alignment> (),
             Orientation = Orientation.Horizontal,
             X = Pos.Center ()
         };
@@ -373,7 +373,7 @@ public sealed class PosAlignDemo : Scenario
                                                             widthAligner.Alignment =
                                                                 (Alignment)Enum.Parse (
                                                                                        typeof (Alignment),
-                                                                                       widthAlignOptionSelector.RadioLabels [widthAlignOptionSelector
+                                                                                       widthAlignOptionSelector.Labels [widthAlignOptionSelector
                                                                                            .Value!.Value]);
                                                             UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
                                                         };
@@ -382,7 +382,7 @@ public sealed class PosAlignDemo : Scenario
 
         OptionSelector heightAlignOptionSelector = new ()
         {
-            RadioLabels = Enum.GetNames<Alignment> (),
+            Labels = Enum.GetNames<Alignment> (),
             Orientation = Orientation.Vertical,
             Y = Pos.Center ()
         };
@@ -393,7 +393,7 @@ public sealed class PosAlignDemo : Scenario
                                                              heightAligner.Alignment =
                                                                  (Alignment)Enum.Parse (
                                                                                         typeof (Alignment),
-                                                                                        heightAlignOptionSelector.RadioLabels [heightAlignOptionSelector
+                                                                                        heightAlignOptionSelector.Labels [heightAlignOptionSelector
                                                                                             .Value!.Value]);
                                                              UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
                                                          };

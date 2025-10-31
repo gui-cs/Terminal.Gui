@@ -92,7 +92,7 @@ public class DimEditor : EditorBase
             Text = $"{Title}:"
         };
         Add (label);
-        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
+        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _radioItems };
         _dimOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
         _valueEdit = new ()
         {

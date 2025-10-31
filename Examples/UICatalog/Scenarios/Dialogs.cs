@@ -151,16 +151,15 @@ public class Dialogs : Scenario
         };
         frame.Add (label);
 
-        List<string> labels = Enum.GetNames<Alignment> ().Select (n => n = "_" + n).ToList ();
-        OptionSelector alignmentGroup = new ()
+        OptionSelector<Alignment> alignmentOptionSelector = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = "Ali_gn",
-            Labels = labels,
+            AssignHotKeys = true
         };
-        frame.Add (alignmentGroup);
-        alignmentGroup.Value = labels.IndexOf ("_" + Dialog.DefaultButtonAlignment.ToString ());
+        frame.Add (alignmentOptionSelector);
+        alignmentOptionSelector.Value = Dialog.DefaultButtonAlignment;
 
         frame.ValidatePosDim = true;
 
@@ -190,7 +189,7 @@ public class Dialogs : Scenario
                                                                       titleEdit,
                                                                       numButtonsEdit,
                                                                       glyphsNotWords,
-                                                                      alignmentGroup,
+                                                                      alignmentOptionSelector,
                                                                       buttonPressedLabel
                                                                      );
                                        Application.Run (dlg);

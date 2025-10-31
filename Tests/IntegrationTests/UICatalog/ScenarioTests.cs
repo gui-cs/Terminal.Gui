@@ -216,7 +216,7 @@ public class ScenarioTests : TestsAllViews
 
         var label = new Label { X = 0, Y = 0, Text = "x:" };
         locationFrame.Add (label);
-        OptionSelector xOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        OptionSelector xOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = radioItems };
         TextField xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{xVal}" };
         locationFrame.Add (xText);
 
@@ -227,7 +227,7 @@ public class ScenarioTests : TestsAllViews
         locationFrame.Add (label);
         TextField yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{yVal}" };
         locationFrame.Add (yText);
-        OptionSelector yOptionSelector = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        OptionSelector yOptionSelector = new () { X = Pos.X (label), Y = Pos.Bottom (label), Labels = radioItems };
         locationFrame.Add (yOptionSelector);
 
         FrameView sizeFrame = new ()
@@ -242,7 +242,7 @@ public class ScenarioTests : TestsAllViews
         radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
         label = new () { X = 0, Y = 0, Text = "width:" };
         sizeFrame.Add (label);
-        OptionSelector wOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        OptionSelector wOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = radioItems };
         TextField wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{wVal}" };
         sizeFrame.Add (wText);
         sizeFrame.Add (wOptionSelector);
@@ -253,7 +253,7 @@ public class ScenarioTests : TestsAllViews
         TextField hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{hVal}" };
         sizeFrame.Add (hText);
 
-        OptionSelector hOptionSelector = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        OptionSelector hOptionSelector = new () { X = Pos.X (label), Y = Pos.Bottom (label), Labels = radioItems };
         sizeFrame.Add (hOptionSelector);
 
         settingsPane.Add (sizeFrame);

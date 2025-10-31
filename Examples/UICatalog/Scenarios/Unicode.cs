@@ -185,7 +185,7 @@ public class UnicodeInMenu : Scenario
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
-            RadioLabels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
+            Labels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
         };
         appWindow.Add (radioGroup);
 

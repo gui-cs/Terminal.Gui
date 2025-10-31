@@ -176,7 +176,7 @@ public class DynamicMenuBar : Scenario
 
             OsChkStyle = new ()
             {
-                X = Pos.Left (lblTitle), Y = Pos.Bottom (CkbSubMenu) + 1, RadioLabels = rChkLabels
+                X = Pos.Left (lblTitle), Y = Pos.Bottom (CkbSubMenu) + 1, Labels = rChkLabels
             };
             Add (OsChkStyle);
 

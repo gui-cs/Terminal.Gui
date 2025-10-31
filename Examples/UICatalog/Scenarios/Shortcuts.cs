@@ -206,7 +206,7 @@ public class Shortcuts : Scenario
             CommandView = new OptionSelector ()
             {
                 Orientation = Orientation.Vertical,
-                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
+                Labels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
                 HighlightStates = MouseState.None,
             },
         };

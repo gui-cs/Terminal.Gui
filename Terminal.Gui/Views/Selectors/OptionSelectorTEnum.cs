@@ -13,10 +13,7 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
     /// </summary>
     public OptionSelector ()
     {
-        List<string> labels = Enum.GetValues<TEnum> ()
-                                  .Select (f => f.ToString ())
-                                  .ToList ();
-        base.Labels = labels;
+        base.Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray (); ;
     }
 
     /// <summary>

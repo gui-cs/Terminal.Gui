@@ -410,7 +410,7 @@ public class Images : Scenario
 
         _osPaletteBuilder = new ()
         {
-            RadioLabels =
+            Labels =
             [
                 "Popularity",
                 "Median Cut"
@@ -444,7 +444,7 @@ public class Images : Scenario
 
         _osDistanceAlgorithm = new ()
         {
-            RadioLabels = new []
+            Labels = new []
             {
                 "Euclidian",
                 "CIE76"

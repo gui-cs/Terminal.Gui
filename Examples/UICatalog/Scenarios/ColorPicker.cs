@@ -131,7 +131,7 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (_demoView),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            RadioLabels =
+            Labels =
             [
                 "_RGB",
                 "_HSV",

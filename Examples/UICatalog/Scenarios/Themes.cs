@@ -29,7 +29,7 @@ public sealed class Themes : Scenario
             BorderStyle = LineStyle.Rounded,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            RadioLabels= options,
+            Labels= options,
             Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
         };
         themeOptionSelector.Border!.Thickness = new (0, 1, 0, 0);
@@ -42,7 +42,7 @@ public sealed class Themes : Scenario
                                                  {
                                                      return;
                                                  }
-                                                 var newTheme = optionSelector!.RadioLabels! [(int)args.Value!] as string;
+                                                 var newTheme = optionSelector!.Labels! [(int)args.Value!] as string;
                                                  // strip off the leading underscore
                                                  ThemeManager.Theme = newTheme!.Substring (1);
                                                  ConfigurationManager.Apply ();

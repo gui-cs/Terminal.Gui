@@ -81,7 +81,7 @@ public sealed class Selectors : Scenario
         };
         optionSelectorsFrame.ClearingViewport += (sender, args) =>
                                                  {
-                                      //               optionSelectorsFrame.SetAttributeForRole (optionSelectorsFrame.HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                                                     //               optionSelectorsFrame.SetAttributeForRole (optionSelectorsFrame.HasFocus ? VisualRole.Focus : VisualRole.Normal);
                                                  };
 
 
@@ -175,9 +175,14 @@ public sealed class Selectors : Scenario
             Title = "<ViewD_iagnosticFlags>",
             Y = Pos.Bottom (flagSelector),
             UsedHotKeys = flagSelector.UsedHotKeys,
-            AssignHotKeys = true
+            AssignHotKeys = true,
+            Value = View.Diagnostics
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
+        flagSelectorT.ValueChanged += (s, a) =>
+                                      {
+                                          View.Diagnostics = (ViewDiagnosticFlags)a.Value!;
+                                      };
 
         appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, canFocus, optionSelectorsFrame, flagSelectorsFrame);
 
@@ -277,5 +282,6 @@ public sealed class Selectors : Scenario
             return optionSelectors;
         }
     }
+
 
 }

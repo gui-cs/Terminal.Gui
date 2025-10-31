@@ -199,9 +199,9 @@ public class UICatalogTop : Toplevel
             {
                 _themesSelector = new ()
                 {
-                   // HighlightStates = MouseState.In,
-                   CanFocus = true,
-                  // InvertFocusAttribute = true
+                    // HighlightStates = MouseState.In,
+                    CanFocus = true,
+                    // InvertFocusAttribute = true
                 };
 
                 _themesSelector.ValueChanged += (_, args) =>
@@ -225,7 +225,7 @@ public class UICatalogTop : Toplevel
 
                 _topSchemesSelector = new ()
                 {
-                  //  HighlightStates = MouseState.In,
+                    //  HighlightStates = MouseState.In,
                 };
 
                 _topSchemesSelector.ValueChanged += (_, args) =>
@@ -328,7 +328,7 @@ public class UICatalogTop : Toplevel
                 AssignHotKeys = true,
                 Labels = Enum.GetNames<LogLevel> (),
                 Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-               // HighlightStates = MouseState.In,
+                // HighlightStates = MouseState.In,
             };
 
             _logLevelSelector.ValueChanged += (_, args) =>
@@ -372,8 +372,8 @@ public class UICatalogTop : Toplevel
         _themesSelector.Value = null;
         _themesSelector.AssignHotKeys = true;
         _themesSelector.UsedHotKeys.Clear ();
-        _themesSelector.Labels = ThemeManager.GetThemeNames ();
-        _themesSelector.Value = ThemeManager.GetThemeNames().IndexOf(ThemeManager.GetCurrentThemeName());
+        _themesSelector.Labels = ThemeManager.GetThemeNames ().ToArray ();
+        _themesSelector.Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
 
         if (_topSchemesSelector is null)
         {
@@ -383,7 +383,7 @@ public class UICatalogTop : Toplevel
         _topSchemesSelector.AssignHotKeys = true;
         _topSchemesSelector.UsedHotKeys.Clear ();
         int? selectedScheme = _topSchemesSelector.Value;
-        _topSchemesSelector.Labels = SchemeManager.GetSchemeNames ();
+        _topSchemesSelector.Labels = SchemeManager.GetSchemeNames ().ToArray ();
         _topSchemesSelector.Value = selectedScheme;
 
         if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))

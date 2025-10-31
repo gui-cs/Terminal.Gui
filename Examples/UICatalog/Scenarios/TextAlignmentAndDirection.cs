@@ -497,7 +497,7 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
             Width = Dim.Fill (9),
-            RadioLabels = ["Current direction", "Opposite direction", "FIll Both"],
+            Labels = ["Current direction", "Opposite direction", "FIll Both"],
             Enabled = false
         };
 
@@ -548,7 +548,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = Dim.Fill (10),
             Height = Dim.Fill (1),
             HotKeySpecifier = (Rune)'\xffff',
-            RadioLabels = directionsEnum.Select (e => e.ToString ()).ToArray ()
+            Labels = directionsEnum.Select (e => e.ToString ()).ToArray ()
         };
 
         directionOptions.ValueChanged += (s, ev) =>

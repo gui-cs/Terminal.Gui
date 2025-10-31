@@ -164,7 +164,7 @@ public class Wizards : Scenario
 
                                            OptionSelector optionSelector = new ()
                                            {
-                                               RadioLabels = ["_One", "_Two", "_3"]
+                                               Labels = ["_One", "_Two", "_3"]
                                            };
                                            firstStep.Add (optionSelector);
 
@@ -186,7 +186,7 @@ public class Wizards : Scenario
 
                                            OptionSelector optionSelecor2 = new ()
                                            {
-                                               RadioLabels = ["_A", "_B", "_C"],
+                                               Labels = ["_A", "_B", "_C"],
                                                Orientation = Orientation.Horizontal
                                            };
                                            secondStep.Add (optionSelecor2);
