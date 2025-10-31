@@ -9,7 +9,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
 {
-    private readonly FakeInput<ConsoleKeyInfo>? _predefinedInput;
+    private readonly FakeConsoleInput<ConsoleKeyInfo>? _predefinedInput;
     private readonly FakeOutput? _output;
 
     /// <summary>
@@ -17,7 +17,7 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// </summary>
     /// <param name="predefinedInput">Optional queue of predefined input events to simulate.</param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
-    public FakeComponentFactory (FakeInput<ConsoleKeyInfo>? predefinedInput = null, FakeOutput? output = null)
+    public FakeComponentFactory (FakeConsoleInput<ConsoleKeyInfo>? predefinedInput = null, FakeOutput? output = null)
     {
         _predefinedInput = predefinedInput;
         _output = output;
@@ -26,7 +26,7 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc/>
     public override IConsoleInput<ConsoleKeyInfo> CreateInput ()
     {
-        return new FakeConsoleInput (_predefinedInput);
+        return new FakeInput (_predefinedInput);
     }
 
     /// <inheritdoc />

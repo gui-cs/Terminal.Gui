@@ -830,6 +830,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
     }
 
+
     [Fact]
     [AutoInitShutdown]
     public void Run_Sets_Running_True ()
