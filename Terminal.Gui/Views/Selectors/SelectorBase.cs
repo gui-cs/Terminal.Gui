@@ -395,7 +395,7 @@ public abstract class SelectorBase : View, IOrientation
     private int _horizontalSpace = 2;
 
     /// <summary>
-    ///     Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="Orientation"/> is
+    ///     Gets or sets the horizontal space for this <see cref="OptionSelector"/> if the <see cref="Orientation"/> is
     ///     <see cref="Orientation.Horizontal"/>
     /// </summary>
     public int HorizontalSpace

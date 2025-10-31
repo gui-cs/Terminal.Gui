@@ -40,31 +40,30 @@ public sealed class PosAlignDemo : Scenario
 
     private void SetupControls (Window appWindow, Dimension dimension, Schemes scheme)
     {
-        RadioGroup alignRadioGroup = new ()
+        OptionSelector<Alignment> alignOptionSelector = new ()
         {
-            RadioLabels = Enum.GetNames<Alignment> (),
             SchemeName = SchemeManager.SchemesToSchemeName (scheme),
         };
 
         if (dimension == Dimension.Width)
         {
-            alignRadioGroup.X = Pos.Align (_horizAligner.Alignment);
-            alignRadioGroup.Y = Pos.Center ();
+            alignOptionSelector.X = Pos.Align (_horizAligner.Alignment);
+            alignOptionSelector.Y = Pos.Center ();
         }
         else
         {
-            alignRadioGroup.X = Pos.Center ();
-            alignRadioGroup.Y = Pos.Align (_vertAligner.Alignment);
+            alignOptionSelector.X = Pos.Center ();
+            alignOptionSelector.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        alignRadioGroup.SelectedItemChanged += (s, e) =>
+        alignOptionSelector.SelectedItemChanged += (s, e) =>
                                                {
                                                    if (dimension == Dimension.Width)
                                                    {
                                                        _horizAligner.Alignment =
                                                            (Alignment)Enum.Parse (
                                                                                   typeof (Alignment),
-                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                                                  alignOptionSelector.RadioLabels [alignOptionSelector.SelectedItem]);
                                                        UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                                    }
                                                    else
@@ -72,11 +71,11 @@ public sealed class PosAlignDemo : Scenario
                                                        _vertAligner.Alignment =
                                                            (Alignment)Enum.Parse (
                                                                                   typeof (Alignment),
-                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                                                  alignOptionSelector.RadioLabels [alignOptionSelector.SelectedItem]);
                                                        UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
                                                    }
                                                };
-        appWindow.Add (alignRadioGroup);
+        appWindow.Add (alignOptionSelector);
 
         CheckBox endToStartCheckBox = new ()
         {
@@ -88,12 +87,12 @@ public sealed class PosAlignDemo : Scenario
         {
             endToStartCheckBox.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
             endToStartCheckBox.X = Pos.Align (_horizAligner.Alignment);
-            endToStartCheckBox.Y = Pos.Top (alignRadioGroup);
+            endToStartCheckBox.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
             endToStartCheckBox.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
-            endToStartCheckBox.X = Pos.Left (alignRadioGroup);
+            endToStartCheckBox.X = Pos.Left (alignOptionSelector);
             endToStartCheckBox.Y = Pos.Align (_vertAligner.Alignment);
         }
 
@@ -126,12 +125,12 @@ public sealed class PosAlignDemo : Scenario
         {
             ignoreFirstOrLast.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
             ignoreFirstOrLast.X = Pos.Align (_horizAligner.Alignment);
-            ignoreFirstOrLast.Y = Pos.Top (alignRadioGroup);
+            ignoreFirstOrLast.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
             ignoreFirstOrLast.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
-            ignoreFirstOrLast.X = Pos.Left (alignRadioGroup);
+            ignoreFirstOrLast.X = Pos.Left (alignOptionSelector);
             ignoreFirstOrLast.Y = Pos.Align (_vertAligner.Alignment);
         }
 
@@ -164,12 +163,12 @@ public sealed class PosAlignDemo : Scenario
         {
             addSpacesBetweenItems.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
             addSpacesBetweenItems.X = Pos.Align (_horizAligner.Alignment);
-            addSpacesBetweenItems.Y = Pos.Top (alignRadioGroup);
+            addSpacesBetweenItems.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
             addSpacesBetweenItems.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
-            addSpacesBetweenItems.X = Pos.Left (alignRadioGroup);
+            addSpacesBetweenItems.X = Pos.Left (alignOptionSelector);
             addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
         }
 
@@ -202,7 +201,7 @@ public sealed class PosAlignDemo : Scenario
         if (dimension == Dimension.Width)
         {
             margin.X = Pos.Align (_horizAligner.Alignment);
-            margin.Y = Pos.Top (alignRadioGroup);
+            margin.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
@@ -229,8 +228,8 @@ public sealed class PosAlignDemo : Scenario
         [
             new ()
             {
-                X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignRadioGroup),
-                Y = dimension == Dimension.Width ? Pos.Top (alignRadioGroup) : Pos.Align (_vertAligner.Alignment),
+                X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignOptionSelector),
+                Y = dimension == Dimension.Width ? Pos.Top (alignOptionSelector) : Pos.Align (_vertAligner.Alignment),
                 Text = NumberToWords.Convert (0)
             }
         ];
@@ -247,12 +246,12 @@ public sealed class PosAlignDemo : Scenario
         if (dimension == Dimension.Width)
         {
             addedViewsUpDown.X = Pos.Align (_horizAligner.Alignment);
-            addedViewsUpDown.Y = Pos.Top (alignRadioGroup);
+            addedViewsUpDown.Y = Pos.Top (alignOptionSelector);
             addedViewsUpDown.Border!.Thickness = new (0, 1, 0, 0);
         }
         else
         {
-            addedViewsUpDown.X = Pos.Left (alignRadioGroup);
+            addedViewsUpDown.X = Pos.Left (alignOptionSelector);
             addedViewsUpDown.Y = Pos.Align (_vertAligner.Alignment);
             addedViewsUpDown.Border!.Thickness = new (1, 0, 0, 0);
         }
@@ -286,8 +285,8 @@ public sealed class PosAlignDemo : Scenario
                                                   {
                                                       var button = new Button
                                                       {
-                                                          X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignRadioGroup),
-                                                          Y = dimension == Dimension.Width ? Pos.Top (alignRadioGroup) : Pos.Align (_vertAligner.Alignment),
+                                                          X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignOptionSelector),
+                                                          Y = dimension == Dimension.Width ? Pos.Top (alignOptionSelector) : Pos.Align (_vertAligner.Alignment),
                                                           Text = NumberToWords.Convert (i + 1)
                                                       };
                                                       appWindow.Add (button);
@@ -356,39 +355,39 @@ public sealed class PosAlignDemo : Scenario
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 
-        RadioGroup widthAlignRadioGroup = new ()
+        OptionSelector widthAlignOptionSelector = new ()
         {
             RadioLabels = Enum.GetNames<Alignment> (),
             Orientation = Orientation.Horizontal,
             X = Pos.Center ()
         };
-        container.Padding.Add (widthAlignRadioGroup);
+        container.Padding.Add (widthAlignOptionSelector);
 
-        widthAlignRadioGroup.SelectedItemChanged += (sender, e) =>
+        widthAlignOptionSelector.SelectedItemChanged += (sender, e) =>
                                                     {
                                                         widthAligner.Alignment =
                                                             (Alignment)Enum.Parse (
                                                                                    typeof (Alignment),
-                                                                                   widthAlignRadioGroup.RadioLabels [widthAlignRadioGroup.SelectedItem]);
+                                                                                   widthAlignOptionSelector.RadioLabels [widthAlignOptionSelector.SelectedItem]);
                                                         UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
                                                     };
 
         Aligner heightAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 
-        RadioGroup heightAlignRadioGroup = new ()
+        OptionSelector heightAlignOptionSelector = new ()
         {
             RadioLabels = Enum.GetNames<Alignment> (),
             Orientation = Orientation.Vertical,
             Y = Pos.Center ()
         };
-        container.Padding.Add (heightAlignRadioGroup);
+        container.Padding.Add (heightAlignOptionSelector);
 
-        heightAlignRadioGroup.SelectedItemChanged += (sender, e) =>
+        heightAlignOptionSelector.SelectedItemChanged += (sender, e) =>
                                                      {
                                                          heightAligner.Alignment =
                                                              (Alignment)Enum.Parse (
                                                                                     typeof (Alignment),
-                                                                                    heightAlignRadioGroup.RadioLabels [heightAlignRadioGroup.SelectedItem]);
+                                                                                    heightAlignOptionSelector.RadioLabels [heightAlignOptionSelector.SelectedItem]);
                                                          UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
                                                      };
 

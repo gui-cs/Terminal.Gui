@@ -23,7 +23,7 @@ public sealed class Themes : Scenario
         };
 
         string[]  options = ThemeManager.GetThemeNames ().Select (option => option = "_" + option).ToArray ();
-        RadioGroup themeOptionSelector = new ()
+        OptionSelector themeOptionSelector = new ()
         {
             Title = "_Themes",
             BorderStyle = LineStyle.Rounded,
@@ -37,7 +37,7 @@ public sealed class Themes : Scenario
 
         themeOptionSelector.SelectedItemChanged += (sender, args) =>
                                              {
-                                                 RadioGroup? optionSelector = sender as RadioGroup;
+                                                 OptionSelector? optionSelector = sender as OptionSelector;
                                                  if (optionSelector is null)
                                                  {
                                                      return;

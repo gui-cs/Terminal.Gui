@@ -1,7 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UICatalog;
 using UICatalog.Scenarios;
@@ -40,7 +37,7 @@ public class RegionScenario : Scenario
 
         tools.SetStyle += b =>
                           {
-                              _drawStyle = (RegionDrawStyles)b;
+                              _drawStyle = b;
                               app.SetNeedsDraw ();
                           };
 
@@ -169,8 +166,8 @@ public class ToolsView : Window
 {
     //private Button _addLayerBtn;
     private readonly AttributeView _attributeView = new ();
-    private RadioGroup? _stylePicker;
-    private RegionOpSelector? _regionOpSelector;
+    private OptionSelector<RegionDrawStyles>? _stylePicker;
+    private OptionSelector<RegionOp>? _regionOpSelector;
 
     public Attribute? CurrentAttribute
     {
@@ -197,22 +194,30 @@ public class ToolsView : Window
         _stylePicker = new ()
         {
             Width = Dim.Fill (),
-            X = 0, Y = Pos.Bottom (_attributeView) + 1, RadioLabels = Enum.GetNames<RegionDrawStyles> ().Select (n => n = "_" + n).ToArray ()
+            X = 0, Y = Pos.Bottom (_attributeView) + 1,
+            AssignHotKeys = true
         };
         _stylePicker.BorderStyle = LineStyle.Single;
         _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
-        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem!); };
-        _stylePicker.SelectedItem = (int)RegionDrawStyles.FillOnly;
+        _stylePicker.ValueChanged += (s, a) => { SetStyle?.Invoke ((RegionDrawStyles)a.Value!); };
+        _stylePicker.Value = RegionDrawStyles.FillOnly;
 
         _regionOpSelector = new ()
         {
             X = 0,
-            Y = Pos.Bottom (_stylePicker) + 1
+            Y = Pos.Bottom (_stylePicker) + 1,
+            AssignHotKeys = true
         };
-        _regionOpSelector.SelectedItemChanged += (s, a) => { RegionOpChanged?.Invoke (this, a); };
-        _regionOpSelector.SelectedItem = RegionOp.MinimalUnion;
+        _regionOpSelector.ValueChanged += (s, a) =>
+                                          {
+                                              if (a.Value is { })
+                                              {
+                                                  RegionOpChanged?.Invoke (this, (RegionOp)a.Value);
+                                              }
+                                          };
+        _regionOpSelector.Value = RegionOp.MinimalUnion;
 
         //_addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
@@ -222,12 +227,12 @@ public class ToolsView : Window
 
     public event EventHandler<Attribute?>? AttributeChanged;
     public event EventHandler<RegionOp>? RegionOpChanged;
-    public event Action<LineStyle>? SetStyle;
+    public event Action<RegionDrawStyles>? SetStyle;
 }
 
 public class RegionOpSelector : View
 {
-    private readonly RadioGroup _radioGroup;
+    private readonly OptionSelector<RegionOp> _optionSelector;
 
     public RegionOpSelector ()
     {
@@ -238,22 +243,22 @@ public class RegionOpSelector : View
         Border!.Thickness = new (0, 1, 0, 0);
         Title = "RegionOp";
 
-        _radioGroup = new ()
+        _optionSelector = new ()
         {
             X = 0,
             Y = 0,
-            RadioLabels = Enum.GetNames<RegionOp> ().Select (n => n = "_" + n).ToArray ()
+            AssignHotKeys = true
         };
-        _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem!); };
-        Add (_radioGroup);
+        _optionSelector.ValueChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.Value!); };
+        base.Add (_optionSelector);
     }
 
     public event EventHandler<RegionOp>? SelectedItemChanged;
 
     public RegionOp SelectedItem
     {
-        get => (RegionOp)_radioGroup.SelectedItem;
-        set => _radioGroup.SelectedItem = (int)value;
+        get => (RegionOp)_optionSelector.SelectedItem;
+        set => _optionSelector.SelectedItem = (int)value;
     }
 }
 

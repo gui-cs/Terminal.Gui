@@ -177,10 +177,10 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (listView);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "OptionSelector:" };
         appWindow.Add (label);
 
-        var radioGroup = new RadioGroup
+        var radioGroup = new OptionSelector
         {
             X = 20,
             Y = Pos.Y (label),

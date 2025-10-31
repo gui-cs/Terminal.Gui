@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Text;
+﻿using System.IO.Abstractions;
 
 namespace UICatalog.Scenarios;
 
@@ -20,10 +16,10 @@ public class FileDialogExamples : Scenario
     private CheckBox _cbMustExist;
     private CheckBox _cbShowTreeBranchLines;
     private CheckBox _cbUseColors;
-    private RadioGroup _rgAllowedTypes;
-    private RadioGroup _rgCaption;
-    private RadioGroup _rgIcons;
-    private RadioGroup _rgOpenMode;
+    private OptionSelector _osAllowedTypes;
+    private OptionSelector _osCaption;
+    private OptionSelector _osIcons;
+    private OptionSelector _osOpenMode;
     private TextField _tbCancelButton;
     private TextField _tbOkButton;
 
@@ -34,28 +30,29 @@ public class FileDialogExamples : Scenario
         var x = 1;
         var win = new Window { Title = GetQuitKeyAndName () };
 
-        _cbMustExist = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Must E_xist" };
+        _cbMustExist = new() { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Must E_xist" };
         win.Add (_cbMustExist);
 
-        _cbUseColors = new CheckBox { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
+        _cbUseColors = new()
+            { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
         win.Add (_cbUseColors);
 
-        _cbCaseSensitive = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Case Sensitive Search" };
+        _cbCaseSensitive = new() { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Case Sensitive Search" };
         win.Add (_cbCaseSensitive);
 
-        _cbAllowMultipleSelection = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Multiple" };
+        _cbAllowMultipleSelection = new() { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Multiple" };
         win.Add (_cbAllowMultipleSelection);
 
-        _cbShowTreeBranchLines = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch _Lines" };
+        _cbShowTreeBranchLines = new() { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch _Lines" };
         win.Add (_cbShowTreeBranchLines);
 
-        _cbAlwaysTableShowHeaders = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Always Show _Headers" };
+        _cbAlwaysTableShowHeaders = new() { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Always Show _Headers" };
         win.Add (_cbAlwaysTableShowHeaders);
 
-        _cbDrivesOnlyInTree = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show _Drives" };
+        _cbDrivesOnlyInTree = new() { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show _Drives" };
         win.Add (_cbDrivesOnlyInTree);
 
-        _cbPreserveFilenameOnDirectoryChanges = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Preserve Filename" };
+        _cbPreserveFilenameOnDirectoryChanges = new() { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Preserve Filename" };
         win.Add (_cbPreserveFilenameOnDirectoryChanges);
 
         y = 0;
@@ -66,9 +63,9 @@ public class FileDialogExamples : Scenario
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
-        _rgCaption = new RadioGroup { X = x, Y = y };
-        _rgCaption.RadioLabels = new [] { "_Ok", "O_pen", "_Save" };
-        win.Add (_rgCaption);
+        _osCaption = new() { X = x, Y = y };
+        _osCaption.RadioLabels = ["_Ok", "O_pen", "_Save"];
+        win.Add (_osCaption);
 
         y = 0;
         x = 34;
@@ -78,9 +75,9 @@ public class FileDialogExamples : Scenario
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
-        _rgOpenMode = new RadioGroup { X = x, Y = y };
-        _rgOpenMode.RadioLabels = new [] { "_File", "D_irectory", "_Mixed" };
-        win.Add (_rgOpenMode);
+        _osOpenMode = new() { X = x, Y = y };
+        _osOpenMode.RadioLabels = ["_File", "D_irectory", "_Mixed"];
+        win.Add (_osOpenMode);
 
         y = 0;
         x = 48;
@@ -90,9 +87,9 @@ public class FileDialogExamples : Scenario
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
-        _rgIcons = new RadioGroup { X = x, Y = y };
-        _rgIcons.RadioLabels = new [] { "_None", "_Unicode", "Nerd_*" };
-        win.Add (_rgIcons);
+        _osIcons = new() { X = x, Y = y };
+        _osIcons.RadioLabels = ["_None", "_Unicode", "Nerd_*"];
+        win.Add (_osIcons);
 
         win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
         win.Add (new Label { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
@@ -105,9 +102,9 @@ public class FileDialogExamples : Scenario
                 );
         win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
-        _rgAllowedTypes = new RadioGroup { X = x, Y = y };
-        _rgAllowedTypes.RadioLabels = new [] { "An_y", "Cs_v (Recommended)", "Csv (S_trict)" };
-        win.Add (_rgAllowedTypes);
+        _osAllowedTypes = new() { X = x, Y = y };
+        _osAllowedTypes.RadioLabels = ["An_y", "Cs_v (Recommended)", "Csv (S_trict)"];
+        win.Add (_osAllowedTypes);
 
         y = 5;
         x = 45;
@@ -118,31 +115,31 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
 
         win.Add (new Label { X = x, Y = y++, Text = "O_k Text:" });
-        _tbOkButton = new TextField { X = x, Y = y++, Width = 12 };
+        _tbOkButton = new() { X = x, Y = y++, Width = 12 };
         win.Add (_tbOkButton);
         win.Add (new Label { X = x, Y = y++, Text = "_Cancel Text:" });
-        _tbCancelButton = new TextField { X = x, Y = y++, Width = 12 };
+        _tbCancelButton = new() { X = x, Y = y++, Width = 12 };
         win.Add (_tbCancelButton);
-        _cbFlipButtonOrder = new CheckBox { X = x, Y = y++, Text = "Flip Ord_er" };
+        _cbFlipButtonOrder = new() { X = x, Y = y++, Text = "Flip Ord_er" };
         win.Add (_cbFlipButtonOrder);
 
         var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
 
         win.Accepting += (s, e) =>
-                        {
-                            try
-                            {
-                                CreateDialog ();
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.ErrorQuery ("Error", ex.ToString (), "_Ok");
-                            }
-                            finally
-                            {
-                                e.Handled = true;
-                            }
-                        };
+                         {
+                             try
+                             {
+                                 CreateDialog ();
+                             }
+                             catch (Exception ex)
+                             {
+                                 MessageBox.ErrorQuery ("Error", ex.ToString (), "_Ok");
+                             }
+                             finally
+                             {
+                                 e.Handled = true;
+                             }
+                         };
         win.Add (btn);
 
         Application.Run (win);
@@ -167,30 +164,31 @@ public class FileDialogExamples : Scenario
         var fd = new FileDialog
         {
             OpenMode = Enum.Parse<OpenMode> (
-                                             _rgOpenMode.RadioLabels
-                                                        .Select (l => TextFormatter.FindHotKey (l, _rgOpenMode.HotKeySpecifier, out int hotPos, out Key _)
+                                             _osOpenMode.RadioLabels
+                                                        .Select (l => TextFormatter.FindHotKey (l, _osOpenMode.HotKeySpecifier, out int hotPos, out Key _)
 
                                                                           // Remove the hotkey specifier at the found position
-                                                                          ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _rgOpenMode.HotKeySpecifier)
+                                                                          ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _osOpenMode.HotKeySpecifier)
 
                                                                           // No hotkey found, return the label as is
                                                                           : l)
-                                                        .ToArray () [_rgOpenMode.SelectedItem]
+                                                        .ToArray () [_osOpenMode.SelectedItem]
                                             ),
             MustExist = _cbMustExist.CheckedState == CheckState.Checked,
             AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
         };
 
-        fd.Style.OkButtonText = _rgCaption.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgCaption.HotKeySpecifier)).ToArray() [_rgCaption.SelectedItem];
+        fd.Style.OkButtonText =
+            _osCaption.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier (l, 0, _osCaption.HotKeySpecifier)).ToArray () [_osCaption.SelectedItem];
 
         // If Save style dialog then give them an overwrite prompt
-        if (_rgCaption.SelectedItem == 2)
+        if (_osCaption.SelectedItem == 2)
         {
             fd.FilesSelected += ConfirmOverwrite;
         }
 
-        fd.Style.IconProvider.UseUnicodeCharacters = _rgIcons.SelectedItem == 1;
-        fd.Style.IconProvider.UseNerdIcons = _rgIcons.SelectedItem == 2;
+        fd.Style.IconProvider.UseUnicodeCharacters = _osIcons.SelectedItem == 1;
+        fd.Style.IconProvider.UseNerdIcons = _osIcons.SelectedItem == 2;
 
         if (_cbCaseSensitive.CheckedState == CheckState.Checked)
         {
@@ -210,13 +208,12 @@ public class FileDialogExamples : Scenario
         }
 
         fd.Style.PreserveFilenameOnDirectoryChanges = _cbPreserveFilenameOnDirectoryChanges.CheckedState == CheckState.Checked;
-        
 
-        if (_rgAllowedTypes.SelectedItem > 0)
+        if (_osAllowedTypes.SelectedItem > 0)
         {
             fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
 
-            if (_rgAllowedTypes.SelectedItem == 1)
+            if (_osAllowedTypes.SelectedItem == 1)
             {
                 fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
             }
@@ -239,9 +236,9 @@ public class FileDialogExamples : Scenario
 
         Application.Run (fd);
 
-        var canceled = fd.Canceled;
-        var multiSelected = fd.MultiSelected;
-        var path = fd.Path;
+        bool canceled = fd.Canceled;
+        IReadOnlyList<string> multiSelected = fd.MultiSelected;
+        string path = fd.Path;
 
         // This needs to be disposed before opening other toplevel
         fd.Dispose ();
@@ -253,7 +250,6 @@ public class FileDialogExamples : Scenario
                               "You canceled navigation and did not pick anything",
                               "Ok"
                              );
-
         }
         else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
         {

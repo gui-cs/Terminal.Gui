@@ -492,7 +492,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // JUSTIFY OPTIONS
 
-        var justifyOptions = new RadioGroup
+        var justifyOptions = new OptionSelector
         {
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
@@ -541,7 +541,7 @@ public class TextAlignmentAndDirection : Scenario
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
-        var directionOptions = new RadioGroup
+        var directionOptions = new OptionSelector
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Bottom (wrapCheckbox) + 1,

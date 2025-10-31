@@ -126,7 +126,7 @@ public class ColorPickers : Scenario
 
 
         // Radio for switching color models
-        var rgColorModel = new RadioGroup ()
+        var osColorModel = new OptionSelector ()
         {
             Y = Pos.Bottom (_demoView),
             Width = Dim.Auto (),
@@ -141,7 +141,7 @@ public class ColorPickers : Scenario
             SelectedItem = (int)foregroundColorPicker.Style.ColorModel,
         };
 
-        rgColorModel.SelectedItemChanged += (_, e) =>
+        osColorModel.SelectedItemChanged += (_, e) =>
                                             {
                                                 // 16 colors
                                                 if (e.SelectedItem == 3)
@@ -176,13 +176,13 @@ public class ColorPickers : Scenario
                                                 }
                                             };
 
-        app.Add (rgColorModel);
+        app.Add (osColorModel);
 
         // Checkbox for switching show text fields on and off
         var cbShowTextFields = new CheckBox ()
         {
             Text = "Show _Text Fields",
-            Y = Pos.Bottom (rgColorModel) + 1,
+            Y = Pos.Bottom (osColorModel) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             CheckedState = foregroundColorPicker.Style.ShowTextFields ? CheckState.Checked : CheckState.UnChecked,

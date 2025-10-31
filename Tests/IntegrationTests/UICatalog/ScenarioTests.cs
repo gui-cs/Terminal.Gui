@@ -216,19 +216,19 @@ public class ScenarioTests : TestsAllViews
 
         var label = new Label { X = 0, Y = 0, Text = "x:" };
         locationFrame.Add (label);
-        RadioGroup xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        OptionSelector xOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         TextField xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{xVal}" };
         locationFrame.Add (xText);
 
-        locationFrame.Add (xRadioGroup);
+        locationFrame.Add (xOptionSelector);
 
         radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "Absolute(y)" };
-        label = new () { X = Pos.Right (xRadioGroup) + 1, Y = 0, Text = "y:" };
+        label = new () { X = Pos.Right (xOptionSelector) + 1, Y = 0, Text = "y:" };
         locationFrame.Add (label);
         TextField yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{yVal}" };
         locationFrame.Add (yText);
-        RadioGroup yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        locationFrame.Add (yRadioGroup);
+        OptionSelector yOptionSelector = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        locationFrame.Add (yOptionSelector);
 
         FrameView sizeFrame = new ()
         {
@@ -242,19 +242,19 @@ public class ScenarioTests : TestsAllViews
         radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
         label = new () { X = 0, Y = 0, Text = "width:" };
         sizeFrame.Add (label);
-        RadioGroup wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        OptionSelector wOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         TextField wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{wVal}" };
         sizeFrame.Add (wText);
-        sizeFrame.Add (wRadioGroup);
+        sizeFrame.Add (wOptionSelector);
 
         radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Absolute(height)" };
-        label = new () { X = Pos.Right (wRadioGroup) + 1, Y = 0, Text = "height:" };
+        label = new () { X = Pos.Right (wOptionSelector) + 1, Y = 0, Text = "height:" };
         sizeFrame.Add (label);
         TextField hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{hVal}" };
         sizeFrame.Add (hText);
 
-        RadioGroup hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        sizeFrame.Add (hRadioGroup);
+        OptionSelector hOptionSelector = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        sizeFrame.Add (hOptionSelector);
 
         settingsPane.Add (sizeFrame);
 
@@ -284,7 +284,7 @@ public class ScenarioTests : TestsAllViews
                                                   curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem]);
                                               };
 
-        xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        xOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
 
         xText.TextChanged += (s, args) =>
                               {
@@ -308,9 +308,9 @@ public class ScenarioTests : TestsAllViews
                                   { }
                               };
 
-        yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        yOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
 
-        wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        wOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
 
         wText.TextChanged += (s, args) =>
                               {
@@ -334,7 +334,7 @@ public class ScenarioTests : TestsAllViews
                                   { }
                               };
 
-        hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
+        hOptionSelector.SelectedItemChanged += (s, selected) => DimPosChanged (curView);
 
         top.Add (leftPane, settingsPane, hostPane);
 
@@ -383,7 +383,7 @@ public class ScenarioTests : TestsAllViews
 
             try
             {
-                switch (xRadioGroup.SelectedItem)
+                switch (xOptionSelector.SelectedItem)
                 {
                     case 0:
                         view.X = Pos.Percent (xVal);
@@ -403,7 +403,7 @@ public class ScenarioTests : TestsAllViews
                         break;
                 }
 
-                switch (yRadioGroup.SelectedItem)
+                switch (yOptionSelector.SelectedItem)
                 {
                     case 0:
                         view.Y = Pos.Percent (yVal);
@@ -423,7 +423,7 @@ public class ScenarioTests : TestsAllViews
                         break;
                 }
 
-                switch (wRadioGroup.SelectedItem)
+                switch (wOptionSelector.SelectedItem)
                 {
                     case 0:
                         view.Width = Dim.Percent (wVal);
@@ -439,7 +439,7 @@ public class ScenarioTests : TestsAllViews
                         break;
                 }
 
-                switch (hRadioGroup.SelectedItem)
+                switch (hOptionSelector.SelectedItem)
                 {
                     case 0:
                         view.Height = Dim.Percent (hVal);
@@ -470,8 +470,8 @@ public class ScenarioTests : TestsAllViews
 
             try
             {
-                xRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => x.Contains (s)));
-                yRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => y.Contains (s)));
+                xOptionSelector.SelectedItem = posNames.IndexOf (posNames.First (s => x.Contains (s)));
+                yOptionSelector.SelectedItem = posNames.IndexOf (posNames.First (s => y.Contains (s)));
             }
             catch (InvalidOperationException e)
             {
@@ -485,8 +485,8 @@ public class ScenarioTests : TestsAllViews
             var w = view.Width!.ToString ();
             var h = view.Height!.ToString ();
 
-            wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
-            hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
+            wOptionSelector.SelectedItem = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
+            hOptionSelector.SelectedItem = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
 
             wText.Text = $"{view.Frame.Width}";
             hText.Text = $"{view.Frame.Height}";

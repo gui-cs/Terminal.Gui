@@ -18,7 +18,7 @@ public class DimEditor : EditorBase
     }
 
     private int _value;
-    private RadioGroup? _dimRadioGroup;
+    private OptionSelector? _dimOptionSelector;
     private TextField? _valueEdit;
 
     /// <inheritdoc />
@@ -44,7 +44,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            _dimRadioGroup!.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
+            _dimOptionSelector!.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
         }
         catch (InvalidOperationException e)
         {
@@ -92,8 +92,8 @@ public class DimEditor : EditorBase
             Text = $"{Title}:"
         };
         Add (label);
-        _dimRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
-        _dimRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
+        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
+        _dimOptionSelector.SelectedItemChanged += OnOptionSelectorOnSelectedItemChanged;
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
@@ -117,11 +117,11 @@ public class DimEditor : EditorBase
         };
         Add (_valueEdit);
 
-        Add (_dimRadioGroup);
+        Add (_dimOptionSelector);
 
     }
 
-    private void OnRadioGroupOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }
+    private void OnOptionSelectorOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }
 
     // These need to have same order 
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent",];
@@ -136,7 +136,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            Dim? dim = _dimRadioGroup!.SelectedItem switch
+            Dim? dim = _dimOptionSelector!.SelectedItem switch
             {
                 0 => Dim.Absolute (_value),
                 1 => Dim.Auto (),
