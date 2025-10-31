@@ -91,14 +91,14 @@ public class PosEditor : EditorBase
             Text = $"{Title}:"
         };
         Add (label);
-        _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _radioItems };
+        _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
         _posOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
 
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = 0,
-            Width = Dim.Func (_ => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
+            Width = Dim.Func (_ => _optionLabels.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
             Text = $"{_value}"
         };
 
@@ -125,7 +125,7 @@ public class PosEditor : EditorBase
 
     // These need to have same order 
     private readonly List<string> _posNames = ["Absolute", "Align", "AnchorEnd", "Center", "Func", "Percent"];
-    private readonly string [] _radioItems = ["Absolute(n)", "Align", "AnchorEnd", "Center", "Func(()=>n)", "Percent(n)"];
+    private readonly string [] _optionLabels = ["Absolute(n)", "Align", "AnchorEnd", "Center", "Func(()=>n)", "Percent(n)"];
 
     private void PosChanged ()
     {

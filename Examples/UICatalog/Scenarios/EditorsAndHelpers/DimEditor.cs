@@ -92,13 +92,13 @@ public class DimEditor : EditorBase
             Text = $"{Title}:"
         };
         Add (label);
-        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _radioItems };
+        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
         _dimOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = 0,
-            Width = Dim.Func (_ => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
+            Width = Dim.Func (_ => _optionLabels.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
             Text = $"{_value}"
         };
 
@@ -125,7 +125,7 @@ public class DimEditor : EditorBase
 
     // These need to have same order 
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent",];
-    private readonly string [] _radioItems = ["Absolute(n)", "Auto", "Fill(n)", "Func(()=>n)", "Percent(n)",];
+    private readonly string [] _optionLabels = ["Absolute(n)", "Auto", "Fill(n)", "Func(()=>n)", "Percent(n)",];
 
     private void DimChanged ()
     {

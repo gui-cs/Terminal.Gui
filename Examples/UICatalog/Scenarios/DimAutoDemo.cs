@@ -168,7 +168,7 @@ public class DimAutoDemo : Scenario
             Labels = ["One", "Two", "Three"],
             X = 0,
             Y = Pos.AnchorEnd (),
-            Title = "Radios",
+            Title = "Options",
             BorderStyle = LineStyle.Dotted
         };
         dimAutoFrameView.Add (optionSelector);

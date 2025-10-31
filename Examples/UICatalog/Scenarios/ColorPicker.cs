@@ -125,7 +125,6 @@ public class ColorPickers : Scenario
         app.Add (_demoView);
 
 
-        // Radio for switching color models
         var osColorModel = new OptionSelector ()
         {
             Y = Pos.Bottom (_demoView),

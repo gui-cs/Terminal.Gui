@@ -180,16 +180,16 @@ public class UnicodeInMenu : Scenario
         label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "OptionSelector:" };
         appWindow.Add (label);
 
-        var radioGroup = new OptionSelector
+        var optionSelector = new OptionSelector
         {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
             Labels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
         };
-        appWindow.Add (radioGroup);
+        appWindow.Add (optionSelector);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (optionSelector) + 1, Text = "TextField:" };
         appWindow.Add (label);
 
         var textField = new TextField
