@@ -64,6 +64,7 @@ public class ApplicationImpl : IApplication
     }
 
     private IKeyboard? _keyboard;
+    private bool _stopAfterFirstIteration;
 
     /// <summary>
     /// Handles keyboard input and key bindings at the Application level
@@ -188,6 +189,13 @@ public class ApplicationImpl : IApplication
 
     /// <inheritdoc/>
     public void RequestStop () => RequestStop (null);
+
+    /// <inheritdoc />
+    public bool StopAfterFirstIteration
+    {
+        get => _stopAfterFirstIteration;
+        set => _stopAfterFirstIteration = value;
+    }
 
     /// <summary>
     /// Creates a new instance of the Application backend.
@@ -426,6 +434,7 @@ public class ApplicationImpl : IApplication
 
         _top.Running = true;
 
+        bool firstIteration = true;
         while (_topLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
             if (_coordinator is null)
@@ -434,6 +443,11 @@ public class ApplicationImpl : IApplication
             }
 
             _coordinator.RunIteration ();
+            if (StopAfterFirstIteration && firstIteration)
+            {
+                Logging.Information ("Run - Stopping after first iteration as requested");
+                view.Running = false;
+            }
         }
 
         Logging.Information ($"Run - Calling End");
