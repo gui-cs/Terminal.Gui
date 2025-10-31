@@ -22,7 +22,7 @@ public partial class GuiTestContext : IDisposable
     internal FakeWindowsInput? _winInput;
     internal FakeNetInput? _netInput;
     internal FakeUnixInput? _unixInput;
-    internal FakeInput<ConsoleKeyInfo>? _fakeInput;
+    internal FakeFakeConsoleInput? _fakeInput;
     internal View? _lastView;
     private readonly object _logsLock = new ();
     private StringBuilder? _logsSb;
@@ -188,7 +188,7 @@ public partial class GuiTestContext : IDisposable
 
                 break;
             case TestDriver.Fake:
-                cf = new FakeComponentFactory (_fakeInput, _output);
+                cf = new FakeFakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
         }

@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 /// Fake console input for testing that can return predefined input or wait indefinitely.
 /// </summary>
-public class FakeConsoleInput : ConsoleInput<ConsoleKeyInfo>
+public class FakeConsoleInput : ConsoleInput<ConsoleKeyInfo>, IFakeConsoleInput
 {
     private readonly FakeInput<ConsoleKeyInfo>? _predefinedInput;
 
