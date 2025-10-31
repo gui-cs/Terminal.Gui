@@ -13,6 +13,9 @@ public class FakeOutput : OutputBase, IConsoleOutput
     private int _cursorTop;
     private Size _consoleSize = new (80, 25);
 
+    /// <summary>
+    /// 
+    /// </summary>
     public FakeOutput ()
     {
         LastBuffer = new OutputBuffer ();

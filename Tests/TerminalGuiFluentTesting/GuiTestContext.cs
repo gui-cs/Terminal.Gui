@@ -170,7 +170,7 @@ public partial class GuiTestContext : IDisposable
             _output.SetSize (width, height);
         }
 
-        _sizeMonitor = new (_output, _output.LastBuffer!);
+        _sizeMonitor = new (_output);
         IComponentFactory? cf = null;
 
         switch (driver)

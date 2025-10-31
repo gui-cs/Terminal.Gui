@@ -20,7 +20,7 @@ public class FakeApplicationFactory
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        ConsoleSizeMonitor sizeMonitor = new (output, output.LastBuffer!);
+        ConsoleSizeMonitor sizeMonitor = new (output);
 
         var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
 

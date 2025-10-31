@@ -44,6 +44,6 @@ public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
     /// <inheritdoc />
     public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        return new ConsoleSizeMonitor (consoleOutput, outputBuffer);
+        return new ConsoleSizeMonitor (consoleOutput);
     }
 }

@@ -18,7 +18,7 @@ public abstract class ComponentFactory<T> : IComponentFactory<T>
     /// <inheritdoc />
     public virtual IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        return new ConsoleSizeMonitor (consoleOutput, outputBuffer);
+        return new ConsoleSizeMonitor (consoleOutput);
     }
 
     /// <inheritdoc />
