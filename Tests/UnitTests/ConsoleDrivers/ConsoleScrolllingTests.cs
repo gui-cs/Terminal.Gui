@@ -15,7 +15,7 @@ public class ConsoleScrollingTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
 
     ////[InlineData (typeof (DotNetDriver))]
     //[InlineData (typeof (ANSIDriver))]
@@ -23,7 +23,7 @@ public class ConsoleScrollingTests
     ////[InlineData (typeof (UnixDriver))]
     public void Left_And_Top_Is_Always_Zero (Type driverType)
     {
-        var driver = (FakeConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (LegacyFakeConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         Assert.Equal (0, Console.WindowLeft);

@@ -5,7 +5,7 @@ namespace UnitTests.ViewsTests;
 public class ColorPickerTests
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_ChangeValueOnUI_UpdatesAllUIElements ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true);
@@ -66,7 +66,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_ClickingAtEndOfBar_SetsMaxValue ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
@@ -102,7 +102,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_ClickingBeyondBar_ChangesToMaxValue ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
@@ -138,7 +138,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_ClickingDifferentBars_ChangesFocus ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
@@ -193,7 +193,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_Construct_DefaultValue ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.HSV, false);
@@ -224,7 +224,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_DisposesOldViews_OnModelChange ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.HSL, true);
@@ -271,7 +271,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_EnterHexFor_ColorName ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
@@ -327,7 +327,7 @@ public class ColorPickerTests
     ///     of tabbing to the next view.
     /// </summary>
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_EnterHexFor_ColorName_AcceptVariation ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
@@ -379,7 +379,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_InvalidHexInput_DoesNotChangeColor ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true);
@@ -419,7 +419,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_RGB_KeyboardNavigation ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
@@ -478,7 +478,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_RGB_MouseNavigation ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
@@ -533,7 +533,7 @@ public class ColorPickerTests
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [MemberData (nameof (ColorPickerTestData))]
     public void ColorPicker_RGB_NoText (
         Color c,
@@ -570,7 +570,7 @@ public class ColorPickerTests
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [MemberData (nameof (ColorPickerTestData_WithTextFields))]
     public void ColorPicker_RGB_NoText_WithTextFields (
         Color c,
@@ -616,7 +616,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_SwitchingColorModels_ResetsBars ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
@@ -663,7 +663,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_SyncBetweenTextFieldAndBars ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true);
@@ -701,7 +701,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ColorPicker_TabCompleteColorName ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);

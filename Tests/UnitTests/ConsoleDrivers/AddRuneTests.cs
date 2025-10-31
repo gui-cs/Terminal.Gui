@@ -17,7 +17,7 @@ public class AddRuneTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -40,7 +40,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         var expected = new Rune ('ắ');
@@ -91,7 +91,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_InvalidLocation_DoesNothing ()
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         driver.Move (driver.Cols, driver.Rows);
@@ -111,7 +111,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_MovesToNextColumn ()
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         driver.AddRune ('a');
@@ -153,7 +153,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_MovesToNextColumn_Wide ()
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         // 🍕 Slice of Pizza "\U0001F355"

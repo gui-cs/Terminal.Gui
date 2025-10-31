@@ -94,7 +94,7 @@ public class ApplicationScreenTests
         // Arrange
         Application.ResetState (true);
         Assert.Null (Application.Driver);
-        Application.Driver = new FakeConsoleDriver { Rows = 25, Cols = 25 };
+        Application.Driver = new LegacyFakeConsoleDriver { Rows = 25, Cols = 25 };
         Application.SubscribeDriverEvents ();
         Assert.Equal (new (0, 0, 25, 25), Application.Screen);
 

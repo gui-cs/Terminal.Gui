@@ -279,13 +279,8 @@ public class ApplicationTests
         LegacyConsoleDriver.RunningUnitTests = false;
     }
 
-    [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
-
-    //[InlineData (typeof (DotNetDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void Init_ResetState_Resets_Properties (Type driverType)
+    [Fact]
+    public void Init_ResetState_Resets_Properties ()
     {
         ThrowOnJsonErrors = true;
 
@@ -293,7 +288,7 @@ public class ApplicationTests
 
         // Set some values
 
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: "fake");
 
         // Application.IsInitialized = true;
 
@@ -418,20 +413,15 @@ public class ApplicationTests
     [Fact]
     public void Shutdown_Alone_Does_Nothing () { Application.Shutdown (); }
 
-    [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
-
-    //[InlineData (typeof (DotNetDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
+    [Fact]
+    public void Init_Shutdown_Fire_InitializedChanged ()
     {
         var initialized = false;
         var shutdown = false;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: "fake");
         Assert.True (initialized);
         Assert.False (shutdown);
 
@@ -673,13 +663,13 @@ public class ApplicationTests
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
         // Using another type not derived from Toplevel will throws at compile time
-        Application.Run<Window> (null, new FakeConsoleDriver ());
+        Application.Run<Window> (null, new LegacyFakeConsoleDriver ());
         Assert.True (Application.Top is Window);
 
         Application.Top!.Dispose ();
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
-        Application.Run<Dialog> (null, new FakeConsoleDriver ());
+        Application.Run<Dialog> (null, new LegacyFakeConsoleDriver ());
         Assert.True (Application.Top is Dialog);
 
         Application.Top!.Dispose ();
@@ -786,7 +776,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         Application.Run<Toplevel> ();
-        Assert.Equal (typeof (FakeConsoleDriver), Application.Driver?.GetType ());
+        Assert.Equal (typeof (LegacyFakeConsoleDriver), Application.Driver?.GetType ());
 
         Application.Top!.Dispose ();
         Application.Shutdown ();
@@ -802,7 +792,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-        Application.Run<Toplevel> (null, new FakeConsoleDriver ());
+        Application.Run<Toplevel> (null, new LegacyFakeConsoleDriver ());
 
         Application.Top!.Dispose ();
         Application.Shutdown ();
@@ -969,7 +959,7 @@ public class ApplicationTests
     [Fact]
     public void Run_Creates_Top_Without_Init ()
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1002,7 +992,7 @@ public class ApplicationTests
     [Fact]
     public void Run_T_Creates_Top_Without_Init ()
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1038,7 +1028,7 @@ public class ApplicationTests
         // The Application.Run(new(Toplevel)) must always call Application.Init() first because
         // the new(Toplevel) may be a derived class that is possible using Application static
         // properties that is only available after the Application.Init was called
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
 
         Assert.Null (Application.Top);
 

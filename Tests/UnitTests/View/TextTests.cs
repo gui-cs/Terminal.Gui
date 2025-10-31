@@ -9,7 +9,7 @@ namespace UnitTests.ViewTests;
 public class TextTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Setting_With_Height_Horizontal ()
     {
         var top = new View { Width = 25, Height = 25 };
@@ -442,7 +442,7 @@ Y
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void DimAuto_Vertical_TextDirection_Wide_Rune ()
     {
         var text = "界View";
@@ -995,7 +995,7 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Narrow_Wide_Runes ()
     {
         Application.Driver!.SetScreenSize (32, 32);
@@ -1118,7 +1118,7 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetText_RendersCorrectly ()
     {
         View view;

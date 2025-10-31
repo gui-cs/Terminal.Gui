@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Mock implementation of the .NET Console API for use in tests. Used by
-///     <exception cref="FakeConsoleDriver"></exception>.
+///     <exception cref="LegacyFakeConsoleDriver"></exception>.
 /// </summary>
 public static class FakeConsole
 {

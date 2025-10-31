@@ -6960,7 +6960,7 @@ line.
 
         public override void Before (MethodInfo methodUnderTest)
         {
-            FakeConsoleDriver.FakeBehaviors.UseFakeClipboard = true;
+            LegacyFakeConsoleDriver.FakeBehaviors.UseFakeClipboard = true;
             base.Before (methodUnderTest);
 
             //                   1         2         3 

@@ -17,7 +17,7 @@ public class ContentsTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -35,7 +35,7 @@ public class ContentsTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -91,7 +91,7 @@ public class ContentsTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]

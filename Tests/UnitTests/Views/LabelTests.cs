@@ -298,7 +298,7 @@ e
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Full_Border ()
     {
         var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
@@ -889,7 +889,7 @@ e
     // TODO: This is a Label test. Move to Label tests.
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Label_Height_Zero_Stays_Zero ()
     {
         Application.Driver!.SetScreenSize (10, 4);
@@ -1319,7 +1319,7 @@ e
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3893
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestLabelUnderscoreMinus ()
     {
         var lbl = new Label

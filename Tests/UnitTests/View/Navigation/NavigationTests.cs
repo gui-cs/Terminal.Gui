@@ -7,7 +7,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_AtLeastOneNavKey_Advances (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -92,7 +92,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_HasFocus_Changed_Event (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -257,7 +257,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_Visible_False_No_HasFocus_Events (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);

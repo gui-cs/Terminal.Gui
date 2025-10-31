@@ -9,7 +9,7 @@ public class DriverColorTests
     public DriverColorTests () { LegacyConsoleDriver.RunningUnitTests = true; }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -27,7 +27,7 @@ public class DriverColorTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -55,7 +55,7 @@ public class DriverColorTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver), false)]
+    [InlineData (typeof (LegacyFakeConsoleDriver), false)]
     //[InlineData (typeof (DotNetDriver), true)]
 
     //[InlineData (typeof (ANSIDriver), true)]

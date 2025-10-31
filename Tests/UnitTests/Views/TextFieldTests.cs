@@ -1617,7 +1617,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };

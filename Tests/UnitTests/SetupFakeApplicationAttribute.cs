@@ -9,14 +9,10 @@ namespace UnitTests;
 
 /// <summary>
 ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
-///     FakeDriver(). The driver is set up with 25 rows and columns.
+///     FakeDriver(). The driver is set up with 80 rows and 25 columns.
 /// </summary>
-/// <remarks>
-///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
-///     On After, sets Configuration.Locations to ConfigLocations.All.
-/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
-public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
+public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
 {
     private IDisposable? _appDispose = null!;
     public override void Before (MethodInfo methodUnderTest)

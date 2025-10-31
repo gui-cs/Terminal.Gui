@@ -198,7 +198,7 @@ internal partial class DriverAssert
     {
         List<List<Rune>> lines = [];
         var sb = new StringBuilder ();
-        driver ??= Application.Driver;
+        driver ??= ApplicationImpl.Instance.Driver;
 
         int x = -1;
         int y = -1;

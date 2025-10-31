@@ -249,7 +249,7 @@ public class ToplevelTests
 
         var win = new Window ();
         win.Add (view);
-        Application.Init (new FakeConsoleDriver ());
+        Application.Init (new LegacyFakeConsoleDriver ());
         Toplevel top = new ();
         top.Add (win);
 
@@ -498,7 +498,7 @@ public class ToplevelTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void GetLocationThatFits_With_Border_Null_Not_Throws ()
     {
         var top = new Toplevel ();
@@ -742,7 +742,7 @@ public class ToplevelTests
     [Fact]
     public void Multi_Thread_Toplevels ()
     {
-        Application.Init (new FakeConsoleDriver ());
+        Application.Init (new LegacyFakeConsoleDriver ());
 
         Toplevel t = new ();
         var w = new Window ();

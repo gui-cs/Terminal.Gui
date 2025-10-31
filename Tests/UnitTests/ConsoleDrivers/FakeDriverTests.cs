@@ -167,7 +167,7 @@ public class FakeDriverTests (ITestOutputHelper output)
     #region SetupFakeDriver Attribute Tests
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetupFakeDriver_Initializes_Driver_With_80x25 ()
     {
         Assert.NotNull (Application.Driver);
@@ -177,7 +177,7 @@ public class FakeDriverTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetupFakeDriver_Driver_Is_IConsoleDriver ()
     {
         Assert.NotNull (Application.Driver);
@@ -189,7 +189,7 @@ public class FakeDriverTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetupFakeDriver_Can_Set_Screen_Size ()
     {
         IConsoleDriver fakeDriver = Application.Driver;

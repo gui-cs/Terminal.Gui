@@ -29,7 +29,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_No_Focus_Returns_False ()
     {
         Application.Navigation = new ();
@@ -50,7 +50,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_No_Position_Returns_False ()
     {
         Application.Navigation = new ();
@@ -68,7 +68,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_No_IntersectSuperView_Returns_False ()
     {
         Application.Navigation = new ();
@@ -96,7 +96,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_Position_OutSide_SuperView_Returns_False ()
     {
         Application.Navigation = new ();
@@ -124,7 +124,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_Focused_With_Position_Returns_True ()
     {
         Application.Navigation = new ();
@@ -142,7 +142,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_Defaults_Invisible ()
     {
         Application.Navigation = new ();

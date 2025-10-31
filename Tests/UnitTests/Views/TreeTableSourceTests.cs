@@ -27,7 +27,7 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
         Application.Driver!.SetScreenSize (100, 100);
@@ -88,7 +88,7 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
         Application.Driver!.SetScreenSize (100, 100);

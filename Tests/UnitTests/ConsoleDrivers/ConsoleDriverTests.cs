@@ -17,7 +17,7 @@ public class ConsoleDriverTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -41,7 +41,7 @@ public class ConsoleDriverTests
     // public void FakeDriver_MockKeyPresses (Type driverType)
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]
@@ -118,7 +118,7 @@ public class ConsoleDriverTests
     //}
 
     [Theory]
-    [InlineData (typeof (FakeConsoleDriver))]
+    [InlineData (typeof (LegacyFakeConsoleDriver))]
     //[InlineData (typeof (DotNetDriver))]
 
     //[InlineData (typeof (ANSIDriver))]

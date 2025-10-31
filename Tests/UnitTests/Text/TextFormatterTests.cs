@@ -15,7 +15,7 @@ public class TextFormatterTests
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 1, 0, "")]
     [InlineData ("A", 0, 1, "")]
@@ -43,7 +43,7 @@ public class TextFormatterTests
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 1, 0, "")]
     [InlineData ("A", 0, 1, "")]
@@ -71,7 +71,7 @@ public class TextFormatterTests
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
 
     // Horizontal with Alignment.Start
@@ -3489,7 +3489,7 @@ public class TextFormatterTests
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 0, 1, "", 0)]
     [InlineData ("A", 1, 1, "A", 0)]
@@ -3528,7 +3528,7 @@ public class TextFormatterTests
         Assert.Equal (expectedY, rect.Y);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 1, 0, "")]
     [InlineData ("A", 0, 1, "")]
@@ -3556,7 +3556,7 @@ public class TextFormatterTests
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 1, 0, "")]
     [InlineData ("A", 0, 1, "")]
@@ -3590,7 +3590,7 @@ public class TextFormatterTests
     [TestRespondersDisposed]
     public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new FakeConsoleDriver ());
+        Application.Init (new LegacyFakeConsoleDriver ());
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
@@ -3622,7 +3622,7 @@ public class TextFormatterTests
         Application.Shutdown ();
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 5, 5, "A")]
     [InlineData (
@@ -3675,7 +3675,7 @@ s")]
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
 
     // The expectedY param is to probe that the expectedText param start at that Y coordinate
@@ -3725,7 +3725,7 @@ s")]
         Assert.Equal (expectedY, rect.Y);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("A", 5, "A")]
     [InlineData (
@@ -3799,7 +3799,7 @@ ssb
                 )]
     public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         var text = "Les Mise\u0328\u0301rables";
@@ -3825,7 +3825,7 @@ ssb
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void FillRemaining_True_False ()
     {
         Application.Driver!.SetScreenSize (22, 5);
@@ -3881,7 +3881,7 @@ ssb
                                                 attrs);
     }
 
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Theory]
     [InlineData ("Hello World", 15, 1, "Hello     World")]
     [InlineData (
@@ -3927,7 +3927,7 @@ Nice       Work")]
         string expected
     )
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         var text = "This is a \tTab";
@@ -3966,7 +3966,7 @@ Nice       Work")]
         string expected
     )
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         var text = "This is a \tTab";
@@ -4006,7 +4006,7 @@ Nice       Work")]
         string expected
     )
     {
-        var driver = new FakeConsoleDriver ();
+        var driver = new LegacyFakeConsoleDriver ();
         driver.Init ();
 
         var text = "This is a \tTab";
@@ -4034,7 +4034,7 @@ Nice       Work")]
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void UICatalog_AboutBox_Text ()
     {
         TextFormatter tf = new ()
@@ -4080,7 +4080,7 @@ Nice       Work")]
     // TODO: Add other TextDirection examples
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData ("界1234", 10, 10, TextDirection.LeftRight_TopBottom, 6, 1, @"界1234")]
     [InlineData ("01234", 10, 10, TextDirection.LeftRight_TopBottom, 5, 1, @"01234")]
     [InlineData (
@@ -4185,7 +4185,7 @@ Nice       Work")]
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData ("界1234", 10, 10, TextDirection.LeftRight_TopBottom, 6, 1, @"界1234")]
     [InlineData ("01234", 10, 10, TextDirection.LeftRight_TopBottom, 5, 1, @"01234")]
     [InlineData (

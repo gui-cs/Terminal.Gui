@@ -6,7 +6,7 @@ namespace UnitTests.LayoutTests;
 public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
-    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
+    [SetupFakeApplication] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
