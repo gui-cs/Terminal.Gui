@@ -87,11 +87,6 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void ContextMenu_CrashesOnRight (TestDriver d)
     {
-        if (d == TestDriver.Fake)
-        {
-            return;
-        }
-
         var clicked = false;
 
         MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
@@ -122,11 +117,6 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void ContextMenu_OpenSubmenu (TestDriver d)
     {
-        if (d == TestDriver.Fake)
-        {
-            return;
-        }
-
         var clicked = false;
 
         MenuItemv2 [] menuItems =

@@ -277,6 +277,20 @@ public partial class GuiTestContext
                 }
 
                 break;
+            case TestDriver.Unix:
+                foreach (ConsoleKeyInfo k in NetSequences.Up)
+                {
+                    SendUnixKey (k.KeyChar);
+                }
+
+                break;
+            case TestDriver.Fake:
+                foreach (ConsoleKeyInfo k in NetSequences.Up)
+                {
+                    SendFakeKey (k);
+                }
+
+                break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
