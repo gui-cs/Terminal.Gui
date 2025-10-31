@@ -84,7 +84,7 @@ public class ViewCommandTests
     [Fact (Skip = "Failing as part of ##4270. Disabling temporarily.")]
     public void Button_CanFocus_False_Raises_Accepted_Correctly ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (new FakeConsoleDriver ());
         var wAcceptedCount = 0;
         var wCancelAccepting = false;
 

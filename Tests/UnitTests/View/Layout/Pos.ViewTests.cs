@@ -14,7 +14,7 @@ public class PosViewTests (ITestOutputHelper output)
     [TestRespondersDisposed]
     public void Subtract_Operator ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (new FakeConsoleDriver ());
 
         var top = new Toplevel ();
 

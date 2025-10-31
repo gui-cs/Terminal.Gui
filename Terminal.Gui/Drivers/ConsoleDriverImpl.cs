@@ -12,7 +12,7 @@ namespace Terminal.Gui.Drivers;
 /// - WindowsDriver optimized for Windows.
 /// - FakeDriver for unit testing.
 /// </remarks>
-public abstract class ConsoleDriver : IConsoleDriver
+public abstract class ConsoleDriverImpl : IConsoleDriver
 {
     /// <summary>
     ///     Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
@@ -37,7 +37,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     // QUESTION: This appears to be an API to help in debugging. It's only implemented in UnixDriver and WindowsDriver.
     // QUESTION: Can it be factored such that it does not contaminate the ConsoleDriver API?
     /// <summary>
-    ///     Provide proper writing to send escape sequence recognized by the <see cref="ConsoleDriver"/>.
+    ///     Provide proper writing to send escape sequence recognized by the <see cref="IConsoleDriver"/>.
     /// </summary>
     /// <param name="ansi"></param>
     public abstract void WriteRaw (string ansi);
@@ -741,7 +741,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     internal abstract IAnsiResponseParser GetParser ();
 
     /// <summary>
-    ///     Gets the <see cref="AnsiRequestScheduler"/> for this <see cref="ConsoleDriver"/>.
+    ///     Gets the <see cref="AnsiRequestScheduler"/> for this <see cref="ConsoleDriverImpl"/>.
     /// </summary>
     /// <returns></returns>
     public AnsiRequestScheduler GetRequestScheduler ()

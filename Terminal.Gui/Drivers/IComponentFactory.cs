@@ -33,7 +33,7 @@ public interface IComponentFactory<T> : IComponentFactory
     IConsoleInput<T> CreateInput ();
 
     /// <summary>
-    /// Creates the <see cref="InputProcessor{T}"/> class for the current driver implementation i.e. the class responsible for
+    /// Creates the <see cref="InputProcessorImpl{T}"/> class for the current driver implementation i.e. the class responsible for
     /// translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="MouseEventArgs"/>.
     /// </summary>
     /// <param name="inputBuffer"></param>

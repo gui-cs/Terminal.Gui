@@ -3,9 +3,9 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Input processor for <see cref="NetInput"/>, deals in <see cref="ConsoleKeyInfo"/> stream
+///     Input processor for <see cref="NetConsoleInput"/>, deals in <see cref="ConsoleKeyInfo"/> stream
 /// </summary>
-public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
+public class NetInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
 {
 #pragma warning disable CA2211
     /// <summary>

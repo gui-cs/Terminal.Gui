@@ -7,41 +7,29 @@ namespace UnitTests.ApplicationTests;
 
 public class ApplicationImplTests
 {
-    public ApplicationImplTests () { ConsoleDriver.RunningUnitTests = true; }
+    public ApplicationImplTests () { ConsoleDriverImpl.RunningUnitTests = true; }
 
-    private ApplicationImpl NewApplicationImpl (TestDriver driver = TestDriver.DotNet)
+    /// <summary>
+    ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.
+    /// </summary>
+    private ApplicationImpl NewMockedApplicationImpl ()
     {
-        if (driver == TestDriver.DotNet)
-        {
-            Mock<INetInput> netInput = new ();
-            SetupRunInputMockMethodToBlock (netInput);
+        Mock<INetConsoleInput> netInput = new ();
+        SetupRunInputMockMethodToBlock (netInput);
 
-            Mock<IComponentFactory<ConsoleKeyInfo>> m = new ();
-            m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
-            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of<IInputProcessor> ());
+        Mock<IComponentFactory<ConsoleKeyInfo>> m = new ();
+        m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
+        m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of<IInputProcessor> ());
 
-            Mock<IConsoleOutput> consoleOutput = new ();
-            var size = new Size (80, 25);
-            consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ()))
-                         .Callback<int, int> ((w, h) => size = new Size (w, h));
-            consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
-            m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
-            m.Setup (f => f.CreateConsoleSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
+        Mock<IConsoleOutput> consoleOutput = new ();
+        var size = new Size (80, 25);
+        consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ()))
+                     .Callback<int, int> ((w, h) => size = new Size (w, h));
+        consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
+        m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
+        m.Setup (f => f.CreateConsoleSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
 
-            return new (m.Object);
-        }
-        else
-        {
-            Mock<IConsoleInput<WindowsConsole.InputRecord>> winInput = new ();
-            SetupRunInputMockMethodToBlock (winInput);
-            Mock<IComponentFactory<WindowsConsole.InputRecord>> m = new ();
-            m.Setup (f => f.CreateInput ()).Returns (winInput.Object);
-            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<WindowsConsole.InputRecord>> ())).Returns (Mock.Of<IInputProcessor> ());
-            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
-            m.Setup (f => f.CreateConsoleSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
-
-            return new (m.Object);
-        }
+        return new (m.Object);
     }
 
     [Fact]
@@ -49,7 +37,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Application.KeyBindings.Clear ();
@@ -70,7 +58,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Driver);
@@ -185,7 +173,7 @@ public class ApplicationImplTests
                 .Verifiable (Times.Once);
     }
 
-    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
+    private void SetupRunInputMockMethodToBlock (Mock<INetConsoleInput> netInput)
     {
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
                 .Callback<CancellationToken> (token =>
@@ -206,7 +194,7 @@ public class ApplicationImplTests
         IApplication orig = ApplicationImpl.Instance;
 
         Assert.Null (Application.Driver);
-        ApplicationImpl app = NewApplicationImpl ();
+        ApplicationImpl app = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (app);
 
         var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));
@@ -221,7 +209,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "fake");
@@ -262,7 +250,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "fake");
@@ -307,12 +295,65 @@ public class ApplicationImplTests
         ApplicationImpl.ChangeInstance (orig);
     }
 
+
+    [Fact]
+    public void InitRunShutdown_StopAfterFirstIteration_Stops ()
+    {
+        IApplication orig = ApplicationImpl.Instance;
+
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
+        ApplicationImpl.ChangeInstance (v2);
+
+        Assert.Null (Application.Top);
+        Assert.Null (Application.Driver);
+
+        v2.Init (null, "fake");
+
+        Toplevel top = new Window ();
+
+        var closedCount = 0;
+
+        top.Closed
+            += (_, a) => { closedCount++; };
+
+        var unloadedCount = 0;
+
+        top.Unloaded
+            += (_, a) => { unloadedCount++; };
+
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 Assert.Fail (@"Didn't stop after first iteration.");
+                                                 return false;
+                                             }
+                                            );
+
+        Assert.Equal (0, closedCount);
+        Assert.Equal (0, unloadedCount);
+
+        v2.StopAfterFirstIteration = true;
+        v2.Run (top);
+
+        Assert.Equal (1, closedCount);
+        Assert.Equal (1, unloadedCount);
+
+        Application.Top?.Dispose ();
+        v2.Shutdown ();
+        Assert.Equal (1, closedCount);
+        Assert.Equal (1, unloadedCount);
+
+        ApplicationImpl.ChangeInstance (orig);
+    }
+
+
     [Fact]
     public void InitRunShutdown_End_Is_Called ()
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Top);
@@ -375,7 +416,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "fake");
@@ -423,7 +464,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "fake");
@@ -448,7 +489,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "fake");
@@ -536,7 +577,7 @@ public class ApplicationImplTests
     {
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         v2.Init (null, "fake");
@@ -602,7 +643,7 @@ public class ApplicationImplTests
         // This test verifies that ApplicationImpl uses instance fields instead of static Application references
         IApplication orig = ApplicationImpl.Instance;
 
-        ApplicationImpl v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         // Before Init, all fields should be null/default

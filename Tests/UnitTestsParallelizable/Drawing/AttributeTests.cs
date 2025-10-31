@@ -103,7 +103,7 @@ public class AttributeTests
     [Fact]
     public void Constructors_Construct ()
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
         driver.Init ();
 
         // Test parameterless constructor
@@ -258,7 +258,7 @@ public class AttributeTests
     [Fact]
     public void Make_Creates ()
     {
-        var driver = new FakeDriver ();
+        var driver = new FakeConsoleDriver ();
         driver.Init ();
 
         var fg = new Color ();

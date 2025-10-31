@@ -57,7 +57,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public IOutputBuffer OutputBuffer { get; } = new OutputBuffer ();
+    public IOutputBuffer OutputBuffer { get; } = new OutputBufferImpl ();
 
     /// <inheritdoc/>
     public IConsoleOutput Out

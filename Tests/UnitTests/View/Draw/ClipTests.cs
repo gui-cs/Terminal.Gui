@@ -273,6 +273,7 @@ public class ClipTests (ITestOutputHelper _output)
     public void SetClip_Default_ClipsToViewport ()
     {
         // Screen is 25x25
+        Application.Driver!.SetScreenSize (25, 25);
         // View is 25x25
         // Viewport is (0, 0, 23, 23)
         // ContentSize is (10, 10)

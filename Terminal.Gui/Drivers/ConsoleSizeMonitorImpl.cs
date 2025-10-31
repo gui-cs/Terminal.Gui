@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <inheritdoc />
-internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer _) : IConsoleSizeMonitor
+internal class ConsoleSizeMonitorImpl (IConsoleOutput consoleOut) : IConsoleSizeMonitor
 {
     private Size _lastSize = Size.Empty;
 
@@ -14,11 +14,6 @@ internal class ConsoleSizeMonitor (IConsoleOutput consoleOut, IOutputBuffer _) :
     /// <inheritdoc/>
     public bool Poll ()
     {
-        //if (ConsoleDriver.RunningUnitTests)
-        //{
-        //    return false;
-        //}
-
         Size size = consoleOut.GetSize ();
 
         if (size != _lastSize)

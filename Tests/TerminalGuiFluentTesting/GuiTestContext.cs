@@ -18,17 +18,17 @@ public partial class GuiTestContext : IDisposable
     private CancellationTokenSource? _hardStop;
     private readonly Task? _runTask;
     internal Exception? _ex;
-    internal readonly FakeOutput _output = new ();
-    internal FakeWindowsInput? _winInput;
-    internal FakeNetInput? _netInput;
-    internal FakeUnixInput? _unixInput;
-    internal FakeFakeInput? _fakeInput;
+    internal readonly FakeConsoleOutput _output = new ();
+    internal NoOpWindowsInput? _winInput;
+    internal NoOpNetInput? _netInput;
+    internal NoOpUnixInput? _unixInput;
+    internal NoOpFakeInput? _fakeInput;
     internal View? _lastView;
     private readonly object _logsLock = new ();
     private StringBuilder? _logsSb;
     internal TestDriver _driver;
     internal bool _finished;
-    private ConsoleSizeMonitor? _sizeMonitor;
+    private ConsoleSizeMonitorImpl? _sizeMonitor;
     internal TimeSpan _timeout;
     private IApplication? _origApp;
     private ILogger? _origLogger;
@@ -170,7 +170,7 @@ public partial class GuiTestContext : IDisposable
             _output.SetSize (width, height);
         }
 
-        _sizeMonitor = new (_output, _output.LastBuffer!);
+        _sizeMonitor = new (_output);
         IComponentFactory? cf = null;
 
         switch (driver)

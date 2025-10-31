@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixInput : ConsoleInput<char>, IUnixInput
+internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
 {
     private const int STDIN_FILENO = 0;
 
@@ -104,11 +104,11 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
 
     private Pollfd [] _pollMap;
 
-    public UnixInput ()
+    public UnixConsoleInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (UnixInput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (UnixConsoleInput)}");
 
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }
@@ -170,7 +170,7 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
     {
         try
         {
-            if (ConsoleDriver.RunningUnitTests)
+            if (ConsoleDriverImpl.RunningUnitTests)
             {
                 return false;
             }
@@ -194,7 +194,7 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
     }
     private void WriteRaw (string text)
     {
-        if (!ConsoleDriver.RunningUnitTests)
+        if (!ConsoleDriverImpl.RunningUnitTests)
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (text);
             // Write to stdout (fd 1)
@@ -224,7 +224,7 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
 
     private void FlushConsoleInput ()
     {
-        if (!ConsoleDriver.RunningUnitTests)
+        if (!ConsoleDriverImpl.RunningUnitTests)
         {
             var fds = new Pollfd [1];
             fds [0].fd = STDIN_FILENO;
@@ -242,7 +242,7 @@ internal class UnixInput : ConsoleInput<char>, IUnixInput
     {
         base.Dispose ();
 
-        if (!ConsoleDriver.RunningUnitTests)
+        if (!ConsoleDriverImpl.RunningUnitTests)
         {
             // Disable mouse events first
             WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);

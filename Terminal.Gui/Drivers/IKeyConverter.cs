@@ -2,7 +2,7 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Interface for subcomponent of a <see cref="InputProcessor{T}"/> which
+///     Interface for subcomponent of a <see cref="InputProcessorImpl{T}"/> which
 ///     can translate the raw console input type T (which typically varies by
 ///     driver) to the shared Terminal.Gui <see cref="Key"/> class.
 /// </summary>

@@ -9,7 +9,7 @@ namespace Terminal.Gui.Drivers;
 ///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
 ///     events and data models.
 /// </summary>
-public abstract class InputProcessor<T> : IInputProcessor
+public abstract class InputProcessorImpl<T> : IInputProcessor
 {
     /// <summary>
     ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
@@ -51,7 +51,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     /// <param name="a"></param>
     public void OnKeyDown (Key a)
     {
-        Logging.Trace ($"{nameof (InputProcessor<T>)} raised {a}");
+        Logging.Trace ($"{nameof (InputProcessorImpl<T>)} raised {a}");
         KeyDown?.Invoke (this, a);
     }
 
@@ -99,7 +99,7 @@ public abstract class InputProcessor<T> : IInputProcessor
     ///     Key converter for translating driver specific
     ///     <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.
     /// </param>
-    protected InputProcessor (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
+    protected InputProcessorImpl (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
     {
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
@@ -117,7 +117,7 @@ public abstract class InputProcessor<T> : IInputProcessor
         Parser.UnexpectedResponseHandler = str =>
                                            {
                                                var cur = new string (str.Select (k => k.Item1).ToArray ());
-                                               Logging.Logger.LogInformation ($"{nameof (InputProcessor<T>)} ignored unrecognized response '{cur}'");
+                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<T>)} ignored unrecognized response '{cur}'");
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 
                                                return true;

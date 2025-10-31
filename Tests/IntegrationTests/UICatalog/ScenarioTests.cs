@@ -617,7 +617,7 @@ public class ScenarioTests : TestsAllViews
         int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
         // by adding this Space it seems to work.

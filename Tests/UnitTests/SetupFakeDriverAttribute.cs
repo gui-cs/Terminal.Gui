@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿#nullable enable
+using System.Diagnostics;
 using System.Reflection;
+using JetBrains.Annotations;
 using TerminalGuiFluentTesting;
 using Xunit.Sdk;
 
@@ -16,16 +18,15 @@ namespace UnitTests;
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
+    private IDisposable? _appDispose = null!;
+
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
 
-        // Turn off diagnostic flags in case some test left them on
-        View.Diagnostics = ViewDiagnosticFlags.Off;
+        _appDispose?.Dispose ();
+        _appDispose = null;
 
-        Application.ResetState (true);
-        Assert.Null (Application.Driver);
-        Assert.Equal (new (0, 0, 2048, 2048), Application.Screen);
         base.After (methodUnderTest);
     }
 
@@ -33,17 +34,10 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
-        Application.ResetState (true);
-        Assert.Null (Application.Driver);
+        Assert.Null (_appDispose);
 
-        var driver = new FakeDriver ();
-
-        Application.Driver = driver;
-        driver.SetScreenSize (25, 25);
-
-        Assert.Equal (new (0, 0, 25, 25), Application.Screen);
-        // Ensures subscribing events, at least for the SizeChanged event
-        Application.SubscribeDriverEvents ();
+        var appFactory = new FakeApplicationFactory ();
+        _appDispose = appFactory.SetupFakeApplication ();
 
         base.Before (methodUnderTest);
     }

@@ -7,7 +7,7 @@ namespace Terminal.Gui.Drivers;
 ///     Base class for reading console input in perpetual loop
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class ConsoleInput<T> : IConsoleInput<T>
+public abstract class ConsoleInputImpl<T> : IConsoleInput<T>
 {
     private ConcurrentQueue<T>? _inputBuffer;
 

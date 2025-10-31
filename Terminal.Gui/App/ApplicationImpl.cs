@@ -189,6 +189,9 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public void RequestStop () => RequestStop (null);
 
+    /// <inheritdoc />
+    public bool StopAfterFirstIteration { get; set; }
+
     /// <summary>
     /// Creates a new instance of the Application backend.
     /// </summary>
@@ -293,8 +296,7 @@ public class ApplicationImpl : IApplication
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
-            FakeOutput fakeOutput = new ();
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
+            _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
@@ -310,10 +312,9 @@ public class ApplicationImpl : IApplication
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            if (ConsoleDriver.RunningUnitTests)
+            if (ConsoleDriverImpl.RunningUnitTests)
             {
-                FakeOutput fakeOutput = new ();
-                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
+                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
             }
             else
             {
@@ -322,10 +323,9 @@ public class ApplicationImpl : IApplication
         }
         else
         {
-            if (ConsoleDriver.RunningUnitTests)
+            if (ConsoleDriverImpl.RunningUnitTests)
             {
-                FakeOutput fakeOutput = new ();
-                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, fakeOutput));
+                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
             }
             else
             {
@@ -341,7 +341,7 @@ public class ApplicationImpl : IApplication
             throw new ("Driver was null even after booting MainLoopCoordinator");
         }
 
-        if (!ConsoleDriver.RunningUnitTests && _driver.Screen.IsEmpty)
+        if (!ConsoleDriverImpl.RunningUnitTests && _driver.Screen.IsEmpty)
         {
             throw new InvalidOperationException (
                                                  "Driver.Screen is empty after Init. The driver should set the screen size during Init.");
@@ -426,6 +426,7 @@ public class ApplicationImpl : IApplication
 
         _top.Running = true;
 
+        bool firstIteration = true;
         while (_topLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
         {
             if (_coordinator is null)
@@ -434,6 +435,11 @@ public class ApplicationImpl : IApplication
             }
 
             _coordinator.RunIteration ();
+            if (StopAfterFirstIteration && firstIteration)
+            {
+                Logging.Information ("Run - Stopping after first iteration as requested");
+                view.RequestStop ();
+            }
         }
 
         Logging.Information ($"Run - Calling End");

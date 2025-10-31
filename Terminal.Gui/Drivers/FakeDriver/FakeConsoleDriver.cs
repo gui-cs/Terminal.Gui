@@ -12,7 +12,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Implements a mock IConsoleDriver for testing.
 /// </summary>
-public class FakeDriver : ConsoleDriver
+public class FakeConsoleDriver : ConsoleDriverImpl
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -44,7 +44,7 @@ public class FakeDriver : ConsoleDriver
     /// <inheritdoc/>
     public override void WriteRaw (string ansi) { }
 
-    public FakeDriver ()
+    public FakeConsoleDriver ()
     {
         // FakeDriver implies UnitTests
         RunningUnitTests = true;

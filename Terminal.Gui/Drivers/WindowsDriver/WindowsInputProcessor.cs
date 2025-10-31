@@ -6,9 +6,9 @@ namespace Terminal.Gui.Drivers;
 using InputRecord = WindowsConsole.InputRecord;
 
 /// <summary>
-///     Input processor for <see cref="WindowsInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
+///     Input processor for <see cref="WindowsConsoleInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
 /// </summary>
-internal class WindowsInputProcessor : InputProcessor<InputRecord>
+internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
 {
     private readonly bool [] _lastWasPressed = new bool[4];
 

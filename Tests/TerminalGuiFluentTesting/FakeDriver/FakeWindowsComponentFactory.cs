@@ -1,10 +1,11 @@
 ﻿namespace TerminalGuiFluentTesting;
 
 #pragma warning disable CS1591
-internal class FakeNetComponentFactory (FakeNetInput netInput, FakeOutput output, ConsoleSizeMonitor fakeSizeMonitor) : NetComponentFactory
+internal class FakeWindowsComponentFactory (NoOpWindowsInput winInput, FakeConsoleOutput output, ConsoleSizeMonitorImpl fakeSizeMonitor)
+    : WindowsComponentFactory
 {
     /// <inheritdoc/>
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return netInput; }
+    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput () { return winInput; }
 
     /// <inheritdoc/>
     public override IConsoleOutput CreateOutput () { return output; }

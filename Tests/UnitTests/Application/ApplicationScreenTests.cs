@@ -7,7 +7,7 @@ public class ApplicationScreenTests
 {
     public ApplicationScreenTests (ITestOutputHelper output)
     {
-        ConsoleDriver.RunningUnitTests = true;
+        ConsoleDriverImpl.RunningUnitTests = true;
     }
 
 
@@ -94,7 +94,7 @@ public class ApplicationScreenTests
         // Arrange
         Application.ResetState (true);
         Assert.Null (Application.Driver);
-        Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        Application.Driver = new FakeConsoleDriver { Rows = 25, Cols = 25 };
         Application.SubscribeDriverEvents ();
         Assert.Equal (new (0, 0, 25, 25), Application.Screen);
 

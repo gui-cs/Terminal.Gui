@@ -27,15 +27,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </param>
     /// <param name="useFakeClipboard">
     ///     If true, will force the use of <see cref="FakeClipboard"/>. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     <see cref="IConsoleDriver"/> == <see cref="FakeConsoleDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
     ///     Only valid if <paramref name="autoInit"/> is true. Only
-    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeConsoleDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardIsSupportedAlwaysTrue">
     ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     <see cref="IConsoleDriver"/> == <see cref="FakeConsoleDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
@@ -50,10 +50,10 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         AutoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         _forceDriver = forceDriver;
-        FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-        FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
+        FakeConsoleDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
+        FakeConsoleDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
-        FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+        FakeConsoleDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
         _verifyShutdown = verifyShutdown;
     }
 

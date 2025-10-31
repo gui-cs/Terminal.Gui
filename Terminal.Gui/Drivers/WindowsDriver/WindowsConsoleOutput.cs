@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsOutput : OutputBase, IConsoleOutput
+internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
 {
     [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -103,11 +103,11 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
 
-    public WindowsOutput ()
+    public WindowsConsoleOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleOutput)}");
 
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }
@@ -184,7 +184,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
     public void Write (ReadOnlySpan<char> str)
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }
@@ -206,7 +206,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
 
     internal Size SetConsoleWindow (short cols, short rows)
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return new (cols, rows);
         }
@@ -303,9 +303,9 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
         }
         catch (Exception e)
         {
-            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsOutput)}");
+            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsConsoleOutput)}");
 
-            if (!ConsoleDriver.RunningUnitTests)
+            if (!ConsoleDriverImpl.RunningUnitTests)
             {
                 throw;
             }
@@ -457,7 +457,7 @@ internal partial class WindowsOutput : OutputBase, IConsoleOutput
     /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (ConsoleDriver.RunningUnitTests)
+        if (ConsoleDriverImpl.RunningUnitTests)
         {
             return;
         }
