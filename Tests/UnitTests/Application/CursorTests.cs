@@ -10,7 +10,7 @@ public class CursorTests
     public CursorTests (ITestOutputHelper output)
     {
         _output = output;
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
     }
 
     private class TestView : View

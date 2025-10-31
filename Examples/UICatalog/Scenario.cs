@@ -191,7 +191,7 @@ public class Scenario : IDisposable
             Application.Iteration += OnApplicationOnIteration;
             Application.Driver!.ClearedContents += (sender, args) => BenchmarkResults.ClearedContentCount++;
 
-            if (Application.Driver is ConsoleDriverImpl cd)
+            if (Application.Driver is LegacyConsoleDriver cd)
             {
                 cd.Refreshed += (sender, args) =>
                                                  {

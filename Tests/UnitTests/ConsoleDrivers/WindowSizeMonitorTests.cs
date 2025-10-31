@@ -4,7 +4,7 @@ namespace UnitTests.DriverTests;
 
 public class WindowSizeMonitorTests
 {
-    public WindowSizeMonitorTests () { ConsoleDriverImpl.RunningUnitTests = false; }
+    public WindowSizeMonitorTests () { LegacyConsoleDriver.RunningUnitTests = false; }
 
     [Fact]
     public void TestWindowSizeMonitor_RaisesEventWhenChanges ()

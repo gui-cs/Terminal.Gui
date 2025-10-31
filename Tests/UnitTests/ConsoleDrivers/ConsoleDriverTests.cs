@@ -12,7 +12,7 @@ public class ConsoleDriverTests
 
     public ConsoleDriverTests (ITestOutputHelper output)
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
         _output = output;
     }
 
@@ -147,7 +147,7 @@ public class ConsoleDriverTests
         driver.Cols = 120;
         driver.Rows = 40;
 
-        ((ConsoleDriverImpl)driver).OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
+        ((LegacyConsoleDriver)driver).OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
         Assert.Equal (120, driver.Cols);
         Assert.Equal (40, driver.Rows);
         Assert.True (wasTerminalResized);
@@ -240,7 +240,7 @@ public class ConsoleDriverTests
     public void Application_Init_Without_Params_Uses_FakeDriver_When_RunningUnitTests ()
     {
         // Arrange
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
         Application.ResetState (true);
 
         // Act

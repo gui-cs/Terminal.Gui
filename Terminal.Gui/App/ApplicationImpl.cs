@@ -312,7 +312,7 @@ public class ApplicationImpl : IApplication
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            if (ConsoleDriverImpl.RunningUnitTests)
+            if (LegacyConsoleDriver.RunningUnitTests)
             {
                 _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
             }
@@ -323,7 +323,7 @@ public class ApplicationImpl : IApplication
         }
         else
         {
-            if (ConsoleDriverImpl.RunningUnitTests)
+            if (LegacyConsoleDriver.RunningUnitTests)
             {
                 _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
             }
@@ -341,7 +341,7 @@ public class ApplicationImpl : IApplication
             throw new ("Driver was null even after booting MainLoopCoordinator");
         }
 
-        if (!ConsoleDriverImpl.RunningUnitTests && _driver.Screen.IsEmpty)
+        if (!LegacyConsoleDriver.RunningUnitTests && _driver.Screen.IsEmpty)
         {
             throw new InvalidOperationException (
                                                  "Driver.Screen is empty after Init. The driver should set the screen size during Init.");

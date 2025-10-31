@@ -100,7 +100,7 @@ public class ScenariosStressTests : TestsAllViews
                 Application.Iteration += OnApplicationOnIteration;
                 Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
 
-                if (Application.Driver is ConsoleDriverImpl cd)
+                if (Application.Driver is LegacyConsoleDriver cd)
                 {
                     cd!.Refreshed += (sender, args) =>
                                      {

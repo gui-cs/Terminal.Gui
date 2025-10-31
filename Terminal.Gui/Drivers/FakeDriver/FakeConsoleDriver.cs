@@ -12,7 +12,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Implements a mock IConsoleDriver for testing.
 /// </summary>
-public class FakeConsoleDriver : ConsoleDriverImpl
+public class FakeConsoleDriver : LegacyConsoleDriver
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 

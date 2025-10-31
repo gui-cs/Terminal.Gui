@@ -12,7 +12,7 @@ public class AddRuneTests
 
     public AddRuneTests (ITestOutputHelper output)
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
         _output = output;
     }
 

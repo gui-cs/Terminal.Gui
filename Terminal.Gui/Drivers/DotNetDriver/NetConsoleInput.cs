@@ -18,7 +18,7 @@ public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
     {
         Logging.Logger.LogInformation ($"Creating {nameof (NetConsoleInput)}");
 
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return;
         }
@@ -53,7 +53,7 @@ public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override bool Peek ()
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return false;
         }
@@ -72,7 +72,7 @@ public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
 
     private void FlushConsoleInput ()
     {
-        if (!ConsoleDriverImpl.RunningUnitTests)
+        if (!LegacyConsoleDriver.RunningUnitTests)
         {
             while (Console.KeyAvailable)
             {
@@ -86,7 +86,7 @@ public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
     {
         base.Dispose ();
 
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return;
         }

@@ -7,7 +7,7 @@ public class ApplicationScreenTests
 {
     public ApplicationScreenTests (ITestOutputHelper output)
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
     }
 
 

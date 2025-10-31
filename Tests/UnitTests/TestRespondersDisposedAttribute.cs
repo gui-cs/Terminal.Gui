@@ -36,7 +36,7 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
         base.Before (methodUnderTest);
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
         // Clear out any lingering Responder instances from previous tests

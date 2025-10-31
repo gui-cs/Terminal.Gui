@@ -11,7 +11,7 @@ public class ApplicationTests
     public ApplicationTests (ITestOutputHelper output)
     {
         _output = output;
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
 
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
@@ -270,13 +270,13 @@ public class ApplicationTests
     [Fact]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
         Application.Init ();
 
         Assert.NotNull (Application.Driver);
 
         Application.Shutdown ();
-        ConsoleDriverImpl.RunningUnitTests = false;
+        LegacyConsoleDriver.RunningUnitTests = false;
     }
 
     [Theory]

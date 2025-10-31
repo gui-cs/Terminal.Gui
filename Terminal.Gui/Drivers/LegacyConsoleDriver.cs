@@ -12,7 +12,7 @@ namespace Terminal.Gui.Drivers;
 /// - WindowsDriver optimized for Windows.
 /// - FakeDriver for unit testing.
 /// </remarks>
-public abstract class ConsoleDriverImpl : IConsoleDriver
+public abstract class LegacyConsoleDriver : IConsoleDriver
 {
     /// <summary>
     ///     Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
@@ -741,7 +741,7 @@ public abstract class ConsoleDriverImpl : IConsoleDriver
     internal abstract IAnsiResponseParser GetParser ();
 
     /// <summary>
-    ///     Gets the <see cref="AnsiRequestScheduler"/> for this <see cref="ConsoleDriverImpl"/>.
+    ///     Gets the <see cref="AnsiRequestScheduler"/> for this <see cref="IConsoleDriver"/>.
     /// </summary>
     /// <returns></returns>
     public AnsiRequestScheduler GetRequestScheduler ()

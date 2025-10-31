@@ -21,7 +21,7 @@ public abstract class ConsoleOutputBase
     /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return;
         }

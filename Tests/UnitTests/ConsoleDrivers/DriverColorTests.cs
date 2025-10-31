@@ -6,7 +6,7 @@ namespace UnitTests.DriverTests;
 
 public class DriverColorTests
 {
-    public DriverColorTests () { ConsoleDriverImpl.RunningUnitTests = true; }
+    public DriverColorTests () { LegacyConsoleDriver.RunningUnitTests = true; }
 
     [Theory]
     [InlineData (typeof (FakeConsoleDriver))]

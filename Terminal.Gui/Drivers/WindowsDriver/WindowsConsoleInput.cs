@@ -43,7 +43,7 @@ internal class WindowsConsoleInput : ConsoleInputImpl<InputRecord>, IWindowsCons
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleInput)}");
 
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return;
         }
@@ -62,7 +62,7 @@ internal class WindowsConsoleInput : ConsoleInputImpl<InputRecord>, IWindowsCons
 
     protected override bool Peek ()
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return false;
         }
@@ -127,7 +127,7 @@ internal class WindowsConsoleInput : ConsoleInputImpl<InputRecord>, IWindowsCons
 
     public override void Dispose ()
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (LegacyConsoleDriver.RunningUnitTests)
         {
             return;
         }

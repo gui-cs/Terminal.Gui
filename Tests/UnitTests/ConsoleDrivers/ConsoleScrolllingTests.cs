@@ -10,7 +10,7 @@ public class ConsoleScrollingTests
 
     public ConsoleScrollingTests (ITestOutputHelper output)
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
         this.output = output;
     }
 

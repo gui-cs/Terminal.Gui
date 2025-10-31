@@ -7,7 +7,7 @@ public class ApplicationStressTests : TestsAllViews
 {
     public ApplicationStressTests (ITestOutputHelper output)
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        LegacyConsoleDriver.RunningUnitTests = true;
     }
 
     private static volatile int _tbCounter;
