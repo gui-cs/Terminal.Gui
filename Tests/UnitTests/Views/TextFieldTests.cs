@@ -517,7 +517,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard: true)]
+    [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
         var tf = new TextField { Width = 20, Text = "This is a test." };

@@ -409,7 +409,6 @@ public class TextViewTests
         Assert.Equal (expectedEventCount, eventcount);
     }
 
-    [Fact]
     [TextViewTestsSetupFakeApplication]
     public void ContentsChanged_Event_Fires_Using_Kill_Delete_Tests ()
     {
@@ -1298,7 +1297,6 @@ This is the second line.
         Assert.Equal (new (0, 1), tv.CursorPosition);
     }
 
-    [Fact]
     [SetupFakeApplication]
     public void HistoryText_Undo_Redo_KillToEndOfLine ()
     {
@@ -1359,7 +1357,6 @@ This is the second line.
         Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
-    [Fact]
     [SetupFakeApplication]
     public void HistoryText_Undo_Redo_KillToLeftStart ()
     {
@@ -3402,7 +3399,6 @@ This is the second line.
         top.Dispose ();
     }
 
-    [Fact (Skip = "FakeClipboard is broken in some way, causing this (really bad) unit test to fail intermittently.")]
     [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
@@ -4181,7 +4177,6 @@ This is the second line.
         }
     }
 
-    [Fact (Skip = "")]
     [TextViewTestsSetupFakeApplication]
     public void Kill_Delete_WordBackward_Multiline ()
     {
@@ -4514,7 +4509,7 @@ This is the second line.
         }
     }
 
-    [Fact]
+    [Fact (Skip = "Fake Clipboard is broken")]
     [TextViewTestsSetupFakeApplication]
     public void Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ()
     {

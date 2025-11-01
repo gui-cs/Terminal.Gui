@@ -33,7 +33,7 @@ public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return new FakeConsoleInput (_predefinedInput); }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new NetInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new FakeInputProcessor (inputBuffer); }
 
     /// <inheritdoc/>
     public override IConsoleOutput CreateOutput () { return _output ?? new FakeConsoleOutput (); }

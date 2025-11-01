@@ -45,7 +45,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         ConsoleSizeMonitor = sizeMonitor;
         sizeMonitor.SizeChanged += (_, e) =>
         {
-            SetScreenSize(e.Size!.Value.Width, e.Size.Value.Height);
+            SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
             //SizeChanged?.Invoke (this, e);
         };
 
@@ -54,6 +54,13 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     private void CreateClipboard ()
     {
+        if (InputProcessor.DriverName is { } && InputProcessor.DriverName.Contains ("fake"))
+        {
+            Clipboard = new FakeClipboard ();
+
+            return;
+        }
+
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
@@ -68,10 +75,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         {
             Clipboard = new WSLClipboard ();
         }
-        else
-        {
-            Clipboard = new FakeClipboard ();
-        }
+
+        // Clipboard is set to FakeClipboard at initialization
     }
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
@@ -99,7 +104,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         _outputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
-        SizeChanged?.Invoke(this, new (new (width, height)));
+        SizeChanged?.Invoke (this, new (new (width, height)));
     }
 
     /// <summary>
@@ -114,7 +119,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>Get the operating system clipboard.</summary>
-    public IClipboard Clipboard { get; private set; } = new FakeClipboard ();
+    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by

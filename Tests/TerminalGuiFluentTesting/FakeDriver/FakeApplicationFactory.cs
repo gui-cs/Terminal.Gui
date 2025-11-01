@@ -16,7 +16,7 @@ public class FakeApplicationFactory
     public IDisposable SetupFakeApplication ()
     {
         var cts = new CancellationTokenSource ();
-        var fakeInput = new NoOpNetInput (cts.Token);
+        var fakeInput = new NoOpFakeInput (cts.Token);
         FakeConsoleOutput output = new ();
         output.SetSize (80, 25);
 
@@ -24,7 +24,7 @@ public class FakeApplicationFactory
 
         ConsoleSizeMonitorImpl sizeMonitor = new (output);
 
-        var impl = new ApplicationImpl (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
+        var impl = new ApplicationImpl (new FakeFakeComponentFactory (fakeInput, output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (impl);
 
