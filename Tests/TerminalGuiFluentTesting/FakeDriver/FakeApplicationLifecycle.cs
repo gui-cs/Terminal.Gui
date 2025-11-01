@@ -14,6 +14,7 @@ internal class FakeApplicationLifecycle (IApplication origApp, CancellationToken
     {
         hardStop.Cancel ();
 
+        Application.RunningUnitTests = false;
         Application.Top?.Dispose ();
         Application.Shutdown ();
         ApplicationImpl.ChangeInstance (origApp);

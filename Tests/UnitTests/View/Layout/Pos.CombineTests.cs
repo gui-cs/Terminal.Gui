@@ -13,11 +13,9 @@ public class PosCombineTests (ITestOutputHelper output)
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
+    [SetupFakeApplication]
     public void PosCombine_Will_Throws ()
     {
-        Application.Init (new LegacyFakeConsoleDriver ());
-
         Toplevel t = new ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
@@ -82,7 +80,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [Fact]
     public void PosCombine_Refs_SuperView_Throws ()
     {
-        Application.Init (new LegacyFakeConsoleDriver ());
+        Application.Init (null, "fake");
 
         var top = new Toplevel ();
         var w = new Window { X = Pos.Left (top) + 2, Y = Pos.Top (top) + 2 };

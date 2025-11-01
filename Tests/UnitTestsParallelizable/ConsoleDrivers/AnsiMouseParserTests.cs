@@ -1,10 +1,8 @@
-﻿namespace UnitTests.DriverTests;
+﻿namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
 public class AnsiMouseParserTests
 {
-    private readonly AnsiMouseParser _parser;
-
-    public AnsiMouseParserTests () { _parser = new (); }
+    private readonly AnsiMouseParser _parser = new ();
 
     // Consolidated test for all mouse events: button press/release, wheel scroll, position, modifiers
     [Theory]

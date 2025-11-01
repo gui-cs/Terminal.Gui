@@ -277,6 +277,13 @@ public class ApplicationImpl : IApplication
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
     }
 
+    /// <summary>
+    ///     Creates the appropriate <see cref="IConsoleDriver"/> based on platform and driverName.
+    /// </summary>
+    /// <param name="driverName"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     private void CreateDriver (string? driverName)
     {
         PlatformID p = Environment.OSVersion.Platform;
@@ -296,6 +303,7 @@ public class ApplicationImpl : IApplication
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
+            Application.RunningUnitTests = true;
             _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
@@ -312,25 +320,11 @@ public class ApplicationImpl : IApplication
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            if (LegacyConsoleDriver.RunningUnitTests)
-            {
-                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
-            }
-            else
-            {
-                _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-            }
+            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
         else
         {
-            if (LegacyConsoleDriver.RunningUnitTests)
-            {
-                _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
-            }
-            else
-            {
-                _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-            }
+            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
         }
 
         _coordinator.StartAsync ().Wait ();
@@ -341,7 +335,7 @@ public class ApplicationImpl : IApplication
             throw new ("Driver was null even after booting MainLoopCoordinator");
         }
 
-        if (!LegacyConsoleDriver.RunningUnitTests && _driver.Screen.IsEmpty)
+        if (!Application.RunningUnitTests && !_driver.Screen.IsEmpty)
         {
             throw new InvalidOperationException (
                                                  "Driver.Screen is empty after Init. The driver should set the screen size during Init.");
@@ -374,7 +368,7 @@ public class ApplicationImpl : IApplication
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null) { return Run<Toplevel> (errorHandler, driver); }
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
@@ -388,13 +382,13 @@ public class ApplicationImpl : IApplication
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public T Run<T> (Func<Exception, bool>? errorHandler = null, string? driver = null)
         where T : Toplevel, new()
     {
         if (!_initialized)
         {
             // Init() has NOT been called. Auto-initialize as per interface contract.
-            Init (driver, null);
+            Init (null, driver);
         }
 
         T top = new ();

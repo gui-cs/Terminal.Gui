@@ -54,15 +54,6 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
     private void CreateClipboard ()
     {
-        if (LegacyFakeConsoleDriver.FakeBehaviors.UseFakeClipboard)
-        {
-            Clipboard = new FakeClipboard (
-                LegacyFakeConsoleDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException,
-                LegacyFakeConsoleDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
-
-            return;
-        }
-
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
@@ -88,7 +79,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         get
         {
-            if (LegacyConsoleDriver.RunningUnitTests && _output is WindowsConsoleOutput or NetConsoleOutput)
+            if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetConsoleOutput)
             {
                 // In unit tests, we don't have a real output, so we return an empty rectangle.
                 return Rectangle.Empty;
@@ -354,7 +345,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
         Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
-        if (!LegacyConsoleDriver.RunningUnitTests)
+        if (!Application.RunningUnitTests)
         {
             Console.ResetColor ();
             Console.Clear ();

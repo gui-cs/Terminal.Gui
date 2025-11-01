@@ -108,7 +108,7 @@ internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (UnixConsoleInput)}");
 
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (Application.RunningUnitTests)
         {
             return;
         }
@@ -170,7 +170,7 @@ internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
     {
         try
         {
-            if (LegacyConsoleDriver.RunningUnitTests)
+            if (Application.RunningUnitTests)
             {
                 return false;
             }
@@ -194,7 +194,7 @@ internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
     }
     private void WriteRaw (string text)
     {
-        if (!LegacyConsoleDriver.RunningUnitTests)
+        if (!Application.RunningUnitTests)
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (text);
             // Write to stdout (fd 1)
@@ -224,7 +224,7 @@ internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
 
     private void FlushConsoleInput ()
     {
-        if (!LegacyConsoleDriver.RunningUnitTests)
+        if (!Application.RunningUnitTests)
         {
             var fds = new Pollfd [1];
             fds [0].fd = STDIN_FILENO;
@@ -242,7 +242,7 @@ internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
     {
         base.Dispose ();
 
-        if (!LegacyConsoleDriver.RunningUnitTests)
+        if (!Application.RunningUnitTests)
         {
             // Disable mouse events first
             WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);

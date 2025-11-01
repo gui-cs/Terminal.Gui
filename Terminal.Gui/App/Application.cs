@@ -42,6 +42,16 @@ public static partial class Application
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
+    /// <summary>
+    ///     Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
+    ///     <code>
+    ///  public ColorTests ()
+    ///  {
+    ///    ConsoleDriver.RunningUnitTests = true;
+    ///  }
+    /// </code>
+    /// </summary>
+    public static bool RunningUnitTests { get; set; }
 
     /// <summary>
     /// <para>
@@ -213,6 +223,7 @@ public static partial class Application
             }
         }
 #endif
+        RunningUnitTests = false;
         Top = null;
         CachedRunStateToplevel = null;
 

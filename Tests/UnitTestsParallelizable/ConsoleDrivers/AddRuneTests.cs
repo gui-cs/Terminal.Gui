@@ -1,36 +1,29 @@
 ﻿using System.Buffers;
 using System.Text;
+using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.DriverTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
-public class AddRuneTests
+public class AddRuneTests : ParallelizableBase
 {
     private readonly ITestOutputHelper _output;
 
     public AddRuneTests (ITestOutputHelper output)
     {
-        LegacyConsoleDriver.RunningUnitTests = true;
+        Application.RunningUnitTests = true;
         _output = output;
     }
 
-    [Theory]
-    [InlineData (typeof (LegacyFakeConsoleDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void AddRune (Type driverType)
+    [Fact]
+    public void AddRune ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        driver.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         driver.Rows = 25;
         driver.Cols = 80;
-        driver.Init ();
         driver.AddRune (new Rune ('a'));
         Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);
 
@@ -40,8 +33,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         var expected = new Rune ('ắ');
 
@@ -91,8 +83,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_InvalidLocation_DoesNothing ()
     {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         driver.Move (driver.Cols, driver.Rows);
         driver.AddRune ('a');
@@ -111,8 +102,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_MovesToNextColumn ()
     {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         driver.AddRune ('a');
         Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);
@@ -153,8 +143,7 @@ public class AddRuneTests
     [Fact]
     public void AddRune_MovesToNextColumn_Wide ()
     {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         // 🍕 Slice of Pizza "\U0001F355"
         OperationStatus operationStatus = Rune.DecodeFromUtf16 ("\U0001F355", out Rune rune, out int charsConsumed);

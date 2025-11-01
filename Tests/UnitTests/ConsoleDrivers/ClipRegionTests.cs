@@ -11,7 +11,7 @@ public class ClipRegionTests
 
     public ClipRegionTests (ITestOutputHelper output)
     {
-        LegacyConsoleDriver.RunningUnitTests = true;
+        Application.RunningUnitTests = true;
         this._output = output;
     }
 

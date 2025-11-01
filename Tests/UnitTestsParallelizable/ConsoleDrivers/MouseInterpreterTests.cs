@@ -1,19 +1,18 @@
-﻿using Moq;
+﻿namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
-namespace UnitTests.DriverTests;
 public class MouseInterpreterTests
 {
     [Theory]
     [MemberData (nameof (SequenceTests))]
-    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, params MouseFlags?[] expected)
+    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, params MouseFlags? [] expected)
     {
         // Arrange: Mock dependencies and set up the interpreter
-        var interpreter = new MouseInterpreter (null);
+        var interpreter = new MouseInterpreter ();
 
         // Act and Assert
-        for (int i = 0; i < events.Count; i++)
+        for (var i = 0; i < events.Count; i++)
         {
-            var results = interpreter.Process (events [i]).ToArray();
+            MouseEventArgs [] results = interpreter.Process (events [i]).ToArray ();
 
             // Raw input event should be there
             Assert.Equal (events [i].Flags, results [0].Flags);
@@ -32,42 +31,42 @@ public class MouseInterpreterTests
 
     public static IEnumerable<object []> SequenceTests ()
     {
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button1Pressed },
-                new()
+                new () { Flags = MouseFlags.Button1Pressed },
+                new ()
             },
             null,
             MouseFlags.Button1Clicked
-        };
+        ];
 
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button1Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button1Pressed },
-                new()
+                new () { Flags = MouseFlags.Button1Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button1Pressed },
+                new ()
             },
             null,
             MouseFlags.Button1Clicked,
             null,
             MouseFlags.Button1DoubleClicked
-        };
+        ];
 
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button1Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button1Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button1Pressed },
-                new()
+                new () { Flags = MouseFlags.Button1Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button1Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button1Pressed },
+                new ()
             },
             null,
             MouseFlags.Button1Clicked,
@@ -75,18 +74,18 @@ public class MouseInterpreterTests
             MouseFlags.Button1DoubleClicked,
             null,
             MouseFlags.Button1TripleClicked
-        };
+        ];
 
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button2Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button2Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button2Pressed },
-                new()
+                new () { Flags = MouseFlags.Button2Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button2Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button2Pressed },
+                new ()
             },
             null,
             MouseFlags.Button2Clicked,
@@ -94,18 +93,18 @@ public class MouseInterpreterTests
             MouseFlags.Button2DoubleClicked,
             null,
             MouseFlags.Button2TripleClicked
-        };
+        ];
 
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button3Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button3Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button3Pressed },
-                new()
+                new () { Flags = MouseFlags.Button3Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button3Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button3Pressed },
+                new ()
             },
             null,
             MouseFlags.Button3Clicked,
@@ -113,18 +112,18 @@ public class MouseInterpreterTests
             MouseFlags.Button3DoubleClicked,
             null,
             MouseFlags.Button3TripleClicked
-        };
+        ];
 
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button4Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button4Pressed },
-                new(),
-                new() { Flags = MouseFlags.Button4Pressed },
-                new()
+                new () { Flags = MouseFlags.Button4Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button4Pressed },
+                new (),
+                new () { Flags = MouseFlags.Button4Pressed },
+                new ()
             },
             null,
             MouseFlags.Button4Clicked,
@@ -132,24 +131,23 @@ public class MouseInterpreterTests
             MouseFlags.Button4DoubleClicked,
             null,
             MouseFlags.Button4TripleClicked
-        };
+        ];
 
-        yield return new object []
-        {
+        yield return
+        [
             new List<MouseEventArgs>
             {
-                new() { Flags = MouseFlags.Button1Pressed ,Position = new Point (10,11)},
-                new(){Position = new Point (10,11)},
+                new () { Flags = MouseFlags.Button1Pressed, Position = new (10, 11) },
+                new () { Position = new (10, 11) },
 
                 // Clicking the line below means no double click because it's a different location
-                new() { Flags = MouseFlags.Button1Pressed,Position = new Point (10,12) },
-                new(){Position = new Point (10,12)}
+                new () { Flags = MouseFlags.Button1Pressed, Position = new (10, 12) },
+                new () { Position = new (10, 12) }
             },
             null,
             MouseFlags.Button1Clicked,
             null,
             MouseFlags.Button1Clicked //release is click because new position
-        };
+        ];
     }
-
 }

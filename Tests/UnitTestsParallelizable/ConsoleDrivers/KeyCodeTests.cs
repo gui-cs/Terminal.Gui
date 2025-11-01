@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace UnitTests.InputTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
 public class KeyCodeTests
 {

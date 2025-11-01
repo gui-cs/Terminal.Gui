@@ -181,7 +181,7 @@ public interface IApplication
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null);
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null);
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
@@ -206,7 +206,7 @@ public interface IApplication
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public T Run<T> (Func<Exception, bool>? errorHandler = null, string? driver = null)
         where T : Toplevel, new();
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>

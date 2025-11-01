@@ -249,7 +249,7 @@ public class ToplevelTests
 
         var win = new Window ();
         win.Add (view);
-        Application.Init (new LegacyFakeConsoleDriver ());
+        Application.Init (null, "fake");
         Toplevel top = new ();
         top.Add (win);
 
@@ -742,7 +742,7 @@ public class ToplevelTests
     [Fact]
     public void Multi_Thread_Toplevels ()
     {
-        Application.Init (new LegacyFakeConsoleDriver ());
+        Application.Init (null, "fake");
 
         Toplevel t = new ();
         var w = new Window ();

@@ -1,15 +1,16 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
 
-namespace UnitTests.DriverTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
+
 public class NetInputProcessorTests
 {
     public static IEnumerable<object []> GetConsoleKeyInfoToKeyTestCases_Rune ()
     {
-        yield return new object [] { new ConsoleKeyInfo ('C', ConsoleKey.None, false, false, false), new Rune('C') };
-        yield return new object [] { new ConsoleKeyInfo ('\\', ConsoleKey.Oem5, false, false, false), new Rune ('\\') };
-        yield return new object [] { new ConsoleKeyInfo ('+', ConsoleKey.OemPlus, true, false, false), new Rune ('+') };
-        yield return new object [] { new ConsoleKeyInfo ('=', ConsoleKey.OemPlus, false, false, false), new Rune ('=') };
+        yield return [new ConsoleKeyInfo ('C', ConsoleKey.None, false, false, false), new Rune ('C')];
+        yield return [new ConsoleKeyInfo ('\\', ConsoleKey.Oem5, false, false, false), new Rune ('\\')];
+        yield return [new ConsoleKeyInfo ('+', ConsoleKey.OemPlus, true, false, false), new Rune ('+')];
+        yield return [new ConsoleKeyInfo ('=', ConsoleKey.OemPlus, false, false, false), new Rune ('=')];
         yield return new object [] { new ConsoleKeyInfo ('_', ConsoleKey.OemMinus, true, false, false), new Rune ('_') };
         yield return new object [] { new ConsoleKeyInfo ('-', ConsoleKey.OemMinus, false, false, false), new Rune ('-') };
         yield return new object [] { new ConsoleKeyInfo (')', ConsoleKey.None, false, false, false), new Rune (')') };
@@ -67,23 +68,21 @@ public class NetInputProcessorTests
 
     public static IEnumerable<object []> GetConsoleKeyInfoToKeyTestCases_Key ()
     {
-        yield return new object [] { new ConsoleKeyInfo ('\t', ConsoleKey.None, false, false, false), Key.Tab};
+        yield return new object [] { new ConsoleKeyInfo ('\t', ConsoleKey.None, false, false, false), Key.Tab };
         yield return new object [] { new ConsoleKeyInfo ('\u001B', ConsoleKey.None, false, false, false), Key.Esc };
         yield return new object [] { new ConsoleKeyInfo ('\u007f', ConsoleKey.None, false, false, false), Key.Backspace };
 
         // TODO: Terminal.Gui does not have a Key for this mapped
         // TODO: null and default(Key) are both not same as Null.  Why user has to do (Key)0 to get a null key?!
         yield return new object [] { new ConsoleKeyInfo ('\0', ConsoleKey.LeftWindows, false, false, false), (Key)0 };
-
     }
-
-
 
     [Theory]
     [MemberData (nameof (GetConsoleKeyInfoToKeyTestCases_Key))]
     public void ConsoleKeyInfoToKey_ValidInput_AsKey (ConsoleKeyInfo input, Key expected)
     {
         var converter = new NetKeyConverter ();
+
         // Act
         var result = converter.ToKey (input);
 
@@ -94,15 +93,15 @@ public class NetInputProcessorTests
     [Fact]
     public void Test_ProcessQueue_CapitalHLowerE ()
     {
-        var queue = new ConcurrentQueue<ConsoleKeyInfo> ();
+        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
 
-        queue.Enqueue (new ConsoleKeyInfo ('H', ConsoleKey.None, true, false, false));
-        queue.Enqueue (new ConsoleKeyInfo ('e', ConsoleKey.None, false, false, false));
+        queue.Enqueue (new ('H', ConsoleKey.None, true, false, false));
+        queue.Enqueue (new ('e', ConsoleKey.None, false, false, false));
 
         var processor = new NetInputProcessor (queue);
 
-        List<Key> ups = new List<Key> ();
-        List<Key> downs = new List<Key> ();
+        List<Key> ups = new ();
+        List<Key> downs = new ();
 
         processor.KeyUp += (s, e) => { ups.Add (e); };
         processor.KeyDown += (s, e) => { downs.Add (e); };

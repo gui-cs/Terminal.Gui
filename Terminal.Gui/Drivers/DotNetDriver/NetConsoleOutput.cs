@@ -37,7 +37,7 @@ public class NetConsoleOutput : ConsoleOutputBase, IConsoleOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (Application.RunningUnitTests)
         {
             // For unit tests, we return a default size.
             return Size.Empty;

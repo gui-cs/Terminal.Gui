@@ -635,11 +635,9 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new LegacyFakeConsoleDriver ());
-
         Toplevel top = new ();
 
         var view = new View { X = -2, Text = "view" };

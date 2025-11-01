@@ -7,7 +7,7 @@ public class ApplicationScreenTests
 {
     public ApplicationScreenTests (ITestOutputHelper output)
     {
-        LegacyConsoleDriver.RunningUnitTests = true;
+        Application.RunningUnitTests = true;
     }
 
 
@@ -89,22 +89,15 @@ public class ApplicationScreenTests
     }
 
     [Fact]
+    [SetupFakeApplication]
     public void Screen_Changes_OnScreenChanged_Without_Call_Application_Init ()
     {
-        // Arrange
-        Application.ResetState (true);
-        Assert.Null (Application.Driver);
-        Application.Driver = new LegacyFakeConsoleDriver { Rows = 25, Cols = 25 };
-        Application.SubscribeDriverEvents ();
-        Assert.Equal (new (0, 0, 25, 25), Application.Screen);
+        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
         // Act
-        Application.Driver.SetScreenSize(120,30);
+        Application.Driver!.SetScreenSize(120,30);
 
         // Assert
         Assert.Equal (new (0, 0, 120, 30), Application.Screen);
-
-        // Cleanup
-        Application.ResetState (true);
     }
 }

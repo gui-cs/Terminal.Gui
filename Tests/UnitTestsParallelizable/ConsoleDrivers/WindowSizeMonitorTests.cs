@@ -1,11 +1,9 @@
 ﻿using Moq;
 
-namespace UnitTests.DriverTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
 public class WindowSizeMonitorTests
 {
-    public WindowSizeMonitorTests () { LegacyConsoleDriver.RunningUnitTests = false; }
-
     [Fact]
     public void TestWindowSizeMonitor_RaisesEventWhenChanges ()
     {
@@ -24,7 +22,7 @@ public class WindowSizeMonitorTests
 
         var monitor = new ConsoleSizeMonitorImpl (consoleOutput.Object);
 
-        List<SizeChangedEventArgs> result = new ();
+        List<SizeChangedEventArgs> result = [];
         monitor.SizeChanged += (s, e) => { result.Add (e); };
 
         Assert.Empty (result);
@@ -46,11 +44,10 @@ public class WindowSizeMonitorTests
         Mock<IConsoleOutput> consoleOutput = new ();
 
         Queue<Size> queue = new (
-                                 new []
-                                 {
-                                     new Size (30, 20),
-                                     new Size (30, 20)
-                                 });
+                                 [
+                                     new (30, 20),
+                                     new (30, 20)
+                                 ]);
 
         consoleOutput.Setup (m => m.GetSize ())
                      .Returns (queue.Dequeue);
@@ -59,7 +56,7 @@ public class WindowSizeMonitorTests
 
         var monitor = new ConsoleSizeMonitorImpl (consoleOutput.Object);
 
-        List<SizeChangedEventArgs> result = new ();
+        List<SizeChangedEventArgs> result = [];
         monitor.SizeChanged += (s, e) => { result.Add (e); };
 
         // First poll always raises event because going from unknown size i.e. 0,0

@@ -274,7 +274,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null)
     {
         return ApplicationImpl.Instance.Run (errorHandler, driver);
     }
@@ -301,7 +301,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public static T Run<T> (Func<Exception, bool>? errorHandler = null, string? driver = null)
         where T : Toplevel, new()
     {
         return ApplicationImpl.Instance.Run<T> (errorHandler, driver);

@@ -1,32 +1,27 @@
 ﻿using System.Text;
 using UnitTests;
+using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.DriverTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
-public class ContentsTests
+public class ContentsTests : ParallelizableBase
 {
     private readonly ITestOutputHelper _output;
 
     public ContentsTests (ITestOutputHelper output)
     {
-        LegacyConsoleDriver.RunningUnitTests = true;
+        Application.RunningUnitTests = true;
         _output = output;
     }
 
-    [Theory]
-    [InlineData (typeof (LegacyFakeConsoleDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    ////[InlineData (typeof (UnixDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
-    ////[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
-    public void AddStr_Combining_Character_1st_Column (Type driverType)
+    [Fact]
+    public void AddStr_Combining_Character_1st_Column ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        driver!.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
+
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
         DriverAssert.AssertDriverContentsAre (expected, _output, driver);
@@ -34,17 +29,10 @@ public class ContentsTests
         driver.End ();
     }
 
-    [Theory]
-    [InlineData (typeof (LegacyFakeConsoleDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    ////[InlineData (typeof (UnixDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
-    ////[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
-    public void AddStr_With_Combining_Characters (Type driverType)
+    [Fact]
+    public void AddStr_With_Combining_Characters ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        driver!.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         var acuteAccent = new Rune (0x0301); // Combining acute accent (é)
         string combined = "e" + acuteAccent;
@@ -90,17 +78,10 @@ public class ContentsTests
         driver.End ();
     }
 
-    [Theory]
-    [InlineData (typeof (LegacyFakeConsoleDriver))]
-    //[InlineData (typeof (DotNetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver))]
-    public void Move_Bad_Coordinates (Type driverType)
+    [Fact]
+    public void Move_Bad_Coordinates ()
     {
-        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        driver.Init ();
+        IConsoleDriver driver = CreateFakeDriver ();
 
         Assert.Equal (0, driver.Col);
         Assert.Equal (0, driver.Row);

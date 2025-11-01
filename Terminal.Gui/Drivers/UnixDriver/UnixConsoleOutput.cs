@@ -112,7 +112,7 @@ internal class UnixConsoleOutput : ConsoleOutputBase, IConsoleOutput
     /// <inheritdoc />
     public void Write (ReadOnlySpan<char> text)
     {
-        if (!LegacyConsoleDriver.RunningUnitTests)
+        if (!Application.RunningUnitTests)
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
             // Write to stdout (fd 1)
@@ -123,7 +123,7 @@ internal class UnixConsoleOutput : ConsoleOutputBase, IConsoleOutput
     /// <inheritdoc />
     public Size GetSize ()
     {
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (Application.RunningUnitTests)
         {
             // For unit tests, we return a default size.
             return Size.Empty;

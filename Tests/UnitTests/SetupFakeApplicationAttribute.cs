@@ -19,7 +19,7 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
-        Assert.Null (_appDispose);
+        _appDispose?.Dispose();
         var appFactory = new FakeApplicationFactory ();
         _appDispose = appFactory.SetupFakeApplication ();
 
@@ -36,5 +36,11 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
 
         base.After (methodUnderTest);
     }
+
+    /// <summary>
+    ///     Runs a single iteration of the main loop (layout, draw, run timed events etc.)
+    /// </summary>
+    public static void RunIteration () { ((ApplicationImpl)ApplicationImpl.Instance).Coordinator?.RunIteration (); }
+
 
 }

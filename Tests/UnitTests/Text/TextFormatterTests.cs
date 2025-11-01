@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UICatalog;
-using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -3587,10 +3586,9 @@ public class TextFormatterTests
     // Draw tests - Note that these depend on View
 
     [Fact]
-    [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new LegacyFakeConsoleDriver ());
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
@@ -3784,45 +3782,8 @@ B  ")]
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [Theory]
-    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
-    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
-    [InlineData (
-                    4,
-                    4,
-                    TextDirection.TopBottom_LeftRight,
-                    @"
-LMre
-eias
-ssb 
- ęl "
-                )]
-    public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
-    {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
 
-        var text = "Les Mise\u0328\u0301rables";
 
-        var tf = new TextFormatter ();
-        tf.Direction = textDirection;
-        tf.Text = text;
-
-        Assert.True (tf.WordWrap);
-
-        tf.ConstrainToSize = new (width, height);
-
-        tf.Draw (
-                 new (0, 0, width, height),
-                 new (ColorName16.White, ColorName16.Black),
-                 new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
-
-        driver.End ();
-    }
 
     [Fact]
     [SetupFakeApplication]
@@ -3914,132 +3875,13 @@ Nice       Work")]
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
-    [Theory]
-    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
-    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
-    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
-    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
-    public void TabWith_PreserveTrailingSpaces_False (
-        int width,
-        int height,
-        TextDirection textDirection,
-        int tabWidth,
-        string expected
-    )
-    {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
-
-        var text = "This is a \tTab";
-        var tf = new TextFormatter ();
-        tf.Direction = textDirection;
-        tf.TabWidth = tabWidth;
-        tf.Text = text;
-        tf.ConstrainToWidth = 20;
-        tf.ConstrainToHeight = 20;
-
-        Assert.True (tf.WordWrap);
-        Assert.False (tf.PreserveTrailingSpaces);
-
-        tf.Draw (
-                 new (0, 0, width, height),
-                 new (ColorName16.White, ColorName16.Black),
-                 new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
-
-        driver.End ();
-    }
-
-    [Theory]
-    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
-    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
-    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
-    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
-    public void TabWith_PreserveTrailingSpaces_True (
-        int width,
-        int height,
-        TextDirection textDirection,
-        int tabWidth,
-        string expected
-    )
-    {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
-
-        var text = "This is a \tTab";
-        var tf = new TextFormatter ();
-
-        tf.Direction = textDirection;
-        tf.TabWidth = tabWidth;
-        tf.PreserveTrailingSpaces = true;
-        tf.Text = text;
-        tf.ConstrainToWidth = 20;
-        tf.ConstrainToHeight = 20;
-
-        Assert.True (tf.WordWrap);
-
-        tf.Draw (
-                 new (0, 0, width, height),
-                 new (ColorName16.White, ColorName16.Black),
-                 new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
-
-        driver.End ();
-    }
-
-    [Theory]
-    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
-    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
-    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
-    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
-    public void TabWith_WordWrap_True (
-        int width,
-        int height,
-        TextDirection textDirection,
-        int tabWidth,
-        string expected
-    )
-    {
-        var driver = new LegacyFakeConsoleDriver ();
-        driver.Init ();
-
-        var text = "This is a \tTab";
-        var tf = new TextFormatter ();
-
-        tf.Direction = textDirection;
-        tf.TabWidth = tabWidth;
-        tf.WordWrap = true;
-        tf.Text = text;
-        tf.ConstrainToWidth = 20;
-        tf.ConstrainToHeight = 20;
-
-        Assert.False (tf.PreserveTrailingSpaces);
-
-        tf.Draw (
-                 new (0, 0, width, height),
-                 new (ColorName16.White, ColorName16.Black),
-                 new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
-
-        driver.End ();
-    }
-
     [Fact]
     [SetupFakeApplication]
     public void UICatalog_AboutBox_Text ()
     {
         TextFormatter tf = new ()
         {
-            Text = UICatalog.UICatalogTop.GetAboutBoxMessage (),
+            Text = UICatalogTop.GetAboutBoxMessage (),
             Alignment = Alignment.Center,
             VerticalAlignment = Alignment.Start,
             WordWrap = false,

@@ -1,7 +1,6 @@
 ﻿using Moq;
 
-namespace UnitTests.DriverTests;
-
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
 public class AnsiRequestSchedulerTests
 {
@@ -12,9 +11,9 @@ public class AnsiRequestSchedulerTests
 
     public AnsiRequestSchedulerTests ()
     {
-        _parserMock = new Mock<IAnsiResponseParser> (MockBehavior.Strict);
+        _parserMock = new (MockBehavior.Strict);
         _staticNow = DateTime.UtcNow; // Initialize static time
-        _scheduler = new AnsiRequestScheduler (_parserMock.Object, () => _staticNow);
+        _scheduler = new (_parserMock.Object, () => _staticNow);
     }
 
     [Fact]
@@ -29,7 +28,7 @@ public class AnsiRequestSchedulerTests
         };
 
         // we have no outstanding for c already
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable(Times.Once);
+        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Once);
 
         // then we should execute our request
         _parserMock.Setup (p => p.ExpectResponse ("c", It.IsAny<Action<string>> (), null, false)).Verifiable (Times.Once);
@@ -37,12 +36,12 @@ public class AnsiRequestSchedulerTests
         // Act
         bool result = _scheduler.SendOrSchedule (request);
 
-
         // Assert
         Assert.Empty (_scheduler.QueuedRequests); // We sent it i.e. we did not queue it for later
         Assert.True (result); // Should send immediately
         _parserMock.Verify ();
     }
+
     [Fact]
     public void SendOrSchedule_QueuesRequest_WhenOutstandingRequestExists ()
     {
@@ -58,14 +57,13 @@ public class AnsiRequestSchedulerTests
         _parserMock.Setup (p => p.IsExpecting ("c")).Returns (true).Verifiable (Times.Once);
 
         // Act
-        var result = _scheduler.SendOrSchedule (request1);
+        bool result = _scheduler.SendOrSchedule (request1);
 
         // Assert
         Assert.Single (_scheduler.QueuedRequests); // Ensure only one request is in the queue
         Assert.False (result); // Should be queued
         _parserMock.Verify ();
     }
-
 
     [Fact]
     public void RunSchedule_ThrottleNotExceeded_AllowSend ()
@@ -79,7 +77,7 @@ public class AnsiRequestSchedulerTests
         };
 
         // Set up to expect no outstanding request for "c" i.e. parser instantly gets response and resolves it
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable(Times.Exactly (2));
+        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Exactly (2));
         _parserMock.Setup (p => p.ExpectResponse ("c", It.IsAny<Action<string>> (), null, false)).Verifiable (Times.Exactly (2));
 
         _scheduler.SendOrSchedule (request);
@@ -87,11 +85,10 @@ public class AnsiRequestSchedulerTests
         // Simulate time passing beyond throttle
         SetTime (101); // Exceed throttle limit
 
-
         // Act
 
         // Send another request after the throttled time limit
-        var result = _scheduler.SendOrSchedule (request);
+        bool result = _scheduler.SendOrSchedule (request);
 
         // Assert
         Assert.Empty (_scheduler.QueuedRequests); // Should send and clear the request
@@ -119,18 +116,17 @@ public class AnsiRequestSchedulerTests
         // Simulate time passing
         SetTime (55); // Does not exceed throttle limit
 
-
         // Act
 
         // Send another request after the throttled time limit
-        var result = _scheduler.SendOrSchedule (request);
+        bool result = _scheduler.SendOrSchedule (request);
 
         // Assert
         Assert.Single (_scheduler.QueuedRequests); // Should have been queued
-        Assert.False(result); // Should have been queued
+        Assert.False (result); // Should have been queued
 
         // Throttle still not exceeded
-        Assert.False(_scheduler.RunSchedule ());
+        Assert.False (_scheduler.RunSchedule ());
 
         SetTime (90);
 
@@ -166,7 +162,7 @@ public class AnsiRequestSchedulerTests
         _parserMock.Setup (p => p.IsExpecting ("c")).Returns (true).Verifiable (Times.Exactly (2));
 
         // Cannot send because there is already outstanding request
-        Assert.False(_scheduler.SendOrSchedule (request1));
+        Assert.False (_scheduler.SendOrSchedule (request1));
         Assert.Single (_scheduler.QueuedRequests);
 
         // Simulate request going stale
@@ -175,13 +171,14 @@ public class AnsiRequestSchedulerTests
         // Parser should be told to give up on this one (evicted)
         _parserMock.Setup (p => p.StopExpecting ("c", false))
                    .Callback (() =>
-                    {
-                        // When we tell parser to evict - it should now tell us it is no longer expecting
-                        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Once);
-                    }).Verifiable ();
+                              {
+                                  // When we tell parser to evict - it should now tell us it is no longer expecting
+                                  _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Once);
+                              })
+                   .Verifiable ();
 
         // When we send again the evicted one should be
-        var evicted = _scheduler.RunSchedule ();
+        bool evicted = _scheduler.RunSchedule ();
 
         Assert.True (evicted); // Stale request should be evicted
         Assert.Empty (_scheduler.QueuedRequests);
@@ -194,7 +191,7 @@ public class AnsiRequestSchedulerTests
     public void RunSchedule_DoesNothing_WhenQueueIsEmpty ()
     {
         // Act
-        var result = _scheduler.RunSchedule ();
+        bool result = _scheduler.RunSchedule ();
 
         // Assert
         Assert.False (result); // No requests to process
@@ -216,21 +213,20 @@ public class AnsiRequestSchedulerTests
         _parserMock.Setup (p => p.ExpectResponse ("x", It.IsAny<Action<string>> (), null, false)).Verifiable (Times.Once);
 
         // Act
-        var a = _scheduler.SendOrSchedule (request1);
-        var b = _scheduler.SendOrSchedule (request2);
+        bool a = _scheduler.SendOrSchedule (request1);
+        bool b = _scheduler.SendOrSchedule (request2);
 
         // Assert
         Assert.False (a);
         Assert.True (b);
-        Assert.Equal(request1, Assert.Single (_scheduler.QueuedRequests));
+        Assert.Equal (request1, Assert.Single (_scheduler.QueuedRequests));
         _parserMock.Verify ();
     }
-
 
     private void SetTime (int milliseconds)
     {
         // This simulates the passing of time by setting the Now function to return a specific time.
-        var newNow = _staticNow.AddMilliseconds (milliseconds);
+        DateTime newNow = _staticNow.AddMilliseconds (milliseconds);
         _scheduler.Now = () => newNow;
     }
 }

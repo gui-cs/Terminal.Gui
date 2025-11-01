@@ -7,7 +7,7 @@ namespace UnitTests.ApplicationTests;
 
 public class ApplicationImplTests
 {
-    public ApplicationImplTests () { LegacyConsoleDriver.RunningUnitTests = true; }
+    public ApplicationImplTests () { Application.RunningUnitTests = true; }
 
     /// <summary>
     ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.

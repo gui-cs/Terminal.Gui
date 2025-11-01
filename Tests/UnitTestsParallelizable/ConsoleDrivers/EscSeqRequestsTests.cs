@@ -1,6 +1,6 @@
 ﻿using UnitTests.Parallelizable;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
 public class EscSeqRequestsTests : ParallelizableBase
 {

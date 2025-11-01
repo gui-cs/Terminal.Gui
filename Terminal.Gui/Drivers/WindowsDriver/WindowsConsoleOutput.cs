@@ -107,7 +107,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleOutput)}");
 
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
         }
@@ -184,7 +184,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
 
     public void Write (ReadOnlySpan<char> str)
     {
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
         }
@@ -206,7 +206,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
 
     internal Size SetConsoleWindow (short cols, short rows)
     {
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return new (cols, rows);
         }
@@ -305,7 +305,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
         {
             Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsConsoleOutput)}");
 
-            if (!LegacyConsoleDriver.RunningUnitTests)
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
                 throw;
             }
@@ -457,7 +457,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
     /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (LegacyConsoleDriver.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
         }
