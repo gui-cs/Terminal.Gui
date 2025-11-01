@@ -199,7 +199,6 @@ public partial class GuiTestContext : IDisposable
     private void InitializeApplication ()
     {
         ApplicationImpl.ChangeInstance (_impl);
-
         ILogger logger = LoggerFactory.Create (builder =>
                                                    builder.SetMinimumLevel (LogLevel.Trace)
                                                           .AddProvider (

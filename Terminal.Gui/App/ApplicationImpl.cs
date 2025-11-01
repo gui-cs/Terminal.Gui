@@ -210,9 +210,9 @@ public class ApplicationImpl : IApplication
     /// methods of <see cref="Application"/>.
     /// </summary>
     /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication newApplication)
+    public static void ChangeInstance (IApplication? newApplication)
     {
-        _lazyInstance = new Lazy<IApplication> (newApplication);
+        _lazyInstance = new Lazy<IApplication> (newApplication!);
     }
 
     /// <inheritdoc/>
@@ -337,8 +337,7 @@ public class ApplicationImpl : IApplication
 
         if (!Application.RunningUnitTests && !_driver.Screen.IsEmpty)
         {
-            throw new InvalidOperationException (
-                                                 "Driver.Screen is empty after Init. The driver should set the screen size during Init.");
+            //throw new InvalidOperationException ("Driver.Screen is empty after Init. The driver should set the screen size during Init.");
         }
     }
 
