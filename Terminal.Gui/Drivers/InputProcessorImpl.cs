@@ -5,30 +5,30 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Processes the queued input buffer contents - which must be of Type <typeparamref name="T"/>.
+///     Processes the queued input buffer contents - which must be of Type <typeparamref name="TKeyInfo"/>.
 ///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
 ///     events and data models.
 /// </summary>
-public abstract class InputProcessorImpl<T> : IInputProcessor
+public abstract class InputProcessorImpl<TKeyInfo> : IInputProcessor
 {
     /// <summary>
     ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
     /// </summary>
     private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
-    internal AnsiResponseParser<T> Parser { get; } = new ();
+    internal AnsiResponseParser<TKeyInfo> Parser { get; } = new ();
 
     /// <summary>
-    ///     Class responsible for translating the driver specific native input class <typeparamref name="T"/> e.g.
+    ///     Class responsible for translating the driver specific native input class <typeparamref name="TKeyInfo"/> e.g.
     ///     <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
     ///     internal library representations of Keys).
     /// </summary>
-    public IKeyConverter<T> KeyConverter { get; }
+    public IKeyConverter<TKeyInfo> KeyConverter { get; }
 
     /// <summary>
     ///     Input buffer which will be drained from by this class.
     /// </summary>
-    public ConcurrentQueue<T> InputBuffer { get; }
+    public ConcurrentQueue<TKeyInfo> InputBuffer { get; }
 
     /// <inheritdoc />
     public string? DriverName { get; init; }
@@ -51,7 +51,7 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
     /// <param name="a"></param>
     public void OnKeyDown (Key a)
     {
-        Logging.Trace ($"{nameof (InputProcessorImpl<T>)} raised {a}");
+        Logging.Trace ($"{nameof (InputProcessorImpl<TKeyInfo>)} raised {a}");
         KeyDown?.Invoke (this, a);
     }
 
@@ -82,7 +82,7 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
 
         foreach (MouseEventArgs e in _mouseInterpreter.Process (a))
         {
-           // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
+            // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
 
             // Pass on
             MouseEvent?.Invoke (this, e);
@@ -97,9 +97,9 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
     /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IConsoleInput{T}"/>)</param>
     /// <param name="keyConverter">
     ///     Key converter for translating driver specific
-    ///     <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.
+    ///     <typeparamref name="TKeyInfo"/> class into Terminal.Gui <see cref="Key"/>.
     /// </param>
-    protected InputProcessorImpl (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
+    protected InputProcessorImpl (ConcurrentQueue<TKeyInfo> inputBuffer, IKeyConverter<TKeyInfo> keyConverter)
     {
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
@@ -117,7 +117,7 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
         Parser.UnexpectedResponseHandler = str =>
                                            {
                                                var cur = new string (str.Select (k => k.Item1).ToArray ());
-                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<T>)} ignored unrecognized response '{cur}'");
+                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<TKeyInfo>)} ignored unrecognized response '{cur}'");
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 
                                                return true;
@@ -130,18 +130,18 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
     /// </summary>
     public void ProcessQueue ()
     {
-        while (InputBuffer.TryDequeue (out T? input))
+        while (InputBuffer.TryDequeue (out TKeyInfo? input))
         {
             Process (input);
         }
 
-        foreach (T input in ReleaseParserHeldKeysIfStale ())
+        foreach (TKeyInfo input in ReleaseParserHeldKeysIfStale ())
         {
             ProcessAfterParsing (input);
         }
     }
 
-    private IEnumerable<T> ReleaseParserHeldKeysIfStale ()
+    private IEnumerable<TKeyInfo> ReleaseParserHeldKeysIfStale ()
     {
         if (Parser.State is AnsiResponseParserState.ExpectingEscapeSequence or AnsiResponseParserState.InResponse
             && DateTime.Now - Parser.StateChangedAt > _escTimeout)
@@ -157,14 +157,14 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
     ///     is called sequentially for each value read from <see cref="InputBuffer"/>.
     /// </summary>
     /// <param name="input"></param>
-    protected abstract void Process (T input);
+    protected abstract void Process (TKeyInfo input);
 
     /// <summary>
     ///     Process the provided single input element - short-circuiting the <see cref="Parser"/>
     ///     stage of the processing.
     /// </summary>
     /// <param name="input"></param>
-    protected abstract void ProcessAfterParsing (T input);
+    protected abstract void ProcessAfterParsing (TKeyInfo input);
 
     private char _highSurrogate = '\0';
 
@@ -220,5 +220,12 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
         }
 
         return true;
+    }
+
+    /// <inheritdoc />
+    public void AddKeyEvent (Key key)
+    {
+        TKeyInfo keyInfo = KeyConverter.ToKeyInfo (key);
+        InputBuffer.Enqueue (keyInfo);
     }
 }

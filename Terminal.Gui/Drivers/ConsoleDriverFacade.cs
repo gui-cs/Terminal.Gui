@@ -63,7 +63,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
         {
             Clipboard = new WindowsClipboard ();
         }
@@ -422,6 +422,12 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// </summary>
     /// <param name="ansi"></param>
     public void WriteRaw (string ansi) { _output.Write (ansi); }
+
+    /// <inheritdoc />
+    public void AddKeyEvent (Key key)
+    {
+        InputProcessor.AddKeyEvent (key);
+    }
 
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution

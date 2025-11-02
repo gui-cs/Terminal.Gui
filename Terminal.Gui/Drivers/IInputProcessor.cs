@@ -74,4 +74,11 @@ public interface IInputProcessor
     ///     <see langword="false"/>.
     /// </returns>
     bool IsValidInput (Key key, out Key result);
+
+
+    /// <summary>
+    ///     Adds a key input event to the driver. For unit tests.
+    /// </summary>
+    /// <param name="key"></param>
+    void AddKeyEvent (Key key);
 }

@@ -23,4 +23,10 @@ internal class NetKeyConverter : IKeyConverter<ConsoleKeyInfo>
 
         return EscSeqUtils.MapKey (adjustedInput);
     }
+
+    /// <inheritdoc />
+    public ConsoleKeyInfo ToKeyInfo (Key key)
+    {
+        return ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key.KeyCode);
+    }
 }

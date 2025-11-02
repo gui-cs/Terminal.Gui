@@ -6,14 +6,14 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 /// Abstract base class implementation of <see cref="IComponentFactory{T}"/>
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public abstract class ComponentFactoryImpl<T> : IComponentFactory<T>
+/// <typeparam name="TKeyInfo"></typeparam>
+public abstract class ComponentFactoryImpl<TKeyInfo> : IComponentFactory<TKeyInfo>
 {
     /// <inheritdoc />
-    public abstract IConsoleInput<T> CreateInput ();
+    public abstract IConsoleInput<TKeyInfo> CreateInput ();
 
     /// <inheritdoc />
-    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<TKeyInfo> inputBuffer);
 
     /// <inheritdoc />
     public virtual IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)

@@ -6,10 +6,10 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Base class for reading console input in perpetual loop
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public abstract class ConsoleInputImpl<T> : IConsoleInput<T>
+/// <typeparam name="TKeyInfo"></typeparam>
+public abstract class ConsoleInputImpl<TKeyInfo> : IConsoleInput<TKeyInfo>
 {
-    private ConcurrentQueue<T>? _inputBuffer;
+    private ConcurrentQueue<TKeyInfo>? _inputBuffer;
 
     /// <summary>
     ///     Determines how to get the current system type, adjust
@@ -21,7 +21,7 @@ public abstract class ConsoleInputImpl<T> : IConsoleInput<T>
     public virtual void Dispose () { }
 
     /// <inheritdoc/>
-    public void Initialize (ConcurrentQueue<T> inputBuffer) { _inputBuffer = inputBuffer; }
+    public void Initialize (ConcurrentQueue<TKeyInfo> inputBuffer) { _inputBuffer = inputBuffer; }
 
     /// <inheritdoc/>
     public void Run (CancellationToken token)
@@ -39,7 +39,7 @@ public abstract class ConsoleInputImpl<T> : IConsoleInput<T>
 
                 while (Peek ())
                 {
-                    foreach (T r in Read ())
+                    foreach (TKeyInfo r in Read ())
                     {
                         _inputBuffer.Enqueue (r);
                     }
@@ -75,5 +75,5 @@ public abstract class ConsoleInputImpl<T> : IConsoleInput<T>
     ///     returns <see langword="true"/>.
     /// </summary>
     /// <returns></returns>
-    protected abstract IEnumerable<T> Read ();
+    protected abstract IEnumerable<TKeyInfo> Read ();
 }

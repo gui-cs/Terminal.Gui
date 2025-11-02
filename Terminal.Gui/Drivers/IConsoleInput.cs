@@ -8,14 +8,14 @@ namespace Terminal.Gui.Drivers;
 ///     for reading and storing the input in a thread safe input buffer
 ///     which is then processed downstream e.g. on main UI thread.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IConsoleInput<T> : IDisposable
+/// <typeparam name="TKeyInfo"></typeparam>
+public interface IConsoleInput<TKeyInfo> : IDisposable
 {
     /// <summary>
     ///     Initializes the input with a buffer into which to put data read
     /// </summary>
     /// <param name="inputBuffer"></param>
-    void Initialize (ConcurrentQueue<T> inputBuffer);
+    void Initialize (ConcurrentQueue<TKeyInfo> inputBuffer);
 
     /// <summary>
     ///     Runs in an infinite input loop.

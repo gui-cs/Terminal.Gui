@@ -35,4 +35,10 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
 
         return new (map);
     }
+
+    /// <inheritdoc />
+    public WindowsConsole.InputRecord ToKeyInfo (Key key)
+    {
+        throw new NotImplementedException ();
+    }
 }

@@ -17,4 +17,10 @@ internal class UnixKeyConverter : IKeyConverter<char>
 
         return EscSeqUtils.MapKey (adjustedInput);
     }
+
+    /// <inheritdoc />
+    public char ToKeyInfo (Key key)
+    {
+        throw new NotImplementedException ();
+    }
 }

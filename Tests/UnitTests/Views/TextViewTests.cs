@@ -1040,7 +1040,7 @@ This is the second line.
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard: true)]
+    [AutoInitShutdown ()]
     public void HistoryText_Undo_Redo_Copy_Without_Selection_Multi_Line_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -2979,7 +2979,7 @@ This is the second line.
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard: true)]
+    [AutoInitShutdown ()]
     public void HistoryText_Undo_Redo_Simple_Copy_Multi_Line_Selected_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
