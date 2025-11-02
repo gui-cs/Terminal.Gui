@@ -304,7 +304,7 @@ public class ApplicationImpl : IApplication
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
             Application.RunningUnitTests = true;
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory (null, new ()));
+            _coordinator = CreateSubcomponents (() => new FakeComponentFactory (new ()));
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {

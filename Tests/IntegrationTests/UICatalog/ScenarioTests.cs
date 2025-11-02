@@ -661,8 +661,6 @@ public class ScenarioTests : TestsAllViews
             }
         };
 
-
-
         Application.InitializedChanged += (_, args) =>
                                           {
                                               _output.WriteLine ($"InitializedChanged: {args.Value}");
