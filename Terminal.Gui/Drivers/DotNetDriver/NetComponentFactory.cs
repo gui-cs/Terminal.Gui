@@ -5,20 +5,20 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 /// <see cref="IComponentFactory{T}"/> implementation for native csharp console I/O i.e. dotnet.
-/// This factory creates instances of internal classes <see cref="NetConsoleInput"/>, <see cref="NetConsoleOutput"/> etc.
+/// This factory creates instances of internal classes <see cref="NetInput"/>, <see cref="NetOutput"/> etc.
 /// </summary>
 public class NetComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
 {
     /// <inheritdoc/>
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput ()
+    public override IInput<ConsoleKeyInfo> CreateInput ()
     {
-        return new NetConsoleInput ();
+        return new NetInput ();
     }
 
     /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
+    public override IOutput CreateOutput ()
     {
-        return new NetConsoleOutput ();
+        return new NetOutput ();
     }
 
     /// <inheritdoc />

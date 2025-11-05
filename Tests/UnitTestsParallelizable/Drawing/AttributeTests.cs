@@ -105,7 +105,7 @@ public class AttributeTests : ParallelizableBase
     [Fact]
     public void Constructors_Construct ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // Test parameterless constructor
         var attr = new Attribute ();
@@ -259,7 +259,7 @@ public class AttributeTests : ParallelizableBase
     [Fact]
     public void Make_Creates ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var fg = new Color ();
         fg = new (Color.Red);

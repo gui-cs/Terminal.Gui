@@ -6,8 +6,8 @@ namespace Terminal.Gui.Drivers;
 ///     can translate the raw console input type T (which typically varies by
 ///     driver) to the shared Terminal.Gui <see cref="Key"/> class.
 /// </summary>
-/// <typeparam name="TKeyInfo"></typeparam>
-public interface IKeyConverter<TKeyInfo>
+/// <typeparam name="TInputRecord"></typeparam>
+public interface IKeyConverter<TInputRecord>
 {
     /// <summary>
     ///     Converts the native keyboard info type into
@@ -15,12 +15,12 @@ public interface IKeyConverter<TKeyInfo>
     /// </summary>
     /// <param name="keyInfo"></param>
     /// <returns></returns>
-    Key ToKey (TKeyInfo keyInfo);
+    Key ToKey (TInputRecord keyInfo);
 
     /// <summary>
     ///     Converts a <see cref="Key"/> into the native keyboard info type.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    TKeyInfo ToKeyInfo (Key key);
+    TInputRecord ToKeyInfo (Key key);
 }

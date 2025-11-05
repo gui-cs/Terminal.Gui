@@ -8,7 +8,6 @@
 ///     <list type="bullet">
 ///         <item>Starting the asynchronous input reading thread</item>
 ///         <item>Initializing the main UI loop on the application thread</item>
-///         <item>Building the <see cref="IConsoleDriver"/> facade</item>
 ///         <item>Coordinating clean shutdown of both threads</item>
 ///     </list>
 /// </remarks>

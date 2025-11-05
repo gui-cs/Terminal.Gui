@@ -21,6 +21,11 @@ internal class UnixKeyConverter : IKeyConverter<char>
     /// <inheritdoc />
     public char ToKeyInfo (Key key)
     {
-        throw new NotImplementedException ();
+        // Convert Key to ConsoleKeyInfo using the cross-platform mapping utility
+        ConsoleKeyInfo consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key.KeyCode);
+
+        // Return the character representation
+        // For Unix, we primarily care about the KeyChar as Unix deals with character input
+        return consoleKeyInfo.KeyChar;
     }
 }

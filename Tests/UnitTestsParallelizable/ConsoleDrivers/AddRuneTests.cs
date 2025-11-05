@@ -20,7 +20,7 @@ public class AddRuneTests : ParallelizableBase
     [Fact]
     public void AddRune ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         driver.Rows = 25;
         driver.Cols = 80;
@@ -33,7 +33,7 @@ public class AddRuneTests : ParallelizableBase
     [Fact]
     public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var expected = new Rune ('ắ');
 
@@ -83,7 +83,7 @@ public class AddRuneTests : ParallelizableBase
     [Fact]
     public void AddRune_InvalidLocation_DoesNothing ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         driver.Move (driver.Cols, driver.Rows);
         driver.AddRune ('a');
@@ -102,7 +102,7 @@ public class AddRuneTests : ParallelizableBase
     [Fact]
     public void AddRune_MovesToNextColumn ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         driver.AddRune ('a');
         Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);
@@ -143,7 +143,7 @@ public class AddRuneTests : ParallelizableBase
     [Fact]
     public void AddRune_MovesToNextColumn_Wide ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // 🍕 Slice of Pizza "\U0001F355"
         OperationStatus operationStatus = Rune.DecodeFromUtf16 ("\U0001F355", out Rune rune, out int charsConsumed);

@@ -17,7 +17,7 @@ public class ApplicationImpl : IApplication
     private IMainLoopCoordinator? _coordinator;
     private string? _driverName;
     private readonly ITimedEvents _timedEvents = new TimedEvents ();
-    private IConsoleDriver? _driver;
+    private IDriver? _driver;
     private bool _initialized;
     private ApplicationPopover? _popover;
     private ApplicationNavigation? _navigation;
@@ -82,7 +82,7 @@ public class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc/>
-    public IConsoleDriver? Driver
+    public IDriver? Driver
     {
         get => _driver;
         set => _driver = value;
@@ -218,7 +218,7 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IConsoleDriver? driver = null, string? driverName = null)
+    public void Init (IDriver? driver = null, string? driverName = null)
     {
         if (_initialized)
         {
@@ -278,7 +278,7 @@ public class ApplicationImpl : IApplication
     }
 
     /// <summary>
-    ///     Creates the appropriate <see cref="IConsoleDriver"/> based on platform and driverName.
+    ///     Creates the appropriate <see cref="IDriver"/> based on platform and driverName.
     /// </summary>
     /// <param name="driverName"></param>
     /// <returns></returns>
@@ -300,31 +300,33 @@ public class ApplicationImpl : IApplication
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
 
+        Logging.Logger.LogTrace ("");
+
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
             Application.RunningUnitTests = true;
-            _coordinator = CreateSubcomponents (() => new FakeComponentFactory (new ()));
+            _coordinator = CreateSubcomponents (fallbackFactory: () => new FakeComponentFactory ());
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            _coordinator = CreateSubcomponents (fallbackFactory: () => new WindowsComponentFactory ());
         }
         else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
         {
-            _coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+            _coordinator = CreateSubcomponents (fallbackFactory: () => new NetComponentFactory ());
         }
         else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
         {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            _coordinator = CreateSubcomponents (fallbackFactory: () => new UnixComponentFactory ());
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            _coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            _coordinator = CreateSubcomponents (fallbackFactory: () => new WindowsComponentFactory ());
         }
         else
         {
-            _coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            _coordinator = CreateSubcomponents (fallbackFactory: () => new UnixComponentFactory ());
         }
 
         _coordinator.StartAsync ().Wait ();
@@ -341,14 +343,14 @@ public class ApplicationImpl : IApplication
         }
     }
 
-    private IMainLoopCoordinator CreateSubcomponents<T> (Func<IComponentFactory<T>> fallbackFactory)
+    private IMainLoopCoordinator CreateSubcomponents<TInputRecord> (Func<IComponentFactory<TInputRecord>> fallbackFactory) where TInputRecord : struct
     {
-        ConcurrentQueue<T> inputBuffer = new ();
-        ApplicationMainLoop<T> loop = new ();
+        ConcurrentQueue<TInputRecord> inputBuffer = new ();
+        ApplicationMainLoop<TInputRecord> loop = new ();
 
-        IComponentFactory<T> cf;
+        IComponentFactory<TInputRecord> cf;
 
-        if (_componentFactory is IComponentFactory<T> typedFactory)
+        if (_componentFactory is IComponentFactory<TInputRecord> typedFactory)
         {
             cf = typedFactory;
         }
@@ -357,7 +359,7 @@ public class ApplicationImpl : IApplication
             cf = fallbackFactory ();
         }
 
-        return new MainLoopCoordinator<T> (_timedEvents, inputBuffer, loop, cf);
+        return new MainLoopCoordinator<TInputRecord> (_timedEvents, inputBuffer, loop, cf);
     }
 
     /// <summary>
@@ -375,14 +377,14 @@ public class ApplicationImpl : IApplication
     /// </summary>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
+    ///     The <see cref="IDriver"/> to use. If not specified the default driver for the platform will
     ///     be used. Must be <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
-    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
+    /// <returns>The created TView object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, string? driver = null)
-        where T : Toplevel, new()
+    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
+        where TView : Toplevel, new()
     {
         if (!_initialized)
         {
@@ -390,7 +392,7 @@ public class ApplicationImpl : IApplication
             Init (null, driver);
         }
 
-        T top = new ();
+        TView top = new ();
         Run (top, errorHandler);
         return top;
     }

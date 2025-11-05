@@ -591,7 +591,7 @@ public class ApplicationTests
     [SetupFakeApplication]
     public void Screen_Size_Changes ()
     {
-        IConsoleDriver driver = Application.Driver;
+        IDriver driver = Application.Driver;
 
         Application.Driver!.SetScreenSize (80, 25);
 

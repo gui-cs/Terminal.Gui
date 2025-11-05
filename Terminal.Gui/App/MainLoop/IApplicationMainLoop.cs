@@ -15,8 +15,8 @@ namespace Terminal.Gui.App;
 ///         <item>Rendering UI updates to the console</item>
 ///     </list>
 /// </remarks>
-/// <typeparam name="T">Type of raw input events processed by the loop, e.g. <see cref="ConsoleKeyInfo"/> for cross-platform .NET driver</typeparam>
-public interface IApplicationMainLoop<T> : IDisposable
+/// <typeparam name="TInputRecord">Type of raw input events processed by the loop, e.g. <see cref="ConsoleKeyInfo"/> for cross-platform .NET driver</typeparam>
+public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRecord : struct
 {
     /// <summary>
     ///     Gets the class responsible for servicing user timeouts
@@ -31,7 +31,7 @@ public interface IApplicationMainLoop<T> : IDisposable
     /// <summary>
     ///     Class for writing output to the console.
     /// </summary>
-    public IConsoleOutput Out { get; }
+    public IOutput Out { get; }
 
     /// <summary>
     ///     Gets the class responsible for processing buffered console input and translating
@@ -48,7 +48,7 @@ public interface IApplicationMainLoop<T> : IDisposable
     /// <summary>
     ///     Gets the class responsible for determining the current console size
     /// </summary>
-    public IConsoleSizeMonitor ConsoleSizeMonitor { get; }
+    public ISizeMonitor ConsoleSizeMonitor { get; }
 
     /// <summary>
     ///     Initializes the loop with a buffer from which data can be read
@@ -60,10 +60,10 @@ public interface IApplicationMainLoop<T> : IDisposable
     /// <param name="componentFactory"></param>
     void Initialize (
         ITimedEvents timedEvents,
-        ConcurrentQueue<T> inputBuffer,
+        ConcurrentQueue<TInputRecord> inputBuffer,
         IInputProcessor inputProcessor,
-        IConsoleOutput consoleOutput,
-        IComponentFactory<T> componentFactory
+        IOutput consoleOutput,
+        IComponentFactory<TInputRecord> componentFactory
     );
 
     /// <summary>

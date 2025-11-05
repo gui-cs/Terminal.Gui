@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
+internal class UnixInput : InputImpl<char>, IUnixInput
 {
     private const int STDIN_FILENO = 0;
 
@@ -104,9 +104,9 @@ internal class UnixConsoleInput : ConsoleInputImpl<char>, IUnixConsoleInput
 
     private Pollfd [] _pollMap;
 
-    public UnixConsoleInput ()
+    public UnixInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (UnixConsoleInput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (UnixInput)}");
 
         if (Application.RunningUnitTests)
         {

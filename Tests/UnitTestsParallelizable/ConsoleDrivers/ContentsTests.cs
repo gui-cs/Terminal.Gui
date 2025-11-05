@@ -20,7 +20,7 @@ public class ContentsTests : ParallelizableBase
     [Fact]
     public void AddStr_Combining_Character_1st_Column ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
@@ -32,7 +32,7 @@ public class ContentsTests : ParallelizableBase
     [Fact]
     public void AddStr_With_Combining_Characters ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var acuteAccent = new Rune (0x0301); // Combining acute accent (é)
         string combined = "e" + acuteAccent;
@@ -81,7 +81,7 @@ public class ContentsTests : ParallelizableBase
     [Fact]
     public void Move_Bad_Coordinates ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         Assert.Equal (0, driver.Col);
         Assert.Equal (0, driver.Row);

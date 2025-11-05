@@ -4,12 +4,12 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Base class for reading console input in perpetual loop
+///     Base class for reading console input in perpetual loop.
 /// </summary>
-/// <typeparam name="TKeyInfo"></typeparam>
-public abstract class ConsoleInputImpl<TKeyInfo> : IConsoleInput<TKeyInfo>
+/// <typeparam name="TInputRecord"></typeparam>
+public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
 {
-    private ConcurrentQueue<TKeyInfo>? _inputBuffer;
+    private ConcurrentQueue<TInputRecord>? _inputQueue;
 
     /// <summary>
     ///     Determines how to get the current system type, adjust
@@ -17,18 +17,28 @@ public abstract class ConsoleInputImpl<TKeyInfo> : IConsoleInput<TKeyInfo>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    /// <inheritdoc/>
-    public virtual void Dispose () { }
+    /// <inheritdoc />
+    public CancellationTokenSource? ExternalCancellationTokenSource { get; set; }
 
     /// <inheritdoc/>
-    public void Initialize (ConcurrentQueue<TKeyInfo> inputBuffer) { _inputBuffer = inputBuffer; }
+    public void Initialize (ConcurrentQueue<TInputRecord> inputQueue) { _inputQueue = inputQueue; }
 
     /// <inheritdoc/>
-    public void Run (CancellationToken token)
+    public void Run (CancellationToken runCancellationToken)
     {
+        // Create a linked token source if we have an external one
+        CancellationTokenSource? linkedCts = null;
+        CancellationToken effectiveToken = runCancellationToken;
+
+        if (ExternalCancellationTokenSource != null)
+        {
+            linkedCts = CancellationTokenSource.CreateLinkedTokenSource (runCancellationToken, ExternalCancellationTokenSource.Token);
+            effectiveToken = linkedCts.Token;
+        }
+
         try
         {
-            if (_inputBuffer == null)
+            if (_inputQueue == null)
             {
                 throw new ("Cannot run input before Initialization");
             }
@@ -39,9 +49,9 @@ public abstract class ConsoleInputImpl<TKeyInfo> : IConsoleInput<TKeyInfo>
 
                 while (Peek ())
                 {
-                    foreach (TKeyInfo r in Read ())
+                    foreach (TInputRecord r in Read ())
                     {
-                        _inputBuffer.Enqueue (r);
+                        _inputQueue.Enqueue (r);
                     }
                 }
 
@@ -52,15 +62,19 @@ public abstract class ConsoleInputImpl<TKeyInfo> : IConsoleInput<TKeyInfo>
 
                 if (sleepFor.Milliseconds > 0)
                 {
-                    Task.Delay (sleepFor, token).Wait (token);
+                    Task.Delay (sleepFor, effectiveToken).Wait (effectiveToken);
                 }
 
-                token.ThrowIfCancellationRequested ();
+                effectiveToken.ThrowIfCancellationRequested ();
             }
-            while (!token.IsCancellationRequested);
+            while (!effectiveToken.IsCancellationRequested);
         }
         catch (OperationCanceledException)
         { }
+        finally
+        {
+            linkedCts?.Dispose ();
+        }
     }
 
     /// <summary>
@@ -75,5 +89,8 @@ public abstract class ConsoleInputImpl<TKeyInfo> : IConsoleInput<TKeyInfo>
     ///     returns <see langword="true"/>.
     /// </summary>
     /// <returns></returns>
-    protected abstract IEnumerable<TKeyInfo> Read ();
+    protected abstract IEnumerable<TInputRecord> Read ();
+
+    /// <inheritdoc/>
+    public virtual void Dispose () { }
 }

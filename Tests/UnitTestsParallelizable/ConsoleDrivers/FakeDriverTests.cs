@@ -16,10 +16,9 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void FakeDriver_Init_Works ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
-        // Verify it's using a driver facade (modern architecture)
-        Assert.IsAssignableFrom<IConsoleDriverFacade> (driver);
+        Assert.IsAssignableFrom<IDriver> (driver);
 
         _output.WriteLine ($"Driver type: {driver.GetType ().Name}");
         _output.WriteLine ($"Screen size: {driver.Screen}");
@@ -29,7 +28,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void FakeDriver_Screen_Has_Default_Size ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
         // Default size should be 80x25
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
         Assert.Equal (80, driver.Cols);
@@ -40,7 +39,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void FakeDriver_Can_Resize ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // Start with default size
         Assert.Equal (80, driver.Cols);
@@ -63,7 +62,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void SetupFakeDriver_Initializes_Driver_With_80x25 ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         Assert.NotNull (driver);
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
@@ -75,12 +74,12 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void SetupFakeDriver_Driver_Is_IConsoleDriver ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         Assert.NotNull (driver);
 
         // Should be IConsoleDriver
-        Assert.IsAssignableFrom<IConsoleDriver> (driver);
+        Assert.IsAssignableFrom<IDriver> (driver);
 
         _output.WriteLine ($"Driver type: {driver.GetType ().Name}");
     }
@@ -89,9 +88,9 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void SetupFakeDriver_Can_Set_Screen_Size ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
-        IConsoleDriver fakeDriver = driver;
+        IDriver fakeDriver = driver;
         Assert.NotNull (fakeDriver);
 
         fakeDriver!.SetScreenSize (100, 50);
@@ -108,7 +107,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void FakeDriver_Clipboard_Works_When_Enabled ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         Assert.NotNull (driver.Clipboard);
         Assert.True (driver.Clipboard.IsSupported);
@@ -124,7 +123,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void FakeDriver_Clipboard_GetClipboarData_Works ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         Assert.NotNull (driver.Clipboard);
 
@@ -141,7 +140,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void FakeDriver_Can_Fill_Rectangle ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // Verify driver is initialized with buffers
         Assert.NotNull (driver);
@@ -165,7 +164,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void FakeDriver_Buffer_Integrity_After_Multiple_Resizes ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // Start with default size
         Assert.Equal (80, driver.Cols);
@@ -209,7 +208,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void ScreenChanged_Event_Fires_On_SetScreenSize ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var screenChangedFired = false;
         Size? newSize = null;
@@ -234,7 +233,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void FakeResize_Triggers_ScreenChanged_And_Updates_Application_Screen ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var screenChangedFired = false;
         Size? eventSize = null;
@@ -264,7 +263,7 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     public void SizeChanged_Event_Still_Fires_For_Compatibility ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var sizeChangedFired = false;
         var screenChangedFired = false;

@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Fake console output for testing that captures what would be written to the console.
 /// </summary>
-public class FakeConsoleOutput : ConsoleOutputBase, IConsoleOutput
+public class FakeOutput : OutputBase, IOutput
 {
     private readonly StringBuilder _output = new ();
     private int _cursorLeft;
@@ -16,7 +16,7 @@ public class FakeConsoleOutput : ConsoleOutputBase, IConsoleOutput
     /// <summary>
     /// 
     /// </summary>
-    public FakeConsoleOutput ()
+    public FakeOutput ()
     {
         LastBuffer = new OutputBufferImpl ();
         LastBuffer.SetSize (80, 25);
@@ -68,14 +68,14 @@ public class FakeConsoleOutput : ConsoleOutputBase, IConsoleOutput
         _output.Append (text);
     }
 
-    /// <inheritdoc cref="IConsoleDriver"/>
+    /// <inheritdoc cref="IDriver"/>
     public override void Write (IOutputBuffer buffer)
     {
         LastBuffer = buffer;
         base.Write (buffer);
     }
 
-    /// <inheritdoc cref="IConsoleDriver"/>
+    /// <inheritdoc cref="IDriver"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         // Capture but don't act on it in fake output

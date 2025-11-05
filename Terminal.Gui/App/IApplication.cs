@@ -28,7 +28,7 @@ public interface IApplication
     IMouse Mouse { get; set; }
 
     /// <summary>Gets or sets the console driver being used.</summary>
-    IConsoleDriver? Driver { get; set; }
+    IDriver? Driver { get; set; }
 
     /// <summary>Gets or sets whether the application has been initialized.</summary>
     bool Initialized { get; set; }
@@ -36,7 +36,7 @@ public interface IApplication
     /// <summary>
     ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
-    ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
+    ///     as long as the selected <see cref="IDriver"/> supports TrueColor.
     /// </summary>
     bool Force16Colors { get; set; }
 
@@ -53,7 +53,7 @@ public interface IApplication
     List<SixelToRender> Sixel { get; }
 
     /// <summary>
-    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IConsoleDriver"/>.
+    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IDriver"/>.
     /// </summary>
     Rectangle Screen { get; set; }
 
@@ -101,7 +101,7 @@ public interface IApplication
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
-    ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
+    ///     This function loads the right <see cref="IDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
     ///     assigns it to <see cref="Application.Top"/>
     /// </para>
     /// <para>
@@ -112,23 +112,23 @@ public interface IApplication
     /// </para>
     /// <para>
     ///     The <see cref="Run{T}"/> function combines
-    ///     <see cref="Init(IConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+    ///     <see cref="Init(IDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
     ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
-    ///     <see cref="Init(IConsoleDriver,string)"/>.
+    ///     <see cref="Init(IDriver,string)"/>.
     /// </para>
     /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or
+    ///     The <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or
     ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
     ///     The driver name (e.g. "dotnet", "windows", "fake", or "unix") of the
-    ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
+    ///     <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IConsoleDriver? driver = null, string? driverName = null);
+    public void Init (IDriver? driver = null, string? driverName = null);
 
     /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
@@ -199,15 +199,15 @@ public interface IApplication
     /// </remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
+    ///     The <see cref="IDriver"/> to use. If not specified the default driver for the platform will
     ///     be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
-    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
+    /// <returns>The created TView object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, string? driver = null)
-        where T : Toplevel, new();
+    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
+        where TView : Toplevel, new();
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
     /// <remarks>
@@ -235,7 +235,7 @@ public interface IApplication
     ///     </para>
     ///     <para>
     ///         When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},IConsoleDriver)"/>
+    ///         <see cref="Run(System.Func{System.Exception,bool},IDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>

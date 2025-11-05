@@ -4,7 +4,7 @@ namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
 public class ConsoleInputTests
 {
-    private class FakeInput : ConsoleInputImpl<char>
+    private class FakeInput : InputImpl<char>
     {
         private readonly string [] _reads;
 

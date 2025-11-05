@@ -3,7 +3,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixConsoleOutput : ConsoleOutputBase, IConsoleOutput
+internal class UnixOutput : OutputBase, IOutput
 {
     [StructLayout (LayoutKind.Sequential)]
     private struct WinSize
@@ -142,7 +142,7 @@ internal class UnixConsoleOutput : ConsoleOutputBase, IConsoleOutput
 
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
-    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
+    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         if (visibility != CursorVisibility.Invisible)

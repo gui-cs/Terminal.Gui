@@ -6,8 +6,8 @@ public static partial class Application // Driver abstractions
 {
     internal static bool _forceFakeConsole;
 
-    /// <summary>Gets the <see cref="IConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
-    public static IConsoleDriver? Driver
+    /// <summary>Gets the <see cref="IDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
+    public static IDriver? Driver
     {
         get => ApplicationImpl.Instance.Driver;
         internal set => ApplicationImpl.Instance.Driver = value;
@@ -16,7 +16,7 @@ public static partial class Application // Driver abstractions
     /// <summary>
     ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
-    ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
+    ///     as long as the selected <see cref="IDriver"/> supports TrueColor.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors
@@ -30,7 +30,7 @@ public static partial class Application // Driver abstractions
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     /// <remarks>
-    ///     Note, <see cref="Application.Init(IConsoleDriver, string)"/> will override this configuration setting if called
+    ///     Note, <see cref="Application.Init(IDriver, string)"/> will override this configuration setting if called
     ///     with either `driver` or `driverName` specified.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]

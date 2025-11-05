@@ -17,19 +17,19 @@ public abstract class ParallelizableBase
     /// <param name="width">Width of the driver buffer</param>
     /// <param name="height">Height of the driver buffer</param>
     /// <returns>A configured IFakeConsoleDriver instance</returns>
-    protected static IConsoleDriver CreateFakeDriver (int width = 80, int height = 25)
+    protected static IDriver CreateFakeDriver (int width = 80, int height = 25)
     {
-        var output = new FakeConsoleOutput ();
+        var output = new FakeOutput ();
 
-        ConsoleDriverFacade<ConsoleKeyInfo> facade = new (
+        DriverImpl driver = new (
                                                           new NetInputProcessor (null),
                                                           new OutputBufferImpl (),
                                                           output,
-                                                          new AnsiRequestScheduler(new AnsiResponseParser()),
-                                                          new ConsoleSizeMonitorImpl (output));
+                                                          new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                                          new SizeMonitorImpl (output));
 
-        facade.SetScreenSize (width, height);
+        driver.SetScreenSize (width, height);
 
-        return facade;
+        return driver;
     }
 }

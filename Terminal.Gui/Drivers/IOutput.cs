@@ -3,7 +3,7 @@
 /// <summary>
 ///     Interface for writing console output
 /// </summary>
-public interface IConsoleOutput : IDisposable
+public interface IOutput : IDisposable
 {
     /// <summary>
     ///     Writes the given text directly to the console. Use to send

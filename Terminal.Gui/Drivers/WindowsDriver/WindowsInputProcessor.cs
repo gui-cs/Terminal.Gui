@@ -6,16 +6,26 @@ namespace Terminal.Gui.Drivers;
 using InputRecord = WindowsConsole.InputRecord;
 
 /// <summary>
-///     Input processor for <see cref="WindowsConsoleInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
+///     Input processor for <see cref="WindowsInput"/>, deals in <see cref="WindowsConsole.InputRecord"/> stream.
 /// </summary>
 internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
 {
-    private readonly bool [] _lastWasPressed = new bool[4];
+    private readonly bool [] _lastWasPressed = new bool [4];
 
     /// <inheritdoc/>
     public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ())
     {
         DriverName = "Windows";
+    }
+
+    /// <inheritdoc />
+    public override void EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    {
+        InputBuffer.Enqueue (new ()
+        {
+            EventType = WindowsConsole.EventType.Mouse,
+            MouseEvent = ToMouseEventRecord (mouseEvent)
+        });
     }
 
     /// <inheritdoc/>
@@ -25,6 +35,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         {
             case WindowsConsole.EventType.Key:
 
+                // TODO: v1 supported distinct key up/down events on Windows.
                 // TODO: For now ignore keyup because ANSI comes in as down+up which is confusing to try and parse/pair these things up
                 if (!inputEvent.KeyEvent.bKeyDown)
                 {
@@ -61,28 +72,20 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
                 break;
 
             case WindowsConsole.EventType.Mouse:
-                MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
+                MouseEventArgs me = ToMouseEvent (inputEvent.MouseEvent);
 
-                OnMouseEvent (me);
+                RaiseMouseEvent (me);
 
                 break;
         }
     }
 
-    /// <inheritdoc/>
-    protected override void ProcessAfterParsing (InputRecord input)
-    {
-        var key = KeyConverter.ToKey (input);
-
-        // If the key is not valid, we don't want to raise any events.
-        if (IsValidInput (key, out key))
-        {
-            OnKeyDown (key!);
-            OnKeyUp (key!);
-        }
-    }
-
-    public MouseEventArgs ToDriverMouse (WindowsConsole.MouseEventRecord e)
+    /// <summary>
+    ///     Converts a Windows-specific mouse event to a <see cref="MouseEventArgs"/>.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    public MouseEventArgs ToMouseEvent (WindowsConsole.MouseEventRecord e)
     {
         var mouseFlags = MouseFlags.None;
 
@@ -208,5 +211,80 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         }
 
         return current;
+    }
+
+    /// <summary>
+    ///     Converts a <see cref="MouseEventArgs"/> to a Windows-specific <see cref="WindowsConsole.MouseEventRecord"/>.
+    /// </summary>
+    /// <param name="mouseEvent"></param>
+    /// <returns></returns>
+    public WindowsConsole.MouseEventRecord ToMouseEventRecord (MouseEventArgs mouseEvent)
+    {
+        var buttonState = WindowsConsole.ButtonState.NoButtonPressed;
+        var eventFlags = WindowsConsole.EventFlags.NoEvent;
+        var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
+
+        // Convert button states
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        {
+            buttonState |= WindowsConsole.ButtonState.Button1Pressed;
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed))
+        {
+            buttonState |= WindowsConsole.ButtonState.Button2Pressed;
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed))
+        {
+            buttonState |= WindowsConsole.ButtonState.Button3Pressed;
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
+        {
+            buttonState |= WindowsConsole.ButtonState.Button4Pressed;
+        }
+
+        // Convert mouse wheel events
+        if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledUp))
+        {
+            eventFlags = WindowsConsole.EventFlags.MouseWheeled;
+            buttonState = (WindowsConsole.ButtonState)0x00780000; // Positive value for wheel up
+        }
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledDown))
+        {
+            eventFlags = WindowsConsole.EventFlags.MouseWheeled;
+            buttonState = (WindowsConsole.ButtonState)unchecked((int)0xFF880000); // Negative value for wheel down
+        }
+
+        // Convert movement flag
+        if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        {
+            eventFlags |= WindowsConsole.EventFlags.MouseMoved;
+        }
+
+        // Convert modifier keys
+        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonAlt))
+        {
+            controlKeyState |= WindowsConsole.ControlKeyState.LeftAltPressed;
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonCtrl))
+        {
+            controlKeyState |= WindowsConsole.ControlKeyState.LeftControlPressed;
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonShift))
+        {
+            controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
+        }
+
+        return new WindowsConsole.MouseEventRecord
+        {
+            MousePosition = new WindowsConsole.Coord ((short)mouseEvent.Position.X, (short)mouseEvent.Position.Y),
+            ButtonState = buttonState,
+            ControlKeyState = controlKeyState,
+            EventFlags = eventFlags
+        };
     }
 }

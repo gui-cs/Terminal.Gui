@@ -625,7 +625,7 @@ public class ThicknessTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void DrawTests ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
         driver.SetScreenSize (60, 40);
 
         var t = new Thickness (0, 0, 0, 0);
@@ -738,7 +738,7 @@ public class ThicknessTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void DrawTests_Ruler ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };

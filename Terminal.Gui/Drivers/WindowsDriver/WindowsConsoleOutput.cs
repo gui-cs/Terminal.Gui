@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
+internal partial class WindowsConsoleOutput : OutputBase, IOutput
 {
     [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -454,7 +454,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
         return true;
     }
 
-    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
+    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))

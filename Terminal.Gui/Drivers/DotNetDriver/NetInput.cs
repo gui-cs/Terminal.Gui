@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
 /// </summary>
-public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
+public class NetInput : InputImpl<ConsoleKeyInfo>, IDisposable
 {
     private readonly NetWinVTConsole _adjustConsole;
 
@@ -14,14 +14,9 @@ public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
     ///     console mode settings that enable virtual input (mouse
     ///     reporting etc).
     /// </summary>
-    public NetConsoleInput ()
+    public NetInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetConsoleInput)}");
-
-        if (Application.RunningUnitTests)
-        {
-            return;
-        }
+        Logging.Logger.LogInformation ($"Creating {nameof (NetInput)}");
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -37,6 +32,7 @@ public class NetConsoleInput : ConsoleInputImpl<ConsoleKeyInfo>
                 Logging.Logger.LogCritical (
                                             ex,
                                             "NetWinVTConsole could not be constructed i.e. could not configure terminal modes. May indicate running in non-interactive session e.g. unit testing CI");
+                return;
             }
         }
 

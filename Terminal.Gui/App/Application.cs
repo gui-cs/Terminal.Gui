@@ -81,7 +81,7 @@ public static partial class Application
     /// <returns>A string representation of the Application </returns>
     public new static string ToString ()
     {
-        IConsoleDriver? driver = Driver;
+        IDriver? driver = Driver;
 
         if (driver is null)
         {
@@ -92,11 +92,11 @@ public static partial class Application
     }
 
     /// <summary>
-    ///     Gets a string representation of the Application rendered by the provided <see cref="IConsoleDriver"/>.
+    ///     Gets a string representation of the Application rendered by the provided <see cref="IDriver"/>.
     /// </summary>
     /// <param name="driver">The driver to use to render the contents.</param>
     /// <returns>A string representation of the Application </returns>
-    public static string ToString (IConsoleDriver? driver)
+    public static string ToString (IDriver? driver)
     {
         if (driver is null)
         {

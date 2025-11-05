@@ -14,7 +14,14 @@ public partial class GuiTestContext
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
     /// <returns></returns>
-    public GuiTestContext RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
+    public GuiTestContext RightClick (int screenX, int screenY)
+    {
+        return MouseEvent (new ()
+        {
+            Flags = MouseFlags.Button3Clicked,
+            ScreenPosition = new (screenX, screenY)
+        });
+    }
 
     /// <summary>
     ///     Simulates a left click at the given screen coordinates on the current driver.
@@ -24,540 +31,167 @@ public partial class GuiTestContext
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
     /// <returns></returns>
-    public GuiTestContext LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
-
-    public GuiTestContext LeftClick<T> (Func<T, bool> evaluator) where T : View { return Click (WindowsConsole.ButtonState.Button1Pressed, evaluator); }
-
-    private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T : View
+    public GuiTestContext LeftClick (int screenX, int screenY)
     {
-        T v;
+        return MouseEvent (new ()
+        {
+            Flags = MouseFlags.Button1Clicked,
+            ScreenPosition = new (screenX, screenY)
+        });
+    }
+
+    /// <summary>
+    ///     Simulates a left mouse click on the top-left cell of the Viewport of the View of type TView determined by the
+    ///     <paramref name="evaluator"/>.
+    /// </summary>
+    /// <typeparam name="TView"></typeparam>
+    /// <param name="evaluator"></param>
+    /// <returns></returns>
+    public GuiTestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
+    {
+        return MouseEvent (new ()
+        {
+            Flags = MouseFlags.Button1Clicked,
+        }, evaluator);
+    }
+
+    private GuiTestContext MouseEvent (MouseEventArgs mouseEvent)
+    {
+        return WaitIteration (() =>
+                              {
+                                  if (Application.Driver is { })
+                                  {
+                                      Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+                                  }
+                                  else
+                                  {
+                                      Fail ("Expected Application.Driver to be non-null.");
+                                  }
+                              });
+    }
+
+
+    private GuiTestContext MouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
+    {
         var screen = Point.Empty;
 
         GuiTestContext ctx = WaitIteration (() =>
                                             {
-                                                v = Find (evaluator);
+                                                TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
+        mouseEvent.ScreenPosition = screen;
 
-        Click (btn, screen.X, screen.Y);
+        MouseEvent (mouseEvent);
 
         return ctx;
     }
 
-    private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
+    //private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
+    //{
+    //    switch (_driverType)
+    //    {
+    //        case TestDriver.Windows:
 
-                _winInput!.InputBuffer!.Enqueue (
-                                                 new ()
-                                                 {
-                                                     EventType = WindowsConsole.EventType.Mouse,
-                                                     MouseEvent = new ()
-                                                     {
-                                                         ButtonState = btn,
-                                                         MousePosition = new ((short)screenX, (short)screenY)
-                                                     }
-                                                 });
+    //            _winInput!.InputQueue!.Enqueue (
+    //                                             new ()
+    //                                             {
+    //                                                 EventType = WindowsConsole.EventType.Mouse,
+    //                                                 MouseEvent = new ()
+    //                                                 {
+    //                                                     ButtonState = btn,
+    //                                                     MousePosition = new ((short)screenX, (short)screenY)
+    //                                                 }
+    //                                             });
 
-                _winInput.InputBuffer.Enqueue (
-                                               new ()
-                                               {
-                                                   EventType = WindowsConsole.EventType.Mouse,
-                                                   MouseEvent = new ()
-                                                   {
-                                                       ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
-                                                       MousePosition = new ((short)screenX, (short)screenY)
-                                                   }
-                                               });
+    //            _winInput.InputQueue.Enqueue (
+    //                                           new ()
+    //                                           {
+    //                                               EventType = WindowsConsole.EventType.Mouse,
+    //                                               MouseEvent = new ()
+    //                                               {
+    //                                                   ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
+    //                                                   MousePosition = new ((short)screenX, (short)screenY)
+    //                                               }
+    //                                           });
 
-                return WaitUntil (() => _winInput.InputBuffer.IsEmpty);
+    //            return WaitUntil (() => _winInput.InputQueue.IsEmpty);
 
-            case TestDriver.DotNet:
+    //        case TestDriver.DotNet:
 
-                int netButton = btn switch
-                                {
-                                    WindowsConsole.ButtonState.Button1Pressed => 0,
-                                    WindowsConsole.ButtonState.Button2Pressed => 1,
-                                    WindowsConsole.ButtonState.Button3Pressed => 2,
-                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
-                                };
+    //            int netButton = btn switch
+    //            {
+    //                WindowsConsole.ButtonState.Button1Pressed => 0,
+    //                WindowsConsole.ButtonState.Button2Pressed => 1,
+    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+    //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
+    //            };
 
-                foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
-                {
-                    SendNetKey (k, false);
-                }
+    //            foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
+    //            {
+    //                SendNetKey (k, false);
+    //            }
 
-                return WaitIteration ();
+    //            return WaitIteration ();
 
-            case TestDriver.Unix:
+    //        case TestDriver.Unix:
 
-                int unixButton = btn switch
-                                {
-                                    WindowsConsole.ButtonState.Button1Pressed => 0,
-                                    WindowsConsole.ButtonState.Button2Pressed => 1,
-                                    WindowsConsole.ButtonState.Button3Pressed => 2,
-                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
-                                };
+    //            int unixButton = btn switch
+    //            {
+    //                WindowsConsole.ButtonState.Button1Pressed => 0,
+    //                WindowsConsole.ButtonState.Button2Pressed => 1,
+    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+    //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
+    //            };
 
-                foreach (ConsoleKeyInfo k in NetSequences.Click (unixButton, screenX, screenY))
-                {
-                    SendUnixKey (k.KeyChar, false);
-                }
+    //            foreach (ConsoleKeyInfo k in NetSequences.Click (unixButton, screenX, screenY))
+    //            {
+    //                SendUnixKey (k.KeyChar, false);
+    //            }
 
-                return WaitIteration ();
+    //            return WaitIteration ();
 
-            case TestDriver.Fake:
+    //        case TestDriver.Fake:
 
-                int fakeButton = btn switch
-                                {
-                                    WindowsConsole.ButtonState.Button1Pressed => 0,
-                                    WindowsConsole.ButtonState.Button2Pressed => 1,
-                                    WindowsConsole.ButtonState.Button3Pressed => 2,
-                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
-                                };
+    //            int fakeButton = btn switch
+    //            {
+    //                WindowsConsole.ButtonState.Button1Pressed => 0,
+    //                WindowsConsole.ButtonState.Button2Pressed => 1,
+    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+    //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
+    //            };
 
-                foreach (ConsoleKeyInfo k in NetSequences.Click (fakeButton, screenX, screenY))
-                {
-                    SendFakeKey (k, false);
-                }
+    //            foreach (ConsoleKeyInfo k in NetSequences.Click (fakeButton, screenX, screenY))
+    //            {
+    //                SendFakeKey (k, false);
+    //            }
 
-                return WaitIteration ();
+    //            return WaitIteration ();
 
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-    }
-
-    public GuiTestContext Down ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
-
-                break;
-            case TestDriver.DotNet:
-                foreach (ConsoleKeyInfo k in NetSequences.Down)
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            case TestDriver.Unix:
-                foreach (ConsoleKeyInfo k in NetSequences.Down)
-                {
-                    SendUnixKey (k.KeyChar);
-                }
-
-                break;
-            case TestDriver.Fake:
-                foreach (ConsoleKeyInfo k in NetSequences.Down)
-                {
-                    SendFakeKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
+    //        default:
+    //            throw new ArgumentOutOfRangeException ();
+    //    }
+    //}
 
     /// <summary>
-    ///     Simulates the Right cursor key
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Right ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
-
-                break;
-            case TestDriver.DotNet:
-                foreach (ConsoleKeyInfo k in NetSequences.Right)
-                {
-                    SendNetKey (k);
-                }
-
-                WaitIteration ();
-
-                break;
-            case TestDriver.Unix:
-                foreach (ConsoleKeyInfo k in NetSequences.Right)
-                {
-                    SendUnixKey (k.KeyChar);
-                }
-
-                WaitIteration ();
-
-                break;
-            case TestDriver.Fake:
-                foreach (ConsoleKeyInfo k in NetSequences.Right)
-                {
-                    SendFakeKey (k);
-                }
-
-                WaitIteration ();
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates the Left cursor key
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Left ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
-
-                break;
-            case TestDriver.DotNet:
-                foreach (ConsoleKeyInfo k in NetSequences.Left)
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            case TestDriver.Unix:
-                foreach (ConsoleKeyInfo k in NetSequences.Left)
-                {
-                    SendUnixKey (k.KeyChar);
-                }
-
-                break;
-            case TestDriver.Fake:
-                foreach (ConsoleKeyInfo k in NetSequences.Left)
-                {
-                    SendFakeKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates the up cursor key
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Up ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (ConsoleKeyMapping.VK.UP);
-
-                break;
-            case TestDriver.DotNet:
-                foreach (ConsoleKeyInfo k in NetSequences.Up)
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            case TestDriver.Unix:
-                foreach (ConsoleKeyInfo k in NetSequences.Up)
-                {
-                    SendUnixKey (k.KeyChar);
-                }
-
-                break;
-            case TestDriver.Fake:
-                foreach (ConsoleKeyInfo k in NetSequences.Up)
-                {
-                    SendFakeKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates pressing the Return/Enter (newline) key.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Enter ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (
-                                new WindowsConsole.KeyEventRecord
-                                {
-                                    UnicodeChar = '\r',
-                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                                    wRepeatCount = 1,
-                                    wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
-                                    wVirtualScanCode = 28
-                                });
-
-                break;
-            case TestDriver.DotNet:
-                SendNetKey (new ('\r', ConsoleKey.Enter, false, false, false));
-
-                break;
-            case TestDriver.Unix:
-                SendUnixKey ('\r');
-
-                break;
-            case TestDriver.Fake:
-                SendFakeKey (new ('\r', ConsoleKey.Enter, false, false, false));
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates pressing the Esc (Escape) key.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Escape ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (
-                                new WindowsConsole.KeyEventRecord
-                                {
-                                    UnicodeChar = '\u001b',
-                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                                    wRepeatCount = 1,
-                                    wVirtualKeyCode = ConsoleKeyMapping.VK.ESCAPE,
-                                    wVirtualScanCode = 1
-                                });
-
-                break;
-            case TestDriver.DotNet:
-
-                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Escape - it isn't
-                SendNetKey (new ('\u001b', ConsoleKey.None, false, false, false));
-
-                break;
-            case TestDriver.Unix:
-
-                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Escape - it isn't
-                SendUnixKey ('\u001b');
-
-                break;
-            case TestDriver.Fake:
-
-                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Escape - it isn't
-                SendFakeKey (new ('\u001b', ConsoleKey.None, false, false, false));
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Simulates pressing the Tab key.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Tab ()
-    {
-        switch (_driver)
-        {
-            case TestDriver.Windows:
-                SendWindowsKey (
-                                new WindowsConsole.KeyEventRecord
-                                {
-                                    UnicodeChar = '\t',
-                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                                    wRepeatCount = 1,
-                                    wVirtualKeyCode = 0,
-                                    wVirtualScanCode = 0
-                                });
-
-                break;
-            case TestDriver.DotNet:
-
-                // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Tab - it isn't
-                SendNetKey (new ('\t', ConsoleKey.None, false, false, false));
-
-                break;
-            case TestDriver.Unix:
-
-                SendUnixKey ('\t');
-
-                break;
-            case TestDriver.Fake:
-
-                // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Tab - it isn't
-                SendFakeKey (new ('\t', ConsoleKey.None, false, false, false));
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Send a full windows OS key including both down and up.
-    /// </summary>
-    /// <param name="fullKey"></param>
-    private void SendWindowsKey (WindowsConsole.KeyEventRecord fullKey)
-    {
-        WindowsConsole.KeyEventRecord down = fullKey;
-        WindowsConsole.KeyEventRecord up = fullKey; // because struct this is new copy
-
-        down.bKeyDown = true;
-        up.bKeyDown = false;
-
-        _winInput.InputBuffer!.Enqueue (
-                                        new ()
-                                        {
-                                            EventType = WindowsConsole.EventType.Key,
-                                            KeyEvent = down
-                                        });
-
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = up
-                                       });
-
-        WaitIteration ();
-    }
-
-    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo, bool wait = true)
-    {
-        _netInput.InputBuffer!.Enqueue (consoleKeyInfo);
-
-        if (wait)
-        {
-            WaitUntil (() => _netInput.InputBuffer.IsEmpty);
-        }
-    }
-
-    private void SendUnixKey (char ch, bool wait = true)
-    {
-        _unixInput.InputBuffer!.Enqueue (ch);
-
-        if (wait)
-        {
-            WaitUntil (() => _unixInput.InputBuffer.IsEmpty);
-        }
-    }
-
-    private void SendFakeKey (ConsoleKeyInfo consoleKeyInfo, bool wait = true)
-    {
-        _fakeInput.InputBuffer!.Enqueue (consoleKeyInfo);
-
-        if (wait)
-        {
-            WaitUntil (() => _fakeInput.InputBuffer.IsEmpty);
-        }
-    }
-
-    /// <summary>
-    ///     Sends a special key e.g. cursor key that does not map to a specific character
-    /// </summary>
-    /// <param name="specialKey"></param>
-    private void SendWindowsKey (ConsoleKeyMapping.VK specialKey)
-    {
-        _winInput.InputBuffer!.Enqueue (
-                                        new ()
-                                        {
-                                            EventType = WindowsConsole.EventType.Key,
-                                            KeyEvent = new ()
-                                            {
-                                                bKeyDown = true,
-                                                wRepeatCount = 0,
-                                                wVirtualKeyCode = specialKey,
-                                                wVirtualScanCode = 0,
-                                                UnicodeChar = '\0',
-                                                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                            }
-                                        });
-
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new ()
-                                           {
-                                               bKeyDown = false,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = specialKey,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
-
-        WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Sends a key to the application. This goes directly to Application and does not go through
-    ///     a driver.
+    ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public GuiTestContext RaiseKeyDownEvent (Key key)
-    {
-        WaitIteration (() => Application.RaiseKeyDownEvent (key));
-
-        return this; //WaitIteration();
-    }
-
     public GuiTestContext Send (Key key)
     {
         return WaitIteration (() =>
                               {
-                                  if (Application.Driver is IConsoleDriverFacade facade)
+                                  if (Application.Driver is { })
                                   {
-                                      facade.InputProcessor.OnKeyDown (key);
-                                      facade.InputProcessor.OnKeyUp (key);
+                                      Application.Driver.InputProcessor.EnqueueKeyDownEvent (key);
                                   }
                                   else
                                   {
-                                      Fail ("Expected Application.Driver to be IConsoleDriverFacade");
+                                      Fail ("Expected Application.Driver to be non-null.");
                                   }
                               });
     }

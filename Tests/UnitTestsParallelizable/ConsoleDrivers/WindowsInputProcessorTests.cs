@@ -483,7 +483,7 @@ public class WindowsInputProcessorTests
         foreach (Tuple<ButtonState, EventFlags, ControlKeyState, MouseFlags> pair in inputOutputPairs)
         {
             var mockEvent = new MouseEventRecord { ButtonState = pair.Item1, EventFlags = pair.Item2, ControlKeyState = pair.Item3 };
-            MouseEventArgs result = processor.ToDriverMouse (mockEvent);
+            MouseEventArgs result = processor.ToMouseEvent (mockEvent);
 
             Assert.Equal (pair.Item4, result.Flags);
         }

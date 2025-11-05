@@ -5,7 +5,7 @@ using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
-internal class WindowsConsoleInput : ConsoleInputImpl<InputRecord>, IWindowsConsoleInput
+internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
 {
     private readonly nint _inputHandle;
 
@@ -39,9 +39,9 @@ internal class WindowsConsoleInput : ConsoleInputImpl<InputRecord>, IWindowsCons
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
 
-    public WindowsConsoleInput ()
+    public WindowsInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleInput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
 
         if (Application.RunningUnitTests)
         {

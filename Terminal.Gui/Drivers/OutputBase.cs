@@ -2,9 +2,9 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Abstract base class to assist with implementing <see cref="IConsoleOutput"/>.
+///     Abstract base class to assist with implementing <see cref="IOutput"/>.
 /// </summary>
-public abstract class ConsoleOutputBase
+public abstract class OutputBase
 {
     private CursorVisibility? _cachedCursorVisibility;
 
@@ -18,7 +18,7 @@ public abstract class ConsoleOutputBase
     /// <param name="visibility"></param>
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 
-    /// <inheritdoc cref="IConsoleOutput.Write(IOutputBuffer)"/>
+    /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
         if (Application.RunningUnitTests)

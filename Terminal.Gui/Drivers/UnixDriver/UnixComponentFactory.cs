@@ -5,14 +5,14 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 /// <see cref="IComponentFactory{T}"/> implementation for native unix console I/O.
-/// This factory creates instances of internal classes <see cref="UnixConsoleInput"/>, <see cref="UnixConsoleOutput"/> etc.
+/// This factory creates instances of internal classes <see cref="UnixInput"/>, <see cref="UnixOutput"/> etc.
 /// </summary>
 public class UnixComponentFactory : ComponentFactoryImpl<char>
 {
     /// <inheritdoc />
-    public override IConsoleInput<char> CreateInput ()
+    public override IInput<char> CreateInput ()
     {
-        return new UnixConsoleInput ();
+        return new UnixInput ();
     }
 
     /// <inheritdoc />
@@ -22,8 +22,8 @@ public class UnixComponentFactory : ComponentFactoryImpl<char>
     }
 
     /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
+    public override IOutput CreateOutput ()
     {
-        return new UnixConsoleOutput ();
+        return new UnixOutput ();
     }
 }

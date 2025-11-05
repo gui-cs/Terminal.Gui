@@ -3,19 +3,19 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Implementation of <see cref="IConsoleOutput"/> that uses native dotnet
+///     Implementation of <see cref="IOutput"/> that uses native dotnet
 ///     methods e.g. <see cref="System.Console"/>
 /// </summary>
-public class NetConsoleOutput : ConsoleOutputBase, IConsoleOutput
+public class NetOutput : OutputBase, IOutput
 {
     private readonly bool _isWinPlatform;
 
     /// <summary>
-    ///     Creates a new instance of the <see cref="NetConsoleOutput"/> class.
+    ///     Creates a new instance of the <see cref="NetOutput"/> class.
     /// </summary>
-    public NetConsoleOutput ()
+    public NetOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetConsoleOutput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
 
         Console.OutputEncoding = Encoding.UTF8;
 
@@ -131,7 +131,7 @@ public class NetConsoleOutput : ConsoleOutputBase, IConsoleOutput
 
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
-    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
+    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         if (visibility != CursorVisibility.Invisible)

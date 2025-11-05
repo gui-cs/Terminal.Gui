@@ -15,16 +15,17 @@ public class FakeApplicationFactory
     /// <returns></returns>
     public IDisposable SetupFakeApplication ()
     {
-        var cts = new CancellationTokenSource ();
-        var fakeInput = new NoOpFakeInput (cts.Token);
-        FakeConsoleOutput output = new ();
+        CancellationTokenSource hardStopTokenSource = new CancellationTokenSource ();
+        FakeInput fakeInput = new FakeInput ();
+        fakeInput.ExternalCancellationTokenSource = hardStopTokenSource;
+        FakeOutput output = new ();
         output.SetSize (80, 25);
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        ConsoleSizeMonitorImpl sizeMonitor = new (output);
+        SizeMonitorImpl sizeMonitor = new (output);
 
-        var impl = new ApplicationImpl (new FakeFakeComponentFactory (fakeInput, output, sizeMonitor));
+        ApplicationImpl impl = new (new FakeComponentFactory (fakeInput, output, sizeMonitor));
 
         ApplicationImpl.ChangeInstance (impl);
 
@@ -32,7 +33,7 @@ public class FakeApplicationFactory
         impl.Init (null, "fake");
 
         // Handle different facade types - cast to common interface instead
-        var d = (IConsoleDriverFacade)Application.Driver!;
+        IDriver d = Application.Driver!;
 
         sizeMonitor.SizeChanged += (_, e) =>
                                    {
@@ -44,6 +45,6 @@ public class FakeApplicationFactory
                                        }
                                    };
 
-        return new FakeApplicationLifecycle (origApp, cts);
+        return new FakeApplicationLifecycle (origApp, hardStopTokenSource);
     }
 }

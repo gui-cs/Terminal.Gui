@@ -3,39 +3,70 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
-internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
+/// <summary>
+///     Provides the main implementation of the driver abstraction layer for Terminal.Gui.
+///     This implementation of <see cref="IDriver"/> coordinates the interaction between input processing, output
+///     rendering,
+///     screen size monitoring, and ANSI escape sequence handling.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="DriverImpl"/> implements <see cref="IDriver"/>,
+///         serving as the central coordination point for console I/O operations. It delegates functionality
+///         to specialized components:
+///     </para>
+///     <list type="bullet">
+///         <item><see cref="IInputProcessor"/> - Processes keyboard and mouse input</item>
+///         <item><see cref="IOutputBuffer"/> - Manages the screen buffer state</item>
+///         <item><see cref="IOutput"/> - Handles actual console output rendering</item>
+///         <item><see cref="AnsiRequestScheduler"/> - Manages ANSI escape sequence requests</item>
+///         <item><see cref="ISizeMonitor"/> - Monitors terminal size changes</item>
+///     </list>
+///     <para>
+///         This class is internal and should not be used directly by application code.
+///         Applications interact with drivers through the <see cref="Application"/> class.
+///     </para>
+/// </remarks>
+internal class DriverImpl : IDriver
 {
-    private readonly IConsoleOutput _output;
-    private readonly IOutputBuffer _outputBuffer;
+    private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
     /// <summary>
-    /// The event fired when the screen changes (size, position, etc.).
+    ///     The event fired when the screen changes (size, position, etc.).
     /// </summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     public IInputProcessor InputProcessor { get; }
-    public IOutputBuffer OutputBuffer => _outputBuffer;
+    public IOutputBuffer OutputBuffer { get; }
 
-    public IConsoleSizeMonitor ConsoleSizeMonitor { get; }
+    public ISizeMonitor ConsoleSizeMonitor { get; }
 
-
-    public ConsoleDriverFacade (
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
+    /// </summary>
+    /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
+    /// <param name="outputBuffer">The output buffer for managing screen state.</param>
+    /// <param name="output">The output interface for rendering to the console.</param>
+    /// <param name="ansiRequestScheduler">The scheduler for managing ANSI escape sequence requests.</param>
+    /// <param name="sizeMonitor">The monitor for tracking terminal size changes.</param>
+    public DriverImpl (
         IInputProcessor inputProcessor,
         IOutputBuffer outputBuffer,
-        IConsoleOutput output,
+        IOutput output,
         AnsiRequestScheduler ansiRequestScheduler,
-        IConsoleSizeMonitor sizeMonitor
+        ISizeMonitor sizeMonitor
     )
     {
         InputProcessor = inputProcessor;
         _output = output;
-        _outputBuffer = outputBuffer;
+        OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
+
         InputProcessor.MouseEvent += (s, e) =>
                                      {
                                          //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
@@ -43,11 +74,13 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
                                      };
 
         ConsoleSizeMonitor = sizeMonitor;
+
         sizeMonitor.SizeChanged += (_, e) =>
-        {
-            SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
-            //SizeChanged?.Invoke (this, e);
-        };
+                                   {
+                                       SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
+
+                                       //SizeChanged?.Invoke (this, e);
+                                   };
 
         CreateClipboard ();
     }
@@ -84,25 +117,25 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     {
         get
         {
-            if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetConsoleOutput)
+            if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
             {
                 // In unit tests, we don't have a real output, so we return an empty rectangle.
                 return Rectangle.Empty;
             }
 
-            return new (0, 0, _outputBuffer.Cols, _outputBuffer.Rows);
+            return new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
         }
     }
 
     /// <summary>
-    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
+    ///     Sets the screen size for testing purposes. Only supported by FakeDriver.
     /// </summary>
     /// <param name="width">The new width in columns.</param>
     /// <param name="height">The new height in rows.</param>
     /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
     public virtual void SetScreenSize (int width, int height)
     {
-        _outputBuffer.SetSize (width, height);
+        OutputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
         SizeChanged?.Invoke (this, new (new (width, height)));
     }
@@ -114,8 +147,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
     public Region? Clip
     {
-        get => _outputBuffer.Clip;
-        set => _outputBuffer.Clip = value;
+        get => OutputBuffer.Clip;
+        set => OutputBuffer.Clip = value;
     }
 
     /// <summary>Get the operating system clipboard.</summary>
@@ -125,13 +158,13 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    public int Col => _outputBuffer.Col;
+    public int Col => OutputBuffer.Col;
 
     /// <summary>The number of columns visible in the terminal.</summary>
     public int Cols
     {
-        get => _outputBuffer.Cols;
-        set => _outputBuffer.Cols = value;
+        get => OutputBuffer.Cols;
+        set => OutputBuffer.Cols = value;
     }
 
     /// <summary>
@@ -140,51 +173,51 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// </summary>
     public Cell [,]? Contents
     {
-        get => _outputBuffer.Contents;
-        set => _outputBuffer.Contents = value;
+        get => OutputBuffer.Contents;
+        set => OutputBuffer.Contents = value;
     }
 
     /// <summary>The leftmost column in the terminal.</summary>
     public int Left
     {
-        get => _outputBuffer.Left;
-        set => _outputBuffer.Left = value;
+        get => OutputBuffer.Left;
+        set => OutputBuffer.Left = value;
     }
 
     /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    public int Row => _outputBuffer.Row;
+    public int Row => OutputBuffer.Row;
 
     /// <summary>The number of rows visible in the terminal.</summary>
     public int Rows
     {
-        get => _outputBuffer.Rows;
-        set => _outputBuffer.Rows = value;
+        get => OutputBuffer.Rows;
+        set => OutputBuffer.Rows = value;
     }
 
     /// <summary>The topmost row in the terminal.</summary>
     public int Top
     {
-        get => _outputBuffer.Top;
-        set => _outputBuffer.Top = value;
+        get => OutputBuffer.Top;
+        set => OutputBuffer.Top = value;
     }
 
     // TODO: Probably not everyone right?
 
-    /// <summary>Gets whether the <see cref="IConsoleDriver"/> supports TrueColor output.</summary>
+    /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
     public bool SupportsTrueColor => true;
 
     // TODO: Currently ignored
     /// <summary>
-    ///     Gets or sets whether the <see cref="IConsoleDriver"/> should use 16 colors instead of the default TrueColors.
+    ///     Gets or sets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
     ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Will be forced to <see langword="true"/> if <see cref="IConsoleDriver.SupportsTrueColor"/> is
-    ///         <see langword="false"/>, indicating that the <see cref="IConsoleDriver"/> cannot support TrueColor.
+    ///         Will be forced to <see langword="true"/> if <see cref="IDriver.SupportsTrueColor"/> is
+    ///         <see langword="false"/>, indicating that the <see cref="IDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
     public bool Force16Colors
@@ -194,85 +227,86 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>
-    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
+    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr"/>
     ///     call.
     /// </summary>
     public Attribute CurrentAttribute
     {
-        get => _outputBuffer.CurrentAttribute;
-        set => _outputBuffer.CurrentAttribute = value;
+        get => OutputBuffer.CurrentAttribute;
+        set => OutputBuffer.CurrentAttribute = value;
     }
 
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <remarks>
     ///     <para>
-    ///         When the method returns, <see cref="IConsoleDriver.Col"/> will be incremented by the number of columns
+    ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
     ///         <paramref name="rune"/> required, even if the new column value is outside of the
-    ///         <see cref="IConsoleDriver.Clip"/> or screen
-    ///         dimensions defined by <see cref="IConsoleDriver.Cols"/>.
+    ///         <see cref="IDriver.Clip"/> or screen
+    ///         dimensions defined by <see cref="IDriver.Cols"/>.
     ///     </para>
     ///     <para>
-    ///         If <paramref name="rune"/> requires more than one column, and <see cref="IConsoleDriver.Col"/> plus the number
+    ///         If <paramref name="rune"/> requires more than one column, and <see cref="IDriver.Col"/> plus the number
     ///         of columns
-    ///         needed exceeds the <see cref="IConsoleDriver.Clip"/> or screen dimensions, the default Unicode replacement
+    ///         needed exceeds the <see cref="IDriver.Clip"/> or screen dimensions, the default Unicode replacement
     ///         character (U+FFFD)
     ///         will be added instead.
     ///     </para>
     /// </remarks>
     /// <param name="rune">Rune to add.</param>
-    public void AddRune (Rune rune) { _outputBuffer.AddRune (rune); }
+    public void AddRune (Rune rune) { OutputBuffer.AddRune (rune); }
 
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
-    ///     convenience method that calls <see cref="IConsoleDriver.AddRune(System.Text.Rune)"/> with the <see cref="Rune"/>
+    ///     convenience method that calls <see cref="IDriver.AddRune(System.Text.Rune)"/> with the <see cref="Rune"/>
     ///     constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
-    public void AddRune (char c) { _outputBuffer.AddRune (c); }
+    public void AddRune (char c) { OutputBuffer.AddRune (c); }
 
     /// <summary>Adds the <paramref name="str"/> to the display at the cursor position.</summary>
     /// <remarks>
     ///     <para>
-    ///         When the method returns, <see cref="IConsoleDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="IConsoleDriver.Clip"/>
+    ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
+    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="IDriver.Clip"/>
     ///         or screen
-    ///         dimensions defined by <see cref="IConsoleDriver.Cols"/>.
+    ///         dimensions defined by <see cref="IDriver.Cols"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
     /// <param name="str">String.</param>
-    public void AddStr (string str) { _outputBuffer.AddStr (str); }
+    public void AddStr (string str) { OutputBuffer.AddStr (str); }
 
-    /// <summary>Clears the <see cref="IConsoleDriver.Contents"/> of the driver.</summary>
+    /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
-        _outputBuffer.ClearContents ();
+        OutputBuffer.ClearContents ();
         ClearedContents?.Invoke (this, new MouseEventArgs ());
     }
 
     /// <summary>
-    ///     Raised each time <see cref="IConsoleDriver.ClearContents"/> is called. For benchmarking.
+    ///     Raised each time <see cref="IDriver.ClearContents"/> is called. For benchmarking.
     /// </summary>
     public event EventHandler<EventArgs>? ClearedContents;
 
     /// <summary>
-    ///     Fills the specified rectangle with the specified rune, using <see cref="IConsoleDriver.CurrentAttribute"/>
+    ///     Fills the specified rectangle with the specified rune, using <see cref="IDriver.CurrentAttribute"/>
     /// </summary>
     /// <remarks>
-    ///     The value of <see cref="IConsoleDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be
+    ///     The value of <see cref="IDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be
     ///     drawn.
     /// </remarks>
     /// <param name="rect">The Screen-relative rectangle.</param>
     /// <param name="rune">The Rune used to fill the rectangle</param>
-    public void FillRect (Rectangle rect, Rune rune = default) { _outputBuffer.FillRect (rect, rune); }
+    public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
 
     /// <summary>
     ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
-    ///     that calls <see cref="IConsoleDriver.FillRect(System.Drawing.Rectangle,System.Text.Rune)"/>.
+    ///     that calls <see cref="IDriver.FillRect(System.Drawing.Rectangle,System.Text.Rune)"/>.
     /// </summary>
     /// <param name="rect"></param>
     /// <param name="c"></param>
-    public void FillRect (Rectangle rect, char c) { _outputBuffer.FillRect (rect, c); }
+    public void FillRect (Rectangle rect, char c) { OutputBuffer.FillRect (rect, c); }
 
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
@@ -296,28 +330,28 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <param name="row">The row.</param>
     /// <returns>
     ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
-    ///     <see cref="IConsoleDriver.Clip"/>.
+    ///     <see cref="IDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (Rune rune, int col, int row) { return _outputBuffer.IsValidLocation (rune, col, row); }
+    public bool IsValidLocation (Rune rune, int col, int row) { return OutputBuffer.IsValidLocation (rune, col, row); }
 
     /// <summary>
-    ///     Updates <see cref="IConsoleDriver.Col"/> and <see cref="IConsoleDriver.Row"/> to the specified column and row in
-    ///     <see cref="IConsoleDriver.Contents"/>.
-    ///     Used by <see cref="IConsoleDriver.AddRune(System.Text.Rune)"/> and <see cref="IConsoleDriver.AddStr"/> to determine
+    ///     Updates <see cref="IDriver.Col"/> and <see cref="IDriver.Row"/> to the specified column and row in
+    ///     <see cref="IDriver.Contents"/>.
+    ///     Used by <see cref="IDriver.AddRune(System.Text.Rune)"/> and <see cref="IDriver.AddStr"/> to determine
     ///     where to add content.
     /// </summary>
     /// <remarks>
     ///     <para>This does not move the cursor on the screen, it only updates the internal state of the driver.</para>
     ///     <para>
-    ///         If <paramref name="col"/> or <paramref name="row"/> are negative or beyond  <see cref="IConsoleDriver.Cols"/>
+    ///         If <paramref name="col"/> or <paramref name="row"/> are negative or beyond  <see cref="IDriver.Cols"/>
     ///         and
-    ///         <see cref="IConsoleDriver.Rows"/>, the method still sets those properties.
+    ///         <see cref="IDriver.Rows"/>, the method still sets those properties.
     ///     </para>
     /// </remarks>
     /// <param name="col">Column to move to.</param>
     /// <param name="row">Row to move to.</param>
-    public void Move (int col, int row) { _outputBuffer.Move (col, row); }
+    public void Move (int col, int row) { OutputBuffer.Move (col, row); }
 
     // TODO: Probably part of output
 
@@ -343,6 +377,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <inheritdoc/>
     public void Suspend ()
     {
+        // BUGBUG: This is all platform-specific and should not be implemented here.
+        // BUGBUG: This needs to be in each platform's driver implementation.
         if (Environment.OSVersion.Platform != PlatformID.Unix)
         {
             return;
@@ -373,8 +409,8 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     }
 
     /// <summary>
-    ///     Sets the position of the terminal cursor to <see cref="IConsoleDriver.Col"/> and
-    ///     <see cref="IConsoleDriver.Row"/>.
+    ///     Sets the position of the terminal cursor to <see cref="IDriver.Col"/> and
+    ///     <see cref="IDriver.Row"/>.
     /// </summary>
     public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
 
@@ -393,22 +429,22 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     /// <returns>The previously set Attribute.</returns>
     public Attribute SetAttribute (Attribute newAttribute)
     {
-        Attribute currentAttribute = _outputBuffer.CurrentAttribute;
-        _outputBuffer.CurrentAttribute = newAttribute;
+        Attribute currentAttribute = OutputBuffer.CurrentAttribute;
+        OutputBuffer.CurrentAttribute = newAttribute;
 
         return currentAttribute;
     }
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
-    public Attribute GetAttribute () { return _outputBuffer.CurrentAttribute; }
+    public Attribute GetAttribute () { return OutputBuffer.CurrentAttribute; }
 
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IConsoleDriver.KeyUp"/>.</summary>
+    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="IConsoleDriver.KeyDown"/>
+    ///     Drivers that do not support key release events will fire this event after <see cref="IDriver.KeyDown"/>
     ///     processing is
     ///     complete.
     /// </remarks>
@@ -418,23 +454,28 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
     /// <summary>
-    ///     Provide proper writing to send escape sequence recognized by the <see cref="IConsoleDriver"/>.
+    ///     Provide proper writing to send escape sequence recognized by the <see cref="IDriver"/>.
     /// </summary>
     /// <param name="ansi"></param>
     public void WriteRaw (string ansi) { _output.Write (ansi); }
 
-    /// <inheritdoc />
-    public void AddKeyEvent (Key key)
-    {
-        InputProcessor.AddKeyEvent (key);
-    }
+    /// <inheritdoc/>
+    public void AddKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
 
     /// <summary>
-    ///     Queues the given <paramref name="request"/> for execution
+    ///     Queues the specified ANSI escape sequence request for execution.
     /// </summary>
-    /// <param name="request"></param>
+    /// <param name="request">The ANSI request to queue.</param>
+    /// <remarks>
+    ///     The request is sent immediately if possible, or queued for later execution
+    ///     by the <see cref="AnsiRequestScheduler"/> to prevent overwhelming the console.
+    /// </remarks>
     public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (request); }
 
+    /// <summary>
+    ///     Gets the <see cref="AnsiRequestScheduler"/> instance used by this driver.
+    /// </summary>
+    /// <returns>The ANSI request scheduler.</returns>
     public AnsiRequestScheduler GetRequestScheduler () { return _ansiRequestScheduler; }
 
     /// <inheritdoc/>

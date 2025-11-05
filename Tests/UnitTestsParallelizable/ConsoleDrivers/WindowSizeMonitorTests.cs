@@ -7,7 +7,7 @@ public class WindowSizeMonitorTests
     [Fact]
     public void TestWindowSizeMonitor_RaisesEventWhenChanges ()
     {
-        Mock<IConsoleOutput> consoleOutput = new ();
+        Mock<IOutput> consoleOutput = new ();
 
         Queue<Size> queue = new (
                                  [
@@ -20,7 +20,7 @@ public class WindowSizeMonitorTests
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
 
-        var monitor = new ConsoleSizeMonitorImpl (consoleOutput.Object);
+        var monitor = new SizeMonitorImpl (consoleOutput.Object);
 
         List<SizeChangedEventArgs> result = [];
         monitor.SizeChanged += (s, e) => { result.Add (e); };
@@ -41,7 +41,7 @@ public class WindowSizeMonitorTests
     [Fact]
     public void TestWindowSizeMonitor_DoesNotRaiseEventWhen_NoChanges ()
     {
-        Mock<IConsoleOutput> consoleOutput = new ();
+        Mock<IOutput> consoleOutput = new ();
 
         Queue<Size> queue = new (
                                  [
@@ -54,7 +54,7 @@ public class WindowSizeMonitorTests
 
         var outputBuffer = Mock.Of<IOutputBuffer> ();
 
-        var monitor = new ConsoleSizeMonitorImpl (consoleOutput.Object);
+        var monitor = new SizeMonitorImpl (consoleOutput.Object);
 
         List<SizeChangedEventArgs> result = [];
         monitor.SizeChanged += (s, e) => { result.Add (e); };
