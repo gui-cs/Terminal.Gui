@@ -9,7 +9,7 @@ public class SyncrhonizationContextTests
     [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        Application.RunningUnitTests = true;
         Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
@@ -19,7 +19,7 @@ public class SyncrhonizationContextTests
 
         Assert.NotEqual (context, contextCopy);
         Application.Shutdown ();
-        ConsoleDriverImpl.RunningUnitTests = false;
+        Application.RunningUnitTests = false;
     }
 
     private object _lockPost = new ();
@@ -33,7 +33,7 @@ public class SyncrhonizationContextTests
     {
         lock (_lockPost)
         {
-            ConsoleDriverImpl.RunningUnitTests = true;
+            Application.RunningUnitTests = true;
 
             Application.Init (null, driverName: driverName);
 
@@ -79,7 +79,7 @@ public class SyncrhonizationContextTests
             {
                 Application.Shutdown ();
             }
-            ConsoleDriverImpl.RunningUnitTests = false;
+            Application.RunningUnitTests = false;
 
         }
     }
@@ -88,7 +88,7 @@ public class SyncrhonizationContextTests
     [AutoInitShutdown]
     public void SynchronizationContext_Send ()
     {
-        ConsoleDriverImpl.RunningUnitTests = true;
+        Application.RunningUnitTests = true;
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;
@@ -117,7 +117,7 @@ public class SyncrhonizationContextTests
         Application.Run ().Dispose ();
         Assert.True (success);
         Application.Shutdown ();
-        ConsoleDriverImpl.RunningUnitTests = false;
+        Application.RunningUnitTests = false;
 
     }
 }

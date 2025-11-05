@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Terminal.Gui.Drivers;
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.App;
@@ -15,19 +14,19 @@ namespace Terminal.Gui.App;
 ///     </para>
 ///     <para>This class is designed to be managed by <see cref="ApplicationImpl"/></para>
 /// </summary>
-/// <typeparam name="T">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
-internal class MainLoopCoordinator<T> : IMainLoopCoordinator
+/// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
+internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TInputRecord : struct
 {
-    private readonly ConcurrentQueue<T> _inputBuffer;
+    private readonly IApplicationMainLoop<TInputRecord> _loop;
+    private readonly IComponentFactory<TInputRecord> _componentFactory;
+    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
+    private IInput<TInputRecord> _input;
+    private readonly ConcurrentQueue<TInputRecord> _inputQueue;
     private readonly IInputProcessor _inputProcessor;
-    private readonly IApplicationMainLoop<T> _loop;
-    private readonly IComponentFactory<T> _componentFactory;
-    private readonly CancellationTokenSource _tokenSource = new ();
-    private IConsoleInput<T> _input;
-    private IConsoleOutput _output;
-    private readonly object _oLockInitialization = new ();
-    private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
+    private IOutput _output;
+    private DriverImpl _driver;
+    private readonly object _oLockInitialization = new ();
     private readonly ITimedEvents _timedEvents;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
@@ -36,19 +35,19 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     ///     Creates a new coordinator that will manage the main UI loop and input thread.
     /// </summary>
     /// <param name="timedEvents">Handles scheduling and execution of user timeout callbacks</param>
-    /// <param name="inputBuffer">Thread-safe queue for buffering raw console input</param>
+    /// <param name="inputQueue">Thread-safe queue for buffering raw console input</param>
     /// <param name="loop">The main application loop instance</param>
     /// <param name="componentFactory">Factory for creating driver-specific components (input, output, etc.)</param>
     public MainLoopCoordinator (
         ITimedEvents timedEvents,
-        ConcurrentQueue<T> inputBuffer,
-        IApplicationMainLoop<T> loop,
-        IComponentFactory<T> componentFactory
+        ConcurrentQueue<TInputRecord> inputQueue,
+        IApplicationMainLoop<TInputRecord> loop,
+        IComponentFactory<TInputRecord> componentFactory
     )
     {
         _timedEvents = timedEvents;
-        _inputBuffer = inputBuffer;
-        _inputProcessor = componentFactory.CreateInputProcessor (_inputBuffer);
+        _inputQueue = inputQueue;
+        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue);
         _loop = loop;
         _componentFactory = componentFactory;
     }
@@ -80,7 +79,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                 throw _inputTask.Exception;
             }
 
-            Logging.Logger.LogCritical("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Logger.LogCritical ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
         Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
@@ -94,14 +93,20 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
             {
                 // Instance must be constructed on the thread in which it is used.
                 _input = _componentFactory.CreateInput ();
-                _input.Initialize (_inputBuffer);
+                _input.Initialize (_inputQueue);
 
-                BuildFacadeIfPossible ();
+
+                // Wire up InputImpl reference for ITestableInput support
+                if (_inputProcessor is InputProcessorImpl<TInputRecord> impl)
+                {
+                    impl.InputImpl = _input;
+                }
+                BuildDriverIfPossible ();
             }
 
             try
             {
-                _input.Run (_tokenSource.Token);
+                _input.Run (_runCancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
             { }
@@ -134,24 +139,24 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         {
             // Instance must be constructed on the thread in which it is used.
             _output = _componentFactory.CreateOutput ();
-            _loop.Initialize (_timedEvents, _inputBuffer, _inputProcessor, _output,_componentFactory);
+            _loop.Initialize (_timedEvents, _inputQueue, _inputProcessor, _output, _componentFactory);
 
-            BuildFacadeIfPossible ();
+            BuildDriverIfPossible ();
         }
     }
 
-    private void BuildFacadeIfPossible ()
+    private void BuildDriverIfPossible ()
     {
         if (_input != null && _output != null)
         {
-            _facade = new (
+            _driver = new (
                            _inputProcessor,
                            _loop.OutputBuffer,
                            _output,
                            _loop.AnsiRequestScheduler,
                            _loop.ConsoleSizeMonitor);
 
-            Application.Driver = _facade;
+            Application.Driver = _driver;
 
             _startupSemaphore.Release ();
         }
@@ -170,7 +175,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 
         _stopCalled = true;
 
-        _tokenSource.Cancel ();
+        _runCancellationTokenSource.Cancel ();
         _output.Dispose ();
 
         // Wait for input infinite loop to exit

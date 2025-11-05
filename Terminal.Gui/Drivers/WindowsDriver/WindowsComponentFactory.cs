@@ -5,14 +5,14 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 /// <see cref="IComponentFactory{T}"/> implementation for win32 only I/O.
-/// This factory creates instances of internal classes <see cref="WindowsConsoleInput"/>, <see cref="WindowsConsoleOutput"/> etc.
+/// This factory creates instances of internal classes <see cref="WindowsInput"/>, <see cref="WindowsConsoleOutput"/> etc.
 /// </summary>
 public class WindowsComponentFactory : ComponentFactoryImpl<WindowsConsole.InputRecord>
 {
     /// <inheritdoc />
-    public override IConsoleInput<WindowsConsole.InputRecord> CreateInput ()
+    public override IInput<WindowsConsole.InputRecord> CreateInput ()
     {
-        return new WindowsConsoleInput ();
+        return new WindowsInput ();
     }
 
     /// <inheritdoc />
@@ -22,7 +22,7 @@ public class WindowsComponentFactory : ComponentFactoryImpl<WindowsConsole.Input
     }
 
     /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
+    public override IOutput CreateOutput ()
     {
         return new WindowsConsoleOutput ();
     }

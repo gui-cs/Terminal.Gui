@@ -605,7 +605,7 @@ public class ScenarioTests : TestsAllViews
     }
 
 
-    [Fact (Skip = "This test seems to exercise FakeConsole.PushMockKeyPress - which is broken")]
+    [Fact]
     public void Run_Generic ()
     {
         ConfigurationManager.Disable (resetToHardCodedDefaults: true);
@@ -617,13 +617,9 @@ public class ScenarioTests : TestsAllViews
         int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
-        Application.Init (null, "fake");
-
-        // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-        // by adding this Space it seems to work.
+        Application.ForceDriver = "fake";
 
         Assert.Equal (Key.Esc, Application.QuitKey);
-        FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
         var ms = 500;
         var abortCount = 0;
@@ -631,7 +627,7 @@ public class ScenarioTests : TestsAllViews
         Func<bool> abortCallback = () =>
                                    {
                                        abortCount++;
-                                       _output.WriteLine ($"'Generic' abortCount {abortCount}");
+                                       _output.WriteLine ($"'Generic' Aborting! - abortCount {abortCount}");
                                        Application.RequestStop ();
 
                                        return false;
@@ -641,38 +637,60 @@ public class ScenarioTests : TestsAllViews
         object? token = null;
 
         Application.Iteration += (s, a) =>
-                                 {
-                                     if (token == null)
-                                     {
-                                         // Timeout only must start at first iteration
-                                         token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
-                                     }
+        {
+            iterations++;
+            if (token == null)
+            {
+                // Timeout only must start at first iteration
+                token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+            }
 
-                                     iterations++;
-                                     _output.WriteLine ($"'Generic' iteration {iterations}");
+            _output.WriteLine ($"'Generic' iteration {iterations}");
 
-                                     // Stop if we run out of control...
-                                     if (iterations == 10)
-                                     {
-                                         _output.WriteLine ("'Generic' had to be force quit!");
-                                         Application.RequestStop ();
-                                     }
-                                 };
+            //// Enable this to test that abort works
+            //if (iterations == 2)
+            //{
+            //    Thread.Sleep (1000);
+            //}
 
-        Application.KeyDown += (sender, args) => { Assert.Equal (Application.QuitKey, args); };
+            // Stop if we run out of control...
+            if (iterations == 10)
+            {
+                _output.WriteLine ("'Generic' had to be force quit!");
+                Application.RequestStop ();
+            }
+        };
+
+        Application.InitializedChanged += (_, args) =>
+                                          {
+                                              _output.WriteLine ($"InitializedChanged: {args.Value}");
+                                              if (args.Value is true)
+                                              {
+                                                  Application.KeyDown += (_, a) =>
+                                                                         {
+                                                                             _output.WriteLine ($"KeyDown: {a.KeyCode}");
+                                                                             Assert.Equal (Application.QuitKey, a);
+                                                                         };
+                                                  _output.WriteLine ($"AddKeyEvent {Application.QuitKey}");
+                                                  Application.Driver!.AddKeyEvent (Application.QuitKey);
+
+                                              }
+                                          };
 
         generic.Main ();
 
         Assert.Equal (0, abortCount);
 
-        // # of key up events should match # of iterations
-        Assert.Equal (1, iterations);
+        // 1 is when we add the key event
+        // 2 is when the key event is grabbed and KeyDown is raised
+        Assert.True (iterations is > 1 and < 10);
 
         generic.Dispose ();
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
         ConfigurationManager.Disable (resetToHardCodedDefaults: true);
+        Application.ForceDriver = string.Empty;
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);

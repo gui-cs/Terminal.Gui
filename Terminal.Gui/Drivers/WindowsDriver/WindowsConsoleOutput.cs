@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
+internal partial class WindowsConsoleOutput : OutputBase, IOutput
 {
     [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -107,7 +107,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleOutput)}");
 
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
         }
@@ -184,7 +184,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
 
     public void Write (ReadOnlySpan<char> str)
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
         }
@@ -206,7 +206,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
 
     internal Size SetConsoleWindow (short cols, short rows)
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return new (cols, rows);
         }
@@ -305,7 +305,7 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
         {
             Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsConsoleOutput)}");
 
-            if (!ConsoleDriverImpl.RunningUnitTests)
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
                 throw;
             }
@@ -454,10 +454,10 @@ internal partial class WindowsConsoleOutput : ConsoleOutputBase, IConsoleOutput
         return true;
     }
 
-    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
+    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (ConsoleDriverImpl.RunningUnitTests)
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
         }

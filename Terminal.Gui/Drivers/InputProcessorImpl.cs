@@ -5,30 +5,30 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Processes the queued input buffer contents - which must be of Type <typeparamref name="T"/>.
+///     Processes the queued input buffer contents - which must be of Type <typeparamref name="TInputRecord"/>.
 ///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
 ///     events and data models.
 /// </summary>
-public abstract class InputProcessorImpl<T> : IInputProcessor
+public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDisposable where TInputRecord : struct
 {
     /// <summary>
     ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
     /// </summary>
     private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
-    internal AnsiResponseParser<T> Parser { get; } = new ();
+    internal AnsiResponseParser<TInputRecord> Parser { get; } = new ();
 
     /// <summary>
-    ///     Class responsible for translating the driver specific native input class <typeparamref name="T"/> e.g.
+    ///     Class responsible for translating the driver specific native input class <typeparamref name="TInputRecord"/> e.g.
     ///     <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
     ///     internal library representations of Keys).
     /// </summary>
-    public IKeyConverter<T> KeyConverter { get; }
+    public IKeyConverter<TInputRecord> KeyConverter { get; }
 
     /// <summary>
     ///     Input buffer which will be drained from by this class.
     /// </summary>
-    public ConcurrentQueue<T> InputBuffer { get; }
+    public ConcurrentQueue<TInputRecord> InputBuffer { get; }
 
     /// <inheritdoc />
     public string? DriverName { get; init; }
@@ -38,51 +38,73 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
 
     private readonly MouseInterpreter _mouseInterpreter = new ();
 
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
+    /// <inheritdoc />
     public event EventHandler<Key>? KeyDown;
 
-    /// <summary>Event fired when a terminal sequence read from input is not recognized and therefore ignored.</summary>
+    /// <inheritdoc />
     public event EventHandler<string>? AnsiSequenceSwallowed;
 
-    /// <summary>
-    ///     Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to
-    ///     <see cref="OnKeyUp"/>.
-    /// </summary>
-    /// <param name="a"></param>
-    public void OnKeyDown (Key a)
+    /// <inheritdoc />
+    public void RaiseKeyDownEvent (Key a)
     {
-        Logging.Trace ($"{nameof (InputProcessorImpl<T>)} raised {a}");
+        Logging.Trace ($"{nameof (InputProcessorImpl<TInputRecord>)} raised {a}");
         KeyDown?.Invoke (this, a);
     }
 
-    /// <summary>Event fired when a key is released.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
-    ///     complete.
-    /// </remarks>
+    /// <inheritdoc />
     public event EventHandler<Key>? KeyUp;
 
-    /// <summary>Called when a key is released. Fires the <see cref="KeyUp"/> event.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will call this method after <see cref="OnKeyDown"/> processing
-    ///     is complete.
-    /// </remarks>
-    /// <param name="a"></param>
-    public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
+    /// <inheritdoc />
+    public void RaiseKeyUpEvent (Key a) { KeyUp?.Invoke (this, a); }
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
+    /// <summary>
+    /// 
+    /// </summary>
+    public IInput<TInputRecord>? InputImpl { get; set; }  // Set by MainLoopCoordinator
+
+    /// <inheritdoc />
+    public virtual void EnqueueKeyDownEvent (Key key)
+    {
+        // Convert Key → TInputRecord
+        TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
+
+        // If input supports testing, use Peek/Read pipeline
+        if (InputImpl is ITestableInput<TInputRecord> testableInput)
+        {
+            testableInput.AddInput (inputRecord);
+            return;
+        }
+
+        // Fallback: direct enqueue (bypasses Peek/Read)
+        InputBuffer.Enqueue (inputRecord);
+    }
+
+    /// <inheritdoc />
+    public void EnqueueKeyUpEvent (Key key)
+    {
+        // TODO: Determine if we can still support this on Windows
+        throw new NotImplementedException ();
+    }
+
+    /// <inheritdoc />
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
-    /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
-    /// <param name="a"></param>
-    public void OnMouseEvent (MouseEventArgs a)
+    /// <inheritdoc />
+    public virtual void EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    {
+        Logging.Critical("EnqueueMouseEvent is not implemented.");
+        //throw new NotImplementedException ();
+    }
+
+    /// <inheritdoc />
+    public void RaiseMouseEvent (MouseEventArgs a)
     {
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;
 
         foreach (MouseEventArgs e in _mouseInterpreter.Process (a))
         {
-           // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
+            // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
 
             // Pass on
             MouseEvent?.Invoke (this, e);
@@ -94,30 +116,30 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
     ///     parser events and setting <see cref="InputBuffer"/> to
     ///     the provided thread safe input collection.
     /// </summary>
-    /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IConsoleInput{T}"/>)</param>
+    /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IInput{T}"/>)</param>
     /// <param name="keyConverter">
     ///     Key converter for translating driver specific
-    ///     <typeparamref name="T"/> class into Terminal.Gui <see cref="Key"/>.
+    ///     <typeparamref name="TInputRecord"/> class into Terminal.Gui <see cref="Key"/>.
     /// </param>
-    protected InputProcessorImpl (ConcurrentQueue<T> inputBuffer, IKeyConverter<T> keyConverter)
+    protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter)
     {
         InputBuffer = inputBuffer;
         Parser.HandleMouse = true;
-        Parser.Mouse += (s, e) => OnMouseEvent (e);
+        Parser.Mouse += (s, e) => RaiseMouseEvent (e);
 
         Parser.HandleKeyboard = true;
 
         Parser.Keyboard += (s, k) =>
                            {
-                               OnKeyDown (k);
-                               OnKeyUp (k);
+                               RaiseKeyDownEvent (k);
+                               RaiseKeyUpEvent (k);
                            };
 
         // TODO: For now handle all other escape codes with ignore
         Parser.UnexpectedResponseHandler = str =>
                                            {
                                                var cur = new string (str.Select (k => k.Item1).ToArray ());
-                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<T>)} ignored unrecognized response '{cur}'");
+                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'");
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 
                                                return true;
@@ -125,23 +147,21 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
         KeyConverter = keyConverter;
     }
 
-    /// <summary>
-    ///     Drains the <see cref="InputBuffer"/> buffer, processing all available keystrokes
-    /// </summary>
+    /// <inheritdoc />
     public void ProcessQueue ()
     {
-        while (InputBuffer.TryDequeue (out T? input))
+        while (InputBuffer.TryDequeue (out TInputRecord input))
         {
             Process (input);
         }
 
-        foreach (T input in ReleaseParserHeldKeysIfStale ())
+        foreach (TInputRecord input in ReleaseParserHeldKeysIfStale ())
         {
             ProcessAfterParsing (input);
         }
     }
 
-    private IEnumerable<T> ReleaseParserHeldKeysIfStale ()
+    private IEnumerable<TInputRecord> ReleaseParserHeldKeysIfStale ()
     {
         if (Parser.State is AnsiResponseParserState.ExpectingEscapeSequence or AnsiResponseParserState.InResponse
             && DateTime.Now - Parser.StateChangedAt > _escTimeout)
@@ -157,14 +177,24 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
     ///     is called sequentially for each value read from <see cref="InputBuffer"/>.
     /// </summary>
     /// <param name="input"></param>
-    protected abstract void Process (T input);
+    protected abstract void Process (TInputRecord input);
 
     /// <summary>
     ///     Process the provided single input element - short-circuiting the <see cref="Parser"/>
     ///     stage of the processing.
     /// </summary>
     /// <param name="input"></param>
-    protected abstract void ProcessAfterParsing (T input);
+    protected virtual void ProcessAfterParsing (TInputRecord input)
+    {
+        var key = KeyConverter.ToKey (input);
+
+        // If the key is not valid, we don't want to raise any events.
+        if (IsValidInput (key, out key))
+        {
+            RaiseKeyDownEvent (key);
+            RaiseKeyUpEvent (key);
+        }
+    }
 
     private char _highSurrogate = '\0';
 
@@ -221,4 +251,10 @@ public abstract class InputProcessorImpl<T> : IInputProcessor
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public CancellationTokenSource? ExternalCancellationTokenSource { get; set; }
+
+    /// <inheritdoc />
+    public void Dispose () { ExternalCancellationTokenSource?.Dispose (); }
 }

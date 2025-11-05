@@ -5,7 +5,7 @@ namespace UnitTests.ViewTests;
 public class BorderTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
     {
         var superView = new View { Width = 10, Height = 10, CanFocus = true };
@@ -48,7 +48,7 @@ public class BorderTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Uses_Parent_Scheme ()
     {
         var view = new View { Title = "A", Height = 2, Width = 5 };
@@ -834,7 +834,7 @@ public class BorderTests (ITestOutputHelper output)
 ╠═╬┄┤
 │ ┊ ┊
 └─┴┄┘")]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SuperViewRendersLineCanvas_No_SubViews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
         var superView = new View
@@ -897,7 +897,7 @@ public class BorderTests (ITestOutputHelper output)
 │    ┊    ┊
 │    ┊    ┊
 └────┴┄┄┄┄┘")]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SuperViewRendersLineCanvas_Title_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
         var superView = new View

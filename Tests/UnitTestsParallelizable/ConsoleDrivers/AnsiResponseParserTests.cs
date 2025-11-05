@@ -3,8 +3,9 @@ using System.Diagnostics;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace UnitTests_Parallelizable.ConsoleDriverTests;
 
+// BUGBUG: These tests use TInputRecord of `int`, but that's not a realistic type for keyboard input.
 public class AnsiResponseParserTests (ITestOutputHelper output)
 {
     private readonly AnsiResponseParser<int> _parser1 = new ();

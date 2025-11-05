@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 namespace UnitTests;
 
 /// <summary>
-///     Provides xUnit-style assertions for <see cref="IConsoleDriver"/> contents.
+///     Provides xUnit-style assertions for <see cref="IDriver"/> contents.
 /// </summary>
 internal partial class DriverAssert
 {
@@ -30,7 +30,7 @@ internal partial class DriverAssert
     public static void AssertDriverAttributesAre (
         string expectedLook,
         ITestOutputHelper output,
-        IConsoleDriver? driver = null,
+        IDriver? driver = null,
         params Attribute [] expectedAttributes
     )
     {
@@ -147,7 +147,7 @@ internal partial class DriverAssert
     public static void AssertDriverContentsAre (
         string expectedLook,
         ITestOutputHelper output,
-        IConsoleDriver? driver = null,
+        IDriver? driver = null,
         bool ignoreLeadingWhitespace = false
     )
     {
@@ -193,12 +193,12 @@ internal partial class DriverAssert
     public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,
         ITestOutputHelper output,
-        IConsoleDriver? driver = null
+        IDriver? driver = null
     )
     {
         List<List<Rune>> lines = [];
         var sb = new StringBuilder ();
-        driver ??= Application.Driver;
+        driver ??= ApplicationImpl.Instance.Driver;
 
         int x = -1;
         int y = -1;
@@ -339,7 +339,7 @@ internal partial class DriverAssert
     /// </summary>
     /// <param name="driver">if null uses <see cref="Application.Driver"/></param>
     /// <param name="expectedColors"></param>
-    internal static void AssertDriverUsedColors (IConsoleDriver? driver = null, params Attribute [] expectedColors)
+    internal static void AssertDriverUsedColors (IDriver? driver = null, params Attribute [] expectedColors)
     {
         driver ??= Application.Driver;
         Cell [,] contents = driver?.Contents!;

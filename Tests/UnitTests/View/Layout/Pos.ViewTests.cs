@@ -11,11 +11,9 @@ public class PosViewTests (ITestOutputHelper output)
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
+    [SetupFakeApplication]
     public void Subtract_Operator ()
     {
-        Application.Init (new FakeConsoleDriver ());
-
         var top = new Toplevel ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };

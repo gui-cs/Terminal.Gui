@@ -8,7 +8,7 @@ public class ScrollBarTests (ITestOutputHelper output)
     #region Draw
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     #region Horizontal
 

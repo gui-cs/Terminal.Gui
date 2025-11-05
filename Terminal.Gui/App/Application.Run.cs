@@ -59,6 +59,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// </remarks>
     public static RunState Begin (Toplevel toplevel)
     {
+        // TODO: Move this to IApplication/ApplicationImpl
         ArgumentNullException.ThrowIfNull (toplevel);
 
         // Ensure the mouse is ungrabbed.
@@ -192,6 +193,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
     internal static bool PositionCursor ()
     {
+        // TODO: Move this to IApplication/ApplicationImpl
         // Find the most focused view and position the cursor there.
         View? mostFocused = Navigation?.GetFocused ();
 
@@ -274,7 +276,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null)
     {
         return ApplicationImpl.Instance.Run (errorHandler, driver);
     }
@@ -295,16 +297,16 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// </remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
+    ///     The <see cref="IDriver"/> to use. If not specified the default driver for the platform will
     ///     be used. Must be <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
-    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
+    /// <returns>The created TView object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new()
+    public static TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
+        where TView : Toplevel, new()
     {
-        return ApplicationImpl.Instance.Run<T> (errorHandler, driver);
+        return ApplicationImpl.Instance.Run<TView> (errorHandler, driver);
     }
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
@@ -331,7 +333,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     </para>
     ///     <para>
     ///         When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},IConsoleDriver)"/>
+    ///         <see cref="Run(System.Func{System.Exception,bool},IDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>
@@ -404,6 +406,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void RunLoop (RunState state)
     {
+        Debug.Fail("Legacy code");
         ArgumentNullException.ThrowIfNull (state);
         ObjectDisposedException.ThrowIf (state.Toplevel is null, "state");
 
@@ -432,6 +435,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <returns><see langword="false"/> if at least one iteration happened.</returns>
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
+        // TODO: Move this to IApplication/ApplicationImpl
         ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
         appImpl.Coordinator?.RunIteration ();
 
@@ -457,6 +461,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void End (RunState runState)
     {
+        // TODO: Move this to IApplication/ApplicationImpl
         ArgumentNullException.ThrowIfNull (runState);
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)

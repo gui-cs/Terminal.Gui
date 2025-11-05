@@ -11,7 +11,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
-    ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
+    ///     This function loads the right <see cref="IDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
     ///     assigns it to <see cref="Top"/>
     /// </para>
     /// <para>
@@ -22,23 +22,23 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// </para>
     /// <para>
     ///     The <see cref="Run{T}"/> function combines
-    ///     <see cref="Init(IConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+    ///     <see cref="Init(IDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
     ///     call. An application can use <see cref="Run{T}"/> without explicitly calling
-    ///     <see cref="Init(IConsoleDriver,string)"/>.
+    ///     <see cref="Init(IDriver,string)"/>.
     /// </para>
     /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or
+    ///     The <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or
     ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
     ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
-    ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
+    ///     <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Init (IConsoleDriver? driver = null, string? driverName = null)
+    public static void Init (IDriver? driver = null, string? driverName = null)
     {
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
@@ -77,7 +77,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
-    /// <summary>Gets a list of <see cref="IConsoleDriver"/> types and type names that are available.</summary>
+    /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
     public static (List<Type?>, List<string?>) GetDriverTypes ()
@@ -86,11 +86,11 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         List<Type?> driverTypes = new ();
 
         // Only inspect the IConsoleDriver assembly
-        var asm = typeof (IConsoleDriver).Assembly;
+        var asm = typeof (IDriver).Assembly;
 
         foreach (Type? type in asm.GetTypes ())
         {
-            if (typeof (IConsoleDriver).IsAssignableFrom (type) &&
+            if (typeof (IDriver).IsAssignableFrom (type) &&
                 type is { IsAbstract: false, IsClass: true })
             {
                 driverTypes.Add (type);
@@ -98,7 +98,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         }
 
         List<string?> driverTypeNames = driverTypes
-                                        .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
+                                        .Where (d => !typeof (IDriver).IsAssignableFrom (d))
                                         .Select (d => d!.Name)
                                         .Union (["dotnet", "windows", "unix", "fake"])
                                         .ToList ()!;

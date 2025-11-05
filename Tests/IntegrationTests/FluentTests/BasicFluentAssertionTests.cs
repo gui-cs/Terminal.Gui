@@ -13,7 +13,7 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void GuiTestContext_Init_Sets_Application_Screen (TestDriver d)
     {
-        using var context = new GuiTestContext (d, _out, TimeSpan.FromSeconds (30));
+        using var context = new GuiTestContext (d, _out, TimeSpan.FromSeconds (10));
 
         Assert.NotEqual (Rectangle.Empty, Application.Screen);
 
@@ -34,13 +34,29 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_QuitKey_Stops (TestDriver d)
+    public void GuiTestContext_QuitKey_ViaApplication_Stops (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d);
         Assert.True (Application.Top!.Running);
 
         Toplevel top = Application.Top;
-        context.RaiseKeyDownEvent (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
+        Assert.False (top!.Running);
+
+        context.WriteOutLogs (_out);
+        context.Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (TestDrivers))]
+    public void GuiTestContext_QuitKey_ViaDriver_Stops (TestDriver d)
+    {
+        using GuiTestContext context = With.A<Window> (40, 10, d);
+        Assert.True (Application.Top!.Running);
+
+        Toplevel top = Application.Top;
+        context.Send (Application.QuitKey);
+        Thread.Sleep (1000);
         Assert.False (top!.Running);
 
         context.WriteOutLogs (_out);
@@ -52,6 +68,8 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     public void GuiTestContext_StartsAndStopsWithoutError (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d);
+
+        context.WriteOutLogs (_out);
 
         // No actual assertions are needed — if no exceptions are thrown, it's working
         context.Stop ();
@@ -91,7 +109,7 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
 
         MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
 
-        using GuiTestContext c = With.A<Window> (40, 10, d)
+        using GuiTestContext c = With.A<Window> (40, 10, d, _out)
                                      .WithContextMenu (new (menuItems))
                                      .ScreenShot ("Before open menu", _out)
 
@@ -148,13 +166,13 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
                                      // Click in main area inside border
                                      .RightClick (1, 1)
                                      .ScreenShot ("After open menu", _out)
-                                     .Down ()
-                                     .Down ()
-                                     .Down ()
-                                     .Right ()
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.CursorRight)
                                      .ScreenShot ("After open submenu", _out)
-                                     .Down ()
-                                     .Enter ()
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.Enter)
                                      .ScreenShot ("Menu should be closed after selecting", _out)
                                      .Stop ()
                                      .WriteOutLogs (_out);
@@ -186,41 +204,41 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
                                             })
                                      .WaitIteration ()
                                      .AssertTrue (v5.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v3.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v1.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v3.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v5.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v3.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v1.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v3.HasFocus)
-                                     .RaiseKeyDownEvent (Key.Tab)
+                                     .Send (Key.Tab)
                                      .AssertTrue (v4.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v5.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .RaiseKeyDownEvent (Key.Tab)
+                                     .Send (Key.Tab)
                                      .AssertTrue (v6.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6.WithShift)
+                                     .Send (Key.F6.WithShift)
                                      .AssertTrue (v4.HasFocus)
-                                     .RaiseKeyDownEvent (Key.F6)
+                                     .Send (Key.F6)
                                      .AssertTrue (v6.HasFocus)
                                      .WriteOutLogs (_out)
                                      .Stop ();

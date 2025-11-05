@@ -10,7 +10,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
+    [SetupFakeApplication] // Required for spinner view that wants to register timeouts
     public void AllViews_Center_Properly (Type viewType)
     {
         // Required for spinner view that wants to register timeouts

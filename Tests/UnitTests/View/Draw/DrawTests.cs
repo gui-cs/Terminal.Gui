@@ -111,7 +111,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport ()
     {
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
@@ -136,7 +136,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Bottom ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
@@ -154,7 +154,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Left ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
@@ -179,7 +179,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Right ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
@@ -204,7 +204,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Top ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
@@ -582,7 +582,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
     [InlineData ("a𐐀b")]
     public void DrawHotString_NonBmp (string expected)
@@ -635,11 +635,9 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new FakeConsoleDriver ());
-
         Toplevel top = new ();
 
         var view = new View { X = -2, Text = "view" };

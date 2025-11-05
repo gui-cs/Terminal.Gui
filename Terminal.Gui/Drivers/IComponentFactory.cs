@@ -11,26 +11,30 @@ namespace Terminal.Gui.Drivers;
 public interface IComponentFactory
 {
     /// <summary>
-    /// Create the <see cref="IConsoleOutput"/> class for the current driver implementation i.e. the class responsible for
+    /// Create the <see cref="IOutput"/> class for the current driver implementation i.e. the class responsible for
     /// rendering <see cref="IOutputBuffer"/> into the console.
     /// </summary>
     /// <returns></returns>
-    IConsoleOutput CreateOutput ();
+    IOutput CreateOutput ();
 }
 
 /// <summary>
-/// Creates driver specific subcomponent classes (<see cref="IConsoleInput{T}"/>, <see cref="IInputProcessor"/> etc) for a
-/// <see cref="IMainLoopCoordinator"/>.
+///     Creates driver specific subcomponent classes (<see cref="IInput{TInputRecord}"/>, <see cref="IInputProcessor"/> etc) for a
+///     <see cref="IMainLoopCoordinator"/>.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IComponentFactory<T> : IComponentFactory
+/// <typeparam name="TInputRecord">
+///     The platform specific console input type. Must be a value type (struct).
+///     Valid types are <see cref="ConsoleKeyInfo"/>, <see cref="WindowsConsole.InputRecord"/>, and <see cref="char"/>.
+/// </typeparam>
+public interface IComponentFactory<TInputRecord> : IComponentFactory
+    where TInputRecord : struct
 {
     /// <summary>
-    /// Create <see cref="IConsoleInput{T}"/> class for the current driver implementation i.e. the class responsible for reading
+    /// Create <see cref="IInput{T}"/> class for the current driver implementation i.e. the class responsible for reading
     /// user input from the console.
     /// </summary>
     /// <returns></returns>
-    IConsoleInput<T> CreateInput ();
+    IInput<TInputRecord> CreateInput ();
 
     /// <summary>
     /// Creates the <see cref="InputProcessorImpl{T}"/> class for the current driver implementation i.e. the class responsible for
@@ -38,14 +42,14 @@ public interface IComponentFactory<T> : IComponentFactory
     /// </summary>
     /// <param name="inputBuffer"></param>
     /// <returns></returns>
-    IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+    IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputBuffer);
 
     /// <summary>
-    /// Creates <see cref="IConsoleSizeMonitor"/> class for the current driver implementation i.e. the class responsible for
+    /// Creates <see cref="ISizeMonitor"/> class for the current driver implementation i.e. the class responsible for
     /// reporting the current size of the terminal.
     /// </summary>
     /// <param name="consoleOutput"></param>
     /// <param name="outputBuffer"></param>
     /// <returns></returns>
-    IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer);
+    ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer);
 }

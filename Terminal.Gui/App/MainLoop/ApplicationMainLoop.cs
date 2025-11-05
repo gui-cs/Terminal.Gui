@@ -19,15 +19,15 @@ namespace Terminal.Gui.App;
 ///         <item>Throttling iterations to respect <see cref="Application.MaximumIterationsPerSecond"/></item>
 ///     </list>
 /// </remarks>
-/// <typeparam name="T">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
-public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
+/// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
+public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
     private ITimedEvents? _timedEvents;
-    private ConcurrentQueue<T>? _inputBuffer;
+    private ConcurrentQueue<TInputRecord>? _inputBuffer;
     private IInputProcessor? _inputProcessor;
-    private IConsoleOutput? _out;
+    private IOutput? _out;
     private AnsiRequestScheduler? _ansiRequestScheduler;
-    private IConsoleSizeMonitor? _consoleSizeMonitor;
+    private ISizeMonitor? _consoleSizeMonitor;
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -40,10 +40,10 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
 
     /// <summary>
     ///     The input events thread-safe collection. This is populated on separate
-    ///     thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
+    ///     thread by a <see cref="IInput{T}"/>. Is drained as part of each
     ///     <see cref="Iteration"/>
     /// </summary>
-    public ConcurrentQueue<T> InputBuffer
+    public ConcurrentQueue<TInputRecord> InputBuffer
     {
         get => _inputBuffer ?? throw new NotInitializedException (nameof (InputBuffer));
         private set => _inputBuffer = value;
@@ -60,7 +60,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     public IOutputBuffer OutputBuffer { get; } = new OutputBufferImpl ();
 
     /// <inheritdoc/>
-    public IConsoleOutput Out
+    public IOutput Out
     {
         get => _out ?? throw new NotInitializedException (nameof (Out));
         private set => _out = value;
@@ -74,7 +74,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public IConsoleSizeMonitor ConsoleSizeMonitor
+    public ISizeMonitor ConsoleSizeMonitor
     {
         get => _consoleSizeMonitor ?? throw new NotInitializedException (nameof (ConsoleSizeMonitor));
         private set => _consoleSizeMonitor = value;
@@ -101,10 +101,10 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     /// <param name="componentFactory"></param>
     public void Initialize (
         ITimedEvents timedEvents,
-        ConcurrentQueue<T> inputBuffer,
+        ConcurrentQueue<TInputRecord> inputBuffer,
         IInputProcessor inputProcessor,
-        IConsoleOutput consoleOutput,
-        IComponentFactory<T> componentFactory
+        IOutput consoleOutput,
+        IComponentFactory<TInputRecord> componentFactory
     )
     {
         InputBuffer = inputBuffer;
@@ -115,7 +115,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
         OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
-        ConsoleSizeMonitor = componentFactory.CreateConsoleSizeMonitor (Out, OutputBuffer);
+        ConsoleSizeMonitor = componentFactory.CreateSizeMonitor (Out, OutputBuffer);
     }
 
     /// <inheritdoc/>

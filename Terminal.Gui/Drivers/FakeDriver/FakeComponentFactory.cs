@@ -9,32 +9,42 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
 {
+    private readonly FakeInput? _input;
+    private readonly FakeOutput? _output;
+    private readonly ISizeMonitor? _sizeMonitor;
+
     /// <summary>
-    ///     Creates a new FakeComponentFactory with optional predefined input and output capture.
+    ///     Creates a new FakeComponentFactory with optional output capture.
     /// </summary>
-    /// <param name="predefinedInput">Optional queue of predefined input events to simulate.</param>
+    /// <param name="input"></param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
-    public FakeComponentFactory (ConcurrentQueue<ConsoleKeyInfo>? predefinedInput = null, FakeConsoleOutput? output = null)
+    /// <param name="sizeMonitor"></param>
+    public FakeComponentFactory (FakeInput? input = null, FakeOutput? output = null, ISizeMonitor? sizeMonitor = null)
     {
-        _predefinedInput = predefinedInput;
+        _input = input;
         _output = output;
+        _sizeMonitor = sizeMonitor;
     }
 
-    private readonly ConcurrentQueue<ConsoleKeyInfo>? _predefinedInput;
-    private readonly FakeConsoleOutput? _output;
 
     /// <inheritdoc/>
-    public override IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        return new ConsoleSizeMonitorImpl (consoleOutput);
+        return _sizeMonitor ?? new SizeMonitorImpl (consoleOutput);
     }
 
     /// <inheritdoc/>
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput () { return new FakeConsoleInput (_predefinedInput); }
+    public override IInput<ConsoleKeyInfo> CreateInput ()
+    {
+        return _input ?? new FakeInput ();
+    }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new NetInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new FakeInputProcessor (inputBuffer); }
 
     /// <inheritdoc/>
-    public override IConsoleOutput CreateOutput () { return _output ?? new FakeConsoleOutput (); }
+    public override IOutput CreateOutput ()
+    {
+        return _output ?? new FakeOutput ();
+    }
 }

@@ -52,7 +52,7 @@ public class RulerTests (ITestOutputHelper output): ParallelizableBase
     [Fact]
     public void Draw_Default ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var r = new Ruler ();
         r.Draw (Point.Empty, driver: driver);
@@ -62,7 +62,7 @@ public class RulerTests (ITestOutputHelper output): ParallelizableBase
     [Fact]
     public void Draw_Horizontal ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var len = 15;
 
@@ -108,7 +108,7 @@ public class RulerTests (ITestOutputHelper output): ParallelizableBase
     [Fact]
     public void Draw_Vertical ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var len = 15;
 

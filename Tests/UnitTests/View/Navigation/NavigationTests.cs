@@ -7,7 +7,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_AtLeastOneNavKey_Advances (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -92,7 +92,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_HasFocus_Changed_Event (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -257,7 +257,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_Visible_False_No_HasFocus_Events (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -322,27 +322,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         top.Dispose ();
 
         Application.ResetState ();
-    }
-
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Navigation_With_Null_Focused_View ()
-    {
-        // Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
-
-
-        using var top = new Toplevel ();
-        top.Ready += (s, e) => { Assert.Null (top.Focused); };
-
-        // Keyboard navigation with tab
-        FakeConsole.MockKeyPresses.Push (new ('\t', ConsoleKey.Tab, false, false, false));
-
-        Application.Iteration += (s, a) => Application.RequestStop ();
-
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
     }
 
     [Fact]

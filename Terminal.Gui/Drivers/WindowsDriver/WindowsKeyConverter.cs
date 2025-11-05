@@ -35,4 +35,50 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
 
         return new (map);
     }
+
+    /// <inheritdoc />
+    public WindowsConsole.InputRecord ToKeyInfo (Key key)
+    {
+        // Convert Key to ConsoleKeyInfo using the cross-platform mapping utility
+        ConsoleKeyInfo consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key.KeyCode);
+
+        // Build the ControlKeyState from the ConsoleKeyInfo modifiers
+        var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
+
+        if (consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift))
+        {
+            controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
+        }
+
+        if (consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt))
+        {
+            controlKeyState |= WindowsConsole.ControlKeyState.LeftAltPressed;
+        }
+
+        if (consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+        {
+            controlKeyState |= WindowsConsole.ControlKeyState.LeftControlPressed;
+        }
+
+        // Get the scan code for this key
+        uint scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (consoleKeyInfo);
+
+        // Create a KeyEventRecord with the converted values
+        var keyEvent = new WindowsConsole.KeyEventRecord
+        {
+            bKeyDown = true, // Assume key down for conversion
+            wRepeatCount = 1,
+            wVirtualKeyCode = (ConsoleKeyMapping.VK)consoleKeyInfo.Key,
+            wVirtualScanCode = (ushort)scanCode,
+            UnicodeChar = consoleKeyInfo.KeyChar,
+            dwControlKeyState = controlKeyState
+        };
+
+        // Create and return an InputRecord with the keyboard event
+        return new WindowsConsole.InputRecord
+        {
+            EventType = WindowsConsole.EventType.Key,
+            KeyEvent = keyEvent
+        };
+    }
 }

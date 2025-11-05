@@ -7,27 +7,27 @@ namespace UnitTests.ApplicationTests;
 
 public class ApplicationImplTests
 {
-    public ApplicationImplTests () { ConsoleDriverImpl.RunningUnitTests = true; }
+    public ApplicationImplTests () { Application.RunningUnitTests = true; }
 
     /// <summary>
     ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.
     /// </summary>
     private ApplicationImpl NewMockedApplicationImpl ()
     {
-        Mock<INetConsoleInput> netInput = new ();
+        Mock<INetInput> netInput = new ();
         SetupRunInputMockMethodToBlock (netInput);
 
         Mock<IComponentFactory<ConsoleKeyInfo>> m = new ();
         m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
         m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of<IInputProcessor> ());
 
-        Mock<IConsoleOutput> consoleOutput = new ();
+        Mock<IOutput> consoleOutput = new ();
         var size = new Size (80, 25);
         consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ()))
                      .Callback<int, int> ((w, h) => size = new Size (w, h));
         consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
         m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
-        m.Setup (f => f.CreateConsoleSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
+        m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
         return new (m.Object);
     }
@@ -52,29 +52,7 @@ public class ApplicationImplTests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
-    [Fact]
-    public void Init_DriverIsFacade ()
-    {
-        IApplication orig = ApplicationImpl.Instance;
-
-        ApplicationImpl v2 = NewMockedApplicationImpl ();
-        ApplicationImpl.ChangeInstance (v2);
-
-        Assert.Null (Application.Driver);
-        v2.Init (null, "fake");
-        Assert.NotNull (Application.Driver);
-
-        Type type = Application.Driver.GetType ();
-        Assert.True (type.IsGenericType);
-        Assert.True (type.GetGenericTypeDefinition () == typeof (ConsoleDriverFacade<>));
-        v2.Shutdown ();
-
-        Assert.Null (Application.Driver);
-
-        ApplicationImpl.ChangeInstance (orig);
-    }
-
+    
     /*
     [Fact]
     public void Init_ExplicitlyRequestWin ()
@@ -158,7 +136,7 @@ public class ApplicationImplTests
         ApplicationImpl.ChangeInstance (orig);
     }
 */
-    private void SetupRunInputMockMethodToBlock (Mock<IConsoleInput<WindowsConsole.InputRecord>> winInput)
+    private void SetupRunInputMockMethodToBlock (Mock<IInput<WindowsConsole.InputRecord>> winInput)
     {
         winInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
                 .Callback<CancellationToken> (token =>
@@ -173,7 +151,7 @@ public class ApplicationImplTests
                 .Verifiable (Times.Once);
     }
 
-    private void SetupRunInputMockMethodToBlock (Mock<INetConsoleInput> netInput)
+    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
     {
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
                 .Callback<CancellationToken> (token =>

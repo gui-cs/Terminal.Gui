@@ -5,11 +5,11 @@ namespace Terminal.Gui.App;
 public static partial class Application // Screen related stuff; intended to hide Driver details
 {
     /// <summary>
-    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IConsoleDriver"/>.
+    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IDriver"/>.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     If the <see cref="IConsoleDriver"/> has not been initialized, this will return a default size of 2048x2048; useful for unit tests.
+    ///     If the <see cref="IDriver"/> has not been initialized, this will return a default size of 2048x2048; useful for unit tests.
     /// </para>
     /// </remarks>
     public static Rectangle Screen

@@ -5,7 +5,7 @@ public partial class ColorPicker
 {
     /// <summary>
     ///     Open a <see cref="Dialog"/> with two <see cref="ColorPicker"/> or <see cref="ColorPicker16"/>, based on the
-    ///     <see cref="IConsoleDriver.Force16Colors"/> is false or true, respectively, for <see cref="Attribute.Foreground"/>
+    ///     <see cref="IDriver.Force16Colors"/> is false or true, respectively, for <see cref="Attribute.Foreground"/>
     ///     and <see cref="Attribute.Background"/> colors.
     /// </summary>
     /// <param name="title">The title to show in the dialog.</param>

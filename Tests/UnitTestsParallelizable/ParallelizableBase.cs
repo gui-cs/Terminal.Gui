@@ -1,6 +1,3 @@
-
-using TerminalGuiFluentTesting;
-
 namespace UnitTests.Parallelizable;
 
 /// <summary>
@@ -13,17 +10,26 @@ public abstract class ParallelizableBase
     // Common setup or utilities for all tests can go here
 
     /// <summary>
-    /// Creates a new FakeDriver instance with the specified buffer size.
-    /// This is a convenience method for tests that need to use Draw() and DriverAssert
-    /// without relying on Application.Driver.
+    ///     Creates a new FakeDriver instance with the specified buffer size.
+    ///     This is a convenience method for tests that need to use Draw() and DriverAssert
+    ///     without relying on Application.Driver.
     /// </summary>
     /// <param name="width">Width of the driver buffer</param>
     /// <param name="height">Height of the driver buffer</param>
     /// <returns>A configured IFakeConsoleDriver instance</returns>
-    protected static IConsoleDriver CreateFakeDriver (int width = 25, int height = 25)
+    protected static IDriver CreateFakeDriver (int width = 80, int height = 25)
     {
-        IConsoleDriver driver = new FakeConsoleDriver ();
+        var output = new FakeOutput ();
+
+        DriverImpl driver = new (
+                                                          new NetInputProcessor (null),
+                                                          new OutputBufferImpl (),
+                                                          output,
+                                                          new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                                          new SizeMonitorImpl (output));
+
         driver.SetScreenSize (width, height);
+
         return driver;
     }
 }

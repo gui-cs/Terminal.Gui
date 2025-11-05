@@ -4,23 +4,22 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Abstract base class implementation of <see cref="IComponentFactory{T}"/>
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public abstract class ComponentFactoryImpl<T> : IComponentFactory<T>
+/// Abstract base class implementation of <see cref="IComponentFactory{TInputRecord}"/> that provides a default implementation of <see cref="CreateSizeMonitor"/>.</summary>
+/// <typeparam name="TInputRecord">The platform specific keyboard input type (e.g. <see cref="ConsoleKeyInfo"/> or <see cref="WindowsConsole.InputRecord"/></typeparam>
+public abstract class ComponentFactoryImpl<TInputRecord> : IComponentFactory<TInputRecord> where TInputRecord : struct
 {
     /// <inheritdoc />
-    public abstract IConsoleInput<T> CreateInput ();
+    public abstract IInput<TInputRecord> CreateInput ();
 
     /// <inheritdoc />
-    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputBuffer);
 
     /// <inheritdoc />
-    public virtual IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
+    public virtual ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        return new ConsoleSizeMonitorImpl (consoleOutput);
+        return new SizeMonitorImpl (consoleOutput);
     }
 
     /// <inheritdoc />
-    public abstract IConsoleOutput CreateOutput ();
+    public abstract IOutput CreateOutput ();
 }

@@ -98,7 +98,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_ClearsEntireViewport ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -146,7 +146,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };

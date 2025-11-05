@@ -42,6 +42,16 @@ public static partial class Application
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
+    /// <summary>
+    ///     Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
+    ///     <code>
+    ///  public ColorTests ()
+    ///  {
+    ///    ConsoleDriver.RunningUnitTests = true;
+    ///  }
+    /// </code>
+    /// </summary>
+    public static bool RunningUnitTests { get; set; }
 
     /// <summary>
     /// <para>
@@ -71,7 +81,7 @@ public static partial class Application
     /// <returns>A string representation of the Application </returns>
     public new static string ToString ()
     {
-        IConsoleDriver? driver = Driver;
+        IDriver? driver = Driver;
 
         if (driver is null)
         {
@@ -82,11 +92,11 @@ public static partial class Application
     }
 
     /// <summary>
-    ///     Gets a string representation of the Application rendered by the provided <see cref="IConsoleDriver"/>.
+    ///     Gets a string representation of the Application rendered by the provided <see cref="IDriver"/>.
     /// </summary>
     /// <param name="driver">The driver to use to render the contents.</param>
     /// <returns>A string representation of the Application </returns>
-    public static string ToString (IConsoleDriver? driver)
+    public static string ToString (IDriver? driver)
     {
         if (driver is null)
         {
@@ -213,6 +223,7 @@ public static partial class Application
             }
         }
 #endif
+        RunningUnitTests = false;
         Top = null;
         CachedRunStateToplevel = null;
 

@@ -36,7 +36,7 @@ public class MouseTests : TestsAllViews
         };
         testView.Margin!.Thickness = new (marginThickness);
         testView.Border!.Thickness = new (borderThickness);
-        testView.Padding.Thickness = new (paddingThickness);
+        testView.Padding!.Thickness = new (paddingThickness);
 
         var top = new Toplevel ();
         top.Add (testView);

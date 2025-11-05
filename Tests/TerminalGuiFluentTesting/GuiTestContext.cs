@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -14,25 +13,21 @@ namespace TerminalGuiFluentTesting;
 /// </summary>
 public partial class GuiTestContext : IDisposable
 {
-    private readonly CancellationTokenSource _cts = new ();
-    private CancellationTokenSource? _hardStop;
+    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly Task? _runTask;
     internal Exception? _ex;
-    internal readonly FakeConsoleOutput _output = new ();
-    internal NoOpWindowsInput? _winInput;
-    internal NoOpNetInput? _netInput;
-    internal NoOpUnixInput? _unixInput;
-    internal NoOpFakeInput? _fakeInput;
+    internal readonly FakeOutput _fakeOutput = new ();
+    internal readonly FakeInput _fakeInput = new ();
     internal View? _lastView;
     private readonly object _logsLock = new ();
     private StringBuilder? _logsSb;
-    internal TestDriver _driver;
+    internal TestDriver _driverType;
     internal bool _finished;
-    private ConsoleSizeMonitorImpl? _sizeMonitor;
+    private SizeMonitorImpl? _sizeMonitor;
     internal TimeSpan _timeout;
     private IApplication? _origApp;
     private ILogger? _origLogger;
-    private ApplicationImpl? _impl;
+    private ApplicationImpl? _applicationImpl;
     private readonly SemaphoreSlim _booting;
     private readonly bool _runApplication;
     private readonly TextWriter? _logWriter;
@@ -64,7 +59,7 @@ public partial class GuiTestContext : IDisposable
 
                                      t.Dispose ();
                                      Application.Shutdown ();
-                                     _cts.Cancel ();
+                                     _runCancellationTokenSource.Cancel ();
                                  }
                                  catch (OperationCanceledException)
                                  { }
@@ -77,14 +72,14 @@ public partial class GuiTestContext : IDisposable
                                          WriteOutLogs (_logWriter);
                                      }
 
-                                     _hardStop.Cancel ();
+                                     _fakeInput.ExternalCancellationTokenSource!.Cancel ();
                                  }
                                  finally
                                  {
                                      CleanupApplication ();
                                  }
                              },
-                             _cts.Token);
+                             _runCancellationTokenSource.Token);
 
         // Wait for booting to complete with a timeout to avoid hangs
         if (!_booting.WaitAsync (_timeout).Result)
@@ -146,10 +141,25 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Common initialization for both constructors.
     /// </summary>
-    private void CommonInit (int width, int height, TestDriver driver, TimeSpan? timeout)
+    private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
     {
-        _timeout = timeout ?? TimeSpan.FromSeconds (30);
-        _hardStop = new (_timeout);
+        _timeout = timeout ?? TimeSpan.FromSeconds (10);
+
+        // ✅ Link _runCancellationTokenSource with a timeout
+        // This creates a token that responds to EITHER the run cancellation OR timeout
+        _fakeInput.ExternalCancellationTokenSource =
+            CancellationTokenSource.CreateLinkedTokenSource (
+                                                             _runCancellationTokenSource.Token,
+                                                             new CancellationTokenSource (_timeout).Token);
+
+        // Now when InputImpl.Run receives this ExternalCancellationTokenSource,
+        // it will create ANOTHER linked token internally that combines:
+        // - Its own runCancellationToken parameter
+        // - The ExternalCancellationTokenSource (which is already linked)
+        // This creates a chain: any of these triggers will stop input:
+        // 1. _runCancellationTokenSource.Cancel() (normal stop)
+        // 2. Timeout expires (test timeout)
+        // 3. Direct cancel of ExternalCancellationTokenSource (hard stop/error)
 
         // Remove frame limit
         Application.MaximumIterationsPerSecond = ushort.MaxValue;
@@ -157,48 +167,45 @@ public partial class GuiTestContext : IDisposable
         _origApp = ApplicationImpl.Instance;
         _origLogger = Logging.Logger;
         _logsSb = new ();
-        _driver = driver;
-
-        _netInput = new (_cts.Token);
-        _winInput = new (_cts.Token);
-        _unixInput = new (_cts.Token);
-        _fakeInput = new (_cts.Token);
+        _driverType = driverType;
 
         // Only set size if explicitly provided (width and height > 0)
         if (width > 0 && height > 0)
         {
-            _output.SetSize (width, height);
+            _fakeOutput.SetSize (width, height);
         }
 
-        _sizeMonitor = new (_output);
+        _sizeMonitor = new (_fakeOutput);
         IComponentFactory? cf = null;
 
-        switch (driver)
+        // TODO: As each drivers' IInput/IOutput implementations are made testable (e.g. 
+        // TODO: safely injectable/mocked), we can expand this switch to use them.
+        switch (driverType)
         {
             case TestDriver.DotNet:
-                cf = new FakeNetComponentFactory (_netInput, _output, _sizeMonitor);
+                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
 
                 break;
             case TestDriver.Windows:
-                cf = new FakeWindowsComponentFactory (_winInput, _output, _sizeMonitor);
+                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
 
                 break;
             case TestDriver.Unix:
-                cf = new FakeUnixComponentFactory (_unixInput, _output, _sizeMonitor);
+                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
 
                 break;
             case TestDriver.Fake:
-                cf = new FakeFakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
 
                 break;
         }
 
-        _impl = new (cf!);
+        _applicationImpl = new (cf!);
     }
 
     private void InitializeApplication ()
     {
-        ApplicationImpl.ChangeInstance (_impl);
+        ApplicationImpl.ChangeInstance (_applicationImpl);
 
         ILogger logger = LoggerFactory.Create (builder =>
                                                    builder.SetMinimumLevel (LogLevel.Trace)
@@ -208,11 +215,13 @@ public partial class GuiTestContext : IDisposable
                                       .CreateLogger ("Test Logging");
         Logging.Logger = logger;
 
-        _impl.Init (null, GetDriverName ());
+        _applicationImpl?.Init (null, GetDriverName ());
     }
 
     private void CleanupApplication ()
     {
+        _fakeInput.ExternalCancellationTokenSource = null;
+
         ApplicationImpl.ChangeInstance (_origApp);
         Logging.Logger = _origLogger;
         _finished = true;
@@ -222,7 +231,7 @@ public partial class GuiTestContext : IDisposable
 
     private string GetDriverName ()
     {
-        return _driver switch
+        return _driverType switch
                {
                    TestDriver.Windows => "windows",
                    TestDriver.DotNet => "dotnet",
@@ -254,7 +263,6 @@ public partial class GuiTestContext : IDisposable
 
                 CleanupApplication ();
             }
-
             return this;
         }
 
@@ -263,13 +271,11 @@ public partial class GuiTestContext : IDisposable
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
         {
-            _cts.Cancel ();
-
-            // Timeout occurred, force the task to stop
-            _hardStop.Cancel ();
+            _runCancellationTokenSource.Cancel ();
+            // No need to manually cancel ExternalCancellationTokenSource
 
             // App is having trouble shutting down, try sending some more shutdown stuff from this thread.
-            // If this doesn't work there will be test cascade failures as the main loop continues to run during next test.
+            // If this doesn't work there will be test failures as the main loop continues to run during next test.
             try
             {
                 Application.RequestStop ();
@@ -283,7 +289,7 @@ public partial class GuiTestContext : IDisposable
             throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
         }
 
-        _cts.Cancel ();
+        _runCancellationTokenSource.Cancel ();
 
         if (_ex != null)
         {
@@ -294,7 +300,8 @@ public partial class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    ///     Hard stops the application and waits for the background thread to exit.
+    ///     Hard stops the application and waits for the background thread to exit.HardStop is used by the source generator for
+    ///     wrapping Xunit assertions.
     /// </summary>
     public void HardStop (Exception? ex = null)
     {
@@ -303,26 +310,10 @@ public partial class GuiTestContext : IDisposable
             _ex = ex;
         }
 
-        _hardStop.Cancel ();
+        // With linked tokens, just cancelling ExternalCancellationTokenSource
+        // will cascade to stop everything
+        _fakeInput.ExternalCancellationTokenSource?.Cancel ();
         Stop ();
-    }
-
-    /// <summary>
-    ///     Cleanup to avoid state bleed between tests
-    /// </summary>
-    public void Dispose ()
-    {
-        Stop ();
-
-        if (_hardStop.IsCancellationRequested)
-        {
-            throw new (
-                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test",
-                       _ex);
-        }
-
-        _hardStop.Cancel ();
-        _booting.Dispose ();
     }
 
     /// <summary>
@@ -334,7 +325,7 @@ public partial class GuiTestContext : IDisposable
     {
         lock (_logsLock)
         {
-            writer.WriteLine (_logsSb.ToString ());
+            writer.WriteLine (_logsSb!.ToString ());
         }
 
         return this; //WaitIteration();
@@ -342,14 +333,14 @@ public partial class GuiTestContext : IDisposable
 
     /// <summary>
     ///     Waits until the end of the current iteration of the main loop. Optionally
-    ///     running a given <paramref name="a"/> action on the UI thread at that time.
+    ///     running a given <paramref name="action"/> action on the UI thread at that time.
     /// </summary>
-    /// <param name="a"></param>
+    /// <param name="action"></param>
     /// <returns></returns>
-    public GuiTestContext WaitIteration (Action? a = null)
+    public GuiTestContext WaitIteration (Action? action = null)
     {
         // If application has already exited don't wait!
-        if (_finished || _cts.Token.IsCancellationRequested || _hardStop.Token.IsCancellationRequested)
+        if (_finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
         {
             return this;
         }
@@ -359,31 +350,32 @@ public partial class GuiTestContext : IDisposable
             throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
-        a ??= () => { };
-        var ctsLocal = new CancellationTokenSource ();
+        action ??= () => { };
+        CancellationTokenSource ctsActionCompleted = new ();
 
         Application.Invoke (() =>
                             {
                                 try
                                 {
-                                    a ();
-                                    ctsLocal.Cancel ();
+                                    action ();
+                                    ctsActionCompleted.Cancel ();
+                                    Logging.Trace("WaitIteration: Action completed");
                                 }
                                 catch (Exception e)
                                 {
                                     _ex = e;
-                                    _hardStop.Cancel ();
+                                    _fakeInput.ExternalCancellationTokenSource?.Cancel ();
                                 }
                             });
 
         // Blocks until either the token or the hardStopToken is cancelled.
+        // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
+        // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
         WaitHandle.WaitAny (
-                            new []
-                            {
-                                _cts.Token.WaitHandle,
-                                _hardStop.Token.WaitHandle,
-                                ctsLocal.Token.WaitHandle
-                            });
+                            [
+                                _runCancellationTokenSource.Token.WaitHandle,
+                                ctsActionCompleted.Token.WaitHandle
+                            ]);
 
         return this;
     }
@@ -440,7 +432,7 @@ public partial class GuiTestContext : IDisposable
     ///     Returns the last set position of the cursor.
     /// </summary>
     /// <returns></returns>
-    public Point GetCursorPosition () { return _output.CursorPosition; }
+    public Point GetCursorPosition () { return _fakeOutput.CursorPosition; }
 
     /// <summary>
     ///     Simulates changing the console size e.g. by resizing window in your operating system
@@ -459,5 +451,27 @@ public partial class GuiTestContext : IDisposable
 
                                   writer.WriteLine (text);
                               });
+    }
+
+    /// <summary>
+    ///     Cleanup to avoid state bleed between tests
+    /// </summary>
+    public void Dispose ()
+    {
+        Stop ();
+
+        if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
+        {
+            throw new (
+                       "Application was hard stopped...",
+                       _ex);
+        }
+
+        // ✅ Dispose the linked token source
+        _fakeInput.ExternalCancellationTokenSource?.Dispose ();
+        _runCancellationTokenSource?.Dispose ();
+        _fakeInput.Dispose();
+        _fakeOutput.Dispose();
+        _booting.Dispose ();
     }
 }
