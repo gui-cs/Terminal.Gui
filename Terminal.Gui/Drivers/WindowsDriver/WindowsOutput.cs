@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsConsoleOutput : OutputBase, IOutput
+internal partial class WindowsOutput : OutputBase, IOutput
 {
     [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -103,9 +103,9 @@ internal partial class WindowsConsoleOutput : OutputBase, IOutput
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
 
-    public WindowsConsoleOutput ()
+    public WindowsOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (WindowsConsoleOutput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
 
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
@@ -303,7 +303,7 @@ internal partial class WindowsConsoleOutput : OutputBase, IOutput
         }
         catch (Exception e)
         {
-            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsConsoleOutput)}");
+            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsOutput)}");
 
             if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
@@ -479,6 +479,12 @@ internal partial class WindowsConsoleOutput : OutputBase, IOutput
                                                   : EscSeqUtils.CSI_HideCursor;
             Write (cursorVisibilitySequence);
         }
+    }
+
+    /// <inheritdoc />
+    public Point GetCursorPosition ()
+    {
+        return _lastCursorPosition ?? Point.Empty;
     }
 
     private Point? _lastCursorPosition;

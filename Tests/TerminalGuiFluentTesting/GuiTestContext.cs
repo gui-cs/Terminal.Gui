@@ -16,7 +16,7 @@ public partial class GuiTestContext : IDisposable
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly Task? _runTask;
     internal Exception? _ex;
-    internal readonly IOutput? _output;
+    internal IOutput? _output;
     internal readonly FakeInput _fakeInput = new ();
     internal View? _lastView;
     private readonly object _logsLock = new ();
@@ -194,16 +194,19 @@ public partial class GuiTestContext : IDisposable
 
                 break;
             case TestDriver.Windows:
+                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Unix:
+                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Fake:
+                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
@@ -457,8 +460,7 @@ public partial class GuiTestContext : IDisposable
     /// <returns></returns>
     public Point GetCursorPosition ()
     {
-        // TODO: Implement Console.Write(EscSeqUtils.CSI_RequestCursorPositionReport.Request); in drivers that support it.
-        return _output.GetCursorPosition ();
+        return _output!.GetCursorPosition ();
     }
 
     /// <summary>

@@ -163,6 +163,12 @@ internal class UnixOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc />
+    public Point GetCursorPosition ()
+    {
+        return _lastCursorPosition ?? Point.Empty;
+    }
+
+    /// <inheritdoc />
     public void SetCursorPosition (int col, int row)
     {
         SetCursorPositionImpl (col, row);

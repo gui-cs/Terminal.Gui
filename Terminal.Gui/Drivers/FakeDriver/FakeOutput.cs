@@ -32,6 +32,12 @@ public class FakeOutput : OutputBase, IOutput
     /// </summary>
     public string Output => _output.ToString ();
 
+    /// <inheritdoc />
+    public Point GetCursorPosition ()
+    {
+        return new (_cursorLeft, _cursorTop);
+    }
+
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
@@ -48,15 +54,6 @@ public class FakeOutput : OutputBase, IOutput
         _cursorTop = row;
 
         return true;
-    }
-
-    /// <summary>
-    /// The last value set by calling <see cref="SetCursorPosition"/>
-    /// </summary>
-    public Point CursorPosition
-    {
-        get => new (_cursorLeft, _cursorTop);
-        private set => throw new NotImplementedException ();
     }
 
     /// <inheritdoc/>

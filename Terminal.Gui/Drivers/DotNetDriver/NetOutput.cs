@@ -49,8 +49,7 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc />
     public Point GetCursorPosition ()
     {
-        // TODO: Implement EscSeqUtils.CSI_RequestCursorPositionReport
-        throw new NotImplementedException ();
+        return _lastCursorPosition ?? Point.Empty;
     }
 
     /// <inheritdoc/>
