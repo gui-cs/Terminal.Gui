@@ -29,7 +29,6 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 internal class DriverImpl : IDriver
 {
-    private readonly string? _driverName;
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
@@ -47,7 +46,6 @@ internal class DriverImpl : IDriver
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
-    /// <param name="input"></param>
     /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
     /// <param name="outputBuffer">The output buffer for managing screen state.</param>
     /// <param name="output">The output interface for rendering to the console.</param>

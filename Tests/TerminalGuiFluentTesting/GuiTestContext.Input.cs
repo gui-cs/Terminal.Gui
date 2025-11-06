@@ -184,8 +184,6 @@ public partial class GuiTestContext
     /// <summary>
     ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public GuiTestContext Send (Key key)
     {
         Logging.Trace ($"Sending key: {key}");
