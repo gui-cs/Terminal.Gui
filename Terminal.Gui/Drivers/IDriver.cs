@@ -278,10 +278,10 @@ public interface IDriver
     event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Adds a key input event to the driver. For unit tests.
+    ///     Enqueues a key input event to the driver. For unit tests.
     /// </summary>
     /// <param name="key"></param>
-    void AddKeyEvent (Key key);
+    void EnqueueKeyEvent (Key key);
 
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution

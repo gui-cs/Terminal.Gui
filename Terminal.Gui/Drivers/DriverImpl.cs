@@ -460,7 +460,7 @@ internal class DriverImpl : IDriver
     public void WriteRaw (string ansi) { _output.Write (ansi); }
 
     /// <inheritdoc/>
-    public void AddKeyEvent (Key key)
+    public void EnqueueKeyEvent (Key key)
     {
         InputProcessor.EnqueueKeyDownEvent (key);
     }

@@ -184,16 +184,16 @@ public partial class GuiTestContext
     /// <summary>
     ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
-    public GuiTestContext Send (Key key)
+    public GuiTestContext EnqueueKey (Key key)
     {
-        Logging.Trace ($"Sending key: {key}");
+        Logging.Trace ($"Enqueuing key: {key}");
 
         // First, enqueue the input
         //WaitIteration (() =>
         // {
         if (Application.Driver is { })
         {
-            Application.Driver.AddKeyEvent (key);
+            Application.Driver.EnqueueKeyEvent (key);
             Thread.Sleep(100);
         }
         else

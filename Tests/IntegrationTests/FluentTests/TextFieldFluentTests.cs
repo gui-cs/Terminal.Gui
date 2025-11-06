@@ -29,18 +29,18 @@ public class TextFieldFluentTests
                           .Focus<TextField> ()
                           .WaitIteration ()
                           .AssertCursorPosition (new Point (1, 1)) // Initial cursor position (because Window has border)
-                          .Send (Key.A)
+                          .EnqueueKey (Key.A)
                           .WaitIteration ()
                           .ScreenShot ("After typing first letter", _out)
                           .AssertCursorPosition (new Point (2, 1)) // Cursor moves along as letter is pressed
-                          .Send (Key.B)
+                          .EnqueueKey (Key.B)
                           .WaitIteration ()
                           .AssertCursorPosition (new Point (3, 1)) // Cursor moves along as letter is pressed
-                          .Send (Key.C)
+                          .EnqueueKey (Key.C)
                           .WaitIteration ()
                           .ScreenShot ("After typing all letters",_out)
                           .AssertCursorPosition (new Point (3, 1)) // Cursor stays where it is because we are at end of TextField
-                          .Send (Key.D)
+                          .EnqueueKey (Key.D)
                           .WaitIteration ()
                           .ScreenShot ("Typing one more letter", _out)
                           .AssertCursorPosition (new Point (3, 1)) // Cursor still stays at end of TextField
