@@ -115,7 +115,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BootMainLoop ()
     {
-        Logging.Trace ($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
+        //Logging.Trace ($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
 
         lock (_oLockInitialization)
         {
@@ -129,7 +129,6 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BuildDriverIfPossible ()
     {
-        Logging.Trace ($"_input: {_input}, _output: {_output}");
 
         if (_input != null && _output != null)
         {
@@ -143,6 +142,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             Application.Driver = _driver;
 
             _startupSemaphore.Release ();
+            Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
         }
     }
 

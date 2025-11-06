@@ -114,7 +114,7 @@ internal class KeyboardImpl : IKeyboard
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
-        Logging.Debug ($"{key}");
+        //Logging.Debug ($"{key}");
 
         // TODO: Add a way to ignore certain keys, esp for debugging.
         //#if DEBUG

@@ -31,7 +31,6 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                                 Toplevel top = Application.Top!;
                                                 Application.Top!.Add (w1, w2, w3);
                                             })
-                                     .WaitIteration ()
                                      .AssertTrue (v5.HasFocus)
                                      .Send (Key.F6)
                                      .AssertTrue (v1.HasFocus)
@@ -69,7 +68,6 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                      .AssertTrue (v4.HasFocus)
                                      .Send (Key.F6)
                                      .AssertTrue (v6.HasFocus)
-                                     .WriteOutLogs (_out)
                                      .Stop ();
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);

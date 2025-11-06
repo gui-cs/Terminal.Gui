@@ -376,7 +376,7 @@ public partial class GuiTestContext : IDisposable
                                 try
                                 {
                                     action ();
-                                    Logging.Trace ("Action completed");
+                                    //Logging.Trace ("Action completed");
                                     ctsActionCompleted.Cancel ();
                                 }
                                 catch (Exception e)
@@ -396,7 +396,7 @@ public partial class GuiTestContext : IDisposable
                                 ctsActionCompleted.Token.WaitHandle
                             ]);
 
-        Logging.Trace ($"Return from WaitIteration");
+       // Logging.Trace ($"Return from WaitIteration");
         return this;
     }
 
@@ -410,7 +410,7 @@ public partial class GuiTestContext : IDisposable
     {
         try
         {
-            Logging.Trace ($"Invoking action via WaitIteration");
+            //Logging.Trace ($"Invoking action via WaitIteration");
             WaitIteration (doAction);
         }
         catch (Exception ex)
@@ -429,7 +429,7 @@ public partial class GuiTestContext : IDisposable
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
-        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
 
         while (!condition ())
         {
@@ -446,7 +446,7 @@ public partial class GuiTestContext : IDisposable
 
     internal void Fail (string reason)
     {
-        Logging.Trace ($"{reason}");
+        Logging.Error ($"{reason}");
 
         Stop ();
 
@@ -470,14 +470,12 @@ public partial class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext ResizeConsole (int width, int height)
     {
-        Logging.Trace ($"{width}x{height}");
-
         return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); });
     }
 
     public GuiTestContext ScreenShot (string title, TextWriter writer)
     {
-        Logging.Trace ($"{title}");
+        //Logging.Trace ($"{title}");
         return WaitIteration (() =>
                               {
                                   writer.WriteLine (title + ":");

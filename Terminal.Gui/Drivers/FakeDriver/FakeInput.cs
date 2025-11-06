@@ -26,14 +26,10 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     /// <inheritdoc/>
     protected override IEnumerable<ConsoleKeyInfo> Read ()
     {
-        //Logging.Trace($"Reading input from queue");
         while (_testInput.TryDequeue (out ConsoleKeyInfo input))
         {
-            Logging.Trace ($"Reading input: {input.Key}");
             yield return input;
         }
-
-        //Logging.Trace($"No more input available");
     }
 
     /// <inheritdoc />

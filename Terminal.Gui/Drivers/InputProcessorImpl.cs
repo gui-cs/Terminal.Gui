@@ -47,7 +47,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc />
     public void RaiseKeyDownEvent (Key a)
     {
-        Logging.Trace ($"{nameof (InputProcessorImpl<TInputRecord>)} raised {a}");
         KeyDown?.Invoke (this, a);
     }
 

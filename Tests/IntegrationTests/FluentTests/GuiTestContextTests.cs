@@ -97,9 +97,10 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         var textField = new TextField { Text = "TEST", Width = 20 };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+                                           .Add (textField)
+                                           .Focus (textField)
                                            .Then (() =>
                                                   {
-                                                      textField.SetFocus ();
                                                       textField.CursorPosition = textField.Text.Length;
                                                   })
                                            .Send (Key.Backspace)
@@ -122,11 +123,11 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                            .Add (textField)
                                            .Add (button)
                                            .Then (() => textField.SetFocus ())
-                                           .Send (Key.T)
+                                           .Send (Key.T.WithShift)
                                            .Send (Key.E)
                                            .Send (Key.S)
                                            .Send (Key.T)
-                                           .AssertEqual ("TEST", textField.Text)
+                                           .AssertEqual ("Test", textField.Text)
                                            .Send (Key.Tab)
                                            .Then (() => Assert.True (button.HasFocus))
                                            .Send (Key.Enter)
@@ -260,7 +261,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         // Send 10 keys rapidly
         for (var i = 0; i < 10; i++)
         {
-            context.Send (Key.A + i);
+            context.Send ((Key)(Key.A.KeyCode + (uint)i));
         }
 
         context.WriteOutLogs (_out);
@@ -269,7 +270,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
         for (var i = 0; i < 10; i++)
         {
-            Assert.Equal ((Key)(Key.A + i), keysReceived [i]);
+            Assert.Equal ((Key)(Key.A.KeyCode + (uint)i), keysReceived [i]);
         }
     }
 
@@ -286,18 +287,18 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
                                            .Send (Key.Enter)
-                                           .Send (Key.Esc)
                                            .Send (Key.Tab)
                                            .Send (Key.CursorUp)
                                            .Send (Key.CursorDown)
+                                           .Send (Key.Esc)
                                            .WriteOutLogs (_out);
 
         Assert.Equal (5, keysReceived.Count);
         Assert.Equal (Key.Enter, keysReceived [0]);
-        Assert.Equal (Key.Esc, keysReceived [1]);
-        Assert.Equal (Key.Tab, keysReceived [2]);
-        Assert.Equal (Key.CursorUp, keysReceived [3]);
-        Assert.Equal (Key.CursorDown, keysReceived [4]);
+        Assert.Equal (Key.Tab, keysReceived [1]);
+        Assert.Equal (Key.CursorUp, keysReceived [2]);
+        Assert.Equal (Key.CursorDown, keysReceived [3]);
+        Assert.Equal (Key.Esc, keysReceived [4]);
     }
 
     [Theory]
@@ -310,6 +311,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
             Height = Dim.Fill ()
         };
         listView.SetSource (["Item1", "Item2", "Item3", "Item4", "Item5"]);
+        listView.SelectedItem = 0;
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (listView)
@@ -358,15 +360,15 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
-                                           .Then (() => textField.SetFocus ())
-                                           .Send (Key.H)
+                                           .Focus(textField)
+                                           .Send (Key.H.WithShift)
                                            .Send (Key.E)
                                            .Send (Key.L)
                                            .Send (Key.L)
                                            .Send (Key.O)
                                            .WriteOutLogs (_out);
 
-        Assert.Equal ("HELLO", textField.Text);
+        Assert.Equal ("Hello", textField.Text);
     }
 
     [Theory]
