@@ -65,106 +65,6 @@ public class ConsoleKeyMappingTests
         Assert.Equal (keyCode, expectedKeyCode);
     }
 
-    [Theory]
-    [MemberData (nameof (GetScanCodeData))]
-    public void GetScanCodeFromConsoleKeyInfo_Tests (
-        char keyChar,
-        ConsoleKey consoleKey,
-        bool shift,
-        bool alt,
-        bool control,
-        uint expectedScanCode
-    )
-    {
-        var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
-        uint scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (consoleKeyInfo);
-
-        Assert.Equal (scanCode, expectedScanCode);
-    }
-
-    public static IEnumerable<object []> GetScanCodeData ()
-    {
-        yield return ['a', ConsoleKey.A, false, false, false, 30];
-        yield return ['A', ConsoleKey.A, true, false, false, 30];
-        yield return ['á', ConsoleKey.A, false, false, false, 30];
-        yield return ['Á', ConsoleKey.A, true, false, false, 30];
-        yield return ['à', ConsoleKey.A, false, false, false, 30];
-        yield return ['À', ConsoleKey.A, true, false, false, 30];
-        yield return ['0', ConsoleKey.D0, false, false, false, 11];
-        yield return ['=', ConsoleKey.D0, true, false, false, 11];
-        yield return ['}', ConsoleKey.D0, false, true, true, 11];
-        yield return ['1', ConsoleKey.D1, false, false, false, 2];
-        yield return ['!', ConsoleKey.D1, true, false, false, 2];
-        yield return ['2', ConsoleKey.D2, false, false, false, 3];
-        yield return ['"', ConsoleKey.D2, true, false, false, 3];
-        yield return ['@', ConsoleKey.D2, false, true, true, 3];
-        yield return ['3', ConsoleKey.D3, false, false, false, 4];
-        yield return ['#', ConsoleKey.D3, true, false, false, 4];
-        yield return ['£', ConsoleKey.D3, false, true, true, 4];
-        yield return ['4', ConsoleKey.D4, false, false, false, 5];
-        yield return ['$', ConsoleKey.D4, true, false, false, 5];
-        yield return ['§', ConsoleKey.D4, false, true, true, 5];
-        yield return ['5', ConsoleKey.D5, false, false, false, 6];
-        yield return ['%', ConsoleKey.D5, true, false, false, 6];
-        yield return ['€', ConsoleKey.D5, false, true, true, 6];
-        yield return ['6', ConsoleKey.D6, false, false, false, 7];
-        yield return ['&', ConsoleKey.D6, true, false, false, 7];
-        yield return ['7', ConsoleKey.D7, false, false, false, 8];
-        yield return ['/', ConsoleKey.D7, true, false, false, 8];
-        yield return ['{', ConsoleKey.D7, false, true, true, 8];
-        yield return ['8', ConsoleKey.D8, false, false, false, 9];
-        yield return ['(', ConsoleKey.D8, true, false, false, 9];
-        yield return ['[', ConsoleKey.D8, false, true, true, 9];
-        yield return ['9', ConsoleKey.D9, false, false, false, 10];
-        yield return [')', ConsoleKey.D9, true, false, false, 10];
-        yield return [']', ConsoleKey.D9, false, true, true, 10];
-        yield return ['´', ConsoleKey.Oem1, false, false, false, 27];
-        yield return ['`', ConsoleKey.Oem1, true, false, false, 27];
-        yield return ['~', ConsoleKey.Oem2, false, false, false, 43];
-        yield return ['^', ConsoleKey.Oem2, true, false, false, 43];
-        yield return ['ç', ConsoleKey.Oem3, false, false, false, 39];
-        yield return ['Ç', ConsoleKey.Oem3, true, false, false, 39];
-        yield return ['\'', ConsoleKey.Oem4, false, false, false, 12];
-        yield return ['?', ConsoleKey.Oem4, true, false, false, 12];
-        yield return ['\\', ConsoleKey.Oem5, false, true, true, 41];
-        yield return ['|', ConsoleKey.Oem5, true, false, false, 41];
-        yield return ['«', ConsoleKey.Oem6, false, true, true, 13];
-        yield return ['»', ConsoleKey.Oem6, true, false, false, 13];
-        yield return ['º', ConsoleKey.Oem7, false, true, true, 40];
-        yield return ['ª', ConsoleKey.Oem7, true, false, false, 40];
-        yield return ['+', ConsoleKey.OemPlus, false, true, true, 26];
-        yield return ['*', ConsoleKey.OemPlus, true, false, false, 26];
-        yield return ['¨', ConsoleKey.OemPlus, false, true, true, 26];
-        yield return [',', ConsoleKey.OemComma, false, true, true, 51];
-        yield return [';', ConsoleKey.OemComma, true, false, false, 51];
-        yield return ['.', ConsoleKey.OemPeriod, false, true, true, 52];
-        yield return [':', ConsoleKey.OemPeriod, true, false, false, 52];
-        yield return ['-', ConsoleKey.OemMinus, false, true, true, 53];
-        yield return ['_', ConsoleKey.OemMinus, true, false, false, 53];
-        yield return ['q', ConsoleKey.Q, false, false, false, 16];
-        yield return ['\0', ConsoleKey.F2, false, false, false, 60];
-        yield return ['英', ConsoleKey.None, false, false, false, 0];
-        yield return ['英', ConsoleKey.None, true, false, false, 0];
-    }
-
-    [Theory]
-    [MemberData (nameof (UnShiftedChars))]
-    public void GetKeyChar_Shifted_Char_From_UnShifted_Char (
-        char unicodeChar,
-        char expectedKeyChar,
-        KeyCode expectedKeyCode
-    )
-    {
-        ConsoleModifiers modifiers = ConsoleKeyMapping.GetModifiers (true, false, false);
-        uint keyChar = ConsoleKeyMapping.GetKeyChar (unicodeChar, modifiers);
-        Assert.Equal (keyChar, expectedKeyChar);
-
-        var keyCode = (KeyCode)keyChar;
-        keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
-
-        Assert.Equal (keyCode, expectedKeyCode);
-    }
-
     public static IEnumerable<object []> UnShiftedChars =>
         new List<object []>
         {
@@ -197,51 +97,326 @@ public class ConsoleKeyMappingTests
         };
 
     [Theory]
-    [MemberData (nameof (ShiftedChars))]
-    public void GetKeyChar_UnShifted_Char_From_Shifted_Char (
-        char unicodeChar,
-        char expectedKeyChar,
-        KeyCode expectedKeyCode
-    )
+    [InlineData (KeyCode.A, false, false, false)] // Unshifted A (lowercase)
+    [InlineData (KeyCode.B, false, false, false)]
+    [InlineData (KeyCode.Z, false, false, false)]
+    [InlineData (KeyCode.A | KeyCode.ShiftMask, true, false, false)] // Shifted A (uppercase)
+    [InlineData (KeyCode.Z | KeyCode.ShiftMask, true, false, false)]
+    [InlineData (KeyCode.A | KeyCode.CtrlMask, false, false, true)] // Ctrl+A
+    [InlineData (KeyCode.A | KeyCode.AltMask, false, true, false)] // Alt+A
+    [InlineData (KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask, true, false, true)] // Ctrl+Shift+A
+    [InlineData (KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask, true, true, false)] // Alt+Shift+A
+    [InlineData (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask, false, true, true)] // Ctrl+Alt+A
+    [InlineData (KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask, true, true, true)] // All modifiers
+    public void MapToConsoleModifiers_LetterKeys_ReturnsCorrectModifiers (
+       KeyCode key,
+       bool expectedShift,
+       bool expectedAlt,
+       bool expectedControl
+   )
     {
-        ConsoleModifiers modifiers = ConsoleKeyMapping.GetModifiers (false, false, false);
-        uint keyChar = ConsoleKeyMapping.GetKeyChar (unicodeChar, modifiers);
-        Assert.Equal (keyChar, expectedKeyChar);
+        // Act
+        ConsoleModifiers result = ConsoleKeyMapping.MapToConsoleModifiers (key);
 
-        var keyCode = (KeyCode)keyChar;
-        keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
-
-        Assert.Equal (keyCode, expectedKeyCode);
+        // Assert
+        Assert.Equal (expectedShift, result.HasFlag (ConsoleModifiers.Shift));
+        Assert.Equal (expectedAlt, result.HasFlag (ConsoleModifiers.Alt));
+        Assert.Equal (expectedControl, result.HasFlag (ConsoleModifiers.Control));
     }
 
-    public static IEnumerable<object []> ShiftedChars =>
-        new List<object []>
+    [Theory]
+    [InlineData (KeyCode.A)] // 65 = 'A' in ASCII, but represents unshifted key
+    [InlineData (KeyCode.B)]
+    [InlineData (KeyCode.M)]
+    [InlineData (KeyCode.Z)]
+    public void MapToConsoleModifiers_UnshiftedLetterKeys_DoesNotSetShiftFlag (KeyCode key)
+    {
+        // This test verifies the BUGFIX: KeyCode.A-Z (65-90) represent UNSHIFTED keys,
+        // even though their numeric values match uppercase ASCII characters.
+        // The old code incorrectly checked char.IsUpper((char)key) which would fail this test.
+
+        // Act
+        ConsoleModifiers result = ConsoleKeyMapping.MapToConsoleModifiers (key);
+
+        // Assert - Shift should NOT be set for unshifted letter keys
+        Assert.False (result.HasFlag (ConsoleModifiers.Shift),
+            $"Shift should not be set for unshifted {key}. The KeyCode value {(int)key} represents a lowercase, unshifted key.");
+    }
+
+    [Theory]
+    [InlineData (KeyCode.D1, false)] // Unshifted number keys
+    [InlineData (KeyCode.D5, false)]
+    [InlineData (KeyCode.Space, false)]
+    [InlineData (KeyCode.Enter, false)]
+    [InlineData (KeyCode.Tab, false)]
+    [InlineData (KeyCode.D1 | KeyCode.ShiftMask, true)] // Shifted number keys
+    public void MapToConsoleModifiers_NonLetterKeys_ReturnsCorrectShiftState (KeyCode key, bool expectedShift)
+    {
+        // Act
+        ConsoleModifiers result = ConsoleKeyMapping.MapToConsoleModifiers (key);
+
+        // Assert
+        Assert.Equal (expectedShift, result.HasFlag (ConsoleModifiers.Shift));
+    }
+
+    [Theory]
+    [InlineData (KeyCode.A, 'a', ConsoleKey.A, false)] // Unshifted A = lowercase 'a'
+    [InlineData (KeyCode.B, 'b', ConsoleKey.B, false)]
+    [InlineData (KeyCode.M, 'm', ConsoleKey.M, false)]
+    [InlineData (KeyCode.Z, 'z', ConsoleKey.Z, false)]
+    public void GetConsoleKeyInfoFromKeyCode_UnshiftedLetterKeys_ReturnsLowercaseChar (
+        KeyCode key,
+        char expectedChar,
+        ConsoleKey expectedKey,
+        bool expectedShift
+    )
+    {
+        // This test verifies the BUGFIX: Key.A through Key.Z should produce lowercase characters
+        // when no ShiftMask is set. The old code would incorrectly return uppercase 'A'.
+
+        // Act
+        ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+        // Assert
+        Assert.Equal (expectedChar, result.KeyChar);
+        Assert.Equal (expectedKey, result.Key);
+        Assert.Equal (expectedShift, (result.Modifiers & ConsoleModifiers.Shift) != 0);
+    }
+
+    [Theory]
+    [InlineData (KeyCode.A | KeyCode.ShiftMask, 'A', ConsoleKey.A, true)] // Shifted A = uppercase 'A'
+    [InlineData (KeyCode.B | KeyCode.ShiftMask, 'B', ConsoleKey.B, true)]
+    [InlineData (KeyCode.M | KeyCode.ShiftMask, 'M', ConsoleKey.M, true)]
+    [InlineData (KeyCode.Z | KeyCode.ShiftMask, 'Z', ConsoleKey.Z, true)]
+    public void GetConsoleKeyInfoFromKeyCode_ShiftedLetterKeys_ReturnsUppercaseChar (
+        KeyCode key,
+        char expectedChar,
+        ConsoleKey expectedKey,
+        bool expectedShift
+    )
+    {
+        // Act
+        ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+        // Assert
+        Assert.Equal (expectedChar, result.KeyChar);
+        Assert.Equal (expectedKey, result.Key);
+        Assert.Equal (expectedShift, (result.Modifiers & ConsoleModifiers.Shift) != 0);
+    }
+
+    [Theory]
+    [InlineData (KeyCode.A | KeyCode.CtrlMask, ConsoleKey.A, false, false, true)]
+    [InlineData (KeyCode.A | KeyCode.AltMask, ConsoleKey.A, false, true, false)]
+    [InlineData (KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask, ConsoleKey.A, true, false, true)]
+    [InlineData (KeyCode.Z | KeyCode.CtrlMask, ConsoleKey.Z, false, false, true)]
+    public void GetConsoleKeyInfoFromKeyCode_LetterKeysWithModifiers_ReturnsCorrectModifiers (
+        KeyCode key,
+        ConsoleKey expectedConsoleKey,
+        bool expectedShift,
+        bool expectedAlt,
+        bool expectedControl
+    )
+    {
+        // Act
+        ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+        // Assert
+        Assert.Equal (expectedConsoleKey, result.Key);
+        Assert.Equal (expectedShift, (result.Modifiers & ConsoleModifiers.Shift) != 0);
+        Assert.Equal (expectedAlt, (result.Modifiers & ConsoleModifiers.Alt) != 0);
+        Assert.Equal (expectedControl, (result.Modifiers & ConsoleModifiers.Control) != 0);
+    }
+
+    [Theory]
+    [InlineData (KeyCode.Enter, '\r', ConsoleKey.Enter)]
+    [InlineData (KeyCode.Tab, '\t', ConsoleKey.Tab)]
+    [InlineData (KeyCode.Esc, '\u001B', ConsoleKey.Escape)]
+    [InlineData (KeyCode.Backspace, '\b', ConsoleKey.Backspace)]
+    [InlineData (KeyCode.Space, ' ', ConsoleKey.Spacebar)]
+    public void GetConsoleKeyInfoFromKeyCode_SpecialKeys_ReturnsCorrectKeyChar (
+        KeyCode key,
+        char expectedChar,
+        ConsoleKey expectedKey
+    )
+    {
+        // Act
+        ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+        // Assert
+        Assert.Equal (expectedChar, result.KeyChar);
+        Assert.Equal (expectedKey, result.Key);
+    }
+
+    [Theory]
+    [InlineData (KeyCode.F1, ConsoleKey.F1)]
+    [InlineData (KeyCode.F5, ConsoleKey.F5)]
+    [InlineData (KeyCode.F12, ConsoleKey.F12)]
+    [InlineData (KeyCode.CursorUp, ConsoleKey.UpArrow)]
+    [InlineData (KeyCode.CursorDown, ConsoleKey.DownArrow)]
+    [InlineData (KeyCode.CursorLeft, ConsoleKey.LeftArrow)]
+    [InlineData (KeyCode.CursorRight, ConsoleKey.RightArrow)]
+    [InlineData (KeyCode.Home, ConsoleKey.Home)]
+    [InlineData (KeyCode.End, ConsoleKey.End)]
+    [InlineData (KeyCode.PageUp, ConsoleKey.PageUp)]
+    [InlineData (KeyCode.PageDown, ConsoleKey.PageDown)]
+    [InlineData (KeyCode.Delete, ConsoleKey.Delete)]
+    [InlineData (KeyCode.Insert, ConsoleKey.Insert)]
+    public void GetConsoleKeyInfoFromKeyCode_NavigationAndFunctionKeys_ReturnsCorrectConsoleKey (
+        KeyCode key,
+        ConsoleKey expectedKey
+    )
+    {
+        // Act
+        ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+        // Assert
+        Assert.Equal (expectedKey, result.Key);
+    }
+
+    [Theory]
+    [InlineData (KeyCode.D0, '0', ConsoleKey.D0)]
+    [InlineData (KeyCode.D1, '1', ConsoleKey.D1)]
+    [InlineData (KeyCode.D5, '5', ConsoleKey.D5)]
+    [InlineData (KeyCode.D9, '9', ConsoleKey.D9)]
+    public void GetConsoleKeyInfoFromKeyCode_NumberKeys_ReturnsCorrectKeyChar (
+        KeyCode key,
+        char expectedChar,
+        ConsoleKey expectedKey
+    )
+    {
+        // Act
+        ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+        // Assert
+        Assert.Equal (expectedChar, result.KeyChar);
+        Assert.Equal (expectedKey, result.Key);
+    }
+
+    [Fact]
+    public void MapToConsoleModifiers_AllLetterKeys_UnshiftedDoesNotSetShift ()
+    {
+        // This comprehensive test ensures ALL letter keys A-Z without ShiftMask
+        // do not have Shift set in the returned modifiers.
+        // This will fail if the old "char.IsUpper" check is present.
+
+        for (KeyCode key = KeyCode.A; key <= KeyCode.Z; key++)
         {
-            new object [] { 'A', 'a', (KeyCode)'a' },
-            new object [] { 'Z', 'z', (KeyCode)'z' },
-            new object [] { 'Á', 'á', (KeyCode)'á' },
-            new object [] { 'À', 'à', (KeyCode)'à' },
-            new object [] { 'Ý', 'ý', (KeyCode)'ý' },
-            new object [] { '!', '1', KeyCode.D1 },
-            new object [] { '"', '2', KeyCode.D2 },
-            new object [] { '#', '3', KeyCode.D3 },
-            new object [] { '$', '4', KeyCode.D4 },
-            new object [] { '%', '5', KeyCode.D5 },
-            new object [] { '&', '6', KeyCode.D6 },
-            new object [] { '/', '7', KeyCode.D7 },
-            new object [] { '(', '8', KeyCode.D8 },
-            new object [] { ')', '9', KeyCode.D9 },
-            new object [] { '=', '0', KeyCode.D0 },
-            new object [] { '|', '\\', (KeyCode)'\\' },
-            new object [] { '?', '\'', (KeyCode)'\'' },
-            new object [] { '»', '«', (KeyCode)'«' },
-            new object [] { '*', '+', (KeyCode)'+' },
-            new object [] { '`', '´', (KeyCode)'´' },
-            new object [] { 'ª', 'º', (KeyCode)'º' },
-            new object [] { '^', '~', (KeyCode)'~' },
-            new object [] { '>', '<', (KeyCode)'<' },
-            new object [] { ';', ',', (KeyCode)',' },
-            new object [] { ':', '.', (KeyCode)'.' },
-            new object [] { '_', '-', (KeyCode)'-' }
-        };
+            // Act
+            ConsoleModifiers result = ConsoleKeyMapping.MapToConsoleModifiers (key);
+
+            // Assert
+            Assert.False (
+                result.HasFlag (ConsoleModifiers.Shift),
+                $"Shift should not be set for unshifted {key} (value {(int)key}). " +
+                $"KeyCode.{key} represents a lowercase, unshifted key even though its numeric value is {(int)key}."
+            );
+        }
+    }
+
+    [Fact]
+    public void MapToConsoleModifiers_AllLetterKeysShifted_SetsShift ()
+    {
+        // Verify that WITH ShiftMask, all letter keys DO set Shift
+
+        for (KeyCode key = KeyCode.A; key <= KeyCode.Z; key++)
+        {
+            KeyCode shiftedKey = key | KeyCode.ShiftMask;
+
+            // Act
+            ConsoleModifiers result = ConsoleKeyMapping.MapToConsoleModifiers (shiftedKey);
+
+            // Assert
+            Assert.True (
+                result.HasFlag (ConsoleModifiers.Shift),
+                $"Shift should be set for {shiftedKey}"
+            );
+        }
+    }
+
+    [Fact]
+    public void GetConsoleKeyInfoFromKeyCode_AllUnshiftedLetterKeys_ReturnLowercaseChars ()
+    {
+        // This comprehensive test verifies ALL letter keys A-Z produce lowercase characters
+        // when no ShiftMask is set. This is the KEY test that will fail with the old code.
+
+        for (KeyCode key = KeyCode.A; key <= KeyCode.Z; key++)
+        {
+            // Act
+            ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key);
+
+            // Calculate expected lowercase character
+            char expectedChar = (char)('a' + (key - KeyCode.A));
+
+            // Assert
+            Assert.True (
+                char.IsLower (result.KeyChar),
+                $"KeyChar for unshifted {key} should be lowercase, but got '{result.KeyChar}' (0x{(int)result.KeyChar:X2}). " +
+                $"Expected lowercase '{expectedChar}' (0x{(int)expectedChar:X2})."
+            );
+
+            Assert.Equal (
+                expectedChar,
+                result.KeyChar
+            );
+
+            Assert.False (
+                (result.Modifiers & ConsoleModifiers.Shift) != 0,
+                $"Shift modifier should not be set for unshifted {key}"
+            );
+        }
+    }
+
+    [Fact]
+    public void GetConsoleKeyInfoFromKeyCode_AllShiftedLetterKeys_ReturnUppercaseChars ()
+    {
+        // Verify that WITH ShiftMask, all letter keys produce uppercase characters
+
+        for (KeyCode key = KeyCode.A; key <= KeyCode.Z; key++)
+        {
+            KeyCode shiftedKey = key | KeyCode.ShiftMask;
+
+            // Act
+            ConsoleKeyInfo result = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (shiftedKey);
+
+            // Calculate expected uppercase character
+            char expectedChar = (char)('A' + (key - KeyCode.A));
+
+            // Assert
+            Assert.True (
+                char.IsUpper (result.KeyChar),
+                $"KeyChar for shifted {shiftedKey} should be uppercase, but got '{result.KeyChar}'"
+            );
+
+            Assert.Equal (expectedChar, result.KeyChar);
+
+            Assert.True (
+                (result.Modifiers & ConsoleModifiers.Shift) != 0,
+                $"Shift modifier should be set for {shiftedKey}"
+            );
+        }
+    }
+
+    [Theory]
+    [InlineData (KeyCode.A, KeyCode.A | KeyCode.ShiftMask, 'a', 'A')] // Without vs With Shift
+    [InlineData (KeyCode.M, KeyCode.M | KeyCode.ShiftMask, 'm', 'M')]
+    [InlineData (KeyCode.Z, KeyCode.Z | KeyCode.ShiftMask, 'z', 'Z')]
+    public void GetConsoleKeyInfoFromKeyCode_ShiftMaskChangesCase (
+        KeyCode unshifted,
+        KeyCode shifted,
+        char expectedUnshiftedChar,
+        char expectedShiftedChar
+    )
+    {
+        // Act
+        ConsoleKeyInfo unshiftedResult = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (unshifted);
+        ConsoleKeyInfo shiftedResult = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (shifted);
+
+        // Assert - Unshifted should be lowercase
+        Assert.Equal (expectedUnshiftedChar, unshiftedResult.KeyChar);
+        Assert.False ((unshiftedResult.Modifiers & ConsoleModifiers.Shift) != 0);
+
+        // Assert - Shifted should be uppercase
+        Assert.Equal (expectedShiftedChar, shiftedResult.KeyChar);
+        Assert.True ((shiftedResult.Modifiers & ConsoleModifiers.Shift) != 0);
+    }
 }

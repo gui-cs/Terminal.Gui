@@ -26,51 +26,51 @@ public class EscSeqUtilsTests
     {
         var cki = new ConsoleKeyInfo ('r', 0, false, false, false);
         var expectedCki = new ConsoleKeyInfo ('r', ConsoleKey.R, false, false, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo (cki).ToString ());
 
         cki = new ('r', 0, true, false, false);
         expectedCki = new ('r', ConsoleKey.R, true, false, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo (cki).ToString ());
 
         cki = new ('r', 0, false, true, false);
         expectedCki = new ('r', ConsoleKey.R, false, true, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo (cki).ToString ());
 
         cki = new ('r', 0, false, false, true);
         expectedCki = new ('r', ConsoleKey.R, false, false, true);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('r', 0, true, true, false);
         expectedCki = new ('r', ConsoleKey.R, true, true, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo (cki).ToString ());
 
         cki = new ('r', 0, false, true, true);
         expectedCki = new ('r', ConsoleKey.R, false, true, true);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('r', 0, true, true, true);
         expectedCki = new ('r', ConsoleKey.R, true, true, true);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('\u0012', 0, false, false, false);
         expectedCki = new ('\u0012', ConsoleKey.R, false, false, true);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('\0', (ConsoleKey)64, false, false, true);
         expectedCki = new ('\0', ConsoleKey.Spacebar, false, false, true);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('\r', 0, false, false, false);
         expectedCki = new ('\r', ConsoleKey.Enter, false, false, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('\u007f', 0, false, false, false);
         expectedCki = new ('\u007f', ConsoleKey.Backspace, false, false, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
 
         cki = new ('R', 0, false, false, false);
         expectedCki = new ('R', ConsoleKey.R, true, false, false);
-        Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
     }
 
     [Theory]

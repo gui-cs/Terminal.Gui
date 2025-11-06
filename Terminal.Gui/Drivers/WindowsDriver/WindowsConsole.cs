@@ -46,7 +46,7 @@ public class WindowsConsole
 
         [FieldOffset (6)]
         [MarshalAs (UnmanagedType.U2)]
-        public ConsoleKeyMapping.VK wVirtualKeyCode;
+        public VK wVirtualKeyCode;
 
         [FieldOffset (8)]
         [MarshalAs (UnmanagedType.U2)]
@@ -375,5 +375,21 @@ public class WindowsConsole
 
         [FieldOffset (0)]
         public uint Value;
+    }
+
+    public static ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
+    {
+        WindowsConsole.ControlKeyState state = keyEvent.dwControlKeyState;
+
+        bool shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
+        bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
+        bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
+        bool capslock = (state & WindowsConsole.ControlKeyState.CapslockOn) != 0;
+        bool numlock = (state & WindowsConsole.ControlKeyState.NumlockOn) != 0;
+        bool scrolllock = (state & WindowsConsole.ControlKeyState.ScrolllockOn) != 0;
+
+        var cki = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+
+        return new (cki, capslock, numlock, scrolllock);
     }
 }
