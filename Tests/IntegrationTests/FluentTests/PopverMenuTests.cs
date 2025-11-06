@@ -354,4 +354,84 @@ public class PopoverMenuTests
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
+
+
+    [Theory]
+    [ClassData (typeof (TestDrivers))]
+    public void ContextMenu_CrashesOnRight (TestDriver d)
+    {
+        var clicked = false;
+
+        MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
+
+        using GuiTestContext c = With.A<Window> (40, 10, d, _out)
+                                     .WithContextMenu (new (menuItems))
+                                     .ScreenShot ("Before open menu", _out)
+
+                                     // Click in main area inside border
+                                     .RightClick (1, 1)
+                                     .Then (() =>
+                                     {
+                                         // Test depends on menu having a border
+                                         IPopover? popover = Application.Popover!.GetActivePopover ();
+                                         Assert.NotNull (popover);
+                                         var popoverMenu = popover as PopoverMenu;
+                                         popoverMenu!.Root!.BorderStyle = LineStyle.Single;
+                                     })
+                                     .WaitIteration ()
+                                     .ScreenShot ("After open menu", _out)
+                                     .LeftClick (2, 2)
+                                     .Stop ()
+                                     .WriteOutLogs (_out);
+        Assert.True (clicked);
+    }
+
+    [Theory]
+    [ClassData (typeof (TestDrivers))]
+    public void ContextMenu_OpenSubmenu (TestDriver d)
+    {
+        var clicked = false;
+
+        MenuItemv2 [] menuItems =
+        [
+            new ("One", "", null),
+            new ("Two", "", null),
+            new ("Three", "", null),
+            new (
+                 "Four",
+                 "",
+                 new (
+                      [
+                          new ("SubMenu1", "", null),
+                          new ("SubMenu2", "", () => clicked = true),
+                          new ("SubMenu3", "", null),
+                          new ("SubMenu4", "", null),
+                          new ("SubMenu5", "", null),
+                          new ("SubMenu6", "", null),
+                          new ("SubMenu7", "", null)
+                      ])),
+            new ("Five", "", null),
+            new ("Six", "", null)
+        ];
+
+        using GuiTestContext c = With.A<Window> (40, 10, d)
+                                     .WithContextMenu (new (menuItems))
+                                     .ScreenShot ("Before open menu", _out)
+
+                                     // Click in main area inside border
+                                     .RightClick (1, 1)
+                                     .ScreenShot ("After open menu", _out)
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.CursorRight)
+                                     .ScreenShot ("After open submenu", _out)
+                                     .Send (Key.CursorDown)
+                                     .Send (Key.Enter)
+                                     .ScreenShot ("Menu should be closed after selecting", _out)
+                                     .Stop ()
+                                     .WriteOutLogs (_out);
+        Assert.True (clicked);
+    }
+
 }

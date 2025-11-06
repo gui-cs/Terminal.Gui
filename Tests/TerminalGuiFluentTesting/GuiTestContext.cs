@@ -22,7 +22,6 @@ public partial class GuiTestContext : IDisposable
     private readonly object _logsLock = new ();
     private StringBuilder? _logsSb;
     internal TestDriver _driverType;
-    internal bool _finished;
     private SizeMonitorImpl? _sizeMonitor;
     internal TimeSpan _timeout;
     private IApplication? _origApp;
@@ -54,7 +53,7 @@ public partial class GuiTestContext : IDisposable
                                      _booting.Release ();
 
                                      Toplevel t = topLevelBuilder ();
-                                     t.Closed += (s, e) => { _finished = true; };
+                                     t.Closed += (s, e) => { Finished = true; };
                                      Application.Run (t); // This will block, but it's on a background thread now
 
                                      t.Dispose ();
@@ -231,7 +230,7 @@ public partial class GuiTestContext : IDisposable
 
         ApplicationImpl.ChangeInstance (_origApp);
         Logging.Logger = _origLogger;
-        _finished = true;
+        Finished = true;
 
         Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
     }
@@ -258,7 +257,7 @@ public partial class GuiTestContext : IDisposable
         if (_runTask is null || _runTask.IsCompleted)
         {
             // If we didn't run the application, just cleanup
-            if (!_runApplication && !_finished)
+            if (!_runApplication && !Finished)
             {
                 try
                 {
@@ -358,7 +357,7 @@ public partial class GuiTestContext : IDisposable
     public GuiTestContext WaitIteration (Action? action = null)
     {
         // If application has already exited don't wait!
-        if (_finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
+        if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
         {
             Logging.Warning ($"WaitIteration called after context was stopped");
             return this;
@@ -487,6 +486,11 @@ public partial class GuiTestContext : IDisposable
                                   writer.WriteLine (text);
                               });
     }
+
+    /// <summary>
+    ///     Gets whether the application has finished running; aka Stop has been called and the main loop has exited.
+    /// </summary>
+    public bool Finished { get; private set; }
 
     /// <summary>
     ///     Cleanup to avoid state bleed between tests
