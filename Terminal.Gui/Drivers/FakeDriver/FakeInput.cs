@@ -18,13 +18,13 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     { }
 
     /// <inheritdoc/>
-    protected override bool Peek ()
+    public override bool Peek ()
     {
         return !_testInput.IsEmpty;
     }
 
     /// <inheritdoc/>
-    protected override IEnumerable<ConsoleKeyInfo> Read ()
+    public override IEnumerable<ConsoleKeyInfo> Read ()
     {
         while (_testInput.TryDequeue (out ConsoleKeyInfo input))
         {

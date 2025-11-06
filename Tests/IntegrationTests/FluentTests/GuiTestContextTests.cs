@@ -44,7 +44,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         Assert.True (Application.Top!.Running);
 
         Toplevel top = Application.Top;
-        context.EnqueueKey (Application.QuitKey);
+        context.EnqueueKeyEvent (Application.QuitKey);
 
         //Thread.Sleep (1000);
         Assert.False (top!.Running);
@@ -84,7 +84,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
                                            .ResizeConsole (50, 20)
-                                           .EnqueueKey (Key.A)
+                                           .EnqueueKeyEvent (Key.A)
                                            .WriteOutLogs (_out);
 
         Assert.True (keyReceived);
@@ -103,8 +103,8 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                                   {
                                                       textField.CursorPosition = textField.Text.Length;
                                                   })
-                                           .EnqueueKey (Key.Backspace)
-                                           .EnqueueKey (Key.Backspace)
+                                           .EnqueueKeyEvent (Key.Backspace)
+                                           .EnqueueKeyEvent (Key.Backspace)
                                            .WriteOutLogs (_out);
 
         Assert.Equal ("TE", textField.Text);
@@ -123,14 +123,14 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                            .Add (textField)
                                            .Add (button)
                                            .Then (() => textField.SetFocus ())
-                                           .EnqueueKey (Key.T.WithShift)
-                                           .EnqueueKey (Key.E)
-                                           .EnqueueKey (Key.S)
-                                           .EnqueueKey (Key.T)
+                                           .EnqueueKeyEvent (Key.T.WithShift)
+                                           .EnqueueKeyEvent (Key.E)
+                                           .EnqueueKeyEvent (Key.S)
+                                           .EnqueueKeyEvent (Key.T)
                                            .AssertEqual ("Test", textField.Text)
-                                           .EnqueueKey (Key.Tab)
+                                           .EnqueueKeyEvent (Key.Tab)
                                            .Then (() => Assert.True (button.HasFocus))
-                                           .EnqueueKey (Key.Enter)
+                                           .EnqueueKeyEvent (Key.Enter)
                                            .AssertEqual (1, clickedCount)
                                            .WriteOutLogs (_out);
     }
@@ -153,7 +153,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
-                                           .EnqueueKey (Key.A);
+                                           .EnqueueKeyEvent (Key.A);
 
         Assert.True (keyReceived, "Key was not received by the view");
         Assert.Equal (Key.A, receivedKey);
@@ -171,9 +171,9 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
-                                           .EnqueueKey (Key.F1)
-                                           .EnqueueKey (Key.F5)
-                                           .EnqueueKey (Key.F12)
+                                           .EnqueueKeyEvent (Key.F1)
+                                           .EnqueueKeyEvent (Key.F5)
+                                           .EnqueueKeyEvent (Key.F12)
                                            .WriteOutLogs (_out);
 
         Assert.Equal (3, keysReceived.Count);
@@ -194,9 +194,9 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
-                                           .EnqueueKey (Key.A)
-                                           .EnqueueKey (Key.B)
-                                           .EnqueueKey (Key.C)
+                                           .EnqueueKeyEvent (Key.A)
+                                           .EnqueueKeyEvent (Key.B)
+                                           .EnqueueKeyEvent (Key.C)
                                            .WriteOutLogs (_out);
 
         Assert.Equal (3, keysReceived.Count);
@@ -218,10 +218,10 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                            .Then (() => view1.SetFocus ())
                                            .AssertTrue (view1.HasFocus)
                                            .AssertFalse (view2.HasFocus)
-                                           .EnqueueKey (Key.Tab)
+                                           .EnqueueKeyEvent (Key.Tab)
                                            .AssertFalse (view1.HasFocus)
                                            .AssertTrue (view2.HasFocus)
-                                           .EnqueueKey (Key.Tab.WithShift)
+                                           .EnqueueKeyEvent (Key.Tab.WithShift)
                                            .AssertTrue (view1.HasFocus)
                                            .AssertFalse (view2.HasFocus)
                                            .WriteOutLogs (_out);
@@ -236,11 +236,11 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
                                            .Then (() => textField.SetFocus ())
-                                           .EnqueueKey (Key.D1)
-                                           .EnqueueKey (Key.D2)
-                                           .EnqueueKey (Key.D3)
-                                           .EnqueueKey (Key.D4)
-                                           .EnqueueKey (Key.D5)
+                                           .EnqueueKeyEvent (Key.D1)
+                                           .EnqueueKeyEvent (Key.D2)
+                                           .EnqueueKeyEvent (Key.D3)
+                                           .EnqueueKeyEvent (Key.D4)
+                                           .EnqueueKeyEvent (Key.D5)
                                            .WriteOutLogs (_out);
 
         Assert.Equal ("12345", textField.Text);
@@ -261,7 +261,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         // Send 10 keys rapidly
         for (var i = 0; i < 10; i++)
         {
-            context.EnqueueKey ((Key)(Key.A.KeyCode + (uint)i));
+            context.EnqueueKeyEvent ((Key)(Key.A.KeyCode + (uint)i));
         }
 
         context.WriteOutLogs (_out);
@@ -286,11 +286,11 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
-                                           .EnqueueKey (Key.Enter)
-                                           .EnqueueKey (Key.Tab)
-                                           .EnqueueKey (Key.CursorUp)
-                                           .EnqueueKey (Key.CursorDown)
-                                           .EnqueueKey (Key.Esc)
+                                           .EnqueueKeyEvent (Key.Enter)
+                                           .EnqueueKeyEvent (Key.Tab)
+                                           .EnqueueKeyEvent (Key.CursorUp)
+                                           .EnqueueKeyEvent (Key.CursorDown)
+                                           .EnqueueKeyEvent (Key.Esc)
                                            .WriteOutLogs (_out);
 
         Assert.Equal (5, keysReceived.Count);
@@ -317,11 +317,11 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                            .Add (listView)
                                            .Then (() => listView.SetFocus ())
                                            .AssertEqual (0, listView.SelectedItem)
-                                           .EnqueueKey (Key.CursorDown)
+                                           .EnqueueKeyEvent (Key.CursorDown)
                                            .AssertEqual (1, listView.SelectedItem)
-                                           .EnqueueKey (Key.CursorDown)
+                                           .EnqueueKeyEvent (Key.CursorDown)
                                            .AssertEqual (2, listView.SelectedItem)
-                                           .EnqueueKey (Key.CursorUp)
+                                           .EnqueueKeyEvent (Key.CursorUp)
                                            .AssertEqual (1, listView.SelectedItem)
                                            .WriteOutLogs (_out);
     }
@@ -344,7 +344,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then (() => view.SetFocus ())
-                                           .EnqueueKey (Key.A.WithCtrl)
+                                           .EnqueueKeyEvent (Key.A.WithCtrl)
                                            .WriteOutLogs (_out);
 
         Assert.True (keyReceived);
@@ -361,11 +361,11 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
                                            .Focus(textField)
-                                           .EnqueueKey (Key.H.WithShift)
-                                           .EnqueueKey (Key.E)
-                                           .EnqueueKey (Key.L)
-                                           .EnqueueKey (Key.L)
-                                           .EnqueueKey (Key.O)
+                                           .EnqueueKeyEvent (Key.H.WithShift)
+                                           .EnqueueKeyEvent (Key.E)
+                                           .EnqueueKeyEvent (Key.L)
+                                           .EnqueueKeyEvent (Key.L)
+                                           .EnqueueKeyEvent (Key.O)
                                            .WriteOutLogs (_out);
 
         Assert.Equal ("Hello", textField.Text);

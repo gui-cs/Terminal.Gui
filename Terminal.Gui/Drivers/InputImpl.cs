@@ -73,14 +73,14 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
     ///     to read from console.
     /// </summary>
     /// <returns></returns>
-    protected abstract bool Peek ();
+    public abstract bool Peek ();
 
     /// <summary>
     ///     Returns the available data without blocking, called when <see cref="Peek"/>
     ///     returns <see langword="true"/>.
     /// </summary>
     /// <returns></returns>
-    protected abstract IEnumerable<TInputRecord> Read ();
+    public abstract IEnumerable<TInputRecord> Read ();
 
     /// <inheritdoc/>
     public virtual void Dispose () { }

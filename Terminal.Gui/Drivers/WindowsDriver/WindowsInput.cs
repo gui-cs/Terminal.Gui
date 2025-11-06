@@ -60,7 +60,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
         SetConsoleMode (_inputHandle, newConsoleMode);
     }
 
-    protected override bool Peek ()
+    public override bool Peek ()
     {
         if (Application.RunningUnitTests)
         {
@@ -98,7 +98,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
         }
     }
 
-    protected override IEnumerable<InputRecord> Read ()
+    public override IEnumerable<InputRecord> Read ()
     {
         const int BUFFER_SIZE = 1;
         nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);

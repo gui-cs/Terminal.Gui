@@ -16,7 +16,7 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext RightClick (int screenX, int screenY)
     {
-        return MouseEvent (new ()
+        return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button3Clicked,
             ScreenPosition = new (screenX, screenY)
@@ -33,7 +33,7 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick (int screenX, int screenY)
     {
-        return MouseEvent (new ()
+        return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Clicked,
             ScreenPosition = new (screenX, screenY)
@@ -49,13 +49,13 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
     {
-        return MouseEvent (new ()
+        return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Clicked,
         }, evaluator);
     }
 
-    private GuiTestContext MouseEvent (MouseEventArgs mouseEvent)
+    private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
         return WaitIteration (() =>
                               {
@@ -71,7 +71,7 @@ public partial class GuiTestContext
     }
 
 
-    private GuiTestContext MouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
+    private GuiTestContext EnqueueMouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
@@ -82,7 +82,7 @@ public partial class GuiTestContext
                                             });
         mouseEvent.ScreenPosition = screen;
 
-        MouseEvent (mouseEvent);
+        EnqueueMouseEvent (mouseEvent);
 
         return ctx;
     }
@@ -184,7 +184,7 @@ public partial class GuiTestContext
     /// <summary>
     ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
-    public GuiTestContext EnqueueKey (Key key)
+    public GuiTestContext EnqueueKeyEvent (Key key)
     {
         Logging.Trace ($"Enqueuing key: {key}");
 

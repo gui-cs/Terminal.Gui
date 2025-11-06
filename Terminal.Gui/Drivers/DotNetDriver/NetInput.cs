@@ -76,7 +76,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
 
     /// <inheritdoc/>
-    protected override bool Peek ()
+    public override bool Peek ()
     {
         if (Application.RunningUnitTests)
         {
@@ -87,7 +87,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     }
 
     /// <inheritdoc/>
-    protected override IEnumerable<ConsoleKeyInfo> Read ()
+    public override IEnumerable<ConsoleKeyInfo> Read ()
     {
         while (Console.KeyAvailable)
         {

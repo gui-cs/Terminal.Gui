@@ -1,6 +1,6 @@
 ﻿using Moq;
 
-namespace UnitTests_Parallelizable.ConsoleDriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
 public class AnsiRequestSchedulerTests
 {

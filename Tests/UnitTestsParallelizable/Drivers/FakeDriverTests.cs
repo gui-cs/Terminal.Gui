@@ -2,7 +2,7 @@ using System.Text;
 using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ConsoleDriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
 /// <summary>
 ///     Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.
