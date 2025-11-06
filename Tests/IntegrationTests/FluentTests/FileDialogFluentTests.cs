@@ -115,7 +115,6 @@ public class FileDialogFluentTests
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
                           .WaitIteration ()
-                          .WriteOutLogs (_out)
                           .AssertFalse (sd!.Canceled)
                           .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
                           .Stop ();
@@ -198,7 +197,6 @@ public class FileDialogFluentTests
                           .WaitIteration ()
                           .AssertFalse (sd!.Canceled)
                           .AssertContains ("empty-dir", sd!.FileName)
-                          .WriteOutLogs (_out)
                           .Stop ();
     }
 

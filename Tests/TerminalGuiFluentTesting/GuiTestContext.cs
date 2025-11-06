@@ -448,8 +448,7 @@ public partial class GuiTestContext : IDisposable
     {
         Logging.Error ($"{reason}");
 
-        Stop ();
-
+        
         throw new (reason);
     }
 
