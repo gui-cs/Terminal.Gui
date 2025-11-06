@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
 /// </summary>
-public class NetInput : InputImpl<ConsoleKeyInfo>, IDisposable
+public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>, IDisposable
 {
     private readonly NetWinVTConsole _adjustConsole;
 
@@ -100,5 +100,10 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, IDisposable
 
         // Flush any pending input so no stray events appear
         FlushConsoleInput ();
+    }
+
+    public void AddInput (ConsoleKeyInfo input)
+    {
+        throw new NotImplementedException ();
     }
 }

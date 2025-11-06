@@ -55,16 +55,6 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
                     }
                 }
 
-                TimeSpan took = Now () - dt;
-                TimeSpan sleepFor = TimeSpan.FromMilliseconds (20) - took;
-
-                Logging.DrainInputStream.Record (took.Milliseconds);
-
-                if (sleepFor.Milliseconds > 0)
-                {
-                    Task.Delay (sleepFor, effectiveToken).Wait (effectiveToken);
-                }
-
                 effectiveToken.ThrowIfCancellationRequested ();
             }
             while (!effectiveToken.IsCancellationRequested);
@@ -73,6 +63,7 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
         { }
         finally
         {
+            Logging.Trace($"Stopping input processing");
             linkedCts?.Dispose ();
         }
     }

@@ -9,6 +9,11 @@ namespace Terminal.Gui.Drivers;
 public interface IDriver
 {
     /// <summary>
+    ///     Gets the name of the driver implementation.
+    /// </summary>
+    string? GetName ();
+
+    /// <summary>
     ///     Class responsible for processing native driver input objects
     ///     e.g. <see cref="ConsoleKeyInfo"/> into <see cref="Key"/> events
     ///     and detecting and processing ansi escape sequences.

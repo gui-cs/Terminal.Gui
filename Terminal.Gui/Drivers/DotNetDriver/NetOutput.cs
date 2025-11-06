@@ -46,6 +46,13 @@ public class NetOutput : OutputBase, IOutput
         return new (Console.WindowWidth, Console.WindowHeight);
     }
 
+    /// <inheritdoc />
+    public Point GetCursorPosition ()
+    {
+        // TODO: Implement EscSeqUtils.CSI_RequestCursorPositionReport
+        throw new NotImplementedException ();
+    }
+
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 

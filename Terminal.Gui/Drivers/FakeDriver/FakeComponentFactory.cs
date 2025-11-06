@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
 {
     private readonly FakeInput? _input;
-    private readonly FakeOutput? _output;
+    private readonly IOutput? _output;
     private readonly ISizeMonitor? _sizeMonitor;
 
     /// <summary>
@@ -19,7 +19,7 @@ public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     /// <param name="input"></param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
     /// <param name="sizeMonitor"></param>
-    public FakeComponentFactory (FakeInput? input = null, FakeOutput? output = null, ISizeMonitor? sizeMonitor = null)
+    public FakeComponentFactory (FakeInput? input = null, IOutput? output = null, ISizeMonitor? sizeMonitor = null)
     {
         _input = input;
         _output = output;

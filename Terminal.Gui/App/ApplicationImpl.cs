@@ -222,7 +222,7 @@ public class ApplicationImpl : IApplication
     {
         if (_initialized)
         {
-            Logging.Logger.LogError ("Init called multiple times without shutdown, aborting.");
+            Logging.Error ("Init called multiple times without shutdown, aborting.");
 
             throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
@@ -300,8 +300,6 @@ public class ApplicationImpl : IApplication
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
 
-        Logging.Logger.LogTrace ("");
-
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
@@ -328,6 +326,8 @@ public class ApplicationImpl : IApplication
         {
             _coordinator = CreateSubcomponents (fallbackFactory: () => new UnixComponentFactory ());
         }
+
+        Logging.Trace ($"Created Subcomponents: {_coordinator}");
 
         _coordinator.StartAsync ().Wait ();
 
@@ -484,7 +484,7 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public void RequestStop (Toplevel? top)
     {
-        Logging.Logger.LogInformation ($"RequestStop '{(top is { } ? top : "null")}'");
+        Logging.Trace ($"Top: '{(top is { } ? top : "null")}'");
 
         top ??= _top;
 

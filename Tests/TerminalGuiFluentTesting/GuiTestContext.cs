@@ -16,7 +16,7 @@ public partial class GuiTestContext : IDisposable
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly Task? _runTask;
     internal Exception? _ex;
-    internal readonly FakeOutput _fakeOutput = new ();
+    internal readonly IOutput? _output;
     internal readonly FakeInput _fakeInput = new ();
     internal View? _lastView;
     private readonly object _logsLock = new ();
@@ -66,17 +66,15 @@ public partial class GuiTestContext : IDisposable
                                  catch (Exception ex)
                                  {
                                      _ex = ex;
-
-                                     if (_logWriter != null)
-                                     {
-                                         WriteOutLogs (_logWriter);
-                                     }
-
                                      _fakeInput.ExternalCancellationTokenSource!.Cancel ();
                                  }
                                  finally
                                  {
                                      CleanupApplication ();
+                                     if (_logWriter != null)
+                                     {
+                                         WriteOutLogs (_logWriter);
+                                     }
                                  }
                              },
                              _runCancellationTokenSource.Token);
@@ -144,6 +142,19 @@ public partial class GuiTestContext : IDisposable
     private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
     {
         _timeout = timeout ?? TimeSpan.FromSeconds (10);
+        _origApp = ApplicationImpl.Instance;
+        _origLogger = Logging.Logger;
+        _logsSb = new ();
+        _driverType = driverType;
+
+        ILogger logger = LoggerFactory.Create (builder =>
+                                                   builder.SetMinimumLevel (LogLevel.Trace)
+                                                          .AddProvider (
+                                                                        new TextWriterLoggerProvider (
+                                                                                                      new ThreadSafeStringWriter (_logsSb, _logsLock))))
+                                      .CreateLogger ("Test Logging");
+        Logging.Logger = logger;
+
 
         // ✅ Link _runCancellationTokenSource with a timeout
         // This creates a token that responds to EITHER the run cancellation OR timeout
@@ -164,18 +175,12 @@ public partial class GuiTestContext : IDisposable
         // Remove frame limit
         Application.MaximumIterationsPerSecond = ushort.MaxValue;
 
-        _origApp = ApplicationImpl.Instance;
-        _origLogger = Logging.Logger;
-        _logsSb = new ();
-        _driverType = driverType;
+        //// Only set size if explicitly provided (width and height > 0)
+        //if (width > 0 && height > 0)
+        //{
+        //    _output.SetSize (width, height);
+        //}
 
-        // Only set size if explicitly provided (width and height > 0)
-        if (width > 0 && height > 0)
-        {
-            _fakeOutput.SetSize (width, height);
-        }
-
-        _sizeMonitor = new (_fakeOutput);
         IComponentFactory? cf = null;
 
         // TODO: As each drivers' IInput/IOutput implementations are made testable (e.g. 
@@ -183,43 +188,42 @@ public partial class GuiTestContext : IDisposable
         switch (driverType)
         {
             case TestDriver.DotNet:
-                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
+                _output = new NetOutput ();
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Windows:
-                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Unix:
-                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Fake:
-                cf = new FakeComponentFactory (_fakeInput, _fakeOutput, _sizeMonitor);
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
         }
 
         _applicationImpl = new (cf!);
+        Logging.Trace ($"Driver: {GetDriverName ()}. Timeout: {_timeout}");
     }
 
     private void InitializeApplication ()
     {
         ApplicationImpl.ChangeInstance (_applicationImpl);
 
-        ILogger logger = LoggerFactory.Create (builder =>
-                                                   builder.SetMinimumLevel (LogLevel.Trace)
-                                                          .AddProvider (
-                                                                        new TextWriterLoggerProvider (
-                                                                                                      new ThreadSafeStringWriter (_logsSb, _logsLock))))
-                                      .CreateLogger ("Test Logging");
-        Logging.Logger = logger;
-
         _applicationImpl?.Init (null, GetDriverName ());
     }
 
     private void CleanupApplication ()
     {
+        Logging.Trace ("CleanupApplication");
         _fakeInput.ExternalCancellationTokenSource = null;
 
         ApplicationImpl.ChangeInstance (_origApp);
@@ -232,14 +236,14 @@ public partial class GuiTestContext : IDisposable
     private string GetDriverName ()
     {
         return _driverType switch
-               {
-                   TestDriver.Windows => "windows",
-                   TestDriver.DotNet => "dotnet",
-                   TestDriver.Unix => "unix",
-                   TestDriver.Fake => "fake",
-                   _ =>
-                       throw new ArgumentOutOfRangeException ()
-               };
+        {
+            TestDriver.Windows => "windows",
+            TestDriver.DotNet => "dotnet",
+            TestDriver.Unix => "unix",
+            TestDriver.Fake => "fake",
+            _ =>
+                throw new ArgumentOutOfRangeException ()
+        };
     }
 
     /// <summary>
@@ -247,6 +251,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     public GuiTestContext Stop ()
     {
+        Logging.Trace ($"Stopping application for driver: {GetDriverName ()}");
         if (_runTask is null || _runTask.IsCompleted)
         {
             // If we didn't run the application, just cleanup
@@ -269,7 +274,8 @@ public partial class GuiTestContext : IDisposable
         WaitIteration (() => { Application.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
-        if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
+        const int waitTimeoutMs = 1000;
+        if (!_runTask.Wait (TimeSpan.FromMilliseconds (waitTimeoutMs)))
         {
             _runCancellationTokenSource.Cancel ();
             // No need to manually cancel ExternalCancellationTokenSource
@@ -281,12 +287,14 @@ public partial class GuiTestContext : IDisposable
                 Application.RequestStop ();
                 Application.Shutdown ();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
+                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Then shutdown threw {ex}");
             }
-
-            throw new TimeoutException ("Application failed to stop within the allotted time.", _ex);
+            finally
+            {
+                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Exception was thrown: {_ex}");
+            }
         }
 
         _runCancellationTokenSource.Cancel ();
@@ -310,9 +318,11 @@ public partial class GuiTestContext : IDisposable
             _ex = ex;
         }
 
+        Logging.Critical ($"HardStop called with exception: {_ex}");
         // With linked tokens, just cancelling ExternalCancellationTokenSource
         // will cascade to stop everything
         _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+        WriteOutLogs (_logWriter);
         Stop ();
     }
 
@@ -321,8 +331,13 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="writer"></param>
     /// <returns></returns>
-    public GuiTestContext WriteOutLogs (TextWriter writer)
+    public GuiTestContext WriteOutLogs (TextWriter? writer)
     {
+        if (writer is null)
+        {
+            return this;
+        }
+
         lock (_logsLock)
         {
             writer.WriteLine (_logsSb!.ToString ());
@@ -342,6 +357,7 @@ public partial class GuiTestContext : IDisposable
         // If application has already exited don't wait!
         if (_finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
         {
+            Logging.Warning ($"WaitIteration called after context was stopped");
             return this;
         }
 
@@ -358,11 +374,12 @@ public partial class GuiTestContext : IDisposable
                                 try
                                 {
                                     action ();
+                                    Logging.Trace ("Action completed");
                                     ctsActionCompleted.Cancel ();
-                                    Logging.Trace("WaitIteration: Action completed");
                                 }
                                 catch (Exception e)
                                 {
+                                    Logging.Warning ($"Action failed with exception: {e}");
                                     _ex = e;
                                     _fakeInput.ExternalCancellationTokenSource?.Cancel ();
                                 }
@@ -377,6 +394,7 @@ public partial class GuiTestContext : IDisposable
                                 ctsActionCompleted.Token.WaitHandle
                             ]);
 
+        Logging.Trace ($"Return from WaitIteration");
         return this;
     }
 
@@ -390,6 +408,7 @@ public partial class GuiTestContext : IDisposable
     {
         try
         {
+            Logging.Trace ($"Invoking action via WaitIteration");
             WaitIteration (doAction);
         }
         catch (Exception ex)
@@ -408,6 +427,8 @@ public partial class GuiTestContext : IDisposable
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
+        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+
         while (!condition ())
         {
             if (sw.Elapsed > _timeout)
@@ -423,6 +444,8 @@ public partial class GuiTestContext : IDisposable
 
     internal void Fail (string reason)
     {
+        Logging.Trace ($"{reason}");
+
         Stop ();
 
         throw new (reason);
@@ -432,7 +455,11 @@ public partial class GuiTestContext : IDisposable
     ///     Returns the last set position of the cursor.
     /// </summary>
     /// <returns></returns>
-    public Point GetCursorPosition () { return _fakeOutput.CursorPosition; }
+    public Point GetCursorPosition ()
+    {
+        // TODO: Implement Console.Write(EscSeqUtils.CSI_RequestCursorPositionReport.Request); in drivers that support it.
+        return _output.GetCursorPosition ();
+    }
 
     /// <summary>
     ///     Simulates changing the console size e.g. by resizing window in your operating system
@@ -440,10 +467,16 @@ public partial class GuiTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); }); }
+    public GuiTestContext ResizeConsole (int width, int height)
+    {
+        Logging.Trace ($"{width}x{height}");
+
+        return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); });
+    }
 
     public GuiTestContext ScreenShot (string title, TextWriter writer)
     {
+        Logging.Trace ($"{title}");
         return WaitIteration (() =>
                               {
                                   writer.WriteLine (title + ":");
@@ -460,6 +493,7 @@ public partial class GuiTestContext : IDisposable
     {
         Stop ();
 
+
         if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
         {
             throw new (
@@ -470,8 +504,8 @@ public partial class GuiTestContext : IDisposable
         // ✅ Dispose the linked token source
         _fakeInput.ExternalCancellationTokenSource?.Dispose ();
         _runCancellationTokenSource?.Dispose ();
-        _fakeInput.Dispose();
-        _fakeOutput.Dispose();
+        _fakeInput.Dispose ();
+        _output.Dispose ();
         _booting.Dispose ();
     }
 }

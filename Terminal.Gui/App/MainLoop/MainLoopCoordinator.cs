@@ -57,7 +57,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// </summary>
     public async Task StartAsync ()
     {
-        Logging.Logger.LogInformation ("Main Loop Coordinator booting...");
+        Logging.Trace ($"Booting... ()");
 
         _inputTask = Task.Run (RunInput);
 
@@ -79,10 +79,10 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 throw _inputTask.Exception;
             }
 
-            Logging.Logger.LogCritical ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Critical ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
-        Logging.Logger.LogInformation ("Main Loop Coordinator booting complete");
+        Logging.Trace ("Booting complete");
     }
 
     private void RunInput ()
@@ -115,26 +115,33 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
         catch (Exception e)
         {
-            Logging.Logger.LogCritical (e, "Input loop crashed");
+            Logging.Critical ($"Input loop crashed: {e}");
 
             throw;
         }
 
         if (_stopCalled)
         {
-            Logging.Logger.LogInformation ("Input loop exited cleanly");
+            Logging.Information ("Input loop exited cleanly");
         }
         else
         {
-            Logging.Logger.LogCritical ("Input loop exited early (stop not called)");
+            Logging.Critical ("Input loop exited early (stop not called)");
         }
     }
 
     /// <inheritdoc/>
-    public void RunIteration () { _loop.Iteration (); }
+    public void RunIteration ()
+    {
+        lock (_oLockInitialization)
+        {
+            _loop.Iteration ();
+        }
+    }
 
     private void BootMainLoop ()
     {
+        Logging.Trace($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
         lock (_oLockInitialization)
         {
             // Instance must be constructed on the thread in which it is used.
@@ -147,6 +154,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BuildDriverIfPossible ()
     {
+        Logging.Trace ($"_input: {_input}, _output: {_output}");
         if (_input != null && _output != null)
         {
             _driver = new (

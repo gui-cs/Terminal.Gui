@@ -51,12 +51,12 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void GuiTestContext_QuitKey_ViaDriver_Stops (TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d);
+        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (Application.Top!.Running);
 
         Toplevel top = Application.Top;
         context.Send (Application.QuitKey);
-        Thread.Sleep (1000);
+        //Thread.Sleep (1000);
         Assert.False (top!.Running);
 
         context.WriteOutLogs (_out);
@@ -67,9 +67,7 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void GuiTestContext_StartsAndStopsWithoutError (TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d);
-
-        context.WriteOutLogs (_out);
+        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
 
         // No actual assertions are needed — if no exceptions are thrown, it's working
         context.Stop ();
@@ -79,7 +77,7 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void GuiTestContext_ForgotToStop (TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d);
+        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
     }
 
     [Theory]
@@ -190,7 +188,7 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
         var v5 = new View { Id = "v5", CanFocus = true };
         var v6 = new View { Id = "v6", CanFocus = true };
 
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then (() =>
                                             {
                                                 var w1 = new Window { Id = "w1" };

@@ -38,7 +38,7 @@ public class MainLoopCoordinatorTests
         mockLogger.Verify (
                            l => l.Log (LogLevel.Critical,
                                        It.IsAny<EventId> (),
-                                       It.Is<It.IsAnyType> ((v, t) => v.ToString () == "Input loop crashed"),
+                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ().Contains("Input loop crashed")),
                                        It.IsAny<Exception> (),
                                        It.IsAny<Func<It.IsAnyType, Exception, string>> ())
                          , Times.Once);

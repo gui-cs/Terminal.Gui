@@ -181,18 +181,69 @@ public partial class GuiTestContext
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
+    /// <summary>
+    ///     Enqueues a key down event to the current driver's input processor.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public GuiTestContext Send (Key key)
     {
-        return WaitIteration (() =>
-                              {
-                                  if (Application.Driver is { })
-                                  {
-                                      Application.Driver.InputProcessor.EnqueueKeyDownEvent (key);
-                                  }
-                                  else
-                                  {
-                                      Fail ("Expected Application.Driver to be non-null.");
-                                  }
-                              });
+        Logging.Trace ($"Sending key: {key}");
+
+        // First, enqueue the input
+        //WaitIteration (() =>
+        // {
+        if (Application.Driver is { })
+        {
+            Application.Driver.AddKeyEvent (key);
+            Thread.Sleep(100);
+        }
+        else
+        {
+            Fail ("Expected Application.Driver to be non-null.");
+        }
+        // });
+
+        WaitIteration ();
+
+        //// TODO: Figure out how to move the logic below into the driver's InputProcessor.EnqueueKeyDownEvent method
+        //// TODO: Or somewhere else more appropriate that's not in test infrastructure.
+        //// Wait for the input to be processed by subscribing to KeyDown event
+        //var processed = false;
+
+        //void KeyHandler (object? sender, Key k)
+        //{
+        //    if (k == key)
+        //    {
+        //        processed = true;
+        //        Logging.Trace ($"Key processed: {key}");
+        //    }
+        //}
+
+        //if (Application.Driver?.InputProcessor is { } processor)
+        //{
+        //    processor.KeyDown += KeyHandler;
+
+        //    try
+        //    {
+        //        // Wait until the key is actually processed (or timeout)
+        //        var timeout = DateTime.Now.AddMilliseconds (100);
+        //        while (!processed && DateTime.Now < timeout)
+        //        {
+        //            Logging.Trace ($"Waiting for key: {key}");
+        //            //WaitIteration ();
+        //        }
+        //        if (!processed)
+        //        {
+        //            Fail ($"Key {key} was not processed within the timeout period.");
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        processor.KeyDown -= KeyHandler;
+        //    }
+        //}
+
+        return this;
     }
 }

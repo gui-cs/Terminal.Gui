@@ -317,7 +317,7 @@ public class MenuBarv2Tests
     {
         MenuBarv2? menuBar = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then (
                                             () =>
                                             {
@@ -358,7 +358,7 @@ public class MenuBarv2Tests
     {
         MenuBarv2? menuBar = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then (
                                             () =>
                                             {

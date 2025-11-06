@@ -9,7 +9,7 @@ namespace Terminal.Gui.Drivers;
 public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>
 {
     // Queue for storing injected input that will be returned by Peek/Read
-    private readonly ConcurrentQueue<ConsoleKeyInfo> _pendingInput = new ();
+    private readonly ConcurrentQueue<ConsoleKeyInfo> _testInput = new ();
 
     /// <summary>
     /// Creates a new FakeConsoleInput.
@@ -18,19 +18,44 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     { }
 
     /// <inheritdoc/>
-    protected override bool Peek () { return !_testInput.IsEmpty; }
+    protected override bool Peek ()
+    {
+        return !_testInput.IsEmpty;
+    }
 
     /// <inheritdoc/>
     protected override IEnumerable<ConsoleKeyInfo> Read ()
     {
-        while (_testInput.TryDequeue (out var input))
+        Logging.Trace($"Reading input from queue");
+        while (_testInput.TryDequeue (out ConsoleKeyInfo input))
         {
+            Logging.Trace ($"Reading input: {input.Key}");
             yield return input;
         }
+
+        Logging.Trace($"No more input available");
     }
 
-    private readonly ConcurrentQueue<ConsoleKeyInfo> _testInput = new ();
-
     /// <inheritdoc />
-    public void AddInput (ConsoleKeyInfo input) { _testInput.Enqueue (input); }
+    public void AddInput (ConsoleKeyInfo input)
+    {
+        Logging.Trace ($"Enqueuing input: {input.Key}");
+
+        _testInput.Enqueue (input);
+
+        // Wait for the input thread to drain the queue (with timeout)
+        var timeout = TimeSpan.FromMilliseconds (100);
+        var sw = System.Diagnostics.Stopwatch.StartNew ();
+        var spinWait = new SpinWait ();
+
+        while (!_testInput.IsEmpty && sw.Elapsed < timeout)
+        {
+            spinWait.SpinOnce ();
+        }
+
+        if (!_testInput.IsEmpty)
+        {
+            Logging.Warning ($"Timeout waiting for input '{input.Key}' to be processed after {sw.ElapsedMilliseconds}ms");
+        }
+    }
 }

@@ -18,7 +18,7 @@ internal class SizeMonitorImpl (IOutput consoleOut) : ISizeMonitor
 
         if (size != _lastSize)
         {
-            Logging.Logger.LogInformation ($"Console size changes from '{_lastSize}' to {size}");
+            //Logging.Trace ($"Size changed from '{_lastSize}' to {size}");
             _lastSize = size;
             SizeChanged?.Invoke (this, new (size));
 
