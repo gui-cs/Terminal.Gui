@@ -11,7 +11,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_Init_Sets_Application_Screen (TestDriver d)
+    public void Constructor_Sets_Application_Screen (TestDriver d)
     {
         using var context = new GuiTestContext (d, _out, TimeSpan.FromSeconds (10));
 
@@ -23,7 +23,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_NewInstance_Runs (TestDriver d)
+    public void With_New_A_Runs (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (Application.Top!.Running);
@@ -34,7 +34,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_QuitKey_ViaApplication_Stops (TestDriver d)
+    public void QuitKey_ViaApplication_Stops (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d);
         Assert.True (Application.Top!.Running);
@@ -49,7 +49,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_QuitKey_ViaDriver_Stops (TestDriver d)
+    public void QuitKey_ViaDriver_Stops (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (Application.Top!.Running);
@@ -65,7 +65,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_StartsAndStopsWithoutError (TestDriver d)
+    public void With_Starts_Stops_Without_Error (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
 
@@ -75,7 +75,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void Without_Stop_Sill_Cleans_Up (TestDriver d)
+    public void With_Without_Stop_Still_Cleans_Up (TestDriver d)
     {
         GuiTestContext? context;
         using (context = With.A<Window> (40, 10, d, _out))
