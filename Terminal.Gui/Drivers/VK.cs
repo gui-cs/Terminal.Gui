@@ -1,5 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
-
+// ReSharper disable UnusedMember.Global
+// ReSharper disable IdentifierTypo
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Generated from winuser.h. See https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes</summary>
