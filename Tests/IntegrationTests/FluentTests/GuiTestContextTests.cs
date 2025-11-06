@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
 
-public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
+public class GuiTestContextTests (ITestOutputHelper outputHelper)
 {
     private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
