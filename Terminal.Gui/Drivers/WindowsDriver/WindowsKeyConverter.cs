@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -30,13 +29,13 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
 
         if (map == KeyCode.Null)
         {
-            return (Key)0;
+            return 0;
         }
 
         return new (map);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public WindowsConsole.InputRecord ToKeyInfo (Key key)
     {
         // Convert Key to ConsoleKeyInfo using the cross-platform mapping utility
@@ -75,7 +74,7 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
         };
 
         // Create and return an InputRecord with the keyboard event
-        return new WindowsConsole.InputRecord
+        return new()
         {
             EventType = WindowsConsole.EventType.Key,
             KeyEvent = keyEvent
@@ -103,7 +102,7 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
         //        // MapVirtualKey with MAPVK_VK_TO_VSC (0) converts VK to scan code
         //        // This uses the current keyboard layout, so it's more accurate than a static table
         //        uint scanCodeExtended = WindowsKeyboardLayout.MapVirtualKey ((VK)key, 0);
-                
+
         //        // The scan code is in the low byte
         //        return (ushort)(scanCodeExtended & 0xFF);
         //    }
@@ -116,70 +115,70 @@ internal class WindowsKeyConverter : IKeyConverter<WindowsConsole.InputRecord>
         // Fallback: Use a simple heuristic for common keys
         // For most test scenarios, these values work fine
         return key switch
-        {
-            ConsoleKey.Escape => 1,
-            ConsoleKey.D1 => 2,
-            ConsoleKey.D2 => 3,
-            ConsoleKey.D3 => 4,
-            ConsoleKey.D4 => 5,
-            ConsoleKey.D5 => 6,
-            ConsoleKey.D6 => 7,
-            ConsoleKey.D7 => 8,
-            ConsoleKey.D8 => 9,
-            ConsoleKey.D9 => 10,
-            ConsoleKey.D0 => 11,
-            ConsoleKey.Tab => 15,
-            ConsoleKey.Q => 16,
-            ConsoleKey.W => 17,
-            ConsoleKey.E => 18,
-            ConsoleKey.R => 19,
-            ConsoleKey.T => 20,
-            ConsoleKey.Y => 21,
-            ConsoleKey.U => 22,
-            ConsoleKey.I => 23,
-            ConsoleKey.O => 24,
-            ConsoleKey.P => 25,
-            ConsoleKey.Enter => 28,
-            ConsoleKey.A => 30,
-            ConsoleKey.S => 31,
-            ConsoleKey.D => 32,
-            ConsoleKey.F => 33,
-            ConsoleKey.G => 34,
-            ConsoleKey.H => 35,
-            ConsoleKey.J => 36,
-            ConsoleKey.K => 37,
-            ConsoleKey.L => 38,
-            ConsoleKey.Z => 44,
-            ConsoleKey.X => 45,
-            ConsoleKey.C => 46,
-            ConsoleKey.V => 47,
-            ConsoleKey.B => 48,
-            ConsoleKey.N => 49,
-            ConsoleKey.M => 50,
-            ConsoleKey.Spacebar => 57,
-            ConsoleKey.F1 => 59,
-            ConsoleKey.F2 => 60,
-            ConsoleKey.F3 => 61,
-            ConsoleKey.F4 => 62,
-            ConsoleKey.F5 => 63,
-            ConsoleKey.F6 => 64,
-            ConsoleKey.F7 => 65,
-            ConsoleKey.F8 => 66,
-            ConsoleKey.F9 => 67,
-            ConsoleKey.F10 => 68,
-            ConsoleKey.Home => 71,
-            ConsoleKey.UpArrow => 72,
-            ConsoleKey.PageUp => 73,
-            ConsoleKey.LeftArrow => 75,
-            ConsoleKey.RightArrow => 77,
-            ConsoleKey.End => 79,
-            ConsoleKey.DownArrow => 80,
-            ConsoleKey.PageDown => 81,
-            ConsoleKey.Insert => 82,
-            ConsoleKey.Delete => 83,
-            ConsoleKey.F11 => 87,
-            ConsoleKey.F12 => 88,
-            _ => 0 // Unknown or not needed for test simulation
-        };
+               {
+                   ConsoleKey.Escape => 1,
+                   ConsoleKey.D1 => 2,
+                   ConsoleKey.D2 => 3,
+                   ConsoleKey.D3 => 4,
+                   ConsoleKey.D4 => 5,
+                   ConsoleKey.D5 => 6,
+                   ConsoleKey.D6 => 7,
+                   ConsoleKey.D7 => 8,
+                   ConsoleKey.D8 => 9,
+                   ConsoleKey.D9 => 10,
+                   ConsoleKey.D0 => 11,
+                   ConsoleKey.Tab => 15,
+                   ConsoleKey.Q => 16,
+                   ConsoleKey.W => 17,
+                   ConsoleKey.E => 18,
+                   ConsoleKey.R => 19,
+                   ConsoleKey.T => 20,
+                   ConsoleKey.Y => 21,
+                   ConsoleKey.U => 22,
+                   ConsoleKey.I => 23,
+                   ConsoleKey.O => 24,
+                   ConsoleKey.P => 25,
+                   ConsoleKey.Enter => 28,
+                   ConsoleKey.A => 30,
+                   ConsoleKey.S => 31,
+                   ConsoleKey.D => 32,
+                   ConsoleKey.F => 33,
+                   ConsoleKey.G => 34,
+                   ConsoleKey.H => 35,
+                   ConsoleKey.J => 36,
+                   ConsoleKey.K => 37,
+                   ConsoleKey.L => 38,
+                   ConsoleKey.Z => 44,
+                   ConsoleKey.X => 45,
+                   ConsoleKey.C => 46,
+                   ConsoleKey.V => 47,
+                   ConsoleKey.B => 48,
+                   ConsoleKey.N => 49,
+                   ConsoleKey.M => 50,
+                   ConsoleKey.Spacebar => 57,
+                   ConsoleKey.F1 => 59,
+                   ConsoleKey.F2 => 60,
+                   ConsoleKey.F3 => 61,
+                   ConsoleKey.F4 => 62,
+                   ConsoleKey.F5 => 63,
+                   ConsoleKey.F6 => 64,
+                   ConsoleKey.F7 => 65,
+                   ConsoleKey.F8 => 66,
+                   ConsoleKey.F9 => 67,
+                   ConsoleKey.F10 => 68,
+                   ConsoleKey.Home => 71,
+                   ConsoleKey.UpArrow => 72,
+                   ConsoleKey.PageUp => 73,
+                   ConsoleKey.LeftArrow => 75,
+                   ConsoleKey.RightArrow => 77,
+                   ConsoleKey.End => 79,
+                   ConsoleKey.DownArrow => 80,
+                   ConsoleKey.PageDown => 81,
+                   ConsoleKey.Insert => 82,
+                   ConsoleKey.Delete => 83,
+                   ConsoleKey.F11 => 87,
+                   ConsoleKey.F12 => 88,
+                   _ => 0 // Unknown or not needed for test simulation
+               };
     }
 }

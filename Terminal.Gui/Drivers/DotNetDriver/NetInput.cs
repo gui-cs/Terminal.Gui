@@ -7,8 +7,6 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>, IDisposable
 {
-    private readonly NetWinVTConsole _adjustConsole;
-
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
@@ -32,6 +30,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
                 Logging.Logger.LogCritical (
                                             ex,
                                             "NetWinVTConsole could not be constructed i.e. could not configure terminal modes. May indicate running in non-interactive session e.g. unit testing CI");
+
                 return;
             }
         }
@@ -45,6 +44,36 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
         Console.TreatControlCAsInput = true;
     }
+
+    private readonly NetWinVTConsole _adjustConsole;
+
+    /// <inheritdoc/>
+    public override void Dispose ()
+    {
+        base.Dispose ();
+
+        if (Application.RunningUnitTests)
+        {
+            return;
+        }
+
+        // Disable mouse events first
+        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+        //Disable alternative screen buffer.
+        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+        //Set cursor key to cursor.
+        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+        _adjustConsole?.Cleanup ();
+
+        // Flush any pending input so no stray events appear
+        FlushConsoleInput ();
+    }
+
+    /// <inheritdoc />
+    public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
 
     /// <inheritdoc/>
     protected override bool Peek ()
@@ -72,38 +101,8 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         {
             while (Console.KeyAvailable)
             {
-                Console.ReadKey (intercept: true);
+                Console.ReadKey (true);
             }
         }
-    }
-
-    /// <inheritdoc/>
-    public override void Dispose ()
-    {
-        base.Dispose ();
-
-        if (Application.RunningUnitTests)
-        {
-            return;
-        }
-
-        // Disable mouse events first
-        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
-
-        //Disable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-        //Set cursor key to cursor.
-        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-
-        _adjustConsole?.Cleanup ();
-
-        // Flush any pending input so no stray events appear
-        FlushConsoleInput ();
-    }
-
-    public void AddInput (ConsoleKeyInfo input)
-    {
-        throw new NotImplementedException ();
     }
 }

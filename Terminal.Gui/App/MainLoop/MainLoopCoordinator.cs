@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.App;
 
@@ -17,20 +16,6 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TInputRecord : struct
 {
-    private readonly IApplicationMainLoop<TInputRecord> _loop;
-    private readonly IComponentFactory<TInputRecord> _componentFactory;
-    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
-    private IInput<TInputRecord> _input;
-    private readonly ConcurrentQueue<TInputRecord> _inputQueue;
-    private readonly IInputProcessor _inputProcessor;
-    private Task _inputTask;
-    private IOutput _output;
-    private DriverImpl _driver;
-    private readonly object _oLockInitialization = new ();
-    private readonly ITimedEvents _timedEvents;
-
-    private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
-
     /// <summary>
     ///     Creates a new coordinator that will manage the main UI loop and input thread.
     /// </summary>
@@ -52,12 +37,28 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         _componentFactory = componentFactory;
     }
 
+    private readonly IApplicationMainLoop<TInputRecord> _loop;
+    private readonly IComponentFactory<TInputRecord> _componentFactory;
+    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
+    private readonly ConcurrentQueue<TInputRecord> _inputQueue;
+    private readonly IInputProcessor _inputProcessor;
+    private readonly object _oLockInitialization = new ();
+    private readonly ITimedEvents _timedEvents;
+
+    private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
+    private IInput<TInputRecord> _input;
+    private Task _inputTask;
+    private IOutput _output;
+    private DriverImpl _driver;
+
+    private bool _stopCalled;
+
     /// <summary>
     ///     Starts the input loop thread in separate task (returning immediately).
     /// </summary>
     public async Task StartAsync ()
     {
-        Logging.Trace ($"Booting... ()");
+        Logging.Trace ("Booting... ()");
 
         _inputTask = Task.Run (RunInput);
 
@@ -85,6 +86,66 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         Logging.Trace ("Booting complete");
     }
 
+    /// <inheritdoc/>
+    public void RunIteration ()
+    {
+        lock (_oLockInitialization)
+        {
+            _loop.Iteration ();
+        }
+    }
+
+    /// <inheritdoc/>
+    public void Stop ()
+    {
+        // Ignore repeated calls to Stop - happens if user spams Application.Shutdown().
+        if (_stopCalled)
+        {
+            return;
+        }
+
+        _stopCalled = true;
+
+        _runCancellationTokenSource.Cancel ();
+        _output.Dispose ();
+
+        // Wait for input infinite loop to exit
+        _inputTask.Wait ();
+    }
+
+    private void BootMainLoop ()
+    {
+        Logging.Trace ($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
+
+        lock (_oLockInitialization)
+        {
+            // Instance must be constructed on the thread in which it is used.
+            _output = _componentFactory.CreateOutput ();
+            _loop.Initialize (_timedEvents, _inputQueue, _inputProcessor, _output, _componentFactory);
+
+            BuildDriverIfPossible ();
+        }
+    }
+
+    private void BuildDriverIfPossible ()
+    {
+        Logging.Trace ($"_input: {_input}, _output: {_output}");
+
+        if (_input != null && _output != null)
+        {
+            _driver = new (
+                           _inputProcessor,
+                           _loop.OutputBuffer,
+                           _output,
+                           _loop.AnsiRequestScheduler,
+                           _loop.ConsoleSizeMonitor);
+
+            Application.Driver = _driver;
+
+            _startupSemaphore.Release ();
+        }
+    }
+
     private void RunInput ()
     {
         try
@@ -95,12 +156,12 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 _input = _componentFactory.CreateInput ();
                 _input.Initialize (_inputQueue);
 
-
                 // Wire up InputImpl reference for ITestableInput support
                 if (_inputProcessor is InputProcessorImpl<TInputRecord> impl)
                 {
                     impl.InputImpl = _input;
                 }
+
                 BuildDriverIfPossible ();
             }
 
@@ -128,65 +189,5 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             Logging.Critical ("Input loop exited early (stop not called)");
         }
-    }
-
-    /// <inheritdoc/>
-    public void RunIteration ()
-    {
-        lock (_oLockInitialization)
-        {
-            _loop.Iteration ();
-        }
-    }
-
-    private void BootMainLoop ()
-    {
-        Logging.Trace($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
-        lock (_oLockInitialization)
-        {
-            // Instance must be constructed on the thread in which it is used.
-            _output = _componentFactory.CreateOutput ();
-            _loop.Initialize (_timedEvents, _inputQueue, _inputProcessor, _output, _componentFactory);
-
-            BuildDriverIfPossible ();
-        }
-    }
-
-    private void BuildDriverIfPossible ()
-    {
-        Logging.Trace ($"_input: {_input}, _output: {_output}");
-        if (_input != null && _output != null)
-        {
-            _driver = new (
-                           _inputProcessor,
-                           _loop.OutputBuffer,
-                           _output,
-                           _loop.AnsiRequestScheduler,
-                           _loop.ConsoleSizeMonitor);
-
-            Application.Driver = _driver;
-
-            _startupSemaphore.Release ();
-        }
-    }
-
-    private bool _stopCalled;
-
-    /// <inheritdoc/>
-    public void Stop ()
-    {
-        // Ignore repeated calls to Stop - happens if user spams Application.Shutdown().
-        if (_stopCalled)
-        {
-            return;
-        }
-
-        _stopCalled = true;
-
-        _runCancellationTokenSource.Cancel ();
-        _output.Dispose ();
-
-        // Wait for input infinite loop to exit
-        _inputTask.Wait ();
     }
 }

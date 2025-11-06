@@ -27,7 +27,7 @@ public static class ConsoleKeyInfoExtensions
     /// </remarks>
     public static string ToString (this ConsoleKeyInfo consoleKeyInfo)
     {
-        var sb = new System.Text.StringBuilder ();
+        var sb = new StringBuilder ();
 
         // Always show the ConsoleKey enum value
         sb.Append ("Key: ");

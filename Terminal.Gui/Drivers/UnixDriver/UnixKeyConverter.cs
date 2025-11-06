@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 internal class UnixKeyConverter : IKeyConverter<char>
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Key ToKey (char value)
     {
         ConsoleKeyInfo adjustedInput = EscSeqUtils.MapChar (value);
@@ -18,7 +18,7 @@ internal class UnixKeyConverter : IKeyConverter<char>
         return EscSeqUtils.MapKey (adjustedInput);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public char ToKeyInfo (Key key)
     {
         // Convert Key to ConsoleKeyInfo using the cross-platform mapping utility
