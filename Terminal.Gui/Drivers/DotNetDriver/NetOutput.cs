@@ -37,20 +37,21 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
-        if (Application.RunningUnitTests)
+        try
         {
-            // For unit tests, we return a default size.
-            return Size.Empty;
+            return new (Console.WindowWidth, Console.WindowHeight);
         }
-
-        return new (Console.WindowWidth, Console.WindowHeight);
+        catch (IOException)
+        {
+            // Not connected to a terminal; return a default size
+            return new (80, 25);
+        }
     }
 
     /// <inheritdoc />
     public Point GetCursorPosition ()
     {
-        // TODO: Implement EscSeqUtils.CSI_RequestCursorPositionReport
-        throw new NotImplementedException ();
+        return _lastCursorPosition ?? Point.Empty;
     }
 
     /// <inheritdoc/>

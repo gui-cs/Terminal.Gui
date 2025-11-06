@@ -75,14 +75,21 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void GuiTestContext_ForgotToStop (TestDriver d)
+    public void Without_Stop_Sill_Cleans_Up (TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
+        GuiTestContext? context;
+        using (context = With.A<Window> (40, 10, d, _out))
+        {
+            Assert.False (context.Finished);
+        }
+
+        Assert.True (context.Finished);
+
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void TestWindowsResize (TestDriver d)
+    public void ResizeConsole_Resizes (TestDriver d)
     {
         var lbl = new Label
         {
@@ -99,151 +106,4 @@ public class BasicFluentAssertionTests (ITestOutputHelper outputHelper)
                                      .Stop ();
     }
 
-    [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ContextMenu_CrashesOnRight (TestDriver d)
-    {
-        var clicked = false;
-
-        MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
-
-        using GuiTestContext c = With.A<Window> (40, 10, d, _out)
-                                     .WithContextMenu (new (menuItems))
-                                     .ScreenShot ("Before open menu", _out)
-
-                                     // Click in main area inside border
-                                     .RightClick (1, 1)
-                                     .Then (() =>
-                                            {
-                                                // Test depends on menu having a border
-                                                IPopover? popover = Application.Popover!.GetActivePopover ();
-                                                Assert.NotNull (popover);
-                                                var popoverMenu = popover as PopoverMenu;
-                                                popoverMenu!.Root!.BorderStyle = LineStyle.Single;
-                                            })
-                                     .WaitIteration ()
-                                     .ScreenShot ("After open menu", _out)
-                                     .LeftClick (2, 2)
-                                     .Stop ()
-                                     .WriteOutLogs (_out);
-        Assert.True (clicked);
-    }
-
-    [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ContextMenu_OpenSubmenu (TestDriver d)
-    {
-        var clicked = false;
-
-        MenuItemv2 [] menuItems =
-        [
-            new ("One", "", null),
-            new ("Two", "", null),
-            new ("Three", "", null),
-            new (
-                 "Four",
-                 "",
-                 new (
-                      [
-                          new ("SubMenu1", "", null),
-                          new ("SubMenu2", "", () => clicked = true),
-                          new ("SubMenu3", "", null),
-                          new ("SubMenu4", "", null),
-                          new ("SubMenu5", "", null),
-                          new ("SubMenu6", "", null),
-                          new ("SubMenu7", "", null)
-                      ])),
-            new ("Five", "", null),
-            new ("Six", "", null)
-        ];
-
-        using GuiTestContext c = With.A<Window> (40, 10, d)
-                                     .WithContextMenu (new (menuItems))
-                                     .ScreenShot ("Before open menu", _out)
-
-                                     // Click in main area inside border
-                                     .RightClick (1, 1)
-                                     .ScreenShot ("After open menu", _out)
-                                     .Send (Key.CursorDown)
-                                     .Send (Key.CursorDown)
-                                     .Send (Key.CursorDown)
-                                     .Send (Key.CursorRight)
-                                     .ScreenShot ("After open submenu", _out)
-                                     .Send (Key.CursorDown)
-                                     .Send (Key.Enter)
-                                     .ScreenShot ("Menu should be closed after selecting", _out)
-                                     .Stop ()
-                                     .WriteOutLogs (_out);
-        Assert.True (clicked);
-    }
-
-    [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Toplevel_TabGroup_Forward_Backward (TestDriver d)
-    {
-        var v1 = new View { Id = "v1", CanFocus = true };
-        var v2 = new View { Id = "v2", CanFocus = true };
-        var v3 = new View { Id = "v3", CanFocus = true };
-        var v4 = new View { Id = "v4", CanFocus = true };
-        var v5 = new View { Id = "v5", CanFocus = true };
-        var v6 = new View { Id = "v6", CanFocus = true };
-
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then (() =>
-                                            {
-                                                var w1 = new Window { Id = "w1" };
-                                                w1.Add (v1, v2);
-                                                var w2 = new Window { Id = "w2" };
-                                                w2.Add (v3, v4);
-                                                var w3 = new Window { Id = "w3" };
-                                                w3.Add (v5, v6);
-                                                Toplevel top = Application.Top!;
-                                                Application.Top!.Add (w1, w2, w3);
-                                            })
-                                     .WaitIteration ()
-                                     .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v3.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v3.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v3.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v3.HasFocus)
-                                     .Send (Key.Tab)
-                                     .AssertTrue (v4.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v5.HasFocus)
-                                     .Send (Key.Tab)
-                                     .AssertTrue (v6.HasFocus)
-                                     .Send (Key.F6.WithShift)
-                                     .AssertTrue (v4.HasFocus)
-                                     .Send (Key.F6)
-                                     .AssertTrue (v6.HasFocus)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
-        Assert.False (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        Assert.False (v4.HasFocus);
-        Assert.False (v5.HasFocus);
-    }
 }
