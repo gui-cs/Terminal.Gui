@@ -29,6 +29,7 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 internal class DriverImpl : IDriver
 {
+    private readonly string? _driverName;
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
@@ -46,6 +47,7 @@ internal class DriverImpl : IDriver
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
+    /// <param name="input"></param>
     /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
     /// <param name="outputBuffer">The output buffer for managing screen state.</param>
     /// <param name="output">The output interface for rendering to the console.</param>
@@ -117,11 +119,11 @@ internal class DriverImpl : IDriver
     {
         get
         {
-            if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
-            {
-                // In unit tests, we don't have a real output, so we return an empty rectangle.
-                return Rectangle.Empty;
-            }
+            //if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
+            //{
+            //    // In unit tests, we don't have a real output, so we return an empty rectangle.
+            //    return Rectangle.Empty;
+            //}
 
             return new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
         }
@@ -460,7 +462,10 @@ internal class DriverImpl : IDriver
     public void WriteRaw (string ansi) { _output.Write (ansi); }
 
     /// <inheritdoc/>
-    public void AddKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
+    public void AddKeyEvent (Key key)
+    {
+        InputProcessor.EnqueueKeyDownEvent (key);
+    }
 
     /// <summary>
     ///     Queues the specified ANSI escape sequence request for execution.
@@ -482,5 +487,10 @@ internal class DriverImpl : IDriver
     public void Refresh ()
     {
         // No need we will always draw when dirty
+    }
+
+    public string? GetName ()
+    {
+        throw new NotImplementedException ();
     }
 }

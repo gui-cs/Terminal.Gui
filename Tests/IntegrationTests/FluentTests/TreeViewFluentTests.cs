@@ -36,7 +36,7 @@ public class TreeViewFluentTests
         tv.AddObject (root);
 
         using GuiTestContext context =
-            With.A<Window> (40, 10, d)
+            With.A<Window> (40, 10, d, _out)
                 .Add (tv)
                 .Focus (tv)
                 .WaitIteration ()

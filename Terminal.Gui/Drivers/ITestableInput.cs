@@ -12,3 +12,4 @@ public interface ITestableInput<TInputRecord> : IInput<TInputRecord>
     /// </summary>
     void AddInput (TInputRecord input);
 }
+

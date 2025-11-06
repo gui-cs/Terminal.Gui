@@ -34,6 +34,12 @@ public interface IOutput : IDisposable
     void SetCursorVisibility (CursorVisibility visibility);
 
     /// <summary>
+    ///     Gets the current position of the console cursor.
+    /// </summary>
+    /// <returns></returns>
+    Point GetCursorPosition ();
+
+    /// <summary>
     ///     Moves the console cursor to the given location.
     /// </summary>
     /// <param name="col"></param>
@@ -46,4 +52,5 @@ public interface IOutput : IDisposable
     /// <param name="width"></param>
     /// <param name="height"></param>
     void SetSize (int width, int height);
+
 }

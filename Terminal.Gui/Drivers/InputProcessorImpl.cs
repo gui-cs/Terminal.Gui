@@ -63,7 +63,8 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public IInput<TInputRecord>? InputImpl { get; set; }  // Set by MainLoopCoordinator
 
     /// <inheritdoc />
-    public virtual void EnqueueKeyDownEvent (Key key)
+    /// <inheritdoc />
+    public void EnqueueKeyDownEvent (Key key)
     {
         // Convert Key → TInputRecord
         TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
@@ -72,11 +73,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         if (InputImpl is ITestableInput<TInputRecord> testableInput)
         {
             testableInput.AddInput (inputRecord);
-            return;
         }
-
-        // Fallback: direct enqueue (bypasses Peek/Read)
-        InputBuffer.Enqueue (inputRecord);
     }
 
     /// <inheritdoc />

@@ -24,7 +24,7 @@ public class TextFieldFluentTests
     public void TextField_Cursor_AtEnd_WhenTyping (TestDriver d)
     {
         // Simulates typing abcd into a TextField with width 3 (wide enough to render 2 characters only)
-        using var c = With.A<Window> (100, 20, d)
+        using var c = With.A<Window> (100, 20, d, _out)
                           .Add (new TextField () { Width = 3 })
                           .Focus<TextField> ()
                           .WaitIteration ()
