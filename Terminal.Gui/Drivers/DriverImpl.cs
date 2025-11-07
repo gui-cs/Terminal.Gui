@@ -32,17 +32,7 @@ internal class DriverImpl : IDriver
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
-
-    /// <summary>
-    ///     The event fired when the screen changes (size, position, etc.).
-    /// </summary>
-    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
-
-    public IInputProcessor InputProcessor { get; }
-    public IOutputBuffer OutputBuffer { get; }
-
-    public ISizeMonitor ConsoleSizeMonitor { get; }
-
+    
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
@@ -73,7 +63,7 @@ internal class DriverImpl : IDriver
                                          MouseEvent?.Invoke (s, e);
                                      };
 
-        ConsoleSizeMonitor = sizeMonitor;
+        SizeMonitor = sizeMonitor;
 
         sizeMonitor.SizeChanged += (_, e) =>
                                    {
@@ -84,6 +74,21 @@ internal class DriverImpl : IDriver
 
         CreateClipboard ();
     }
+
+    /// <summary>
+    ///     The event fired when the screen changes (size, position, etc.).
+    /// </summary>
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
+
+    /// <inheritdoc/>
+    public IInputProcessor InputProcessor { get; }
+
+    /// <inheritdoc/>
+    public IOutputBuffer OutputBuffer { get; }
+
+    /// <inheritdoc/>
+    public ISizeMonitor SizeMonitor { get; }
+
 
     private void CreateClipboard ()
     {

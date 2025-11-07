@@ -19,23 +19,23 @@ namespace Terminal.Gui.App;
 public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRecord : struct
 {
     /// <summary>
-    ///     Gets the class responsible for servicing user timeouts
+    ///     Gets the <see cref="ITimedEvents"/> implementation that manages user-defined timeouts and periodic events.
     /// </summary>
     public ITimedEvents TimedEvents { get; }
 
     /// <summary>
-    ///     Gets the class responsible for writing final rendered output to the console
+    ///     Gets the <see cref="IOutputBuffer"/> representing the desired screen state for console rendering.
     /// </summary>
     public IOutputBuffer OutputBuffer { get; }
 
     /// <summary>
-    ///     Class for writing output to the console.
+    ///     Gets the <see cref="IOutput"/> implementation responsible for rendering the <see cref="OutputBuffer"/> to the console using platform specific methods.
     /// </summary>
-    public IOutput Out { get; }
+    public IOutput Output { get; }
 
     /// <summary>
-    ///     Gets the class responsible for processing buffered console input and translating
-    ///     it into events on the UI thread.
+    ///     Gets <see cref="InputProcessor"/> implementation that processes the mouse and keyboard input populated by <see cref="IInput{TInputRecord}"/>
+    ///     implementations on the input thread and translating to events on the UI thread.
     /// </summary>
     public IInputProcessor InputProcessor { get; }
 
@@ -46,23 +46,58 @@ public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRe
     public AnsiRequestScheduler AnsiRequestScheduler { get; }
 
     /// <summary>
-    ///     Gets the class responsible for determining the current console size
+    ///     Gets the <see cref="ISizeMonitor"/> implementation that tracks terminal size changes.
     /// </summary>
-    public ISizeMonitor ConsoleSizeMonitor { get; }
+    public ISizeMonitor SizeMonitor { get; }
 
     /// <summary>
-    ///     Initializes the loop with a buffer from which data can be read
+    ///     Initializes the main loop with its required dependencies.
     /// </summary>
-    /// <param name="timedEvents"></param>
-    /// <param name="inputBuffer"></param>
-    /// <param name="inputProcessor"></param>
-    /// <param name="consoleOutput"></param>
-    /// <param name="componentFactory"></param>
+    /// <param name="timedEvents">
+    ///     The <see cref="ITimedEvents"/> implementation for managing user-defined timeouts and periodic callbacks
+    ///     (e.g., <see cref="Application.AddTimeout"/>).
+    /// </param>
+    /// <param name="inputQueue">
+    ///     The thread-safe queue containing raw input events populated by <see cref="IInput{TInputRecord}"/> on
+    ///     the input thread. This queue is drained by <see cref="InputProcessor"/> during each <see cref="Iteration"/>.
+    /// </param>
+    /// <param name="inputProcessor">
+    ///     The <see cref="IInputProcessor"/> that translates raw input records (e.g., <see cref="ConsoleKeyInfo"/>) 
+    ///     into Terminal.Gui events (<see cref="Key"/>, <see cref="MouseEventArgs"/>) and raises them on the main UI thread.
+    /// </param>
+    /// <param name="output">
+    ///     The <see cref="IOutput"/> implementation responsible for rendering the <see cref="OutputBuffer"/> to the
+    ///     console using platform-specific methods (e.g., Win32 APIs, ANSI escape sequences).
+    /// </param>
+    /// <param name="componentFactory">
+    ///     The factory for creating driver-specific components. Used here to create the <see cref="ISizeMonitor"/>
+    ///     that tracks terminal size changes.
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="MainLoopCoordinator{TInputRecord}"/> during application startup
+    ///         to wire up all the components needed for the main loop to function. It must be called before
+    ///         <see cref="Iteration"/> can be invoked.
+    ///     </para>
+    ///     <para>
+    ///         <b>Initialization order:</b>
+    ///     </para>
+    ///     <list type="number">
+    ///         <item>Store references to <paramref name="timedEvents"/>, <paramref name="inputQueue"/>, 
+    ///               <paramref name="inputProcessor"/>, and <paramref name="output"/></item>
+    ///         <item>Create <see cref="AnsiRequestScheduler"/> for managing ANSI requests/responses</item>
+    ///         <item>Initialize <see cref="OutputBuffer"/> size to match current console dimensions</item>
+    ///         <item>Create <see cref="ISizeMonitor"/> using the <paramref name="componentFactory"/></item>
+    ///     </list>
+    ///     <para>
+    ///         After initialization, the main loop is ready to process events via <see cref="Iteration"/>.
+    ///     </para>
+    /// </remarks>
     void Initialize (
         ITimedEvents timedEvents,
-        ConcurrentQueue<TInputRecord> inputBuffer,
+        ConcurrentQueue<TInputRecord> inputQueue,
         IInputProcessor inputProcessor,
-        IOutput consoleOutput,
+        IOutput output,
         IComponentFactory<TInputRecord> componentFactory
     );
 

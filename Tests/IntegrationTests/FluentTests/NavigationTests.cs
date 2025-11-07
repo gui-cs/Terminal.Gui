@@ -1,4 +1,5 @@
-﻿using TerminalGuiFluentTesting;
+﻿#nullable enable
+using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
@@ -6,7 +7,7 @@ namespace IntegrationTests.FluentTests;
 
 public class NavigationTests (ITestOutputHelper outputHelper)
 {
-    private readonly TextWriter _out = new TestOutputWriter (outputHelper);
+    private readonly TextWriter? _out = new TestOutputWriter (outputHelper);
 
     [Theory]
     [ClassData (typeof (TestDrivers))]

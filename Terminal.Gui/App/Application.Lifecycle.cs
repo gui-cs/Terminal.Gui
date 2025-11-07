@@ -43,7 +43,10 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
-    internal static int? MainThreadId
+    /// <summary>
+    ///     Gets or sets the main thread ID for the application.
+    /// </summary>
+    public static int? MainThreadId
     {
         get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
         set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;

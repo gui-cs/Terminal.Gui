@@ -5,12 +5,48 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Processes the queued input buffer contents - which must be of Type <typeparamref name="TInputRecord"/>.
+///     Processes the queued input queue contents - which must be of Type <typeparamref name="TInputRecord"/>.
 ///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
-///     events and data models.
+///     events and data models. Runs on the main loop thread.
 /// </summary>
 public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDisposable where TInputRecord : struct
 {
+    /// <summary>
+    ///     Constructs base instance including wiring all relevant
+    ///     parser events and setting <see cref="InputQueue"/> to
+    ///     the provided thread safe input collection.
+    /// </summary>
+    /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IInput{T}"/>)</param>
+    /// <param name="keyConverter">
+    ///     Key converter for translating driver specific
+    ///     <typeparamref name="TInputRecord"/> class into Terminal.Gui <see cref="Key"/>.
+    /// </param>
+    protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter)
+    {
+        InputQueue = inputBuffer;
+        Parser.HandleMouse = true;
+        Parser.Mouse += (s, e) => RaiseMouseEvent (e);
+
+        Parser.HandleKeyboard = true;
+
+        Parser.Keyboard += (s, k) =>
+                           {
+                               RaiseKeyDownEvent (k);
+                               RaiseKeyUpEvent (k);
+                           };
+
+        // TODO: For now handle all other escape codes with ignore
+        Parser.UnexpectedResponseHandler = str =>
+                                           {
+                                               var cur = new string (str.Select (k => k.Item1).ToArray ());
+                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'");
+                                               AnsiSequenceSwallowed?.Invoke (this, cur);
+
+                                               return true;
+                                           };
+        KeyConverter = keyConverter;
+    }
+
     /// <summary>
     ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
     /// </summary>
@@ -26,9 +62,10 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public IKeyConverter<TInputRecord> KeyConverter { get; }
 
     /// <summary>
-    ///     Input buffer which will be drained from by this class.
+    ///     The input queue which is filled by <see cref="IInput{TInputRecord}"/> implementations running on the input thread.
+    ///     Implementations of this class should dequeue from this queue in <see cref="ProcessQueue"/> on the main loop thread.
     /// </summary>
-    public ConcurrentQueue<TInputRecord> InputBuffer { get; }
+    public ConcurrentQueue<TInputRecord> InputQueue { get; }
 
     /// <inheritdoc />
     public string? DriverName { get; init; }
@@ -67,7 +104,8 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // Convert Key → TInputRecord
         TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
 
-        // If input supports testing, use Peek/Read pipeline
+        // If input supports testing, use InputImplPeek/Read pipeline
+        // which runs on the input thread.
         if (InputImpl is ITestableInput<TInputRecord> testableInput)
         {
             testableInput.AddInput (inputRecord);
@@ -111,46 +149,10 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         }
     }
 
-    /// <summary>
-    ///     Constructs base instance including wiring all relevant
-    ///     parser events and setting <see cref="InputBuffer"/> to
-    ///     the provided thread safe input collection.
-    /// </summary>
-    /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IInput{T}"/>)</param>
-    /// <param name="keyConverter">
-    ///     Key converter for translating driver specific
-    ///     <typeparamref name="TInputRecord"/> class into Terminal.Gui <see cref="Key"/>.
-    /// </param>
-    protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter)
-    {
-        InputBuffer = inputBuffer;
-        Parser.HandleMouse = true;
-        Parser.Mouse += (s, e) => RaiseMouseEvent (e);
-
-        Parser.HandleKeyboard = true;
-
-        Parser.Keyboard += (s, k) =>
-                           {
-                               RaiseKeyDownEvent (k);
-                               RaiseKeyUpEvent (k);
-                           };
-
-        // TODO: For now handle all other escape codes with ignore
-        Parser.UnexpectedResponseHandler = str =>
-                                           {
-                                               var cur = new string (str.Select (k => k.Item1).ToArray ());
-                                               Logging.Logger.LogInformation ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'");
-                                               AnsiSequenceSwallowed?.Invoke (this, cur);
-
-                                               return true;
-                                           };
-        KeyConverter = keyConverter;
-    }
-
     /// <inheritdoc />
     public void ProcessQueue ()
     {
-        while (InputBuffer.TryDequeue (out TInputRecord input))
+        while (InputQueue.TryDequeue (out TInputRecord input))
         {
             Process (input);
         }
@@ -174,7 +176,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     /// <summary>
     ///     Process the provided single input element <paramref name="input"/>. This method
-    ///     is called sequentially for each value read from <see cref="InputBuffer"/>.
+    ///     is called sequentially for each value read from <see cref="InputQueue"/>.
     /// </summary>
     /// <param name="input"></param>
     protected abstract void Process (TInputRecord input);

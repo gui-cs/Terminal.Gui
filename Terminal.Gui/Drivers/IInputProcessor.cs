@@ -18,7 +18,7 @@ public interface IInputProcessor
     string? DriverName { get; init; }
 
     /// <summary>
-    ///     Drains the input buffer, processing all available keystrokes
+    ///     Drains the input queue, processing all available keystrokes. To be called on the main loop thread.
     /// </summary>
     void ProcessQueue ();
 
@@ -91,6 +91,6 @@ public interface IInputProcessor
     ///     Adds a mouse input event to the input queue. For unit tests.
     /// </summary>
     /// <param name="mouseEvent"></param>
-    void EnqueueMouseEvent (MouseEventArgs  mouseEvent);
+    void EnqueueMouseEvent (MouseEventArgs mouseEvent);
 
 }

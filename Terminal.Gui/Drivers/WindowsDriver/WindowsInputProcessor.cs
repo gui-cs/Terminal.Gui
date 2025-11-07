@@ -21,7 +21,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     /// <inheritdoc />
     public override void EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
-        InputBuffer.Enqueue (new ()
+        InputQueue.Enqueue (new ()
         {
             EventType = WindowsConsole.EventType.Mouse,
             MouseEvent = ToMouseEventRecord (mouseEvent)

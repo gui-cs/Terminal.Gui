@@ -19,7 +19,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         Assert.True (Application.Top!.Running);
 
         Toplevel top = Application.Top;
-        Application.RaiseKeyDownEvent (Application.QuitKey);
+        context.Then (() => Application.RaiseKeyDownEvent (Application.QuitKey));
         Assert.False (top!.Running);
     }
 

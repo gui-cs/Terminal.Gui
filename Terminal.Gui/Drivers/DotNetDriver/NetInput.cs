@@ -3,7 +3,9 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>.
 /// </summary>
 public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>, IDisposable
 {
@@ -78,12 +80,14 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// <inheritdoc/>
     public override bool Peek ()
     {
-        if (Application.RunningUnitTests)
+        try
+        {
+            return Console.KeyAvailable;
+        }
+        catch
         {
             return false;
         }
-
-        return Console.KeyAvailable;
     }
 
     /// <inheritdoc/>
@@ -97,12 +101,9 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
 
     private void FlushConsoleInput ()
     {
-        if (!Application.RunningUnitTests)
+        while (Console.KeyAvailable)
         {
-            while (Console.KeyAvailable)
-            {
-                Console.ReadKey (true);
-            }
+            Console.ReadKey (true);
         }
     }
 }

@@ -56,7 +56,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <summary>
     ///     Starts the input loop thread in separate task (returning immediately).
     /// </summary>
-    public async Task StartAsync ()
+    public async Task StartInputTask ()
     {
         Logging.Trace ("Booting... ()");
 
@@ -137,7 +137,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                            _loop.OutputBuffer,
                            _output,
                            _loop.AnsiRequestScheduler,
-                           _loop.ConsoleSizeMonitor);
+                           _loop.SizeMonitor);
 
             Application.Driver = _driver;
 
@@ -146,6 +146,9 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
     }
 
+    /// <summary>
+    ///     INTERNAL: Runs the IInput read loop on a new thread called the "Input Thread".
+    /// </summary>
     private void RunInput ()
     {
         try

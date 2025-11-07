@@ -4,7 +4,9 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Implements a fake console input for testing purposes that uses the same key input type as NetInput i.e. <see cref="ConsoleKeyInfo"/>.
+///     <see cref="IInput{TInputRecord}"/> implementation that uses a fake input source for testing.
+///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>.
 /// </summary>
 public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>
 {
@@ -12,7 +14,7 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     private readonly ConcurrentQueue<ConsoleKeyInfo> _testInput = new ();
 
     /// <summary>
-    /// Creates a new FakeConsoleInput.
+    ///     Creates a new FakeInput.
     /// </summary>
     public FakeInput ()
     { }
@@ -20,12 +22,14 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     /// <inheritdoc/>
     public override bool Peek ()
     {
+        // Will be called on the input thread.
         return !_testInput.IsEmpty;
     }
 
     /// <inheritdoc/>
     public override IEnumerable<ConsoleKeyInfo> Read ()
     {
+        // Will be called on the input thread.
         while (_testInput.TryDequeue (out ConsoleKeyInfo input))
         {
             yield return input;
@@ -37,6 +41,7 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     {
         //Logging.Trace ($"Enqueuing input: {input.Key}");
 
+        // Will be called on the main loop thread.
         _testInput.Enqueue (input);
 
         // Wait for the input thread to drain the queue (with timeout)

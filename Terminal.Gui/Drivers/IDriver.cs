@@ -29,7 +29,8 @@ public interface IDriver
     ///     Interface for classes responsible for reporting the current
     ///     size of the terminal window.
     /// </summary>
-    ISizeMonitor ConsoleSizeMonitor { get; }
+    ISizeMonitor SizeMonitor { get; }
+
     /// <summary>Get the operating system clipboard.</summary>
     /// 
     IClipboard? Clipboard { get; }

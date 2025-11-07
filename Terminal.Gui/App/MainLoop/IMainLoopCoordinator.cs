@@ -25,7 +25,7 @@ public interface IMainLoopCoordinator
     ///     </list>
     /// </remarks>
     /// <returns>A task that completes when initialization is done</returns>
-    public Task StartAsync ();
+    public Task StartInputTask ();
 
     /// <summary>
     ///     Stops the input thread and performs cleanup.

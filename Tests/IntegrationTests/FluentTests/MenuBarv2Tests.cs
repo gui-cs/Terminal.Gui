@@ -16,7 +16,7 @@ public class MenuBarv2Tests
     public MenuBarv2Tests (ITestOutputHelper outputHelper)
     {
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-        _out = new TestOutputWriter (outputHelper);
+        //_out = new TestOutputWriter (outputHelper);
     }
 
     [Theory]
@@ -160,7 +160,6 @@ public class MenuBarv2Tests
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)
                                      .WaitIteration ()
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
-                                     .WriteOutLogs (_out)
                                      .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (menuBar?.IsOpen ());

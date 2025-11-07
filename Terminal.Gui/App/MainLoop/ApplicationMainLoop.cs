@@ -1,7 +1,8 @@
 ﻿#nullable enable
-using Terminal.Gui.Drivers;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
@@ -23,11 +24,11 @@ namespace Terminal.Gui.App;
 public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
     private ITimedEvents? _timedEvents;
-    private ConcurrentQueue<TInputRecord>? _inputBuffer;
+    private ConcurrentQueue<TInputRecord>? _inputQueue;
     private IInputProcessor? _inputProcessor;
-    private IOutput? _out;
+    private IOutput? _output;
     private AnsiRequestScheduler? _ansiRequestScheduler;
-    private ISizeMonitor? _consoleSizeMonitor;
+    private ISizeMonitor? _sizeMonitor;
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -41,12 +42,12 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     /// <summary>
     ///     The input events thread-safe collection. This is populated on separate
     ///     thread by a <see cref="IInput{T}"/>. Is drained as part of each
-    ///     <see cref="Iteration"/>
+    ///     <see cref="Iteration"/> on the main loop thread.
     /// </summary>
-    public ConcurrentQueue<TInputRecord> InputBuffer
+    public ConcurrentQueue<TInputRecord> InputQueue
     {
-        get => _inputBuffer ?? throw new NotInitializedException (nameof (InputBuffer));
-        private set => _inputBuffer = value;
+        get => _inputQueue ?? throw new NotInitializedException (nameof (InputQueue));
+        private set => _inputQueue = value;
     }
 
     /// <inheritdoc/>
@@ -60,10 +61,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     public IOutputBuffer OutputBuffer { get; } = new OutputBufferImpl ();
 
     /// <inheritdoc/>
-    public IOutput Out
+    public IOutput Output
     {
-        get => _out ?? throw new NotInitializedException (nameof (Out));
-        private set => _out = value;
+        get => _output ?? throw new NotInitializedException (nameof (Output));
+        private set => _output = value;
     }
 
     /// <inheritdoc/>
@@ -74,22 +75,16 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     }
 
     /// <inheritdoc/>
-    public ISizeMonitor ConsoleSizeMonitor
+    public ISizeMonitor SizeMonitor
     {
-        get => _consoleSizeMonitor ?? throw new NotInitializedException (nameof (ConsoleSizeMonitor));
-        private set => _consoleSizeMonitor = value;
+        get => _sizeMonitor ?? throw new NotInitializedException (nameof (SizeMonitor));
+        private set => _sizeMonitor = value;
     }
 
     /// <summary>
     ///     Handles raising events and setting required draw status etc when <see cref="Application.Top"/> changes
     /// </summary>
     public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
-
-    /// <summary>
-    ///     Determines how to get the current system type, adjust
-    ///     in unit tests to simulate specific timings.
-    /// </summary>
-    public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
     /// <summary>
     ///     Initializes the class with the provided subcomponents
@@ -107,29 +102,28 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         IComponentFactory<TInputRecord> componentFactory
     )
     {
-        InputBuffer = inputBuffer;
-        Out = consoleOutput;
+        InputQueue = inputBuffer;
+        Output = consoleOutput;
         InputProcessor = inputProcessor;
 
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
         OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
-        ConsoleSizeMonitor = componentFactory.CreateSizeMonitor (Out, OutputBuffer);
+        SizeMonitor = componentFactory.CreateSizeMonitor (Output, OutputBuffer);
     }
 
     /// <inheritdoc/>
     public void Iteration ()
     {
-
         Application.RaiseIteration ();
 
-        DateTime dt = Now ();
+        DateTime dt = DateTime.Now;
         int timeAllowed = 1000 / Math.Max(1,(int)Application.MaximumIterationsPerSecond);
 
         IterationImpl ();
 
-        TimeSpan took = Now () - dt;
+        TimeSpan took = DateTime.Now - dt;
         TimeSpan sleepFor = TimeSpan.FromMilliseconds (timeAllowed) - took;
 
         Logging.TotalIterationMetric.Record (took.Milliseconds);
@@ -142,6 +136,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     internal void IterationImpl ()
     {
+        // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
         ToplevelTransitionManager.RaiseReadyEventIfNeeded ();
@@ -153,7 +148,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
                                      || AnySubViewsNeedDrawn (Application.Top)
                                      || (Application.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (Application.Mouse.MouseGrabView));
 
-            bool sizeChanged = ConsoleSizeMonitor.Poll ();
+            bool sizeChanged = SizeMonitor.Poll ();
 
             if (needsDrawOrLayout || sizeChanged)
             {
@@ -161,9 +156,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
                 Application.LayoutAndDraw (true);
 
-                Out.Write (OutputBuffer);
+                Output.Write (OutputBuffer);
 
-                Out.SetCursorVisibility (CursorVisibility.Default);
+                Output.SetCursorVisibility (CursorVisibility.Default);
             }
 
             SetCursor ();
@@ -192,12 +187,12 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             // Translate to screen coordinates
             to = mostFocused.ViewportToScreen (to.Value);
 
-            Out.SetCursorPosition (to.Value.X, to.Value.Y);
-            Out.SetCursorVisibility (mostFocused.CursorVisibility);
+            Output.SetCursorPosition (to.Value.X, to.Value.Y);
+            Output.SetCursorVisibility (mostFocused.CursorVisibility);
         }
         else
         {
-            Out.SetCursorVisibility (CursorVisibility.Invisible);
+            Output.SetCursorVisibility (CursorVisibility.Invisible);
         }
     }
 

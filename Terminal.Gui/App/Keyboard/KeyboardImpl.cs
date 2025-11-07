@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -114,6 +116,7 @@ internal class KeyboardImpl : IKeyboard
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
+        //ebug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
         //Logging.Debug ($"{key}");
 
         // TODO: Add a way to ignore certain keys, esp for debugging.

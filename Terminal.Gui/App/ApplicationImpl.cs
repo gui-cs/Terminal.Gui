@@ -492,7 +492,7 @@ public class ApplicationImpl : IApplication
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");
 
-        Coordinator.StartAsync ().Wait ();
+        Coordinator.StartInputTask ().Wait ();
 
         if (Driver == null)
         {
@@ -507,7 +507,7 @@ public class ApplicationImpl : IApplication
 
     private IMainLoopCoordinator CreateSubcomponents<TInputRecord> (Func<IComponentFactory<TInputRecord>> fallbackFactory) where TInputRecord : struct
     {
-        ConcurrentQueue<TInputRecord> inputBuffer = new ();
+        ConcurrentQueue<TInputRecord> inputQueue = new ();
         ApplicationMainLoop<TInputRecord> loop = new ();
 
         IComponentFactory<TInputRecord> cf;
@@ -521,6 +521,6 @@ public class ApplicationImpl : IApplication
             cf = fallbackFactory ();
         }
 
-        return new MainLoopCoordinator<TInputRecord> (_timedEvents, inputBuffer, loop, cf);
+        return new MainLoopCoordinator<TInputRecord> (_timedEvents, inputQueue, loop, cf);
     }
 }

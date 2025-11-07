@@ -1,7 +1,8 @@
 ﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Interface for writing console output
+///     The low-level interface drivers implement to provide output capabilities; encapsulates platform-specific
+///     output functionality.
 /// </summary>
 public interface IOutput : IDisposable
 {
@@ -33,7 +34,7 @@ public interface IOutput : IDisposable
     void SetCursorVisibility (CursorVisibility visibility);
 
     /// <summary>
-    ///     Sets the size of the console..
+    ///     Sets the size of the console.
     /// </summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
