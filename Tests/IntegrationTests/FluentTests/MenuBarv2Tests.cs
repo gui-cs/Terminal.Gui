@@ -16,7 +16,7 @@ public class MenuBarv2Tests
     public MenuBarv2Tests (ITestOutputHelper outputHelper)
     {
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-        //_out = new TestOutputWriter (outputHelper);
+        _out = new TestOutputWriter (outputHelper);
     }
 
     [Theory]

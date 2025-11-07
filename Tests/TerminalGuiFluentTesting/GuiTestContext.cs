@@ -195,7 +195,7 @@ public partial class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); }); }
 
-    public GuiTestContext ScreenShot (string title, TextWriter writer)
+    public GuiTestContext ScreenShot (string title, TextWriter? writer)
     {
         //Logging.Trace ($"{title}");
         return WaitIteration (() =>
@@ -203,7 +203,7 @@ public partial class GuiTestContext : IDisposable
                                   writer.WriteLine (title + ":");
                                   var text = Application.ToString ();
 
-                                  writer.WriteLine (text);
+                                  writer?.WriteLine (text);
                               });
     }
 
