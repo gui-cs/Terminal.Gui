@@ -126,7 +126,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             else
             {
                 Assert.Fail ("Specifying driver name not yet supported");
-                //Application.Init ((IConsoleDriver)Activator.CreateInstance (_forceDriver));
+                //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
             }
         }
     }

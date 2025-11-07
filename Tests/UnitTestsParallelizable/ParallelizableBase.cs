@@ -16,7 +16,7 @@ public abstract class ParallelizableBase
     /// </summary>
     /// <param name="width">Width of the driver buffer</param>
     /// <param name="height">Height of the driver buffer</param>
-    /// <returns>A configured IFakeConsoleDriver instance</returns>
+    /// <returns>A configured IFakeDriver instance</returns>
     protected static IDriver CreateFakeDriver (int width = 80, int height = 25)
     {
         var output = new FakeOutput ();

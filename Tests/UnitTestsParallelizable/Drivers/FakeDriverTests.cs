@@ -72,13 +72,13 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     [Fact]
 
-    public void SetupFakeDriver_Driver_Is_IConsoleDriver ()
+    public void SetupFakeDriver_Driver_Is_IDriver ()
     {
         IDriver driver = CreateFakeDriver ();
 
         Assert.NotNull (driver);
 
-        // Should be IConsoleDriver
+        // Should be IDriver
         Assert.IsAssignableFrom<IDriver> (driver);
 
         _output.WriteLine ($"Driver type: {driver.GetType ().Name}");

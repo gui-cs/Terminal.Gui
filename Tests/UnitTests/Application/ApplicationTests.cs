@@ -246,7 +246,7 @@ public class ApplicationTests
     ////[InlineData (typeof (UnixDriver))]
     //public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
     //{
-    //    var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
+    //    var driver = (IDriver)Activator.CreateInstance (driverType);
     //    Application.Init (driverName: driverType.Name);
     //    Assert.NotNull (Application.Driver);
     //    Assert.NotEqual (driver, Application.Driver);
@@ -602,7 +602,7 @@ public class ApplicationTests
         driver.Cols = 100;
         driver.Rows = 30;
 
-        // IConsoleDriver.Screen isn't assignable
+        // IDriver.Screen isn't assignable
         //driver.Screen = new (0, 0, driver.Cols, Rows);
 
         Application.Driver!.SetScreenSize (100, 30);

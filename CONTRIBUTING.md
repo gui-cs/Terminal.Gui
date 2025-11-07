@@ -325,7 +325,7 @@ dotnet build --configuration Release --no-restore
 **`/Terminal.Gui/`** - Core library (496 C# files):
 - `App/` - Application lifecycle (`Application.cs` static class, `RunState`, `MainLoop`)
 - `Configuration/` - `ConfigurationManager` for settings
-- `Drivers/` - Console driver implementations (`IConsoleDriver`, `NetDriver`, `UnixDriver`, `WindowsDriver`)
+- `Drivers/` - Console driver implementations (`Dotnet`, `Windows`, `Unix`, `Fake`)
 - `Drawing/` - Rendering system (attributes, colors, glyphs)
 - `Input/` - Keyboard and mouse input handling
 - `ViewBase/` - Core `View` class hierarchy and layout

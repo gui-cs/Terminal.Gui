@@ -85,7 +85,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         // use reflection to get the list of drivers
         List<Type?> driverTypes = new ();
 
-        // Only inspect the IConsoleDriver assembly
+        // Only inspect the IDriver assembly
         var asm = typeof (IDriver).Assembly;
 
         foreach (Type? type in asm.GetTypes ())

@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.Drivers;
 
-/// <summary>Base interface for Terminal.Gui ConsoleDriver implementations.</summary>
+/// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
 /// <remarks>
 ///     There are currently four implementations: UnixDriver, WindowsDriver, DotNetDriver, and FakeDriver
 /// </remarks>
