@@ -333,7 +333,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     </para>
     ///     <para>
     ///         When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},IDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>

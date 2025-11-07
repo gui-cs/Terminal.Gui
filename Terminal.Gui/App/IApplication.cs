@@ -235,7 +235,6 @@ public interface IApplication
     ///     </para>
     ///     <para>
     ///         When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},IDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>
