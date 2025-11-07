@@ -23,8 +23,7 @@ public class PopoverMenuTests
     public void EnableForDesign_CreatesMenuItems (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var popoverMenu = new PopoverMenu ();
                                                 Application.Top!.Add (popoverMenu);
@@ -44,8 +43,7 @@ public class PopoverMenuTests
                                                 View? cutMenuItem = popoverMenu.GetMenuItemsOfAllSubMenus ().FirstOrDefault (v => v?.Title == "Cu_t");
 
                                                 Assert.NotNull (cutMenuItem);
-                                            })
-                                     .Stop ();
+                                            });
     }
 
     private static object o = new  ();
@@ -57,43 +55,40 @@ public class PopoverMenuTests
         lock (o)
         {
             using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
-                                            {
-                                                var popoverMenu = new PopoverMenu ();
-
-                                                // Call EnableForDesign
-                                                Toplevel top = Application.Top!;
-                                                popoverMenu.EnableForDesign (ref top);
-
-                                                View? view = new View ()
+                                         .Then (() =>
                                                 {
-                                                    CanFocus = true,
-                                                    Height = Dim.Auto (),
-                                                    Width = Dim.Auto (),
-                                                    Id = "focusableView",
-                                                    Text = "View",
-                                                };
-                                                Application.Top!.Add (view);
+                                                    var popoverMenu = new PopoverMenu ();
 
-                                                // EnableForDesign sets to true; undo that
-                                                popoverMenu.Visible = false;
+                                                    // Call EnableForDesign
+                                                    Toplevel top = Application.Top!;
+                                                    popoverMenu.EnableForDesign (ref top);
 
-                                                Application.Popover!.Register (popoverMenu);
+                                                    View? view = new View ()
+                                                    {
+                                                        CanFocus = true,
+                                                        Height = Dim.Auto (),
+                                                        Width = Dim.Auto (),
+                                                        Id = "focusableView",
+                                                        Text = "View",
+                                                    };
+                                                    Application.Top!.Add (view);
 
-                                                view.SetFocus ();
-                                            })
-                                     .WaitIteration ()
-                                     .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
-                                     .ScreenShot ("PopoverMenu initial state", _out)
-                                     .Then (() => Application.Popover!.Show (Application.Popover.Popovers.First ()))
-                                     .WaitIteration ()
-                                     .ScreenShot ($"After Show", _out)
-                                     .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertEqual ("Cu_t", Application.Navigation!.GetFocused ()!.Title)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                                    // EnableForDesign sets to true; undo that
+                                                    popoverMenu.Visible = false;
+
+                                                    Application.Popover!.Register (popoverMenu);
+
+                                                    view.SetFocus ();
+                                                })
+                                         .WaitIteration ()
+                                         .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                         .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
+                                         .ScreenShot ("PopoverMenu initial state", _out)
+                                         .Then (() => Application.Popover!.Show (Application.Popover.Popovers.First ()))
+                                         .WaitIteration ()
+                                         .ScreenShot ($"After Show", _out)
+                                         .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
+                                         .AssertEqual ("Cu_t", Application.Navigation!.GetFocused ()!.Title);
         }
         
     }
@@ -103,8 +98,7 @@ public class PopoverMenuTests
     public void QuitKey_Hides (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var popoverMenu = new PopoverMenu ();
 
@@ -140,11 +134,9 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .WriteOutLogs (_out)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
-                                     .AssertFalse (Application.Popover!.Popovers.Cast<PopoverMenu> ().FirstOrDefault()!.Visible)
-                                     .AssertNull (Application.Popover!.GetActivePopover())
-                                     .AssertTrue (Application.Top!.Running)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                     .AssertFalse (Application.Popover!.Popovers.Cast<PopoverMenu> ().FirstOrDefault ()!.Visible)
+                                     .AssertNull (Application.Popover!.GetActivePopover ())
+                                     .AssertTrue (Application.Top!.Running);
     }
 
     [Theory]
@@ -152,8 +144,7 @@ public class PopoverMenuTests
     public void QuitKey_Restores_Focus_Correctly (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var popoverMenu = new PopoverMenu ();
 
@@ -181,18 +172,16 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .ScreenShot ("PopoverMenu initial state", _out)
                                      .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsNotType<MenuItemv2>(Application.Navigation!.GetFocused())
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .Then (() => Application.Popover!.Show (Application.Popover.Popovers.First ()))
                                      .WaitIteration ()
                                      .ScreenShot ($"After Show", _out)
                                      .AssertTrue (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsType<MenuItemv2>(Application.Navigation!.GetFocused())
+                                     .AssertIsType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsNotType<MenuItemv2>(Application.Navigation!.GetFocused())
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ());
     }
 
     [Theory]
@@ -200,8 +189,7 @@ public class PopoverMenuTests
     public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var popoverMenu = new PopoverMenu ();
 
@@ -227,7 +215,7 @@ public class PopoverMenuTests
                                                 view.SetFocus ();
                                             })
                                      .WaitIteration ()
-                                     .AssertIsNotType<MenuItemv2>(Application.Navigation!.GetFocused())
+                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("PopoverMenu initial state", _out)
                                      .Then (() => Application.Popover!.Show (Application.Popover.Popovers.First ()))
                                      .WaitIteration ()
@@ -238,9 +226,7 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertTrue (Application.Top!.Running)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                     .AssertTrue (Application.Top!.Running);
     }
 
 
@@ -264,10 +250,9 @@ public class PopoverMenuTests
         };
 
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
-                                                var popoverMenu = new PopoverMenu();
+                                                var popoverMenu = new PopoverMenu ();
                                                 Toplevel top = Application.Top!;
                                                 popoverMenu.EnableForDesign (ref top);
                                                 Application.Popover!.Register (popoverMenu);
@@ -276,9 +261,7 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .Focus (testView)
                                      .EnqueueKeyEvent (Key.Space)
-                                     .AssertEqual (1, spaceKeyDownCount)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                     .AssertEqual (1, spaceKeyDownCount);
     }
 
     [Theory]
@@ -301,8 +284,7 @@ public class PopoverMenuTests
         };
 
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var popoverMenu = new PopoverMenu ();
                                                 Toplevel top = Application.Top!;
@@ -313,9 +295,7 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .Focus (testView)
                                      .EnqueueKeyEvent (Key.Enter)
-                                     .AssertEqual (1, enterKeyDownCount)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                     .AssertEqual (1, enterKeyDownCount);
     }
 
     [Theory]
@@ -338,8 +318,7 @@ public class PopoverMenuTests
                             };
 
         using GuiTestContext c = With.A<Window> (50, 20, d)
-                                     .Then (
-                                            () =>
+                                     .Then (() =>
                                             {
                                                 var popoverMenu = new PopoverMenu ();
                                                 Toplevel top = Application.Top!;
@@ -350,9 +329,7 @@ public class PopoverMenuTests
                                      .WaitIteration ()
                                      .Focus (testView)
                                      .EnqueueKeyEvent (Application.QuitKey)
-                                     .AssertEqual (1, quitKeyDownCount)
-                                     .WriteOutLogs (_out)
-                                     .Stop ();
+                                     .AssertEqual (1, quitKeyDownCount);
     }
 
 
@@ -371,18 +348,17 @@ public class PopoverMenuTests
                                      // Click in main area inside border
                                      .RightClick (1, 1)
                                      .Then (() =>
-                                     {
-                                         // Test depends on menu having a border
-                                         IPopover? popover = Application.Popover!.GetActivePopover ();
-                                         Assert.NotNull (popover);
-                                         var popoverMenu = popover as PopoverMenu;
-                                         popoverMenu!.Root!.BorderStyle = LineStyle.Single;
-                                     })
+                                            {
+                                                // Test depends on menu having a border
+                                                IPopover? popover = Application.Popover!.GetActivePopover ();
+                                                Assert.NotNull (popover);
+                                                var popoverMenu = popover as PopoverMenu;
+                                                popoverMenu!.Root!.BorderStyle = LineStyle.Single;
+                                            })
                                      .WaitIteration ()
                                      .ScreenShot ("After open menu", _out)
                                      .LeftClick (2, 2)
-                                     .Stop ()
-                                     .WriteOutLogs (_out);
+                                     .Stop ();
         Assert.True (clicked);
     }
 
@@ -428,9 +404,7 @@ public class PopoverMenuTests
                                      .ScreenShot ("After open submenu", _out)
                                      .EnqueueKeyEvent (Key.CursorDown)
                                      .EnqueueKeyEvent (Key.Enter)
-                                     .ScreenShot ("Menu should be closed after selecting", _out)
-                                     .Stop ()
-                                     .WriteOutLogs (_out);
+                                     .ScreenShot ("Menu should be closed after selecting", _out);
         Assert.True (clicked);
     }
 

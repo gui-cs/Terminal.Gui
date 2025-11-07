@@ -62,7 +62,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public IInput<TInputRecord>? InputImpl { get; set; }  // Set by MainLoopCoordinator
 
     /// <inheritdoc />
-    /// <inheritdoc />
     public void EnqueueKeyDownEvent (Key key)
     {
         // Convert Key → TInputRecord
@@ -88,8 +87,13 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc />
     public virtual void EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
-        Logging.Critical("EnqueueMouseEvent is not implemented.");
-        //throw new NotImplementedException ();
+        // Base implementation: For drivers where TInputRecord cannot represent mouse events
+        // (e.g., ConsoleKeyInfo), derived classes should override this method.
+        // See WindowsInputProcessor for an example implementation that converts MouseEventArgs
+        // to InputRecord and enqueues it.
+        Logging.Logger.LogWarning (
+            $"{DriverName ?? "Unknown"} driver's InputProcessor does not support EnqueueMouseEvent. " +
+            "Override this method to enable mouse event enqueueing for testing.");
     }
 
     /// <inheritdoc />

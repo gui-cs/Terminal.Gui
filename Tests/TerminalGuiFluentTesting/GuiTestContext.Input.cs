@@ -36,7 +36,7 @@ public partial class GuiTestContext
         return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Clicked,
-            ScreenPosition = new (screenX, screenY)
+            ScreenPosition = new (screenX, screenY),
         });
     }
 
@@ -57,17 +57,23 @@ public partial class GuiTestContext
 
     private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
-        return WaitIteration (() =>
-                              {
-                                  if (Application.Driver is { })
-                                  {
-                                      Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
-                                  }
-                                  else
-                                  {
-                                      Fail ("Expected Application.Driver to be non-null.");
-                                  }
-                              });
+            // Enqueue the mouse event
+        WaitIteration (() =>
+        {
+            if (Application.Driver is { })
+            {
+                mouseEvent.Position = mouseEvent.ScreenPosition;
+
+                Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+            }
+            else
+            {
+                Fail ("Expected Application.Driver to be non-null.");
+            }
+        });
+
+        // Wait for the event to be processed (similar to EnqueueKeyEvent)
+        return WaitIteration ();
     }
 
 
@@ -81,6 +87,7 @@ public partial class GuiTestContext
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
         mouseEvent.ScreenPosition = screen;
+        mouseEvent.Position = new Point (0, 0);
 
         EnqueueMouseEvent (mouseEvent);
 
