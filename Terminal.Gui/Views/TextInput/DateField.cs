@@ -36,7 +36,7 @@ public class DateField : TextField
     private CultureInfo _culture = CultureInfo.CurrentCulture;
 
     /// <summary>CultureInfo for date. The default is CultureInfo.CurrentCulture.</summary>
-    public CultureInfo Culture
+    public CultureInfo? Culture
     {
         get => _culture;
         set
@@ -382,7 +382,7 @@ public class DateField : TextField
 
     private void SetInitialProperties (DateTime date)
     {
-        _format = $" {StandardizeDateFormat (Culture.DateTimeFormat.ShortDatePattern)}";
+        _format = $" {StandardizeDateFormat (Culture!.DateTimeFormat.ShortDatePattern)}";
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
         Date = date;
         CursorPosition = 1;
