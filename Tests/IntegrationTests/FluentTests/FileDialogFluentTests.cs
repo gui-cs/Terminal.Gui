@@ -108,7 +108,6 @@ public class FileDialogFluentTests
         using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
-                          .WaitIteration ()
                           .AssertFalse (sd!.Canceled)
                           .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
@@ -181,7 +180,6 @@ public class FileDialogFluentTests
                           .EnqueueKeyEvent (Key.CursorDown)
                           .ScreenShot ("After navigate down in tree", _out)
                           .EnqueueKeyEvent (Key.Enter)
-                          .WaitIteration ()
                           .AssertFalse (sd!.Canceled)
                           .AssertContains ("empty-dir", sd!.FileName);
     }
@@ -245,7 +243,6 @@ public class FileDialogFluentTests
                           .EnqueueKeyEvent (Key.L)
                           .EnqueueKeyEvent (Key.L)
                           .EnqueueKeyEvent (Key.O)
-                          .WaitIteration ()
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd!.Path)
                           .LeftClick<Button> (b => b.Text == "►_Tree")
@@ -330,7 +327,6 @@ public class FileDialogFluentTests
         }
 
         c.LeftClick<Button> (b => b.Text == "_Save");
-        c.WaitIteration ();
         c.AssertFalse (sd!.Canceled);
 
         if (preserve)
