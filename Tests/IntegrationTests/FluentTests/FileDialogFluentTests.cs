@@ -119,11 +119,11 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
-                          .ScreenShot ("Save dialog", _out)
-                          .EnqueueKeyEvent (Key.S.WithAlt)
-                          .AssertFalse (sd!.Canceled)
-                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
+        using GuiTestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+                                     .ScreenShot ("Save dialog", _out)
+                                     .EnqueueKeyEvent (Key.S.WithAlt)
+                                     .AssertFalse (sd!.Canceled)
+                                     .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
 
     }
 
