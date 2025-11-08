@@ -54,9 +54,9 @@ public class ScenarioTests : TestsAllViews
 
         Application.ForceDriver = "FakeDriver";
         scenario!.Main ();
+        Application.ForceDriver = string.Empty;
         scenario.Dispose ();
         scenario = null;
-        Application.ForceDriver = string.Empty;
 
         Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
@@ -344,35 +344,38 @@ public class ScenarioTests : TestsAllViews
 
         var iterations = 0;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
-
-                                     if (iterations < viewClasses.Count)
-                                     {
-                                         classListView.MoveDown ();
-
-                                         if (curView is { })
-                                         {
-                                             Assert.Equal (
-                                                           curView.GetType ().Name,
-                                                           viewClasses.Values.ToArray () [classListView.SelectedItem].Name
-                                                          );
-                                         }
-                                     }
-                                     else
-                                     {
-                                         Application.RequestStop ();
-                                     }
-                                 };
-
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (viewClasses.Count, iterations);
 
         top.Dispose ();
         Application.Shutdown ();
         ConfigurationManager.Disable (resetToHardCodedDefaults: true);
+
+        return;
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            iterations++;
+
+            if (iterations < viewClasses.Count)
+            {
+                classListView.MoveDown ();
+
+                if (curView is { })
+                {
+                    Assert.Equal (
+                                  curView.GetType ().Name,
+                                  viewClasses.Values.ToArray () [classListView.SelectedItem].Name);
+                }
+            }
+            else
+            {
+                Application.RequestStop ();
+            }
+        }
 
         void DimPosChanged (View? view)
         {
@@ -636,9 +639,57 @@ public class ScenarioTests : TestsAllViews
         var iterations = 0;
         object? token = null;
 
-        Application.Iteration += (s, a) =>
+        Application.Iteration += OnApplicationOnIteration;
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        generic.Main ();
+        Application.ForceDriver = string.Empty;
+
+        Assert.Equal (0, abortCount);
+
+        // 1 is when we add the key event
+        // 2 is when the key event is grabbed and KeyDown is raised
+        Assert.True (iterations is > 1 and < 10);
+
+        generic.Dispose ();
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (View.Instances);
+#endif
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object? _, EventArgs<bool> args)
+        {
+            _output.WriteLine ($"InitializedChanged: {args.Value}");
+
+            if (args.Value is true)
+            {
+                Application.KeyDown += (_, a) =>
+                                       {
+                                           _output.WriteLine ($"KeyDown: {a.KeyCode}");
+                                           Assert.Equal (Application.QuitKey, a);
+                                       };
+                _output.WriteLine ($"AddKeyEvent {Application.QuitKey}");
+                Application.Driver!.EnqueueKeyEvent (Application.QuitKey);
+            }
+
+            if (args.Value is false)
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+            }
+
+        }
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
         {
             iterations++;
+
             if (token == null)
             {
                 // Timeout only must start at first iteration
@@ -659,41 +710,6 @@ public class ScenarioTests : TestsAllViews
                 _output.WriteLine ("'Generic' had to be force quit!");
                 Application.RequestStop ();
             }
-        };
-
-        Application.InitializedChanged += (_, args) =>
-                                          {
-                                              _output.WriteLine ($"InitializedChanged: {args.Value}");
-                                              if (args.Value is true)
-                                              {
-                                                  Application.KeyDown += (_, a) =>
-                                                                         {
-                                                                             _output.WriteLine ($"KeyDown: {a.KeyCode}");
-                                                                             Assert.Equal (Application.QuitKey, a);
-                                                                         };
-                                                  _output.WriteLine ($"AddKeyEvent {Application.QuitKey}");
-                                                  Application.Driver!.EnqueueKeyEvent (Application.QuitKey);
-
-                                              }
-                                          };
-
-        generic.Main ();
-
-        Assert.Equal (0, abortCount);
-
-        // 1 is when we add the key event
-        // 2 is when the key event is grabbed and KeyDown is raised
-        Assert.True (iterations is > 1 and < 10);
-
-        generic.Dispose ();
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
-        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
-        Application.ForceDriver = string.Empty;
-
-#if DEBUG_IDISPOSABLE
-        Assert.Empty (View.Instances);
-#endif
+        }
     }
 }

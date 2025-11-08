@@ -56,7 +56,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <summary>
     ///     Starts the input loop thread in separate task (returning immediately).
     /// </summary>
-    public async Task StartInputTask ()
+    public async Task StartInputTaskAsync ()
     {
         Logging.Trace ("Booting... ()");
 

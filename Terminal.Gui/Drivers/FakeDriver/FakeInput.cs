@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     <see cref="IInput{TInputRecord}"/> implementation that uses a fake input source for testing.
 ///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
-///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>.
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>.
 /// </summary>
 public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>
 {

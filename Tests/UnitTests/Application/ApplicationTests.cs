@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
@@ -323,17 +324,13 @@ public class ApplicationTests
             Assert.Null (Application.Popover);
 
             // Events - Can't check
-            //Assert.Null (Application.NotifyNewRunState);
-            //Assert.Null (Application.NotifyNewRunState);
-            //Assert.Null (Application.Iteration);
-            //Assert.Null (Application.SizeChanging);
-            //Assert.Null (Application.GrabbedMouse);
-            //Assert.Null (Application.UnGrabbingMouse);
-            //Assert.Null (Application.GrabbedMouse);
-            //Assert.Null (Application.UnGrabbedMouse);
-            //Assert.Null (Application.MouseEvent);
-            //Assert.Null (Application.KeyDown);
-            //Assert.Null (Application.KeyUp);
+            Assert.Null (GetEventSubscribers (typeof (Application), "InitializedChanged"));
+            Assert.Null (GetEventSubscribers (typeof (Application), "NotifyNewRunState"));
+            Assert.Null (GetEventSubscribers (typeof (Application), "Iteration"));
+            Assert.Null (GetEventSubscribers (typeof (Application), "ScreenChanged"));
+            //Assert.Null (GetEventSubscribers (typeof (Application.Mouse), "MouseEvent"));
+            //Assert.Null (GetEventSubscribers (typeof (Application.Keyboard), "KeyDown"));
+            //Assert.Null (GetEventSubscribers (typeof (Application.Keyboard), "KeyUp"));
         }
 
         CheckReset ();
@@ -369,6 +366,29 @@ public class ApplicationTests
         CheckReset ();
 
         ThrowOnJsonErrors = false;
+    }
+
+    /// <summary>
+    /// Gets the delegate backing an event to check if it has subscribers.
+    /// Returns null if there are no subscribers.
+    /// </summary>
+    private static Delegate? GetEventSubscribers (Type type, string eventName)
+    {
+        // Events are backed by private fields with the same name (or sometimes EventName + "Event")
+        var field = type.GetField (eventName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        if (field == null)
+        {
+            // Try alternative naming convention
+            field = type.GetField (eventName + "Event", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        if (field == null)
+        {
+            throw new ArgumentException ($"Event field '{eventName}' not found on type {type.Name}");
+        }
+
+        return (Delegate?)field.GetValue (null); // null for static fields
     }
 
     [Fact]

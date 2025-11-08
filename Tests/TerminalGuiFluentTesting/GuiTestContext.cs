@@ -108,7 +108,7 @@ public partial class GuiTestContext : IDisposable
         // Wait for booting to complete with a timeout to avoid hangs
         if (!_booting.WaitAsync (_timeout).Result)
         {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
+            throw new TimeoutException ($"Application failed to start within {_timeout}ms.");
         }
 
         ResizeConsole (width, height);
@@ -391,7 +391,7 @@ public partial class GuiTestContext : IDisposable
         {
             if (sw.Elapsed > _timeout)
             {
-                throw new TimeoutException ("Failed to reach condition within the time limit");
+                throw new TimeoutException ($"Failed to reach condition within {_timeout}ms");
             }
 
             c = WaitIteration ();
