@@ -92,5 +92,8 @@ public class FakeOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
-    protected override void Write (StringBuilder output) { _output.Append (output); }
+    protected override void Write (StringBuilder output)
+    {
+        _output.Append (output);
+    }
 }

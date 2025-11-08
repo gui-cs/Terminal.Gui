@@ -82,6 +82,7 @@ public partial class GuiTestContext : IDisposable
                                      Application.Run (t); // This will block, but it's on a background thread now
 
                                      t.Dispose ();
+                                     Logging.Trace("Application.Run completed");
                                      Application.Shutdown ();
                                      _runCancellationTokenSource.Cancel ();
                                  }
@@ -141,6 +142,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     public void Dispose ()
     {
+        Logging.Trace($"Disposing GuiTestContext");
         Stop ();
 
         if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
@@ -282,7 +284,7 @@ public partial class GuiTestContext : IDisposable
     {
         try
         {
-            //Logging.Trace ($"Invoking action via WaitIteration");
+            Logging.Trace ($"Invoking action via WaitIteration");
             WaitIteration (doAction);
         }
         catch (Exception ex)
@@ -317,6 +319,7 @@ public partial class GuiTestContext : IDisposable
             throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
+        Logging.Trace($"WaitIteration started");
         action ??= () => { };
         CancellationTokenSource ctsActionCompleted = new ();
 
@@ -377,7 +380,7 @@ public partial class GuiTestContext : IDisposable
         throw new (reason);
     }
 
-    internal GuiTestContext WaitUntil (Func<bool> condition)
+    public GuiTestContext WaitUntil (Func<bool> condition)
     {
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
@@ -460,7 +463,7 @@ public partial class GuiTestContext : IDisposable
         switch (driverType)
         {
             case TestDriver.DotNet:
-                _output = new NetOutput ();
+                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 

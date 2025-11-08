@@ -16,8 +16,11 @@ public class FakeInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
     /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo input)
     {
+        Logging.Trace ($"input: {input.KeyChar}");
+
         foreach (Tuple<char, ConsoleKeyInfo> released in Parser.ProcessInput (Tuple.Create (input.KeyChar, input)))
         {
+            Logging.Trace($"released: {released.Item1}");
             ProcessAfterParsing (released.Item2);
         }
     }

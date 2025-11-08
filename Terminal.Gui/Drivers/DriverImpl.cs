@@ -32,7 +32,7 @@ internal class DriverImpl : IDriver
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
-    
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
@@ -94,7 +94,10 @@ internal class DriverImpl : IDriver
     {
         if (InputProcessor.DriverName is { } && InputProcessor.DriverName.Contains ("fake"))
         {
-            Clipboard = new FakeClipboard ();
+            if (Clipboard is null)
+            {
+                Clipboard = new FakeClipboard ();
+            }
 
             return;
         }

@@ -466,28 +466,27 @@ public class ApplicationImpl : IApplication
         // Decide which driver to use - component factory type takes priority
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
-            Application.RunningUnitTests = true;
-            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            Coordinator = CreateSubcomponents (fallbackFactory: () => new FakeComponentFactory ());
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
-            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            Coordinator = CreateSubcomponents (fallbackFactory: () => new WindowsComponentFactory ());
         }
         else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
         {
-            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+            Coordinator = CreateSubcomponents (fallbackFactory: () => new NetComponentFactory ());
         }
         else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
         {
-            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            Coordinator = CreateSubcomponents (fallbackFactory: () => new UnixComponentFactory ());
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
-            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            Coordinator = CreateSubcomponents (fallbackFactory: () => new WindowsComponentFactory ());
         }
         else
         {
-            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            Coordinator = CreateSubcomponents (fallbackFactory: () => new UnixComponentFactory ());
         }
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");
