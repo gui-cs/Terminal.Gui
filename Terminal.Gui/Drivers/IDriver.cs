@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.Drivers;
 
-/// <summary>Base interface for Terminal.Gui ConsoleDriver implementations.</summary>
+/// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
 /// <remarks>
 ///     There are currently four implementations: UnixDriver, WindowsDriver, DotNetDriver, and FakeDriver
 /// </remarks>
@@ -29,7 +29,8 @@ public interface IDriver
     ///     Interface for classes responsible for reporting the current
     ///     size of the terminal window.
     /// </summary>
-    ISizeMonitor ConsoleSizeMonitor { get; }
+    ISizeMonitor SizeMonitor { get; }
+
     /// <summary>Get the operating system clipboard.</summary>
     /// 
     IClipboard? Clipboard { get; }
@@ -278,10 +279,10 @@ public interface IDriver
     event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Adds a key input event to the driver. For unit tests.
+    ///     Enqueues a key input event to the driver. For unit tests.
     /// </summary>
     /// <param name="key"></param>
-    void AddKeyEvent (Key key);
+    void EnqueueKeyEvent (Key key);
 
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution

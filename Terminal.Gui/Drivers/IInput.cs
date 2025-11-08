@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
 
@@ -7,7 +8,8 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Implementations run on a separate thread (started by <see cref="Terminal.Gui.App.MainLoopCoordinator{TInputRecord}"/>)
+///         Implementations run on a separate thread (started by
+///         <see cref="Terminal.Gui.App.MainLoopCoordinator{TInputRecord}.StartInputTask"/>)
 ///         and continuously read platform-specific input from the console, placing it into a thread-safe queue
 ///         for processing by <see cref="IInputProcessor"/> on the main UI thread.
 ///     </para>
@@ -30,7 +32,9 @@ namespace Terminal.Gui.Drivers;
 ///     <list type="number">
 ///         <item><see cref="Initialize"/> - Set the shared input queue</item>
 ///         <item><see cref="Run"/> - Start the perpetual read loop (blocks until cancelled)</item>
-///         <item>Loop calls <see cref="InputImpl{TInputRecord}.Peek"/> and <see cref="InputImpl{TInputRecord}.Read"/></item>
+///         <item>
+///             Loop calls <see cref="InputImpl{TInputRecord}.Peek"/> and <see cref="InputImpl{TInputRecord}.Read"/>
+///         </item>
 ///         <item>Cancellation via `runCancellationToken` or <see cref="ExternalCancellationTokenSource"/></item>
 ///     </list>
 ///     <para>
@@ -120,13 +124,14 @@ public interface IInput<TInputRecord> : IDisposable
     ///     provided by <see cref="Initialize"/>.
     /// </summary>
     /// <param name="runCancellationToken">
-    ///     The primary cancellation token that stops the input loop. Typically provided by
+    ///     The primary cancellation token that stops the input loop. Provided by
     ///     <see cref="Terminal.Gui.App.MainLoopCoordinator{TInputRecord}"/> and triggered
     ///     during application shutdown.
     /// </param>
     /// <remarks>
     ///     <para>
-    ///         <b>Threading:</b> This method runs on a dedicated input thread and blocks until
+    ///         <b>Threading:</b> This method runs on a dedicated input thread created by
+    ///         <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>. and blocks until
     ///         cancellation is requested. It should never be called from the main UI thread.
     ///     </para>
     ///     <para>

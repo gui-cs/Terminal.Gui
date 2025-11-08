@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     <see cref="IKeyConverter{T}"/> capable of converting the
@@ -24,9 +23,6 @@ internal class NetKeyConverter : IKeyConverter<ConsoleKeyInfo>
         return EscSeqUtils.MapKey (adjustedInput);
     }
 
-    /// <inheritdoc />
-    public ConsoleKeyInfo ToKeyInfo (Key key)
-    {
-        return ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key.KeyCode);
-    }
+    /// <inheritdoc/>
+    public ConsoleKeyInfo ToKeyInfo (Key key) { return ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key.KeyCode); }
 }

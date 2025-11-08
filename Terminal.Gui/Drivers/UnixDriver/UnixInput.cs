@@ -166,7 +166,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     }
 
     /// <inheritdoc />
-    protected override bool Peek ()
+    public override bool Peek ()
     {
         try
         {
@@ -203,7 +203,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     }
 
     /// <inheritdoc/>
-    protected override IEnumerable<char> Read ()
+    public override IEnumerable<char> Read ()
     {
         while (poll (_pollMap!, (uint)_pollMap!.Length, 0) != 0)
         {

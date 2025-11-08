@@ -43,7 +43,10 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
     }
 
-    internal static int MainThreadId
+    /// <summary>
+    ///     Gets or sets the main thread ID for the application.
+    /// </summary>
+    public static int? MainThreadId
     {
         get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
         set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
@@ -85,7 +88,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         // use reflection to get the list of drivers
         List<Type?> driverTypes = new ();
 
-        // Only inspect the IConsoleDriver assembly
+        // Only inspect the IDriver assembly
         var asm = typeof (IDriver).Assembly;
 
         foreach (Type? type in asm.GetTypes ())

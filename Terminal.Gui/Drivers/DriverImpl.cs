@@ -29,25 +29,13 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 internal class DriverImpl : IDriver
 {
-    private readonly string? _driverName;
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
-
-    /// <summary>
-    ///     The event fired when the screen changes (size, position, etc.).
-    /// </summary>
-    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
-
-    public IInputProcessor InputProcessor { get; }
-    public IOutputBuffer OutputBuffer { get; }
-
-    public ISizeMonitor ConsoleSizeMonitor { get; }
-
+    
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
-    /// <param name="input"></param>
     /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
     /// <param name="outputBuffer">The output buffer for managing screen state.</param>
     /// <param name="output">The output interface for rendering to the console.</param>
@@ -75,7 +63,7 @@ internal class DriverImpl : IDriver
                                          MouseEvent?.Invoke (s, e);
                                      };
 
-        ConsoleSizeMonitor = sizeMonitor;
+        SizeMonitor = sizeMonitor;
 
         sizeMonitor.SizeChanged += (_, e) =>
                                    {
@@ -86,6 +74,21 @@ internal class DriverImpl : IDriver
 
         CreateClipboard ();
     }
+
+    /// <summary>
+    ///     The event fired when the screen changes (size, position, etc.).
+    /// </summary>
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
+
+    /// <inheritdoc/>
+    public IInputProcessor InputProcessor { get; }
+
+    /// <inheritdoc/>
+    public IOutputBuffer OutputBuffer { get; }
+
+    /// <inheritdoc/>
+    public ISizeMonitor SizeMonitor { get; }
+
 
     private void CreateClipboard ()
     {
@@ -462,7 +465,7 @@ internal class DriverImpl : IDriver
     public void WriteRaw (string ansi) { _output.Write (ansi); }
 
     /// <inheritdoc/>
-    public void AddKeyEvent (Key key)
+    public void EnqueueKeyEvent (Key key)
     {
         InputProcessor.EnqueueKeyDownEvent (key);
     }

@@ -1,10 +1,45 @@
 ﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Interface for writing console output
+///     The low-level interface drivers implement to provide output capabilities; encapsulates platform-specific
+///     output functionality.
 /// </summary>
 public interface IOutput : IDisposable
 {
+    /// <summary>
+    ///     Gets the current position of the console cursor.
+    /// </summary>
+    /// <returns></returns>
+    Point GetCursorPosition ();
+
+    /// <summary>
+    ///     Returns the current size of the console in rows/columns (i.e.
+    ///     of characters not pixels).
+    /// </summary>
+    /// <returns></returns>
+    public Size GetSize ();
+
+    /// <summary>
+    ///     Moves the console cursor to the given location.
+    /// </summary>
+    /// <param name="col"></param>
+    /// <param name="row"></param>
+    void SetCursorPosition (int col, int row);
+
+    /// <summary>
+    ///     Updates the console cursor (the blinking underscore) to be hidden,
+    ///     visible etc.
+    /// </summary>
+    /// <param name="visibility"></param>
+    void SetCursorVisibility (CursorVisibility visibility);
+
+    /// <summary>
+    ///     Sets the size of the console.
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    void SetSize (int width, int height);
+
     /// <summary>
     ///     Writes the given text directly to the console. Use to send
     ///     ansi escape codes etc. Regular screen output should use the
@@ -18,39 +53,4 @@ public interface IOutput : IDisposable
     /// </summary>
     /// <param name="buffer"></param>
     void Write (IOutputBuffer buffer);
-
-    /// <summary>
-    ///     Returns the current size of the console in rows/columns (i.e.
-    ///     of characters not pixels).
-    /// </summary>
-    /// <returns></returns>
-    public Size GetSize ();
-
-    /// <summary>
-    ///     Updates the console cursor (the blinking underscore) to be hidden,
-    ///     visible etc.
-    /// </summary>
-    /// <param name="visibility"></param>
-    void SetCursorVisibility (CursorVisibility visibility);
-
-    /// <summary>
-    ///     Gets the current position of the console cursor.
-    /// </summary>
-    /// <returns></returns>
-    Point GetCursorPosition ();
-
-    /// <summary>
-    ///     Moves the console cursor to the given location.
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
-    void SetCursorPosition (int col, int row);
-
-    /// <summary>
-    ///     Sets the size of the console..
-    /// </summary>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    void SetSize (int width, int height);
-
 }

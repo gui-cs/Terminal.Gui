@@ -13,85 +13,6 @@ namespace TerminalGuiFluentTesting;
 /// </summary>
 public partial class GuiTestContext : IDisposable
 {
-    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
-    private readonly Task? _runTask;
-    internal Exception? _ex;
-    internal IOutput? _output;
-    internal readonly FakeInput _fakeInput = new ();
-    internal View? _lastView;
-    private readonly object _logsLock = new ();
-    private StringBuilder? _logsSb;
-    internal TestDriver _driverType;
-    private SizeMonitorImpl? _sizeMonitor;
-    internal TimeSpan _timeout;
-    private IApplication? _origApp;
-    private ILogger? _origLogger;
-    private ApplicationImpl? _applicationImpl;
-    private readonly SemaphoreSlim _booting;
-    private readonly bool _runApplication;
-    private readonly TextWriter? _logWriter;
-
-    /// <summary>
-    ///     Constructor for tests that need to run the application with Application.Run.
-    /// </summary>
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
-    {
-        _logWriter = logWriter;
-        _runApplication = true;
-        _booting = new (0, 1);
-
-        CommonInit (width, height, driver, timeout);
-
-        // Start the application in a background thread
-        _runTask = Task.Run (
-                             () =>
-                             {
-                                 try
-                                 {
-                                     InitializeApplication ();
-
-                                     _booting.Release ();
-
-                                     Toplevel t = topLevelBuilder ();
-                                     t.Closed += (s, e) => { Finished = true; };
-                                     Application.Run (t); // This will block, but it's on a background thread now
-
-                                     t.Dispose ();
-                                     Application.Shutdown ();
-                                     _runCancellationTokenSource.Cancel ();
-                                 }
-                                 catch (OperationCanceledException)
-                                 { }
-                                 catch (Exception ex)
-                                 {
-                                     _ex = ex;
-                                     _fakeInput.ExternalCancellationTokenSource!.Cancel ();
-                                 }
-                                 finally
-                                 {
-                                     CleanupApplication ();
-                                     if (_logWriter != null)
-                                     {
-                                         WriteOutLogs (_logWriter);
-                                     }
-                                 }
-                             },
-                             _runCancellationTokenSource.Token);
-
-        // Wait for booting to complete with a timeout to avoid hangs
-        if (!_booting.WaitAsync (_timeout).Result)
-        {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
-        }
-
-        ResizeConsole (width, height);
-
-        if (_ex != null)
-        {
-            throw new ("Application crashed", _ex);
-        }
-    }
-
     /// <summary>
     ///     Constructor for tests that only need Application.Init without running the main loop.
     ///     Uses the driver's default screen size instead of forcing a specific size.
@@ -136,6 +57,359 @@ public partial class GuiTestContext : IDisposable
     }
 
     /// <summary>
+    ///     Constructor for tests that need to run the application with Application.Run.
+    /// </summary>
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    {
+        _logWriter = logWriter;
+        _runApplication = true;
+        _booting = new (0, 1);
+
+        CommonInit (width, height, driver, timeout);
+
+        // Start the application in a background thread
+        _runTask = Task.Run (
+                             () =>
+                             {
+                                 try
+                                 {
+                                     InitializeApplication ();
+
+                                     _booting.Release ();
+
+                                     Toplevel t = topLevelBuilder ();
+                                     t.Closed += (s, e) => { Finished = true; };
+                                     Application.Run (t); // This will block, but it's on a background thread now
+
+                                     t.Dispose ();
+                                     Application.Shutdown ();
+                                     _runCancellationTokenSource.Cancel ();
+                                 }
+                                 catch (OperationCanceledException)
+                                 { }
+                                 catch (Exception ex)
+                                 {
+                                     _ex = ex;
+                                     _fakeInput.ExternalCancellationTokenSource!.Cancel ();
+                                 }
+                                 finally
+                                 {
+                                     CleanupApplication ();
+
+                                     if (_logWriter != null)
+                                     {
+                                         WriteOutLogs (_logWriter);
+                                     }
+                                 }
+                             },
+                             _runCancellationTokenSource.Token);
+
+        // Wait for booting to complete with a timeout to avoid hangs
+        if (!_booting.WaitAsync (_timeout).Result)
+        {
+            throw new TimeoutException ("Application failed to start within the allotted time.");
+        }
+
+        ResizeConsole (width, height);
+
+        if (_ex != null)
+        {
+            throw new ("Application crashed", _ex);
+        }
+    }
+
+    internal readonly FakeInput _fakeInput = new ();
+    internal Exception? _ex;
+    internal IOutput? _output;
+    internal View? _lastView;
+    internal TestDriver _driverType;
+    internal TimeSpan _timeout;
+    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
+    private readonly Task? _runTask;
+    private readonly object _logsLock = new ();
+    private readonly SemaphoreSlim _booting;
+    private readonly bool _runApplication;
+    private readonly TextWriter? _logWriter;
+    private StringBuilder? _logsSb;
+    private SizeMonitorImpl? _sizeMonitor;
+    private IApplication? _origApp;
+    private ILogger? _origLogger;
+    private ApplicationImpl? _applicationImpl;
+
+    /// <summary>
+    ///     Cleanup to avoid state bleed between tests
+    /// </summary>
+    public void Dispose ()
+    {
+        Stop ();
+
+        if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
+        {
+            throw new ("Application was hard stopped...", _ex);
+        }
+
+        // ✅ Dispose the linked token source
+        _fakeInput.ExternalCancellationTokenSource?.Dispose ();
+        _runCancellationTokenSource?.Dispose ();
+        _fakeInput.Dispose ();
+        _output?.Dispose ();
+        _booting.Dispose ();
+    }
+
+    /// <summary>
+    ///     Gets whether the application has finished running; aka Stop has been called and the main loop has exited.
+    /// </summary>
+    public bool Finished { get; private set; }
+
+    /// <summary>
+    ///     Returns the last set position of the cursor.
+    /// </summary>
+    /// <returns></returns>
+    public Point GetCursorPosition () { return _output!.GetCursorPosition (); }
+
+    /// <summary>
+    ///     Hard stops the application and waits for the background thread to exit.HardStop is used by the source generator for
+    ///     wrapping Xunit assertions.
+    /// </summary>
+    public void HardStop (Exception? ex = null)
+    {
+        if (ex != null)
+        {
+            _ex = ex;
+        }
+
+        Logging.Critical ($"HardStop called with exception: {_ex}");
+
+        // With linked tokens, just cancelling ExternalCancellationTokenSource
+        // will cascade to stop everything
+        _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+        WriteOutLogs (_logWriter);
+        Stop ();
+    }
+
+    /// <summary>
+    ///     Simulates changing the console size e.g. by resizing window in your operating system
+    /// </summary>
+    /// <param name="width">new Width for the console.</param>
+    /// <param name="height">new Height for the console.</param>
+    /// <returns></returns>
+    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); }); }
+
+    public GuiTestContext ScreenShot (string title, TextWriter? writer)
+    {
+        //Logging.Trace ($"{title}");
+        return WaitIteration (() =>
+                              {
+                                  writer.WriteLine (title + ":");
+                                  var text = Application.ToString ();
+
+                                  writer?.WriteLine (text);
+                              });
+    }
+
+    /// <summary>
+    ///     Stops the application and waits for the background thread to exit.
+    /// </summary>
+    public GuiTestContext Stop ()
+    {
+        Logging.Trace ($"Stopping application for driver: {GetDriverName ()}");
+
+        if (_runTask is null || _runTask.IsCompleted)
+        {
+            // If we didn't run the application, just cleanup
+            if (!_runApplication && !Finished)
+            {
+                try
+                {
+                    Application.Shutdown ();
+                }
+                catch
+                {
+                    // Ignore errors during shutdown
+                }
+
+                CleanupApplication ();
+            }
+
+            return this;
+        }
+
+        WaitIteration (() => { Application.RequestStop (); });
+
+        // Wait for the application to stop, but give it a 1-second timeout
+        const int waitTimeoutMs = 1000;
+
+        if (!_runTask.Wait (TimeSpan.FromMilliseconds (waitTimeoutMs)))
+        {
+            _runCancellationTokenSource.Cancel ();
+
+            // No need to manually cancel ExternalCancellationTokenSource
+
+            // App is having trouble shutting down, try sending some more shutdown stuff from this thread.
+            // If this doesn't work there will be test failures as the main loop continues to run during next test.
+            try
+            {
+                Application.RequestStop ();
+                Application.Shutdown ();
+            }
+            catch (Exception ex)
+            {
+                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Then shutdown threw {ex}");
+            }
+            finally
+            {
+                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Exception was thrown: {_ex}");
+            }
+        }
+
+        _runCancellationTokenSource.Cancel ();
+
+        if (_ex != null)
+        {
+            throw _ex; // Propagate any exception that happened in the background task
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Performs the supplied <paramref name="doAction"/> immediately.
+    ///     Enables running commands without breaking the Fluent API calls.
+    /// </summary>
+    /// <param name="doAction"></param>
+    /// <returns></returns>
+    public GuiTestContext Then (Action doAction)
+    {
+        try
+        {
+            //Logging.Trace ($"Invoking action via WaitIteration");
+            WaitIteration (doAction);
+        }
+        catch (Exception ex)
+        {
+            _ex = ex;
+            HardStop ();
+
+            throw;
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Waits until the end of the current iteration of the main loop. Optionally
+    ///     running a given <paramref name="action"/> action on the UI thread at that time.
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns></returns>
+    public GuiTestContext WaitIteration (Action? action = null)
+    {
+        // If application has already exited don't wait!
+        if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
+        {
+            Logging.Warning ("WaitIteration called after context was stopped");
+
+            return this;
+        }
+
+        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
+        {
+            throw new NotSupportedException ("Cannot WaitIteration during Invoke");
+        }
+
+        action ??= () => { };
+        CancellationTokenSource ctsActionCompleted = new ();
+
+        Application.Invoke (() =>
+                            {
+                                try
+                                {
+                                    action ();
+
+                                    //Logging.Trace ("Action completed");
+                                    ctsActionCompleted.Cancel ();
+                                }
+                                catch (Exception e)
+                                {
+                                    Logging.Warning ($"Action failed with exception: {e}");
+                                    _ex = e;
+                                    _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+                                }
+                            });
+
+        // Blocks until either the token or the hardStopToken is cancelled.
+        // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
+        // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
+        WaitHandle.WaitAny (
+                            [
+                                _runCancellationTokenSource.Token.WaitHandle,
+                                ctsActionCompleted.Token.WaitHandle
+                            ]);
+
+        // Logging.Trace ($"Return from WaitIteration");
+        return this;
+    }
+
+    /// <summary>
+    ///     Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <returns></returns>
+    public GuiTestContext WriteOutLogs (TextWriter? writer)
+    {
+        if (writer is null)
+        {
+            return this;
+        }
+
+        lock (_logsLock)
+        {
+            writer.WriteLine (_logsSb!.ToString ());
+        }
+
+        return this; //WaitIteration();
+    }
+
+    internal void Fail (string reason)
+    {
+        Logging.Error ($"{reason}");
+
+        throw new (reason);
+    }
+
+    internal GuiTestContext WaitUntil (Func<bool> condition)
+    {
+        GuiTestContext? c = null;
+        var sw = Stopwatch.StartNew ();
+
+        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+
+        while (!condition ())
+        {
+            if (sw.Elapsed > _timeout)
+            {
+                throw new TimeoutException ("Failed to reach condition within the time limit");
+            }
+
+            c = WaitIteration ();
+        }
+
+        return c ?? this;
+    }
+
+    private void CleanupApplication ()
+    {
+        Logging.Trace ("CleanupApplication");
+        _fakeInput.ExternalCancellationTokenSource = null;
+
+        ApplicationImpl.ChangeInstance (_origApp);
+        Logging.Logger = _origLogger;
+        Finished = true;
+
+        Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
+    }
+
+    /// <summary>
     ///     Common initialization for both constructors.
     /// </summary>
     private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
@@ -153,7 +427,6 @@ public partial class GuiTestContext : IDisposable
                                                                                                       new ThreadSafeStringWriter (_logsSb, _logsLock))))
                                       .CreateLogger ("Test Logging");
         Logging.Logger = logger;
-
 
         // ✅ Link _runCancellationTokenSource with a timeout
         // This creates a token that responds to EITHER the run cancellation OR timeout
@@ -216,302 +489,23 @@ public partial class GuiTestContext : IDisposable
         Logging.Trace ($"Driver: {GetDriverName ()}. Timeout: {_timeout}");
     }
 
+    private string GetDriverName ()
+    {
+        return _driverType switch
+               {
+                   TestDriver.Windows => "windows",
+                   TestDriver.DotNet => "dotnet",
+                   TestDriver.Unix => "unix",
+                   TestDriver.Fake => "fake",
+                   _ =>
+                       throw new ArgumentOutOfRangeException ()
+               };
+    }
+
     private void InitializeApplication ()
     {
         ApplicationImpl.ChangeInstance (_applicationImpl);
 
         _applicationImpl?.Init (null, GetDriverName ());
-    }
-
-    private void CleanupApplication ()
-    {
-        Logging.Trace ("CleanupApplication");
-        _fakeInput.ExternalCancellationTokenSource = null;
-
-        ApplicationImpl.ChangeInstance (_origApp);
-        Logging.Logger = _origLogger;
-        Finished = true;
-
-        Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
-    }
-
-    private string GetDriverName ()
-    {
-        return _driverType switch
-        {
-            TestDriver.Windows => "windows",
-            TestDriver.DotNet => "dotnet",
-            TestDriver.Unix => "unix",
-            TestDriver.Fake => "fake",
-            _ =>
-                throw new ArgumentOutOfRangeException ()
-        };
-    }
-
-    /// <summary>
-    ///     Stops the application and waits for the background thread to exit.
-    /// </summary>
-    public GuiTestContext Stop ()
-    {
-        Logging.Trace ($"Stopping application for driver: {GetDriverName ()}");
-        if (_runTask is null || _runTask.IsCompleted)
-        {
-            // If we didn't run the application, just cleanup
-            if (!_runApplication && !Finished)
-            {
-                try
-                {
-                    Application.Shutdown ();
-                }
-                catch
-                {
-                    // Ignore errors during shutdown
-                }
-
-                CleanupApplication ();
-            }
-            return this;
-        }
-
-        WaitIteration (() => { Application.RequestStop (); });
-
-        // Wait for the application to stop, but give it a 1-second timeout
-        const int waitTimeoutMs = 1000;
-        if (!_runTask.Wait (TimeSpan.FromMilliseconds (waitTimeoutMs)))
-        {
-            _runCancellationTokenSource.Cancel ();
-            // No need to manually cancel ExternalCancellationTokenSource
-
-            // App is having trouble shutting down, try sending some more shutdown stuff from this thread.
-            // If this doesn't work there will be test failures as the main loop continues to run during next test.
-            try
-            {
-                Application.RequestStop ();
-                Application.Shutdown ();
-            }
-            catch (Exception ex)
-            {
-                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Then shutdown threw {ex}");
-            }
-            finally
-            {
-                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Exception was thrown: {_ex}");
-            }
-        }
-
-        _runCancellationTokenSource.Cancel ();
-
-        if (_ex != null)
-        {
-            throw _ex; // Propagate any exception that happened in the background task
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Hard stops the application and waits for the background thread to exit.HardStop is used by the source generator for
-    ///     wrapping Xunit assertions.
-    /// </summary>
-    public void HardStop (Exception? ex = null)
-    {
-        if (ex != null)
-        {
-            _ex = ex;
-        }
-
-        Logging.Critical ($"HardStop called with exception: {_ex}");
-        // With linked tokens, just cancelling ExternalCancellationTokenSource
-        // will cascade to stop everything
-        _fakeInput.ExternalCancellationTokenSource?.Cancel ();
-        WriteOutLogs (_logWriter);
-        Stop ();
-    }
-
-    /// <summary>
-    ///     Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
-    /// </summary>
-    /// <param name="writer"></param>
-    /// <returns></returns>
-    public GuiTestContext WriteOutLogs (TextWriter? writer)
-    {
-        if (writer is null)
-        {
-            return this;
-        }
-
-        lock (_logsLock)
-        {
-            writer.WriteLine (_logsSb!.ToString ());
-        }
-
-        return this; //WaitIteration();
-    }
-
-    /// <summary>
-    ///     Waits until the end of the current iteration of the main loop. Optionally
-    ///     running a given <paramref name="action"/> action on the UI thread at that time.
-    /// </summary>
-    /// <param name="action"></param>
-    /// <returns></returns>
-    public GuiTestContext WaitIteration (Action? action = null)
-    {
-        // If application has already exited don't wait!
-        if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
-        {
-            Logging.Warning ($"WaitIteration called after context was stopped");
-            return this;
-        }
-
-        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
-        {
-            throw new NotSupportedException ("Cannot WaitIteration during Invoke");
-        }
-
-        action ??= () => { };
-        CancellationTokenSource ctsActionCompleted = new ();
-
-        Application.Invoke (() =>
-                            {
-                                try
-                                {
-                                    action ();
-                                    Logging.Trace ("Action completed");
-                                    ctsActionCompleted.Cancel ();
-                                }
-                                catch (Exception e)
-                                {
-                                    Logging.Warning ($"Action failed with exception: {e}");
-                                    _ex = e;
-                                    _fakeInput.ExternalCancellationTokenSource?.Cancel ();
-                                }
-                            });
-
-        // Blocks until either the token or the hardStopToken is cancelled.
-        // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
-        // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
-        WaitHandle.WaitAny (
-                            [
-                                _runCancellationTokenSource.Token.WaitHandle,
-                                ctsActionCompleted.Token.WaitHandle
-                            ]);
-
-        Logging.Trace ($"Return from WaitIteration");
-        return this;
-    }
-
-    /// <summary>
-    ///     Performs the supplied <paramref name="doAction"/> immediately.
-    ///     Enables running commands without breaking the Fluent API calls.
-    /// </summary>
-    /// <param name="doAction"></param>
-    /// <returns></returns>
-    public GuiTestContext Then (Action doAction)
-    {
-        try
-        {
-            Logging.Trace ($"Invoking action via WaitIteration");
-            WaitIteration (doAction);
-        }
-        catch (Exception ex)
-        {
-            _ex = ex;
-            HardStop ();
-
-            throw;
-        }
-
-        return this;
-    }
-
-    internal GuiTestContext WaitUntil (Func<bool> condition)
-    {
-        GuiTestContext? c = null;
-        var sw = Stopwatch.StartNew ();
-
-        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
-
-        while (!condition ())
-        {
-            if (sw.Elapsed > _timeout)
-            {
-                throw new TimeoutException ("Failed to reach condition within the time limit");
-            }
-
-            c = WaitIteration ();
-        }
-
-        return c ?? this;
-    }
-
-    internal void Fail (string reason)
-    {
-        Logging.Trace ($"{reason}");
-
-        Stop ();
-
-        throw new (reason);
-    }
-
-    /// <summary>
-    ///     Returns the last set position of the cursor.
-    /// </summary>
-    /// <returns></returns>
-    public Point GetCursorPosition ()
-    {
-        return _output!.GetCursorPosition ();
-    }
-
-    /// <summary>
-    ///     Simulates changing the console size e.g. by resizing window in your operating system
-    /// </summary>
-    /// <param name="width">new Width for the console.</param>
-    /// <param name="height">new Height for the console.</param>
-    /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height)
-    {
-        Logging.Trace ($"{width}x{height}");
-
-        return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); });
-    }
-
-    public GuiTestContext ScreenShot (string title, TextWriter writer)
-    {
-        Logging.Trace ($"{title}");
-        return WaitIteration (() =>
-                              {
-                                  writer.WriteLine (title + ":");
-                                  var text = Application.ToString ();
-
-                                  writer.WriteLine (text);
-                              });
-    }
-
-    /// <summary>
-    ///     Gets whether the application has finished running; aka Stop has been called and the main loop has exited.
-    /// </summary>
-    public bool Finished { get; private set; }
-
-    /// <summary>
-    ///     Cleanup to avoid state bleed between tests
-    /// </summary>
-    public void Dispose ()
-    {
-        Stop ();
-
-
-        if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
-        {
-            throw new (
-                       "Application was hard stopped...",
-                       _ex);
-        }
-
-        // ✅ Dispose the linked token source
-        _fakeInput.ExternalCancellationTokenSource?.Dispose ();
-        _runCancellationTokenSource?.Dispose ();
-        _fakeInput.Dispose ();
-        _output.Dispose ();
-        _booting.Dispose ();
     }
 }

@@ -672,7 +672,7 @@ public class ScenarioTests : TestsAllViews
                                                                              Assert.Equal (Application.QuitKey, a);
                                                                          };
                                                   _output.WriteLine ($"AddKeyEvent {Application.QuitKey}");
-                                                  Application.Driver!.AddKeyEvent (Application.QuitKey);
+                                                  Application.Driver!.EnqueueKeyEvent (Application.QuitKey);
 
                                               }
                                           };

@@ -62,7 +62,7 @@ public partial class GuiTestContext
             }
 
             // No, try tab to the next (or first)
-            Send (Application.NextTabKey);
+            EnqueueKeyEvent (Application.NextTabKey);
             WaitIteration ();
 
             next = t.MostFocused;

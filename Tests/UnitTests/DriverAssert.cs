@@ -25,7 +25,7 @@ internal partial class DriverAssert
     ///     <paramref name="expectedAttributes"/>.
     /// </param>
     /// <param name="output"></param>
-    /// <param name="driver">The IConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="expectedAttributes"></param>
     public static void AssertDriverAttributesAre (
         string expectedLook,
@@ -142,7 +142,7 @@ internal partial class DriverAssert
     /// <summary>Asserts that the driver contents match the expected contents, optionally ignoring any trailing whitespace.</summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
-    /// <param name="driver">The IConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="ignoreLeadingWhitespace"></param>
     public static void AssertDriverContentsAre (
         string expectedLook,
@@ -188,7 +188,7 @@ internal partial class DriverAssert
     /// </summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
-    /// <param name="driver">The IConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <returns></returns>
     public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,

@@ -3,12 +3,12 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>.
 /// </summary>
 public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>, IDisposable
 {
-    private readonly NetWinVTConsole _adjustConsole;
-
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
@@ -32,6 +32,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
                 Logging.Logger.LogCritical (
                                             ex,
                                             "NetWinVTConsole could not be constructed i.e. could not configure terminal modes. May indicate running in non-interactive session e.g. unit testing CI");
+
                 return;
             }
         }
@@ -46,36 +47,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         Console.TreatControlCAsInput = true;
     }
 
-    /// <inheritdoc/>
-    protected override bool Peek ()
-    {
-        if (Application.RunningUnitTests)
-        {
-            return false;
-        }
-
-        return Console.KeyAvailable;
-    }
-
-    /// <inheritdoc/>
-    protected override IEnumerable<ConsoleKeyInfo> Read ()
-    {
-        while (Console.KeyAvailable)
-        {
-            yield return Console.ReadKey (true);
-        }
-    }
-
-    private void FlushConsoleInput ()
-    {
-        if (!Application.RunningUnitTests)
-        {
-            while (Console.KeyAvailable)
-            {
-                Console.ReadKey (intercept: true);
-            }
-        }
-    }
+    private readonly NetWinVTConsole _adjustConsole;
 
     /// <inheritdoc/>
     public override void Dispose ()
@@ -102,8 +74,36 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         FlushConsoleInput ();
     }
 
-    public void AddInput (ConsoleKeyInfo input)
+    /// <inheritdoc />
+    public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
+
+    /// <inheritdoc/>
+    public override bool Peek ()
     {
-        throw new NotImplementedException ();
+        try
+        {
+            return Console.KeyAvailable;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <inheritdoc/>
+    public override IEnumerable<ConsoleKeyInfo> Read ()
+    {
+        while (Console.KeyAvailable)
+        {
+            yield return Console.ReadKey (true);
+        }
+    }
+
+    private void FlushConsoleInput ()
+    {
+        while (Console.KeyAvailable)
+        {
+            Console.ReadKey (true);
+        }
     }
 }

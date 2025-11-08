@@ -80,7 +80,7 @@ public class UICatalog
         // Get allowed driver names
         string? [] allowedDrivers = Application.GetDriverTypes ().Item2.ToArray ();
 
-        Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.")
+        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.")
             .FromAmong (allowedDrivers!);
         driverOption.SetDefaultValue (string.Empty);
         driverOption.AddAlias ("-d");

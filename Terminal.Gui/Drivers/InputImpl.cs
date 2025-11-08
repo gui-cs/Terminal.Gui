@@ -5,6 +5,8 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Base class for reading console input in perpetual loop.
+///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>.
 /// </summary>
 /// <typeparam name="TInputRecord"></typeparam>
 public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
@@ -73,14 +75,14 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
     ///     to read from console.
     /// </summary>
     /// <returns></returns>
-    protected abstract bool Peek ();
+    public abstract bool Peek ();
 
     /// <summary>
     ///     Returns the available data without blocking, called when <see cref="Peek"/>
     ///     returns <see langword="true"/>.
     /// </summary>
     /// <returns></returns>
-    protected abstract IEnumerable<TInputRecord> Read ();
+    public abstract IEnumerable<TInputRecord> Read ();
 
     /// <inheritdoc/>
     public virtual void Dispose () { }

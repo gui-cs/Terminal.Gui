@@ -1,4 +1,5 @@
-﻿using TerminalGuiFluentTesting;
+﻿#nullable enable
+using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
@@ -6,7 +7,7 @@ namespace IntegrationTests.FluentTests;
 
 public class NavigationTests (ITestOutputHelper outputHelper)
 {
-    private readonly TextWriter _out = new TestOutputWriter (outputHelper);
+    private readonly TextWriter? _out = new TestOutputWriter (outputHelper);
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
@@ -31,45 +32,43 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                                 Toplevel top = Application.Top!;
                                                 Application.Top!.Add (w1, w2, w3);
                                             })
-                                     .WaitIteration ()
                                      .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v3.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v3.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v3.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v3.HasFocus)
-                                     .Send (Key.Tab)
+                                     .EnqueueKeyEvent (Key.Tab)
                                      .AssertTrue (v4.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v5.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .Send (Key.Tab)
+                                     .EnqueueKeyEvent (Key.Tab)
                                      .AssertTrue (v6.HasFocus)
-                                     .Send (Key.F6.WithShift)
+                                     .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v4.HasFocus)
-                                     .Send (Key.F6)
+                                     .EnqueueKeyEvent (Key.F6)
                                      .AssertTrue (v6.HasFocus)
-                                     .WriteOutLogs (_out)
                                      .Stop ();
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);

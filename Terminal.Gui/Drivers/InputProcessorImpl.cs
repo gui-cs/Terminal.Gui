@@ -5,112 +5,15 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Processes the queued input buffer contents - which must be of Type <typeparamref name="TInputRecord"/>.
+///     Processes the queued input queue contents - which must be of Type <typeparamref name="TInputRecord"/>.
 ///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
-///     events and data models.
+///     events and data models. Runs on the main loop thread.
 /// </summary>
 public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDisposable where TInputRecord : struct
 {
     /// <summary>
-    ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
-    /// </summary>
-    private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
-
-    internal AnsiResponseParser<TInputRecord> Parser { get; } = new ();
-
-    /// <summary>
-    ///     Class responsible for translating the driver specific native input class <typeparamref name="TInputRecord"/> e.g.
-    ///     <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
-    ///     internal library representations of Keys).
-    /// </summary>
-    public IKeyConverter<TInputRecord> KeyConverter { get; }
-
-    /// <summary>
-    ///     Input buffer which will be drained from by this class.
-    /// </summary>
-    public ConcurrentQueue<TInputRecord> InputBuffer { get; }
-
-    /// <inheritdoc />
-    public string? DriverName { get; init; }
-
-    /// <inheritdoc/>
-    public IAnsiResponseParser GetParser () { return Parser; }
-
-    private readonly MouseInterpreter _mouseInterpreter = new ();
-
-    /// <inheritdoc />
-    public event EventHandler<Key>? KeyDown;
-
-    /// <inheritdoc />
-    public event EventHandler<string>? AnsiSequenceSwallowed;
-
-    /// <inheritdoc />
-    public void RaiseKeyDownEvent (Key a)
-    {
-        Logging.Trace ($"{nameof (InputProcessorImpl<TInputRecord>)} raised {a}");
-        KeyDown?.Invoke (this, a);
-    }
-
-    /// <inheritdoc />
-    public event EventHandler<Key>? KeyUp;
-
-    /// <inheritdoc />
-    public void RaiseKeyUpEvent (Key a) { KeyUp?.Invoke (this, a); }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public IInput<TInputRecord>? InputImpl { get; set; }  // Set by MainLoopCoordinator
-
-    /// <inheritdoc />
-    /// <inheritdoc />
-    public void EnqueueKeyDownEvent (Key key)
-    {
-        // Convert Key → TInputRecord
-        TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
-
-        // If input supports testing, use Peek/Read pipeline
-        if (InputImpl is ITestableInput<TInputRecord> testableInput)
-        {
-            testableInput.AddInput (inputRecord);
-        }
-    }
-
-    /// <inheritdoc />
-    public void EnqueueKeyUpEvent (Key key)
-    {
-        // TODO: Determine if we can still support this on Windows
-        throw new NotImplementedException ();
-    }
-
-    /// <inheritdoc />
-    public event EventHandler<MouseEventArgs>? MouseEvent;
-
-    /// <inheritdoc />
-    public virtual void EnqueueMouseEvent (MouseEventArgs mouseEvent)
-    {
-        Logging.Critical("EnqueueMouseEvent is not implemented.");
-        //throw new NotImplementedException ();
-    }
-
-    /// <inheritdoc />
-    public void RaiseMouseEvent (MouseEventArgs a)
-    {
-        // Ensure ScreenPosition is set
-        a.ScreenPosition = a.Position;
-
-        foreach (MouseEventArgs e in _mouseInterpreter.Process (a))
-        {
-            // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
-
-            // Pass on
-            MouseEvent?.Invoke (this, e);
-        }
-    }
-
-    /// <summary>
     ///     Constructs base instance including wiring all relevant
-    ///     parser events and setting <see cref="InputBuffer"/> to
+    ///     parser events and setting <see cref="InputQueue"/> to
     ///     the provided thread safe input collection.
     /// </summary>
     /// <param name="inputBuffer">The collection that will be populated with new input (see <see cref="IInput{T}"/>)</param>
@@ -120,7 +23,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// </param>
     protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter)
     {
-        InputBuffer = inputBuffer;
+        InputQueue = inputBuffer;
         Parser.HandleMouse = true;
         Parser.Mouse += (s, e) => RaiseMouseEvent (e);
 
@@ -144,10 +47,112 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         KeyConverter = keyConverter;
     }
 
+    /// <summary>
+    ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    /// </summary>
+    private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
+
+    internal AnsiResponseParser<TInputRecord> Parser { get; } = new ();
+
+    /// <summary>
+    ///     Class responsible for translating the driver specific native input class <typeparamref name="TInputRecord"/> e.g.
+    ///     <see cref="ConsoleKeyInfo"/> into the Terminal.Gui <see cref="Key"/> class (used for all
+    ///     internal library representations of Keys).
+    /// </summary>
+    public IKeyConverter<TInputRecord> KeyConverter { get; }
+
+    /// <summary>
+    ///     The input queue which is filled by <see cref="IInput{TInputRecord}"/> implementations running on the input thread.
+    ///     Implementations of this class should dequeue from this queue in <see cref="ProcessQueue"/> on the main loop thread.
+    /// </summary>
+    public ConcurrentQueue<TInputRecord> InputQueue { get; }
+
+    /// <inheritdoc />
+    public string? DriverName { get; init; }
+
+    /// <inheritdoc/>
+    public IAnsiResponseParser GetParser () { return Parser; }
+
+    private readonly MouseInterpreter _mouseInterpreter = new ();
+
+    /// <inheritdoc />
+    public event EventHandler<Key>? KeyDown;
+
+    /// <inheritdoc />
+    public event EventHandler<string>? AnsiSequenceSwallowed;
+
+    /// <inheritdoc />
+    public void RaiseKeyDownEvent (Key a)
+    {
+        KeyDown?.Invoke (this, a);
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc />
+    public void RaiseKeyUpEvent (Key a) { KeyUp?.Invoke (this, a); }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public IInput<TInputRecord>? InputImpl { get; set; }  // Set by MainLoopCoordinator
+
+    /// <inheritdoc />
+    public void EnqueueKeyDownEvent (Key key)
+    {
+        // Convert Key → TInputRecord
+        TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
+
+        // If input supports testing, use InputImplPeek/Read pipeline
+        // which runs on the input thread.
+        if (InputImpl is ITestableInput<TInputRecord> testableInput)
+        {
+            testableInput.AddInput (inputRecord);
+        }
+    }
+
+    /// <inheritdoc />
+    public void EnqueueKeyUpEvent (Key key)
+    {
+        // TODO: Determine if we can still support this on Windows
+        throw new NotImplementedException ();
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<MouseEventArgs>? MouseEvent;
+
+    /// <inheritdoc />
+    public virtual void EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    {
+        // Base implementation: For drivers where TInputRecord cannot represent mouse events
+        // (e.g., ConsoleKeyInfo), derived classes should override this method.
+        // See WindowsInputProcessor for an example implementation that converts MouseEventArgs
+        // to InputRecord and enqueues it.
+        Logging.Logger.LogWarning (
+            $"{DriverName ?? "Unknown"} driver's InputProcessor does not support EnqueueMouseEvent. " +
+            "Override this method to enable mouse event enqueueing for testing.");
+    }
+
+    /// <inheritdoc />
+    public void RaiseMouseEvent (MouseEventArgs a)
+    {
+        // Ensure ScreenPosition is set
+        a.ScreenPosition = a.Position;
+
+        foreach (MouseEventArgs e in _mouseInterpreter.Process (a))
+        {
+            // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
+
+            // Pass on
+            MouseEvent?.Invoke (this, e);
+        }
+    }
+
     /// <inheritdoc />
     public void ProcessQueue ()
     {
-        while (InputBuffer.TryDequeue (out TInputRecord input))
+        while (InputQueue.TryDequeue (out TInputRecord input))
         {
             Process (input);
         }
@@ -171,7 +176,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     /// <summary>
     ///     Process the provided single input element <paramref name="input"/>. This method
-    ///     is called sequentially for each value read from <see cref="InputBuffer"/>.
+    ///     is called sequentially for each value read from <see cref="InputQueue"/>.
     /// </summary>
     /// <param name="input"></param>
     protected abstract void Process (TInputRecord input);

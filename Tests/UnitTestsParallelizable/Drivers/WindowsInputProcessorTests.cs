@@ -5,7 +5,7 @@ using EventFlags = Terminal.Gui.Drivers.WindowsConsole.EventFlags;
 using ControlKeyState = Terminal.Gui.Drivers.WindowsConsole.ControlKeyState;
 using MouseEventRecord = Terminal.Gui.Drivers.WindowsConsole.MouseEventRecord;
 
-namespace UnitTests_Parallelizable.ConsoleDriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
 public class WindowsInputProcessorTests
 {
@@ -23,7 +23,7 @@ public class WindowsInputProcessorTests
                                bKeyDown = true,
                                UnicodeChar = 'H',
                                dwControlKeyState = ControlKeyState.CapslockOn,
-                               wVirtualKeyCode = (ConsoleKeyMapping.VK)72,
+                               wVirtualKeyCode = (VK)72,
                                wVirtualScanCode = 35
                            }
                        });
@@ -37,7 +37,7 @@ public class WindowsInputProcessorTests
                                bKeyDown = false,
                                UnicodeChar = 'H',
                                dwControlKeyState = ControlKeyState.CapslockOn,
-                               wVirtualKeyCode = (ConsoleKeyMapping.VK)72,
+                               wVirtualKeyCode = (VK)72,
                                wVirtualScanCode = 35
                            }
                        });
@@ -51,7 +51,7 @@ public class WindowsInputProcessorTests
                                bKeyDown = true,
                                UnicodeChar = 'i',
                                dwControlKeyState = ControlKeyState.NoControlKeyPressed,
-                               wVirtualKeyCode = (ConsoleKeyMapping.VK)73,
+                               wVirtualKeyCode = (VK)73,
                                wVirtualScanCode = 23
                            }
                        });
@@ -65,7 +65,7 @@ public class WindowsInputProcessorTests
                                bKeyDown = false,
                                UnicodeChar = 'i',
                                dwControlKeyState = ControlKeyState.NoControlKeyPressed,
-                               wVirtualKeyCode = (ConsoleKeyMapping.VK)73,
+                               wVirtualKeyCode = (VK)73,
                                wVirtualScanCode = 23
                            }
                        });
@@ -488,4 +488,5 @@ public class WindowsInputProcessorTests
             Assert.Equal (pair.Item4, result.Flags);
         }
     }
-}
+
+    }

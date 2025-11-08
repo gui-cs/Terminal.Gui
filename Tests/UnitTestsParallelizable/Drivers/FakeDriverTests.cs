@@ -2,7 +2,7 @@ using System.Text;
 using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ConsoleDriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
 /// <summary>
 ///     Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.
@@ -72,13 +72,13 @@ public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
 
     [Fact]
 
-    public void SetupFakeDriver_Driver_Is_IConsoleDriver ()
+    public void SetupFakeDriver_Driver_Is_IDriver ()
     {
         IDriver driver = CreateFakeDriver ();
 
         Assert.NotNull (driver);
 
-        // Should be IConsoleDriver
+        // Should be IDriver
         Assert.IsAssignableFrom<IDriver> (driver);
 
         _output.WriteLine ($"Driver type: {driver.GetType ().Name}");

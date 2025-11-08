@@ -227,7 +227,7 @@ public static partial class Application
         Top = null;
         CachedRunStateToplevel = null;
 
-        MainThreadId = -1;
+        MainThreadId = null;
         Iteration = null;
         StopAfterFirstIteration = false;
         ClearScreenNextIteration = false;

@@ -18,7 +18,8 @@ public interface IKeyConverter<TInputRecord>
     Key ToKey (TInputRecord keyInfo);
 
     /// <summary>
-    ///     Converts a <see cref="Key"/> into the native keyboard info type.
+    ///     Converts a <see cref="Key"/> into the native keyboard info type. Should be used for simulating
+    ///     key presses in unit tests.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>

@@ -16,7 +16,7 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext RightClick (int screenX, int screenY)
     {
-        return MouseEvent (new ()
+        return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button3Clicked,
             ScreenPosition = new (screenX, screenY)
@@ -33,10 +33,10 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick (int screenX, int screenY)
     {
-        return MouseEvent (new ()
+        return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Clicked,
-            ScreenPosition = new (screenX, screenY)
+            ScreenPosition = new (screenX, screenY),
         });
     }
 
@@ -49,29 +49,35 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
     {
-        return MouseEvent (new ()
+        return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Clicked,
         }, evaluator);
     }
 
-    private GuiTestContext MouseEvent (MouseEventArgs mouseEvent)
+    private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
-        return WaitIteration (() =>
-                              {
-                                  if (Application.Driver is { })
-                                  {
-                                      Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
-                                  }
-                                  else
-                                  {
-                                      Fail ("Expected Application.Driver to be non-null.");
-                                  }
-                              });
+            // Enqueue the mouse event
+        WaitIteration (() =>
+        {
+            if (Application.Driver is { })
+            {
+                mouseEvent.Position = mouseEvent.ScreenPosition;
+
+                Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+            }
+            else
+            {
+                Fail ("Expected Application.Driver to be non-null.");
+            }
+        });
+
+        // Wait for the event to be processed (similar to EnqueueKeyEvent)
+        return WaitIteration ();
     }
 
 
-    private GuiTestContext MouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
+    private GuiTestContext EnqueueMouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
@@ -81,8 +87,9 @@ public partial class GuiTestContext
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
         mouseEvent.ScreenPosition = screen;
+        mouseEvent.Position = new Point (0, 0);
 
-        MouseEvent (mouseEvent);
+        EnqueueMouseEvent (mouseEvent);
 
         return ctx;
     }
@@ -184,65 +191,22 @@ public partial class GuiTestContext
     /// <summary>
     ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public GuiTestContext Send (Key key)
+    public GuiTestContext EnqueueKeyEvent (Key key)
     {
-        Logging.Trace ($"Sending key: {key}");
+        Logging.Trace ($"Enqueuing key: {key}");
 
         // First, enqueue the input
-        //WaitIteration (() =>
-        // {
         if (Application.Driver is { })
         {
-            Application.Driver.AddKeyEvent (key);
+            Application.Driver.EnqueueKeyEvent (key);
             Thread.Sleep(100);
         }
         else
         {
             Fail ("Expected Application.Driver to be non-null.");
         }
-        // });
 
         WaitIteration ();
-
-        //// TODO: Figure out how to move the logic below into the driver's InputProcessor.EnqueueKeyDownEvent method
-        //// TODO: Or somewhere else more appropriate that's not in test infrastructure.
-        //// Wait for the input to be processed by subscribing to KeyDown event
-        //var processed = false;
-
-        //void KeyHandler (object? sender, Key k)
-        //{
-        //    if (k == key)
-        //    {
-        //        processed = true;
-        //        Logging.Trace ($"Key processed: {key}");
-        //    }
-        //}
-
-        //if (Application.Driver?.InputProcessor is { } processor)
-        //{
-        //    processor.KeyDown += KeyHandler;
-
-        //    try
-        //    {
-        //        // Wait until the key is actually processed (or timeout)
-        //        var timeout = DateTime.Now.AddMilliseconds (100);
-        //        while (!processed && DateTime.Now < timeout)
-        //        {
-        //            Logging.Trace ($"Waiting for key: {key}");
-        //            //WaitIteration ();
-        //        }
-        //        if (!processed)
-        //        {
-        //            Fail ($"Key {key} was not processed within the timeout period.");
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        processor.KeyDown -= KeyHandler;
-        //    }
-        //}
 
         return this;
     }
