@@ -41,7 +41,7 @@ public class ApplicationPopoverTests
         Assert.Null (Application.Popover);
         Application.Init (null, "fake");
         Assert.NotNull (Application.Popover);
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
@@ -63,7 +63,7 @@ public class ApplicationPopoverTests
         // Arrange
         Assert.Null (Application.Popover);
         Application.Init (null, "fake");
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);

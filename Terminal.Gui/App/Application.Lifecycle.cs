@@ -2,6 +2,10 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.VisualBasic;
+using Terminal.Gui.App;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Views;
 
 namespace Terminal.Gui.App;
 
@@ -52,33 +56,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
     }
 
-    internal static void SubscribeDriverEvents ()
-    {
-        ArgumentNullException.ThrowIfNull (Driver);
-
-        Driver.SizeChanged += Driver_SizeChanged;
-        Driver.KeyDown += Driver_KeyDown;
-        Driver.KeyUp += Driver_KeyUp;
-        Driver.MouseEvent += Driver_MouseEvent;
-    }
-
-    internal static void UnsubscribeDriverEvents ()
-    {
-        ArgumentNullException.ThrowIfNull (Driver);
-
-        Driver.SizeChanged -= Driver_SizeChanged;
-        Driver.KeyDown -= Driver_KeyDown;
-        Driver.KeyUp -= Driver_KeyUp;
-        Driver.MouseEvent -= Driver_MouseEvent;
-    }
-
-    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e)
-    {
-        RaiseScreenChangedEvent (new Rectangle (new (0, 0), e.Size!.Value));
-    }
-    private static void Driver_KeyDown (object? sender, Key e) { RaiseKeyDownEvent (e); }
-    private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
-    private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
     /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
@@ -132,19 +109,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         internal set => ApplicationImpl.Instance.Initialized = value;
     }
 
-    /// <summary>
-    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
-    /// </summary>
-    /// <remarks>
-    ///     Intended to support unit tests that need to know when the application has been initialized.
-    /// </remarks>
-    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
 
-    /// <summary>
-    ///  Raises the <see cref="InitializedChanged"/> event.
-    /// </summary>
-    internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
-    {
-        Application.InitializedChanged?.Invoke (sender, e);
-    }
+
+
 }

@@ -54,24 +54,26 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     {
         base.Dispose ();
 
-        if (Application.RunningUnitTests)
+        try
         {
-            return;
+            // Disable mouse events first
+            Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+            _adjustConsole?.Cleanup ();
+
+            // Flush any pending input so no stray events appear
+            FlushConsoleInput ();
         }
-
-        // Disable mouse events first
-        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
-
-        //Disable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-        //Set cursor key to cursor.
-        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-
-        _adjustConsole?.Cleanup ();
-
-        // Flush any pending input so no stray events appear
-        FlushConsoleInput ();
+        catch
+        {
+            // Swallow any exceptions during Dispose for unit tests
+        }
     }
 
     /// <inheritdoc />

@@ -96,9 +96,4 @@ public static partial class Application // Mouse handling
     {
         Mouse.RaiseMouseEvent (mouseEvent);
     }
-
-    /// <summary>
-    ///     INTERNAL: Clears mouse state during application reset.
-    /// </summary>
-    internal static void ResetMouseState () { Mouse.ResetState (); }
 }

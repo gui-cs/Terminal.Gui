@@ -29,7 +29,7 @@ public class PosTests ()
                        Assert.Equal (2, v.Y = 2);
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run (t);
         t.Dispose ();
@@ -96,7 +96,7 @@ public class PosTests ()
                              }
                          };
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      while (count < 20)
                                      {
@@ -166,7 +166,7 @@ public class PosTests ()
                              }
                          };
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      while (count > 0)
                                      {
@@ -210,7 +210,7 @@ public class PosTests ()
                        Assert.Equal (2, w.Y = 2);
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run (t);
         t.Dispose ();
@@ -236,7 +236,7 @@ public class PosTests ()
                        Assert.Equal (2, w.Y = 2);
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run (t);
         t.Dispose ();

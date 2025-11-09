@@ -856,7 +856,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      while (count > -1)
                                      {
@@ -1008,7 +1008,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      while (count < 21)
                                      {

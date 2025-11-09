@@ -22,7 +22,7 @@ public static partial class Application // Keyboard handling
     /// <remarks>Can be used to simulate key press events.</remarks>
     /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool RaiseKeyDownEvent (Key key) => Keyboard.RaiseKeyDownEvent (key);
+    public static bool RaiseKeyDownEvent (Key key) => ApplicationImpl.Instance.Keyboard.RaiseKeyDownEvent (key);
 
     /// <summary>
     ///     Invokes any commands bound at the Application-level to <paramref name="key"/>.
@@ -33,7 +33,7 @@ public static partial class Application // Keyboard handling
     ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
-    public static bool? InvokeCommandsBoundToKey (Key key) => Keyboard.InvokeCommandsBoundToKey (key);
+    public static bool? InvokeCommandsBoundToKey (Key key) => ApplicationImpl.Instance.Keyboard.InvokeCommandsBoundToKey (key);
 
     /// <summary>
     ///     Invokes an Application-bound command.
@@ -47,7 +47,7 @@ public static partial class Application // Keyboard handling
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
     /// <exception cref="NotSupportedException"></exception>
-    public static bool? InvokeCommand (Command command, Key key, KeyBinding binding) => Keyboard.InvokeCommand (command, key, binding);
+    public static bool? InvokeCommand (Command command, Key key, KeyBinding binding) => ApplicationImpl.Instance.Keyboard.InvokeCommand (command, key, binding);
 
     /// <summary>
     ///     Raised when the user presses a key.
@@ -63,8 +63,8 @@ public static partial class Application // Keyboard handling
     /// </remarks>
     public static event EventHandler<Key>? KeyDown
     {
-        add => Keyboard.KeyDown += value;
-        remove => Keyboard.KeyDown -= value;
+        add => ApplicationImpl.Instance.Keyboard.KeyDown += value;
+        remove => ApplicationImpl.Instance.Keyboard.KeyDown -= value;
     }
 
     /// <summary>
@@ -76,16 +76,8 @@ public static partial class Application // Keyboard handling
     /// <remarks>Can be used to simulate key release events.</remarks>
     /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool RaiseKeyUpEvent (Key key) => Keyboard.RaiseKeyUpEvent (key);
+    public static bool RaiseKeyUpEvent (Key key) => ApplicationImpl.Instance.Keyboard.RaiseKeyUpEvent (key);
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
-    public static KeyBindings KeyBindings => Keyboard.KeyBindings;
-
-    internal static void AddKeyBindings ()
-    {
-        if (Keyboard is KeyboardImpl keyboard)
-        {
-            keyboard.AddKeyBindings ();
-        }
-    }
+    public static KeyBindings KeyBindings => ApplicationImpl.Instance.Keyboard.KeyBindings;
 }

@@ -5,11 +5,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests.DialogTests;
 
-public class MessageBoxTests
+public class MessageBoxTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public MessageBoxTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Enter_Causes_Focused_Button_Click_No_Accept ()
@@ -20,7 +17,7 @@ public class MessageBoxTests
 
         var btnAcceptCount = 0;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iteration++;
 
@@ -65,7 +62,7 @@ public class MessageBoxTests
 
         var iteration = 0;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iteration++;
 
@@ -103,7 +100,7 @@ public class MessageBoxTests
 
         var btnAcceptCount = 0;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iteration++;
 
@@ -161,7 +158,7 @@ public class MessageBoxTests
 
         var mbFrame = Rectangle.Empty;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -200,7 +197,7 @@ public class MessageBoxTests
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -226,7 +223,7 @@ public class MessageBoxTests
  ║ ff ff ff ff ff ║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
 
@@ -242,7 +239,7 @@ public class MessageBoxTests
  ║ffffffffffffffff║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
                                      }
@@ -270,7 +267,7 @@ public class MessageBoxTests
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -299,7 +296,7 @@ public class MessageBoxTests
   ║    ff ff     ║
   ║     ⟦► btn ◄⟧║
   ╚══════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
 
@@ -320,7 +317,7 @@ public class MessageBoxTests
  ║ffffffffffffffff║
  ║fffffff⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
                                      }
@@ -345,7 +342,7 @@ public class MessageBoxTests
         int iterations = -1;
         Application.Driver!.SetScreenSize(100, 100);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -382,7 +379,7 @@ public class MessageBoxTests
         int iterations = -1;
         Application.Driver?.SetScreenSize(100, 100);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -415,7 +412,7 @@ public class MessageBoxTests
         int iterations = -1;
         Application.Driver?.SetScreenSize(100, 100);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -450,7 +447,7 @@ public class MessageBoxTests
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -485,7 +482,7 @@ public class MessageBoxTests
                                                             └────────────────────────────────────────────────────────────────────┘
                                                             """;
 
-                                         DriverAssert.AssertDriverContentsAre (expectedText, _output);
+                                         DriverAssert.AssertDriverContentsAre (expectedText, output);
 
                                          Application.RequestStop ();
                                      }
@@ -502,7 +499,7 @@ public class MessageBoxTests
     [AutoInitShutdown]
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
-        Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
+        ApplicationImpl.Instance.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
         int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
 
         Assert.Equal (0, res);

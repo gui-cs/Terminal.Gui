@@ -50,7 +50,7 @@ public class PosViewTests (ITestOutputHelper output)
                              }
                          };
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      while (count > 0)
                                      {

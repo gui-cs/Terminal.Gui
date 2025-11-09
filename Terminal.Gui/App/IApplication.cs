@@ -62,6 +62,18 @@ public interface IApplication
     /// </summary>
     bool ClearScreenNextIteration { get; set; }
 
+    /// <summary>
+    ///     Calls <see cref="View.PositionCursor"/> on the most focused view.
+    /// </summary>
+    /// <remarks>
+    ///     Does nothing if there is no most focused view.
+    ///     <para>
+    ///         If the most focused view is not visible within it's superview, the cursor will be hidden.
+    ///     </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
+    public bool PositionCursor ();
+
     /// <summary>Gets or sets the popover manager.</summary>
     ApplicationPopover? Popover { get; set; }
 
@@ -78,6 +90,21 @@ public interface IApplication
     /// Caches the Toplevel associated with the current RunState.
     /// </summary>
     Toplevel? CachedRunStateToplevel { get; set; }
+
+
+    /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
+    /// <returns>
+    ///     The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon
+    ///     completion.
+    /// </returns>
+    /// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
+    /// <remarks>
+    ///     This method prepares the provided <see cref="Toplevel"/> for running with the focus, it adds this to the list
+    ///     of <see cref="Toplevel"/>s, lays out the SubViews, focuses the first element, and draws the <see cref="Toplevel"/>
+    ///     in the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
+    ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
+    /// </remarks>
+    public RunState Begin (Toplevel toplevel);
 
     /// <summary>Requests that the currently running Top stop running.</summary>
     void RequestStop ();
@@ -129,6 +156,14 @@ public interface IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public void Init (IDriver? driver = null, string? driverName = null);
+
+    /// <summary>
+    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </summary>
+    /// <remarks>
+    ///     Intended to support unit tests that need to know when the application has been initialized.
+    /// </remarks>
+    public event EventHandler<EventArgs<bool>>? InitializedChanged;
 
     /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
@@ -252,6 +287,39 @@ public interface IApplication
     /// </param>
     public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null);
 
+
+    /// <summary>
+    ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
+    ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
+    /// </summary>
+    /// <remarks>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
+    ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
+    ///     when the application is done.
+    /// </remarks>
+    public event EventHandler<RunStateEventArgs>? NotifyNewRunState;
+
+    /// <summary>Notify that an existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
+    /// <remarks>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
+    ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
+    ///     when the application is done.
+    /// </remarks>
+    public event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
+
+    public void RaiseIteration ();
+
+    /// <summary>This event is raised on each iteration of the main loop.</summary>
+    /// <remarks>See also <see cref="Timeout"/></remarks>
+    public event EventHandler<IterationEventArgs>? Iteration;
+
+    /// <summary>
+    ///     Building block API: completes the execution of a <see cref="Toplevel"/> that was started with
+    ///     <see cref="Begin(Toplevel)"/> .
+    /// </summary>
+    /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
+    public void End (RunState runState);
+
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
@@ -261,9 +329,21 @@ public interface IApplication
     /// </remarks>
     public void Shutdown ();
 
+
+    // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
+    // Encapsulate all setting of initial state for Application; Having
+    // this in a function like this ensures we don't make mistakes in
+    // guaranteeing that the state of this singleton is deterministic when Init
+    // starts running and after Shutdown returns.
+    public void ResetState (bool ignoreDisposed = false);
+
     /// <summary>
     ///     Handles recurring events. These are invoked on the main UI thread - allowing for
     ///     safe updates to <see cref="View"/> instances.
     /// </summary>
     ITimedEvents? TimedEvents { get; }
+
+    /// <summary>Raised when the terminal's size changed. The new size of the terminal is provided.</summary>
+    public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
+
 }

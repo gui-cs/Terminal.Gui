@@ -29,7 +29,7 @@ public class SubViewTests
                              Assert.Equal (1, wc);
                              Assert.Equal (1, v1c);
                              Assert.Equal (1, v2c);
-                             Assert.Equal (0, sv1c); // Added after t in the Application.Iteration.
+                             Assert.Equal (0, sv1c); // Added after t in the ApplicationImpl.Instance.Iteration.
 
                              Assert.True (t.CanFocus);
                              Assert.True (w.CanFocus);
@@ -64,7 +64,7 @@ public class SubViewTests
         w.Add (v1, v2);
         t.Add (w);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      var sv1 = new View { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
 

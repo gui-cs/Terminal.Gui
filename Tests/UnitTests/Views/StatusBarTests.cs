@@ -100,7 +100,7 @@ public class StatusBarTests
                                );
         var iteration = 0;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      if (iteration == 0)
                                      {

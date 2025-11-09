@@ -110,7 +110,7 @@ public class PosCombineTests (ITestOutputHelper output)
             Assert.Equal (6, v2.Frame.Y);
         };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Assert.Throws<LayoutException> (() => Application.Run ());
         top.Dispose ();

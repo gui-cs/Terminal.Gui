@@ -10,41 +10,18 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
     {
-        get => Keyboard.QuitKey;
-        set => Keyboard.QuitKey = value;
+        get => ApplicationImpl.Instance.Keyboard.QuitKey;
+        set => ApplicationImpl.Instance.Keyboard.QuitKey = value;
     }
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
     {
-        get => Keyboard.ArrangeKey;
-        set => Keyboard.ArrangeKey = value;
+        get => ApplicationImpl.Instance.Keyboard.ArrangeKey;
+        set => ApplicationImpl.Instance.Keyboard.ArrangeKey = value;
     }
-
-    /// <summary>
-    ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
-    ///     created in <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
-    /// </summary>
-    /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
-    ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
-    ///     when the application is done.
-    /// </remarks>
-    public static event EventHandler<RunStateEventArgs>? NotifyNewRunState;
-
-    /// <summary>Notify that an existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
-    /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
-    ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
-    ///     when the application is done.
-    /// </remarks>
-#pragma warning disable CS0067 // Event is never used
-#pragma warning disable CS0414 // Event is never used
-    public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
-#pragma warning restore CS0414 // Event is never used
-#pragma warning restore CS0067 // Event is never used
-
+    
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
     /// <returns>
     ///     The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon
@@ -57,129 +34,8 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     in the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
     ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
     /// </remarks>
-    public static RunState Begin (Toplevel toplevel)
-    {
-        // TODO: Move this to IApplication/ApplicationImpl
-        ArgumentNullException.ThrowIfNull (toplevel);
+    public static RunState Begin (Toplevel toplevel) => ApplicationImpl.Instance.Begin (toplevel);
 
-        // Ensure the mouse is ungrabbed.
-        if (Mouse.MouseGrabView is { })
-        {
-            Mouse.UngrabMouse ();
-        }
-
-        var rs = new RunState (toplevel);
-
-#if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
-        {
-            // This assertion confirm if the Top was already disposed
-            Debug.Assert (Top.WasDisposed);
-            Debug.Assert (Top == CachedRunStateToplevel);
-        }
-#endif
-
-        lock (TopLevels)
-        {
-            if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
-            {
-                // If Top was already disposed and isn't on the Toplevels Stack,
-                // clean it up here if is the same as _cachedRunStateToplevel
-                if (Top == CachedRunStateToplevel)
-                {
-                    Top = null;
-                }
-                else
-                {
-                    // Probably this will never hit
-                    throw new ObjectDisposedException (Top.GetType ().FullName);
-                }
-            }
-
-            // BUGBUG: We should not depend on `Id` internally.
-            // BUGBUG: It is super unclear what this code does anyway.
-            if (string.IsNullOrEmpty (toplevel.Id))
-            {
-                var count = 1;
-                var id = (TopLevels.Count + count).ToString ();
-
-                while (TopLevels.Count > 0 && TopLevels.FirstOrDefault (x => x.Id == id) is { })
-                {
-                    count++;
-                    id = (TopLevels.Count + count).ToString ();
-                }
-
-                toplevel.Id = (TopLevels.Count + count).ToString ();
-
-                TopLevels.Push (toplevel);
-            }
-            else
-            {
-                Toplevel? dup = TopLevels.FirstOrDefault (x => x.Id == toplevel.Id);
-
-                if (dup is null)
-                {
-                    TopLevels.Push (toplevel);
-                }
-            }
-        }
-
-        if (Top is null)
-        {
-            Top = toplevel;
-        }
-
-        if ((Top?.Modal == false && toplevel.Modal)
-            || (Top?.Modal == false && !toplevel.Modal)
-            || (Top?.Modal == true && toplevel.Modal))
-        {
-            if (toplevel.Visible)
-            {
-                if (Top is { HasFocus: true })
-                {
-                    Top.HasFocus = false;
-                }
-
-                // Force leave events for any entered views in the old Top
-                if (GetLastMousePosition () is { })
-                {
-                    RaiseMouseEnterLeaveEvents (GetLastMousePosition ()!.Value, new ());
-                }
-
-                Top?.OnDeactivate (toplevel);
-                Toplevel previousTop = Top!;
-
-                Top = toplevel;
-                Top.OnActivate (previousTop);
-            }
-        }
-
-        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!toplevel.IsInitialized)
-        {
-            toplevel.BeginInit ();
-            toplevel.EndInit (); // Calls Layout
-        }
-
-        // Try to set initial focus to any TabStop
-        if (!toplevel.HasFocus)
-        {
-            toplevel.SetFocus ();
-        }
-
-        toplevel.OnLoaded ();
-
-        ApplicationImpl.Instance.LayoutAndDraw (true);
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
-
-        NotifyNewRunState?.Invoke (toplevel, new (rs));
-
-        return rs;
-    }
 
     /// <summary>
     ///     Calls <see cref="View.PositionCursor"/> on the most focused view.
@@ -191,72 +47,9 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
-    internal static bool PositionCursor ()
+    public static bool PositionCursor ()
     {
-        // TODO: Move this to IApplication/ApplicationImpl
-        // Find the most focused view and position the cursor there.
-        View? mostFocused = Navigation?.GetFocused ();
-
-        // If the view is not visible or enabled, don't position the cursor
-        if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
-        {
-            var current = CursorVisibility.Invisible;
-            Driver?.GetCursorVisibility (out current);
-
-            if (current != CursorVisibility.Invisible)
-            {
-                Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-
-            return false;
-        }
-
-        // If the view is not visible within it's superview, don't position the cursor
-        Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
-
-        Rectangle superViewViewport =
-            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver!.Screen;
-
-        if (!superViewViewport.IntersectsWith (mostFocusedViewport))
-        {
-            return false;
-        }
-
-        Point? cursor = mostFocused.PositionCursor ();
-
-        Driver!.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
-
-        if (cursor is { })
-        {
-            // Convert cursor to screen coords
-            cursor = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = cursor.Value }).Location;
-
-            // If the cursor is not in a visible location in the SuperView, hide it
-            if (!superViewViewport.Contains (cursor.Value))
-            {
-                if (currentCursorVisibility != CursorVisibility.Invisible)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
-
-                return false;
-            }
-
-            // Show it
-            if (currentCursorVisibility == CursorVisibility.Invisible)
-            {
-                Driver.SetCursorVisibility (mostFocused.CursorVisibility);
-            }
-
-            return true;
-        }
-
-        if (currentCursorVisibility != CursorVisibility.Invisible)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        return false;
+        return ApplicationImpl.Instance.PositionCursor ();
     }
 
     /// <summary>
@@ -387,9 +180,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         ApplicationImpl.Instance.LayoutAndDraw (forceRedraw);
     }
 
-    /// <summary>This event is raised on each iteration of the main loop.</summary>
-    /// <remarks>See also <see cref="Timeout"/></remarks>
-    public static event EventHandler<IterationEventArgs>? Iteration;
 
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
@@ -399,46 +189,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     {
         get => ApplicationImpl.Instance.StopAfterFirstIteration;
         set => ApplicationImpl.Instance.StopAfterFirstIteration = value;
-    }
-
-    /// <summary>Building block API: Runs the main loop for the created <see cref="Toplevel"/>.</summary>
-    /// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
-    public static void RunLoop (RunState state)
-    {
-        Debug.Fail("Legacy code");
-        ArgumentNullException.ThrowIfNull (state);
-        ObjectDisposedException.ThrowIf (state.Toplevel is null, "state");
-
-        var firstIteration = true;
-
-        for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
-        {
-            if (StopAfterFirstIteration && !firstIteration)
-            {
-                return;
-            }
-
-            firstIteration = RunIteration (ref state, firstIteration);
-        }
-
-        // Run one last iteration to consume any outstanding input events from Driver
-        // This is important for remaining OnKeyUp events.
-        RunIteration (ref state, firstIteration);
-    }
-
-    /// <summary>Run one application iteration.</summary>
-    /// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
-    /// <param name="firstIteration">
-    ///     Set to <see langword="true"/> if this is the first run loop iteration.
-    /// </param>
-    /// <returns><see langword="false"/> if at least one iteration happened.</returns>
-    public static bool RunIteration (ref RunState state, bool firstIteration = false)
-    {
-        // TODO: Move this to IApplication/ApplicationImpl
-        ApplicationImpl appImpl = (ApplicationImpl)ApplicationImpl.Instance;
-        appImpl.Coordinator?.RunIteration ();
-
-        return false;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
@@ -460,56 +210,8 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
     public static void End (RunState runState)
     {
-        // TODO: Move this to IApplication/ApplicationImpl
-        ArgumentNullException.ThrowIfNull (runState);
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            ApplicationPopover.HideWithQuitCommand (visiblePopover);
-        }
-
-        runState.Toplevel.OnUnloaded ();
-
-        // End the RunState.Toplevel
-        // First, take it off the Toplevel Stack
-        if (TopLevels.TryPop (out Toplevel? topOfStack))
-        {
-            if (topOfStack != runState.Toplevel)
-            {
-                // If the top of the stack is not the RunState.Toplevel then
-                // this call to End is not balanced with the call to Begin that started the RunState
-                throw new ArgumentException ("End must be balanced with calls to Begin");
-            }
-        }
-
-        // Notify that it is closing
-        runState.Toplevel?.OnClosed (runState.Toplevel);
-
-        if (TopLevels.TryPeek (out Toplevel? newTop))
-        {
-            Top = newTop;
-            Top?.SetNeedsDraw ();
-        }
-
-        if (runState.Toplevel is { HasFocus: true })
-        {
-            runState.Toplevel.HasFocus = false;
-        }
-
-        if (Top is { HasFocus: false })
-        {
-            Top.SetFocus ();
-        }
-
-        CachedRunStateToplevel = runState.Toplevel;
-
-        runState.Toplevel = null;
-        runState.Dispose ();
-
-        LayoutAndDraw (true);
+        ApplicationImpl.Instance.End (runState);
     }
-    internal static void RaiseIteration ()
-    {
-        Iteration?.Invoke (null, new ());
-    }
+
+    internal static void RaiseIteration () => ApplicationImpl.Instance.RaiseIteration ();
 }

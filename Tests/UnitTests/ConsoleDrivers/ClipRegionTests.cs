@@ -5,15 +5,9 @@ using Xunit.Abstractions;
 
 namespace UnitTests.DriverTests;
 
-public class ClipRegionTests
+public class ClipRegionTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ClipRegionTests (ITestOutputHelper output)
-    {
-        Application.RunningUnitTests = true;
-        this._output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void AddRune_Is_Clipped ()

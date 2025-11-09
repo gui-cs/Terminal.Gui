@@ -21,11 +21,6 @@ public abstract class OutputBase
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public virtual void Write (IOutputBuffer buffer)
     {
-        if (Application.RunningUnitTests)
-        {
-            return;
-        }
-
         var top = 0;
         var left = 0;
         int rows = buffer.Rows;

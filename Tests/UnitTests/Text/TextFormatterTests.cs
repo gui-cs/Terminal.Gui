@@ -3597,7 +3597,7 @@ public class TextFormatterTests
         var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      Assert.Equal (-2, view.Y);
 

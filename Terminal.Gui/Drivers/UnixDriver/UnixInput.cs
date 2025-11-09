@@ -108,24 +108,26 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (UnixInput)}");
 
-        if (Application.RunningUnitTests)
-        {
-            return;
-        }
-
         _pollMap = new Pollfd [1];
         _pollMap [0].fd = STDIN_FILENO; // stdin
         _pollMap [0].events = (short)Condition.PollIn;
 
-        EnableRawModeAndTreatControlCAsInput ();
+        try
+        {
+            EnableRawModeAndTreatControlCAsInput ();
 
-        //Enable alternative screen buffer.
-        WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            //Enable alternative screen buffer.
+            WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
-        //Set cursor key to application.
-        WriteRaw (EscSeqUtils.CSI_HideCursor);
+            //Set cursor key to application.
+            WriteRaw (EscSeqUtils.CSI_HideCursor);
 
-        WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
+            WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
+        }
+        catch
+        {
+            // ignore exceptions during construction for unit tests
+        }
     }
 
     private void EnableRawModeAndTreatControlCAsInput ()
@@ -170,11 +172,6 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         try
         {
-            if (Application.RunningUnitTests)
-            {
-                return false;
-            }
-
             int n = poll (_pollMap!, (uint)_pollMap!.Length, 0);
 
             if (n != 0)
@@ -182,24 +179,19 @@ internal class UnixInput : InputImpl<char>, IUnixInput
                 return true;
             }
 
-            return false;
         }
         catch (Exception ex)
         {
             // Optionally log the exception
-            Logging.Logger.LogError ($"Error in Peek: {ex.Message}");
-
-            return false;
+            Logging.Error ($"Error in Peek: {ex.Message}");
         }
+        return false;
     }
     private void WriteRaw (string text)
     {
-        if (!Application.RunningUnitTests)
-        {
-            byte [] utf8 = Encoding.UTF8.GetBytes (text);
-            // Write to stdout (fd 1)
-            write (STDOUT_FILENO, utf8, utf8.Length);
-        }
+        byte [] utf8 = Encoding.UTF8.GetBytes (text);
+        // Write to stdout (fd 1)
+        write (STDOUT_FILENO, utf8, utf8.Length);
     }
 
     /// <inheritdoc/>
@@ -224,16 +216,13 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void FlushConsoleInput ()
     {
-        if (!Application.RunningUnitTests)
+        var fds = new Pollfd [1];
+        fds [0].fd = STDIN_FILENO;
+        fds [0].events = (short)Condition.PollIn;
+        var buf = new byte [256];
+        while (poll (fds, 1, 0) > 0)
         {
-            var fds = new Pollfd [1];
-            fds [0].fd = STDIN_FILENO;
-            fds [0].events = (short)Condition.PollIn;
-            var buf = new byte [256];
-            while (poll (fds, 1, 0) > 0)
-            {
-                read (STDIN_FILENO, buf, buf.Length);
-            }
+            read (STDIN_FILENO, buf, buf.Length);
         }
     }
 
@@ -242,7 +231,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         base.Dispose ();
 
-        if (!Application.RunningUnitTests)
+        try
         {
             // Disable mouse events first
             WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);
@@ -261,6 +250,10 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
             // Restore terminal to original state
             tcsetattr (STDIN_FILENO, TCSANOW, ref _original);
+        }
+        catch
+        {
+            // ignore exceptions during disposal for unit tests
         }
     }
 }

@@ -107,7 +107,7 @@ public class Navigation : Scenario
         //                 };
         //timer.Start ();
 
-        Application.Iteration += (sender, args) =>
+        ApplicationImpl.Instance.Iteration += (sender, args) =>
                                  {
                                      if (progressBar.Fraction == 1.0)
                                      {

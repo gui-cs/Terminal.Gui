@@ -50,7 +50,7 @@ public class ScenarioTests : TestsAllViews
         var iterationCount = 0;
         Key quitKey = Application.QuitKey;
 
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+        ApplicationImpl.Instance.InitializedChanged += OnApplicationOnInitializedChanged;
 
         Application.ForceDriver = "FakeDriver";
         scenario!.Main ();
@@ -58,7 +58,7 @@ public class ScenarioTests : TestsAllViews
         scenario.Dispose ();
         scenario = null;
 
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+        ApplicationImpl.Instance.InitializedChanged -= OnApplicationOnInitializedChanged;
 
         lock (_timeoutLock)
         {
@@ -90,7 +90,7 @@ public class ScenarioTests : TestsAllViews
         {
             if (a.Value)
             {
-                Application.Iteration += OnApplicationOnIteration;
+                ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
                 initialized = true;
 
                 lock (_timeoutLock)
@@ -100,7 +100,7 @@ public class ScenarioTests : TestsAllViews
             }
             else
             {
-                Application.Iteration -= OnApplicationOnIteration;
+                ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
                 shutdownGracefully = true;
             }
 
@@ -344,9 +344,9 @@ public class ScenarioTests : TestsAllViews
 
         var iterations = 0;
 
-        Application.Iteration += OnApplicationOnIteration;
+        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
         Application.Run (top);
-        Application.Iteration -= OnApplicationOnIteration;
+        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (viewClasses.Count, iterations);
 
@@ -639,8 +639,8 @@ public class ScenarioTests : TestsAllViews
         var iterations = 0;
         object? token = null;
 
-        Application.Iteration += OnApplicationOnIteration;
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        ApplicationImpl.Instance.InitializedChanged += OnApplicationOnInitializedChanged;
 
         generic.Main ();
         Application.ForceDriver = string.Empty;
@@ -680,8 +680,8 @@ public class ScenarioTests : TestsAllViews
 
             if (args.Value is false)
             {
-                Application.Iteration -= OnApplicationOnIteration;
-                Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+                ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+                ApplicationImpl.Instance.InitializedChanged -= OnApplicationOnInitializedChanged;
             }
 
         }

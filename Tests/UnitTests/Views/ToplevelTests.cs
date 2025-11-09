@@ -277,7 +277,7 @@ public class ToplevelTests
         int iterations = -1;
         Window testWindow;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -397,7 +397,7 @@ public class ToplevelTests
 
         var location = new Rectangle (win.Frame.X, win.Frame.Y, 7, 3);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 

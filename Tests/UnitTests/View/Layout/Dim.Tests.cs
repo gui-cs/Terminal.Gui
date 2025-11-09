@@ -217,7 +217,7 @@ public class DimTests
                        Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run (t);
         t.Dispose ();

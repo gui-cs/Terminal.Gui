@@ -394,7 +394,7 @@ internal class DriverImpl : IDriver
 
         Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
-        if (!Application.RunningUnitTests)
+        try
         {
             Console.ResetColor ();
             Console.Clear ();
@@ -409,9 +409,14 @@ internal class DriverImpl : IDriver
 
             //Enable alternative screen buffer.
             Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-
-            Application.LayoutAndDraw ();
         }
+        catch (Exception ex)
+        {
+            Logging.Error ($"Error suspending terminal: {ex.Message}");
+        }
+
+        Application.LayoutAndDraw ();
+
 
         Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }

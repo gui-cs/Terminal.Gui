@@ -158,12 +158,12 @@ public class Scenario : IDisposable
     public void StartBenchmark ()
     {
         BenchmarkResults.Scenario = GetName ();
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+        ApplicationImpl.Instance.InitializedChanged += OnApplicationOnInitializedChanged;
     }
 
     public BenchmarkResults EndBenchmark ()
     {
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+        ApplicationImpl.Instance.InitializedChanged -= OnApplicationOnInitializedChanged;
 
         lock (_timeoutLock)
         {
@@ -188,17 +188,17 @@ public class Scenario : IDisposable
                 _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (BenchmarkTimeout), ForceCloseCallback);
             }
 
-            Application.Iteration += OnApplicationOnIteration;
+            ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
             Application.Driver!.ClearedContents += (sender, args) => BenchmarkResults.ClearedContentCount++;
-            Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
+            ApplicationImpl.Instance.NotifyNewRunState += OnApplicationNotifyNewRunState;
 
 
             _stopwatch = Stopwatch.StartNew ();
         }
         else
         {
-            Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
-            Application.Iteration -= OnApplicationOnIteration;
+            ApplicationImpl.Instance.NotifyNewRunState -= OnApplicationNotifyNewRunState;
+            ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
             BenchmarkResults.Duration = _stopwatch!.Elapsed;
             _stopwatch?.Stop ();
         }

@@ -10,7 +10,6 @@ public class CursorTests
     public CursorTests (ITestOutputHelper output)
     {
         _output = output;
-        Application.RunningUnitTests = true;
     }
 
     private class TestView : View

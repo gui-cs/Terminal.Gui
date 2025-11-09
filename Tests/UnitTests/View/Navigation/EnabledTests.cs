@@ -20,7 +20,7 @@ public class EnabledTests
 
         var iterations = 0;
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      iterations++;
 

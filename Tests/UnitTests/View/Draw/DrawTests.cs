@@ -643,7 +643,7 @@ public class DrawTests (ITestOutputHelper output)
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      Assert.Equal (-2, view.X);
 

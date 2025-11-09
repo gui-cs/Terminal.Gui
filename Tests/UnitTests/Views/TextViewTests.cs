@@ -63,7 +63,7 @@ public class TextViewTests
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -180,7 +180,7 @@ public class TextViewTests
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_Init ()
     {
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
+        ApplicationImpl.Instance.Iteration += (s, a) => { Application.RequestStop (); };
 
         var expectedRow = 0;
         var expectedCol = 0;
@@ -236,7 +236,7 @@ public class TextViewTests
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_Set_Text ()
     {
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
+        ApplicationImpl.Instance.Iteration += (s, a) => { Application.RequestStop (); };
         var eventcount = 0;
 
         var expectedRow = 0;
@@ -276,7 +276,7 @@ public class TextViewTests
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_Typing ()
     {
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
+        ApplicationImpl.Instance.Iteration += (s, a) => { Application.RequestStop (); };
         var eventcount = 0;
 
         var expectedRow = 0;
@@ -4898,7 +4898,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -4941,7 +4941,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -4984,7 +4984,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -5036,7 +5036,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -5090,7 +5090,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
+        ApplicationImpl.Instance.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);

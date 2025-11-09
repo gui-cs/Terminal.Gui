@@ -409,7 +409,7 @@ public class UICatalog
             // Measure how long it takes for the app to shut down
             var sw = new Stopwatch ();
             string scenarioName = scenario.GetName ();
-            Application.InitializedChanged += ApplicationOnInitializedChanged;
+            ApplicationImpl.Instance.InitializedChanged += ApplicationOnInitializedChanged;
 #endif
 
             scenario.Main ();
@@ -423,7 +423,7 @@ public class UICatalog
             VerifyObjectsWereDisposed ();
 
 #if DEBUG_IDISPOSABLE
-            Application.InitializedChanged -= ApplicationOnInitializedChanged;
+            ApplicationImpl.Instance.InitializedChanged -= ApplicationOnInitializedChanged;
 
             void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
             {

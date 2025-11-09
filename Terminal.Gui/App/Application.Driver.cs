@@ -4,8 +4,6 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Driver abstractions
 {
-    internal static bool _forceFakeConsole;
-
     /// <summary>Gets the <see cref="IDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
     public static IDriver? Driver
     {

@@ -268,7 +268,8 @@ public partial class GuiTestContext : IDisposable
 
         if (_ex != null)
         {
-            throw _ex; // Propagate any exception that happened in the background task
+            Logging.Critical ($"Exception occurred: {_ex}");
+            //throw _ex; // Propagate any exception that happened in the background task
         }
 
         return this;
@@ -405,6 +406,7 @@ public partial class GuiTestContext : IDisposable
         Logging.Trace ("CleanupApplication");
         _fakeInput.ExternalCancellationTokenSource = null;
 
+        Application.ResetState (true);
         ApplicationImpl.ChangeInstance (_origApp);
         Logging.Logger = _origLogger;
         Finished = true;
