@@ -204,7 +204,6 @@ public partial class GuiTestContext
             _applicationImpl.Driver.KeyDown += DriverOnKeyDown;
             _applicationImpl.Driver.EnqueueKeyEvent (key);
             WaitUntil (() => keyReceived);
-            _applicationImpl.Driver.KeyDown -= DriverOnKeyDown;
         }
         else
         {
@@ -214,7 +213,11 @@ public partial class GuiTestContext
 
         return this;
 
-        void DriverOnKeyDown (object? sender, Key e) { keyReceived = true; }
+        void DriverOnKeyDown (object? sender, Key e)
+        {
+            _applicationImpl.Driver.KeyDown -= DriverOnKeyDown;
+            keyReceived = true;
+        }
 
     }
 }
