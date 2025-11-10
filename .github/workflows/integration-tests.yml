@@ -61,3 +61,11 @@ jobs:
             --blame-hang-timeout 60s \
             --blame-crash-collect-always
 
+      - name: Upload Integration Tests Coverage
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: Tests/IntegrationTests/TestResults/**/coverage.cobertura.xml
+          flags: integrationtests-${{ runner.os }}
+          name: codecov-integration-${{ runner.os }}
+

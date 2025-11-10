@@ -79,6 +79,14 @@ jobs:
           logs/UnitTests    
           TestResults/UnitTests/
   
+    - name: Upload UnitTests Coverage
+      if: always()
+      uses: codecov/codecov-action@v4
+      with:
+        files: Tests/UnitTests/TestResults/**/coverage.cobertura.xml
+        flags: unittests-nonparallel-${{ runner.os }}
+        name: codecov-unittests-${{ runner.os }}
+
   parallel_unittests:
     name: Parallel Unit Tests  
     runs-on: ${{ matrix.os }}
@@ -142,3 +150,11 @@ jobs:
         path: |
           logs/UnitTestsParallelizable/
           TestResults/UnitTestsParallelizable/
+  
+    - name: Upload Parallelizable Coverage
+      if: always()
+      uses: codecov/codecov-action@v4
+      with:
+        files: Tests/UnitTestsParallelizable/TestResults/**/coverage.cobertura.xml
+        flags: unittests-parallel-${{ runner.os }}
+        name: codecov-parallelizable-${{ runner.os }}
