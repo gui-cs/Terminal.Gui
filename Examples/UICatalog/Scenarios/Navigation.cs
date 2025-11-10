@@ -107,18 +107,7 @@ public class Navigation : Scenario
         //                 };
         //timer.Start ();
 
-        Application.Iteration += (sender, args) =>
-                                 {
-                                     if (progressBar.Fraction == 1.0)
-                                     {
-                                         progressBar.Fraction = 0;
-                                     }
-
-                                     progressBar.Fraction += 0.01f;
-
-                                     Application.Invoke (() => { });
-
-                                 };
+        Application.Iteration += OnApplicationIteration;
 
         View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
@@ -214,11 +203,24 @@ public class Navigation : Scenario
 
         testFrame.SetFocus ();
         Application.Run (app);
+        Application.Iteration -= OnApplicationIteration;
         // timer.Close ();
         app.Dispose ();
         Application.Shutdown ();
 
         return;
+
+        void OnApplicationIteration (object sender, IterationEventArgs args)
+        {
+            if (progressBar.Fraction == 1.0)
+            {
+                progressBar.Fraction = 0;
+            }
+
+            progressBar.Fraction += 0.01f;
+
+            Application.Invoke (() => { });
+        }
 
         void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
         {

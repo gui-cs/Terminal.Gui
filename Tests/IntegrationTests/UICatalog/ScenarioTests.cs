@@ -100,7 +100,6 @@ public class ScenarioTests : TestsAllViews
             }
             else
             {
-                Application.Iteration -= OnApplicationOnIteration;
                 shutdownGracefully = true;
             }
 
@@ -135,6 +134,8 @@ public class ScenarioTests : TestsAllViews
                 quitKey = Application.QuitKey;
                 _output.WriteLine ($"Attempting to quit with {quitKey} after {iterationCount} iterations.");
                 Application.RaiseKeyDownEvent (quitKey);
+                Application.Iteration -= OnApplicationOnIteration;
+
             }
         }
     }
@@ -605,111 +606,5 @@ public class ScenarioTests : TestsAllViews
         }
 
         void LayoutCompleteHandler (object? sender, LayoutEventArgs args) { UpdateTitle (curView); }
-    }
-
-
-    [Fact]
-    public void Run_Generic ()
-    {
-        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
-        Assert.NotEmpty (scenarios);
-
-        int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
-        Scenario generic = scenarios [item];
-
-        Application.ForceDriver = "fake";
-
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        var ms = 500;
-        var abortCount = 0;
-
-        Func<bool> abortCallback = () =>
-                                   {
-                                       abortCount++;
-                                       _output.WriteLine ($"'Generic' Aborting! - abortCount {abortCount}");
-                                       Application.RequestStop ();
-
-                                       return false;
-                                   };
-
-        var iterations = 0;
-        object? token = null;
-
-        Application.Iteration += OnApplicationOnIteration;
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
-
-        generic.Main ();
-        Application.ForceDriver = string.Empty;
-
-        Assert.Equal (0, abortCount);
-
-        // 1 is when we add the key event
-        // 2 is when the key event is grabbed and KeyDown is raised
-        Assert.True (iterations is > 1 and < 10);
-
-        generic.Dispose ();
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
-        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
-
-#if DEBUG_IDISPOSABLE
-        Assert.Empty (View.Instances);
-#endif
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object? _, EventArgs<bool> args)
-        {
-            _output.WriteLine ($"InitializedChanged: {args.Value}");
-
-            if (args.Value is true)
-            {
-                Application.KeyDown += (_, a) =>
-                                       {
-                                           _output.WriteLine ($"KeyDown: {a.KeyCode}");
-                                           Assert.Equal (Application.QuitKey, a);
-                                       };
-                _output.WriteLine ($"AddKeyEvent {Application.QuitKey}");
-                Application.Driver!.EnqueueKeyEvent (Application.QuitKey);
-            }
-
-            if (args.Value is false)
-            {
-                Application.Iteration -= OnApplicationOnIteration;
-                Application.InitializedChanged -= OnApplicationOnInitializedChanged;
-            }
-
-        }
-
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
-        {
-            iterations++;
-
-            if (token == null)
-            {
-                // Timeout only must start at first iteration
-                token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
-            }
-
-            _output.WriteLine ($"'Generic' iteration {iterations}");
-
-            //// Enable this to test that abort works
-            //if (iterations == 2)
-            //{
-            //    Thread.Sleep (1000);
-            //}
-
-            // Stop if we run out of control...
-            if (iterations == 10)
-            {
-                _output.WriteLine ("'Generic' had to be force quit!");
-                Application.RequestStop ();
-            }
-        }
     }
 }

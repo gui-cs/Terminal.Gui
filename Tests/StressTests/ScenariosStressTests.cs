@@ -105,8 +105,6 @@ public class ScenariosStressTests : TestsAllViews
             }
             else
             {
-                Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
-                Application.Iteration -= OnApplicationOnIteration;
                 stopwatch!.Stop ();
             }
 
@@ -158,6 +156,8 @@ public class ScenariosStressTests : TestsAllViews
             _output.WriteLine (
                                $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
+            Application.Iteration -= OnApplicationOnIteration;
+            Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
             Application.RequestStop ();
 
             return false;
