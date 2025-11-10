@@ -56,6 +56,7 @@ jobs:
       run: echo "{VSTEST_DUMP_PATH}={logs/UnitTests/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTests
+      shell: bash
       run: |
         dotnet test Tests/UnitTests \
           --no-build \
@@ -119,6 +120,7 @@ jobs:
       run: echo "{VSTEST_DUMP_PATH}={logs/UnitTestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTestsParallelizable
+      shell: bash
       run: |
         dotnet test Tests/UnitTestsParallelizable \
           --no-build \
@@ -130,8 +132,7 @@ jobs:
           --blame-crash \
           --blame-hang \
           --blame-hang-timeout 60s \
-          --blame-crash-collect-always     
-       # mv -v Tests/UnitTestsParallelizable/TestResults/*/*.* TestResults/UnitTestsParallelizable/
+          --blame-crash-collect-always
 
     - name: Upload UnitTestsParallelizable Logs
       if: always()
