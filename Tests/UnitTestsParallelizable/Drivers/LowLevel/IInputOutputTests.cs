@@ -5,9 +5,9 @@ using Xunit.Sdk;
 namespace UnitTests_Parallelizable.DriverTests;
 
 /// <summary>
-/// Low-level tests for IInput and IOutput implementations across all drivers.
-/// These tests are designed to fail with good error messages when run in environments
-/// without a real terminal (like GitHub Actions).
+///     Low-level tests for IInput and IOutput implementations across all drivers.
+///     These tests are designed to fail with good error messages when run in environments
+///     without a real terminal (like GitHub Actions).
 /// </summary>
 public class IInputOutputTests (ITestOutputHelper output)
 {
@@ -21,10 +21,10 @@ public class IInputOutputTests (ITestOutputHelper output)
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var input = new NetInput ();
-            _output.WriteLine ($"NetInput created successfully");
-        });
+                                                 {
+                                                     using var input = new NetInput ();
+                                                     _output.WriteLine ("NetInput created successfully");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -45,10 +45,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            bool hasInput = input.Peek ();
-            _output.WriteLine ($"NetInput.Peek() returned: {hasInput}");
-        });
+                                                 {
+                                                     bool hasInput = input.Peek ();
+                                                     _output.WriteLine ($"NetInput.Peek() returned: {hasInput}");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -69,10 +69,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            var items = input.Read ().ToList ();
-            _output.WriteLine ($"NetInput.Read() returned {items.Count} items");
-        });
+                                                 {
+                                                     List<ConsoleKeyInfo> items = input.Read ().ToList ();
+                                                     _output.WriteLine ($"NetInput.Read() returned {items.Count} items");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -93,10 +93,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            input.Dispose ();
-            _output.WriteLine ($"NetInput disposed successfully");
-        });
+                                                 {
+                                                     input.Dispose ();
+                                                     _output.WriteLine ("NetInput disposed successfully");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -114,10 +114,10 @@ public class IInputOutputTests (ITestOutputHelper output)
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var output = new NetOutput ();
-            _output.WriteLine ($"NetOutput created successfully");
-        });
+                                                 {
+                                                     using var output = new NetOutput ();
+                                                     _output.WriteLine ("NetOutput created successfully");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -138,11 +138,12 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Size size = default;
+
         Exception? exception = Record.Exception (() =>
-        {
-            size = output.GetSize ();
-            _output.WriteLine ($"NetOutput.GetSize() returned: {size.Width}x{size.Height}");
-        });
+                                                 {
+                                                     size = output.GetSize ();
+                                                     _output.WriteLine ($"NetOutput.GetSize() returned: {size.Width}x{size.Height}");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -165,11 +166,11 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            ReadOnlySpan<char> text = "Test".AsSpan ();
-            output.Write (text);
-            _output.WriteLine ($"NetOutput.Write() succeeded");
-        });
+                                                 {
+                                                     ReadOnlySpan<char> text = "Test".AsSpan ();
+                                                     output.Write (text);
+                                                     _output.WriteLine ("NetOutput.Write() succeeded");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -190,10 +191,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            output.SetCursorPosition (0, 0);
-            _output.WriteLine ($"NetOutput.SetCursorPosition() succeeded");
-        });
+                                                 {
+                                                     output.SetCursorPosition (0, 0);
+                                                     _output.WriteLine ("NetOutput.SetCursorPosition() succeeded");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -211,11 +212,11 @@ public class IInputOutputTests (ITestOutputHelper output)
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            var queue = new ConcurrentQueue<ConsoleKeyInfo> ();
-            var processor = new NetInputProcessor (queue);
-            _output.WriteLine ($"NetInputProcessor created successfully");
-        });
+                                                 {
+                                                     ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+                                                     var processor = new NetInputProcessor (queue);
+                                                     _output.WriteLine ("NetInputProcessor created successfully");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -239,23 +240,27 @@ public class IInputOutputTests (ITestOutputHelper output)
         if (OperatingSystem.IsWindows ())
         {
             _output.WriteLine ("Skipping Unix test on Windows");
+
             return;
         }
 
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            try
-            {
-                using var input = new UnixInput ();
-                _output.WriteLine ($"UnixInput created successfully");
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains ("tcgetattr") || ex.Message.Contains ("tcsetattr"))
-            {
-                _output.WriteLine ($"Expected failure on non-terminal: {ex.Message}");
-                throw new XunitException ($"UnixInput failed in non-terminal environment: {ex.Message}\nThis is expected in GitHub Actions. The driver should detect this and handle gracefully.");
-            }
-        });
+                                                 {
+                                                     try
+                                                     {
+                                                         using var input = new UnixInput ();
+                                                         _output.WriteLine ("UnixInput created successfully");
+                                                     }
+                                                     catch (InvalidOperationException ex) when (ex.Message.Contains ("tcgetattr")
+                                                                                                || ex.Message.Contains ("tcsetattr"))
+                                                     {
+                                                         _output.WriteLine ($"Expected failure on non-terminal: {ex.Message}");
+
+                                                         throw new XunitException (
+                                                                                   $"UnixInput failed in non-terminal environment: {ex.Message}\nThis is expected in GitHub Actions. The driver should detect this and handle gracefully.");
+                                                     }
+                                                 });
 
         // Assert
         if (exception != null && !(exception is XunitException))
@@ -273,15 +278,16 @@ public class IInputOutputTests (ITestOutputHelper output)
         if (OperatingSystem.IsWindows ())
         {
             _output.WriteLine ("Skipping Unix test on Windows");
+
             return;
         }
 
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var output = new UnixOutput ();
-            _output.WriteLine ($"UnixOutput created successfully");
-        });
+                                                 {
+                                                     using var output = new UnixOutput ();
+                                                     _output.WriteLine ("UnixOutput created successfully");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -301,6 +307,7 @@ public class IInputOutputTests (ITestOutputHelper output)
         if (OperatingSystem.IsWindows ())
         {
             _output.WriteLine ("Skipping Unix test on Windows");
+
             return;
         }
 
@@ -309,11 +316,12 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Size size = default;
+
         Exception? exception = Record.Exception (() =>
-        {
-            size = output.GetSize ();
-            _output.WriteLine ($"UnixOutput.GetSize() returned: {size.Width}x{size.Height}");
-        });
+                                                 {
+                                                     size = output.GetSize ();
+                                                     _output.WriteLine ($"UnixOutput.GetSize() returned: {size.Width}x{size.Height}");
+                                                 });
 
         // Assert
         Assert.Null (exception);
@@ -333,15 +341,16 @@ public class IInputOutputTests (ITestOutputHelper output)
         if (!OperatingSystem.IsWindows ())
         {
             _output.WriteLine ("Skipping Windows test on non-Windows");
+
             return;
         }
 
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var input = new WindowsInput ();
-            _output.WriteLine ($"WindowsInput created successfully");
-        });
+                                                 {
+                                                     using var input = new WindowsInput ();
+                                                     _output.WriteLine ("WindowsInput created successfully");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -361,23 +370,25 @@ public class IInputOutputTests (ITestOutputHelper output)
         if (!OperatingSystem.IsWindows ())
         {
             _output.WriteLine ("Skipping Windows test on non-Windows");
+
             return;
         }
 
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            try
-            {
-                using var output = new WindowsOutput ();
-                _output.WriteLine ($"WindowsOutput created successfully");
-            }
-            catch (Exception ex)
-            {
-                _output.WriteLine ($"WindowsOutput threw during construction: {ex.GetType ().Name}: {ex.Message}");
-                throw;
-            }
-        });
+                                                 {
+                                                     try
+                                                     {
+                                                         using var output = new WindowsOutput ();
+                                                         _output.WriteLine ("WindowsOutput created successfully");
+                                                     }
+                                                     catch (Exception ex)
+                                                     {
+                                                         _output.WriteLine ($"WindowsOutput threw during construction: {ex.GetType ().Name}: {ex.Message}");
+
+                                                         throw;
+                                                     }
+                                                 });
 
         // Assert
         if (exception != null)
@@ -399,10 +410,10 @@ public class IInputOutputTests (ITestOutputHelper output)
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var input = new FakeInput ();
-            _output.WriteLine ($"FakeInput created successfully");
-        });
+                                                 {
+                                                     using var input = new FakeInput ();
+                                                     _output.WriteLine ("FakeInput created successfully");
+                                                 });
 
         // Assert
         Assert.Null (exception);
@@ -414,10 +425,10 @@ public class IInputOutputTests (ITestOutputHelper output)
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var output = new FakeOutput ();
-            _output.WriteLine ($"FakeOutput created successfully");
-        });
+                                                 {
+                                                     using var output = new FakeOutput ();
+                                                     _output.WriteLine ("FakeOutput created successfully");
+                                                 });
 
         // Assert
         Assert.Null (exception);
@@ -452,10 +463,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var input = factory.CreateInput ();
-            _output.WriteLine ($"NetComponentFactory.CreateInput() succeeded");
-        });
+                                                 {
+                                                     using IInput<ConsoleKeyInfo> input = factory.CreateInput ();
+                                                     _output.WriteLine ("NetComponentFactory.CreateInput() succeeded");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -476,10 +487,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var output = factory.CreateOutput ();
-            _output.WriteLine ($"NetComponentFactory.CreateOutput() succeeded");
-        });
+                                                 {
+                                                     using IOutput output = factory.CreateOutput ();
+                                                     _output.WriteLine ("NetComponentFactory.CreateOutput() succeeded");
+                                                 });
 
         // Assert
         if (exception != null)
@@ -500,10 +511,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var input = factory.CreateInput ();
-            _output.WriteLine ($"FakeComponentFactory.CreateInput() succeeded");
-        });
+                                                 {
+                                                     using IInput<ConsoleKeyInfo> input = factory.CreateInput ();
+                                                     _output.WriteLine ("FakeComponentFactory.CreateInput() succeeded");
+                                                 });
 
         // Assert
         Assert.Null (exception);
@@ -518,10 +529,10 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         // Act
         Exception? exception = Record.Exception (() =>
-        {
-            using var output = factory.CreateOutput ();
-            _output.WriteLine ($"FakeComponentFactory.CreateOutput() succeeded");
-        });
+                                                 {
+                                                     using IOutput output = factory.CreateOutput ();
+                                                     _output.WriteLine ("FakeComponentFactory.CreateOutput() succeeded");
+                                                 });
 
         // Assert
         Assert.Null (exception);

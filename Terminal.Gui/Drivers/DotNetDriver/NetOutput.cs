@@ -53,7 +53,8 @@ public class NetOutput : OutputBase, IOutput
     {
         try
         {
-            return new (Console.WindowWidth, Console.WindowHeight);
+            Size size = new (Console.WindowWidth, Console.WindowHeight);
+            return size.IsEmpty ? new (80, 25) : size;
         }
         catch (IOException)
         {

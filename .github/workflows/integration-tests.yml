@@ -69,3 +69,13 @@ jobs:
           flags: integrationtests-${{ runner.os }}
           name: codecov-integration-${{ runner.os }}
 
+      - name: Upload Integration Tests Coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: Tests/IntegrationTests/TestResults/**/coverage.cobertura.xml
+          flags: integrationtests
+          name: IntegrationTests-${{ runner.os }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
