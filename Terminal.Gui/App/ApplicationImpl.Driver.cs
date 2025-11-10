@@ -61,9 +61,14 @@ public partial class ApplicationImpl
         {
             Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
         }
-        else
+        else if (p == PlatformID.Unix)
         {
             Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+        }
+        else
+        {
+            Logging.Information($"Falling back to dotnet driver.");
+            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
         }
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");
