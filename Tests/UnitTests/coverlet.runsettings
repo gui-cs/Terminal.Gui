@@ -1,23 +1,32 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
-  <DataCollectionRunSettings>
-    <DataCollectors>
-      <DataCollector friendlyName="XPlat code coverage">
-        <Configuration>
-          <Format>opencover</Format>          
-          <Exclude>[UnitTests]*,[UICatalog]*,[coverlet.*.tests?]*,[*]Coverlet.Core*</Exclude> <!-- [Assembly-Filter]Type-Filter -->
-          <Include></Include> <!-- [Assembly-Filter]Type-Filter -->
-          <ExcludeByAttribute></ExcludeByAttribute>
-          <ExcludeByFile></ExcludeByFile> <!-- Globbing filter -->
-          <IncludeDirectory></IncludeDirectory>
-          <SingleHit>false</SingleHit>
-          <UseSourceLink>true</UseSourceLink>
-          <IncludeTestAssembly>true</IncludeTestAssembly>
-          <SkipAutoProps>true</SkipAutoProps>
-          <DeterministicReport>false</DeterministicReport>
-          <ResultsDirectory>TestResults/</ResultsDirectory>
-        </Configuration>
-      </DataCollector>
-    </DataCollectors>
-  </DataCollectionRunSettings>
+	<!-- Existing Coverlet/Code Coverage Config -->
+	<DataCollectionRunSettings>
+		<DataCollectors>
+			<DataCollector friendlyName="XPlat Code Coverage">
+				<Configuration>
+					<Format>cobertura</Format>
+					<Exclude>[*]*.g.cs,[*]*.AssemblyInfo.cs</Exclude>
+					<!-- Add more excludes as needed -->
+				</Configuration>
+			</DataCollector>
+		</DataCollectors>
+	</DataCollectionRunSettings>
+
+	<!-- New: xUnit Config for Stop-on-Fail -->
+	<xUnit>
+		<ParallelizeAssembly>false</ParallelizeAssembly>
+		<!-- Disable assembly parallelism -->
+		<ParallelizeTestCollections>false</ParallelizeTestCollections>
+		<!-- Disable collection parallelism -->
+		<MaxParallelThreads>1</MaxParallelThreads>
+		<!-- Ensure single-threaded -->
+		<StopOnFail>true</StopOnFail>
+		<!-- STOP HERE ON FIRST FAILURE! -->
+	</xUnit>
+
+	<!-- Optional: Global Run Config (e.g., results dir) -->
+	<RunConfiguration>
+		<ResultsDirectory>./TestResults</ResultsDirectory>
+	</RunConfiguration>
 </RunSettings>
