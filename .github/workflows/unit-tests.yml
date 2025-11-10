@@ -57,9 +57,17 @@ jobs:
 
     - name: Run UnitTests
       run: |
-       dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/UnitTests/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
-     
-       # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
+        dotnet test Tests/UnitTests \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --settings Tests/UnitTests/runsettings.xml \
+          --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
+          --blame \
+          --blame-crash \
+          --blame-hang \
+          --blame-hang-timeout 60s \
+          --blame-crash-collect-always
 
     - name: Upload Test Logs
       if: always()
@@ -112,8 +120,17 @@ jobs:
 
     - name: Run UnitTestsParallelizable
       run: |
-       dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
-     
+        dotnet test Tests/UnitTestsParallelizable \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --settings Tests/UnitTestsParallelizable/runsettings.xml \
+          --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
+          --blame \
+          --blame-crash \
+          --blame-hang \
+          --blame-hang-timeout 60s \
+          --blame-crash-collect-always     
        # mv -v Tests/UnitTestsParallelizable/TestResults/*/*.* TestResults/UnitTestsParallelizable/
 
     - name: Upload UnitTestsParallelizable Logs

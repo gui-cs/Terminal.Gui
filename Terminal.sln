@@ -35,7 +35,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C
 		.github\workflows\build.yml = .github\workflows\build.yml
 		.github\workflows\check-duplicates.yml = .github\workflows\check-duplicates.yml
 		copilot-instructions.md = copilot-instructions.md
-		Tests\UnitTests\coverlet.runsettings = Tests\UnitTests\coverlet.runsettings
 		GitVersion.yml = GitVersion.yml
 		.github\workflows\integration-tests.yml = .github\workflows\integration-tests.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
