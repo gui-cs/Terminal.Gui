@@ -969,13 +969,7 @@ public class DialogTests (ITestOutputHelper output)
 
         var iterations = 0;
 
-        Application.Iteration += (s, a) =>
-                     {
-                         if (++iterations > 2)
-                         {
-                             Application.RequestStop ();
-                         }
-                     };
+        Application.Iteration += OnApplicationOnIteration;
         var btn = $"{Glyphs.LeftBracket} Ok {Glyphs.RightBracket}";
 
         win.Loaded += (s, a) =>
@@ -999,7 +993,18 @@ public class DialogTests (ITestOutputHelper output)
                           dlg.Dispose ();
                       };
         Application.Run (win);
+        Application.Iteration -= OnApplicationOnIteration;
         win.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            if (++iterations > 2)
+            {
+                Application.RequestStop ();
+            }
+        }
     }
 
     [Theory]
@@ -1072,36 +1077,36 @@ public class DialogTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
-                                              {
-                                                  iterations++;
-
-                                                  if (iterations == 0)
-                                                  {
-                                                      var dlg = new Dialog
-                                                      {
-                                                          Buttons = [new () { Text = "Ok" }],
-                                                          Width = Dim.Percent (85),
-                                                          Height = Dim.Percent (85)
-                                                      };
-                                                      Application.Run (dlg);
-                                                      dlg.Dispose ();
-                                                  }
-                                                  else if (iterations == 1)
-                                                  {
-                                                      AutoInitShutdownAttribute.RunIteration ();
-
-                                                      // BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
-                                                      _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-                                                  }
-                                                  else
-                                                  {
-                                                      Application.RequestStop ();
-                                                  }
-                                              };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (win);
+        Application.Iteration -= OnApplicationOnIteration;
         win.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            iterations++;
+
+            if (iterations == 0)
+            {
+                var dlg = new Dialog { Buttons = [new () { Text = "Ok" }], Width = Dim.Percent (85), Height = Dim.Percent (85) };
+                Application.Run (dlg);
+                dlg.Dispose ();
+            }
+            else if (iterations == 1)
+            {
+                AutoInitShutdownAttribute.RunIteration ();
+
+                // BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
+                _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+            }
+            else
+            {
+                Application.RequestStop ();
+            }
+        }
     }
 
     [Fact]
@@ -1152,28 +1157,38 @@ public class DialogTests (ITestOutputHelper output)
 
         int iterations = -1;
 
-        Application.Iteration += (s, a) =>
-                                              {
-                                                  iterations++;
+        Application.Iteration += OnApplicationOnIteration;
 
-                                                  switch (iterations)
-                                                  {
-                                                      case 0:
-                                                          Application.Top!.SetNeedsLayout ();
-                                                          Application.Top.SetNeedsDraw ();
+        Application.Run ().Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
+        Application.Shutdown ();
 
-                                                          break;
+        Assert.Equal (9, iterations);
 
-                                                      case 1:
-                                                          Assert.False (btn1.NewKeyDownEvent (Key.Space));
+        return;
 
-                                                          break;
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            iterations++;
 
-                                                      // Now this happens on iteration 3 because Space triggers Run on the new dialog which itself causes another iteration
-                                                      // as it starts. Meaning we haven't exited case 1 when we enter case 2 from next Run stack frame.
-                                                      case 3:
+            switch (iterations)
+            {
+                case 0:
+                    Application.Top!.SetNeedsLayout ();
+                    Application.Top.SetNeedsDraw ();
 
-                                                          expected = @$"
+                    break;
+
+                case 1:
+                    Assert.False (btn1.NewKeyDownEvent (Key.Space));
+
+                    break;
+
+                // Now this happens on iteration 3 because Space triggers Run on the new dialog which itself causes another iteration
+                // as it starts. Meaning we haven't exited case 1 when we enter case 2 from next Run stack frame.
+                case 3:
+
+                    expected = @$"
   ┌───────────────────────┐
   │                       │
   │                       │
@@ -1182,15 +1197,15 @@ public class DialogTests (ITestOutputHelper output)
   │                       │
   │{Glyphs.LeftBracket} Show Sub {Glyphs.RightBracket} {Glyphs.LeftBracket} Close {Glyphs.RightBracket} │
   └───────────────────────┘";
-                                                          DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+                    DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-                                                          Assert.False (btn2!.NewKeyDownEvent (Key.Space));
+                    Assert.False (btn2!.NewKeyDownEvent (Key.Space));
 
-                                                          break;
-                                                      case 5:
+                    break;
+                case 5:
 
-                                                          DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                                         @$"
+                    DriverAssert.AssertDriverContentsWithFrameAre (
+                                                                   @$"
   ┌───────────────────────┐
   │  ┌──────────────────┐ │
   │  │ya                │ │
@@ -1199,32 +1214,26 @@ public class DialogTests (ITestOutputHelper output)
   │  └──────────────────┘ │
   │{Glyphs.LeftBracket} Show Sub {Glyphs.RightBracket} {Glyphs.LeftBracket} Close {Glyphs.RightBracket} │
   └───────────────────────┘",
-                                                                                                         output
-                                                                                                        );
+                                                                   output);
 
-                                                          Assert.False (Application.Top!.NewKeyDownEvent (Key.Enter));
+                    Assert.False (Application.Top!.NewKeyDownEvent (Key.Enter));
 
-                                                          break;
-                                                      case 7:
+                    break;
+                case 7:
 
-                                                          DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+                    DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-                                                          Assert.False (btn3!.NewKeyDownEvent (Key.Space));
+                    Assert.False (btn3!.NewKeyDownEvent (Key.Space));
 
-                                                          break;
-                                                      case 9:
-                                                          DriverAssert.AssertDriverContentsWithFrameAre ("", output);
+                    break;
+                case 9:
+                    DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
-                                                          Application.RequestStop ();
+                    Application.RequestStop ();
 
-                                                          break;
-                                                  }
-                                              };
-
-        Application.Run ().Dispose ();
-        Application.Shutdown ();
-
-        Assert.Equal (9, iterations);
+                    break;
+            }
+        }
     }
 
     [Fact]
@@ -1324,24 +1333,7 @@ public class DialogTests (ITestOutputHelper output)
 
         var iterations = 0;
 
-        Application.Iteration += (s, a) =>
-                     {
-                         if (++iterations > 2)
-                         {
-                             Application.RequestStop ();
-                         }
-
-                         if (iterations == 1)
-                         {
-                             Application.Run (d);
-                             d.Dispose ();
-                         }
-                         else if (iterations == 2)
-                         {
-                             // Mouse click outside of dialog
-                             Application.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
-                         }
-                     };
+        Application.Iteration += OnApplicationOnIteration;
 
         top.MouseEvent += (s, e) =>
                           {
@@ -1351,7 +1343,29 @@ public class DialogTests (ITestOutputHelper output)
 
         Application.Run (top);
         top.Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            if (++iterations > 2)
+            {
+                Application.RequestStop ();
+            }
+
+            if (iterations == 1)
+            {
+                Application.Run (d);
+                d.Dispose ();
+            }
+            else if (iterations == 2)
+            {
+                // Mouse click outside of dialog
+                Application.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
+            }
+        }
     }
 
     [Fact]

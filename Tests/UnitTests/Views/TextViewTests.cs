@@ -4903,40 +4903,45 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     int width = _textView.Viewport.Width - 1;
-                                     Assert.Equal (30, width + 1);
-                                     Assert.Equal (10, _textView.Height);
-                                     _textView.Text = "";
-                                     var col = 0;
-                                     var leftCol = 0;
-                                     int tabWidth = _textView.TabWidth;
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.Tab);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     while (col > 0)
-                                     {
-                                         col--;
-                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     top.Remove (_textView);
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            int width = _textView.Viewport.Width - 1;
+            Assert.Equal (30, width + 1);
+            Assert.Equal (10, _textView.Height);
+            _textView.Text = "";
+            var col = 0;
+            var leftCol = 0;
+            int tabWidth = _textView.TabWidth;
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.Tab);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            while (col > 0)
+            {
+                col--;
+                _textView.NewKeyDownEvent (Key.Tab.WithShift);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            top.Remove (_textView);
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -4946,40 +4951,45 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     int width = _textView.Viewport.Width - 1;
-                                     Assert.Equal (30, width + 1);
-                                     Assert.Equal (10, _textView.Height);
-                                     var col = 0;
-                                     var leftCol = 0;
-                                     Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                     Assert.Equal (leftCol, _textView.LeftColumn);
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.Tab);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     while (col > 0)
-                                     {
-                                         col--;
-                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     top.Remove (_textView);
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            int width = _textView.Viewport.Width - 1;
+            Assert.Equal (30, width + 1);
+            Assert.Equal (10, _textView.Height);
+            var col = 0;
+            var leftCol = 0;
+            Assert.Equal (new (col, 0), _textView.CursorPosition);
+            Assert.Equal (leftCol, _textView.LeftColumn);
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.Tab);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            while (col > 0)
+            {
+                col--;
+                _textView.NewKeyDownEvent (Key.Tab.WithShift);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            top.Remove (_textView);
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -4989,49 +4999,54 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     int width = _textView.Viewport.Width - 1;
-                                     Assert.Equal (30, width + 1);
-                                     Assert.Equal (10, _textView.Height);
-                                     _textView.Text = "";
-                                     var col = 0;
-                                     var leftCol = 0;
-                                     int tabWidth = _textView.TabWidth;
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.Tab);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     while (col > 0)
-                                     {
-                                         col--;
-                                         _textView.NewKeyDownEvent (Key.CursorLeft);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.CursorRight);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     top.Remove (_textView);
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            int width = _textView.Viewport.Width - 1;
+            Assert.Equal (30, width + 1);
+            Assert.Equal (10, _textView.Height);
+            _textView.Text = "";
+            var col = 0;
+            var leftCol = 0;
+            int tabWidth = _textView.TabWidth;
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.Tab);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            while (col > 0)
+            {
+                col--;
+                _textView.NewKeyDownEvent (Key.CursorLeft);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.CursorRight);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            top.Remove (_textView);
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -5041,51 +5056,56 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     int width = _textView.Viewport.Width - 1;
-                                     Assert.Equal (30, width + 1);
-                                     Assert.Equal (10, _textView.Height);
-                                     Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-                                     var col = 0;
-                                     var leftCol = 0;
-                                     int tabWidth = _textView.TabWidth;
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.Tab);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     Assert.Equal (132, _textView.Text.Length);
-
-                                     while (col > 0)
-                                     {
-                                         col--;
-                                         _textView.NewKeyDownEvent (Key.CursorLeft);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.CursorRight);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     top.Remove (_textView);
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            int width = _textView.Viewport.Width - 1;
+            Assert.Equal (30, width + 1);
+            Assert.Equal (10, _textView.Height);
+            Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+            var col = 0;
+            var leftCol = 0;
+            int tabWidth = _textView.TabWidth;
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.Tab);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            Assert.Equal (132, _textView.Text.Length);
+
+            while (col > 0)
+            {
+                col--;
+                _textView.NewKeyDownEvent (Key.CursorLeft);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.CursorRight);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            top.Remove (_textView);
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -5095,67 +5115,72 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     int width = _textView.Viewport.Width - 1;
-                                     Assert.Equal (30, width + 1);
-                                     Assert.Equal (10, _textView.Height);
-                                     var col = 0;
-                                     var leftCol = 0;
-                                     Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                     Assert.Equal (leftCol, _textView.LeftColumn);
-                                     Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-                                     Assert.Equal (32, _textView.Text.Length);
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.Tab);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     _textView.NewKeyDownEvent (Key.Home);
-                                     col = 0;
-                                     Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                     leftCol = 0;
-                                     Assert.Equal (leftCol, _textView.LeftColumn);
-
-                                     _textView.NewKeyDownEvent (Key.End);
-                                     col = _textView.Text.Length;
-                                     Assert.Equal (132, _textView.Text.Length);
-                                     Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                     leftCol = GetLeftCol (leftCol);
-                                     Assert.Equal (leftCol, _textView.LeftColumn);
-                                     string txt = _textView.Text;
-
-                                     while (col - 1 > 0 && txt [col - 1] != '\t')
-                                     {
-                                         col--;
-                                     }
-
-                                     _textView.CursorPosition = new (col, 0);
-                                     leftCol = GetLeftCol (leftCol);
-
-                                     while (col > 0)
-                                     {
-                                         col--;
-                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-                                     Assert.Equal (32, _textView.Text.Length);
-
-                                     top.Remove (_textView);
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            int width = _textView.Viewport.Width - 1;
+            Assert.Equal (30, width + 1);
+            Assert.Equal (10, _textView.Height);
+            var col = 0;
+            var leftCol = 0;
+            Assert.Equal (new (col, 0), _textView.CursorPosition);
+            Assert.Equal (leftCol, _textView.LeftColumn);
+            Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+            Assert.Equal (32, _textView.Text.Length);
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.Tab);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            _textView.NewKeyDownEvent (Key.Home);
+            col = 0;
+            Assert.Equal (new (col, 0), _textView.CursorPosition);
+            leftCol = 0;
+            Assert.Equal (leftCol, _textView.LeftColumn);
+
+            _textView.NewKeyDownEvent (Key.End);
+            col = _textView.Text.Length;
+            Assert.Equal (132, _textView.Text.Length);
+            Assert.Equal (new (col, 0), _textView.CursorPosition);
+            leftCol = GetLeftCol (leftCol);
+            Assert.Equal (leftCol, _textView.LeftColumn);
+            string txt = _textView.Text;
+
+            while (col - 1 > 0 && txt [col - 1] != '\t')
+            {
+                col--;
+            }
+
+            _textView.CursorPosition = new (col, 0);
+            leftCol = GetLeftCol (leftCol);
+
+            while (col > 0)
+            {
+                col--;
+                _textView.NewKeyDownEvent (Key.Tab.WithShift);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+            Assert.Equal (32, _textView.Text.Length);
+
+            top.Remove (_textView);
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
