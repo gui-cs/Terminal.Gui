@@ -5,7 +5,7 @@
 # ------------------------------------------------------------
 
 # 1. Define paths
-$testDir    = Join-Path $PWD "Test"
+$testDir    = Join-Path $PWD "Tests"
 $covDir     = Join-Path $testDir "coverage"
 $reportDir  = Join-Path $testDir "report"
 $mergedFile = Join-Path $covDir "coverage.merged.cobertura.xml"
@@ -15,12 +15,13 @@ Write-Host "Cleaning old coverage files..."
 Remove-Item -Recurse -Force $covDir, $reportDir -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Path $covDir, $reportDir -Force | Out-Null
 
+dotnet build --configuration Debug
+
 # ------------------------------------------------------------
 # 3. Run UNIT TESTS (non-parallel)
 # ------------------------------------------------------------
 Write-Host "`nRunning UnitTests (quiet)..."
 dotnet test Tests/UnitTests `
-  --no-build `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
   --settings Tests/UnitTests/runsettings.xml `
@@ -30,7 +31,6 @@ dotnet test Tests/UnitTests `
 # ------------------------------------------------------------
 Write-Host "`nRunning UnitTestsParallelizable (quiet)..."
 dotnet test Tests/UnitTestsParallelizable `
-  --no-build `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
   --settings Tests/UnitTestsParallelizable/runsettings.xml `
@@ -40,7 +40,6 @@ dotnet test Tests/UnitTestsParallelizable `
 # ------------------------------------------------------------
 Write-Host "`nRunning IntegrationTests (quiet)..."
 dotnet test Tests/IntegrationTests `
-  --no-build `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
   --settings Tests/IntegrationTests/runsettings.xml `

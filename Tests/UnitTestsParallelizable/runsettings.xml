@@ -6,7 +6,9 @@
 			<DataCollector friendlyName="XPlat Code Coverage">
 				<Configuration>
 					<Format>cobertura</Format>
-					<Exclude>[*]obj/**,[*]*.g.cs,[*]*AssemblyInfo.cs</Exclude>
+					<ExcludeByFile>**/obj/**/*.*</ExcludeByFile>
+					<Exclude>[*]*.g.cs</Exclude>
+					<Exclude>[*]*AssemblyInfo.cs</Exclude>
 				</Configuration>
 			</DataCollector>
 		</DataCollectors>
