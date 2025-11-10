@@ -3597,12 +3597,7 @@ public class TextFormatterTests
         var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
         top.Add (view);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
-                                 {
-                                     Assert.Equal (-2, view.Y);
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         try
         {
@@ -3613,11 +3608,24 @@ public class TextFormatterTests
             // After the fix this exception will not be caught.
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
+        finally
+        {
+            Application.Iteration -= OnApplicationOnIteration;
+        }
 
         top.Dispose ();
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            Assert.Equal (-2, view.Y);
+
+            Application.RequestStop ();
+        }
     }
 
     [SetupFakeApplication]

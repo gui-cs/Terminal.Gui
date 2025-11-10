@@ -29,7 +29,7 @@ public class PosTests ()
                        Assert.Equal (2, v.Y = 2);
                    };
 
-        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();
@@ -96,15 +96,7 @@ public class PosTests ()
                              }
                          };
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
-                                 {
-                                     while (count < 20)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnInstanceOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -113,6 +105,7 @@ public class PosTests ()
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnInstanceOnIteration;
 
         Assert.Equal (20, count);
 
@@ -120,6 +113,18 @@ public class PosTests ()
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnInstanceOnIteration (object s, IterationEventArgs a)
+        {
+            while (count < 20)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -166,15 +171,7 @@ public class PosTests ()
                              }
                          };
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
-                                 {
-                                     while (count > 0)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -183,6 +180,7 @@ public class PosTests ()
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, count);
 
@@ -190,6 +188,18 @@ public class PosTests ()
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count > 0)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -210,7 +220,7 @@ public class PosTests ()
                        Assert.Equal (2, w.Y = 2);
                    };
 
-        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();
@@ -236,7 +246,7 @@ public class PosTests ()
                        Assert.Equal (2, w.Y = 2);
                    };
 
-        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();

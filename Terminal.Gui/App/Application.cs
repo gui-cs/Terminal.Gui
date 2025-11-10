@@ -39,17 +39,6 @@ namespace Terminal.Gui.App;
 /// <remarks></remarks>
 public static partial class Application
 {
-    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
-    public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
-    
-    /// <summary>
-    /// <para>
-    /// Handles recurring events. These are invoked on the main UI thread - allowing for
-    /// safe updates to <see cref="View"/> instances.
-    /// </para>
-    /// </summary>
-    public static ITimedEvents? TimedEvents => ApplicationImpl.Instance?.TimedEvents;
-
     /// <summary>
     /// Maximum number of iterations of the main loop (and hence draws)
     /// to allow to occur per second. Defaults to <see cref="DefaultMaximumIterationsPerSecond"/>> which is a 40ms sleep
@@ -128,6 +117,10 @@ public static partial class Application
         return sb.ToString ();
     }
 
+    /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
+    public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
+
+
     internal static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
     {
         ResourceManager rm = new (typeof (Strings));
@@ -169,15 +162,5 @@ public static partial class Application
 
         // It's called from a self-contained single-file and get available cultures from the embedded resources strings.
         return GetAvailableCulturesFromEmbeddedResources ();
-    }
-
-    // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
-    // Encapsulate all setting of initial state for Application; Having
-    // this in a function like this ensures we don't make mistakes in
-    // guaranteeing that the state of this singleton is deterministic when Init
-    // starts running and after Shutdown returns.
-    internal static void ResetState (bool ignoreDisposed = false)
-    {
-        ApplicationImpl.Instance?.ResetState (ignoreDisposed);
     }
 }

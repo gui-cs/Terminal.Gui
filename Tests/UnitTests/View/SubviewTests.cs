@@ -1,5 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.ViewTests;
 
@@ -13,7 +12,6 @@ public class SubViewTests
     [AutoInitShutdown]
     public void Initialized_Event_Will_Be_Invoked_When_Added_Dynamically ()
     {
-
         var t = new Toplevel { Id = "0" };
 
         var w = new Window { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
@@ -29,7 +27,7 @@ public class SubViewTests
                              Assert.Equal (1, wc);
                              Assert.Equal (1, v1c);
                              Assert.Equal (1, v2c);
-                             Assert.Equal (0, sv1c); // Added after t in the ApplicationImpl.Instance.Iteration.
+                             Assert.Equal (0, sv1c); // Added after t in the Application.Iteration.
 
                              Assert.True (t.CanFocus);
                              Assert.True (w.CanFocus);
@@ -64,28 +62,11 @@ public class SubViewTests
         w.Add (v1, v2);
         t.Add (w);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
-                                 {
-                                     var sv1 = new View { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
-
-                                     sv1.Initialized += (s, e) =>
-                                                        {
-                                                            sv1c++;
-                                                            Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
-                                                            Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
-                                                            Assert.False (sv1.CanFocus);
-
-                                                            //Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
-                                                            Assert.False (sv1.CanFocus);
-                                                        };
-
-                                     v1.Add (sv1);
-
-                                     Application.LayoutAndDraw ();
-                                     t.Running = false;
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (t);
+        Application.Iteration -= OnApplicationOnIteration;
+
         t.Dispose ();
         Application.Shutdown ();
 
@@ -99,5 +80,28 @@ public class SubViewTests
         Assert.True (w.CanFocus);
         Assert.False (v1.CanFocus);
         Assert.False (v2.CanFocus);
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            var sv1 = new View { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
+
+            sv1.Initialized += (s, e) =>
+                               {
+                                   sv1c++;
+                                   Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
+                                   Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
+                                   Assert.False (sv1.CanFocus);
+
+                                   //Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
+                                   Assert.False (sv1.CanFocus);
+                               };
+
+            v1.Add (sv1);
+
+            Application.LayoutAndDraw ();
+            t.Running = false;
+        }
     }
 }

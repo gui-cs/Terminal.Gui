@@ -80,6 +80,8 @@ public class ApplicationScreenTests
         // Assert
         Assert.Equal (4, clearedContentsRaised);
 
+        Application.Driver!.ClearedContents -= OnClearedContents;
+
         Application.End (rs);
 
         return;

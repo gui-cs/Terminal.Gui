@@ -24,7 +24,7 @@ public class SyncrhonizationContextTests
 
     [Theory]
     [InlineData ("fake")]
-   // [InlineData ("windows")]
+    // [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
     public void SynchronizationContext_Post (string driverName = null)
@@ -67,14 +67,7 @@ public class SyncrhonizationContextTests
             Application.Run ().Dispose ();
             Assert.True (success);
 
-            if (ApplicationImpl.Instance is ApplicationImpl)
-            {
-                ApplicationImpl.Instance.Shutdown ();
-            }
-            else
-            {
-                Application.Shutdown ();
-            }
+            Application.Shutdown ();
         }
     }
 

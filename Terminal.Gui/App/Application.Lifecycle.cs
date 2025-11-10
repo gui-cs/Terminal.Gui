@@ -56,36 +56,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
     }
 
-
-    /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
-    /// <returns></returns>
-    [RequiresUnreferencedCode ("AOT")]
-    public static (List<Type?>, List<string?>) GetDriverTypes ()
-    {
-        // use reflection to get the list of drivers
-        List<Type?> driverTypes = new ();
-
-        // Only inspect the IDriver assembly
-        var asm = typeof (IDriver).Assembly;
-
-        foreach (Type? type in asm.GetTypes ())
-        {
-            if (typeof (IDriver).IsAssignableFrom (type) &&
-                type is { IsAbstract: false, IsClass: true })
-            {
-                driverTypes.Add (type);
-            }
-        }
-
-        List<string?> driverTypeNames = driverTypes
-                                        .Where (d => !typeof (IDriver).IsAssignableFrom (d))
-                                        .Select (d => d!.Name)
-                                        .Union (["dotnet", "windows", "unix", "fake"])
-                                        .ToList ()!;
-
-        return (driverTypes, driverTypeNames);
-    }
-
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
@@ -109,7 +79,17 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         internal set => ApplicationImpl.Instance.Initialized = value;
     }
 
+    /// <inheritdoc cref="IApplication.InitializedChanged"/>
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged
+    {
+        add => ApplicationImpl.Instance.InitializedChanged += value;
+        remove => ApplicationImpl.Instance.InitializedChanged -= value;
+    }
 
-
-
+    // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
+    // Encapsulate all setting of initial state for Application; Having
+    // this in a function like this ensures we don't make mistakes in
+    // guaranteeing that the state of this singleton is deterministic when Init
+    // starts running and after Shutdown returns.
+    internal static void ResetState (bool ignoreDisposed = false) => ApplicationImpl.Instance?.ResetState (ignoreDisposed);
 }

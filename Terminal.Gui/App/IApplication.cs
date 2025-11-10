@@ -77,15 +77,6 @@ public interface IApplication
     /// </remarks>
     public void ResetState (bool ignoreDisposed = false);
 
-    /// <summary>
-    ///     Gets whether this is the legacy implementation (<see langword="false"/>) or modern implementation
-    ///     (<see langword="true"/>).
-    /// </summary>
-    /// <remarks>
-    ///     <see cref="ApplicationImpl"/> returns <see langword="false"/> (modern implementation).
-    /// </remarks>
-    bool IsLegacy { get; }
-
     #endregion Initialization and Shutdown
 
     #region Begin->Run->Iteration->Stop->End

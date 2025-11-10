@@ -17,7 +17,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var btnAcceptCount = 0;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iteration++;
 
@@ -62,7 +62,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var iteration = 0;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iteration++;
 
@@ -100,7 +100,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var btnAcceptCount = 0;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iteration++;
 
@@ -158,7 +158,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var mbFrame = Rectangle.Empty;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -197,7 +197,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -267,7 +267,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -342,7 +342,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         int iterations = -1;
         Application.Driver!.SetScreenSize(100, 100);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -379,7 +379,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         int iterations = -1;
         Application.Driver?.SetScreenSize(100, 100);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -412,7 +412,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         int iterations = -1;
         Application.Driver?.SetScreenSize(100, 100);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -447,7 +447,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
 
@@ -499,7 +499,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
-        ApplicationImpl.Instance.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
+        Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
         int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
 
         Assert.Equal (0, res);

@@ -56,13 +56,13 @@ public class ScenariosStressTests : TestsAllViews
 
         Stopwatch? stopwatch = null;
 
-        ApplicationImpl.Instance.InitializedChanged += OnApplicationOnInitializedChanged;
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
         Application.ForceDriver = "FakeDriver";
         scenario!.Main ();
         scenario.Dispose ();
         scenario = null;
         Application.ForceDriver = string.Empty;
-        ApplicationImpl.Instance.InitializedChanged -= OnApplicationOnInitializedChanged;
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
         lock (_timeoutLock)
         {
@@ -97,16 +97,16 @@ public class ScenariosStressTests : TestsAllViews
                     timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
                 }
 
-                ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+                Application.Iteration += OnApplicationOnIteration;
                 Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
-                ApplicationImpl.Instance.NotifyNewRunState += OnApplicationNotifyNewRunState;
+                Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
 
                 stopwatch = Stopwatch.StartNew ();
             }
             else
             {
-                ApplicationImpl.Instance.NotifyNewRunState -= OnApplicationNotifyNewRunState;
-                ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+                Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
+                Application.Iteration -= OnApplicationOnIteration;
                 stopwatch!.Stop ();
             }
 

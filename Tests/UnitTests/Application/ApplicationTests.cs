@@ -38,7 +38,7 @@ public class ApplicationTests
         object timeout = null;
         var timeoutCount = 0;
 
-        ApplicationImpl.Instance.InitializedChanged += OnApplicationOnInitializedChanged;
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
         _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
         Application.Run<Toplevel> ().Dispose ();
@@ -50,7 +50,7 @@ public class ApplicationTests
         Assert.Equal (1, timeoutCount);
         Application.Shutdown ();
 
-        ApplicationImpl.Instance.InitializedChanged -= OnApplicationOnInitializedChanged;
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
         lock (_timeoutLock)
         {
@@ -78,7 +78,7 @@ public class ApplicationTests
         {
             if (a.Value)
             {
-                ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+                Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
 
                 lock (_timeoutLock)
@@ -89,7 +89,7 @@ public class ApplicationTests
             }
             else
             {
-                ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+                Application.Iteration -= OnApplicationOnIteration;
                 shutdown = true;
             }
         }
@@ -199,28 +199,25 @@ public class ApplicationTests
         var stopwatch = new Stopwatch ();
         stopwatch.Start ();
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
-
-        RunState runstate = null;
+        RunState runState = null;
 
         EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
-                                                            runstate = e.State;
+                                                            runState = e.State;
                                                         };
-        ApplicationImpl.Instance.NotifyNewRunState += newRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         var topLevel = new Toplevel ();
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
-        Assert.NotNull (runstate);
-        Assert.Equal (rs, runstate);
+        Assert.NotNull (runState);
+        Assert.Equal (rs, runState);
 
         Assert.Equal (topLevel, Application.Top);
 
-        ApplicationImpl.Instance.NotifyNewRunState -= newRunStateFn;
-        Application.End (runstate);
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.NotifyNewRunState -= newRunStateFn;
+        Application.End (runState);
 
         Assert.NotNull (Application.Top);
         Assert.NotNull (Application.Driver);
@@ -236,11 +233,6 @@ public class ApplicationTests
 
         _output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
 
-        return;
-
-        // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
-        // if we don't stop
-        void OnApplicationOnIteration (object s, IterationEventArgs a) { Application.RequestStop (); }
     }
 
     // Legacy driver test - all InlineData commented out
@@ -427,17 +419,17 @@ public class ApplicationTests
         var initialized = false;
         var shutdown = false;
 
-        ApplicationImpl.Instance.InitializedChanged += OnApplicationOnInitializedChanged;
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        ApplicationImpl.Instance.Init (driverName: "fake");
+        Application.Init (driverName: "fake");
         Assert.True (initialized);
         Assert.False (shutdown);
 
-        ApplicationImpl.Instance.Shutdown ();
+        Application.Shutdown ();
         Assert.True (initialized);
         Assert.True (shutdown);
 
-        ApplicationImpl.Instance.InitializedChanged -= OnApplicationOnInitializedChanged;
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
         return;
 
@@ -496,7 +488,7 @@ public class ApplicationTests
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        ApplicationImpl.Instance.NotifyNewRunState += newRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
@@ -505,7 +497,7 @@ public class ApplicationTests
 
         Assert.Equal (topLevel, Application.Top);
 
-        ApplicationImpl.Instance.NotifyNewRunState -= newRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.NotNull (Application.Top);
@@ -575,7 +567,7 @@ public class ApplicationTests
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
-        ApplicationImpl.Instance.TimedEvents!.RunTimers ();
+        Application.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
@@ -588,9 +580,9 @@ public class ApplicationTests
 
         Application.Init (null, "fake");
 
-        ApplicationImpl.Instance.Iteration += Application_Iteration;
+        Application.Iteration += Application_Iteration;
         Application.Run<Toplevel> ().Dispose ();
-        ApplicationImpl.Instance.Iteration -= Application_Iteration;
+        Application.Iteration -= Application_Iteration;
 
         Assert.Equal (1, iteration);
         Application.Shutdown ();
@@ -617,7 +609,7 @@ public class ApplicationTests
 
         Application.Driver!.SetScreenSize (80, 25);
 
-        Assert.Equal (new (0, 0, 80, 25), driver.Screen);
+        Assert.Equal (new (0, 0, 80, 25), driver!.Screen);
         Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
         // TODO: Should not be possible to manually change these at whim!
@@ -698,10 +690,10 @@ public class ApplicationTests
         // but Begin does
         var initTop = new Toplevel ();
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run<Toplevel> ();
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplicationOnIteration;
 
 #if DEBUG_IDISPOSABLE
         Assert.False (initTop.WasDisposed);
@@ -814,9 +806,9 @@ public class ApplicationTests
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run (top);
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplicationOnIteration;
 
         top.Dispose ();
         Application.Shutdown ();
@@ -840,9 +832,9 @@ public class ApplicationTests
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run (top);
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplicationOnIteration;
 
         top.Dispose ();
         Application.Shutdown ();
@@ -867,9 +859,9 @@ public class ApplicationTests
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run (top);
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplicationOnIteration;
 
         top.Dispose ();
         Application.Shutdown ();
@@ -986,9 +978,9 @@ public class ApplicationTests
         Application.StopAfterFirstIteration = true;
 
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplicationOnIteration;
         Toplevel top = Application.Run (null, "fake");
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplicationOnIteration;
 #if DEBUG_IDISPOSABLE
         Assert.Equal (top, Application.Top);
         Assert.False (top.WasDisposed);
@@ -1020,7 +1012,7 @@ public class ApplicationTests
         Assert.Null (Application.Top);
 
         Application.StopAfterFirstIteration = true;
-                                 
+
         Application.Run<Toplevel> (null, "fake");
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top!.WasDisposed);
@@ -1055,9 +1047,9 @@ public class ApplicationTests
 
         Application.Init (null, "fake");
 
-        ApplicationImpl.Instance.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run (new Toplevel ());
-        ApplicationImpl.Instance.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplicationOnIteration;
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top!.WasDisposed);
         Exception exception = Record.Exception (Application.Shutdown);

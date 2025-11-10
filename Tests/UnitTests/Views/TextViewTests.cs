@@ -63,50 +63,55 @@ public class TextViewTests
         var top = new Toplevel ();
         top.Add (_textView);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
-                                 {
-                                     int width = _textView.Viewport.Width - 1;
-                                     Assert.Equal (30, width + 1);
-                                     Assert.Equal (10, _textView.Height);
-                                     _textView.Text = "";
-
-                                     for (var i = 0; i < 100; i++)
-                                     {
-                                         _textView.Text += "\t";
-                                     }
-
-                                     var col = 100;
-                                     int tabWidth = _textView.TabWidth;
-                                     int leftCol = _textView.LeftColumn;
-                                     _textView.MoveEnd ();
-                                     Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                     leftCol = GetLeftCol (leftCol);
-                                     Assert.Equal (leftCol, _textView.LeftColumn);
-
-                                     while (col > 0)
-                                     {
-                                         col--;
-                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     while (col < 100)
-                                     {
-                                         col++;
-                                         _textView.NewKeyDownEvent (Key.Tab);
-                                         Assert.Equal (new (col, 0), _textView.CursorPosition);
-                                         leftCol = GetLeftCol (leftCol);
-                                         Assert.Equal (leftCol, _textView.LeftColumn);
-                                     }
-
-                                     Application.Top.Remove (_textView);
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            int width = _textView.Viewport.Width - 1;
+            Assert.Equal (30, width + 1);
+            Assert.Equal (10, _textView.Height);
+            _textView.Text = "";
+
+            for (var i = 0; i < 100; i++)
+            {
+                _textView.Text += "\t";
+            }
+
+            var col = 100;
+            int tabWidth = _textView.TabWidth;
+            int leftCol = _textView.LeftColumn;
+            _textView.MoveEnd ();
+            Assert.Equal (new (col, 0), _textView.CursorPosition);
+            leftCol = GetLeftCol (leftCol);
+            Assert.Equal (leftCol, _textView.LeftColumn);
+
+            while (col > 0)
+            {
+                col--;
+                _textView.NewKeyDownEvent (Key.Tab.WithShift);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            while (col < 100)
+            {
+                col++;
+                _textView.NewKeyDownEvent (Key.Tab);
+                Assert.Equal (new (col, 0), _textView.CursorPosition);
+                leftCol = GetLeftCol (leftCol);
+                Assert.Equal (leftCol, _textView.LeftColumn);
+            }
+
+            Application.Top.Remove (_textView);
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -180,7 +185,7 @@ public class TextViewTests
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_Init ()
     {
-        ApplicationImpl.Instance.Iteration += (s, a) => { Application.RequestStop (); };
+        Application.StopAfterFirstIteration = true;
 
         var expectedRow = 0;
         var expectedCol = 0;
@@ -236,7 +241,7 @@ public class TextViewTests
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_Set_Text ()
     {
-        ApplicationImpl.Instance.Iteration += (s, a) => { Application.RequestStop (); };
+        Application.StopAfterFirstIteration = true;
         var eventcount = 0;
 
         var expectedRow = 0;
@@ -276,7 +281,7 @@ public class TextViewTests
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_Typing ()
     {
-        ApplicationImpl.Instance.Iteration += (s, a) => { Application.RequestStop (); };
+        Application.StopAfterFirstIteration = true;
         var eventcount = 0;
 
         var expectedRow = 0;
@@ -4898,7 +4903,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -4941,7 +4946,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -4984,7 +4989,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -5036,7 +5041,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
@@ -5090,7 +5095,7 @@ This is the second line.
         var top = new Toplevel ();
         top.Add (_textView);
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
+        Application.Iteration += (s, a) =>
                                  {
                                      int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);

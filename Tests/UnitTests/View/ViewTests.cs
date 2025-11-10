@@ -499,42 +499,47 @@ public class ViewTests
 
         var iterations = 0;
 
-        ApplicationImpl.Instance.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
-
-                                     Assert.True (button.Visible);
-                                     Assert.True (button.CanFocus);
-                                     Assert.True (button.HasFocus);
-                                     Assert.True (win.Visible);
-                                     Assert.True (win.CanFocus);
-                                     Assert.True (win.HasFocus);
-
-                                     win.Visible = false;
-                                     Assert.True (button.Visible);
-                                     Assert.True (button.CanFocus);
-                                     Assert.False (button.HasFocus);
-                                     Assert.False (win.Visible);
-                                     Assert.True (win.CanFocus);
-                                     Assert.False (win.HasFocus);
-
-                                     button.SetFocus ();
-                                     Assert.False (button.HasFocus);
-                                     Assert.False (win.HasFocus);
-
-                                     win.SetFocus ();
-                                     Assert.False (button.HasFocus);
-                                     Assert.False (win.HasFocus);
-
-                                     win.Visible = true;
-                                     Assert.True (button.HasFocus);
-                                     Assert.True (win.HasFocus);
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
         Assert.Equal (1, iterations);
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iterations++;
+
+            Assert.True (button.Visible);
+            Assert.True (button.CanFocus);
+            Assert.True (button.HasFocus);
+            Assert.True (win.Visible);
+            Assert.True (win.CanFocus);
+            Assert.True (win.HasFocus);
+
+            win.Visible = false;
+            Assert.True (button.Visible);
+            Assert.True (button.CanFocus);
+            Assert.False (button.HasFocus);
+            Assert.False (win.Visible);
+            Assert.True (win.CanFocus);
+            Assert.False (win.HasFocus);
+
+            button.SetFocus ();
+            Assert.False (button.HasFocus);
+            Assert.False (win.HasFocus);
+
+            win.SetFocus ();
+            Assert.False (button.HasFocus);
+            Assert.False (win.HasFocus);
+
+            win.Visible = true;
+            Assert.True (button.HasFocus);
+            Assert.True (win.HasFocus);
+
+            Application.RequestStop ();
+        }
     }
 }
