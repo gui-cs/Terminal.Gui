@@ -68,3 +68,8 @@ BenchmarkDotNet.Artifacts/
 *.log.*
 
 log.*
+
+/Test/coverage/
+!/Test/coverage/.gitkeep   # keep folder in repo
+/Test/report/
+*.cobertura.xml

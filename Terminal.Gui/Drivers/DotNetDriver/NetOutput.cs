@@ -163,20 +163,27 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (visibility != CursorVisibility.Invisible)
+        try
         {
-            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            if (visibility != CursorVisibility.Invisible)
             {
-                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+                {
+                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
 
-                Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
             }
-
-            Write (EscSeqUtils.CSI_ShowCursor);
+            else
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
         }
-        else
+        catch
         {
-            Write (EscSeqUtils.CSI_HideCursor);
+            // Ignore any exceptions
         }
     }
 }
