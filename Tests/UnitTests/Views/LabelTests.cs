@@ -856,22 +856,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > -1)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-
-                                         if (count == 0)
-                                         {
-                                             field.NewKeyDownEvent (Key.Enter);
-
-                                             break;
-                                         }
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -880,10 +865,30 @@ e
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, count);
         Assert.Equal (count, listLabels.Count);
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count > -1)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+
+                if (count == 0)
+                {
+                    field.NewKeyDownEvent (Key.Enter);
+
+                    break;
+                }
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This is a Label test. Move to Label tests.
@@ -1008,22 +1013,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count < 21)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-
-                                         if (count == 20)
-                                         {
-                                             field.NewKeyDownEvent (Key.Enter);
-
-                                             break;
-                                         }
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -1032,10 +1022,30 @@ e
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (20, count);
         Assert.Equal (count, listLabels.Count);
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count < 21)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+
+                if (count == 20)
+                {
+                    field.NewKeyDownEvent (Key.Enter);
+
+                    break;
+                }
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     [Fact]

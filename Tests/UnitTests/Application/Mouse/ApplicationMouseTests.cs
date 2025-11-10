@@ -253,7 +253,7 @@ public class ApplicationMouseTests
 
         //int iterations = -1;
 
-        //Application.Iteration += (s, a) =>
+        //ApplicationImpl.Instance.Iteration += (s, a) =>
         //                         {
         //                             iterations++;
 

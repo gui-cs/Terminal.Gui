@@ -643,12 +643,7 @@ public class DrawTests (ITestOutputHelper output)
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Assert.Equal (-2, view.X);
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         try
         {
@@ -659,11 +654,24 @@ public class DrawTests (ITestOutputHelper output)
             // After the fix this exception will not be caught.
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
+        finally
+        {
+            Application.Iteration -= OnApplicationOnIteration;
+        }
 
         top.Dispose ();
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            Assert.Equal (-2, view.X);
+
+            Application.RequestStop ();
+        }
     }
 
 

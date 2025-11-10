@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Base class for reading console input in perpetual loop.
 ///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
-///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>.
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>.
 /// </summary>
 /// <typeparam name="TInputRecord"></typeparam>
 public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>

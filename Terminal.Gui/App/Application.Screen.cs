@@ -18,29 +18,6 @@ public static partial class Application // Screen related stuff; intended to hid
         set => ApplicationImpl.Instance.Screen = value;
     }
 
-    /// <summary>Invoked when the terminal's size changed. The new size of the terminal is provided.</summary>
-    public static event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
-
-    /// <summary>
-    ///     Called when the application's size has changed. Sets the size of all <see cref="Toplevel"/>s and fires the
-    ///     <see cref="ScreenChanged"/> event.
-    /// </summary>
-    /// <param name="screen">The new screen size and position.</param>
-    public static void RaiseScreenChangedEvent (Rectangle screen)
-    {
-        Screen = new (Point.Empty, screen.Size);
-
-        ScreenChanged?.Invoke (ApplicationImpl.Instance, new (screen));
-
-        foreach (Toplevel t in TopLevels)
-        {
-            t.OnSizeChanging (new (screen.Size));
-            t.SetNeedsLayout ();
-        }
-
-        LayoutAndDraw (true);
-    }
-
     /// <summary>
     ///     Gets or sets whether the screen will be cleared, and all Views redrawn, during the next Application iteration.
     /// </summary>

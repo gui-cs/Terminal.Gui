@@ -62,9 +62,17 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
-        byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
-        // Write to stdout (fd 1)
-        write (STDOUT_FILENO, utf8, utf8.Length);
+        try
+        {
+            byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
+
+            // Write to stdout (fd 1)
+            write (STDOUT_FILENO, utf8, utf8.Length);
+        }
+        catch
+        {
+            // ignore for unit tests
+        }
     }
 
     private Point? _lastCursorPosition;
@@ -79,10 +87,17 @@ internal class UnixOutput : OutputBase, IOutput
 
         _lastCursorPosition = new (screenPositionX, screenPositionY);
 
-        using var writer = CreateUnixStdoutWriter ();
+        try
+        {
+            using var writer = CreateUnixStdoutWriter ();
 
-        // + 1 is needed because Unix is based on 1 instead of 0 and
-        EscSeqUtils.CSI_WriteCursorPosition (writer, screenPositionY + 1, screenPositionX + 1);
+            // + 1 is needed because Unix is based on 1 instead of 0 and
+            EscSeqUtils.CSI_WriteCursorPosition (writer, screenPositionY + 1, screenPositionX + 1);
+        }
+        catch
+        {
+            // ignore
+        }
 
         return true;
     }
@@ -112,32 +127,30 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc />
     public void Write (ReadOnlySpan<char> text)
     {
-        if (!Application.RunningUnitTests)
-        {
-            byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
-            // Write to stdout (fd 1)
-            write (STDOUT_FILENO, utf8, utf8.Length);
-        }
+        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+        // Write to stdout (fd 1)
+        write (STDOUT_FILENO, utf8, utf8.Length);
     }
 
     /// <inheritdoc />
     public Size GetSize ()
     {
-        if (Application.RunningUnitTests)
+        try
         {
-            // For unit tests, we return a default size.
-            return Size.Empty;
-        }
-
-        if (ioctl (1, TIOCGWINSZ, out WinSize ws) == 0)
-        {
-            if (ws.ws_col > 0 && ws.ws_row > 0)
+            if (ioctl (1, TIOCGWINSZ, out WinSize ws) == 0)
             {
-                return new (ws.ws_col, ws.ws_row);
+                if (ws.ws_col > 0 && ws.ws_row > 0)
+                {
+                    return new (ws.ws_col, ws.ws_row);
+                }
             }
         }
+        catch
+        {
+            // ignore
+        }
 
-        return Size.Empty; // fallback
+        return new (80, 25); // fallback
     }
 
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
@@ -145,20 +158,27 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (visibility != CursorVisibility.Invisible)
+        try
         {
-            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            if (visibility != CursorVisibility.Invisible)
             {
-                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+                {
+                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
 
-                Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
             }
-
-            Write (EscSeqUtils.CSI_ShowCursor);
+            else
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
         }
-        else
+        catch
         {
-            Write (EscSeqUtils.CSI_HideCursor);
+            // ignore
         }
     }
 

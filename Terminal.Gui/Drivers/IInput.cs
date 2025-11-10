@@ -9,7 +9,7 @@ namespace Terminal.Gui.Drivers;
 /// <remarks>
 ///     <para>
 ///         Implementations run on a separate thread (started by
-///         <see cref="Terminal.Gui.App.MainLoopCoordinator{TInputRecord}.StartInputTask"/>)
+///         <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>)
 ///         and continuously read platform-specific input from the console, placing it into a thread-safe queue
 ///         for processing by <see cref="IInputProcessor"/> on the main UI thread.
 ///     </para>
@@ -131,7 +131,7 @@ public interface IInput<TInputRecord> : IDisposable
     /// <remarks>
     ///     <para>
     ///         <b>Threading:</b> This method runs on a dedicated input thread created by
-    ///         <see cref="MainLoopCoordinator{TInputRecord}.StartInputTask"/>. and blocks until
+    ///         <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>. and blocks until
     ///         cancellation is requested. It should never be called from the main UI thread.
     ///     </para>
     ///     <para>

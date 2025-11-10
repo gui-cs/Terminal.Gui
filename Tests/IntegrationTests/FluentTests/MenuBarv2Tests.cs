@@ -346,7 +346,6 @@ public class MenuBarv2Tests
                                                 menuBar.EnableForDesign (ref top);
                                                 Application.Top!.Add (menuBar);
                                             })
-                                     .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)

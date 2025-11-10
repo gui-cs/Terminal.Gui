@@ -189,7 +189,8 @@ public class Scenario : IDisposable
             }
 
             Application.Iteration += OnApplicationOnIteration;
-            Application.Driver!.ClearedContents += (sender, args) => BenchmarkResults.ClearedContentCount++;
+
+            Application.Driver!.ClearedContents += OnClearedContents;
             Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
 
 
@@ -197,11 +198,16 @@ public class Scenario : IDisposable
         }
         else
         {
+            Application.Driver!.ClearedContents -= OnClearedContents;
             Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
             Application.Iteration -= OnApplicationOnIteration;
             BenchmarkResults.Duration = _stopwatch!.Elapsed;
             _stopwatch?.Stop ();
         }
+
+        return;
+
+        void OnClearedContents (object? sender, EventArgs args) => BenchmarkResults.ClearedContentCount++;
     }
 
     private void OnApplicationOnIteration (object? s, IterationEventArgs a)

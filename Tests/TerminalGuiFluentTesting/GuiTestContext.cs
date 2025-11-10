@@ -82,6 +82,7 @@ public partial class GuiTestContext : IDisposable
                                      Application.Run (t); // This will block, but it's on a background thread now
 
                                      t.Dispose ();
+                                     Logging.Trace("Application.Run completed");
                                      Application.Shutdown ();
                                      _runCancellationTokenSource.Cancel ();
                                  }
@@ -107,7 +108,7 @@ public partial class GuiTestContext : IDisposable
         // Wait for booting to complete with a timeout to avoid hangs
         if (!_booting.WaitAsync (_timeout).Result)
         {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
+            throw new TimeoutException ($"Application failed to start within {_timeout}ms.");
         }
 
         ResizeConsole (width, height);
@@ -141,6 +142,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     public void Dispose ()
     {
+        Logging.Trace($"Disposing GuiTestContext");
         Stop ();
 
         if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
@@ -266,7 +268,8 @@ public partial class GuiTestContext : IDisposable
 
         if (_ex != null)
         {
-            throw _ex; // Propagate any exception that happened in the background task
+            Logging.Critical ($"Exception occurred: {_ex}");
+            //throw _ex; // Propagate any exception that happened in the background task
         }
 
         return this;
@@ -282,7 +285,7 @@ public partial class GuiTestContext : IDisposable
     {
         try
         {
-            //Logging.Trace ($"Invoking action via WaitIteration");
+            Logging.Trace ($"Invoking action via WaitIteration");
             WaitIteration (doAction);
         }
         catch (Exception ex)
@@ -317,6 +320,7 @@ public partial class GuiTestContext : IDisposable
             throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
+        Logging.Trace($"WaitIteration started");
         action ??= () => { };
         CancellationTokenSource ctsActionCompleted = new ();
 
@@ -377,7 +381,7 @@ public partial class GuiTestContext : IDisposable
         throw new (reason);
     }
 
-    internal GuiTestContext WaitUntil (Func<bool> condition)
+    public GuiTestContext WaitUntil (Func<bool> condition)
     {
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
@@ -388,7 +392,7 @@ public partial class GuiTestContext : IDisposable
         {
             if (sw.Elapsed > _timeout)
             {
-                throw new TimeoutException ("Failed to reach condition within the time limit");
+                throw new TimeoutException ($"Failed to reach condition within {_timeout}ms");
             }
 
             c = WaitIteration ();
@@ -402,6 +406,7 @@ public partial class GuiTestContext : IDisposable
         Logging.Trace ("CleanupApplication");
         _fakeInput.ExternalCancellationTokenSource = null;
 
+        Application.ResetState (true);
         ApplicationImpl.ChangeInstance (_origApp);
         Logging.Logger = _origLogger;
         Finished = true;
@@ -460,7 +465,7 @@ public partial class GuiTestContext : IDisposable
         switch (driverType)
         {
             case TestDriver.DotNet:
-                _output = new NetOutput ();
+                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 

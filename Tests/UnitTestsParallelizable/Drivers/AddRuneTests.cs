@@ -7,15 +7,9 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class AddRuneTests : ParallelizableBase
+public class AddRuneTests (ITestOutputHelper output) : ParallelizableBase
 {
-    private readonly ITestOutputHelper _output;
-
-    public AddRuneTests (ITestOutputHelper output)
-    {
-        Application.RunningUnitTests = true;
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void AddRune ()

@@ -50,15 +50,7 @@ public class PosViewTests (ITestOutputHelper output)
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > 0)
-                                     {
-                                         field.NewKeyDownEvent (new (KeyCode.Enter));
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -67,10 +59,24 @@ public class PosViewTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
+
         top.Dispose ();
         Assert.Equal (0, count);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count > 0)
+            {
+                field.NewKeyDownEvent (new (KeyCode.Enter));
+            }
+
+            Application.RequestStop ();
+        }
     }
 }

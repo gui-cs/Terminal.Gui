@@ -193,21 +193,31 @@ public partial class GuiTestContext
     /// </summary>
     public GuiTestContext EnqueueKeyEvent (Key key)
     {
-        Logging.Trace ($"Enqueuing key: {key}");
+        //Logging.Trace ($"Enqueuing key: {key}");
 
-        // First, enqueue the input
-        if (Application.Driver is { })
+        // Enqueue the key event and wait for it to be processed.
+        // We do this by subscribing to the Driver.KeyDown event and waiting until it is raised.
+        // This prevents the application from missing the key event if we enqueue it and immediately return.
+        bool keyReceived = false;
+        if (_applicationImpl?.Driver is { })
         {
-            Application.Driver.EnqueueKeyEvent (key);
-            Thread.Sleep(100);
+            _applicationImpl.Driver.KeyDown += DriverOnKeyDown;
+            _applicationImpl.Driver.EnqueueKeyEvent (key);
+            WaitUntil (() => keyReceived);
         }
         else
         {
             Fail ("Expected Application.Driver to be non-null.");
         }
 
-        WaitIteration ();
 
         return this;
+
+        void DriverOnKeyDown (object? sender, Key e)
+        {
+            _applicationImpl.Driver.KeyDown -= DriverOnKeyDown;
+            keyReceived = true;
+        }
+
     }
 }

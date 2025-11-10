@@ -58,7 +58,6 @@ public class GlobalTestSetup : IDisposable
         Assert.False (Application.Initialized);
         Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
         Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
-        Assert.False (Application._forceFakeConsole);
         Assert.Null (Application.MainThreadId);
         Assert.Empty (Application.TopLevels);
         Assert.Empty (Application.CachedViewsUnderMouse);
@@ -76,7 +75,7 @@ public class GlobalTestSetup : IDisposable
         // Events - Can't check
         //Assert.Null (Application.NotifyNewRunState);
         //Assert.Null (Application.NotifyNewRunState);
-        //Assert.Null (Application.Iteration);
+        //Assert.Null (ApplicationImpl.Instance.Iteration);
         //Assert.Null (Application.SizeChanging);
         //Assert.Null (Application.GrabbedMouse);
         //Assert.Null (Application.UnGrabbingMouse);

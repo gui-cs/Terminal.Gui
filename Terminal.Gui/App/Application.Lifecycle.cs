@@ -2,6 +2,10 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.VisualBasic;
+using Terminal.Gui.App;
+using Terminal.Gui.Drivers;
+using Terminal.Gui.Views;
 
 namespace Terminal.Gui.App;
 
@@ -52,63 +56,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
     }
 
-    internal static void SubscribeDriverEvents ()
-    {
-        ArgumentNullException.ThrowIfNull (Driver);
-
-        Driver.SizeChanged += Driver_SizeChanged;
-        Driver.KeyDown += Driver_KeyDown;
-        Driver.KeyUp += Driver_KeyUp;
-        Driver.MouseEvent += Driver_MouseEvent;
-    }
-
-    internal static void UnsubscribeDriverEvents ()
-    {
-        ArgumentNullException.ThrowIfNull (Driver);
-
-        Driver.SizeChanged -= Driver_SizeChanged;
-        Driver.KeyDown -= Driver_KeyDown;
-        Driver.KeyUp -= Driver_KeyUp;
-        Driver.MouseEvent -= Driver_MouseEvent;
-    }
-
-    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e)
-    {
-        RaiseScreenChangedEvent (new Rectangle (new (0, 0), e.Size!.Value));
-    }
-    private static void Driver_KeyDown (object? sender, Key e) { RaiseKeyDownEvent (e); }
-    private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
-    private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
-
-    /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
-    /// <returns></returns>
-    [RequiresUnreferencedCode ("AOT")]
-    public static (List<Type?>, List<string?>) GetDriverTypes ()
-    {
-        // use reflection to get the list of drivers
-        List<Type?> driverTypes = new ();
-
-        // Only inspect the IDriver assembly
-        var asm = typeof (IDriver).Assembly;
-
-        foreach (Type? type in asm.GetTypes ())
-        {
-            if (typeof (IDriver).IsAssignableFrom (type) &&
-                type is { IsAbstract: false, IsClass: true })
-            {
-                driverTypes.Add (type);
-            }
-        }
-
-        List<string?> driverTypeNames = driverTypes
-                                        .Where (d => !typeof (IDriver).IsAssignableFrom (d))
-                                        .Select (d => d!.Name)
-                                        .Union (["dotnet", "windows", "unix", "fake"])
-                                        .ToList ()!;
-
-        return (driverTypes, driverTypeNames);
-    }
-
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
@@ -132,19 +79,17 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         internal set => ApplicationImpl.Instance.Initialized = value;
     }
 
-    /// <summary>
-    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
-    /// </summary>
-    /// <remarks>
-    ///     Intended to support unit tests that need to know when the application has been initialized.
-    /// </remarks>
-    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
-
-    /// <summary>
-    ///  Raises the <see cref="InitializedChanged"/> event.
-    /// </summary>
-    internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
+    /// <inheritdoc cref="IApplication.InitializedChanged"/>
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged
     {
-        Application.InitializedChanged?.Invoke (sender, e);
+        add => ApplicationImpl.Instance.InitializedChanged += value;
+        remove => ApplicationImpl.Instance.InitializedChanged -= value;
     }
+
+    // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
+    // Encapsulate all setting of initial state for Application; Having
+    // this in a function like this ensures we don't make mistakes in
+    // guaranteeing that the state of this singleton is deterministic when Init
+    // starts running and after Shutdown returns.
+    internal static void ResetState (bool ignoreDisposed = false) => ApplicationImpl.Instance?.ResetState (ignoreDisposed);
 }

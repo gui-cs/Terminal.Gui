@@ -43,30 +43,27 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
 
-        if (Application.RunningUnitTests)
+        try
         {
-            return;
+            _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
+
+            GetConsoleMode (_inputHandle, out uint v);
+            _originalConsoleMode = v;
+
+            uint newConsoleMode = _originalConsoleMode;
+            newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
+            newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+            newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
+            SetConsoleMode (_inputHandle, newConsoleMode);
         }
-
-        _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
-
-        GetConsoleMode (_inputHandle, out uint v);
-        _originalConsoleMode = v;
-
-        uint newConsoleMode = _originalConsoleMode;
-        newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
-        newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
-        newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-        SetConsoleMode (_inputHandle, newConsoleMode);
+        catch
+        {
+            // ignore errors during unit tests
+        }
     }
 
     public override bool Peek ()
     {
-        if (Application.RunningUnitTests)
-        {
-            return false;
-        }
-
         const int BUFFER_SIZE = 1; // We only need to check if there's at least one event
         nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
 
@@ -87,7 +84,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
         catch (Exception ex)
         {
             // Optionally log the exception
-            Console.WriteLine (@$"Error in Peek: {ex.Message}");
+            Logging.Error (@$"Error in Peek: {ex.Message}");
 
             return false;
         }
@@ -127,16 +124,18 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
 
     public override void Dispose ()
     {
-        if (Application.RunningUnitTests)
+        try
         {
-            return;
-        }
+            if (!FlushConsoleInputBuffer (_inputHandle))
+            {
+                throw new ApplicationException ($"Failed to flush input buffer, error code: {Marshal.GetLastWin32Error ()}.");
+            }
 
-        if (!FlushConsoleInputBuffer (_inputHandle))
+            SetConsoleMode (_inputHandle, _originalConsoleMode);
+        }
+        catch
         {
-            throw new ApplicationException ($"Failed to flush input buffer, error code: {Marshal.GetLastWin32Error ()}.");
+            // ignore errors during unit tests
         }
-
-        SetConsoleMode (_inputHandle, _originalConsoleMode);
     }
 }

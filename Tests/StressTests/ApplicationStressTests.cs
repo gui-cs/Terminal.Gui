@@ -7,7 +7,6 @@ public class ApplicationStressTests : TestsAllViews
 {
     public ApplicationStressTests (ITestOutputHelper output)
     {
-        Application.RunningUnitTests = true;
     }
 
     private static volatile int _tbCounter;

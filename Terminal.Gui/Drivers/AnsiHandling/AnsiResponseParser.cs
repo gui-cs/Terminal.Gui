@@ -141,6 +141,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
             bool isEscape = currentChar == ESCAPE;
 
+            // Logging.Trace($"Processing character '{currentChar}' (isEscape: {isEscape})");
             switch (State)
             {
                 case AnsiResponseParserState.Normal:

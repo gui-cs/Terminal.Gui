@@ -5,11 +5,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests.DialogTests;
 
-public class MessageBoxTests
+public class MessageBoxTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public MessageBoxTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Enter_Causes_Focused_Button_Click_No_Accept ()
@@ -226,7 +223,7 @@ public class MessageBoxTests
  ║ ff ff ff ff ff ║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
 
@@ -242,7 +239,7 @@ public class MessageBoxTests
  ║ffffffffffffffff║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
                                      }
@@ -299,7 +296,7 @@ public class MessageBoxTests
   ║    ff ff     ║
   ║     ⟦► btn ◄⟧║
   ╚══════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
 
@@ -320,7 +317,7 @@ public class MessageBoxTests
  ║ffffffffffffffff║
  ║fffffff⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        _output
+                                                                                        output
                                                                                        );
                                          Application.RequestStop ();
                                      }
@@ -485,7 +482,7 @@ public class MessageBoxTests
                                                             └────────────────────────────────────────────────────────────────────┘
                                                             """;
 
-                                         DriverAssert.AssertDriverContentsAre (expectedText, _output);
+                                         DriverAssert.AssertDriverContentsAre (expectedText, output);
 
                                          Application.RequestStop ();
                                      }

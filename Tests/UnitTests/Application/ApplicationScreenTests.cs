@@ -7,7 +7,6 @@ public class ApplicationScreenTests
 {
     public ApplicationScreenTests (ITestOutputHelper output)
     {
-        Application.RunningUnitTests = true;
     }
 
 
@@ -81,6 +80,8 @@ public class ApplicationScreenTests
         // Assert
         Assert.Equal (4, clearedContentsRaised);
 
+        Application.Driver!.ClearedContents -= OnClearedContents;
+
         Application.End (rs);
 
         return;
@@ -95,7 +96,7 @@ public class ApplicationScreenTests
         Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
         // Act
-        Application.Driver!.SetScreenSize(120,30);
+        Application.Driver!.SetScreenSize (120, 30);
 
         // Assert
         Assert.Equal (new (0, 0, 120, 30), Application.Screen);

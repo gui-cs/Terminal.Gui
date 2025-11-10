@@ -7,16 +7,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class ContentsTests : ParallelizableBase
+public class ContentsTests (ITestOutputHelper output) : ParallelizableBase
 {
-    private readonly ITestOutputHelper _output;
-
-    public ContentsTests (ITestOutputHelper output)
-    {
-        Application.RunningUnitTests = true;
-        _output = output;
-    }
-
     [Fact]
     public void AddStr_Combining_Character_1st_Column ()
     {
@@ -24,7 +16,7 @@ public class ContentsTests : ParallelizableBase
 
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
-        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         driver.End ();
     }
@@ -39,7 +31,7 @@ public class ContentsTests : ParallelizableBase
         var expected = "é";
 
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // 3 char combine
         // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
@@ -49,7 +41,7 @@ public class ContentsTests : ParallelizableBase
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
         combined = "e" + oGonek + acuteAccent;
@@ -57,7 +49,7 @@ public class ContentsTests : ParallelizableBase
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
         combined = "i" + oGonek + acuteAccent;
@@ -65,7 +57,7 @@ public class ContentsTests : ParallelizableBase
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
         combined = "u" + oGonek + acuteAccent;
@@ -73,7 +65,7 @@ public class ContentsTests : ParallelizableBase
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         driver.End ();
     }
