@@ -73,8 +73,8 @@ public class GlobalTestSetup : IDisposable
         Assert.Null (Application.Popover);
 
         // Events - Can't check
-        //Assert.Null (Application.NotifyNewRunState);
-        //Assert.Null (Application.NotifyNewRunState);
+        //Assert.Null (Application.SessionBegun);
+        //Assert.Null (Application.SessionBegun);
         //Assert.Null (ApplicationImpl.Instance.Iteration);
         //Assert.Null (Application.SizeChanging);
         //Assert.Null (Application.GrabbedMouse);

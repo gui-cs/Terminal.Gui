@@ -97,11 +97,13 @@ public partial class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public Toplevel? Top { get; set; }
 
+    // BUGBUG: Technically, this is not the full lst of TopLevels. There be dragons here, e.g. see how Toplevel.Id is used. What
+
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> TopLevels { get; } = new ();
 
     /// <inheritdoc/>
-    public Toplevel? CachedRunStateToplevel { get; set; }
+    public Toplevel? CachedSessionTokenToplevel { get; set; }
 
     #endregion View Management
 }

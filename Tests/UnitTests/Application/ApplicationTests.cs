@@ -16,7 +16,7 @@ public class ApplicationTests
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
         View.Instances.Clear ();
-        RunState.Instances.Clear ();
+        SessionToken.Instances.Clear ();
 #endif
     }
 
@@ -166,7 +166,7 @@ public class ApplicationTests
     {
         Assert.Null (Application.Top);
 
-        RunState rs = Application.Begin (new ());
+        SessionToken rs = Application.Begin (new ());
         Application.Top!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
         Assert.Equal (rs.Toplevel, Application.Top);
         Application.End (rs);
@@ -199,25 +199,25 @@ public class ApplicationTests
         var stopwatch = new Stopwatch ();
         stopwatch.Start ();
 
-        RunState runState = null;
+        SessionToken sessionToken = null;
 
-        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
+        EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
-                                                            runState = e.State;
+                                                            sessionToken = e.State;
                                                         };
-        Application.NotifyNewRunState += newRunStateFn;
+        Application.SessionBegun += newSessionTokenFn;
 
         var topLevel = new Toplevel ();
-        RunState rs = Application.Begin (topLevel);
+        SessionToken rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
-        Assert.NotNull (runState);
-        Assert.Equal (rs, runState);
+        Assert.NotNull (sessionToken);
+        Assert.Equal (rs, sessionToken);
 
         Assert.Equal (topLevel, Application.Top);
 
-        Application.NotifyNewRunState -= newRunStateFn;
-        Application.End (runState);
+        Application.SessionBegun -= newSessionTokenFn;
+        Application.End (sessionToken);
 
         Assert.NotNull (Application.Top);
         Assert.NotNull (Application.Driver);
@@ -321,7 +321,7 @@ public class ApplicationTests
 
             // Events - Can't check
             //Assert.Null (GetEventSubscribers (typeof (Application), "InitializedChanged"));
-            //Assert.Null (GetEventSubscribers (typeof (Application), "NotifyNewRunState"));
+            //Assert.Null (GetEventSubscribers (typeof (Application), "SessionBegun"));
             //Assert.Null (GetEventSubscribers (typeof (Application), "Iteration"));
             //Assert.Null (GetEventSubscribers (typeof (Application), "ScreenChanged"));
             //Assert.Null (GetEventSubscribers (typeof (Application.Mouse), "MouseEvent"));
@@ -481,24 +481,24 @@ public class ApplicationTests
         Toplevel topLevel = new ();
         Application.Init (null, "fake");
 
-        RunState runstate = null;
+        SessionToken sessionToken = null;
 
-        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
+        EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
-                                                            runstate = e.State;
+                                                            sessionToken = e.State;
                                                         };
-        Application.NotifyNewRunState += newRunStateFn;
+        Application.SessionBegun += newSessionTokenFn;
 
-        RunState rs = Application.Begin (topLevel);
+        SessionToken rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
-        Assert.NotNull (runstate);
-        Assert.Equal (rs, runstate);
+        Assert.NotNull (sessionToken);
+        Assert.Equal (rs, sessionToken);
 
         Assert.Equal (topLevel, Application.Top);
 
-        Application.NotifyNewRunState -= newRunStateFn;
-        Application.End (runstate);
+        Application.SessionBegun -= newSessionTokenFn;
+        Application.End (sessionToken);
 
         Assert.NotNull (Application.Top);
         Assert.NotNull (Application.Driver);
@@ -550,7 +550,7 @@ public class ApplicationTests
     {
         Assert.True (Application.Initialized);
         Assert.Null (Application.Top);
-        RunState rs = Application.Begin (new ());
+        SessionToken rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.Mouse.MouseGrabView); // public
         Application.Top!.Dispose ();
@@ -563,7 +563,7 @@ public class ApplicationTests
     public void Invoke_Adds_Idle ()
     {
         Toplevel top = new ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
@@ -803,7 +803,7 @@ public class ApplicationTests
     public void Run_RequestStop_Stops ()
     {
         var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.NotNull (rs);
 
         Application.Iteration += OnApplicationOnIteration;
@@ -829,7 +829,7 @@ public class ApplicationTests
     public void Run_Sets_Running_True ()
     {
         var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.NotNull (rs);
 
         Application.Iteration += OnApplicationOnIteration;
@@ -856,7 +856,7 @@ public class ApplicationTests
     public void Run_RunningFalse_Stops ()
     {
         var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.NotNull (rs);
 
         Application.Iteration += OnApplicationOnIteration;
@@ -906,7 +906,7 @@ public class ApplicationTests
             Arrangement = ViewArrangement.Movable
         };
         Application.Driver!.SetScreenSize (10, 10);
-        RunState rs = Application.Begin (w);
+        SessionToken rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.
         Assert.Equal (new (0, 0), w.Frame.Location);

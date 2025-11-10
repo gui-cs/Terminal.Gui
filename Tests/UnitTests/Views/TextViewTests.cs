@@ -268,7 +268,7 @@ public class TextViewTests
 
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.Equal (1, eventcount); // for Initialize
 
         expectedCol = 0;
@@ -298,7 +298,7 @@ public class TextViewTests
 
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.Equal (1, eventcount); // for Initialize
 
         expectedCol = 0;
@@ -414,6 +414,7 @@ public class TextViewTests
         Assert.Equal (expectedEventCount, eventcount);
     }
 
+    [Fact]
     [TextViewTestsSetupFakeApplication]
     public void ContentsChanged_Event_Fires_Using_Kill_Delete_Tests ()
     {
@@ -650,7 +651,7 @@ public class TextViewTests
         string envText = tv.Text;
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.False (tv.WordWrap);
@@ -724,7 +725,7 @@ This is the second line.
         string envText = tv.Text;
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.True (tv.WordWrap);
@@ -799,7 +800,7 @@ This is the second line.
         string envText = tv.Text;
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.False (tv.WordWrap);
@@ -872,7 +873,7 @@ This is the second line.
         string envText = tv.Text;
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.True (tv.WordWrap);
@@ -1302,6 +1303,7 @@ This is the second line.
         Assert.Equal (new (0, 1), tv.CursorPosition);
     }
 
+    [Fact]
     [SetupFakeApplication]
     public void HistoryText_Undo_Redo_KillToEndOfLine ()
     {
@@ -1362,6 +1364,7 @@ This is the second line.
         Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
+    [Fact]
     [SetupFakeApplication]
     public void HistoryText_Undo_Redo_KillToLeftStart ()
     {
@@ -3404,6 +3407,7 @@ This is the second line.
         top.Dispose ();
     }
 
+    [Fact]
     [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
@@ -4182,6 +4186,7 @@ This is the second line.
         }
     }
 
+    [Fact]
     [TextViewTestsSetupFakeApplication]
     public void Kill_Delete_WordBackward_Multiline ()
     {
@@ -4815,7 +4820,7 @@ This is the second line.
         // Proves #3022 is fixed (TextField selected text does not show in v2)
         Toplevel top = new ();
         top.Add (_textView);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         _textView.CursorPosition = Point.Empty;
         _textView.SelectionStartColumn = 0;
@@ -7098,7 +7103,7 @@ line.  ",
         tv.Load (cells);
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.True (tv.InheritsPreviousAttribute);

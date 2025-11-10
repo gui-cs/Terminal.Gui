@@ -35,7 +35,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         };
         subView.Add (subSubView);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.True (top.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.True (subSubView.HasFocus);
@@ -52,7 +52,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         var top = new Toplevel ();
         Assert.False (top.HasFocus);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.True (top.HasFocus);
 
         top.Dispose ();

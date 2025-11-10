@@ -103,7 +103,7 @@ public class LabelTests (ITestOutputHelper output)
 
         Toplevel top = new ();
         top.Add (label);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (label.TextFormatter.FillRemaining);
@@ -708,7 +708,7 @@ e
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
 
         Assert.Equal (29, label.Text.Length);
@@ -755,7 +755,7 @@ e
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);

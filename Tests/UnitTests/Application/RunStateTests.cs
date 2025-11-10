@@ -6,28 +6,28 @@ using UnitTests;
 
 namespace UnitTests.ApplicationTests;
 
-/// <summary>These tests focus on Application.RunState and the various ways it can be changed.</summary>
-public class RunStateTests
+/// <summary>These tests focus on Application.SessionToken and the various ways it can be changed.</summary>
+public class SessionTokenTests
 {
-    public RunStateTests ()
+    public SessionTokenTests ()
     {
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
 
         View.Instances.Clear ();
-        RunState.Instances.Clear ();
+        SessionToken.Instances.Clear ();
 #endif
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Begin_End_Cleans_Up_RunState ()
+    public void Begin_End_Cleans_Up_SessionToken ()
     {
         // Test null Toplevel
         Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
 
         var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.NotNull (rs);
         Application.End (rs);
 
@@ -49,9 +49,9 @@ public class RunStateTests
     }
 
     [Fact]
-    public void Dispose_Cleans_Up_RunState ()
+    public void Dispose_Cleans_Up_SessionToken ()
     {
-        var rs = new RunState (null);
+        var rs = new SessionToken (null);
         Assert.NotNull (rs);
 
         // Should not throw because Toplevel was null
@@ -60,7 +60,7 @@ public class RunStateTests
         Assert.True (rs.WasDisposed);
 #endif
         var top = new Toplevel ();
-        rs = new RunState (top);
+        rs = new SessionToken (top);
         Assert.NotNull (rs);
 
         // Should throw because Toplevel was not cleaned up
@@ -76,13 +76,13 @@ public class RunStateTests
     }
 
     [Fact]
-    public void New_Creates_RunState ()
+    public void New_Creates_SessionToken ()
     {
-        var rs = new RunState (null);
+        var rs = new SessionToken (null);
         Assert.Null (rs.Toplevel);
 
         var top = new Toplevel ();
-        rs = new RunState (top);
+        rs = new SessionToken (top);
         Assert.Equal (top, rs.Toplevel);
     }
 
@@ -92,8 +92,8 @@ public class RunStateTests
         Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 
-        // Validate there are no outstanding RunState-based instances left
-        foreach (RunState inst in RunState.Instances)
+        // Validate there are no outstanding SessionToken-based instances left
+        foreach (SessionToken inst in SessionToken.Instances)
         {
             Assert.True (inst.WasDisposed);
         }

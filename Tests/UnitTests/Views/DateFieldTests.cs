@@ -195,7 +195,7 @@ public class DateFieldTests
 
             // If InvariantCulture was used this will fail but not with PT culture
             Assert.Equal (" 13/12/1971", df.Text);
-            Assert.Equal ("13/12/1971", df.Date.ToString (CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern));
+            Assert.Equal ("13/12/1971", df.Date!.Value.ToString (CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern));
             Assert.Equal (4, df.CursorPosition);
         }
         finally

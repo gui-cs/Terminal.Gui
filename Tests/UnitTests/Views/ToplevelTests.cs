@@ -590,10 +590,10 @@ public class ToplevelTests
     {
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable };
-        RunState rsTop = Application.Begin (top);
+        SessionToken rsTop = Application.Begin (top);
         Application.Driver?.SetScreenSize (40, 10);
 
-        RunState rsWindow = Application.Begin (window);
+        SessionToken rsWindow = Application.Begin (window);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
@@ -688,7 +688,7 @@ public class ToplevelTests
                     }
                    );
 
-        RunState rs = Application.Begin (window);
+        SessionToken rs = Application.Begin (window);
 
         Assert.Null (Application.Mouse.MouseGrabView);
         Assert.Equal (new (0, 0, 10, 3), window.Frame);

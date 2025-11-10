@@ -22,7 +22,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     }
 
     /// <inheritdoc cref="IApplication.Begin"/>
-    public static RunState Begin (Toplevel toplevel) => ApplicationImpl.Instance.Begin (toplevel);
+    public static SessionToken Begin (Toplevel toplevel) => ApplicationImpl.Instance.Begin (toplevel);
 
     /// <inheritdoc cref="IApplication.PositionCursor"/>
     public static bool PositionCursor () => ApplicationImpl.Instance.PositionCursor ();
@@ -67,7 +67,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
 
     /// <inheritdoc cref="IApplication.End"/>
-    public static void End (RunState runState) => ApplicationImpl.Instance.End (runState);
+    public static void End (SessionToken sessionToken) => ApplicationImpl.Instance.End (sessionToken);
 
     /// <inheritdoc cref="IApplication.RaiseIteration"/>
     internal static void RaiseIteration () => ApplicationImpl.Instance.RaiseIteration ();
@@ -79,17 +79,17 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         remove => ApplicationImpl.Instance.Iteration -= value;
     }
 
-    /// <inheritdoc cref="IApplication.NotifyNewRunState"/>
-    public static event EventHandler<RunStateEventArgs>? NotifyNewRunState
+    /// <inheritdoc cref="IApplication.SessionBegun"/>
+    public static event EventHandler<SessionTokenEventArgs>? SessionBegun
     {
-        add => ApplicationImpl.Instance.NotifyNewRunState += value;
-        remove => ApplicationImpl.Instance.NotifyNewRunState -= value;
+        add => ApplicationImpl.Instance.SessionBegun += value;
+        remove => ApplicationImpl.Instance.SessionBegun -= value;
     }
 
-    /// <inheritdoc cref="IApplication.NotifyStopRunState"/>
-    public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState
+    /// <inheritdoc cref="IApplication.SessionEnded"/>
+    public static event EventHandler<ToplevelEventArgs>? SessionEnded
     {
-        add => ApplicationImpl.Instance.NotifyStopRunState += value;
-        remove => ApplicationImpl.Instance.NotifyStopRunState -= value;
+        add => ApplicationImpl.Instance.SessionEnded += value;
+        remove => ApplicationImpl.Instance.SessionEnded -= value;
     }
 }

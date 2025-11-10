@@ -108,13 +108,13 @@ public class DatePicker : View
         return _table;
     }
 
-    private void DateField_DateChanged (object? sender, DateTimeEventArgs<DateTime> e)
+    private void DateField_DateChanged (object? sender, EventArgs<DateTime> e)
     {
-        Date = e.NewValue;
+        Date = e.Value;
 
-        if (e.NewValue.Date.Day != _date.Day)
+        if (e.Value.Date.Day != _date.Day)
         {
-            SelectDayOnCalendar (e.NewValue.Day);
+            SelectDayOnCalendar (e.Value.Day);
         }
 
         if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year)
