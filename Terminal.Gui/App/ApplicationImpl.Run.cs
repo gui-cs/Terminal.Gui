@@ -271,7 +271,8 @@ public partial class ApplicationImpl
         sessionToken.Toplevel = null;
         sessionToken.Dispose ();
 
-        LayoutAndDraw (true);
+        // BUGBUG: Why layout and draw here? This causes the screen to be cleared!
+        //LayoutAndDraw (true);
 
         SessionEnded?.Invoke (this, new (CachedSessionTokenToplevel));
     }

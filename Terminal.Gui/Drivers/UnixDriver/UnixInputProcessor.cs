@@ -10,7 +10,7 @@ internal class UnixInputProcessor : InputProcessorImpl<char>
     /// <inheritdoc />
     public UnixInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter ())
     {
-        DriverName = "Unix";
+        DriverName = "unix";
     }
 
     /// <inheritdoc />
