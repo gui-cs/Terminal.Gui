@@ -21,7 +21,7 @@ jobs:
     needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
@@ -85,7 +85,7 @@ jobs:
     needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
