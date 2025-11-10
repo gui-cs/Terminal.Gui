@@ -100,9 +100,31 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// <inheritdoc/>
     public override IEnumerable<ConsoleKeyInfo> Read ()
     {
-        while (Console.KeyAvailable)
+        while (true)
         {
-            yield return Console.ReadKey (true);
+            ConsoleKeyInfo keyInfo = default;
+
+            try
+            {
+                if (!Console.KeyAvailable)
+                {
+                    break;
+                }
+
+                keyInfo = Console.ReadKey (true);
+            }
+            catch (InvalidOperationException)
+            {
+                // Not connected to a terminal (GitHub Actions, redirected input, etc.)
+                yield break;
+            }
+            catch (IOException)
+            {
+                // I/O error reading from console
+                yield break;
+            }
+
+            yield return keyInfo;
         }
     }
 
