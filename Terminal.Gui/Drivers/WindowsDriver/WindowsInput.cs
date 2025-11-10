@@ -84,7 +84,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
         catch (Exception ex)
         {
             // Optionally log the exception
-            Console.WriteLine (@$"Error in Peek: {ex.Message}");
+            Logging.Error (@$"Error in Peek: {ex.Message}");
 
             return false;
         }
