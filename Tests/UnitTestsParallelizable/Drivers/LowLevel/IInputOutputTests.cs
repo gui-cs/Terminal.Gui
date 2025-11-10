@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Concurrent;
 using Xunit.Abstractions;
 using Xunit.Sdk;

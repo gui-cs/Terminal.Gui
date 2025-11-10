@@ -108,12 +108,12 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         Logging.Logger.LogInformation ($"Creating {nameof (UnixInput)}");
 
-        _pollMap = new Pollfd [1];
-        _pollMap [0].fd = STDIN_FILENO; // stdin
-        _pollMap [0].events = (short)Condition.PollIn;
-
         try
         {
+            _pollMap = new Pollfd [1];
+            _pollMap [0].fd = STDIN_FILENO; // stdin
+            _pollMap [0].events = (short)Condition.PollIn;
+
             EnableRawModeAndTreatControlCAsInput ();
 
             //Enable alternative screen buffer.
