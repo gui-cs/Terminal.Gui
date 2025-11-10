@@ -18,14 +18,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: build
     strategy:
-      fail-fast: false   # Let all OSes finish
+      fail-fast: false  # Let all OSes finish even if one fails
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     timeout-minutes: 15
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # Fixed: Has 'uses'
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
@@ -40,7 +40,7 @@ jobs:
           path: .
 
       - name: Restore NuGet packages
-        run: dotnet restore
+        run: dotnet restore  # Fixed: Has 'run'
 
       - name: Set VSTEST_DUMP_PATH
         shell: bash
@@ -51,7 +51,7 @@ jobs:
         run: |
           dotnet test Tests/IntegrationTests \
             --no-build \
-            --verbosity normal \
+            --verbosity minimal \
             --collect:"XPlat Code Coverage" \
             --settings Tests/IntegrationTests/runsettings.xml \
             --diag:logs/${{ runner.os }}/logs.txt \
@@ -61,39 +61,3 @@ jobs:
             --blame-hang-timeout 60s \
             --blame-crash-collect-always
 
-      - name: Install coverage tools
-        if: always()
-        shell: bash
-        run: |
-          dotnet tool install -g dotnet-reportgenerator-globaltool
-          dotnet tool install -g dotnet-coverage
-
-      - name: Generate & upload coverage report
-        if: always()
-        shell: bash
-        run: |
-          # Find all cobertura files (GUID-named)
-          COV_FILES=$(find . -path "*/TestResults/*/*.cobertura.xml" -type f)
-          if [ -z "$COV_FILES" ]; then
-            echo "No coverage files found"
-            exit 0
-          fi
-
-          # Merge into one file
-          dotnet-coverage merge \
-            -o coverage.merged.cobertura.xml \
-            -f cobertura \
-            $COV_FILES
-
-          # Generate HTML + text
-          reportgenerator \
-            -reports:coverage.merged.cobertura.xml \
-            -targetdir:coveragereport \
-            -reporttypes:"Html;TextSummary"
-
-          # Show summary in GitHub UI
-          echo "## Integration Tests Coverage (${{ runner.os }})" >> $GITHUB_STEP_SUMMARY
-          cat coveragereport/Summary.txt >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload HTML coverage artifact
-        if: always()
