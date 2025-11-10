@@ -20,13 +20,13 @@ public class SyncrhonizationContextTests
         Application.Shutdown ();
     }
 
-    private object _lockPost = new ();
+    private readonly object _lockPost = new ();
 
     [Theory]
     [InlineData ("fake")]
-    // [InlineData ("windows")]
+    [InlineData ("windows")]
     [InlineData ("dotnet")]
-    [InlineData ("unix")]
+    //[InlineData ("unix")]
     public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)
