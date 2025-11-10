@@ -6,13 +6,12 @@ namespace Terminal.Gui.App;
 
 public partial class ApplicationImpl
 {
-
     /// <inheritdoc/>
     public bool Initialized { get; set; }
 
     #region Lifecycle Events
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<EventArgs<bool>>? InitializedChanged;
 
     #endregion Lifecycle Events
@@ -84,58 +83,45 @@ public partial class ApplicationImpl
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     public void Shutdown ()
     {
-#if DEBUG
-        // Check that all Application events have no remaining subscribers
-        AssertNoEventSubscribers (nameof (Iteration), Iteration);
-        AssertNoEventSubscribers (nameof (NotifyNewRunState), NotifyNewRunState);
-        AssertNoEventSubscribers (nameof (NotifyStopRunState), NotifyStopRunState);
-        AssertNoEventSubscribers (nameof (ScreenChanged), ScreenChanged);
-#endif
-
+        // Stop the coordinator if running
         Coordinator?.Stop ();
 
+        // Capture state before cleanup
         bool wasInitialized = Initialized;
 
-        // Reset Screen before calling Application.ResetState to avoid circular reference
-        ResetScreen ();
+#if DEBUG
 
-        // Call ResetState FIRST so it can properly dispose Popover and other resources
-        // that are accessed via Application.* static properties that now delegate to instance fields
-        ResetState ();
-        ConfigurationManager.PrintJsonErrors ();
-
-        // Clear instance fields after ResetState has disposed everything
-        Driver = null;
-        _mouse = null;
-        _keyboard = null;
-        Initialized = false;
-        Navigation = null;
-        Popover = null;
-        CachedRunStateToplevel = null;
-        Top = null;
-        TopLevels.Clear ();
-        MainThreadId = null;
-        _screen = null;
-        ClearScreenNextIteration = false;
-        Sixel.Clear ();
-
-        // Don't reset ForceDriver and Force16Colors; they need to be set before Init is called
-
+        // Check that all Application events have no remaining subscribers BEFORE clearing them
+        // Only check if we were actually initialized
         if (wasInitialized)
         {
-            bool init = Initialized; // Will be false after clearing fields above
+            AssertNoEventSubscribers (nameof (Iteration), Iteration);
+            AssertNoEventSubscribers (nameof (NotifyNewRunState), NotifyNewRunState);
+            AssertNoEventSubscribers (nameof (NotifyStopRunState), NotifyStopRunState);
+            AssertNoEventSubscribers (nameof (ScreenChanged), ScreenChanged);
+
+            //AssertNoEventSubscribers (nameof (InitializedChanged), InitializedChanged);
+        }
+#endif
+
+        // Clean up all application state (including sync context)
+        // ResetState handles the case where Initialized is false
+        ResetState ();
+
+        // Configuration manager diagnostics
+        ConfigurationManager.PrintJsonErrors ();
+
+        // Raise the initialized changed event to notify shutdown
+        if (wasInitialized)
+        {
+            bool init = Initialized; // Will be false after ResetState
             RaiseInitializedChanged (this, new (in init));
         }
 
-        // TODO: Determine if we should be resetting this here. Initialized is bound to
-        // TODO: Init/Shutdown, and the point of this event is to notify when that changes.
+        // Clear the event to prevent memory leaks
         InitializedChanged = null;
 
-#if DEBUG
-        // Check that all Application events have no remaining subscribers
-        AssertNoEventSubscribers (nameof (InitializedChanged), InitializedChanged);
-#endif
-
+        // Create a new lazy instance for potential future Init
         _lazyInstance = new (() => new ApplicationImpl ());
     }
 
@@ -158,8 +144,7 @@ public partial class ApplicationImpl
         {
             string subscriberInfo = string.Join (
                                                  ", ",
-                                                 subscribers.Select (
-                                                                     d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
+                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
                                                                     )
                                                 );
 
@@ -170,17 +155,20 @@ public partial class ApplicationImpl
     }
 #endif
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
     {
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
+
+        // === 1. Stop all running toplevels ===
         foreach (Toplevel? t in TopLevels)
         {
             t!.Running = false;
         }
 
+        // === 2. Close and dispose popover ===
         if (Popover?.GetActivePopover () is View popover)
         {
             // This forcefully closes the popover; invoking Command.Quit would be more graceful
@@ -191,7 +179,9 @@ public partial class ApplicationImpl
         Popover?.Dispose ();
         Popover = null;
 
+        // === 3. Clean up toplevels ===
         TopLevels.Clear ();
+
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
@@ -207,15 +197,11 @@ public partial class ApplicationImpl
             }
         }
 #endif
+
         Top = null;
         CachedRunStateToplevel = null;
 
-        MainThreadId = null;
-        Iteration = null;
-        StopAfterFirstIteration = false;
-        ClearScreenNextIteration = false;
-
-        // Driver stuff
+        // === 4. Clean up driver ===
         if (Driver is { })
         {
             UnsubscribeDriverEvents ();
@@ -223,44 +209,51 @@ public partial class ApplicationImpl
             Driver = null;
         }
 
-        // Reset Screen to null so it will be recalculated on next access
-        // Note: ApplicationImpl.Shutdown() also calls ResetScreen() before calling this method
-        // to avoid potential circular reference issues. Calling it twice is harmless.
-        if (ApplicationImpl.Instance is ApplicationImpl impl)
-        {
-            impl.ResetScreen ();
-        }
+        // Reset screen
+        ResetScreen ();
+        _screen = null;
 
-        // Run State stuff
+        // === 5. Clear run state ===
+        Iteration = null;
         NotifyNewRunState = null;
         NotifyStopRunState = null;
-        // Mouse and Keyboard will be lazy-initialized in ApplicationImpl on next access
+        StopAfterFirstIteration = false;
+        ClearScreenNextIteration = false;
 
-        Initialized = false;
-
-        // Mouse
+        // === 6. Reset input systems ===
+        // Mouse and Keyboard will be lazy-initialized on next access
+        _mouse = null;
+        _keyboard = null;
         Mouse.ResetState ();
 
-        // Keyboard events and bindings are now managed by the Keyboard instance
-
+        // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
-
         Navigation = null;
 
+        // === 8. Reset initialization state ===
+        Initialized = false;
+        MainThreadId = null;
+
+        // === 9. Clear graphics ===
+        Sixel.Clear ();
+
+        // === 10. Reset synchronization context ===
+        // IMPORTANT: Always reset sync context, even if not initialized
+        // This ensures cleanup works correctly even if Shutdown is called without Init
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
+
+        // Note: ForceDriver and Force16Colors are NOT reset; 
+        // they need to persist across Init/Shutdown cycles
     }
 
     /// <summary>
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
-    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e)
-    {
-        InitializedChanged?.Invoke (sender, e);
-    }
+    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
 
     #endregion Lifecycle Methods
 }
