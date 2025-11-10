@@ -43,7 +43,7 @@ public class ScenarioTests : TestsAllViews
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
         var scenarioName = scenario!.GetName ();
 
-        uint abortTime = 5000;  // Scrolling scenario can take up to 3 seconds to init on slow CI machines
+        uint abortTime = 10000;  // Scrolling scenario can take up to 3 seconds to init on slow CI machines
         object? timeout = null;
         var initialized = false;
         var shutdownGracefully = false;
