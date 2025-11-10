@@ -15,9 +15,16 @@ public class NetOutput : OutputBase, IOutput
     /// </summary>
     public NetOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
+        Logging.Information ($"Creating {nameof (NetOutput)}");
 
-        Console.OutputEncoding = Encoding.UTF8;
+        try
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+        }
+        catch
+        {
+            // ignore for unit tests
+        }
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -30,7 +37,14 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        Console.Out.Write (text);
+        try
+        {
+            Console.Out.Write (text);
+        }
+        catch (IOException)
+        {
+            // Not connected to a terminal; do nothing
+        }
     }
 
 
@@ -96,7 +110,14 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
-        Console.Out.Write (output);
+        try
+        {
+            Console.Out.Write (output);
+        }
+        catch (IOException)
+        {
+            // Not connected to a terminal; do nothing
+        }
     }
 
     /// <inheritdoc />
@@ -111,7 +132,7 @@ public class NetOutput : OutputBase, IOutput
 
         if (_isWinPlatform)
         {
-            // Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+            // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             try
             {
                 Console.SetCursorPosition (col, row);
