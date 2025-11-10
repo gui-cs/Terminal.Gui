@@ -26,7 +26,7 @@ public class SyncrhonizationContextTests
     [InlineData ("fake")]
     [InlineData ("windows")]
     [InlineData ("dotnet")]
-    //[InlineData ("unix")]
+    [InlineData ("unix")]
     public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)
