@@ -1,11 +1,11 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests.Parallelizable;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class TextFieldTests (ITestOutputHelper output) : ParallelizableBase
+public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()

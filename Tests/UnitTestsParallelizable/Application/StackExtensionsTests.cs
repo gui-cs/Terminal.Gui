@@ -1,6 +1,8 @@
-﻿namespace UnitTests_Parallelizable.ApplicationTests;
+﻿using UnitTests;
 
-public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
+namespace UnitTests_Parallelizable.ApplicationTests;
+
+public class StackExtensionsTests : FakeDriverBase
 {
     [Fact]
     public void Stack_Toplevels_Contains ()

@@ -1,10 +1,10 @@
 ﻿// Alias Console to MockConsole so we don't accidentally use Console
 
-using UnitTests.Parallelizable;
+using UnitTests;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class DriverColorTests : ParallelizableBase
+public class DriverColorTests : FakeDriverBase
 {
     [Fact]
     public void Force16Colors_Sets ()

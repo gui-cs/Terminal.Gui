@@ -29,7 +29,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\UnitTests\TestsAllViews.cs" Link="TestsAllViews.cs" />
         <Compile Include="..\UnitTests\DriverAssert.cs" Link="DriverAssert.cs" />
         <Compile Include="..\UnitTests\OutputAssert.cs" Link="OutputAssert.cs" />
     </ItemGroup>
@@ -57,6 +56,7 @@
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
         </ProjectReference>
         <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
+        <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -7,7 +7,7 @@ namespace UnitTests;
 /// <summary>
 ///     Base class for tests that need to test all views.
 /// </summary>
-public class TestsAllViews : Parallelizable.ParallelizableBase
+public class TestsAllViews : FakeDriverBase
 {
     /// <summary>
     ///     Gets all view types.

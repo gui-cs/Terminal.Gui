@@ -1,13 +1,13 @@
 ﻿using System.Buffers;
 using System.Text;
-using UnitTests.Parallelizable;
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class AddRuneTests (ITestOutputHelper output) : ParallelizableBase
+public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 

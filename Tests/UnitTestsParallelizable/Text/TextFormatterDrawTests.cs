@@ -1,13 +1,13 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 using UICatalog;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace UnitTests.TextTests;
 
-public class TextFormatterDrawTests (ITestOutputHelper output) : ParallelizableBase
+public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 {
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };

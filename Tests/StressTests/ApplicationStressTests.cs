@@ -1,9 +1,8 @@
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;
 
-public class ApplicationStressTests : TestsAllViews
+public class ApplicationStressTests
 {
     public ApplicationStressTests (ITestOutputHelper output)
     {

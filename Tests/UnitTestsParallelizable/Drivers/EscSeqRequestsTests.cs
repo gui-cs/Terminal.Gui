@@ -1,8 +1,8 @@
-﻿using UnitTests.Parallelizable;
+﻿using UnitTests;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class EscSeqRequestsTests : ParallelizableBase
+public class EscSeqRequestsTests : FakeDriverBase
 {
     [Fact]
     public void Add_Tests ()

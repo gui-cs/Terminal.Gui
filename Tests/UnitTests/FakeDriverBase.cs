@@ -1,14 +1,11 @@
-namespace UnitTests.Parallelizable;
+namespace UnitTests;
 
 /// <summary>
-///     Base class for parallelizable tests. Ensures that tests can run in parallel without interference
-///     by setting various Terminal.Gui static properties to their default values. E.g. View.EnableDebugIDisposableAsserts.
+///     Enables tests to create a FakeDriver for testing purposes.
 /// </summary>
 [Collection ("Global Test Setup")]
-public abstract class ParallelizableBase
+public abstract class FakeDriverBase
 {
-    // Common setup or utilities for all tests can go here
-
     /// <summary>
     ///     Creates a new FakeDriver instance with the specified buffer size.
     ///     This is a convenience method for tests that need to use Draw() and DriverAssert
@@ -22,7 +19,7 @@ public abstract class ParallelizableBase
         var output = new FakeOutput ();
 
         DriverImpl driver = new (
-                                                          new NetInputProcessor (null),
+                                                          new FakeInputProcessor (null),
                                                           new OutputBufferImpl (),
                                                           output,
                                                           new AnsiRequestScheduler (new AnsiResponseParser ()),

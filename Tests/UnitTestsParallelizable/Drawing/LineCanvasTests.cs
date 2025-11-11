@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DrawingTests;
@@ -11,7 +10,7 @@ namespace UnitTests_Parallelizable.DrawingTests;
 ///     Note: Tests that verify rendered output (ToString()) cannot be parallelized because LineCanvas
 ///     depends on Application.Driver for glyph resolution and configuration. Those tests remain in UnitTests.
 /// </summary>
-public class LineCanvasTests (ITestOutputHelper output) : ParallelizableBase
+public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
 {
     #region Basic API Tests
 

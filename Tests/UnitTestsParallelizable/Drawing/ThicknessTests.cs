@@ -1,11 +1,10 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DrawingTests;
 
-public class ThicknessTests (ITestOutputHelper output) : ParallelizableBase
+public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()

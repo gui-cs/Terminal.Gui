@@ -1,12 +1,12 @@
 ﻿using System.Text;
-using UnitTests.Parallelizable;
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace UnitTests.TextTests;
 
-public class TextFormatterJustificationTests (ITestOutputHelper output) : ParallelizableBase
+public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Theory]
 

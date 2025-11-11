@@ -1,13 +1,12 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class ContentsTests (ITestOutputHelper output) : ParallelizableBase
+public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void AddStr_Combining_Character_1st_Column ()

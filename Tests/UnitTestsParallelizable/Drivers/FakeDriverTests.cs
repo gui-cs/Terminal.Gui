@@ -1,5 +1,5 @@
 using System.Text;
-using UnitTests.Parallelizable;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DriverTests;
@@ -7,7 +7,7 @@ namespace UnitTests_Parallelizable.DriverTests;
 /// <summary>
 ///     Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.
 /// </summary>
-public class FakeDriverTests (ITestOutputHelper output) : ParallelizableBase
+public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 

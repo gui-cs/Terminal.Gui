@@ -1,11 +1,10 @@
 using System.Diagnostics;
 using UICatalog;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;
 
-public class ScenariosStressTests : TestsAllViews
+public class ScenariosStressTests
 {
     public ScenariosStressTests (ITestOutputHelper output)
     {

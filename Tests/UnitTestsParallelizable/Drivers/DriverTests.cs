@@ -1,6 +1,6 @@
-﻿using UnitTests.Parallelizable;
+﻿using UnitTests;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class DriverTests : ParallelizableBase
+public class DriverTests : FakeDriverBase
 { }

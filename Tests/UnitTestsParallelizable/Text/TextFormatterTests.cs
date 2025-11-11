@@ -2,18 +2,10 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-// Alias Console to MockConsole so we don't accidentally use Console
-
 namespace UnitTests_Parallelizable.TextTests;
 
-public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
+public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 {
-    private readonly ITestOutputHelper _output;
-
-    public TextFormatterTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
     [Theory]
     [InlineData ("")]
     [InlineData (null)]
@@ -2997,7 +2989,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3026,7 +3018,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3052,7 +3044,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3078,7 +3070,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3114,7 +3106,7 @@ ssb
                  default (Rectangle),
                  driver
                 );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
@@ -3153,7 +3145,7 @@ ssb
                  default (Rectangle),
                  driver
                 );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
@@ -3192,7 +3184,7 @@ ssb
                  default (Rectangle),
                  driver
                 );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
@@ -3231,7 +3223,7 @@ ssb
                  default (Rectangle),
                  driver
                 );
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
