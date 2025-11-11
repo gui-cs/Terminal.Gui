@@ -1,26 +1,72 @@
-﻿using System.Reflection;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
+﻿#nullable enable
+using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-[Collection ("Global Test Setup")]
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Center_Properly (Type viewType)
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        View? view = CreateInstanceIfNotGeneric (viewType);
+
+        // See https://github.com/gui-cs/Terminal.Gui/issues/3156
+
+        if (view is null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        view.X = Pos.Center ();
+        view.Y = Pos.Center ();
+
+        // Ensure the view has positive dimensions
+        view.Width = 10;
+        view.Height = 10;
+
+        var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
+        frame.Add (view);
+        frame.LayoutSubViews ();
+        frame.Dispose ();
+
+        // What's the natural width/height?
+        int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
+        int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
+
+        Assert.True (
+                     view.Frame.Left == expectedX,
+                     $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
+                    );
+
+        Assert.True (
+                     view.Frame.Top == expectedY,
+                     $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
+                    );
+    }
+
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Tests_All_Constructors (Type viewType)
     {
         Assert.True (TestAllConstructorsOfType (viewType));
-
         return;
 
         bool TestAllConstructorsOfType (Type type)
         {
             foreach (ConstructorInfo ctor in type.GetConstructors ())
             {
-                View view = CreateViewFromType (type, ctor);
+                View? view = CreateViewFromType (type, ctor);
 
                 if (view != null)
                 {

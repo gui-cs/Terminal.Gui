@@ -1,21 +1,20 @@
-﻿using UnitTests;
+﻿#nullable enable
+using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.LayoutTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
-    [SetupFakeApplication] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
-        Application.ResetState (true);
-        // Required for spinner view that wants to register timeouts
+        IDriver driver = CreateFakeDriver ();
 
-        var view = (View)CreateInstanceIfNotGeneric (viewType);
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
-        if (view == null)
+        if (view is null)
         {
             output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
