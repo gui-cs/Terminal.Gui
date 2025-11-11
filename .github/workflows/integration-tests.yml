@@ -64,7 +64,7 @@ jobs:
               --no-build \
               --verbosity minimal \
               --collect:"XPlat Code Coverage" \
-              --settings Tests/IntegrationTests/runsettings.xml \
+              --settings Tests/IntegrationTests/runsettings.coverage.xml \
               --diag:logs/IntegrationTests/${{ runner.os }}/logs.txt \
               --blame \
               --blame-crash \

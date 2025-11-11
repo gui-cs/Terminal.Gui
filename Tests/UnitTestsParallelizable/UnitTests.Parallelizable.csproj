@@ -53,6 +53,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
         </ProjectReference>
         <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />

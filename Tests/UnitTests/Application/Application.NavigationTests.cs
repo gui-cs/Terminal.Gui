@@ -114,7 +114,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.Equal (subView2, Application.Navigation.GetFocused ());
 
         Application.Top.Dispose ();
-        Application.ResetState ();
+        Application.Top = null;
+        Application.Navigation = null;
     }
 
     [Fact]
@@ -151,6 +152,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.Null (Application.Navigation.GetFocused ());
 
         Application.Top.Dispose ();
-        Application.ResetState ();
+        Application.Top = null;
+        Application.Navigation = null;
     }
 }

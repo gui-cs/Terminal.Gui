@@ -1,8 +1,3 @@
-// Alias Console to MockConsole so we don't accidentally use Console
-
-using System.Numerics;
-using Terminal.Gui.Drivers;
-using UnitTests;
 
 namespace UnitTests.ApplicationTests;
 
@@ -56,7 +51,7 @@ public class SessionTokenTests
         Assert.True (rs.WasDisposed);
 #endif
         var top = new Toplevel ();
-        rs = new SessionToken (top);
+        rs = new (top);
         Assert.NotNull (rs);
 
         // Should throw because Toplevel was not cleaned up
@@ -78,7 +73,7 @@ public class SessionTokenTests
         Assert.Null (rs.Toplevel);
 
         var top = new Toplevel ();
-        rs = new SessionToken (top);
+        rs = new (top);
         Assert.Equal (top, rs.Toplevel);
     }
 }
