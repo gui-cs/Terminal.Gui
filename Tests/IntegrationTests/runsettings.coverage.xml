@@ -10,13 +10,8 @@
 					<Exclude>[*]*.g.cs</Exclude>
 					<Exclude>[*]*AssemblyInfo.cs</Exclude>
 					<!-- Exclude test projects -->
-					<Exclude>[UnitTests]*</Exclude>
-					<Exclude>[UnitTestsParallelizable]*</Exclude>
-					<Exclude>[IntegrationTests]*</Exclude>
-					<Exclude>[TerminalGuiFluentTesting]*</Exclude>
-					<!-- Exclude analyzers and UI catalog -->
-					<Exclude>[Terminal.Gui.Analyzers]*</Exclude>
-					<Exclude>[UICatalog]*</Exclude>
+					<!-- ONLY include Terminal.Gui assembly -->
+					<Include>[Terminal.Gui]*</Include>
 				</Configuration>
 			</DataCollector>
 		</DataCollectors>
