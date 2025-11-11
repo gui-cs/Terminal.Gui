@@ -15,9 +15,16 @@ public class NetOutput : OutputBase, IOutput
     /// </summary>
     public NetOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetOutput)}");
+        Logging.Information ($"Creating {nameof (NetOutput)}");
 
-        Console.OutputEncoding = Encoding.UTF8;
+        try
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+        }
+        catch
+        {
+            // ignore for unit tests
+        }
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -30,7 +37,14 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        Console.Out.Write (text);
+        try
+        {
+            Console.Out.Write (text);
+        }
+        catch (IOException)
+        {
+            // Not connected to a terminal; do nothing
+        }
     }
 
 
@@ -39,7 +53,8 @@ public class NetOutput : OutputBase, IOutput
     {
         try
         {
-            return new (Console.WindowWidth, Console.WindowHeight);
+            Size size = new (Console.WindowWidth, Console.WindowHeight);
+            return size.IsEmpty ? new (80, 25) : size;
         }
         catch (IOException)
         {
@@ -96,7 +111,14 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
-        Console.Out.Write (output);
+        try
+        {
+            Console.Out.Write (output);
+        }
+        catch (IOException)
+        {
+            // Not connected to a terminal; do nothing
+        }
     }
 
     /// <inheritdoc />
@@ -111,7 +133,7 @@ public class NetOutput : OutputBase, IOutput
 
         if (_isWinPlatform)
         {
-            // Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+            // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             try
             {
                 Console.SetCursorPosition (col, row);
@@ -142,20 +164,27 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (visibility != CursorVisibility.Invisible)
+        try
         {
-            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            if (visibility != CursorVisibility.Invisible)
             {
-                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+                {
+                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
 
-                Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
             }
-
-            Write (EscSeqUtils.CSI_ShowCursor);
+            else
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
         }
-        else
+        catch
         {
-            Write (EscSeqUtils.CSI_HideCursor);
+            // Ignore any exceptions
         }
     }
 }

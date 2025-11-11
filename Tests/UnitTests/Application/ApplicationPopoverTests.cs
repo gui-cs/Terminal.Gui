@@ -44,7 +44,7 @@ public class ApplicationPopoverTests
         Application.StopAfterFirstIteration = true;
 
         var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Act
         Application.End (rs);
@@ -66,7 +66,7 @@ public class ApplicationPopoverTests
         Application.StopAfterFirstIteration = true;
 
         var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         PopoverTestClass popover = new ();
 

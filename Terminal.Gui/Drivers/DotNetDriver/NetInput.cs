@@ -16,7 +16,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// </summary>
     public NetInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetInput)}");
+        Logging.Information ($"Creating {nameof (NetInput)}");
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -29,22 +29,27 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
             catch (ApplicationException ex)
             {
                 // Likely running as a unit test, or in a non-interactive session.
-                Logging.Logger.LogCritical (
-                                            ex,
-                                            "NetWinVTConsole could not be constructed i.e. could not configure terminal modes. May indicate running in non-interactive session e.g. unit testing CI");
+                Logging.Critical ($"NetWinVTConsole could not configure terminal modes. May indicate running in non-interactive session: {ex}");
 
                 return;
             }
         }
 
-        //Enable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+        try
+        {
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
-        //Set cursor key to application.
-        Console.Out.Write (EscSeqUtils.CSI_HideCursor);
+            //Set cursor key to application.
+            Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
-        Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
-        Console.TreatControlCAsInput = true;
+            Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+            Console.TreatControlCAsInput = true;
+        }
+        catch
+        {
+            // Swallow any exceptions during initialization for unit tests
+        }
     }
 
     private readonly NetWinVTConsole _adjustConsole;
@@ -95,9 +100,31 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// <inheritdoc/>
     public override IEnumerable<ConsoleKeyInfo> Read ()
     {
-        while (Console.KeyAvailable)
+        while (true)
         {
-            yield return Console.ReadKey (true);
+            ConsoleKeyInfo keyInfo = default;
+
+            try
+            {
+                if (!Console.KeyAvailable)
+                {
+                    break;
+                }
+
+                keyInfo = Console.ReadKey (true);
+            }
+            catch (InvalidOperationException)
+            {
+                // Not connected to a terminal (GitHub Actions, redirected input, etc.)
+                yield break;
+            }
+            catch (IOException)
+            {
+                // I/O error reading from console
+                yield break;
+            }
+
+            yield return keyInfo;
         }
     }
 

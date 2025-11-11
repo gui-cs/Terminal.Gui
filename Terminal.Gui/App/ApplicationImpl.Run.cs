@@ -18,13 +18,13 @@ public partial class ApplicationImpl
     #region Begin->Run->Stop->End
 
     /// <inheritdoc/>
-    public event EventHandler<RunStateEventArgs>? NotifyNewRunState;
+    public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
     /// <inheritdoc/>
-    public event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
+    public event EventHandler<ToplevelEventArgs>? SessionEnded;
 
     /// <inheritdoc/>
-    public RunState Begin (Toplevel toplevel)
+    public SessionToken Begin (Toplevel toplevel)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
@@ -34,14 +34,14 @@ public partial class ApplicationImpl
             Mouse.UngrabMouse ();
         }
 
-        var rs = new RunState (toplevel);
+        var rs = new SessionToken (toplevel);
 
 #if DEBUG_IDISPOSABLE
         if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
-            Debug.Assert (Top == CachedRunStateToplevel);
+            Debug.Assert (Top == CachedSessionTokenToplevel);
         }
 #endif
 
@@ -50,8 +50,8 @@ public partial class ApplicationImpl
             if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
             {
                 // If Top was already disposed and isn't on the Toplevels Stack,
-                // clean it up here if is the same as _cachedRunStateToplevel
-                if (Top == CachedRunStateToplevel)
+                // clean it up here if is the same as _CachedSessionTokenToplevel
+                if (Top == CachedSessionTokenToplevel)
                 {
                     Top = null;
                 }
@@ -142,10 +142,16 @@ public partial class ApplicationImpl
             Driver?.UpdateCursor ();
         }
 
-        NotifyNewRunState?.Invoke (toplevel, new (rs));
+        SessionBegun?.Invoke (this, new (rs));
 
         return rs;
     }
+
+    /// <inheritdoc/>
+    public bool StopAfterFirstIteration { get; set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<IterationEventArgs>? Iteration;
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
@@ -170,11 +176,6 @@ public partial class ApplicationImpl
         return top;
     }
 
-    /// <inheritdoc/>
-    public bool StopAfterFirstIteration { get; set; }
-
-    /// <inheritdoc/>
-    public event EventHandler<IterationEventArgs>? Iteration;
 
     /// <inheritdoc/>
     public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
@@ -194,7 +195,7 @@ public partial class ApplicationImpl
 
         Top = view;
 
-        RunState rs = Application.Begin (view);
+        SessionToken rs = Application.Begin (view);
 
         Top.Running = true;
 
@@ -223,31 +224,31 @@ public partial class ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public void End (RunState runState)
+    public void End (SessionToken sessionToken)
     {
-        ArgumentNullException.ThrowIfNull (runState);
+        ArgumentNullException.ThrowIfNull (sessionToken);
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
         }
 
-        runState.Toplevel.OnUnloaded ();
+        sessionToken.Toplevel.OnUnloaded ();
 
-        // End the RunState.Toplevel
+        // End the Session
         // First, take it off the Toplevel Stack
         if (TopLevels.TryPop (out Toplevel? topOfStack))
         {
-            if (topOfStack != runState.Toplevel)
+            if (topOfStack != sessionToken.Toplevel)
             {
-                // If the top of the stack is not the RunState.Toplevel then
-                // this call to End is not balanced with the call to Begin that started the RunState
+                // If the top of the stack is not the SessionToken.Toplevel then
+                // this call to End is not balanced with the call to Begin that started the Session
                 throw new ArgumentException ("End must be balanced with calls to Begin");
             }
         }
 
         // Notify that it is closing
-        runState.Toplevel?.OnClosed (runState.Toplevel);
+        sessionToken.Toplevel?.OnClosed (sessionToken.Toplevel);
 
         if (TopLevels.TryPeek (out Toplevel? newTop))
         {
@@ -255,9 +256,9 @@ public partial class ApplicationImpl
             Top?.SetNeedsDraw ();
         }
 
-        if (runState.Toplevel is { HasFocus: true })
+        if (sessionToken.Toplevel is { HasFocus: true })
         {
-            runState.Toplevel.HasFocus = false;
+            sessionToken.Toplevel.HasFocus = false;
         }
 
         if (Top is { HasFocus: false })
@@ -265,14 +266,15 @@ public partial class ApplicationImpl
             Top.SetFocus ();
         }
 
-        CachedRunStateToplevel = runState.Toplevel;
+        CachedSessionTokenToplevel = sessionToken.Toplevel;
 
-        runState.Toplevel = null;
-        runState.Dispose ();
+        sessionToken.Toplevel = null;
+        sessionToken.Dispose ();
 
-        LayoutAndDraw (true);
+        // BUGBUG: Why layout and draw here? This causes the screen to be cleared!
+        //LayoutAndDraw (true);
 
-        NotifyStopRunState?.Invoke (this, new (topOfStack!));
+        SessionEnded?.Invoke (this, new (CachedSessionTokenToplevel));
     }
 
     /// <inheritdoc/>

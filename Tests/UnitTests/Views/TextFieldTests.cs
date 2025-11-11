@@ -837,7 +837,7 @@ public class TextFieldTests (ITestOutputHelper output)
         _textField.CursorPosition = 0;
         var top = new Toplevel ();
         top.Add (_textField);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Attribute [] attributes =
         {

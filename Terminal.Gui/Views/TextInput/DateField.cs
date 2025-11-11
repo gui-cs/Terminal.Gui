@@ -15,10 +15,10 @@ namespace Terminal.Gui.Views;
 /// <summary>Provides date editing functionality with mouse support.</summary>
 public class DateField : TextField
 {
-    private const string RightToLeftMark = "\u200f";
+    private const string RIGHT_TO_LEFT_MARK = "\u200f";
 
     private readonly int _dateFieldLength = 12;
-    private DateTime _date;
+    private DateTime? _date;
     private string? _format;
     private string? _separator;
 
@@ -44,7 +44,7 @@ public class DateField : TextField
             _culture = value ?? CultureInfo.CurrentCulture;
             _separator = GetDataSeparator (_culture.DateTimeFormat.DateSeparator);
             _format = " " + StandardizeDateFormat (_culture.DateTimeFormat.ShortDatePattern);
-            Text = Date.ToString (_format).Replace (RightToLeftMark, "");
+            Text = Date?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "");
         }
     }
 
@@ -57,7 +57,7 @@ public class DateField : TextField
 
     /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
     /// <remarks></remarks>
-    public DateTime Date
+    public DateTime? Date
     {
         get => _date;
         set
@@ -67,14 +67,14 @@ public class DateField : TextField
                 return;
             }
 
-            DateTime oldData = _date;
+            DateTime? oldData = _date;
             _date = value;
 
             if (_format is { })
             {
-                Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()))
-                            .Replace (RightToLeftMark, "");
-                DateTimeEventArgs<DateTime> args = new (oldData, value, _format);
+                Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ()))
+                            .Replace (RIGHT_TO_LEFT_MARK, "");
+                EventArgs<DateTime> args = new (value!.Value);
 
                 if (oldData != value)
                 {
@@ -90,7 +90,7 @@ public class DateField : TextField
     /// <summary>DateChanged event, raised when the <see cref="Date"/> property has changed.</summary>
     /// <remarks>This event is raised when the <see cref="Date"/> property changes.</remarks>
     /// <remarks>The passed event arguments containing the old value, new value, and format string.</remarks>
-    public event EventHandler<DateTimeEventArgs<DateTime>>? DateChanged;
+    public event EventHandler<EventArgs<DateTime>>? DateChanged;
 
     /// <inheritdoc/>
     public override void DeleteCharLeft (bool useOldCursorPos = true)
@@ -135,7 +135,7 @@ public class DateField : TextField
 
     /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>
     /// <param name="args">Event arguments</param>
-    protected virtual void OnDateChanged (DateTimeEventArgs<DateTime> args) {  }
+    protected virtual void OnDateChanged (EventArgs<DateTime> args) {  }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
@@ -221,7 +221,7 @@ public class DateField : TextField
             if ($" {date}" != e.Result)
             {
                 // Change the date format to match the current culture
-                e.Result = $" {date}".Replace (RightToLeftMark, "");
+                e.Result = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
             }
 
             AdjCursorPosition (CursorPosition);
@@ -249,9 +249,9 @@ public class DateField : TextField
     {
         string sepChar = separator.Trim ();
 
-        if (sepChar.Length > 1 && sepChar.Contains (RightToLeftMark))
+        if (sepChar.Length > 1 && sepChar.Contains (RIGHT_TO_LEFT_MARK))
         {
-            sepChar = sepChar.Replace (RightToLeftMark, "");
+            sepChar = sepChar.Replace (RIGHT_TO_LEFT_MARK, "");
         }
 
         return sepChar;
@@ -480,9 +480,9 @@ public class DateField : TextField
 
         for (var i = 0; i < vals.Length; i++)
         {
-            if (vals [i].Contains (RightToLeftMark))
+            if (vals [i].Contains (RIGHT_TO_LEFT_MARK))
             {
-                vals [i] = vals [i].Replace (RightToLeftMark, "");
+                vals [i] = vals [i].Replace (RIGHT_TO_LEFT_MARK, "");
             }
         }
 

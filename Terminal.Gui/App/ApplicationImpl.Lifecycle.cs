@@ -9,14 +9,8 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public bool Initialized { get; set; }
 
-    #region Lifecycle Events
-
     /// <inheritdoc/>
     public event EventHandler<EventArgs<bool>>? InitializedChanged;
-
-    #endregion Lifecycle Events
-
-    #region Lifecycle Methods
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
@@ -96,8 +90,8 @@ public partial class ApplicationImpl
         if (wasInitialized)
         {
             AssertNoEventSubscribers (nameof (Iteration), Iteration);
-            AssertNoEventSubscribers (nameof (NotifyNewRunState), NotifyNewRunState);
-            AssertNoEventSubscribers (nameof (NotifyStopRunState), NotifyStopRunState);
+            AssertNoEventSubscribers (nameof (SessionBegun), SessionBegun);
+            AssertNoEventSubscribers (nameof (SessionEnded), SessionEnded);
             AssertNoEventSubscribers (nameof (ScreenChanged), ScreenChanged);
 
             //AssertNoEventSubscribers (nameof (InitializedChanged), InitializedChanged);
@@ -189,17 +183,17 @@ public partial class ApplicationImpl
         {
             Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
 
-            // If End wasn't called _cachedRunStateToplevel may be null
-            if (CachedRunStateToplevel is { })
+            // If End wasn't called _CachedSessionTokenToplevel may be null
+            if (CachedSessionTokenToplevel is { })
             {
-                Debug.Assert (CachedRunStateToplevel.WasDisposed);
-                Debug.Assert (CachedRunStateToplevel == Top);
+                Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
+                Debug.Assert (CachedSessionTokenToplevel == Top);
             }
         }
 #endif
 
         Top = null;
-        CachedRunStateToplevel = null;
+        CachedSessionTokenToplevel = null;
 
         // === 4. Clean up driver ===
         if (Driver is { })
@@ -215,8 +209,8 @@ public partial class ApplicationImpl
 
         // === 5. Clear run state ===
         Iteration = null;
-        NotifyNewRunState = null;
-        NotifyStopRunState = null;
+        SessionBegun = null;
+        SessionEnded = null;
         StopAfterFirstIteration = false;
         ClearScreenNextIteration = false;
 
@@ -254,6 +248,4 @@ public partial class ApplicationImpl
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
     internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
-
-    #endregion Lifecycle Methods
 }

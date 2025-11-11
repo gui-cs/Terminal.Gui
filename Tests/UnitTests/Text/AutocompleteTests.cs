@@ -21,7 +21,7 @@ public class AutocompleteTests (ITestOutputHelper output)
                                 .ToList ();
         Toplevel top = new ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         for (var i = 0; i < 7; i++)
         {

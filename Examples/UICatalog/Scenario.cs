@@ -191,7 +191,7 @@ public class Scenario : IDisposable
             Application.Iteration += OnApplicationOnIteration;
 
             Application.Driver!.ClearedContents += OnClearedContents;
-            Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
+            Application.SessionBegun += OnApplicationSessionBegun;
 
 
             _stopwatch = Stopwatch.StartNew ();
@@ -199,7 +199,7 @@ public class Scenario : IDisposable
         else
         {
             Application.Driver!.ClearedContents -= OnClearedContents;
-            Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
+            Application.SessionBegun -= OnApplicationSessionBegun;
             Application.Iteration -= OnApplicationOnIteration;
             BenchmarkResults.Duration = _stopwatch!.Elapsed;
             _stopwatch?.Stop ();
@@ -219,7 +219,7 @@ public class Scenario : IDisposable
         }
     }
 
-    private void OnApplicationNotifyNewRunState (object? sender, RunStateEventArgs e)
+    private void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
     {
         SubscribeAllSubViews (Application.Top!);
 

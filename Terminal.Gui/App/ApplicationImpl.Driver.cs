@@ -44,26 +44,38 @@ public partial class ApplicationImpl
         if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
         {
             Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+            _driverName = "fake";
         }
         else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
         {
             Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            _driverName = "windows";
         }
         else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
         {
             Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+            _driverName = "dotnet";
         }
         else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
         {
             Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            _driverName = "unix";
         }
         else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
         {
             Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+            _driverName = "windows";
+        }
+        else if (p == PlatformID.Unix)
+        {
+            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            _driverName = "unix";
         }
         else
         {
-            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+            Logging.Information($"Falling back to dotnet driver.");
+            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+            _driverName = "dotnet";
         }
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");

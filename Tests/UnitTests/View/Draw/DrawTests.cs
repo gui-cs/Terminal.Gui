@@ -691,7 +691,7 @@ public class DrawTests (ITestOutputHelper output)
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -719,7 +719,7 @@ At 0,0
    A text wit",
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -739,7 +739,7 @@ At 0,0
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
 
         top.Draw ();
 
@@ -772,7 +772,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -792,7 +792,7 @@ At 0,0
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -818,7 +818,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -838,7 +838,7 @@ At 0,0
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
 
         top.Draw ();
 
@@ -870,7 +870,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
     public class DerivedView : View

@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿#nullable enable
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -15,7 +16,7 @@ public class ApplicationMouseTests
         _output = output;
 #if DEBUG_IDISPOSABLE
         View.Instances.Clear ();
-        RunState.Instances.Clear ();
+        SessionToken.Instances.Clear ();
 #endif
     }
 
@@ -46,7 +47,7 @@ public class ApplicationMouseTests
         var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Pressed };
         var clicked = false;
 
-        void OnApplicationOnMouseEvent (object s, MouseEventArgs e)
+        void OnApplicationOnMouseEvent (object? s, MouseEventArgs e)
         {
             Assert.Equal (expectedX, e.ScreenPosition.X);
             Assert.Equal (expectedY, e.ScreenPosition.Y);
@@ -306,7 +307,7 @@ public class ApplicationMouseTests
     [AutoInitShutdown]
     public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
     {
-        View grabView = null;
+        View? grabView = null;
         var count = 0;
 
         var view1 = new View { Id = "view1" };
@@ -341,7 +342,7 @@ public class ApplicationMouseTests
         Application.Mouse.UngrabMouse ();
         Assert.Null (Application.Mouse.MouseGrabView);
 
-        void Application_GrabbedMouse (object sender, ViewEventArgs e)
+        void Application_GrabbedMouse (object? sender, ViewEventArgs e)
         {
             if (count == 0)
             {
@@ -357,7 +358,7 @@ public class ApplicationMouseTests
             Application.Mouse.GrabbedMouse -= Application_GrabbedMouse;
         }
 
-        void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
+        void Application_UnGrabbedMouse (object? sender, ViewEventArgs e)
         {
             if (count == 0)
             {

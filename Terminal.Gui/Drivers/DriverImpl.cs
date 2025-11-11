@@ -502,6 +502,6 @@ internal class DriverImpl : IDriver
 
     public string? GetName ()
     {
-        throw new NotImplementedException ();
+        return InputProcessor.DriverName?.ToLowerInvariant ();
     }
 }

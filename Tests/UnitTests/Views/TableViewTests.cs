@@ -417,7 +417,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tableView);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         tableView.SchemeName = "TopLevel";
 
@@ -1061,7 +1061,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
@@ -1157,7 +1157,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
@@ -3116,7 +3116,9 @@ A B C
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorUp });
 
+#pragma warning disable xUnit2031
         Assert.Single (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
+#pragma warning restore xUnit2031
 
         // Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });

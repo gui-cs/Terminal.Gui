@@ -469,7 +469,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Toplevel top = new ();
         Window win = new ();
         top.Add (win);
-        RunState rsTop = Application.Begin (top);
+        SessionToken rsTop = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 15);
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
@@ -571,7 +571,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             menu.SetNeedsDraw ();
         }
 
-        RunState rsDialog = Application.Begin (dialog);
+        SessionToken rsDialog = Application.Begin (dialog);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
@@ -778,7 +778,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
             menu.SetNeedsDraw ();
         }
 
-        RunState rs = Application.Begin (dialog);
+        SessionToken rs = Application.Begin (dialog);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
@@ -1855,7 +1855,7 @@ wo
         };
         win.Add (menu);
         Application.Driver!.SetScreenSize (40, 8);
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -2882,7 +2882,7 @@ Edit
         };
         var top = new Toplevel ();
         top.Add (menu);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         menu.OpenMenu ();
 

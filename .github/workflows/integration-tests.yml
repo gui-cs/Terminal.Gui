@@ -1,5 +1,4 @@
 name: Build & Run Integration Tests
-
 on:
   push:
     branches: [ v2_release, v2_develop ]
@@ -9,9 +8,8 @@ on:
     branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
-      
+
 jobs:
-  # Call the build workflow to build the solution once
   build:
     uses: ./.github/workflows/build.yml
 
@@ -20,46 +18,64 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: build
     strategy:
-      # Turn off fail-fast to let all runners run even if there are errors
-      fail-fast: true
+      fail-fast: false  # Let all OSes finish even if one fails
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+    timeout-minutes: 15
 
-    timeout-minutes: 10
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Fixed: Has 'uses'
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+          dotnet-quality: ga
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.x
-        dotnet-quality: 'ga'
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-        path: .
+      - name: Restore NuGet packages
+        run: dotnet restore  # Fixed: Has 'run'
 
-    - name: Restore NuGet packages
-      run: dotnet restore
+      - name: Set VSTEST_DUMP_PATH
+        shell: bash
+        run: echo "VSTEST_DUMP_PATH=logs/${{ runner.os }}/" >> $GITHUB_ENV
 
-    - name: Set VSTEST_DUMP_PATH
-      shell: bash
-      run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
+      - name: Run IntegrationTests with Coverage
+        shell: bash
+        run: |
+          dotnet test Tests/IntegrationTests \
+            --no-build \
+            --verbosity minimal \
+            --collect:"XPlat Code Coverage" \
+            --settings Tests/IntegrationTests/runsettings.xml \
+            --diag:logs/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 60s \
+            --blame-crash-collect-always
 
-    - name: Run IntegrationTests
-      run: |
-       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
-     
-    - name: Upload Test Logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: integration-test-logs-${{ runner.os }}
-        path: |
-          logs/    
-          TestResults/IntegrationTests/
+      - name: Upload Integration Tests Coverage
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: Tests/IntegrationTests/TestResults/**/coverage.cobertura.xml
+          flags: integrationtests-${{ runner.os }}
+          name: codecov-integration-${{ runner.os }}
+
+      - name: Upload Integration Tests Coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: Tests/IntegrationTests/TestResults/**/coverage.cobertura.xml
+          flags: integrationtests
+          name: IntegrationTests-${{ runner.os }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
 

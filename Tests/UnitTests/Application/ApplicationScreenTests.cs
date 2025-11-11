@@ -33,7 +33,7 @@ public class ApplicationScreenTests
     public void ClearContents_Called_When_Top_Frame_Changes ()
     {
         Toplevel top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         // Arrange
         var clearedContentsRaised = 0;
 

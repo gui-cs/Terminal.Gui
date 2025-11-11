@@ -1,6 +1,6 @@
 ![.NET Core](https://github.com/gui-cs/Terminal.Gui/workflows/.NET%20Core/badge.svg?branch=develop)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
-![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
+[![codecov](https://codecov.io/gh/gui-cs/Terminal.Gui/branch/v2_develop/graph/badge.svg)](https://codecov.io/gh/gui-cs/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/gui-cs/gui.cs.svg)](LICENSE)
 ![Bugs](https://img.shields.io/github/issues/gui-cs/gui.cs/bug)

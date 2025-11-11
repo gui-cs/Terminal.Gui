@@ -119,12 +119,12 @@ public partial class GuiTestContext : IDisposable
         }
     }
 
-    internal readonly FakeInput _fakeInput = new ();
-    internal Exception? _ex;
-    internal IOutput? _output;
-    internal View? _lastView;
-    internal TestDriver _driverType;
-    internal TimeSpan _timeout;
+    private readonly FakeInput _fakeInput = new ();
+    private Exception? _ex;
+    private IOutput? _output;
+    private View? _lastView;
+    private TestDriver _driverType;
+    private TimeSpan _timeout;
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly Task? _runTask;
     private readonly object _logsLock = new ();
@@ -202,7 +202,7 @@ public partial class GuiTestContext : IDisposable
         //Logging.Trace ($"{title}");
         return WaitIteration (() =>
                               {
-                                  writer.WriteLine (title + ":");
+                                  writer?.WriteLine (title + ":");
                                   var text = Application.ToString ();
 
                                   writer?.WriteLine (text);

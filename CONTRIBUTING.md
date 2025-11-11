@@ -323,7 +323,7 @@ dotnet build --configuration Release --no-restore
 ### Main Directories
 
 **`/Terminal.Gui/`** - Core library (496 C# files):
-- `App/` - Application lifecycle (`Application.cs` static class, `RunState`, `MainLoop`)
+- `App/` - Application lifecycle (`Application.cs` static class, `SessionToken`, `MainLoop`)
 - `Configuration/` - `ConfigurationManager` for settings
 - `Drivers/` - Console driver implementations (`Dotnet`, `Windows`, `Unix`, `Fake`)
 - `Drawing/` - Rendering system (attributes, colors, glyphs)

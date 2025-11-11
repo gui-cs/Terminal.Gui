@@ -21,7 +21,7 @@ jobs:
     needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
@@ -56,10 +56,19 @@ jobs:
       run: echo "{VSTEST_DUMP_PATH}={logs/UnitTests/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTests
+      shell: bash
       run: |
-       dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/UnitTests/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false
-     
-       # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
+        dotnet test Tests/UnitTests \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --settings Tests/UnitTests/runsettings.xml \
+          --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
+          --blame \
+          --blame-crash \
+          --blame-hang \
+          --blame-hang-timeout 60s \
+          --blame-crash-collect-always
 
     - name: Upload Test Logs
       if: always()
@@ -70,13 +79,23 @@ jobs:
           logs/UnitTests    
           TestResults/UnitTests/
   
+    - name: Upload Non-Parallel UnitTests Coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && always()
+      uses: codecov/codecov-action@v4
+      with:
+        files: Tests/UnitTests/TestResults/**/coverage.cobertura.xml
+        flags: unittests-nonparallel
+        name: UnitTests-${{ runner.os }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+
   parallel_unittests:
     name: Parallel Unit Tests  
     runs-on: ${{ matrix.os }}
     needs: build
     strategy:
       # Turn off fail-fast to let all runners run even if there are errors
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
@@ -111,10 +130,19 @@ jobs:
       run: echo "{VSTEST_DUMP_PATH}={logs/UnitTestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTestsParallelizable
+      shell: bash
       run: |
-       dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=false
-     
-       # mv -v Tests/UnitTestsParallelizable/TestResults/*/*.* TestResults/UnitTestsParallelizable/
+        dotnet test Tests/UnitTestsParallelizable \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --settings Tests/UnitTestsParallelizable/runsettings.xml \
+          --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
+          --blame \
+          --blame-crash \
+          --blame-hang \
+          --blame-hang-timeout 60s \
+          --blame-crash-collect-always
 
     - name: Upload UnitTestsParallelizable Logs
       if: always()
@@ -124,3 +152,13 @@ jobs:
         path: |
           logs/UnitTestsParallelizable/
           TestResults/UnitTestsParallelizable/
+  
+    - name: Upload Parallelizable UnitTests Coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && always()
+      uses: codecov/codecov-action@v4
+      with:
+        files: Tests/UnitTestsParallelizable/TestResults/**/coverage.cobertura.xml
+        flags: unittests-parallel
+        name: UnitTestsParallelizable-${{ runner.os }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false

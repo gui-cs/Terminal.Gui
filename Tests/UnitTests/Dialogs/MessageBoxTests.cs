@@ -17,41 +17,46 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var btnAcceptCount = 0;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iteration++;
-
-                                     switch (iteration)
-                                     {
-                                         case 1:
-                                             result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
-                                             Application.RequestStop ();
-
-                                             break;
-
-                                         case 2:
-                                             // Tab to btn2
-                                             Application.RaiseKeyDownEvent (Key.Tab);
-
-                                             var btn = Application.Navigation!.GetFocused () as Button;
-
-                                             btn.Accepting += (sender, e) => { btnAcceptCount++; };
-
-                                             // Click
-                                             Application.RaiseKeyDownEvent (Key.Enter);
-
-                                             break;
-
-                                         default:
-                                             Assert.Fail ();
-
-                                             break;
-                                     }
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run ().Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (1, result);
         Assert.Equal (1, btnAcceptCount);
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iteration++;
+
+            switch (iteration)
+            {
+                case 1:
+                    result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                    Application.RequestStop ();
+
+                    break;
+
+                case 2:
+                    // Tab to btn2
+                    Application.RaiseKeyDownEvent (Key.Tab);
+
+                    var btn = Application.Navigation!.GetFocused () as Button;
+
+                    btn.Accepting += (sender, e) => { btnAcceptCount++; };
+
+                    // Click
+                    Application.RaiseKeyDownEvent (Key.Enter);
+
+                    break;
+
+                default:
+                    Assert.Fail ();
+
+                    break;
+            }
+        }
     }
 
     [Fact]
@@ -62,32 +67,37 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var iteration = 0;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iteration++;
-
-                                     switch (iteration)
-                                     {
-                                         case 1:
-                                             result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
-                                             Application.RequestStop ();
-
-                                             break;
-
-                                         case 2:
-                                             Application.RaiseKeyDownEvent (Key.Esc);
-
-                                             break;
-
-                                         default:
-                                             Assert.Fail ();
-
-                                             break;
-                                     }
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run ().Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (-1, result);
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iteration++;
+
+            switch (iteration)
+            {
+                case 1:
+                    result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                    Application.RequestStop ();
+
+                    break;
+
+                case 2:
+                    Application.RaiseKeyDownEvent (Key.Esc);
+
+                    break;
+
+                default:
+                    Assert.Fail ();
+
+                    break;
+            }
+        }
     }
 
     [Fact]
@@ -100,40 +110,45 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var btnAcceptCount = 0;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iteration++;
-
-                                     switch (iteration)
-                                     {
-                                         case 1:
-                                             result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
-                                             Application.RequestStop ();
-
-                                             break;
-
-                                         case 2:
-                                             // Tab to btn2
-                                             Application.RaiseKeyDownEvent (Key.Tab);
-
-                                             var btn = Application.Navigation!.GetFocused () as Button;
-
-                                             btn.Accepting += (sender, e) => { btnAcceptCount++; };
-
-                                             Application.RaiseKeyDownEvent (Key.Space);
-
-                                             break;
-
-                                         default:
-                                             Assert.Fail ();
-
-                                             break;
-                                     }
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run ().Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (1, result);
         Assert.Equal (1, btnAcceptCount);
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iteration++;
+
+            switch (iteration)
+            {
+                case 1:
+                    result = MessageBox.Query (string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                    Application.RequestStop ();
+
+                    break;
+
+                case 2:
+                    // Tab to btn2
+                    Application.RaiseKeyDownEvent (Key.Tab);
+
+                    var btn = Application.Navigation!.GetFocused () as Button;
+
+                    btn.Accepting += (sender, e) => { btnAcceptCount++; };
+
+                    Application.RaiseKeyDownEvent (Key.Space);
+
+                    break;
+
+                default:
+                    Assert.Fail ();
+
+                    break;
+            }
+        }
     }
 
     [Theory]
@@ -158,25 +173,30 @@ public class MessageBoxTests (ITestOutputHelper output)
 
         var mbFrame = Rectangle.Empty;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
-
-                                     if (iterations == 0)
-                                     {
-                                         MessageBox.Query (string.Empty, message, 0, wrapMessage, hasButton ? ["0"] : []);
-                                         Application.RequestStop ();
-                                     }
-                                     else if (iterations == 1)
-                                     {
-                                         mbFrame = Application.Top!.Frame;
-                                         Application.RequestStop ();
-                                     }
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run ().Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (new (expectedX, expectedY, expectedW, expectedH), mbFrame);
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iterations++;
+
+            if (iterations == 0)
+            {
+                MessageBox.Query (string.Empty, message, 0, wrapMessage, hasButton ? ["0"] : []);
+                Application.RequestStop ();
+            }
+            else if (iterations == 1)
+            {
+                mbFrame = Application.Top!.Frame;
+                Application.RequestStop ();
+            }
+        }
     }
 
     [Fact]
@@ -197,56 +217,57 @@ public class MessageBoxTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
+        Application.Iteration += OnApplicationOnIteration;
 
-                                     if (iterations == 0)
-                                     {
-                                         var sb = new StringBuilder ();
+        Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
+        top.Dispose ();
 
-                                         for (var i = 0; i < 17; i++)
-                                         {
-                                             sb.Append ("ff ");
-                                         }
+        return;
 
-                                         MessageBox.Query (string.Empty, sb.ToString (), 0, false, "btn");
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iterations++;
 
-                                         Application.RequestStop ();
-                                     }
-                                     else if (iterations == 2)
-                                     {
+            if (iterations == 0)
+            {
+                var sb = new StringBuilder ();
 
-                                         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                        @"
+                for (var i = 0; i < 17; i++)
+                {
+                    sb.Append ("ff ");
+                }
+
+                MessageBox.Query (string.Empty, sb.ToString (), 0, false, "btn");
+
+                Application.RequestStop ();
+            }
+            else if (iterations == 2)
+            {
+                DriverAssert.AssertDriverContentsWithFrameAre (
+                                                               @"
  ╔════════════════╗
  ║ ff ff ff ff ff ║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        output
-                                                                                       );
-                                         Application.RequestStop ();
+                                                               output);
+                Application.RequestStop ();
 
-                                         // Really long text
-                                         MessageBox.Query (string.Empty, new ('f', 500), 0, false, "btn");
-                                     }
-                                     else if (iterations == 4)
-                                     {
-
-                                         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                        @"
+                // Really long text
+                MessageBox.Query (string.Empty, new ('f', 500), 0, false, "btn");
+            }
+            else if (iterations == 4)
+            {
+                DriverAssert.AssertDriverContentsWithFrameAre (
+                                                               @"
  ╔════════════════╗
  ║ffffffffffffffff║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        output
-                                                                                       );
-                                         Application.RequestStop ();
-                                     }
-                                 };
-
-        Application.Run (top);
-        top.Dispose ();
+                                                               output);
+                Application.RequestStop ();
+            }
+        }
     }
 
     [Fact]
@@ -267,28 +288,35 @@ public class MessageBoxTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
+        Application.Iteration += OnApplicationOnIteration;
 
-                                     if (iterations == 0)
-                                     {
-                                         var sb = new StringBuilder ();
+        Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
+        top.Dispose ();
 
-                                         for (var i = 0; i < 17; i++)
-                                         {
-                                             sb.Append ("ff ");
-                                         }
+        return;
 
-                                         MessageBox.Query (string.Empty, sb.ToString (), 0, true, "btn");
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iterations++;
 
-                                         Application.RequestStop ();
-                                     }
-                                     else if (iterations == 2)
-                                     {
+            if (iterations == 0)
+            {
+                var sb = new StringBuilder ();
 
-                                         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                        @"
+                for (var i = 0; i < 17; i++)
+                {
+                    sb.Append ("ff ");
+                }
+
+                MessageBox.Query (string.Empty, sb.ToString (), 0, true, "btn");
+
+                Application.RequestStop ();
+            }
+            else if (iterations == 2)
+            {
+                DriverAssert.AssertDriverContentsWithFrameAre (
+                                                               @"
   ╔══════════════╗
   ║ff ff ff ff ff║
   ║ff ff ff ff ff║
@@ -296,18 +324,16 @@ public class MessageBoxTests (ITestOutputHelper output)
   ║    ff ff     ║
   ║     ⟦► btn ◄⟧║
   ╚══════════════╝",
-                                                                                        output
-                                                                                       );
-                                         Application.RequestStop ();
+                                                               output);
+                Application.RequestStop ();
 
-                                         // Really long text
-                                         MessageBox.Query (string.Empty, new ('f', 500), 0, true, "btn");
-                                     }
-                                     else if (iterations == 4)
-                                     {
-
-                                         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                        @"
+                // Really long text
+                MessageBox.Query (string.Empty, new ('f', 500), 0, true, "btn");
+            }
+            else if (iterations == 4)
+            {
+                DriverAssert.AssertDriverContentsWithFrameAre (
+                                                               @"
  ╔════════════════╗
  ║ffffffffffffffff║
  ║ffffffffffffffff║
@@ -317,17 +343,13 @@ public class MessageBoxTests (ITestOutputHelper output)
  ║ffffffffffffffff║
  ║fffffff⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                        output
-                                                                                       );
-                                         Application.RequestStop ();
-                                     }
-                                 };
-
-        Application.Run (top);
-        top.Dispose ();
+                                                               output);
+                Application.RequestStop ();
+            }
+        }
     }
 
-    [Theory]
+    [Theory (Skip = "Bogus test: Never does anything")]
     [InlineData (0, 0, "1")]
     [InlineData (1, 1, "1")]
     [InlineData (7, 5, "1")]
@@ -364,7 +386,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  };
     }
 
-    [Theory]
+    [Theory (Skip = "Bogus test: Never does anything")]
     [InlineData (0, 0, "1")]
     [InlineData (1, 1, "1")]
     [InlineData (7, 5, "1")]
@@ -401,7 +423,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  };
     }
 
-    [Theory]
+    [Theory (Skip = "Bogus test: Never does anything")]
     [InlineData (0, 0)]
     [InlineData (1, 1)]
     [InlineData (7, 5)]
@@ -447,51 +469,55 @@ public class MessageBoxTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
-
-                                     if (iterations == 0)
-                                     {
-                                         MessageBox.Query (
-                                                           "",
-                                                           UICatalog.UICatalogTop.GetAboutBoxMessage (),
-                                                           wrapMessage: false,
-                                                           buttons: "_Ok"
-                                                          );
-
-                                         Application.RequestStop ();
-                                     }
-                                     else if (iterations == 2)
-                                     {
-                                         var expectedText = """
-                                                            ┌────────────────────────────────────────────────────────────────────┐
-                                                            │   ╔═══════════════════════════════════════════════════════════╗    │
-                                                            │   ║UI Catalog: A comprehensive sample library and test app for║    │
-                                                            │   ║                                                           ║    │
-                                                            │   ║ _______                  _             _   _____       _  ║    │
-                                                            │   ║|__   __|                (_)           | | / ____|     (_) ║    │
-                                                            │   ║   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ║    │
-                                                            │   ║   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ║    │
-                                                            │   ║   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ║    │
-                                                            │   ║   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ║    │
-                                                            │   ║                                                           ║    │
-                                                            │   ║                      v2 - Pre-Alpha                       ║    │
-                                                            │   ║                                                   ⟦► Ok ◄⟧║    │
-                                                            │   ╚═══════════════════════════════════════════════════════════╝    │
-                                                            └────────────────────────────────────────────────────────────────────┘
-                                                            """;
-
-                                         DriverAssert.AssertDriverContentsAre (expectedText, output);
-
-                                         Application.RequestStop ();
-                                     }
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Single;
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            iterations++;
+
+            if (iterations == 0)
+            {
+                MessageBox.Query (
+                                  "",
+                                  UICatalog.UICatalogTop.GetAboutBoxMessage (),
+                                  wrapMessage: false,
+                                  buttons: "_Ok");
+
+                Application.RequestStop ();
+            }
+            else if (iterations == 2)
+            {
+                var expectedText = """
+                                   ┌────────────────────────────────────────────────────────────────────┐
+                                   │   ╔═══════════════════════════════════════════════════════════╗    │
+                                   │   ║UI Catalog: A comprehensive sample library and test app for║    │
+                                   │   ║                                                           ║    │
+                                   │   ║ _______                  _             _   _____       _  ║    │
+                                   │   ║|__   __|                (_)           | | / ____|     (_) ║    │
+                                   │   ║   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ║    │
+                                   │   ║   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ║    │
+                                   │   ║   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ║    │
+                                   │   ║   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ║    │
+                                   │   ║                                                           ║    │
+                                   │   ║                      v2 - Pre-Alpha                       ║    │
+                                   │   ║                                                   ⟦► Ok ◄⟧║    │
+                                   │   ╚═══════════════════════════════════════════════════════════╝    │
+                                   └────────────────────────────────────────────────────────────────────┘
+                                   """;
+
+                DriverAssert.AssertDriverContentsAre (expectedText, output);
+
+                Application.RequestStop ();
+            }
+        }
     }
 
     [Theory]
@@ -499,10 +525,15 @@ public class MessageBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
-        Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
+        Application.Iteration += OnApplicationOnIteration;
         int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, res);
+
+        return;
+
+        void OnApplicationOnIteration (object o, IterationEventArgs iterationEventArgs) => Assert.True (Application.RaiseKeyDownEvent (key));
     }
 
     public static IEnumerable<object []> AcceptingKeys ()

@@ -95,7 +95,7 @@ public class BorderTests (ITestOutputHelper output)
         };
         win.Border!.Thickness = win.Border!.Thickness with { Top = 4 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 5);
         AutoInitShutdownAttribute.RunIteration ();
@@ -228,7 +228,7 @@ public class BorderTests (ITestOutputHelper output)
         };
         win.Border!.Thickness = win.Border!.Thickness with { Top = 3 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 4);
         AutoInitShutdownAttribute.RunIteration ();
@@ -361,7 +361,7 @@ public class BorderTests (ITestOutputHelper output)
         };
         win.Border!.Thickness = win.Border!.Thickness with { Top = 2 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 4);
         AutoInitShutdownAttribute.RunIteration ();
@@ -483,7 +483,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (20, height);
         AutoInitShutdownAttribute.RunIteration ();
@@ -544,7 +544,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 3);
         AutoInitShutdownAttribute.RunIteration ();
@@ -727,7 +727,7 @@ public class BorderTests (ITestOutputHelper output)
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Application.Driver!.SetScreenSize (5, 5);
         AutoInitShutdownAttribute.RunIteration ();
@@ -754,7 +754,7 @@ public class BorderTests (ITestOutputHelper output)
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Application.Driver!.SetScreenSize (10, 4);
         AutoInitShutdownAttribute.RunIteration ();
@@ -776,7 +776,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (3, 3);
         AutoInitShutdownAttribute.RunIteration ();

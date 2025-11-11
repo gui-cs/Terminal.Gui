@@ -449,7 +449,7 @@ public class ViewTests
         win.Add (view);
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
