@@ -69,23 +69,4 @@
         <Using Include="Terminal.Gui" />
         <Using Include="Xunit" />
     </ItemGroup>
-    <PropertyGroup Label="FineCodeCoverage">
-        <Enabled>
-            False
-        </Enabled>
-        <Exclude>
-            [UICatalog]*
-        </Exclude>
-        <Include></Include>
-        <ExcludeByFile>
-            <!--**/Migrations/*
-      **/Hacks/*.cs-->
-        </ExcludeByFile>
-        <ExcludeByAttribute>
-            <!--MyCustomExcludeFromCodeCoverage-->
-        </ExcludeByAttribute>
-        <IncludeTestAssembly>
-            False
-        </IncludeTestAssembly>
-    </PropertyGroup>
 </Project>

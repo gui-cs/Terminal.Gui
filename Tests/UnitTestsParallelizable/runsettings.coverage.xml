@@ -11,7 +11,7 @@
 					<Exclude>[*]*AssemblyInfo.cs</Exclude>
 					<!-- Exclude test projects -->
 					<Exclude>[UnitTests]*</Exclude>
-					<Exclude>[UnitTestsParallelizable]*</Exclude>
+					<Exclude>[UnitTests.Parallelizable]*</Exclude>
 					<Exclude>[IntegrationTests]*</Exclude>
 					<Exclude>[TerminalGuiFluentTesting]*</Exclude>
 					<!-- Exclude analyzers and UI catalog -->
@@ -35,6 +35,6 @@
 
 	<!-- Optional: Global Run Config (e.g., results dir) -->
 	<RunConfiguration>
-		<ResultsDirectory>../../TestResults</ResultsDirectory>
+		<ResultsDirectory>../TestResults</ResultsDirectory>
 	</RunConfiguration>
 </RunSettings>
