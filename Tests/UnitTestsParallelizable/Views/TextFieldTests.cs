@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewsTests;

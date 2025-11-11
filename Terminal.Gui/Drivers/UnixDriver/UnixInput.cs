@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
+﻿#nullable enable
+using System.Runtime.InteropServices;
 
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming

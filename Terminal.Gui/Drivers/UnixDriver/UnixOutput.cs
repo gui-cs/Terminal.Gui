@@ -1,5 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿#nullable enable   
+using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
@@ -91,10 +93,10 @@ internal class UnixOutput : OutputBase, IOutput
 
         try
         {
-            using TextWriter writer = CreateUnixStdoutWriter ();
+            using TextWriter? writer = CreateUnixStdoutWriter ();
 
             // + 1 is needed because Unix is based on 1 instead of 0 and
-            EscSeqUtils.CSI_WriteCursorPosition (writer, screenPositionY + 1, screenPositionX + 1);
+            EscSeqUtils.CSI_WriteCursorPosition (writer!, screenPositionY + 1, screenPositionX + 1);
         }
         catch
         {

@@ -1968,7 +1968,7 @@ public class TextView : View, IDesignable
         SetWrapModel ();
         string? contents = Clipboard.Contents;
 
-        if (_copyWithoutSelection && contents.FirstOrDefault (x => x is '\n' or '\r') == 0)
+        if (_copyWithoutSelection && contents!.FirstOrDefault (x => x is '\n' or '\r') == 0)
         {
             List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
             List<Cell> currentLine = GetCurrentLine ();
@@ -2003,7 +2003,7 @@ public class TextView : View, IDesignable
             }
 
             _copyWithoutSelection = false;
-            InsertAllText (contents, true);
+            InsertAllText (contents!, true);
 
             if (IsSelecting)
             {

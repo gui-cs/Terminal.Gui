@@ -16,7 +16,7 @@ public partial class GuiTestContext : IDisposable
 
     // ===== Threading & Synchronization =====
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
-    private readonly CancellationTokenSource _timeoutCts;
+    private readonly CancellationTokenSource? _timeoutCts;
     private readonly Task? _runTask;
     private readonly SemaphoreSlim _booting;
     private readonly object _cancellationLock = new ();
@@ -427,9 +427,9 @@ public partial class GuiTestContext : IDisposable
         WaitIteration (() => { Application.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
-        const int waitTimeoutMs = 1000;
+        const int WAIT_TIMEOUT_MS = 1000;
 
-        if (!_runTask.Wait (TimeSpan.FromMilliseconds (waitTimeoutMs)))
+        if (!_runTask.Wait (TimeSpan.FromMilliseconds (WAIT_TIMEOUT_MS)))
         {
             _runCancellationTokenSource.Cancel ();
 
@@ -444,11 +444,11 @@ public partial class GuiTestContext : IDisposable
             }
             catch (Exception ex)
             {
-                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Then shutdown threw {ex}");
+                Logging.Critical ($"Application failed to stop in {WAIT_TIMEOUT_MS}. Then shutdown threw {ex}");
             }
             finally
             {
-                Logging.Critical ($"Application failed to stop in {waitTimeoutMs}. Exception was thrown: {_backgroundException}");
+                Logging.Critical ($"Application failed to stop in {WAIT_TIMEOUT_MS}. Exception was thrown: {_backgroundException}");
             }
         }
 
