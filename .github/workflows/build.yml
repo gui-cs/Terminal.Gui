@@ -53,12 +53,15 @@ jobs:
     - name: Pack Release Terminal.Gui
       run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-build --output ./local_packages
 
-    # Add local package source and restore AOT/Self-Contained projects
+    # Restore AOT and Self-Contained projects with explicit source paths
     - name: Restore AOT and Self-Contained projects
       run: |
-        dotnet nuget add source ./local_packages --name local
-        dotnet restore ./Examples/NativeAot/NativeAot.csproj
-        dotnet restore ./Examples/SelfContained/SelfContained.csproj
+        dotnet restore ./Examples/NativeAot/NativeAot.csproj \
+          --source ${{ github.workspace }}/local_packages \
+          --source https://api.nuget.org/v3/index.json
+        dotnet restore ./Examples/SelfContained/SelfContained.csproj \
+          --source ${{ github.workspace }}/local_packages \
+          --source https://api.nuget.org/v3/index.json
 
     # Build Release AOT and Self-Contained (using the packed NuGet package)
     - name: Build Release AOT and Self-Contained
