@@ -28,6 +28,6 @@
 
 	<!-- Optional: Global Run Config (e.g., results dir) -->
 	<RunConfiguration>
-		<ResultsDirectory>./TestResults</ResultsDirectory>
+		<ResultsDirectory>../../TestResults</ResultsDirectory>
 	</RunConfiguration>
 </RunSettings>

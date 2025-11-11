@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Fixed: Has 'uses'
+        uses: actions/checkout@v4
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
@@ -40,40 +40,65 @@ jobs:
           path: .
 
       - name: Restore NuGet packages
-        run: dotnet restore  # Fixed: Has 'run'
+        run: dotnet restore
+
+      - name: Disable Windows Defender (Windows only)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Add-MpPreference -ExclusionPath "${{ github.workspace }}"
+          Add-MpPreference -ExclusionProcess "dotnet.exe"
+          Add-MpPreference -ExclusionProcess "testhost.exe"
+          Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
 
       - name: Set VSTEST_DUMP_PATH
         shell: bash
-        run: echo "VSTEST_DUMP_PATH=logs/${{ runner.os }}/" >> $GITHUB_ENV
+        run: echo "VSTEST_DUMP_PATH=logs/IntegrationTests/${{ runner.os }}/" >> $GITHUB_ENV
 
-      - name: Run IntegrationTests with Coverage
+      - name: Run IntegrationTests
         shell: bash
         run: |
-          dotnet test Tests/IntegrationTests \
-            --no-build \
-            --verbosity minimal \
-            --collect:"XPlat Code Coverage" \
-            --settings Tests/IntegrationTests/runsettings.xml \
-            --diag:logs/${{ runner.os }}/logs.txt \
-            --blame \
-            --blame-crash \
-            --blame-hang \
-            --blame-hang-timeout 60s \
-            --blame-crash-collect-always
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            # Run with coverage on Linux only
+            dotnet test Tests/IntegrationTests \
+              --no-build \
+              --verbosity minimal \
+              --collect:"XPlat Code Coverage" \
+              --settings Tests/IntegrationTests/runsettings.xml \
+              --diag:logs/IntegrationTests/${{ runner.os }}/logs.txt \
+              --blame \
+              --blame-crash \
+              --blame-hang \
+              --blame-hang-timeout 60s \
+              --blame-crash-collect-always
+          else
+            # Run without coverage on Windows/macOS for speed
+            dotnet test Tests/IntegrationTests \
+              --no-build \
+              --verbosity minimal \
+              --settings Tests/IntegrationTests/runsettings.xml \
+              --diag:logs/IntegrationTests/${{ runner.os }}/logs.txt \
+              --blame \
+              --blame-crash \
+              --blame-hang \
+              --blame-hang-timeout 60s \
+              --blame-crash-collect-always
+          fi
 
-      - name: Upload Integration Tests Coverage
+      - name: Upload Integration Test Logs
         if: always()
-        uses: codecov/codecov-action@v4
+        uses: actions/upload-artifact@v4
         with:
-          files: Tests/IntegrationTests/TestResults/**/coverage.cobertura.xml
-          flags: integrationtests-${{ runner.os }}
-          name: codecov-integration-${{ runner.os }}
+          name: integration_tests-logs-${{ runner.os }}
+          path: |
+            logs/IntegrationTests/
+            TestResults/
 
       - name: Upload Integration Tests Coverage to Codecov
         if: matrix.os == 'ubuntu-latest' && always()
         uses: codecov/codecov-action@v4
         with:
-          files: Tests/IntegrationTests/TestResults/**/coverage.cobertura.xml
+          files: TestResults/**/coverage.cobertura.xml
           flags: integrationtests
           name: IntegrationTests-${{ runner.os }}
           token: ${{ secrets.CODECOV_TOKEN }}

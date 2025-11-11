@@ -64,20 +64,8 @@ jobs:
     - name: Run UnitTests
       shell: bash
       run: |
-        if [ "${{ runner.os }}" == "Windows" ]; then
-          # Run without coverage on Windows for speed
-          dotnet test Tests/UnitTests \
-            --no-build \
-            --verbosity normal \
-            --settings Tests/UnitTests/runsettings.xml \
-            --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
-            --blame \
-            --blame-crash \
-            --blame-hang \
-            --blame-hang-timeout 120s \
-            --blame-crash-collect-always
-        else
-          # Run with coverage on Linux/macOS
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          # Run with coverage on Linux only
           dotnet test Tests/UnitTests \
             --no-build \
             --verbosity normal \
@@ -88,6 +76,18 @@ jobs:
             --blame-crash \
             --blame-hang \
             --blame-hang-timeout 60s \
+            --blame-crash-collect-always
+        else
+          # Run without coverage on Windows/macOS for speed
+          dotnet test Tests/UnitTests \
+            --no-build \
+            --verbosity normal \
+            --settings Tests/UnitTests/runsettings.xml \
+            --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 120s \
             --blame-crash-collect-always
         fi
 
@@ -104,7 +104,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest' && always()
       uses: codecov/codecov-action@v4
       with:
-        files: Tests/UnitTests/TestResults/**/coverage.cobertura.xml
+        files: TestResults/**/coverage.cobertura.xml
         flags: unittests-nonparallel
         name: UnitTests-${{ runner.os }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -120,7 +120,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
 
     - name: Checkout code
@@ -138,48 +138,8 @@ jobs:
         name: build-artifacts
         path: .
 
-# Test
-    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
-    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
-    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
-
-    - name: Set VSTEST_DUMP_PATH
-      shell: bash
-      run: echo "{VSTEST_DUMP_PATH}={logs/UnitTestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
-
-    - name: Run UnitTestsParallelizable
-      shell: bash
-      run: |
-        dotnet test Tests/UnitTestsParallelizable \
-          --no-build \
-          --verbosity normal \
-          --collect:"XPlat Code Coverage" \
-          --settings Tests/UnitTestsParallelizable/runsettings.xml \
-          --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
-          --blame \
-          --blame-crash \
-          --blame-hang \
-          --blame-hang-timeout 60s \
-          --blame-crash-collect-always
-
-    - name: Upload UnitTestsParallelizable Logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: parallel_unittests-logs-${{ runner.os }}
-        path: |
-          logs/UnitTestsParallelizable/
-          TestResults/UnitTestsParallelizable/
-  
-    - name: Upload Parallelizable UnitTests Coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && always()
-      uses: codecov/codecov-action@v4
-      with:
-        files: Tests/UnitTestsParallelizable/TestResults/**/coverage.cobertura.xml
-        flags: unittests-parallel
-        name: UnitTestsParallelizable-${{ runner.os }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
+    - name: Restore NuGet packages
+      run: dotnet restore
 
     - name: Disable Windows Defender (Windows only)
       if: runner.os == 'Windows'
@@ -188,3 +148,57 @@ jobs:
         Add-MpPreference -ExclusionPath "${{ github.workspace }}"
         Add-MpPreference -ExclusionProcess "dotnet.exe"
         Add-MpPreference -ExclusionProcess "testhost.exe"
+        Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
+
+    - name: Set VSTEST_DUMP_PATH
+      shell: bash
+      run: echo "VSTEST_DUMP_PATH=logs/UnitTestsParallelizable/${{ runner.os }}/" >> $GITHUB_ENV
+
+    - name: Run UnitTestsParallelizable
+      shell: bash
+      run: |
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          # Run with coverage on Linux only
+          dotnet test Tests/UnitTestsParallelizable \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --settings Tests/UnitTestsParallelizable/runsettings.xml \
+            --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 60s \
+            --blame-crash-collect-always
+        else
+          # Run without coverage on Windows/macOS for speed
+          dotnet test Tests/UnitTestsParallelizable \
+            --no-build \
+            --verbosity normal \
+            --settings Tests/UnitTestsParallelizable/runsettings.xml \
+            --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 60s \
+            --blame-crash-collect-always
+        fi
+
+    - name: Upload UnitTestsParallelizable Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: parallel_unittests-logs-${{ runner.os }}
+        path: |
+          logs/UnitTestsParallelizable/
+          TestResults/
+  
+    - name: Upload Parallelizable UnitTests Coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && always()
+      uses: codecov/codecov-action@v4
+      with:
+        files: TestResults/**/coverage.cobertura.xml
+        flags: unittests-parallel
+        name: UnitTestsParallelizable-${{ runner.os }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false

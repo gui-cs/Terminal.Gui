@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RunSettings>
 	<DataCollectionRunSettings>
 		<DataCollectors>
@@ -19,4 +20,8 @@
 		<MaxParallelThreads>1</MaxParallelThreads>
 		<StopOnFail>true</StopOnFail>
 	</xUnit>
+	<!-- Optional: Global Run Config (e.g., results dir) -->
+	<RunConfiguration>
+		<ResultsDirectory>../../TestResults</ResultsDirectory>
+	</RunConfiguration>
 </RunSettings>
