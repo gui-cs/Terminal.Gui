@@ -106,7 +106,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     public UnixInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (UnixInput)}");
+        Logging.Information ($"Creating {nameof (UnixInput)}");
 
         try
         {
