@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 namespace Terminal.Gui.Drivers;
 
@@ -89,7 +91,7 @@ internal class UnixOutput : OutputBase, IOutput
 
         try
         {
-            using var writer = CreateUnixStdoutWriter ();
+            using TextWriter writer = CreateUnixStdoutWriter ();
 
             // + 1 is needed because Unix is based on 1 instead of 0 and
             EscSeqUtils.CSI_WriteCursorPosition (writer, screenPositionY + 1, screenPositionX + 1);
@@ -102,26 +104,37 @@ internal class UnixOutput : OutputBase, IOutput
         return true;
     }
 
-    private TextWriter CreateUnixStdoutWriter ()
+    private TextWriter? CreateUnixStdoutWriter ()
     {
-        // duplicate stdout so we don’t mess with Console.Out’s FD
+        // duplicate stdout so we don't mess with Console.Out's FD
         int fdCopy = dup (STDOUT_FILENO);
 
         if (fdCopy == -1)
         {
-            throw new IOException ("Failed to dup STDOUT_FILENO");
+            // Log but don't throw - we're likely running without a TTY (CI/CD, tests, etc.)
+            var errno = Marshal.GetLastWin32Error ();
+            Logging.Warning ($"Failed to dup STDOUT_FILENO, errno={errno}. Running without TTY support.");
+            return null;  // Return null instead of throwing
         }
 
-        // wrap the raw fd into a SafeFileHandle
-        var handle = new SafeFileHandle (fdCopy, ownsHandle: true);
-
-        // create FileStream from the safe handle
-        var stream = new FileStream (handle, FileAccess.Write);
-
-        return new StreamWriter (stream)
+        try
         {
-            AutoFlush = true
-        };
+            // wrap the raw fd into a SafeFileHandle
+            SafeFileHandle handle = new SafeFileHandle (fdCopy, ownsHandle: true);
+
+            // create FileStream from the safe handle
+            FileStream stream = new FileStream (handle, FileAccess.Write);
+
+            return new StreamWriter (stream)
+            {
+                AutoFlush = true
+            };
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"Failed to create TextWriter from dup'd STDOUT: {ex.Message}");
+            return null;
+        }
     }
 
     /// <inheritdoc />

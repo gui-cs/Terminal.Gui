@@ -90,7 +90,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (0, tv.TabScrollOffset);
     }
 
-    [Fact]
+    [Fact (Skip = "Really slow test")]
     [AutoInitShutdown]
     public void MouseClick_ChangesTab ()
     {

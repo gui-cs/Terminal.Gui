@@ -1,6 +1,11 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable CommentTypo
+
 namespace Terminal.Gui.Drivers;
 
 internal class UnixInput : InputImpl<char>, IUnixInput
@@ -53,45 +58,33 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     private const ulong CS8 = 0x00000030;
 
     private Termios _original;
+    private bool _terminalInitialized;
 
     [StructLayout (LayoutKind.Sequential)]
     private struct Pollfd
     {
         public int fd;
         public short events;
-        public readonly short revents; // readonly signals "don't touch this in managed code"
+        public readonly short revents;
     }
 
-    /// <summary>Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.</summary>
     [Flags]
     private enum Condition : short
     {
-        /// <summary>There is data to read</summary>
         PollIn = 1,
-
-        /// <summary>There is urgent data to read</summary>
         PollPri = 2,
-
-        /// <summary>Writing to the specified descriptor will not block</summary>
         PollOut = 4,
-
-        /// <summary>Error condition on output</summary>
         PollErr = 8,
-
-        /// <summary>Hang-up on output</summary>
         PollHup = 16,
-
-        /// <summary>File descriptor is not open.</summary>
         PollNval = 32
     }
 
     [DllImport ("libc", SetLastError = true)]
-    private static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
+    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
 
     [DllImport ("libc", SetLastError = true)]
     private static extern int read (int fd, byte [] buf, int count);
 
-    // File descriptor for stdout
     private const int STDOUT_FILENO = 1;
 
     [DllImport ("libc", SetLastError = true)]
@@ -100,9 +93,9 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     [DllImport ("libc", SetLastError = true)]
     private static extern int tcflush (int fd, int queueSelector);
 
-    private const int TCIFLUSH = 0;  // flush data received but not read
+    private const int TCIFLUSH = 0;
 
-    private Pollfd [] _pollMap;
+    private Pollfd []? _pollMap;
 
     public UnixInput ()
     {
@@ -111,99 +104,139 @@ internal class UnixInput : InputImpl<char>, IUnixInput
         try
         {
             _pollMap = new Pollfd [1];
-            _pollMap [0].fd = STDIN_FILENO; // stdin
+            _pollMap [0].fd = STDIN_FILENO;
             _pollMap [0].events = (short)Condition.PollIn;
 
             EnableRawModeAndTreatControlCAsInput ();
 
-            //Enable alternative screen buffer.
-            WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-
-            //Set cursor key to application.
-            WriteRaw (EscSeqUtils.CSI_HideCursor);
-
-            WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
+            if (_terminalInitialized)
+            {
+                WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                WriteRaw (EscSeqUtils.CSI_HideCursor);
+                WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
+            }
         }
-        catch
+        catch (DllNotFoundException ex)
         {
-            // ignore exceptions during construction for unit tests
+            Logging.Warning ($"UnixInput: libc not available: {ex.Message}. Running in degraded mode.");
+            _terminalInitialized = false;
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"UnixInput: Failed to initialize terminal: {ex.Message}. Running in degraded mode.");
+            _terminalInitialized = false;
         }
     }
 
     private void EnableRawModeAndTreatControlCAsInput ()
     {
-        if (tcgetattr (STDIN_FILENO, out _original) != 0)
-        {
-            var e = Marshal.GetLastWin32Error ();
-            throw new InvalidOperationException ($"tcgetattr failed errno={e} ({StrError (e)})");
-        }
-
-        var raw = _original;
-
-        // Prefer cfmakeraw if available
         try
         {
-            cfmakeraw_ref (ref raw);
-        }
-        catch (EntryPointNotFoundException)
-        {
-            // fallback: roughly cfmakeraw equivalent
-            raw.c_iflag &= ~((uint)BRKINT | (uint)ICRNL | (uint)INPCK | (uint)ISTRIP | (uint)IXON);
-            raw.c_oflag &= ~(uint)OPOST;
-            raw.c_cflag |= (uint)CS8;
-            raw.c_lflag &= ~((uint)ECHO | (uint)ICANON | (uint)IEXTEN | (uint)ISIG);
-        }
+            int result = tcgetattr (STDIN_FILENO, out _original);
 
-        if (tcsetattr (STDIN_FILENO, TCSANOW, ref raw) != 0)
+            if (result != 0)
+            {
+                int e = Marshal.GetLastWin32Error ();
+                Logging.Warning ($"tcgetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
+                return;
+            }
+
+            Termios raw = _original;
+
+            try
+            {
+                cfmakeraw_ref (ref raw);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                raw.c_iflag &= ~((uint)BRKINT | (uint)ICRNL | (uint)INPCK | (uint)ISTRIP | (uint)IXON);
+                raw.c_oflag &= ~(uint)OPOST;
+                raw.c_cflag |= (uint)CS8;
+                raw.c_lflag &= ~((uint)ECHO | (uint)ICANON | (uint)IEXTEN | (uint)ISIG);
+            }
+
+            result = tcsetattr (STDIN_FILENO, TCSANOW, ref raw);
+
+            if (result != 0)
+            {
+                int e = Marshal.GetLastWin32Error ();
+                Logging.Warning ($"tcsetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
+                return;
+            }
+
+            _terminalInitialized = true;
+        }
+        catch (DllNotFoundException)
         {
-            var e = Marshal.GetLastWin32Error ();
-            throw new InvalidOperationException ($"tcsetattr failed errno={e} ({StrError (e)})");
+            throw; // Re-throw to be caught by constructor
         }
     }
 
     private string StrError (int err)
     {
-        var p = strerror (err);
-        return p == nint.Zero ? $"errno={err}" : Marshal.PtrToStringAnsi (p) ?? $"errno={err}";
-    }
-
-    /// <inheritdoc />
-    public override bool Peek ()
-    {
         try
         {
-            int n = poll (_pollMap!, (uint)_pollMap!.Length, 0);
+            nint p = strerror (err);
+            return p == nint.Zero ? $"errno={err}" : Marshal.PtrToStringAnsi (p) ?? $"errno={err}";
+        }
+        catch
+        {
+            return $"errno={err}";
+        }
+    }
 
-            if (n != 0)
-            {
-                return true;
-            }
+    /// <inheritdoc/>
+    public override bool Peek ()
+    {
+        if (!_terminalInitialized || _pollMap is null)
+        {
+            return false;
+        }
 
+        try
+        {
+            int n = poll (_pollMap, (uint)_pollMap.Length, 0);
+            return n != 0;
         }
         catch (Exception ex)
         {
-            // Optionally log the exception
             Logging.Error ($"Error in Peek: {ex.Message}");
+            return false;
         }
-        return false;
     }
+
     private void WriteRaw (string text)
     {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text);
-        // Write to stdout (fd 1)
-        write (STDOUT_FILENO, utf8, utf8.Length);
+        if (!_terminalInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            byte [] utf8 = Encoding.UTF8.GetBytes (text);
+            write (STDOUT_FILENO, utf8, utf8.Length);
+        }
+        catch
+        {
+            // ignore exceptions during write
+        }
     }
 
     /// <inheritdoc/>
     public override IEnumerable<char> Read ()
     {
-        while (poll (_pollMap!, (uint)_pollMap!.Length, 0) != 0)
+        if (!_terminalInitialized || _pollMap is null)
         {
-            // Check if stdin has data
+            yield break;
+        }
+
+        while (poll (_pollMap, (uint)_pollMap.Length, 0) != 0)
+        {
             if ((_pollMap [0].revents & (int)Condition.PollIn) != 0)
             {
                 var buf = new byte [256];
-                int bytesRead = read (0, buf, buf.Length); // Read from stdin
+                int bytesRead = read (0, buf, buf.Length);
                 string input = Encoding.UTF8.GetString (buf, 0, bytesRead);
 
                 foreach (char ch in input)
@@ -216,44 +249,51 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void FlushConsoleInput ()
     {
-        var fds = new Pollfd [1];
-        fds [0].fd = STDIN_FILENO;
-        fds [0].events = (short)Condition.PollIn;
-        var buf = new byte [256];
-        while (poll (fds, 1, 0) > 0)
+        if (!_terminalInitialized)
         {
-            read (STDIN_FILENO, buf, buf.Length);
+            return;
+        }
+
+        try
+        {
+            Pollfd [] fds = new Pollfd [1];
+            fds [0].fd = STDIN_FILENO;
+            fds [0].events = (short)Condition.PollIn;
+            var buf = new byte [256];
+
+            while (poll (fds, 1, 0) > 0)
+            {
+                read (STDIN_FILENO, buf, buf.Length);
+            }
+        }
+        catch
+        {
+            // ignore
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Dispose ()
     {
         base.Dispose ();
 
+        if (!_terminalInitialized)
+        {
+            return;
+        }
+
         try
         {
-            // Disable mouse events first
             WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);
-
-            // Drain any pending input already queued by the terminal
             FlushConsoleInput ();
-
-            // Flush kernel input buffer
             tcflush (STDIN_FILENO, TCIFLUSH);
-
-            //Disable alternative screen buffer.
             WriteRaw (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-            //Set cursor key to cursor.
             WriteRaw (EscSeqUtils.CSI_ShowCursor);
-
-            // Restore terminal to original state
             tcsetattr (STDIN_FILENO, TCSANOW, ref _original);
         }
         catch
         {
-            // ignore exceptions during disposal for unit tests
+            // ignore exceptions during disposal
         }
     }
 }

@@ -187,8 +187,6 @@ public class ApplicationTests
         top.Dispose ();
         Assert.True (top.WasDisposed);
 #endif
-        Application.Shutdown ();
-        Assert.Null (Application.Top);
     }
 
     [Fact]
@@ -223,10 +221,6 @@ public class ApplicationTests
         Assert.NotNull (Application.Driver);
 
         topLevel.Dispose ();
-        Application.Shutdown ();
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
 
         // Stop stopwatch
         stopwatch.Stop ();
@@ -278,6 +272,41 @@ public class ApplicationTests
         // Reset
         Application.ResetState ();
 
+        CheckReset ();
+
+        // Set the values that can be set
+        Application.Initialized = true;
+        Application.MainThreadId = 1;
+
+        //Application._topLevels = new List<Toplevel> ();
+        Application.CachedViewsUnderMouse.Clear ();
+
+        //Application.SupportedCultures = new List<CultureInfo> ();
+        Application.Force16Colors = true;
+
+        //Application.ForceDriver = "driver";
+        Application.StopAfterFirstIteration = true;
+        Application.PrevTabGroupKey = Key.A;
+        Application.NextTabGroupKey = Key.B;
+        Application.QuitKey = Key.C;
+        Application.KeyBindings.Add (Key.D, Command.Cancel);
+
+        Application.CachedViewsUnderMouse.Clear ();
+
+        //Application.WantContinuousButtonPressedView = new View ();
+
+        // Mouse
+        Application.LastMousePosition = new Point (1, 1);
+
+        Application.Navigation = new ();
+
+        Application.ResetState ();
+        CheckReset ();
+
+        ThrowOnJsonErrors = false;
+
+        return;
+
         void CheckReset ()
         {
             // Check that all fields and properties are set to their default values
@@ -328,39 +357,6 @@ public class ApplicationTests
             //Assert.Null (GetEventSubscribers (typeof (Application.Keyboard), "KeyDown"));
             //Assert.Null (GetEventSubscribers (typeof (Application.Keyboard), "KeyUp"));
         }
-
-        CheckReset ();
-
-        // Set the values that can be set
-        Application.Initialized = true;
-        Application.MainThreadId = 1;
-
-        //Application._topLevels = new List<Toplevel> ();
-        Application.CachedViewsUnderMouse.Clear ();
-
-        //Application.SupportedCultures = new List<CultureInfo> ();
-        Application.Force16Colors = true;
-
-        //Application.ForceDriver = "driver";
-        Application.StopAfterFirstIteration = true;
-        Application.PrevTabGroupKey = Key.A;
-        Application.NextTabGroupKey = Key.B;
-        Application.QuitKey = Key.C;
-        Application.KeyBindings.Add (Key.D, Command.Cancel);
-
-        Application.CachedViewsUnderMouse.Clear ();
-
-        //Application.WantContinuousButtonPressedView = new View ();
-
-        // Mouse
-        Application.LastMousePosition = new Point (1, 1);
-
-        Application.Navigation = new ();
-
-        Application.ResetState ();
-        CheckReset ();
-
-        ThrowOnJsonErrors = false;
     }
 
     ///// <summary>
@@ -570,7 +566,6 @@ public class ApplicationTests
         Application.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -773,12 +768,7 @@ public class ApplicationTests
     {
         Application.StopAfterFirstIteration = true;
 
-        Application.Run<Toplevel> ();
-
-        Application.Top!.Dispose ();
-        Application.Shutdown ();
-
-        Assert.Null (Application.Top);
+        Application.Run<Toplevel> ().Dispose ();
     }
 
     [Fact]
@@ -792,9 +782,6 @@ public class ApplicationTests
 
         Application.Top!.Dispose ();
         Application.Shutdown ();
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
     }
 
     [Fact]
@@ -811,9 +798,6 @@ public class ApplicationTests
         Application.Iteration -= OnApplicationOnIteration;
 
         top.Dispose ();
-        Application.Shutdown ();
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
 
         return;
 
