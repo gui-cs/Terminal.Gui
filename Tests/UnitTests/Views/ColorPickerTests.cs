@@ -60,9 +60,6 @@ public class ColorPickerTests
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("0", bTextField.Text);
         Assert.Equal ("#800000", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState();
     }
 
     [Fact]
@@ -95,10 +92,6 @@ public class ColorPickerTests
         Assert.Equal ("B:", b.Text);
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState ();
-
     }
 
     [Fact]
@@ -131,10 +124,6 @@ public class ColorPickerTests
         Assert.Equal ("B:", b.Text);
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState ();
-
     }
 
     [Fact]
@@ -186,10 +175,6 @@ public class ColorPickerTests
         cp.Draw ();
 
         Assert.IsAssignableFrom<BBar> (cp.Focused);
-
-        Application.Top?.Dispose ();
-        Application.ResetState ();
-
     }
 
     [Fact]
@@ -317,9 +302,6 @@ public class ColorPickerTests
         // Color name should be recognised as a known string and populated
         Assert.Equal ("#7FFFD4", hex.Text);
         Assert.Equal ("Aquamarine", name.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
     }
 
     /// <summary>
@@ -373,9 +355,6 @@ public class ColorPickerTests
         // But still, Color name should be recognised as a known string and populated
         Assert.Equal ("#7FFFD4", hex.Text);
         Assert.Equal ("Aquamarine", name.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -412,10 +391,6 @@ public class ColorPickerTests
         Assert.Equal ("B:", b.Text);
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("#000000", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Fact]
@@ -471,10 +446,6 @@ public class ColorPickerTests
         // Meaning we are asserting that triangle is at end
         Assert.Equal (19, r.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
-
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Fact]
@@ -526,10 +497,6 @@ public class ColorPickerTests
 
         Assert.Equal (4, r.TrianglePosition);
         Assert.Equal ("#1E0000", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Theory]
@@ -563,10 +530,6 @@ public class ColorPickerTests
         Assert.Equal (expectedB, b.Text);
         Assert.Equal (expectedBTriangle, b.TrianglePosition);
         Assert.Equal (expectedHex, hex.Text);
-
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Theory]
@@ -609,10 +572,6 @@ public class ColorPickerTests
         Assert.Equal (expectedBTriangle, b.TrianglePosition);
         Assert.Equal (expectedBValue.ToString (), bTextField.Text);
         Assert.Equal (expectedHex, hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Fact]
@@ -656,10 +615,6 @@ public class ColorPickerTests
         Assert.Equal ("V:", v.Text);
         Assert.Equal (19, v.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
-
-        Application.Top!.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Fact]
@@ -694,10 +649,6 @@ public class ColorPickerTests
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("0", bTextField.Text);
         Assert.Equal ("#800000", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
-
     }
 
     [Fact]
@@ -747,9 +698,6 @@ public class ColorPickerTests
         Assert.NotSame (name, cp.Focused);
 
         Assert.Equal ("#00FFFF", hex.Text);
-
-        Application.Top?.Dispose ();
-        Application.ResetState (true);
     }
 
     public static IEnumerable<object []> ColorPickerTestData ()
