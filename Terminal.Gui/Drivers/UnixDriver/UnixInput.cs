@@ -1,6 +1,9 @@
 ﻿using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
+
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable CommentTypo
 
 namespace Terminal.Gui.Drivers;
 
@@ -87,7 +90,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     }
 
     [DllImport ("libc", SetLastError = true)]
-    private static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
+    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
 
     [DllImport ("libc", SetLastError = true)]
     private static extern int read (int fd, byte [] buf, int count);
@@ -101,9 +104,9 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     [DllImport ("libc", SetLastError = true)]
     private static extern int tcflush (int fd, int queueSelector);
 
-    private const int TCIFLUSH = 0;  // flush data received but not read
+    private const int TCIFLUSH = 0; // flush data received but not read
 
-    private Pollfd [] _pollMap;
+    private readonly Pollfd [] _pollMap;
 
     public UnixInput ()
     {
@@ -137,13 +140,15 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
         if (result != 0)
         {
-            var e = Marshal.GetLastWin32Error ();
+            int e = Marshal.GetLastWin32Error ();
+
             // Log but don't throw - we're likely running without a TTY (CI/CD, tests, redirected I/O, etc.)
             Logging.Warning ($"tcgetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
-            return;  // Early return instead of throwing
+
+            return; // Early return instead of throwing
         }
 
-        var raw = _original;
+        Termios raw = _original;
 
         // Prefer cfmakeraw if available
         try
@@ -163,20 +168,21 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
         if (result != 0)
         {
-            var e = Marshal.GetLastWin32Error ();
+            int e = Marshal.GetLastWin32Error ();
+
             // Log but don't throw
             Logging.Warning ($"tcsetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
-            return;  // Early return instead of throwing
         }
     }
 
     private string StrError (int err)
     {
-        var p = strerror (err);
+        nint p = strerror (err);
+
         return p == nint.Zero ? $"errno={err}" : Marshal.PtrToStringAnsi (p) ?? $"errno={err}";
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool Peek ()
     {
         try
@@ -187,18 +193,20 @@ internal class UnixInput : InputImpl<char>, IUnixInput
             {
                 return true;
             }
-
         }
         catch (Exception ex)
         {
             // Optionally log the exception
             Logging.Error ($"Error in Peek: {ex.Message}");
         }
+
         return false;
     }
+
     private void WriteRaw (string text)
     {
         byte [] utf8 = Encoding.UTF8.GetBytes (text);
+
         // Write to stdout (fd 1)
         write (STDOUT_FILENO, utf8, utf8.Length);
     }
@@ -225,17 +233,18 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void FlushConsoleInput ()
     {
-        var fds = new Pollfd [1];
+        Pollfd [] fds = new Pollfd [1];
         fds [0].fd = STDIN_FILENO;
         fds [0].events = (short)Condition.PollIn;
         var buf = new byte [256];
+
         while (poll (fds, 1, 0) > 0)
         {
             read (STDIN_FILENO, buf, buf.Length);
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Dispose ()
     {
         base.Dispose ();
