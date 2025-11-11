@@ -110,6 +110,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     public UnixInput ()
     {
+        return;
         Logging.Information ($"Creating {nameof (UnixInput)}");
 
         try
@@ -136,6 +137,8 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void EnableRawModeAndTreatControlCAsInput ()
     {
+        return;
+
         int result = tcgetattr (STDIN_FILENO, out _original);
 
         if (result != 0)
@@ -185,6 +188,8 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     /// <inheritdoc/>
     public override bool Peek ()
     {
+        return false;
+
         try
         {
             int n = poll (_pollMap!, (uint)_pollMap!.Length, 0);
@@ -205,6 +210,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void WriteRaw (string text)
     {
+        return;
         try
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (text);
@@ -221,6 +227,8 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     /// <inheritdoc/>
     public override IEnumerable<char> Read ()
     {
+        yield return '\n';
+
         while (poll (_pollMap!, (uint)_pollMap!.Length, 0) != 0)
         {
             // Check if stdin has data
@@ -240,6 +248,8 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void FlushConsoleInput ()
     {
+        return;
+
         Pollfd [] fds = new Pollfd [1];
         fds [0].fd = STDIN_FILENO;
         fds [0].events = (short)Condition.PollIn;
@@ -256,6 +266,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         base.Dispose ();
 
+        return;
         try
         {
             // Disable mouse events first
