@@ -32,19 +32,6 @@ public class FakeApplicationFactory
         // Initialize with a fake driver
         impl.Init (null, "fake");
 
-        // Handle different facade types - cast to common interface instead
-        IDriver d = Application.Driver!;
-
-        sizeMonitor.SizeChanged += (_, e) =>
-                                   {
-                                       if (e.Size != null)
-                                       {
-                                           Size s = e.Size.Value;
-                                           output.SetSize (s.Width, s.Height);
-                                           d.OutputBuffer.SetSize (s.Width, s.Height);
-                                       }
-                                   };
-
         return new FakeApplicationLifecycle (origApp, hardStopTokenSource);
     }
 }
