@@ -75,7 +75,7 @@ jobs:
             # Run without coverage on Windows/macOS for speed
             dotnet test Tests/IntegrationTests \
               --no-build \
-              --verbosity detailed \
+              --verbosity minimal \
               --settings Tests/IntegrationTests/runsettings.xml \
               --diag:logs/IntegrationTests/${{ runner.os }}/logs.txt \
               --blame \

@@ -85,7 +85,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         top.Dispose ();
-        Application.ResetState ();
 
         Assert.True (left);
     }
@@ -251,8 +250,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         Assert.Equal (2, enterCount);
         Assert.Equal (1, leaveCount);
-
-        Application.ResetState ();
     }
 
     [Theory]
@@ -320,8 +317,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (0, hasFocusChangedCount);
 
         top.Dispose ();
-
-        Application.ResetState ();
     }
 
     [Fact]

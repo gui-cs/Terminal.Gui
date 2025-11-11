@@ -24,7 +24,7 @@ Write-Host "`nRunning UnitTests (quiet)..."
 dotnet test Tests/UnitTests `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
-  --settings Tests/UnitTests/runsettings.xml `
+  --settings Tests/UnitTests/runsettings.coverage.xml `
   --blame-hang-timeout 10s
 
 # ------------------------------------------------------------

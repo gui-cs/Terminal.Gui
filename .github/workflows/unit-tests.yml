@@ -163,7 +163,7 @@ jobs:
             --no-build \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
-            --settings Tests/UnitTestsParallelizable/runsettings.xml \
+            --settings Tests/UnitTests/runsettings.coverage.xml \
             --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
             --blame \
             --blame-crash \
