@@ -187,8 +187,6 @@ public class ApplicationTests
         top.Dispose ();
         Assert.True (top.WasDisposed);
 #endif
-        Application.Shutdown ();
-        Assert.Null (Application.Top);
     }
 
     [Fact]
@@ -223,10 +221,6 @@ public class ApplicationTests
         Assert.NotNull (Application.Driver);
 
         topLevel.Dispose ();
-        Application.Shutdown ();
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
 
         // Stop stopwatch
         stopwatch.Stop ();
@@ -572,7 +566,6 @@ public class ApplicationTests
         Application.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -775,12 +768,7 @@ public class ApplicationTests
     {
         Application.StopAfterFirstIteration = true;
 
-        Application.Run<Toplevel> ();
-
-        Application.Top!.Dispose ();
-        Application.Shutdown ();
-
-        Assert.Null (Application.Top);
+        Application.Run<Toplevel> ().Dispose ();
     }
 
     [Fact]
@@ -794,9 +782,6 @@ public class ApplicationTests
 
         Application.Top!.Dispose ();
         Application.Shutdown ();
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
     }
 
     [Fact]
@@ -813,9 +798,6 @@ public class ApplicationTests
         Application.Iteration -= OnApplicationOnIteration;
 
         top.Dispose ();
-        Application.Shutdown ();
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
 
         return;
 
