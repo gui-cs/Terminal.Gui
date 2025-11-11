@@ -11,9 +11,9 @@ on:
       - '**.md'
       
 jobs:
-  # Call the build workflow to build the solution once
+  # Call the quick-build workflow to build Debug configuration only
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/quick-build.yml
 
   non_parallel_unittests:
     name: Non-Parallel Unit Tests  
@@ -40,7 +40,7 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
-        name: build-artifacts
+        name: test-build-artifacts
         path: .
 
     # KEEP THIS - It's needed for --no-build to work
@@ -135,7 +135,7 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
-        name: build-artifacts
+        name: test-build-artifacts
         path: .
 
     - name: Restore NuGet packages

@@ -32,12 +32,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
-		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\build-validation.yml = .github\workflows\build-validation.yml
 		.github\workflows\check-duplicates.yml = .github\workflows\check-duplicates.yml
 		copilot-instructions.md = copilot-instructions.md
 		GitVersion.yml = GitVersion.yml
 		.github\workflows\integration-tests.yml = .github\workflows\integration-tests.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
+		.github\workflows\quick-build.yml = .github\workflows\quick-build.yml
 		.github\workflows\stress-tests.yml = .github\workflows\stress-tests.yml
 		.github\workflows\unit-tests.yml = .github\workflows\unit-tests.yml
 	EndProjectSection

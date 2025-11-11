@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/quick-build.yml
 
   integration_tests:
     name: Integration Tests
@@ -36,7 +36,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
+          name: test-build-artifacts
           path: .
 
       - name: Restore NuGet packages

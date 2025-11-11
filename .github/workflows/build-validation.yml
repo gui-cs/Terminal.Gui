@@ -1,4 +1,4 @@
-name: Build Solution
+name: Build Validation
 
 on:
   push:
@@ -9,18 +9,11 @@ on:
     branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
-  workflow_call:
-    outputs:
-      artifact-name:
-        description: "Name of the build artifacts"
-        value: ${{ jobs.build.outputs.artifact-name }}
       
 jobs:
-  build:
-    name: Build Debug & Release
+  build-validation:
+    name: Build All Configurations
     runs-on: ubuntu-latest
-    outputs:
-      artifact-name: build-artifacts
     
     timeout-minutes: 10
     steps:
@@ -63,14 +56,3 @@ jobs:
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts
-        path: |
-          **/bin/Debug/**
-          **/obj/Debug/**
-          **/bin/Release/**
-          **/obj/Release/**
-        retention-days: 1
