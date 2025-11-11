@@ -41,8 +41,6 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.True (subSubView.HasFocus);
 
         top.Dispose ();
-
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -56,7 +54,6 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.True (top.HasFocus);
 
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     [Fact]
