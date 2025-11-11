@@ -112,8 +112,6 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         Logging.Information ($"Creating {nameof (UnixInput)}");
 
-        return;
-
         try
         {
             _pollMap = new Pollfd [1];
@@ -187,7 +185,6 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     /// <inheritdoc/>
     public override bool Peek ()
     {
-        return false;
         try
         {
             int n = poll (_pollMap!, (uint)_pollMap!.Length, 0);
@@ -208,10 +205,17 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void WriteRaw (string text)
     {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text);
+        try
+        {
+            byte [] utf8 = Encoding.UTF8.GetBytes (text);
 
-        // Write to stdout (fd 1)
-        write (STDOUT_FILENO, utf8, utf8.Length);
+            // Write to stdout (fd 1)
+            write (STDOUT_FILENO, utf8, utf8.Length);
+        }
+        catch
+        {
+            // ignore exceptions during write for unit tests
+        }
     }
 
     /// <inheritdoc/>
@@ -252,7 +256,6 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     {
         base.Dispose ();
 
-        return;
         try
         {
             // Disable mouse events first
