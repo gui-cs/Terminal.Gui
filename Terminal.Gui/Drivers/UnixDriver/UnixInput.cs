@@ -133,10 +133,14 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private void EnableRawModeAndTreatControlCAsInput ()
     {
-        if (tcgetattr (STDIN_FILENO, out _original) != 0)
+        int result = tcgetattr (STDIN_FILENO, out _original);
+
+        if (result != 0)
         {
             var e = Marshal.GetLastWin32Error ();
-            throw new InvalidOperationException ($"tcgetattr failed errno={e} ({StrError (e)})");
+            // Log but don't throw - we're likely running without a TTY (CI/CD, tests, redirected I/O, etc.)
+            Logging.Warning ($"tcgetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
+            return;  // Early return instead of throwing
         }
 
         var raw = _original;
@@ -155,10 +159,14 @@ internal class UnixInput : InputImpl<char>, IUnixInput
             raw.c_lflag &= ~((uint)ECHO | (uint)ICANON | (uint)IEXTEN | (uint)ISIG);
         }
 
-        if (tcsetattr (STDIN_FILENO, TCSANOW, ref raw) != 0)
+        result = tcsetattr (STDIN_FILENO, TCSANOW, ref raw);
+
+        if (result != 0)
         {
             var e = Marshal.GetLastWin32Error ();
-            throw new InvalidOperationException ($"tcsetattr failed errno={e} ({StrError (e)})");
+            // Log but don't throw
+            Logging.Warning ($"tcsetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
+            return;  // Early return instead of throwing
         }
     }
 
