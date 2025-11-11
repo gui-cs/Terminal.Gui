@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+// ReSharper disable IdentifierTypo
 
 namespace Terminal.Gui.Drivers;
 

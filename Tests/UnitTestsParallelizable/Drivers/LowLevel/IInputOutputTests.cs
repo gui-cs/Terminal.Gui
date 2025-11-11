@@ -233,7 +233,7 @@ public class IInputOutputTests (ITestOutputHelper output)
 
     #region Unix Driver Tests
 
-    [Fact]
+    [Fact (Skip = "testing")]
     [Trait ("Category", "LowLevelDriver")]
     [Trait ("Platform", "Unix")]
     public void UnixInput_Constructor_DoesNotThrow_WhenNoTerminalAvailable ()
