@@ -4,10 +4,11 @@ using System.Collections;
 using System.Globalization;
 using System.Resources;
 using System.Runtime.CompilerServices;
+using UnitTests;
 
 namespace UnitTests_Parallelizable.ResourcesTests;
 
-public class ResourceManagerTests : UnitTests.Parallelizable.ParallelizableBase
+public class ResourceManagerTests : FakeDriverBase
 {
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";

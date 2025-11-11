@@ -6,7 +6,7 @@ namespace UnitTests.ViewsTests;
 public class ScrollSliderTests (ITestOutputHelper output)
 {
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData (
                     3,
                     10,

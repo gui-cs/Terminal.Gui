@@ -109,14 +109,14 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
-    private IConsoleDriver? _driver;
+    private IDriver? _driver;
 
     /// <summary>
     ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a
     ///     convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    internal IConsoleDriver? Driver
+    internal IDriver? Driver
     {
         get
         {

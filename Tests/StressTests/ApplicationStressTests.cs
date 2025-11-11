@@ -1,13 +1,11 @@
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;
 
-public class ApplicationStressTests : TestsAllViews
+public class ApplicationStressTests
 {
     public ApplicationStressTests (ITestOutputHelper output)
     {
-        ConsoleDriver.RunningUnitTests = true;
     }
 
     private static volatile int _tbCounter;
@@ -33,16 +31,11 @@ public class ApplicationStressTests : TestsAllViews
     /// to TimedEvents (Stopwatch-based timing) and Application.Invoke (MainLoop wakeup).
     /// </para>
     /// </remarks>
-    [Theory]
-    [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (DotNetDriver), Skip = "System.IO.IOException: The handle is invalid")]
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (UnixDriver), Skip = "Unable to load DLL 'libc' or one of its dependencies: The specified module could not be found. (0x8007007E)")]
-    public async Task InvokeLeakTest (Type driverType)
+    [Fact]
+    public async Task InvokeLeakTest ()
     {
 
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: "fake");
         Random r = new ();
         TextField tf = new ();
         var top = new Toplevel ();

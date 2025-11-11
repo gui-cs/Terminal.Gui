@@ -57,7 +57,7 @@ public class ListViewTests (ITestOutputHelper output)
         win.Add (lv);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (12, 12);
         AutoInitShutdownAttribute.RunIteration ();
 

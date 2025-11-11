@@ -12,8 +12,8 @@ namespace NativeAot;
 
 public static class Program
 {
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IConsoleDriver, String)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IConsoleDriver, String)")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     private static void Main (string [] args)
     {
         ConfigurationManager.Enable(ConfigLocations.All);

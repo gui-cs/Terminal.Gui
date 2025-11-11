@@ -1,61 +1,48 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
 using Moq;
 using TerminalGuiFluentTesting;
 
 namespace UnitTests.ApplicationTests;
+
 public class ApplicationImplTests
 {
-    public ApplicationImplTests ()
+    /// <summary>
+    ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.
+    /// </summary>
+    private ApplicationImpl NewMockedApplicationImpl ()
     {
-        ConsoleDriver.RunningUnitTests = true;
-    }
+        Mock<INetInput> netInput = new ();
+        SetupRunInputMockMethodToBlock (netInput);
 
-    private ApplicationImpl NewApplicationImpl (TestDriver driver = TestDriver.DotNet)
-    {
+        Mock<IComponentFactory<ConsoleKeyInfo>> m = new ();
+        m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
+        m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of<IInputProcessor> ());
 
-        if (driver == TestDriver.DotNet)
-        {
-            var netInput = new Mock<INetInput> ();
-            SetupRunInputMockMethodToBlock (netInput);
+        Mock<IOutput> consoleOutput = new ();
+        var size = new Size (80, 25);
+        consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ()))
+                     .Callback<int, int> ((w, h) => size = new Size (w, h));
+        consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
+        m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
+        m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
-            var m = new Mock<IComponentFactory<ConsoleKeyInfo>> ();
-            m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
-            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of <IInputProcessor> ());
-            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
-            m.Setup (f => f.CreateConsoleSizeMonitor (It.IsAny<IConsoleOutput> (),It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
-
-            return new (m.Object);
-        }
-        else
-        {
-
-            var winInput = new Mock<IConsoleInput<WindowsConsole.InputRecord>> ();
-            SetupRunInputMockMethodToBlock (winInput);
-            var m = new Mock<IComponentFactory<WindowsConsole.InputRecord>> ();
-            m.Setup (f => f.CreateInput ()).Returns (winInput.Object);
-            m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<WindowsConsole.InputRecord>> ())).Returns (Mock.Of<IInputProcessor> ());
-            m.Setup (f => f.CreateOutput ()).Returns (Mock.Of<IConsoleOutput> ());
-            m.Setup (f => f.CreateConsoleSizeMonitor (It.IsAny<IConsoleOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<IConsoleSizeMonitor> ());
-            return new (m.Object);
-        }
+        return new (m.Object);
     }
 
     [Fact]
     public void Init_CreatesKeybindings ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Application.KeyBindings.Clear ();
 
         Assert.Empty (Application.KeyBindings.GetBindings ());
 
-        v2.Init ();
+        v2.Init (null, "fake");
 
         Assert.NotEmpty (Application.KeyBindings.GetBindings ());
 
@@ -63,28 +50,7 @@ public class ApplicationImplTests
 
         ApplicationImpl.ChangeInstance (orig);
     }
-
-    [Fact]
-    public void Init_DriverIsFacade ()
-    {
-        var orig = ApplicationImpl.Instance;
-
-        var v2 = NewApplicationImpl ();
-        ApplicationImpl.ChangeInstance (v2);
-
-        Assert.Null (Application.Driver);
-        v2.Init ();
-        Assert.NotNull (Application.Driver);
-
-        var type = Application.Driver.GetType ();
-        Assert.True (type.IsGenericType);
-        Assert.True (type.GetGenericTypeDefinition () == typeof (ConsoleDriverFacade<>));
-        v2.Shutdown ();
-
-        Assert.Null (Application.Driver);
-
-        ApplicationImpl.ChangeInstance (orig);
-    }
+    
     /*
     [Fact]
     public void Init_ExplicitlyRequestWin ()
@@ -168,7 +134,7 @@ public class ApplicationImplTests
         ApplicationImpl.ChangeInstance (orig);
     }
 */
-    private void SetupRunInputMockMethodToBlock (Mock<IConsoleInput<WindowsConsole.InputRecord>> winInput)
+    private void SetupRunInputMockMethodToBlock (Mock<IInput<WindowsConsole.InputRecord>> winInput)
     {
         winInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
                 .Callback<CancellationToken> (token =>
@@ -201,15 +167,15 @@ public class ApplicationImplTests
     [Fact]
     public void NoInitThrowOnRun ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
         Assert.Null (Application.Driver);
-        var app = NewApplicationImpl ();
+        ApplicationImpl app = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (app);
 
         var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));
         Assert.Equal ("Run cannot be accessed before Initialization", ex.Message);
-        app.Shutdown();
+        app.Shutdown ();
 
         ApplicationImpl.ChangeInstance (orig);
     }
@@ -217,25 +183,27 @@ public class ApplicationImplTests
     [Fact]
     public void InitRunShutdown_Top_Set_To_Null_After_Shutdown ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init ();
+        v2.Init (null, "fake");
 
-        var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
-                       () =>
-                       {
-                           if (Application.Top != null)
-                           {
-                               Application.RequestStop ();
-                               return false;
-                           }
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 if (Application.Top != null)
+                                                 {
+                                                     Application.RequestStop ();
 
-                           return false;
-                       }
-                       );
+                                                     return false;
+                                                 }
+
+                                                 return false;
+                                             }
+                                            );
         Assert.Null (Application.Top);
 
         // Blocks until the timeout call is hit
@@ -243,7 +211,7 @@ public class ApplicationImplTests
         v2.Run (new Window ());
 
         // We returned false above, so we should not have to remove the timeout
-        Assert.False(v2.RemoveTimeout (timeoutToken));
+        Assert.False (v2.RemoveTimeout (timeoutToken));
 
         Assert.NotNull (Application.Top);
         Application.Top?.Dispose ();
@@ -256,35 +224,40 @@ public class ApplicationImplTests
     [Fact]
     public void InitRunShutdown_Running_Set_To_False ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init ();
+        v2.Init (null, "fake");
 
-        Toplevel top = new Window ()
+        Toplevel top = new Window
         {
             Title = "InitRunShutdown_Running_Set_To_False"
         };
-        var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
-                                          () =>
-                                          {
-                                              Assert.True (top!.Running);
-                                              if (Application.Top != null)
-                                              {
-                                                  Application.RequestStop ();
-                                                  return false;
-                                              }
 
-                                              return false;
-                                          }
-                                         );
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 Assert.True (top!.Running);
+
+                                                 if (Application.Top != null)
+                                                 {
+                                                     Application.RequestStop ();
+
+                                                     return false;
+                                                 }
+
+                                                 return false;
+                                             }
+                                            );
 
         Assert.False (top!.Running);
 
         // Blocks until the timeout call is hit
         v2.Run (top);
+
         // We returned false above, so we should not have to remove the timeout
         Assert.False (v2.RemoveTimeout (timeoutToken));
 
@@ -298,49 +271,101 @@ public class ApplicationImplTests
         ApplicationImpl.ChangeInstance (orig);
     }
 
-    [Fact]
-    public void InitRunShutdown_End_Is_Called ()
-    {
-        var orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+    [Fact]
+    public void InitRunShutdown_StopAfterFirstIteration_Stops ()
+    {
+        IApplication orig = ApplicationImpl.Instance;
+
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
         Assert.Null (Application.Top);
         Assert.Null (Application.Driver);
 
-        v2.Init ();
+        v2.Init (null, "fake");
+
+        Toplevel top = new Window ();
+
+        var closedCount = 0;
+
+        top.Closed
+            += (_, a) => { closedCount++; };
+
+        var unloadedCount = 0;
+
+        top.Unloaded
+            += (_, a) => { unloadedCount++; };
+
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 Assert.Fail (@"Didn't stop after first iteration.");
+                                                 return false;
+                                             }
+                                            );
+
+        Assert.Equal (0, closedCount);
+        Assert.Equal (0, unloadedCount);
+
+        v2.StopAfterFirstIteration = true;
+        v2.Run (top);
+
+        Assert.Equal (1, closedCount);
+        Assert.Equal (1, unloadedCount);
+
+        Application.Top?.Dispose ();
+        v2.Shutdown ();
+        Assert.Equal (1, closedCount);
+        Assert.Equal (1, unloadedCount);
+
+        ApplicationImpl.ChangeInstance (orig);
+    }
+
+
+    [Fact]
+    public void InitRunShutdown_End_Is_Called ()
+    {
+        IApplication orig = ApplicationImpl.Instance;
+
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
+        ApplicationImpl.ChangeInstance (v2);
+
+        Assert.Null (Application.Top);
+        Assert.Null (Application.Driver);
+
+        v2.Init (null, "fake");
 
         Toplevel top = new Window ();
 
         // BUGBUG: Both Closed and Unloaded are called from End; what's the difference?
-        int closedCount = 0;
+        var closedCount = 0;
+
         top.Closed
-            += (_, a) =>
-               {
-                   closedCount++;
-               };
+            += (_, a) => { closedCount++; };
 
-        int unloadedCount = 0;
+        var unloadedCount = 0;
+
         top.Unloaded
-            += (_, a) =>
-               {
-                   unloadedCount++;
-               };
+            += (_, a) => { unloadedCount++; };
 
-        var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
-                                          () =>
-                                          {
-                                              Assert.True (top!.Running);
-                                              if (Application.Top != null)
-                                              {
-                                                  Application.RequestStop ();
-                                                  return false;
-                                              }
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 Assert.True (top!.Running);
 
-                                              return false;
-                                          }
-                                         );
+                                                 if (Application.Top != null)
+                                                 {
+                                                     Application.RequestStop ();
+
+                                                     return false;
+                                                 }
+
+                                                 return false;
+                                             }
+                                            );
 
         Assert.Equal (0, closedCount);
         Assert.Equal (0, unloadedCount);
@@ -365,29 +390,32 @@ public class ApplicationImplTests
     [Fact]
     public void InitRunShutdown_QuitKey_Quits ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init ();
+        v2.Init (null, "fake");
 
-        Toplevel top = new Window ()
+        Toplevel top = new Window
         {
             Title = "InitRunShutdown_QuitKey_Quits"
         };
-        var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
-                                          () =>
-                                          {
-                                              Assert.True (top!.Running);
-                                              if (Application.Top != null)
-                                              {
-                                                  Application.RaiseKeyDownEvent (Application.QuitKey);
-                                              }
 
-                                              return false;
-                                          }
-                                         );
+        object timeoutToken = v2.AddTimeout (
+                                             TimeSpan.FromMilliseconds (150),
+                                             () =>
+                                             {
+                                                 Assert.True (top!.Running);
+
+                                                 if (Application.Top != null)
+                                                 {
+                                                     Application.RaiseKeyDownEvent (Application.QuitKey);
+                                                 }
+
+                                                 return false;
+                                             }
+                                            );
 
         Assert.False (top!.Running);
 
@@ -410,12 +438,12 @@ public class ApplicationImplTests
     [Fact]
     public void InitRunShutdown_Generic_IdleForExit ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init ();
+        v2.Init (null, "fake");
 
         v2.AddTimeout (TimeSpan.Zero, IdleExit);
         Assert.Null (Application.Top);
@@ -435,16 +463,17 @@ public class ApplicationImplTests
     [Fact]
     public void Shutdown_Closing_Closed_Raised ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init ();
+        v2.Init (null, "fake");
 
-        int closing = 0;
-        int closed = 0;
+        var closing = 0;
+        var closed = 0;
         var t = new Toplevel ();
+
         t.Closing
             += (_, a) =>
                {
@@ -453,6 +482,7 @@ public class ApplicationImplTests
                    {
                        a.Cancel = true;
                    }
+
                    closing++;
                    Assert.Same (t, a.RequestingTop);
                };
@@ -464,7 +494,7 @@ public class ApplicationImplTests
                    Assert.Same (t, a.Toplevel);
                };
 
-        v2.AddTimeout(TimeSpan.Zero, IdleExit);
+        v2.AddTimeout (TimeSpan.Zero, IdleExit);
 
         // Blocks until the timeout call is hit
 
@@ -484,6 +514,7 @@ public class ApplicationImplTests
         if (Application.Top != null)
         {
             Application.RequestStop ();
+
             return true;
         }
 
@@ -520,52 +551,50 @@ public class ApplicationImplTests
     [Fact]
     public void Open_Calls_ContinueWith_On_UIThread ()
     {
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl ();
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init ();
+        v2.Init (null, "fake");
         var b = new Button ();
 
-        bool result = false;
+        var result = false;
 
         b.Accepting +=
             (_, _) =>
             {
-
-                Task.Run (() =>
-                          {
-                              Task.Delay (300).Wait ();
-                          }).ContinueWith (
-                                           (t, _) =>
-                                           {
-                                               // no longer loading
-                                               Application.Invoke (() =>
-                                                                   {
-                                                                       result = true;
-                                                                       Application.RequestStop ();
-                                                                   });
-                                           },
-                                           TaskScheduler.FromCurrentSynchronizationContext ());
+                Task.Run (() => { Task.Delay (300).Wait (); })
+                    .ContinueWith (
+                                   (t, _) =>
+                                   {
+                                       // no longer loading
+                                       Application.Invoke (() =>
+                                                           {
+                                                               result = true;
+                                                               Application.RequestStop ();
+                                                           });
+                                   },
+                                   TaskScheduler.FromCurrentSynchronizationContext ());
             };
 
-        v2.AddTimeout (TimeSpan.FromMilliseconds (150),
-                                          () =>
-                                          {
-                                              // Run asynchronous logic inside Task.Run
-                                              if (Application.Top != null)
-                                              {
-                                                  b.NewKeyDownEvent (Key.Enter);
-                                                  b.NewKeyUpEvent (Key.Enter);
-                                              }
+        v2.AddTimeout (
+                       TimeSpan.FromMilliseconds (150),
+                       () =>
+                       {
+                           // Run asynchronous logic inside Task.Run
+                           if (Application.Top != null)
+                           {
+                               b.NewKeyDownEvent (Key.Enter);
+                               b.NewKeyUpEvent (Key.Enter);
+                           }
 
-                                              return false;
-                                          });
+                           return false;
+                       });
 
         Assert.Null (Application.Top);
 
-        var w = new Window ()
+        var w = new Window
         {
             Title = "Open_CallsContinueWithOnUIThread"
         };
@@ -585,50 +614,50 @@ public class ApplicationImplTests
     }
 
     [Fact]
-    public void ApplicationImpl_UsesInstanceFields_NotStaticReferences()
+    public void ApplicationImpl_UsesInstanceFields_NotStaticReferences ()
     {
         // This test verifies that ApplicationImpl uses instance fields instead of static Application references
-        var orig = ApplicationImpl.Instance;
+        IApplication orig = ApplicationImpl.Instance;
 
-        var v2 = NewApplicationImpl();
-        ApplicationImpl.ChangeInstance(v2);
+        ApplicationImpl v2 = NewMockedApplicationImpl ();
+        ApplicationImpl.ChangeInstance (v2);
 
         // Before Init, all fields should be null/default
-        Assert.Null(v2.Driver);
-        Assert.False(v2.Initialized);
-        Assert.Null(v2.Popover);
-        Assert.Null(v2.Navigation);
-        Assert.Null(v2.Top);
-        Assert.Empty(v2.TopLevels);
+        Assert.Null (v2.Driver);
+        Assert.False (v2.Initialized);
+        Assert.Null (v2.Popover);
+        Assert.Null (v2.Navigation);
+        Assert.Null (v2.Top);
+        Assert.Empty (v2.TopLevels);
 
         // Init should populate instance fields
-        v2.Init();
+        v2.Init (null, "fake");
 
         // After Init, Driver, Navigation, and Popover should be populated
-        Assert.NotNull(v2.Driver);
-        Assert.True(v2.Initialized);
-        Assert.NotNull(v2.Popover);
-        Assert.NotNull(v2.Navigation);
-        Assert.Null(v2.Top); // Top is still null until Run
+        Assert.NotNull (v2.Driver);
+        Assert.True (v2.Initialized);
+        Assert.NotNull (v2.Popover);
+        Assert.NotNull (v2.Navigation);
+        Assert.Null (v2.Top); // Top is still null until Run
 
         // Verify that static Application properties delegate to instance
-        Assert.Equal(v2.Driver, Application.Driver);
-        Assert.Equal(v2.Initialized, Application.Initialized);
-        Assert.Equal(v2.Popover, Application.Popover);
-        Assert.Equal(v2.Navigation, Application.Navigation);
-        Assert.Equal(v2.Top, Application.Top);
-        Assert.Same(v2.TopLevels, Application.TopLevels);
+        Assert.Equal (v2.Driver, Application.Driver);
+        Assert.Equal (v2.Initialized, Application.Initialized);
+        Assert.Equal (v2.Popover, Application.Popover);
+        Assert.Equal (v2.Navigation, Application.Navigation);
+        Assert.Equal (v2.Top, Application.Top);
+        Assert.Same (v2.TopLevels, Application.TopLevels);
 
         // Shutdown should clean up instance fields
-        v2.Shutdown();
+        v2.Shutdown ();
 
-        Assert.Null(v2.Driver);
-        Assert.False(v2.Initialized);
-        Assert.Null(v2.Popover);
-        Assert.Null(v2.Navigation);
-        Assert.Null(v2.Top);
-        Assert.Empty(v2.TopLevels);
+        Assert.Null (v2.Driver);
+        Assert.False (v2.Initialized);
+        Assert.Null (v2.Popover);
+        Assert.Null (v2.Navigation);
+        Assert.Null (v2.Top);
+        Assert.Empty (v2.TopLevels);
 
-        ApplicationImpl.ChangeInstance(orig);
+        ApplicationImpl.ChangeInstance (orig);
     }
 }
