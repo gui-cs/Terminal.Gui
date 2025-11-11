@@ -55,17 +55,32 @@ jobs:
     - name: Run UnitTests
       shell: bash
       run: |
-        dotnet test Tests/UnitTests \
-          --no-build \
-          --verbosity normal \
-          --collect:"XPlat Code Coverage" \
-          --settings Tests/UnitTests/runsettings.xml \
-          --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
-          --blame \
-          --blame-crash \
-          --blame-hang \
-          --blame-hang-timeout 60s \
-          --blame-crash-collect-always
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          # Run without coverage on Windows for speed
+          dotnet test Tests/UnitTests \
+            --no-build \
+            --verbosity normal \
+            --settings Tests/UnitTests/runsettings.xml \
+            --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 60s \
+            --blame-crash-collect-always
+        else
+          # Run with coverage on Linux/macOS
+          dotnet test Tests/UnitTests \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --settings Tests/UnitTests/runsettings.xml \
+            --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 60s \
+            --blame-crash-collect-always
+        fi
 
     - name: Upload Test Logs
       if: always()
@@ -156,3 +171,11 @@ jobs:
         name: UnitTestsParallelizable-${{ runner.os }}
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
+
+    - name: Disable Windows Defender (Windows only)
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: |
+        Add-MpPreference -ExclusionPath "${{ github.workspace }}"
+        Add-MpPreference -ExclusionProcess "dotnet.exe"
+        Add-MpPreference -ExclusionProcess "testhost.exe"
