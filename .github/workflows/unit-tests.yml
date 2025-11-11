@@ -25,7 +25,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 10
+    timeout-minutes: 15  # Increased from 10 for Windows
     steps:
 
     - name: Checkout code
@@ -43,14 +43,23 @@ jobs:
         name: build-artifacts
         path: .
 
-# Test
-    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
-    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
-    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
+    # KEEP THIS - It's needed for --no-build to work
+    - name: Restore NuGet packages
+      run: dotnet restore
+
+    # Optimize Windows performance
+    - name: Disable Windows Defender (Windows only)
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: |
+        Add-MpPreference -ExclusionPath "${{ github.workspace }}"
+        Add-MpPreference -ExclusionProcess "dotnet.exe"
+        Add-MpPreference -ExclusionProcess "testhost.exe"
+        Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
-      run: echo "{VSTEST_DUMP_PATH}={logs/UnitTests/${{ runner.os }}/}" >> $GITHUB_ENV
+      run: echo "VSTEST_DUMP_PATH=logs/UnitTests/${{ runner.os }}/" >> $GITHUB_ENV
 
     - name: Run UnitTests
       shell: bash
@@ -65,7 +74,7 @@ jobs:
             --blame \
             --blame-crash \
             --blame-hang \
-            --blame-hang-timeout 60s \
+            --blame-hang-timeout 120s \
             --blame-crash-collect-always
         else
           # Run with coverage on Linux/macOS
@@ -89,7 +98,7 @@ jobs:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
           logs/UnitTests    
-          TestResults/UnitTests/
+          TestResults/
   
     - name: Upload Non-Parallel UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()
