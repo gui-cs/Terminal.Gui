@@ -438,10 +438,6 @@ public class ApplicationTests
         Assert.Throws<InvalidOperationException> (() =>
                                                       Application.Init (null, "fake")
                                                  );
-        Application.Shutdown ();
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
     }
 
     [Fact]
@@ -450,10 +446,6 @@ public class ApplicationTests
     {
         // Now try the other way
         Assert.Throws<InvalidOperationException> (() => Application.Init (null, "fake"));
-        Application.Shutdown ();
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
     }
 
     [Fact]

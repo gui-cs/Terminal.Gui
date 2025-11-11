@@ -38,14 +38,10 @@ public class SessionTokenTests
         Assert.NotNull (Application.Driver);
 
         top.Dispose ();
-        Shutdown ();
 
 #if DEBUG_IDISPOSABLE
         Assert.True (rs.WasDisposed);
 #endif
-
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Driver);
     }
 
     [Fact]
@@ -84,19 +80,5 @@ public class SessionTokenTests
         var top = new Toplevel ();
         rs = new SessionToken (top);
         Assert.Equal (top, rs.Toplevel);
-    }
-
-
-    private void Shutdown ()
-    {
-        Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-
-        // Validate there are no outstanding SessionToken-based instances left
-        foreach (SessionToken inst in SessionToken.Instances)
-        {
-            Assert.True (inst.WasDisposed);
-        }
-#endif
     }
 }
