@@ -22,7 +22,7 @@ dotnet build --configuration Debug
 # ------------------------------------------------------------
 Write-Host "`nRunning UnitTests (quiet)..."
 dotnet test Tests/UnitTests `
-  --verbosity minimal `
+  --verbosity detailed `
   --collect:"XPlat Code Coverage" `
   --settings Tests/UnitTests/runsettings.xml `
 

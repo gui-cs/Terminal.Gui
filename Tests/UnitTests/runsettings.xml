@@ -28,6 +28,8 @@
 
 	<!-- Optional: Global Run Config (e.g., results dir) -->
 	<RunConfiguration>
+    <!-- 2 minutes -->
+		<TestSessionTimeout>120000</TestSessionTimeout>
 		<ResultsDirectory>../../TestResults</ResultsDirectory>
 	</RunConfiguration>
 </RunSettings>
