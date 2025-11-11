@@ -44,8 +44,6 @@ public class CursorTests
         };
         view.TestLocation = new Point (0, 0);
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
-
     }
 
     [Fact]
@@ -63,7 +61,6 @@ public class CursorTests
         view.CanFocus = true;
         view.SetFocus ();
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -91,7 +88,6 @@ public class CursorTests
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -119,7 +115,6 @@ public class CursorTests
         view.SetFocus ();
         view.TestLocation = new Point (1, 1);
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -137,7 +132,6 @@ public class CursorTests
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
         Assert.True (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -160,7 +154,5 @@ public class CursorTests
         {
             Assert.Equal (CursorVisibility.Invisible, cursor);
         }
-
-        Application.ResetState (true);
     }
 }
