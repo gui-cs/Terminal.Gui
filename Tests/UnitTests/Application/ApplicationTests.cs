@@ -278,6 +278,41 @@ public class ApplicationTests
         // Reset
         Application.ResetState ();
 
+        CheckReset ();
+
+        // Set the values that can be set
+        Application.Initialized = true;
+        Application.MainThreadId = 1;
+
+        //Application._topLevels = new List<Toplevel> ();
+        Application.CachedViewsUnderMouse.Clear ();
+
+        //Application.SupportedCultures = new List<CultureInfo> ();
+        Application.Force16Colors = true;
+
+        //Application.ForceDriver = "driver";
+        Application.StopAfterFirstIteration = true;
+        Application.PrevTabGroupKey = Key.A;
+        Application.NextTabGroupKey = Key.B;
+        Application.QuitKey = Key.C;
+        Application.KeyBindings.Add (Key.D, Command.Cancel);
+
+        Application.CachedViewsUnderMouse.Clear ();
+
+        //Application.WantContinuousButtonPressedView = new View ();
+
+        // Mouse
+        Application.LastMousePosition = new Point (1, 1);
+
+        Application.Navigation = new ();
+
+        Application.ResetState ();
+        CheckReset ();
+
+        ThrowOnJsonErrors = false;
+
+        return;
+
         void CheckReset ()
         {
             // Check that all fields and properties are set to their default values
@@ -328,39 +363,6 @@ public class ApplicationTests
             //Assert.Null (GetEventSubscribers (typeof (Application.Keyboard), "KeyDown"));
             //Assert.Null (GetEventSubscribers (typeof (Application.Keyboard), "KeyUp"));
         }
-
-        CheckReset ();
-
-        // Set the values that can be set
-        Application.Initialized = true;
-        Application.MainThreadId = 1;
-
-        //Application._topLevels = new List<Toplevel> ();
-        Application.CachedViewsUnderMouse.Clear ();
-
-        //Application.SupportedCultures = new List<CultureInfo> ();
-        Application.Force16Colors = true;
-
-        //Application.ForceDriver = "driver";
-        Application.StopAfterFirstIteration = true;
-        Application.PrevTabGroupKey = Key.A;
-        Application.NextTabGroupKey = Key.B;
-        Application.QuitKey = Key.C;
-        Application.KeyBindings.Add (Key.D, Command.Cancel);
-
-        Application.CachedViewsUnderMouse.Clear ();
-
-        //Application.WantContinuousButtonPressedView = new View ();
-
-        // Mouse
-        Application.LastMousePosition = new Point (1, 1);
-
-        Application.Navigation = new ();
-
-        Application.ResetState ();
-        CheckReset ();
-
-        ThrowOnJsonErrors = false;
     }
 
     ///// <summary>

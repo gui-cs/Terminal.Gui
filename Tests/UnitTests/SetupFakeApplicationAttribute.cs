@@ -32,7 +32,6 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
 
         _appDispose?.Dispose ();
         _appDispose = null;
-        Application.ResetState (true);
 
         base.After (methodUnderTest);
     }
