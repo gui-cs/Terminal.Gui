@@ -9,13 +9,49 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Center_Properly (Type viewType)
+    public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {
         IDriver driver = CreateFakeDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
-        // See https://github.com/gui-cs/Terminal.Gui/issues/3156
+        if (view is null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        var drawContentCount = 0;
+        view.DrawingContent += (s, e) => drawContentCount++;
+
+        var layoutStartedCount = 0;
+        view.SubViewLayout += (s, e) => layoutStartedCount++;
+
+        var layoutCompleteCount = 0;
+        view.SubViewsLaidOut += (s, e) => layoutCompleteCount++;
+
+        view.SetNeedsLayout ();
+        view.SetNeedsDraw ();
+        view.Layout ();
+
+        Assert.Equal (0, drawContentCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Center_Properly (Type viewType)
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
         if (view is null)
         {

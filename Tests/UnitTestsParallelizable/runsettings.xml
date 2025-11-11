@@ -1,18 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
-	<!-- Existing Coverlet/Code Coverage Config -->
-	<DataCollectionRunSettings>
-		<DataCollectors>
-			<DataCollector friendlyName="XPlat Code Coverage">
-				<Configuration>
-					<Format>cobertura</Format>
-					<ExcludeByFile>**/obj/**/*.*</ExcludeByFile>
-					<Exclude>[*]*.g.cs</Exclude>
-					<Exclude>[*]*AssemblyInfo.cs</Exclude>
-				</Configuration>
-			</DataCollector>
-		</DataCollectors>
-	</DataCollectionRunSettings>
 
 	<!-- New: xUnit Config for Stop-on-Fail -->
 	<xUnit>
@@ -25,8 +12,4 @@
 		<!-- Still stop on first failure -->
 	</xUnit>
 
-	<!-- Optional: Global Run Config (e.g., results dir) -->
-	<RunConfiguration>
-		<ResultsDirectory>../../TestResults</ResultsDirectory>
-	</RunConfiguration>
 </RunSettings>

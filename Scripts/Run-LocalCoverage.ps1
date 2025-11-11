@@ -34,7 +34,7 @@ Write-Host "`nRunning UnitTestsParallelizable (quiet)..."
 dotnet test Tests/UnitTestsParallelizable `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
-  --settings Tests/UnitTestsParallelizable/runsettings.xml `
+  --settings Tests/UnitTestsParallelizable/runsettings.coverage.xml `
 
 # ------------------------------------------------------------
 # 5. Run INTEGRATION TESTS
@@ -43,7 +43,7 @@ Write-Host "`nRunning IntegrationTests (quiet)..."
 dotnet test Tests/IntegrationTests `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
-  --settings Tests/IntegrationTests/runsettings.xml `
+  --settings Tests/IntegrationTests/runsettings.coverage.xml `
 
 # ------------------------------------------------------------
 # 6. Find ALL coverage files (from all 3 projects)
