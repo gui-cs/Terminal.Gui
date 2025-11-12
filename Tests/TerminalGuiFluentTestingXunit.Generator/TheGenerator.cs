@@ -28,7 +28,7 @@ public class TheGenerator : IIncrementalGenerator
     private void Execute (SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) arg2)
     {
         INamedTypeSymbol assertType = arg2.Left.GetTypeByMetadataName ("Xunit.Assert")
-            ?? throw new NotSupportedException("Referencing codebase does not include Xunit, could not find Xunit.Assert");
+            ?? throw new NotSupportedException ("Referencing codebase does not include Xunit, could not find Xunit.Assert");
 
         GenerateMethods (assertType, context, "Equal", false);
 
@@ -70,7 +70,7 @@ public class TheGenerator : IIncrementalGenerator
         GenerateMethods (assertType, context, "Subset", true);
         GenerateMethods (assertType, context, "Superset", true);
 
-//        GenerateMethods (assertType, context, "Throws", true);
+        //        GenerateMethods (assertType, context, "Throws", true);
         //      GenerateMethods (assertType, context, "ThrowsAny", true);
         GenerateMethods (assertType, context, "True", false);
     }
@@ -208,25 +208,49 @@ public class TheGenerator : IIncrementalGenerator
             dec = dec.WithTypeParameterList (SyntaxFactory.TypeParameterList (SyntaxFactory.SeparatedList (typeParameters)));
 
             // Handle type parameter constraints
-            List<TypeParameterConstraintClauseSyntax> constraintClauses = methodSymbol.TypeParameters
-                                                                                      .Where (tp => tp.ConstraintTypes.Length > 0)
-                                                                                      .Select (
-                                                                                               tp =>
-                                                                                                   SyntaxFactory.TypeParameterConstraintClause (tp.Name)
-                                                                                                       .WithConstraints (
-                                                                                                            SyntaxFactory
-                                                                                                                .SeparatedList<TypeParameterConstraintSyntax> (
-                                                                                                                     tp.ConstraintTypes.Select (
-                                                                                                                          constraintType =>
-                                                                                                                              SyntaxFactory.TypeConstraint (
-                                                                                                                               SyntaxFactory.ParseTypeName (
-                                                                                                                                constraintType
-                                                                                                                                    .ToDisplayString ()))
-                                                                                                                         )
-                                                                                                                    )
-                                                                                                           )
-                                                                                              )
-                                                                                      .ToList ();
+            List<TypeParameterConstraintClauseSyntax> constraintClauses = new ();
+
+            foreach (ITypeParameterSymbol tp in methodSymbol.TypeParameters)
+            {
+                List<TypeParameterConstraintSyntax> constraints = new ();
+
+                // Add class/struct constraints
+                if (tp.HasReferenceTypeConstraint)
+                {
+                    constraints.Add (SyntaxFactory.ClassOrStructConstraint (SyntaxKind.ClassConstraint));
+                }
+                else if (tp.HasValueTypeConstraint)
+                {
+                    constraints.Add (SyntaxFactory.ClassOrStructConstraint (SyntaxKind.StructConstraint));
+                }
+                else if (tp.HasNotNullConstraint)
+                {
+                    // Add notnull constraint
+                    constraints.Add (SyntaxFactory.TypeConstraint (SyntaxFactory.IdentifierName ("notnull")));
+                }
+
+                // Add type constraints
+                foreach (ITypeSymbol constraintType in tp.ConstraintTypes)
+                {
+                    constraints.Add (
+                        SyntaxFactory.TypeConstraint (
+                            SyntaxFactory.ParseTypeName (constraintType.ToDisplayString ())));
+                }
+
+                // Add new() constraint
+                if (tp.HasConstructorConstraint)
+                {
+                    constraints.Add (SyntaxFactory.ConstructorConstraint ());
+                }
+
+                // Only add constraint clause if there are constraints
+                if (constraints.Any ())
+                {
+                    constraintClauses.Add (
+                        SyntaxFactory.TypeParameterConstraintClause (tp.Name)
+                            .WithConstraints (SyntaxFactory.SeparatedList (constraints)));
+                }
+            }
 
             if (constraintClauses.Any ())
             {
@@ -281,12 +305,12 @@ public class TheGenerator : IIncrementalGenerator
         if (p.RefKind != RefKind.None)
         {
             SyntaxKind modifierKind = p.RefKind switch
-                                      {
-                                          RefKind.Ref => SyntaxKind.RefKeyword,
-                                          RefKind.Out => SyntaxKind.OutKeyword,
-                                          RefKind.In => SyntaxKind.InKeyword,
-                                          _ => throw new NotSupportedException ($"Unsupported RefKind: {p.RefKind}")
-                                      };
+            {
+                RefKind.Ref => SyntaxKind.RefKeyword,
+                RefKind.Out => SyntaxKind.OutKeyword,
+                RefKind.In => SyntaxKind.InKeyword,
+                _ => throw new NotSupportedException ($"Unsupported RefKind: {p.RefKind}")
+            };
 
 
             modifiers.Add (SyntaxFactory.Token (modifierKind));
@@ -302,23 +326,23 @@ public class TheGenerator : IIncrementalGenerator
         if (p.HasExplicitDefaultValue)
         {
             ExpressionSyntax defaultValueExpression = p.ExplicitDefaultValue switch
-                                                      {
-                                                          null => SyntaxFactory.LiteralExpression (SyntaxKind.NullLiteralExpression),
-                                                          bool b => SyntaxFactory.LiteralExpression (
-                                                                                                     b
-                                                                                                         ? SyntaxKind.TrueLiteralExpression
-                                                                                                         : SyntaxKind.FalseLiteralExpression),
-                                                          int i => SyntaxFactory.LiteralExpression (
-                                                                                                    SyntaxKind.NumericLiteralExpression,
-                                                                                                    SyntaxFactory.Literal (i)),
-                                                          double d => SyntaxFactory.LiteralExpression (
-                                                                                                       SyntaxKind.NumericLiteralExpression,
-                                                                                                       SyntaxFactory.Literal (d)),
-                                                          string s => SyntaxFactory.LiteralExpression (
-                                                                                                       SyntaxKind.StringLiteralExpression,
-                                                                                                       SyntaxFactory.Literal (s)),
-                                                          _ => SyntaxFactory.ParseExpression (p.ExplicitDefaultValue.ToString ()) // Fallback
-                                                      };
+            {
+                null => SyntaxFactory.LiteralExpression (SyntaxKind.NullLiteralExpression),
+                bool b => SyntaxFactory.LiteralExpression (
+                                                           b
+                                                               ? SyntaxKind.TrueLiteralExpression
+                                                               : SyntaxKind.FalseLiteralExpression),
+                int i => SyntaxFactory.LiteralExpression (
+                                                          SyntaxKind.NumericLiteralExpression,
+                                                          SyntaxFactory.Literal (i)),
+                double d => SyntaxFactory.LiteralExpression (
+                                                             SyntaxKind.NumericLiteralExpression,
+                                                             SyntaxFactory.Literal (d)),
+                string s => SyntaxFactory.LiteralExpression (
+                                                             SyntaxKind.StringLiteralExpression,
+                                                             SyntaxFactory.Literal (s)),
+                _ => SyntaxFactory.ParseExpression (p.ExplicitDefaultValue.ToString ()) // Fallback
+            };
 
             parameterSyntax = parameterSyntax.WithDefault (
                                                            SyntaxFactory.EqualsValueClause (defaultValueExpression)
