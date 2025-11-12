@@ -188,18 +188,18 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
 
 
     /// <summary>
-    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Dim object.
+    ///     Indicates whether the specified type <typeparamref name="TDim"/> is in the hierarchy of this Dim object.
     /// </summary>
     /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
     /// <returns></returns>
-    public bool Has<T> (out T dim) where T : Dim
+    public bool Has<TDim> (out TDim dim) where TDim : Dim
     {
-        dim = (this as T)!;
+        dim = (this as TDim)!;
 
         return this switch
                {
-                   DimCombine combine => combine.Left.Has<T> (out dim) || combine.Right.Has<T> (out dim),
-                   T => true,
+                   DimCombine combine => combine.Left.Has<TDim> (out dim) || combine.Right.Has<TDim> (out dim),
+                   TDim => true,
                    _ => false
                };
     }

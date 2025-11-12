@@ -66,7 +66,6 @@ public partial class ApplicationImpl : IApplication
     }
 
     private IKeyboard? _keyboard;
-    private bool _stopAfterFirstIteration;
 
     /// <summary>
     ///     Handles keyboard input and key bindings at the Application level
