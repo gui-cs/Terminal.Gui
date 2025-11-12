@@ -6,7 +6,7 @@ public class ViewPropertiesEditor : EditorBase
 {
     private CheckBox? _canFocusCheckBox;
     private CheckBox? _enabledCheckBox;
-    private RadioGroup? _orientation;
+    private OptionSelector<Orientation>? _orientationOptionSelector;
     private TextView? _text;
 
     /// <inheritdoc/>
@@ -48,24 +48,23 @@ public class ViewPropertiesEditor : EditorBase
 
         Label label = new () { X = Pos.Right (_enabledCheckBox) + 1, Y = Pos.Top (_enabledCheckBox), Text = "Orientation:" };
 
-        _orientation = new ()
+        _orientationOptionSelector = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = new [] { "Horizontal", "Vertical" },
             Orientation = Orientation.Horizontal
         };
 
-        _orientation.SelectedItemChanged += (s, selected) =>
+        _orientationOptionSelector.ValueChanged += (s, selected) =>
                                             {
                                                 if (ViewToEdit is IOrientation orientatedView)
                                                 {
-                                                    orientatedView.Orientation = (Orientation)_orientation.SelectedItem!;
+                                                    orientatedView.Orientation = _orientationOptionSelector.Value!.Value;
                                                 }
                                             };
-        Add (label, _orientation);
+        Add (label, _orientationOptionSelector);
 
-        label = new () { X = 0, Y = Pos.Bottom (_orientation), Text = "Text:" };
+        label = new () { X = 0, Y = Pos.Bottom (_orientationOptionSelector), Text = "Text:" };
 
         _text = new ()
         {
@@ -114,12 +113,12 @@ public class ViewPropertiesEditor : EditorBase
 
             if (ViewToEdit is IOrientation orientatedView)
             {
-                _orientation!.SelectedItem = (int)orientatedView.Orientation;
-                _orientation.Enabled = true;
+                _orientationOptionSelector!.Value = orientatedView.Orientation;
+                _orientationOptionSelector.Enabled = true;
             }
             else
             {
-                _orientation!.Enabled = false;
+                _orientationOptionSelector!.Enabled = false;
             }
         }
     }

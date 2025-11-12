@@ -149,6 +149,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
             // Force 16 colors if not in virtual terminal mode.
             Application.Force16Colors = true;
+
         }
 
         GetSize ();
