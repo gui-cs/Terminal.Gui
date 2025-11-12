@@ -64,4 +64,19 @@ public class StringTests
         var str = "\u200D";
         Assert.Equal (0, str.GetColumns ());
     }
+
+    [Theory]
+    [InlineData (null)]
+    [InlineData ("")]
+    public void TestGetColumns_Does_Not_Throws_With_Null_And_Empty_String (string? text)
+    {
+        if (text is null)
+        {
+            Assert.Equal (0, StringExtensions.GetColumns (text!));
+        }
+        else
+        {
+            Assert.Equal (0, text.GetColumns ());
+        }
+    }
 }
