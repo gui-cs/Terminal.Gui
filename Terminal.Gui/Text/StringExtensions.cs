@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Buffers;
+using System.Globalization;
 
 namespace Terminal.Gui.Text;
 
@@ -55,7 +56,29 @@ public static class StringExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The string to measure.</param>
     /// <returns></returns>
-    public static int GetColumns (this string str) { return str is null ? 0 : str.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 0)); }
+    public static int GetColumns (this string str)
+    {
+        if (string.IsNullOrEmpty (str))
+        {
+            return 0;
+        }
+
+        var total = 0;
+        TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator (str);
+
+        while (enumerator.MoveNext ())
+        {
+            string element = enumerator.GetTextElement ();
+
+            // Get the maximum rune width within this grapheme cluster
+            int width = element
+                        .EnumerateRunes ()
+                        .Max (r => Math.Max (r.GetColumns (), 0));
+            total += width;
+        }
+
+        return total;
+    }
 
     /// <summary>Gets the number of runes in the string.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
