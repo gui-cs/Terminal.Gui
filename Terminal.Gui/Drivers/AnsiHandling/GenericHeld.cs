@@ -2,12 +2,12 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Implementation of <see cref="IHeld"/> for <see cref="AnsiResponseParser{T}"/>
+///     Implementation of <see cref="IHeld"/> for <see cref="AnsiResponseParser{TInputRecord}"/>
 /// </summary>
-/// <typeparam name="T"></typeparam>
-internal class GenericHeld<T> : IHeld
+/// <typeparam name="TInputRecord"></typeparam>
+internal class GenericHeld<TInputRecord> : IHeld
 {
-    private readonly List<Tuple<char, T>> held = new ();
+    private readonly List<Tuple<char, TInputRecord>> held = [];
 
     public void ClearHeld () { held.Clear (); }
 
@@ -15,7 +15,7 @@ internal class GenericHeld<T> : IHeld
 
     public IEnumerable<object> HeldToObjects () { return held; }
 
-    public void AddToHeld (object o) { held.Add ((Tuple<char, T>)o); }
+    public void AddToHeld (object o) { held.Add ((Tuple<char, TInputRecord>)o); }
 
     /// <inheritdoc/>
     public int Length => held.Count;

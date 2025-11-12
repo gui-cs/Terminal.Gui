@@ -618,7 +618,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     #region Mouse Tests
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Mouse_Click ()
     {
         var radioGroup = new RadioGroup
@@ -668,7 +668,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Mouse_DoubleClick_Accepts ()
     {
         var radioGroup = new RadioGroup

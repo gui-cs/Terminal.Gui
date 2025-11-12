@@ -24,7 +24,7 @@ internal class Ruler
     /// <param name="location">The location to start drawing the ruler, in screen-relative coordinates.</param>
     /// <param name="start">The start value of the ruler.</param>
     /// <param name="driver">Optional Driver. If not provided, driver will be used.</param>
-    public void Draw (Point location, int start = 0, IConsoleDriver? driver = null)
+    public void Draw (Point location, int start = 0, IDriver? driver = null)
     {
         if (start < 0)
         {

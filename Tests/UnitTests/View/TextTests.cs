@@ -9,7 +9,7 @@ namespace UnitTests.ViewTests;
 public class TextTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Setting_With_Height_Horizontal ()
     {
         var top = new View { Width = 25, Height = 25 };
@@ -65,7 +65,7 @@ Y
 
         var top = new Toplevel ();
         top.Add (label, viewX, viewY);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         label.Text = "Hello";
         AutoInitShutdownAttribute.RunIteration ();
@@ -120,7 +120,7 @@ Y
         var top = new Toplevel ();
         top.Add (win);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (15, 15);
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
@@ -385,7 +385,7 @@ Y
         win.Add (view);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (4, 10);
 
         Assert.Equal (5, text.Length);
@@ -442,7 +442,7 @@ Y
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void DimAuto_Vertical_TextDirection_Wide_Rune ()
     {
         var text = "界View";
@@ -510,7 +510,7 @@ w ";
         win.Add (horizontalView, verticalView);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 20);
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
@@ -598,7 +598,7 @@ w ";
         win.Add (horizontalView, verticalView);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (22, 22);
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
@@ -677,7 +677,7 @@ w ";
         var lbl = new Label { Text = "123" };
         var top = new Toplevel ();
         top.Add (lbl);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 3, 1), lbl.Frame);
@@ -995,7 +995,7 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Narrow_Wide_Runes ()
     {
         Application.Driver!.SetScreenSize (32, 32);
@@ -1118,7 +1118,7 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetText_RendersCorrectly ()
     {
         View view;

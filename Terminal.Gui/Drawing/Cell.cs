@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
-///     <see cref="IConsoleDriver"/>).
+///     <see cref="IDriver"/>).
 /// </summary>
 public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Rune Rune = default)
 {

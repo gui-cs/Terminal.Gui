@@ -1,11 +1,10 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class TextFieldTests (ITestOutputHelper output) : ParallelizableBase
+public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()
@@ -561,7 +560,7 @@ public class TextFieldTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var tf = new TextField { Width = 3, Text = "ắ" };
         tf.Driver = driver;
@@ -612,7 +611,7 @@ public class TextFieldTests (ITestOutputHelper output) : ParallelizableBase
     [Fact]
     public void Adjust_First ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
         tf.Driver = driver;

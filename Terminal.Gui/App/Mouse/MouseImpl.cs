@@ -1,5 +1,6 @@
 #nullable enable
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
@@ -55,6 +56,7 @@ internal class MouseImpl : IMouse
     /// <inheritdoc/>
     public void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
+        //Debug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
         if (Application?.Initialized is true)
         {
             // LastMousePosition is only set if the application is initialized.
