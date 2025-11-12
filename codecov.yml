@@ -18,7 +18,10 @@ coverage:
         # Only measure Terminal.Gui library
         paths:
           - "Terminal.Gui/"
-        
+        branches:
+          - v2_develop
+          - v2_release
+           
     # Per-patch (PR) coverage
     patch:
       default:
@@ -64,8 +67,3 @@ ignore:
   - "**/obj/**"               # Build artifacts
   - "**/bin/**"               # Build artifacts
   - "**/*.AssemblyInfo.cs"    # Assembly info files
-
-# Only process coverage from these branches
-branches:
-  - v2_develop
-  - v2_release
