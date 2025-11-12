@@ -32,8 +32,6 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Assert.Throws<LayoutException> (() => Application.Run (t));
         t.Dispose ();
-        Application.Shutdown ();
-
         v2.Dispose ();
     }
 
@@ -73,8 +71,6 @@ public class PosCombineTests (ITestOutputHelper output)
         var foundView = View.GetViewsUnderLocation (new Point(9, 4), ViewportSettingsFlags.None).LastOrDefault ();
         Assert.Equal (foundView, view2);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
-
     }
 
     [Fact]
@@ -114,7 +110,6 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Assert.Throws<LayoutException> (() => Application.Run ());
         top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.Shutdown ();
     }
-
 }
