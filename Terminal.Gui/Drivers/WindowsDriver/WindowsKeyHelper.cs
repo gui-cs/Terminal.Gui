@@ -1,77 +1,65 @@
 #nullable enable
 using System.Diagnostics;
+// ReSharper disable InconsistentNaming
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Helper class for Windows key conversion utilities.
-/// Contains static methods extracted from the legacy WindowsDriver for key processing.
+///     Helper class for Windows key conversion utilities.
+///     Contains static methods extracted from the legacy WindowsDriver for key processing.
 /// </summary>
 internal static class WindowsKeyHelper
 {
+    /// <summary>
+    ///     Converts a key event record with a virtual key code of Packet to a corresponding key event record with updated
+    ///     key information.
+    /// </summary>
+    /// <remarks>
+    ///     This method is typically used to interpret Packet key events, which may represent input from
+    ///     IMEs or other sources that generate Unicode characters not directly mapped to standard virtual key codes. The
+    ///     returned record will have its key and scan code fields updated to reflect the decoded character and
+    ///     modifiers.
+    /// </remarks>
+    /// <param name="keyEvent">
+    ///     The key event record to convert. If the virtual key code is not Packet, the original record is returned
+    ///     unchanged.
+    /// </param>
+    /// <returns>
+    ///     A new key event record with updated key, scan code, and character information if the input represents a Packet
+    ///     key; otherwise, the original key event record.
+    /// </returns>
     public static WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
     {
-        if (keyEvent.wVirtualKeyCode != (ConsoleKeyMapping.VK)ConsoleKey.Packet)
+        if (keyEvent.wVirtualKeyCode != (VK)ConsoleKey.Packet)
         {
             return keyEvent;
         }
 
-        var mod = new ConsoleModifiers ();
-
-        if (keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ShiftPressed))
+        // VK_PACKET means Windows is giving us a Unicode character without a virtual key.
+        // The character is already in UnicodeChar - we don't need to decode anything.
+        // We set VK to None and scan code to 0 since they're meaningless for VK_PACKET.
+        return new ()
         {
-            mod |= ConsoleModifiers.Shift;
-        }
-
-        if (keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightAltPressed)
-            || keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftAltPressed))
-        {
-            mod |= ConsoleModifiers.Alt;
-        }
-
-        if (keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftControlPressed)
-            || keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed))
-        {
-            mod |= ConsoleModifiers.Control;
-        }
-
-        var cKeyInfo = new ConsoleKeyInfo (
-                                           keyEvent.UnicodeChar,
-                                           (ConsoleKey)keyEvent.wVirtualKeyCode,
-                                           mod.HasFlag (ConsoleModifiers.Shift),
-                                           mod.HasFlag (ConsoleModifiers.Alt),
-                                           mod.HasFlag (ConsoleModifiers.Control));
-        cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
-        uint scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (cKeyInfo);
-
-        return new WindowsConsole.KeyEventRecord
-        {
-            UnicodeChar = cKeyInfo.KeyChar,
+            UnicodeChar = keyEvent.UnicodeChar,        // Keep the character - this is the key info!
             bKeyDown = keyEvent.bKeyDown,
-            dwControlKeyState = keyEvent.dwControlKeyState,
+            dwControlKeyState = keyEvent.dwControlKeyState,  // Keep modifiers
             wRepeatCount = keyEvent.wRepeatCount,
-            wVirtualKeyCode = (ConsoleKeyMapping.VK)cKeyInfo.Key,
-            wVirtualScanCode = (ushort)scanCode
+            wVirtualKeyCode = (VK)ConsoleKey.None,     // No virtual key for VK_PACKET
+            wVirtualScanCode = 0                        // No scan code for VK_PACKET
         };
     }
-    public static WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
-    {
-        WindowsConsole.ControlKeyState state = keyEvent.dwControlKeyState;
 
-        bool shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
-        bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
-        bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
-        bool capslock = (state & WindowsConsole.ControlKeyState.CapslockOn) != 0;
-        bool numlock = (state & WindowsConsole.ControlKeyState.NumlockOn) != 0;
-        bool scrolllock = (state & WindowsConsole.ControlKeyState.ScrolllockOn) != 0;
-
-        var cki = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
-
-        return new WindowsConsole.ConsoleKeyInfoEx (cki, capslock, numlock, scrolllock);
-    }
     public static KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
     {
         ConsoleKeyInfo keyInfo = keyInfoEx.ConsoleKeyInfo;
+
+        // Handle VK_PACKET / None - character-only input (IME, emoji, etc.)
+        if (keyInfo.Key == ConsoleKey.None && keyInfo.KeyChar != 0)
+        {
+            // This is a character from VK_PACKET (IME, emoji picker, etc.)
+            // Just return the character as-is with modifiers
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+        }
 
         switch (keyInfo.Key)
         {
@@ -116,7 +104,7 @@ internal static class WindowsKeyHelper
             case ConsoleKey.OemMinus:
                 // These virtual key codes are mapped differently depending on the keyboard layout in use.
                 // We use the Win32 API to map them to the correct character.
-                uint mapResult = ConsoleKeyMapping.MapVKtoChar ((ConsoleKeyMapping.VK)keyInfo.Key);
+                uint mapResult = WindowsKeyboardLayout.MapVKtoChar ((VK)keyInfo.Key);
 
                 if (mapResult == 0)
                 {
@@ -162,13 +150,13 @@ internal static class WindowsKeyHelper
                         // returned (e.g. on ENG OemPlus un-shifted is =, not +). This is important
                         // for key persistence ("Ctrl++" vs. "Ctrl+=").
                         mappedChar = keyInfo.Key switch
-                        {
-                            ConsoleKey.OemPeriod => '.',
-                            ConsoleKey.OemComma => ',',
-                            ConsoleKey.OemPlus => '+',
-                            ConsoleKey.OemMinus => '-',
-                            _ => mappedChar
-                        };
+                                     {
+                                         ConsoleKey.OemPeriod => '.',
+                                         ConsoleKey.OemComma => ',',
+                                         ConsoleKey.OemPlus => '+',
+                                         ConsoleKey.OemMinus => '-',
+                                         _ => mappedChar
+                                     };
                     }
 
                     // Return the mappedChar with modifiers. Because mappedChar is un-shifted, if Shift was down
@@ -245,17 +233,17 @@ internal static class WindowsKeyHelper
         if (Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
             // If the key is JUST a modifier, return it as just that key
-            if (keyInfo.Key == (ConsoleKey)ConsoleKeyMapping.VK.SHIFT)
+            if (keyInfo.Key == (ConsoleKey)VK.SHIFT)
             { // Shift 16
                 return KeyCode.ShiftMask;
             }
 
-            if (keyInfo.Key == (ConsoleKey)ConsoleKeyMapping.VK.CONTROL)
+            if (keyInfo.Key == (ConsoleKey)VK.CONTROL)
             { // Ctrl 17
                 return KeyCode.CtrlMask;
             }
 
-            if (keyInfo.Key == (ConsoleKey)ConsoleKeyMapping.VK.MENU)
+            if (keyInfo.Key == (ConsoleKey)VK.MENU)
             { // Alt 18
                 return KeyCode.AltMask;
             }

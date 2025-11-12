@@ -158,10 +158,7 @@ public class Keys : Scenario
         appKeyListView.SchemeName = "TopLevel";
         win.Add (onSwallowedListView);
 
-        if (Application.Driver is IConsoleDriverFacade fac)
-        {
-            fac.InputProcessor.AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b","Esc")); };
-        }
+        Application.Driver!.InputProcessor.AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
 
         Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
         Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");

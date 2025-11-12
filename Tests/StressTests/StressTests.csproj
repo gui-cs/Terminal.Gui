@@ -19,9 +19,6 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<Optimize>true</Optimize>
 	</PropertyGroup>
-	<ItemGroup>
-		<Compile Include="..\UnitTests\TestsAllViews.cs" Link="TestsAllViews.cs" />
-	</ItemGroup>
     <ItemGroup>
         <PackageReference Include="coverlet.collector" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />

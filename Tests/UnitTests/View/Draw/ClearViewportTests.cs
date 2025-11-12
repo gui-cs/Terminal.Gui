@@ -98,7 +98,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_ClearsEntireViewport ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -146,7 +146,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -337,7 +337,7 @@ public class ClearViewportTests (ITestOutputHelper output)
 
         Toplevel top = new ();
         top.Add (root);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         if (label)
@@ -406,7 +406,7 @@ cccccccccccccccccccc",
                                                    );
         }
 
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
 
         CM.Disable (resetToHardCodedDefaults: true);

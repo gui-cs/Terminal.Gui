@@ -20,45 +20,26 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     are automatically called Before/After a test runs.
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
-    /// <param name="consoleDriverType">
-    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, UnixDriver, DotNetDriver)
-    ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
+    /// <param name="forceDriver">
+    ///     Forces the specified driver ("windows", "dotnet", "unix", or "fake") to
+    ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="useFakeClipboard">
-    ///     If true, will force the use of <see cref="FakeClipboard"/>. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only
-    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardIsSupportedAlwaysTrue">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
-        Type consoleDriverType = null,
-        bool useFakeClipboard = true,
-        bool fakeClipboardAlwaysThrowsNotSupportedException = false,
-        bool fakeClipboardIsSupportedAlwaysTrue = false,
+        string forceDriver = null,
         bool verifyShutdown = false
     )
     {
         AutoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-        _driverType = consoleDriverType;
-        FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-        FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
-            fakeClipboardAlwaysThrowsNotSupportedException;
-        FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+        _forceDriver = forceDriver;
         _verifyShutdown = verifyShutdown;
     }
 
     private readonly bool _verifyShutdown;
-    private readonly Type _driverType;
+    private readonly string _forceDriver;
     private IDisposable _v2Cleanup;
 
     public override void After (MethodInfo methodUnderTest)
@@ -136,20 +117,16 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            if (_driverType == null)
+            if (string.IsNullOrEmpty(_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
             {
-                //Application.Init (null, "fake");
-                //Application.Driver!.SetScreenSize (80, 25);
-                //Application.Top = null;
-                //Application.TopLevels.Clear ();
-
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
-                //Application.Driver!.SetScreenSize (80,25));
+
             }
             else
             {
-                Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+                Assert.Fail ("Specifying driver name not yet supported");
+                //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
             }
         }
     }

@@ -517,7 +517,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard: true)]
+    [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
         var tf = new TextField { Width = 20, Text = "This is a test." };
@@ -837,7 +837,7 @@ public class TextFieldTests (ITestOutputHelper output)
         _textField.CursorPosition = 0;
         var top = new Toplevel ();
         top.Add (_textField);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Attribute [] attributes =
         {
@@ -1617,7 +1617,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };

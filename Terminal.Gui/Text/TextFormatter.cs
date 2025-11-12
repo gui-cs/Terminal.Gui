@@ -47,7 +47,7 @@ public class TextFormatter
         set => _textDirection = EnableNeedsFormat (value);
     }
 
-    /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="IConsoleDriver"/> using the colors specified.</summary>
+    /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="IDriver"/> using the colors specified.</summary>
     /// <remarks>
     ///     Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to
     ///     <c>false</c>.
@@ -63,7 +63,7 @@ public class TextFormatter
         Attribute normalColor,
         Attribute hotColor,
         Rectangle maximum = default,
-        IConsoleDriver? driver = null
+        IDriver? driver = null
     )
     {
         // With this check, we protect against subclasses with overrides of Text (like Button)
@@ -874,7 +874,7 @@ public class TextFormatter
     /// </summary>
     /// <remarks>
     ///     Uses the same formatting logic as <see cref="Draw"/>, including alignment, direction, word wrap, and constraints,
-    ///     but does not perform actual drawing to <see cref="IConsoleDriver"/>.
+    ///     but does not perform actual drawing to <see cref="IDriver"/>.
     /// </remarks>
     /// <param name="screen">Specifies the screen-relative location and maximum size for drawing the text.</param>
     /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>

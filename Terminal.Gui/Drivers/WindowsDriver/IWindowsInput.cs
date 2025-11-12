@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Interface for windows only input which uses low level win32 apis
+///     Wraps IConsoleInput for Windows console input events (WindowsConsole.InputRecord). Needed to support Mocking in tests.
 /// </summary>
-public interface IWindowsInput : IConsoleInput<WindowsConsole.InputRecord>
+public interface IWindowsInput : IInput<WindowsConsole.InputRecord>
 { }

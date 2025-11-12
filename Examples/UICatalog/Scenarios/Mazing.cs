@@ -129,7 +129,7 @@ public class Mazing : Scenario
             return;
         }
 
-        Point newPos = _m.Player;
+        Point newPos = _m!.Player;
 
         Command? command = e.Context?.Command;
 

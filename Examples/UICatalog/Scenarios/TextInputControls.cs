@@ -498,5 +498,5 @@ public class TextInputControls : Scenario
 
 
 
-    private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) { _labelMirroringTimeField.Text = _timeField.Text; }
+    private void TimeChanged (object sender, EventArgs<TimeSpan> e) { _labelMirroringTimeField.Text = _timeField.Text; }
 }
