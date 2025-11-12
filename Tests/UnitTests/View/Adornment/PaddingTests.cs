@@ -6,7 +6,7 @@ namespace UnitTests.ViewTests;
 public class PaddingTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Padding_Uses_Parent_Scheme ()
     {
         Application.Driver!.SetScreenSize (5, 5);

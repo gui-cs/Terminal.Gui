@@ -98,7 +98,7 @@ public class HorizontalAxis : Axis
     /// <param name="text">Text to render under the axis tick</param>
     public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
     {
-        IConsoleDriver driver = Application.Driver;
+        IDriver driver = Application.Driver;
         int y = GetAxisYPosition (graph);
 
         graph.Move (screenPosition, y);

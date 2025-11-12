@@ -27,7 +27,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
                     221
                     111
                     """)]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
         Application.Driver!.SetScreenSize (5, 5);
@@ -97,7 +97,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
                     !@#$
                     !@#$
                     """)]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Visual_Test (ShadowStyle style, string expected)
     {
         Application.Driver!.SetScreenSize (5, 5);

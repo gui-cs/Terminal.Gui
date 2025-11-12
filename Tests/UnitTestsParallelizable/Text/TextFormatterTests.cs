@@ -2,18 +2,10 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-// Alias Console to MockConsole so we don't accidentally use Console
-
 namespace UnitTests_Parallelizable.TextTests;
 
-public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
+public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 {
-    private readonly ITestOutputHelper _output;
-
-    public TextFormatterTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
     [Theory]
     [InlineData ("")]
     [InlineData (null)]
@@ -720,7 +712,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
         foreach (Alignment alignment in Enum.GetValues (typeof (Alignment)))
         {
             TextFormatter tf = new ()
-                { Text = text, ConstrainToSize = new (1, maxWidth), WordWrap = wrap, VerticalAlignment = alignment, Direction = TextDirection.TopBottom_LeftRight };
+            { Text = text, ConstrainToSize = new (1, maxWidth), WordWrap = wrap, VerticalAlignment = alignment, Direction = TextDirection.TopBottom_LeftRight };
 
             List<string> list = TextFormatter.Format (
                                                       text,
@@ -2913,7 +2905,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     [InlineData ("This has lf in the end\n", "This has lf in the end")]
     public void StripCRLF_RemovesCrLf (string input, string expected)
     {
-        string actual = TextFormatter.StripCRLF(input, keepNewLine: false);
+        string actual = TextFormatter.StripCRLF (input, keepNewLine: false);
         Assert.Equal (expected, actual);
     }
 
@@ -2937,7 +2929,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     [InlineData ("This has lf in the end\n", "This has lf in the end\n")]
     public void StripCRLF_KeepNewLine_RemovesCarriageReturnFromCrLf (string input, string expected)
     {
-        string actual = TextFormatter.StripCRLF(input, keepNewLine: true);
+        string actual = TextFormatter.StripCRLF (input, keepNewLine: true);
         Assert.Equal (expected, actual);
     }
 
@@ -2961,7 +2953,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     [InlineData ("This has lf in the end\n", "This has lf in the end ")]
     public void ReplaceCRLFWithSpace_ReplacesCrLfWithSpace (string input, string expected)
     {
-        string actual = TextFormatter.ReplaceCRLFWithSpace(input);
+        string actual = TextFormatter.ReplaceCRLFWithSpace (input);
         Assert.Equal (expected, actual);
     }
 
@@ -2986,7 +2978,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     public void Draw_Horizontal_Centered (string text, int width, string expectedText)
     {
         var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
-        
+
         TextFormatter tf = new ()
         {
             Text = text,
@@ -2997,7 +2989,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3015,7 +3007,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     public void Draw_Horizontal_Justified (string text, int width, string expectedText)
     {
         var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
-        
+
         TextFormatter tf = new ()
         {
             Text = text,
@@ -3026,7 +3018,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3041,7 +3033,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     public void Draw_Horizontal_Left (string text, int width, string expectedText)
     {
         var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
-        
+
         TextFormatter tf = new ()
         {
             Text = text,
@@ -3052,7 +3044,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
@@ -3067,7 +3059,7 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
     public void Draw_Horizontal_Right (string text, int width, string expectedText)
     {
         var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
-        
+
         TextFormatter tf = new ()
         {
             Text = text,
@@ -3078,6 +3070,162 @@ public class TextFormatterTests : UnitTests.Parallelizable.ParallelizableBase
 
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output, driver);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
+
+    [Theory]
+    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
+    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
+    [InlineData (
+                    4,
+                    4,
+                    TextDirection.TopBottom_LeftRight,
+                    @"
+LMre
+eias
+ssb 
+ ęl "
+                )]
+    public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
+    {
+        var driver = CreateFakeDriver ();
+        var text = "Les Mise\u0328\u0301rables";
+
+        var tf = new TextFormatter ();
+        tf.Direction = textDirection;
+        tf.Text = text;
+
+        Assert.True (tf.WordWrap);
+
+        tf.ConstrainToSize = new (width, height);
+
+        tf.Draw (
+                 new (0, 0, width, height),
+                 new (ColorName16.White, ColorName16.Black),
+                 new (ColorName16.Blue, ColorName16.Black),
+                 default (Rectangle),
+                 driver
+                );
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
+
+        driver.End ();
+    }
+
+
+    [Theory]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+    public void TabWith_PreserveTrailingSpaces_True (
+        int width,
+        int height,
+        TextDirection textDirection,
+        int tabWidth,
+        string expected
+    )
+    {
+        var driver = CreateFakeDriver ();
+        var text = "This is a \tTab";
+        var tf = new TextFormatter ();
+
+        tf.Direction = textDirection;
+        tf.TabWidth = tabWidth;
+        tf.PreserveTrailingSpaces = true;
+        tf.Text = text;
+        tf.ConstrainToWidth = 20;
+        tf.ConstrainToHeight = 20;
+
+        Assert.True (tf.WordWrap);
+
+        tf.Draw (
+                 new (0, 0, width, height),
+                 new (ColorName16.White, ColorName16.Black),
+                 new (ColorName16.Blue, ColorName16.Black),
+                 default (Rectangle),
+                 driver
+                );
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
+
+        driver.End ();
+    }
+
+    [Theory]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+    public void TabWith_WordWrap_True (
+        int width,
+        int height,
+        TextDirection textDirection,
+        int tabWidth,
+        string expected
+    )
+    {
+        var driver = CreateFakeDriver ();
+
+        var text = "This is a \tTab";
+        var tf = new TextFormatter ();
+
+        tf.Direction = textDirection;
+        tf.TabWidth = tabWidth;
+        tf.WordWrap = true;
+        tf.Text = text;
+        tf.ConstrainToWidth = 20;
+        tf.ConstrainToHeight = 20;
+
+        Assert.False (tf.PreserveTrailingSpaces);
+
+        tf.Draw (
+                 new (0, 0, width, height),
+                 new (ColorName16.White, ColorName16.Black),
+                 new (ColorName16.Blue, ColorName16.Black),
+                 default (Rectangle),
+                 driver
+                );
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
+
+        driver.End ();
+    }
+
+
+    [Theory]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+    public void TabWith_PreserveTrailingSpaces_False (
+        int width,
+        int height,
+        TextDirection textDirection,
+        int tabWidth,
+        string expected
+    )
+    {
+        var driver = CreateFakeDriver ();
+
+        var text = "This is a \tTab";
+        var tf = new TextFormatter ();
+        tf.Direction = textDirection;
+        tf.TabWidth = tabWidth;
+        tf.Text = text;
+        tf.ConstrainToWidth = 20;
+        tf.ConstrainToHeight = 20;
+
+        Assert.True (tf.WordWrap);
+        Assert.False (tf.PreserveTrailingSpaces);
+
+        tf.Draw (
+                 new (0, 0, width, height),
+                 new (ColorName16.White, ColorName16.Black),
+                 new (ColorName16.Blue, ColorName16.Black),
+                 default (Rectangle),
+                 driver
+                );
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
+
+        driver.End ();
+    }
+
 }

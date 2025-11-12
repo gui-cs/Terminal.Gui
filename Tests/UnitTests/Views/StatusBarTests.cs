@@ -100,30 +100,34 @@ public class StatusBarTests
                                );
         var iteration = 0;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     if (iteration == 0)
-                                     {
-                                         Assert.Equal ("", msg);
-                                         Application.RaiseKeyDownEvent (Application.QuitKey);
-                                     }
-                                     else if (iteration == 1)
-                                     {
-                                         Assert.Equal ("Quiting...", msg);
-                                         msg = "";
-                                         sb.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
-                                     }
-                                     else
-                                     {
-                                         Assert.Equal ("Quiting...", msg);
-
-                                         Application.RequestStop ();
-                                     }
-
-                                     iteration++;
-                                 };
-
+        Application.Iteration += OnApplicationOnIteration;
         Application.Run ().Dispose ();
+        Application.Iteration -= OnApplicationOnIteration;
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            if (iteration == 0)
+            {
+                Assert.Equal ("", msg);
+                Application.RaiseKeyDownEvent (Application.QuitKey);
+            }
+            else if (iteration == 1)
+            {
+                Assert.Equal ("Quiting...", msg);
+                msg = "";
+                sb.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+            }
+            else
+            {
+                Assert.Equal ("Quiting...", msg);
+
+                Application.RequestStop ();
+            }
+
+            iteration++;
+        }
     }
 
     [Fact]

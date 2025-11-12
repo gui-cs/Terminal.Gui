@@ -1,8 +1,9 @@
 using System.Text;
+using UnitTests;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class SliderOptionTests : UnitTests.Parallelizable.ParallelizableBase
+public class SliderOptionTests : FakeDriverBase
 {
     [Fact]
     public void OnChanged_Should_Raise_ChangedEvent ()
@@ -94,7 +95,7 @@ public class SliderOptionTests : UnitTests.Parallelizable.ParallelizableBase
     }
 }
 
-public class SliderEventArgsTests : UnitTests.Parallelizable.ParallelizableBase
+public class SliderEventArgsTests : FakeDriverBase
 {
     [Fact]
     public void Constructor_Sets_Cancel_Default_To_False ()
@@ -138,7 +139,7 @@ public class SliderEventArgsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 }
 
-public class SliderTests : UnitTests.Parallelizable.ParallelizableBase
+public class SliderTests : FakeDriverBase
 {
     [Fact]
     public void Constructor_Default ()

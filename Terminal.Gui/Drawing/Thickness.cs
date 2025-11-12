@@ -90,7 +90,7 @@ public record struct Thickness
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
     /// <param name="driver">Optional driver. If not specified, <see cref="Application.Driver"/> will be used.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
-    public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null, IConsoleDriver? driver = null)
+    public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null, IDriver? driver = null)
     {
         if (rect.Size.Width < 1 || rect.Size.Height < 1)
         {

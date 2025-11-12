@@ -32,7 +32,7 @@ public class PosCenterTests (ITestOutputHelper output)
 
         win.Add (subview);
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (20, height);
         AutoInitShutdownAttribute.RunIteration ();
@@ -178,7 +178,7 @@ public class PosCenterTests (ITestOutputHelper output)
 
         win.Add (subview);
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 7);
         AutoInitShutdownAttribute.RunIteration ();
