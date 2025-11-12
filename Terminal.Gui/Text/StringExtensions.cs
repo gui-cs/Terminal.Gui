@@ -67,7 +67,7 @@ public static class StringExtensions
 
         foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
         {
-            // Sum all runes' display widths within this grapheme cluster
+            // Get the maximum rune width within this grapheme cluster
             int clusterWidth = 0;
 
             foreach (var rune in grapheme.EnumerateRunes ())
