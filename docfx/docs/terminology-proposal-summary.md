@@ -1,8 +1,8 @@
 # Terminology Proposal Summary
 
-> **Updated October 2025**: Proposal validated against current modernized codebase (post-MainLoop removal, driver refactoring).
+> **Updated November 2025**: Proposal validated against massively improved v2_develop codebase. ALL legacy code removed, TopLevels now public, RunState→SessionToken. **This proposal is now more important than ever.**
 > 
-> **Latest Validation**: October 28, 2025 - Confirmed accurate with recent driver architecture improvements and test infrastructure updates.
+> **Latest Validation**: November 12, 2025 - After Issue #4374 cleanup, the confusing Top/TopLevels terminology stands out as the remaining inconsistency in an otherwise modern, clean API.
 
 This is a brief summary of the [full terminology proposal](terminology-proposal.md).
 

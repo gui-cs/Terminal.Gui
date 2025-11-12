@@ -1,8 +1,8 @@
 # Terminal.Gui Terminology Proposal - Documentation Index
 
-> **Updated October 2025**: Proposal validated and updated to reflect recent architectural modernizations, including removal of legacy MainLoop infrastructure, driver architecture refactoring, and test infrastructure improvements.
+> **Updated November 2025**: Proposal validated after massive v2_develop cleanup (Issue #4374). ALL legacy Driver/Application code removed, RunState→SessionToken, TopLevels now public. The confusing Top/TopLevels terminology is now the main remaining inconsistency in an otherwise clean, modern API.
 >
-> **Latest Validation**: October 28, 2025 - Verified against current codebase including FakeDriver consolidation and recent API refinements.
+> **Latest Validation**: November 12, 2025 - Verified against fully modernized codebase. **This proposal is more timely and important than ever.**
 
 This directory contains a comprehensive proposal for renaming `Application.Top` and related terminology in Terminal.Gui v2.
 

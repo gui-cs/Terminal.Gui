@@ -1,8 +1,8 @@
 # Terminology Proposal: Renaming Application.Top and Toplevel
 
-> **Note**: This proposal has been updated (October 2025) to reflect recent architectural improvements in Terminal.Gui v2, including the removal of legacy MainLoop infrastructure, driver architecture refactoring (FakeDriver consolidation), and modernization of the application event loop. The proposal remains valid and relevant with the current codebase.
+> **Note**: This proposal has been updated (November 2025) to reflect major architectural improvements in Terminal.Gui v2, including the removal of ALL legacy MainLoop/Driver infrastructure, RunState→SessionToken rename, and making TopLevels public. The proposal remains valid and even more relevant with the current modernized codebase.
 >
-> **Latest Validation**: October 28, 2025 - Verified against recent changes including driver architecture improvements and test infrastructure modernization.
+> **Latest Validation**: November 12, 2025 - Verified against v2_develop after massive legacy cleanup (Issue #4374). All legacy code removed, API simplified and modernized.
 
 ## Executive Summary
 
@@ -19,19 +19,36 @@ This document proposes new, clearer terminology to replace the confusing `Applic
 
 ### Current Usage Patterns
 
-Based on current code analysis (as of October 28, 2025):
+Based on current code analysis (as of November 12, 2025):
 - `Application.Top` - The currently active/running view with its own run loop
-- `Application.TopLevels` - Internal stack of all active "runnable" views  
-- `Application.CachedRunStateToplevel` - Internal caching mechanism for RunState management (added recently)
+- `Application.TopLevels` - **NOW PUBLIC** stack of all active "runnable" views (was internal, now exposed as public API)
 - `Toplevel` class - Base class for views that can run independently (Window, Dialog, etc.)
+- `SessionToken` - Represents a running session (renamed from `RunState` in Nov 2025)
 - Modal vs Non-modal - Views that can be "run" either as overlays or embedded
 
-**Recent Architectural Updates**: 
-- Terminal.Gui v2 has completed modernization of its application infrastructure
-- Legacy MainLoop code removed, consolidated around `ApplicationImpl.Coordinator`
-- Driver architecture refactored with FakeDriver consolidation into the main library
-- Test infrastructure modernized
-- The terminology confusion addressed in this proposal remains relevant with current codebase
+**Major Recent Architectural Updates (November 2025)**: 
+- **ALL legacy Driver and Application code has been removed** (Issue #4374)
+- `RunState` renamed to `SessionToken` for clarity
+- `Application.TopLevels` **changed from internal to public** - now part of public API
+- `CachedRunStateToplevel` property removed (no longer needed)
+- BUGBUG comment about TopLevels removed - stack management cleaned up
+- Test infrastructure completely revamped
+- Driver architecture fully modernized with clean separation of concerns
+- The terminology confusion addressed in this proposal is **now even more relevant** as the API has been cleaned up and simplified
+
+### Why This Proposal Is More Important Now (November 2025)
+
+With the recent massive cleanup of legacy code (Issue #4374), Terminal.Gui v2's architecture is now cleaner and more modern than ever. However, this makes the confusing `Top`/`TopLevels` terminology **stand out even more** as an inconsistency:
+
+1. **TopLevels is now public**: Previously internal, `Application.TopLevels` is now part of the public API, making its confusing name a more visible problem for users.
+
+2. **SessionToken clarity**: The rename from `RunState` to `SessionToken` shows a pattern of improving terminology clarity - this proposal continues that pattern.
+
+3. **Clean slate**: With all legacy code removed, this is the **perfect time** to modernize terminology before v2 reaches wider adoption.
+
+4. **No legacy baggage**: Unlike before, there are no legacy MainLoop or old Driver APIs to worry about - the codebase is clean and modern, making terminology updates easier.
+
+5. **Consistency with modern patterns**: The cleaned-up codebase now follows modern .NET patterns more closely - `Application.Current` and `Application.RunStack` would complete this modernization.
 
 ## Proposed Terminology
 
@@ -57,12 +74,19 @@ Based on current code analysis (as of October 28, 2025):
 - **Technical**: Accurately represents the ConcurrentStack<T> implementation
 - **Paired**: Works well with `Application.Current` (Current from RunStack)
 - **Future-proof**: Works whether items are `Toplevel` or `IRunnable`
+- **NOW PUBLIC** (Nov 2025): `TopLevels` was changed from internal to public, making its confusing name a **user-facing problem** that needs fixing
+
+**Why This Is Even More Important Now:**
+- With `TopLevels` now public (as of November 2025), its confusing name directly impacts users
+- The rename would improve the public API without breaking existing code (via deprecation)
+- Completes the modernization pattern started with `RunState` → `SessionToken`
 
 **Alternative Names Considered:**
 - `Application.ViewStack` - Too generic, not all views are in this stack
 - `Application.RunnableStack` - Assumes future IRunnable interface
 - `Application.ModalStack` - Inaccurate, non-modal views can be in the stack
 - `Application.ActiveViews` - Doesn't convey the stack nature
+- `Application.Sessions` - Less clear about the stack nature
 
 ### 3. Toplevel Class → (Keep as-is with evolution plan)
 
