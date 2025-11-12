@@ -204,7 +204,7 @@ jobs:
       with:
         name: parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTestsParallelable/
+          logs/UnitTestsParallelizable/
           TestResults/
   
     - name: Upload Parallelizable UnitTests Coverage to Codecov
