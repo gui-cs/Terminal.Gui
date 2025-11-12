@@ -158,10 +158,11 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          # Run with coverage on Linux only
+          # Run with coverage on Linux only, exclude Windows-specific tests
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
             --verbosity normal \
+            --filter "Platform!=Windows" \
             --collect:"XPlat Code Coverage" \
             --settings Tests/UnitTests/runsettings.coverage.xml \
             --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
@@ -170,8 +171,21 @@ jobs:
             --blame-hang \
             --blame-hang-timeout 60s \
             --blame-crash-collect-always
+        elif [ "${{ runner.os }}" == "Darwin" ]; then
+          # Run without coverage on macOS, exclude Windows-specific tests
+          dotnet test Tests/UnitTestsParallelizable \
+            --no-build \
+            --verbosity normal \
+            --filter "Platform!=Windows" \
+            --settings Tests/UnitTestsParallelizable/runsettings.xml \
+            --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
+            --blame \
+            --blame-crash \
+            --blame-hang \
+            --blame-hang-timeout 60s \
+            --blame-crash-collect-always
         else
-          # Run without coverage on Windows/macOS for speed
+          # Run without coverage on Windows for speed, include all tests
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
             --verbosity normal \
@@ -190,7 +204,7 @@ jobs:
       with:
         name: parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTestsParallelizable/
+          logs/UnitTestsParallelable/
           TestResults/
   
     - name: Upload Parallelizable UnitTests Coverage to Codecov
