@@ -374,7 +374,7 @@ In v1 `View` had `MostFocused` property that traversed up the view-hierarchy ret
 var focused = Application.Navigation.GetFocused();
 
 // This replaces the v1 pattern:
-// var focused = Application.Top.MostFocused;
+// var focused = Application.Current.MostFocused;
 ```
 
 ## How Does `View.Add/Remove` Work?
