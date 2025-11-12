@@ -27,7 +27,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         var acuteAccent = new Rune (0x0301); // Combining acute accent (é)
         string combined = "e" + acuteAccent;
-        var expected = "é";
+        var expected = "é";
 
         driver.AddStr (combined);
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
@@ -36,7 +36,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
         var oGonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
         combined = "a" + oGonek + acuteAccent;
-        expected = ("a" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("a" + oGonek + acuteAccent).Normalize (NormalizationForm.FormD); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -44,7 +44,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
         combined = "e" + oGonek + acuteAccent;
-        expected = ("e" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("e" + oGonek + acuteAccent).Normalize (NormalizationForm.FormD); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -52,7 +52,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
         combined = "i" + oGonek + acuteAccent;
-        expected = ("i" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("i" + oGonek + acuteAccent).Normalize (NormalizationForm.FormD); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -60,7 +60,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
         combined = "u" + oGonek + acuteAccent;
-        expected = ("u" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("u" + oGonek + acuteAccent).Normalize (NormalizationForm.FormD); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);

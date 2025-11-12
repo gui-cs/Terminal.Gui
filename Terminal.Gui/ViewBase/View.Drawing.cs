@@ -195,11 +195,11 @@ public partial class View // Drawing APIs
         else
         {
             // Set the clip to be just the thicknesses of the adornments
-            // TODO: Put this union logic in a method on View? 
+            // TODO: Put this union logic in a method on View?
             Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
-            clipAdornments?.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments?.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments?.Combine (originalClip, RegionOp.Intersect);
+            clipAdornments.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
+            clipAdornments.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
+            clipAdornments.Combine (originalClip, RegionOp.Intersect);
             SetClip (clipAdornments);
         }
 
@@ -240,7 +240,7 @@ public partial class View // Drawing APIs
     {
         // We do not attempt to draw Margin. It is drawn in a separate pass.
 
-        // Each of these renders lines to this View's LineCanvas 
+        // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
         if (Border is { } && Border.Thickness != Thickness.Empty)
         {
@@ -446,7 +446,7 @@ public partial class View // Drawing APIs
         // Report the drawn area to the context
         context?.AddDrawnRegion (textRegion);
 
-        TextFormatter?.Draw (
+        TextFormatter.Draw (
                              drawRect,
                              HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
                              HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
@@ -658,7 +658,7 @@ public partial class View // Drawing APIs
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    AddRune (p.Value.Value.Rune);
+                    AddStr (p.Value.Value.Grapheme);
                 }
             }
 
@@ -685,7 +685,7 @@ public partial class View // Drawing APIs
                 context!.ClipDrawnRegion (ViewportToScreen (Viewport));
 
                 // Exclude the drawn region from the clip
-                ExcludeFromClip (context!.GetDrawnRegion ());
+                ExcludeFromClip (context.GetDrawnRegion ());
 
                 // Exclude the Border and Padding from the clip
                 ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));

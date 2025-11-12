@@ -174,7 +174,7 @@ public class LineCanvas : IDisposable
                 intersectionsBufferList.Clear ();
                 foreach (var line in _lines)
                 {
-                    if (line.Intersects (x, y) is IntersectionDefinition intersect)
+                    if (line.Intersects (x, y) is { } intersect)
                     {
                         intersectionsBufferList.Add (intersect);
                     }
@@ -218,9 +218,8 @@ public class LineCanvas : IDisposable
             for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
             {
                 IntersectionDefinition [] intersects = _lines
-                    // ! nulls are filtered out by the next Where filter
-                    .Select (l => l.Intersects (x, y)!)
-                    .Where (i => i is not null)
+                    .Select (l => l.Intersects (x, y))
+                    .OfType<IntersectionDefinition> () // automatically filters nulls and casts
                     .ToArray ();
 
                 Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
@@ -414,7 +413,7 @@ public class LineCanvas : IDisposable
 
         if (rune.HasValue)
         {
-            cell.Rune = rune.Value;
+            cell.Grapheme = rune.ToString ()!;
         }
 
         cell.Attribute = GetAttributeForIntersects (intersects);

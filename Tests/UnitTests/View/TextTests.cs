@@ -701,7 +701,7 @@ w ";
 
             for (var i = 0; i < 4; i++)
             {
-                text += Application.Driver?.Contents [0, i].Rune;
+                text += Application.Driver?.Contents [0, i].Grapheme;
             }
 
             return text;

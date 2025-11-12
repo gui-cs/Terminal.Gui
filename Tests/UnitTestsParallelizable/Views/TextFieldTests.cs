@@ -591,7 +591,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
-ắ",
+ắ",
                                                        output,
                                                        driver
                                                       );
@@ -602,7 +602,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
-ắ",
+ắ",
                                                        output,
                                                        driver
                                                       );
@@ -626,7 +626,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
             for (var i = 0; i < 16; i++)
             {
-                item += driver.Contents [0, i]!.Rune;
+                item += driver.Contents [0, i]!.Grapheme;
             }
 
             return item;

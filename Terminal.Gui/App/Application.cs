@@ -89,26 +89,14 @@ public static partial class Application
         {
             for (var c = 0; c < driver.Cols; c++)
             {
-                Rune rune = contents [r, c].Rune;
+                string text = contents [r, c].Grapheme;
 
-                if (rune.DecodeSurrogatePair (out char []? sp))
-                {
-                    sb.Append (sp);
-                }
-                else
-                {
-                    sb.Append ((char)rune.Value);
-                }
+                sb.Append (text);
 
-                if (rune.GetColumns () > 1)
+                if (text.GetColumns () > 1)
                 {
                     c++;
                 }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	sb.Append ((char)combMark.Value);
-                //}
             }
 
             sb.AppendLine ();

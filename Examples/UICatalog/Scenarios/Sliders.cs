@@ -86,17 +86,17 @@ public class Sliders : Scenario
                                 {
                                     if (single.Orientation == Orientation.Horizontal)
                                     {
-                                        single.Style.SpaceChar = new () { Rune = Glyphs.HLine };
-                                        single.Style.OptionChar = new () { Rune = Glyphs.HLine };
+                                        single.Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () };
+                                        single.Style.OptionChar = new () { Grapheme = Glyphs.HLine.ToString () };
                                     }
                                     else
                                     {
-                                        single.Style.SpaceChar = new () { Rune = Glyphs.VLine };
-                                        single.Style.OptionChar = new () { Rune = Glyphs.VLine };
+                                        single.Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
+                                        single.Style.OptionChar = new () { Grapheme = Glyphs.VLine.ToString () };
                                     }
                                 };
-        single.Style.SetChar = new () { Rune = Glyphs.ContinuousMeterSegment };
-        single.Style.DragChar = new () { Rune = Glyphs.ContinuousMeterSegment };
+        single.Style.SetChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        single.Style.DragChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
 
         v.Add (single);
 
@@ -257,7 +257,7 @@ public class Sliders : Scenario
                                                     {
                                                         s.Orientation = Orientation.Horizontal;
 
-                                                        s.Style.SpaceChar = new () { Rune = Glyphs.HLine };
+                                                        s.Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () };
 
                                                         if (prev == null)
                                                         {
@@ -275,7 +275,7 @@ public class Sliders : Scenario
                                                     {
                                                         s.Orientation = Orientation.Vertical;
 
-                                                        s.Style.SpaceChar = new () { Rune = Glyphs.VLine };
+                                                        s.Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
 
                                                         if (prev == null)
                                                         {

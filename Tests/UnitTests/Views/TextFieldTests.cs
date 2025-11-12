@@ -95,6 +95,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.Equal (11, caption.Length);
         Assert.Equal (10, caption.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (10, caption.GetColumns ());
 
         TextField tf = GetTextFieldsInView ();
 
@@ -103,7 +104,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
-        DriverAssert.AssertDriverContentsAre ("Misérables", output);
+        DriverAssert.AssertDriverContentsAre ("Misérables", output);
         Application.Top.Dispose ();
     }
 
@@ -1646,7 +1647,7 @@ Les Misérables",
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
-Les Miśerables",
+Les Miśerables",
                                                       output
                                                      );
     }

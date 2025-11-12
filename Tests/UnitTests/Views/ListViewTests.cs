@@ -362,7 +362,7 @@ Item 6",
 
             for (var i = 0; i < 7; i++)
             {
-                item += Application.Driver?.Contents [line, i].Rune;
+                item += Application.Driver?.Contents [line, i].Grapheme;
             }
 
             return item;

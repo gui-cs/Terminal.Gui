@@ -16,24 +16,24 @@ public class ClipRegionTests (ITestOutputHelper output)
 
         Application.Driver!.Move (0, 0);
         Application.Driver!.AddRune ('x');
-        Assert.Equal ((Rune)'x', Application.Driver!.Contents! [0, 0].Rune);
+        Assert.Equal ("x", Application.Driver!.Contents! [0, 0].Grapheme);
 
         Application.Driver?.Move (5, 5);
         Application.Driver?.AddRune ('x');
-        Assert.Equal ((Rune)'x', Application.Driver!.Contents [5, 5].Rune);
+        Assert.Equal ("x", Application.Driver!.Contents [5, 5].Grapheme);
 
         // Clear the contents
         Application.Driver?.FillRect (new Rectangle (0, 0, Application.Driver.Rows, Application.Driver.Cols), ' ');
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents [0, 0].Rune);
+        Assert.Equal (" ", Application.Driver?.Contents [0, 0].Grapheme);
 
         // Setup the region with a single rectangle, fill screen with 'x'
         Application.Driver!.Clip = new (new Rectangle (5, 5, 5, 5));
         Application.Driver.FillRect (new Rectangle (0, 0, Application.Driver.Rows, Application.Driver.Cols), 'x');
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents [0, 0].Rune);
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents [4, 9].Rune);
-        Assert.Equal ((Rune)'x', Application.Driver?.Contents [5, 5].Rune);
-        Assert.Equal ((Rune)'x', Application.Driver?.Contents [9, 9].Rune);
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents [10, 10].Rune);
+        Assert.Equal (" ", Application.Driver?.Contents [0, 0].Grapheme);
+        Assert.Equal (" ", Application.Driver?.Contents [4, 9].Grapheme);
+        Assert.Equal ("x", Application.Driver?.Contents [5, 5].Grapheme);
+        Assert.Equal ("x", Application.Driver?.Contents [9, 9].Grapheme);
+        Assert.Equal (" ", Application.Driver?.Contents [10, 10].Grapheme);
 
         Application.Shutdown ();
     }

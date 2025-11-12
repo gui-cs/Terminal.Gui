@@ -32,9 +32,6 @@ public abstract class OutputBase
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
-        const int MAX_CHARS_PER_RUNE = 2;
-        Span<char> runeBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
-
         for (int row = top; row < rows; row++)
         {
             if (!SetCursorPositionImpl (0, row))
@@ -94,28 +91,8 @@ public abstract class OutputBase
 
                     outputWidth++;
 
-                    // Avoid Rune.ToString() by appending the rune chars.
-                    Rune rune = buffer.Contents [row, col].Rune;
-                    int runeCharsWritten = rune.EncodeToUtf16 (runeBuffer);
-                    ReadOnlySpan<char> runeChars = runeBuffer [..runeCharsWritten];
-                    output.Append (runeChars);
-
-                    if (buffer.Contents [row, col].CombiningMarks.Count > 0)
-                    {
-                        // AtlasEngine does not support NON-NORMALIZED combining marks in a way
-                        // compatible with the driver architecture. Any CMs (except in the first col)
-                        // are correctly combined with the base char, but are ALSO treated as 1 column
-                        // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-                        // 
-                        // For now, we just ignore the list of CMs.
-                        //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                        //	output.Append (combMark);
-                    }
-                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
-                    {
-                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPositionImpl (col - 1, row);
-                    }
+                    string text = buffer.Contents [row, col].Grapheme;
+                    output.Append (text);
 
                     buffer.Contents [row, col].IsDirty = false;
                 }

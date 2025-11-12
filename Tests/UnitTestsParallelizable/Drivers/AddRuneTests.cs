@@ -19,7 +19,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         driver.Rows = 25;
         driver.Cols = 80;
         driver.AddRune (new Rune ('a'));
-        Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);
+        Assert.Equal ("a", driver.Contents [0, 0].Grapheme);
 
         driver.End ();
     }
@@ -29,28 +29,30 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     {
         IDriver driver = CreateFakeDriver ();
 
-        var expected = new Rune ('ắ');
+        var expected = "ắ";
 
         var text = "\u1eaf";
         driver.AddStr (text);
-        Assert.Equal (expected, driver.Contents [0, 0].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+        Assert.Equal (expected, driver.Contents [0, 0].Grapheme);
+        Assert.Equal (" ", driver.Contents [0, 1].Grapheme);
 
         driver.ClearContents ();
         driver.Move (0, 0);
 
+        expected = "ắ";
         text = "\u0103\u0301";
         driver.AddStr (text);
-        Assert.Equal (expected, driver.Contents [0, 0].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+        Assert.Equal (expected, driver.Contents [0, 0].Grapheme);
+        Assert.Equal (" ", driver.Contents [0, 1].Grapheme);
 
         driver.ClearContents ();
         driver.Move (0, 0);
 
+        expected = "ắ";
         text = "\u0061\u0306\u0301";
         driver.AddStr (text);
-        Assert.Equal (expected, driver.Contents [0, 0].Rune);
-        Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
+        Assert.Equal (expected, driver.Contents [0, 0].Grapheme);
+        Assert.Equal (" ", driver.Contents [0, 1].Grapheme);
 
         //		var s = "a\u0301\u0300\u0306";
 
@@ -86,7 +88,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         {
             for (var row = 0; row < driver.Rows; row++)
             {
-                Assert.Equal ((Rune)' ', driver.Contents [row, col].Rune);
+                Assert.Equal (" ", driver.Contents [row, col].Grapheme);
             }
         }
 
@@ -99,12 +101,12 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         IDriver driver = CreateFakeDriver ();
 
         driver.AddRune ('a');
-        Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);
+        Assert.Equal ("a", driver.Contents [0, 0].Grapheme);
         Assert.Equal (0, driver.Row);
         Assert.Equal (1, driver.Col);
 
         driver.AddRune ('b');
-        Assert.Equal ((Rune)'b', driver.Contents [0, 1].Rune);
+        Assert.Equal ("b", driver.Contents [0, 1].Grapheme);
         Assert.Equal (0, driver.Row);
         Assert.Equal (2, driver.Col);
 
@@ -116,7 +118,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 
         // Add a rune to the last column of the first row; should increment the row or col even though it's now invalid
         driver.AddRune ('c');
-        Assert.Equal ((Rune)'c', driver.Contents [0, lastCol].Rune);
+        Assert.Equal ("c", driver.Contents [0, lastCol].Grapheme);
         Assert.Equal (lastCol + 1, driver.Col);
 
         // Add a rune; should succeed but do nothing as it's outside of Contents
@@ -127,7 +129,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         {
             for (var row = 0; row < driver.Rows; row++)
             {
-                Assert.NotEqual ((Rune)'d', driver.Contents [row, col].Rune);
+                Assert.NotEqual ("d", driver.Contents [row, col].Grapheme);
             }
         }
 
@@ -146,12 +148,12 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (2, rune.GetColumns ());
 
         driver.AddRune (rune);
-        Assert.Equal (rune, driver.Contents [0, 0].Rune);
+        Assert.Equal (rune.ToString (), driver.Contents [0, 0].Grapheme);
         Assert.Equal (0, driver.Row);
         Assert.Equal (2, driver.Col);
 
         //driver.AddRune ('b');
-        //Assert.Equal ((Rune)'b', driver.Contents [0, 1].Rune);
+        //Assert.Equal ((Text)'b', driver.Contents [0, 1].Text);
         //Assert.Equal (0, driver.Row);
         //Assert.Equal (2, driver.Col);
 
@@ -163,7 +165,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 
         //// Add a rune to the last column of the first row; should increment the row or col even though it's now invalid
         //driver.AddRune ('c');
-        //Assert.Equal ((Rune)'c', driver.Contents [0, lastCol].Rune);
+        //Assert.Equal ((Text)'c', driver.Contents [0, lastCol].Text);
         //Assert.Equal (lastCol + 1, driver.Col);
 
         //// Add a rune; should succeed but do nothing as it's outside of Contents
@@ -171,7 +173,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         //Assert.Equal (lastCol + 2, driver.Col);
         //for (var col = 0; col < driver.Cols; col++) {
         //	for (var row = 0; row < driver.Rows; row++) {
-        //		Assert.NotEqual ((Rune)'d', driver.Contents [row, col].Rune);
+        //		Assert.NotEqual ((Text)'d', driver.Contents [row, col].Text);
         //	}
         //}
 

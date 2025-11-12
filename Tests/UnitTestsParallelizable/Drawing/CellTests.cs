@@ -1,17 +1,15 @@
-﻿using System.Text;
-using Xunit.Abstractions;
+﻿namespace UnitTests_Parallelizable.DrawingTests;
 
-namespace UnitTests_Parallelizable.DrawingTests;
-
-public class CellTests ()
+public class CellTests
 {
     [Fact]
     public void Constructor_Defaults ()
     {
         var c = new Cell ();
         Assert.True (c is { });
-        Assert.Equal (0, c.Rune.Value);
         Assert.Null (c.Attribute);
+        Assert.False (c.IsDirty);
+        Assert.Null (c.Grapheme);
     }
 
     [Fact]
@@ -21,32 +19,50 @@ public class CellTests ()
 
         var c2 = new Cell
         {
-            Rune = new ('a'), Attribute = new (Color.Red)
+            Grapheme = "a", Attribute = new (Color.Red)
         };
         Assert.False (c1.Equals (c2));
         Assert.False (c2.Equals (c1));
 
-        c1.Rune = new ('a');
+        c1.Grapheme = "a";
         c1.Attribute = new ();
-        Assert.Equal (c1.Rune, c2.Rune);
+        Assert.Equal (c1.Grapheme, c2.Grapheme);
         Assert.False (c1.Equals (c2));
         Assert.False (c2.Equals (c1));
     }
 
     [Fact]
-    public void ToString_Override ()
+    public void Set_Text_With_Invalid_Grapheme_Throws ()
     {
-        var c1 = new Cell ();
+        Assert.Throws<InvalidOperationException> (() => new Cell { Grapheme = "ab" });
+        Assert.Throws<InvalidOperationException> (() => new Cell { Grapheme = "\u0061\u0062" }); // ab
+    }
 
-        var c2 = new Cell
-        {
-            Rune = new ('a'), Attribute = new (Color.Red)
-        };
-        Assert.Equal ("['\0':]", c1.ToString ());
+    [Theory]
+    [MemberData (nameof (ToStringTestData))]
+    public void ToString_Override (string text, Attribute? attribute, string expected)
+    {
+        var c = new Cell (attribute, true, text);
+        string result = c.ToString ();
 
-        Assert.Equal (
-                      "['a':[Red,Red,None]]",
-                      c2.ToString ()
-                     );
+        Assert.Equal (expected, result);
+    }
+
+    public static IEnumerable<object []> ToStringTestData ()
+    {
+        yield return ["", null, "[\"\":]"];
+        yield return ["a", null, "[\"a\":]"];
+        yield return ["\t", null, "[\"\\t\":]"];
+        yield return ["\r", null, "[\"\\r\":]"];
+        yield return ["\n", null, "[\"\\n\":]"];
+        yield return ["\r\n", null, "[\"\\r\\n\":]"];
+        yield return ["\f", null, "[\"\\f\":]"];
+        yield return ["\v", null, "[\"\\v\":]"];
+        yield return ["\x1B", null, "[\"\\u001B\":]"];
+        yield return ["\\", new Attribute (Color.Blue), "[\"\\\":[Blue,Blue,None]]"];
+        yield return ["😀", null, "[\"😀\":]"];
+        yield return ["👨‍👩‍👦‍👦", null, "[\"👨‍👩‍👦‍👦\":]"];
+        yield return ["A", new Attribute (Color.Red) { Style = TextStyle.Blink }, "[\"A\":[Red,Red,Blink]]"];
+        yield return ["\U0001F469\u200D\u2764\uFE0F\u200D\U0001F48B\u200D\U0001F468", null, "[\"👩‍❤️‍💋‍👨\":]"];
     }
 }

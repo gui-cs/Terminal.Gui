@@ -665,5 +665,30 @@ Nice       Work")]
         DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
     }
 
+    [Theory]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2, 1, TextDirection.LeftRight_TopBottom, "👨‍👩‍👧‍👦")]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2, 1, TextDirection.TopBottom_LeftRight, "👨‍👩‍👧‍👦")]
+    public void Draw_Emojis_With_Zero_Width_Joiner (
+        string text,
+        int width,
+        int height,
+        TextDirection direction,
+        string expectedDraw
+    )
+    {
+        TextFormatter tf = new ()
+        {
+            Direction = direction,
+            ConstrainToSize = new (width, height),
+            Text = text,
+            WordWrap = false
+        };
+        Assert.Equal (width, text.GetColumns ());
+
+        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output);
+    }
+
     #endregion
 }

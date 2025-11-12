@@ -100,7 +100,7 @@ internal class ShadowView : View
 
                 if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
                 {
-                    AddRune (ScreenContents [r, c].Rune);
+                    AddStr (ScreenContents [r, c].Grapheme);
                 }
             }
         }
@@ -134,7 +134,7 @@ internal class ShadowView : View
 
                 if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
                 {
-                    AddRune (ScreenContents [r, c].Rune);
+                    AddStr (ScreenContents [r, c].Grapheme);
                 }
             }
         }
@@ -142,7 +142,7 @@ internal class ShadowView : View
 
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment adornment
+        if (SuperView is not Adornment
             || location.X < 0
             || location.X >= Application.Screen.Width
             || location.Y < 0
@@ -170,8 +170,8 @@ internal class ShadowView : View
         // use the Normal attribute from the View under the shadow.
         if (newAttribute.Background == Color.DarkGray)
         {
-            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
-            View? underView = currentViewsUnderMouse!.LastOrDefault ();
+            List<View?> currentViewsUnderMouse = GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
+            View? underView = currentViewsUnderMouse.LastOrDefault ();
             attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 
             newAttribute = new (

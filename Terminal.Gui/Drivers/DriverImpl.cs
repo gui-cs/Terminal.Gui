@@ -332,8 +332,8 @@ internal class DriverImpl : IDriver
     /// </returns>
     public bool IsRuneSupported (Rune rune) { return Rune.IsValid (rune.Value); }
 
-    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
+    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
@@ -341,7 +341,7 @@ internal class DriverImpl : IDriver
     ///     <see cref="IDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (Rune rune, int col, int row) { return OutputBuffer.IsValidLocation (rune, col, row); }
+    public bool IsValidLocation (string text, int col, int row) { return OutputBuffer.IsValidLocation (text, col, row); }
 
     /// <summary>
     ///     Updates <see cref="IDriver.Col"/> and <see cref="IDriver.Row"/> to the specified column and row in

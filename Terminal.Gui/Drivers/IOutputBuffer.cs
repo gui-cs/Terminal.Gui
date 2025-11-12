@@ -85,15 +85,15 @@ public interface IOutputBuffer
     void FillRect (Rectangle rect, char rune);
 
     /// <summary>
-    ///     Tests whether the specified coordinate is valid for drawing the specified Rune.
+    ///     Tests whether the specified coordinate is valid for drawing the specified Text.
     /// </summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
-    ///     True if the coordinate is valid for the Rune; false otherwise.
+    ///     True if the coordinate is valid for the Text; false otherwise.
     /// </returns>
-    bool IsValidLocation (Rune rune, int col, int row);
+    bool IsValidLocation (string text, int col, int row);
 
     /// <summary>
     ///     The first cell index on left of screen - basically always 0.

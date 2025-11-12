@@ -189,7 +189,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
     public override bool ProcessKey (Key key)
     {
-        if (SuggestionGenerator.IsWordChar ((Rune)key))
+        if (SuggestionGenerator.IsWordChar (key.AsRune.ToString ()))
         {
             Visible = true;
             _closed = false;

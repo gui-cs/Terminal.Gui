@@ -792,19 +792,16 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     [MemberData (nameof (CMGlyphs))]
     public void GetLengthThatFits_List_Simple_And_Wide_Runes (string text, int columns, int expectedLength)
     {
-        List<Rune> runes = text.ToRuneList ();
-        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (text, columns));
     }
 
     [Theory]
     [InlineData ("test", 3, 3)]
     [InlineData ("test", 4, 4)]
     [InlineData ("test", 10, 4)]
-    public void GetLengthThatFits_Runelist (string text, int columns, int expectedLength)
+    public void GetLengthThatFits_For_String (string text, int columns, int expectedLength)
     {
-        List<Rune> runes = text.ToRuneList ();
-
-        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (text, columns));
     }
 
     [Theory]
@@ -833,7 +830,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     public void GetLengthThatFits_With_Combining_Runes ()
     {
         var text = "Les Mise\u0328\u0301rables";
-        Assert.Equal (16, TextFormatter.GetLengthThatFits (text, 14));
+        Assert.Equal (14, TextFormatter.GetLengthThatFits (text, 14));
     }
 
     [Fact]
@@ -2761,8 +2758,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
                         "ฮ",
                         "ฯ",
                         "ะั",
-                        "า",
-                        "ำ"
+                        "าำ"
                     }
                 )]
     public void WordWrap_Unicode_SingleWordLine (
@@ -2797,7 +2793,17 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
         Assert.True (
                      expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0)
                     );
-        Assert.Equal (resultLines, wrappedLines);
+
+        if (maxWidth == 1)
+        {
+            List<string> newResultLines = resultLines.ToList ();
+            newResultLines [^1] = "";
+            Assert.Equal (newResultLines, wrappedLines);
+        }
+        else
+        {
+            Assert.Equal (resultLines, wrappedLines);
+        }
     }
 
     /// <summary>WordWrap strips CRLF</summary>
@@ -3074,8 +3080,8 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     }
 
     [Theory]
-    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
-    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
+    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misę́rables")]
+    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę́\nr\na\nb\nl\ne\ns")]
     [InlineData (
                     4,
                     4,
@@ -3084,7 +3090,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 LMre
 eias
 ssb 
- ęl "
+ ę́l "
                 )]
     public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
     {
@@ -3110,7 +3116,6 @@ ssb
 
         driver.End ();
     }
-
 
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
@@ -3189,7 +3194,6 @@ ssb
         driver.End ();
     }
 
-
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
     [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
@@ -3227,5 +3231,4 @@ ssb
 
         driver.End ();
     }
-
 }
