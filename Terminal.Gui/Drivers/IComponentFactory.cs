@@ -1,51 +1,60 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
-using Terminal.Gui.App;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Base untyped interface for <see cref="IComponentFactory{T}"/> for methods that are not templated on low level
-/// console input type.
+///     Base untyped interface for <see cref="IComponentFactory{T}"/> for methods that are not templated on low level
+///     console input type.
 /// </summary>
 public interface IComponentFactory
 {
     /// <summary>
-    /// Create the <see cref="IConsoleOutput"/> class for the current driver implementation i.e. the class responsible for
-    /// rendering <see cref="IOutputBuffer"/> into the console.
+    ///     Create the <see cref="IOutput"/> class for the current driver implementation i.e. the class responsible for
+    ///     rendering <see cref="IOutputBuffer"/> into the console.
     /// </summary>
     /// <returns></returns>
-    IConsoleOutput CreateOutput ();
+    IOutput CreateOutput ();
 }
 
 /// <summary>
-/// Creates driver specific subcomponent classes (<see cref="IConsoleInput{T}"/>, <see cref="IInputProcessor"/> etc) for a
-/// <see cref="IMainLoopCoordinator"/>.
+///     Creates driver specific subcomponent classes (<see cref="IInput{TInputRecord}"/>, <see cref="IInputProcessor"/>
+///     etc) for a
+///     <see cref="IMainLoopCoordinator"/>.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IComponentFactory<T> : IComponentFactory
+/// <typeparam name="TInputRecord">
+///     The platform specific console input type. Must be a value type (struct).
+///     Valid types are <see cref="ConsoleKeyInfo"/>, <see cref="WindowsConsole.InputRecord"/>, and <see cref="char"/>.
+/// </typeparam>
+public interface IComponentFactory<TInputRecord> : IComponentFactory
+    where TInputRecord : struct
 {
     /// <summary>
-    /// Create <see cref="IConsoleInput{T}"/> class for the current driver implementation i.e. the class responsible for reading
-    /// user input from the console.
+    ///     Create <see cref="IInput{T}"/> class for the current driver implementation i.e. the class responsible for reading
+    ///     user input from the console.
     /// </summary>
     /// <returns></returns>
-    IConsoleInput<T> CreateInput ();
+    IInput<TInputRecord> CreateInput ();
 
     /// <summary>
-    /// Creates the <see cref="InputProcessor{T}"/> class for the current driver implementation i.e. the class responsible for
-    /// translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="MouseEventArgs"/>.
+    ///     Creates the <see cref="InputProcessorImpl{T}"/> class for the current driver implementation i.e. the class
+    ///     responsible for
+    ///     translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="MouseEventArgs"/>.
     /// </summary>
-    /// <param name="inputBuffer"></param>
+    /// <param name="inputQueue">
+    ///     The input queue containing raw console input events, populated by <see cref="IInput{TInputRecord}"/>
+    ///     implementations on the input thread and
+    ///     read by <see cref="IInputProcessor"/> on the main loop thread.
+    /// </param>
     /// <returns></returns>
-    IInputProcessor CreateInputProcessor (ConcurrentQueue<T> inputBuffer);
+    IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputQueue);
 
     /// <summary>
-    /// Creates <see cref="IConsoleSizeMonitor"/> class for the current driver implementation i.e. the class responsible for
-    /// reporting the current size of the terminal.
+    ///     Creates <see cref="ISizeMonitor"/> class for the current driver implementation i.e. the class responsible for
+    ///     reporting the current size of the terminal.
     /// </summary>
     /// <param name="consoleOutput"></param>
     /// <param name="outputBuffer"></param>
     /// <returns></returns>
-    IConsoleSizeMonitor CreateConsoleSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer);
+    ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer);
 }

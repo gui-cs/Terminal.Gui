@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using UnitTests;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
+public class TextValidateField_NET_Provider_Tests : FakeDriverBase
 {
     [Fact]
     public void Backspace_Key_Deletes_Previous_Character ()
@@ -425,7 +426,7 @@ public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.Par
     }
 }
 
-public class TextValidateField_Regex_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
+public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
 {
     [Fact]
     public void End_Key_End_Of_Input ()

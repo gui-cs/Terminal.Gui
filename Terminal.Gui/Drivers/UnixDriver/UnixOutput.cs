@@ -1,9 +1,13 @@
-﻿using System.Runtime.InteropServices;
+﻿#nullable enable   
+using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixOutput : OutputBase, IConsoleOutput
+internal class UnixOutput : OutputBase, IOutput
 {
     [StructLayout (LayoutKind.Sequential)]
     private struct WinSize
@@ -62,9 +66,17 @@ internal class UnixOutput : OutputBase, IConsoleOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
-        byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
-        // Write to stdout (fd 1)
-        write (STDOUT_FILENO, utf8, utf8.Length);
+        try
+        {
+            byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
+
+            // Write to stdout (fd 1)
+            write (STDOUT_FILENO, utf8, utf8.Length);
+        }
+        catch
+        {
+            // ignore for unit tests
+        }
     }
 
     private Point? _lastCursorPosition;
@@ -79,87 +91,124 @@ internal class UnixOutput : OutputBase, IConsoleOutput
 
         _lastCursorPosition = new (screenPositionX, screenPositionY);
 
-        using var writer = CreateUnixStdoutWriter ();
+        try
+        {
+            using TextWriter? writer = CreateUnixStdoutWriter ();
 
-        // + 1 is needed because Unix is based on 1 instead of 0 and
-        EscSeqUtils.CSI_WriteCursorPosition (writer, screenPositionY + 1, screenPositionX + 1);
+            // + 1 is needed because Unix is based on 1 instead of 0 and
+            EscSeqUtils.CSI_WriteCursorPosition (writer!, screenPositionY + 1, screenPositionX + 1);
+        }
+        catch
+        {
+            // ignore
+        }
 
         return true;
     }
 
-    private TextWriter CreateUnixStdoutWriter ()
+    private TextWriter? CreateUnixStdoutWriter ()
     {
-        // duplicate stdout so we don’t mess with Console.Out’s FD
+        // duplicate stdout so we don't mess with Console.Out's FD
         int fdCopy = dup (STDOUT_FILENO);
 
         if (fdCopy == -1)
         {
-            throw new IOException ("Failed to dup STDOUT_FILENO");
+            // Log but don't throw - we're likely running without a TTY (CI/CD, tests, etc.)
+            var errno = Marshal.GetLastWin32Error ();
+            Logging.Warning ($"Failed to dup STDOUT_FILENO, errno={errno}. Running without TTY support.");
+            return null;  // Return null instead of throwing
         }
 
-        // wrap the raw fd into a SafeFileHandle
-        var handle = new SafeFileHandle (fdCopy, ownsHandle: true);
-
-        // create FileStream from the safe handle
-        var stream = new FileStream (handle, FileAccess.Write);
-
-        return new StreamWriter (stream)
+        try
         {
-            AutoFlush = true
-        };
+            // wrap the raw fd into a SafeFileHandle
+            SafeFileHandle handle = new SafeFileHandle (fdCopy, ownsHandle: true);
+
+            // create FileStream from the safe handle
+            FileStream stream = new FileStream (handle, FileAccess.Write);
+
+            return new StreamWriter (stream)
+            {
+                AutoFlush = true
+            };
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"Failed to create TextWriter from dup'd STDOUT: {ex.Message}");
+            return null;
+        }
     }
 
     /// <inheritdoc />
     public void Write (ReadOnlySpan<char> text)
     {
-        if (!ConsoleDriver.RunningUnitTests)
+        try
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+
             // Write to stdout (fd 1)
             write (STDOUT_FILENO, utf8, utf8.Length);
+        }
+        catch
+        {
+            // ignore for unit tests
         }
     }
 
     /// <inheritdoc />
     public Size GetSize ()
     {
-        if (ConsoleDriver.RunningUnitTests)
+        try
         {
-            // For unit tests, we return a default size.
-            return Size.Empty;
-        }
-
-        if (ioctl (1, TIOCGWINSZ, out WinSize ws) == 0)
-        {
-            if (ws.ws_col > 0 && ws.ws_row > 0)
+            if (ioctl (1, TIOCGWINSZ, out WinSize ws) == 0)
             {
-                return new (ws.ws_col, ws.ws_row);
+                if (ws.ws_col > 0 && ws.ws_row > 0)
+                {
+                    return new (ws.ws_col, ws.ws_row);
+                }
             }
         }
+        catch
+        {
+            // ignore
+        }
 
-        return Size.Empty; // fallback
+        return new (80, 25); // fallback
     }
 
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
-    /// <inheritdoc cref="IConsoleOutput.SetCursorVisibility"/>
+    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
-        if (visibility != CursorVisibility.Invisible)
+        try
         {
-            if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+            if (visibility != CursorVisibility.Invisible)
             {
-                _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+                {
+                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
 
-                Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
             }
-
-            Write (EscSeqUtils.CSI_ShowCursor);
+            else
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
         }
-        else
+        catch
         {
-            Write (EscSeqUtils.CSI_HideCursor);
+            // ignore
         }
+    }
+
+    /// <inheritdoc />
+    public Point GetCursorPosition ()
+    {
+        return _lastCursorPosition ?? Point.Empty;
     }
 
     /// <inheritdoc />

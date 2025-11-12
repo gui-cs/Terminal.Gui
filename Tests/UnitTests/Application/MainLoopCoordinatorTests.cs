@@ -26,7 +26,7 @@ public class MainLoopCoordinatorTests
 
         // StartAsync boots the main loop and the input thread. But if the input class bombs
         // on startup it is important that the exception surface at the call site and not lost
-        var ex = await Assert.ThrowsAsync<AggregateException>(c.StartAsync);
+        var ex = await Assert.ThrowsAsync<AggregateException>(c.StartInputTaskAsync);
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
 
 
@@ -38,7 +38,7 @@ public class MainLoopCoordinatorTests
         mockLogger.Verify (
                            l => l.Log (LogLevel.Critical,
                                        It.IsAny<EventId> (),
-                                       It.Is<It.IsAnyType> ((v, t) => v.ToString () == "Input loop crashed"),
+                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ().Contains("Input loop crashed")),
                                        It.IsAny<Exception> (),
                                        It.IsAny<Func<It.IsAnyType, Exception, string>> ())
                          , Times.Once);

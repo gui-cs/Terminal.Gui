@@ -7,6 +7,7 @@ using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
+
 public class FileDialogFluentTests
 {
     private readonly TextWriter _out;
@@ -46,7 +47,7 @@ public class FileDialogFluentTests
         return NewSaveDialog (out sd, out _, modal);
     }
 
-    private Toplevel NewSaveDialog (out SaveDialog sd, out MockFileSystem fs,bool modal = true)
+    private Toplevel NewSaveDialog (out SaveDialog sd, out MockFileSystem fs, bool modal = true)
     {
         fs = CreateExampleFileSystem ();
         sd = new SaveDialog (fs) { Modal = modal };
@@ -56,14 +57,13 @@ public class FileDialogFluentTests
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void CancelFileDialog_UsingEscape (TestDriver d)
+    public void CancelFileDialog_QuitKey_Quits (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (()=>NewSaveDialog(out sd), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
             .ScreenShot ("Save dialog", _out)
-            .Escape ()
-            .AssertTrue (sd!.Canceled)
-            .Stop ();
+            .EnqueueKeyEvent (Application.QuitKey)
+            .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -71,12 +71,11 @@ public class FileDialogFluentTests
     public void CancelFileDialog_UsingCancelButton_TabThenEnter (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (() => NewSaveDialog (out sd,modal:false), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd, modal: false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Focus<Button> (b => b.Text == "_Cancel")
                           .AssertTrue (sd!.Canceled)
-                          .Enter ()
-                          .Stop ();
+                          .EnqueueKeyEvent (Key.Enter);
     }
 
     [Theory]
@@ -87,9 +86,7 @@ public class FileDialogFluentTests
         using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Cancel")
-                          .WriteOutLogs (_out)
-                          .AssertTrue (sd!.Canceled)
-                          .Stop ();
+                          .AssertTrue (sd!.Canceled);
     }
     [Theory]
     [ClassData (typeof (TestDrivers))]
@@ -98,10 +95,8 @@ public class FileDialogFluentTests
         SaveDialog? sd = null;
         using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Send (Key.C.WithAlt)
-                          .WriteOutLogs (_out)
-                          .AssertTrue (sd!.Canceled)
-                          .Stop ();
+                          .EnqueueKeyEvent (Key.C.WithAlt)
+                          .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -110,14 +105,11 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd,out fs), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
-                          .WaitIteration ()
-                          .WriteOutLogs (_out)
-                          .AssertFalse(sd!.Canceled)
-                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
-                          .Stop ();
+                          .AssertFalse (sd!.Canceled)
+                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
 
     [Theory]
@@ -126,13 +118,11 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
-                          .ScreenShot ("Save dialog", _out)
-                          .Send (Key.S.WithAlt)
-                          .WriteOutLogs (_out)
-                          .AssertFalse (sd!.Canceled)
-                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
-                          .Stop ();
+        using GuiTestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+                                     .ScreenShot ("Save dialog", _out)
+                                     .EnqueueKeyEvent (Key.S.WithAlt)
+                                     .AssertFalse (sd!.Canceled)
+                                     .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
 
     }
 
@@ -142,14 +132,12 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs,modal:false), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Focus<Button> (b => b.Text == "_Save")
-                          .Enter ()
-                          .WriteOutLogs (_out)
-                          .AssertFalse(sd!.Canceled)
-                          .AssertEqual (GetFileSystemRoot(fs!), sd!.FileName)
-                          .Stop ();
+                          .EnqueueKeyEvent (Key.Enter)
+                          .AssertFalse (sd!.Canceled)
+                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
 
     private string GetFileSystemRoot (IFileSystem fs)
@@ -165,15 +153,13 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs,modal:false), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<Button> (b => b.Text == "►_Tree")
-                          .Enter ()
+                          .EnqueueKeyEvent (Key.Enter)
                           .ScreenShot ("After pop tree", _out)
-                          .WriteOutLogs (_out)
-                          .AssertTrue (sd!.Canceled)
-                          .Stop ();
+                          .AssertTrue (sd!.Canceled);
 
     }
 
@@ -189,16 +175,13 @@ public class FileDialogFluentTests
                           .LeftClick<Button> (b => b.Text == "►_Tree")
                           .ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
-                          .Right ()
+                          .EnqueueKeyEvent (Key.CursorRight)
                           .ScreenShot ("After expand tree", _out)
-                          .Down ()
+                          .EnqueueKeyEvent (Key.CursorDown)
                           .ScreenShot ("After navigate down in tree", _out)
-                          .Enter ()
-                          .WaitIteration ()
+                          .EnqueueKeyEvent (Key.Enter)
                           .AssertFalse (sd!.Canceled)
-                          .AssertContains ("empty-dir", sd!.FileName)
-                          .WriteOutLogs (_out)
-                          .Stop ();
+                          .AssertContains ("empty-dir", sd!.FileName);
     }
 
     [Theory]
@@ -208,40 +191,36 @@ public class FileDialogFluentTests
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
         using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (()=>sd!.Style.PreserveFilenameOnDirectoryChanges=true)
+                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
-                          .Focus<TextField> (_=>true)
+                          .Focus<TextField> (_ => true)
                           // Clear selection by pressing right in 'file path' text box
-                          .RaiseKeyDownEvent (Key.CursorRight)
-                          .AssertIsType <TextField>(sd!.Focused)
+                          .EnqueueKeyEvent (Key.CursorRight)
+                          .AssertIsType<TextField> (sd!.Focused)
                           // Type a filename into the dialog
-                          .RaiseKeyDownEvent (Key.H)
-                          .RaiseKeyDownEvent (Key.E)
-                          .RaiseKeyDownEvent (Key.L)
-                          .RaiseKeyDownEvent (Key.L)
-                          .RaiseKeyDownEvent (Key.O)
-                          .WaitIteration ()
+                          .EnqueueKeyEvent (Key.H)
+                          .EnqueueKeyEvent (Key.E)
+                          .EnqueueKeyEvent (Key.L)
+                          .EnqueueKeyEvent (Key.L)
+                          .EnqueueKeyEvent (Key.O)
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd!.Path)
                           .LeftClick<Button> (b => b.Text == "►_Tree")
                           .ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
-                          .Right ()
+                          .EnqueueKeyEvent (Key.CursorRight)
                           .ScreenShot ("After expand tree", _out)
                           // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
                           .AssertEndsWith ("hello", sd!.Path)
-                          .Down ()
+                          .EnqueueKeyEvent (Key.CursorDown)
                           .ScreenShot ("After navigate down in tree", _out)
                           // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
-                          .AssertContains ("empty-dir",sd!.Path)
+                          .AssertContains ("empty-dir", sd!.Path)
                           .AssertEndsWith ("hello", sd!.Path)
-                          .Enter ()
-                          .WaitIteration ()
+                          .EnqueueKeyEvent (Key.Enter)
                           .AssertFalse (sd!.Canceled)
-                          .AssertContains ("empty-dir", sd!.FileName)
-                          .WriteOutLogs (_out)
-                          .Stop ();
+                          .AssertContains ("empty-dir", sd!.FileName);
     }
 
     [Theory]
@@ -251,38 +230,34 @@ public class FileDialogFluentTests
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
         using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (()=> sd!.Style.PreserveFilenameOnDirectoryChanges = false)
+                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)
                           // Clear selection by pressing right in 'file path' text box
-                          .RaiseKeyDownEvent (Key.CursorRight)
+                          .EnqueueKeyEvent (Key.CursorRight)
                           .AssertIsType<TextField> (sd!.Focused)
                           // Type a filename into the dialog
-                          .RaiseKeyDownEvent (Key.H)
-                          .RaiseKeyDownEvent (Key.E)
-                          .RaiseKeyDownEvent (Key.L)
-                          .RaiseKeyDownEvent (Key.L)
-                          .RaiseKeyDownEvent (Key.O)
-                          .WaitIteration ()
+                          .EnqueueKeyEvent (Key.H)
+                          .EnqueueKeyEvent (Key.E)
+                          .EnqueueKeyEvent (Key.L)
+                          .EnqueueKeyEvent (Key.L)
+                          .EnqueueKeyEvent (Key.O)
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd!.Path)
                           .LeftClick<Button> (b => b.Text == "►_Tree")
                           .ScreenShot ("After pop tree", _out)
                           .Focus<TreeView<IFileSystemInfo>> (_ => true)
-                          .Right ()
+                          .EnqueueKeyEvent (Key.CursorRight)
                           .ScreenShot ("After expand tree", _out)
-                          .Down ()
+                          .EnqueueKeyEvent (Key.CursorDown)
                           .ScreenShot ("After navigate down in tree", _out)
                           // PreserveFilenameOnDirectoryChanges is false so just select new path
                           .AssertEndsWith ("empty-dir", sd!.Path)
                           .AssertDoesNotContain ("hello", sd!.Path)
-                          .Enter ()
-                          .WaitIteration ()
+                          .EnqueueKeyEvent (Key.Enter)
                           .AssertFalse (sd!.Canceled)
-                          .AssertContains ("empty-dir", sd!.FileName)
-                          .WriteOutLogs (_out)
-                          .Stop ();
+                          .AssertContains ("empty-dir", sd!.FileName);
     }
 
     [Theory]
@@ -297,20 +272,19 @@ public class FileDialogFluentTests
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)
                           // Clear selection by pressing right in 'file path' text box
-                          .RaiseKeyDownEvent (Key.CursorRight)
+                          .EnqueueKeyEvent (Key.CursorRight)
                           .AssertIsType<TextField> (sd!.Focused)
                           // Type a filename into the dialog
-                          .RaiseKeyDownEvent (Key.H)
-                          .RaiseKeyDownEvent (Key.E)
-                          .RaiseKeyDownEvent (Key.L)
-                          .RaiseKeyDownEvent (Key.L)
-                          .RaiseKeyDownEvent (Key.O)
-                          .WaitIteration ()
+                          .EnqueueKeyEvent (Key.H)
+                          .EnqueueKeyEvent (Key.E)
+                          .EnqueueKeyEvent (Key.L)
+                          .EnqueueKeyEvent (Key.L)
+                          .EnqueueKeyEvent (Key.O)
                           .ScreenShot ("After typing filename 'hello'", _out)
                           .AssertEndsWith ("hello", sd!.Path)
                           .Focus<TableView> (_ => true)
                           .ScreenShot ("After focus table", _out)
-                          .Down ()
+                          .EnqueueKeyEvent (Key.CursorDown)
                           .ScreenShot ("After down in table", _out);
 
         if (preserve)
@@ -324,8 +298,7 @@ public class FileDialogFluentTests
              .AssertDoesNotContain ("hello", sd!.Path);
         }
 
-        c.Up ()
-         .ScreenShot ("After up in table", _out);
+        c.EnqueueKeyEvent (Key.CursorUp).ScreenShot ("After up in table", _out);
 
         if (preserve)
         {
@@ -338,7 +311,7 @@ public class FileDialogFluentTests
              .AssertDoesNotContain ("hello", sd!.Path);
         }
 
-        c.Enter ()
+        c.EnqueueKeyEvent (Key.Enter)
          .ScreenShot ("After enter in table", _out); ;
 
 
@@ -354,7 +327,6 @@ public class FileDialogFluentTests
         }
 
         c.LeftClick<Button> (b => b.Text == "_Save");
-        c.WaitIteration ();
         c.AssertFalse (sd!.Canceled);
 
         if (preserve)
@@ -368,8 +340,6 @@ public class FileDialogFluentTests
              .AssertDoesNotContain ("hello", sd!.Path);
         }
 
-        c.WriteOutLogs (_out);
-        c.WaitIteration ();
         c.Stop ();
     }
 }

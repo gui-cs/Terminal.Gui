@@ -189,32 +189,25 @@ public class Scenario : IDisposable
             }
 
             Application.Iteration += OnApplicationOnIteration;
-            Application.Driver!.ClearedContents += (sender, args) => BenchmarkResults.ClearedContentCount++;
 
-            if (Application.Driver is ConsoleDriver cd)
-            {
-                cd.Refreshed += (sender, args) =>
-                                                 {
-                                                     BenchmarkResults.RefreshedCount++;
-                                                     if (args.Value)
-                                                     {
-                                                         BenchmarkResults.UpdatedCount++;
-                                                     }
-                                                 };
-
-            }
-            Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
+            Application.Driver!.ClearedContents += OnClearedContents;
+            Application.SessionBegun += OnApplicationSessionBegun;
 
 
             _stopwatch = Stopwatch.StartNew ();
         }
         else
         {
-            Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
+            Application.Driver!.ClearedContents -= OnClearedContents;
+            Application.SessionBegun -= OnApplicationSessionBegun;
             Application.Iteration -= OnApplicationOnIteration;
             BenchmarkResults.Duration = _stopwatch!.Elapsed;
             _stopwatch?.Stop ();
         }
+
+        return;
+
+        void OnClearedContents (object? sender, EventArgs args) => BenchmarkResults.ClearedContentCount++;
     }
 
     private void OnApplicationOnIteration (object? s, IterationEventArgs a)
@@ -226,7 +219,7 @@ public class Scenario : IDisposable
         }
     }
 
-    private void OnApplicationNotifyNewRunState (object? sender, RunStateEventArgs e)
+    private void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
     {
         SubscribeAllSubViews (Application.Top!);
 

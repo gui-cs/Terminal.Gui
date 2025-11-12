@@ -1,3 +1,6 @@
 ﻿namespace Terminal.Gui.Drivers;
 
-internal interface IUnixInput : IConsoleInput<char>;
+/// <summary>
+///     Wraps IConsoleInput for Unix console input events (char). Needed to support Mocking in tests.
+/// </summary>
+internal interface IUnixInput : IInput<char>;

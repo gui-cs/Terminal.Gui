@@ -7,8 +7,10 @@ public class TestDrivers : IEnumerable<object []>
 {
     public IEnumerator<object []> GetEnumerator ()
     {
-        yield return new object [] { TestDriver.Windows };
-        yield return new object [] { TestDriver.DotNet };
+        yield return [TestDriver.Windows];
+        yield return [TestDriver.DotNet];
+        yield return [TestDriver.Unix];
+        yield return [TestDriver.Fake];
     }
 
     IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();
@@ -22,10 +24,10 @@ public class TestDrivers_WithTrueFalseParameter : IEnumerable<object []>
 {
     public IEnumerator<object []> GetEnumerator ()
     {
-        yield return new object [] { TestDriver.Windows,false };
-        yield return new object [] { TestDriver.DotNet,false };
-        yield return new object [] { TestDriver.Windows,true };
-        yield return new object [] { TestDriver.DotNet,true };
+        yield return [TestDriver.Windows, false];
+        yield return [TestDriver.DotNet, false];
+        yield return [TestDriver.Unix, true];
+        yield return [TestDriver.Fake, true];
     }
 
     IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();

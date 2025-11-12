@@ -10,7 +10,6 @@ public class CursorTests
     public CursorTests (ITestOutputHelper output)
     {
         _output = output;
-        ConsoleDriver.RunningUnitTests = true;
     }
 
     private class TestView : View
@@ -29,7 +28,7 @@ public class CursorTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_No_Focus_Returns_False ()
     {
         Application.Navigation = new ();
@@ -45,12 +44,10 @@ public class CursorTests
         };
         view.TestLocation = new Point (0, 0);
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
-
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_No_Position_Returns_False ()
     {
         Application.Navigation = new ();
@@ -64,11 +61,10 @@ public class CursorTests
         view.CanFocus = true;
         view.SetFocus ();
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_No_IntersectSuperView_Returns_False ()
     {
         Application.Navigation = new ();
@@ -92,11 +88,10 @@ public class CursorTests
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_Position_OutSide_SuperView_Returns_False ()
     {
         Application.Navigation = new ();
@@ -120,11 +115,10 @@ public class CursorTests
         view.SetFocus ();
         view.TestLocation = new Point (1, 1);
         Assert.False (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_Focused_With_Position_Returns_True ()
     {
         Application.Navigation = new ();
@@ -138,11 +132,10 @@ public class CursorTests
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
         Assert.True (Application.PositionCursor ());
-        Application.ResetState (true);
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void PositionCursor_Defaults_Invisible ()
     {
         Application.Navigation = new ();
@@ -161,7 +154,5 @@ public class CursorTests
         {
             Assert.Equal (CursorVisibility.Invisible, cursor);
         }
-
-        Application.ResetState (true);
     }
 }

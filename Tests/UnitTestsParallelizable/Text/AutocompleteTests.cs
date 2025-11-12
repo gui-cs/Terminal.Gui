@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-using TerminalGuiFluentTesting;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -9,14 +7,10 @@ namespace UnitTests_Parallelizable.TextTests;
 /// Pure unit tests for Autocomplete functionality that don't require Application or Driver.
 /// Integration tests for Autocomplete (popup behavior, rendering) remain in UnitTests.
 /// </summary>
-public class AutocompleteTests : UnitTests.Parallelizable.ParallelizableBase
+public class AutocompleteTests (ITestOutputHelper output) : FakeDriverBase
 {
-    private readonly ITestOutputHelper _output;
-    
-    public AutocompleteTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
+
     [Fact]
     public void Test_GenerateSuggestions_Simple ()
     {

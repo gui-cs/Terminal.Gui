@@ -11,11 +11,9 @@ public class PosViewTests (ITestOutputHelper output)
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
+    [SetupFakeApplication]
     public void Subtract_Operator ()
     {
-        Application.Init (new FakeDriver ());
-
         var top = new Toplevel ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
@@ -52,15 +50,7 @@ public class PosViewTests (ITestOutputHelper output)
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > 0)
-                                     {
-                                         field.NewKeyDownEvent (new (KeyCode.Enter));
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -69,10 +59,24 @@ public class PosViewTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
+
         top.Dispose ();
         Assert.Equal (0, count);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count > 0)
+            {
+                field.NewKeyDownEvent (new (KeyCode.Enter));
+            }
+
+            Application.RequestStop ();
+        }
     }
 }
