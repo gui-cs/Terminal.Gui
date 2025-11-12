@@ -7,7 +7,7 @@ namespace UnitTests_Parallelizable.TextTests;
 public class RuneTests
 {
     [Fact]
-    public void Cast_To_Char_Durrogate_Pair_Return_UTF16 ()
+    public void Cast_To_Char_Surrogate_Pair_Return_UTF16 ()
     {
         Assert.NotEqual ("𝔹", $"{new Rune (unchecked ((char)0x1d539))}");
         Assert.Equal ("픹", $"{new Rune (unchecked ((char)0x1d539))}");
@@ -65,8 +65,11 @@ public class RuneTests
         PrintTextElementCount ("\u0061\u0301", "á", 1, 2, 2, 1);
         PrintTextElementCount ("\u0061\u0301", "á", 1, 2, 2, 1);
         PrintTextElementCount ("\u0065\u0301", "é", 1, 2, 2, 1);
-        PrintTextElementCount ("\U0001f469\U0001f3fd\u200d\U0001f692", "👩🏽‍🚒", 6, 4, 7, 1);
+        PrintTextElementCount ("\U0001f469\U0001f3fd\u200d\U0001f692", "👩🏽‍🚒", 2, 4, 7, 1);
         PrintTextElementCount ("\ud801\udccf", "𐓏", 1, 1, 2, 1);
+        PrintTextElementCount ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", "👨‍👩‍👧‍👦", 2, 7, 11, 1);
+        PrintTextElementCount ("\U0001f469\u200d\U0001f692", "👩‍🚒", 2, 3, 5, 1);
+        PrintTextElementCount ("\u0068\u0069", "hi", 2, 2, 2, 2);
     }
 
     [Theory]
@@ -84,8 +87,8 @@ public class RuneTests
                     2,
                     1
                 )] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
-    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 6, 8)] // Man, Woman and Girl emoji.
-    [InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 2, 8)] // Man, Woman and Girl emoji.
+    [InlineData ("\u0915\u093f", "कि", 2, 1, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
     [InlineData (
                     "\u0e4d\u0e32",
                     "ํา",
