@@ -289,12 +289,9 @@ public class OutputBufferImpl : IOutputBuffer
     /// </returns>
     public bool IsValidLocation (string text, int col, int row)
     {
-        if (text.GetColumns () < 2)
-        {
-            return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip!.Contains (col, row);
-        }
+        int textWidth = text.GetColumns ();
 
-        return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
+        return col >= 0 && row >= 0 && col + textWidth <= Cols && row < Rows && Clip!.Contains (col, row);
     }
 
     /// <inheritdoc/>
