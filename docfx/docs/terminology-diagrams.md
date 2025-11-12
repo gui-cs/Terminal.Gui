@@ -20,7 +20,7 @@ graph TB
     
     subgraph Proposed["Proposed Terminology (Clear)"]
         B1[Application.Current]
-        B2[Application.RunStack]
+        B2[Application.SessionStack]
         B3[Toplevel class<br/>keep as-is]
         
         B1 -->|"top item in"| B2
@@ -38,7 +38,7 @@ graph TB
 
 ```mermaid
 graph TD
-    subgraph RunStack["Application.RunStack (ConcurrentStack&lt;Toplevel&gt;)"]
+    subgraph SessionStack["Application.SessionStack (ConcurrentStack&lt;Toplevel&gt;)"]
         direction TB
         Dialog[Dialog<br/>Modal: true]
         Window[Window<br/>Modal: false]
@@ -89,10 +89,10 @@ sequenceDiagram
     Dev->>Code: Application.Current?
     Code->>Dev: ✓ Obviously the current view!
     
-    Dev->>Code: Application.RunStack?
+    Dev->>Code: Application.SessionStack?
     Code->>Dev: ✓ Stack of running views!
     
-    Dev->>Code: Current from RunStack?
+    Dev->>Code: Current from SessionStack?
     Code->>Dev: ✓ Top item in the stack!
     
     Note over Dev,API: Self-documenting, no docs needed
@@ -140,7 +140,7 @@ graph TB
         Content --> Button2
     end
     
-    subgraph Stack["Application.RunStack"]
+    subgraph Stack["Application.SessionStack"]
         direction TB
         S1[Window<br/>Currently Active]
         S2[Previous Toplevel<br/>Waiting]
@@ -163,23 +163,23 @@ sequenceDiagram
     participant Main as Main Window
     participant Dialog as Dialog
     
-    Note over App: Initially empty RunStack
+    Note over App: Initially empty SessionStack
     
     App->>Main: Run(mainWindow)
     activate Main
-    Note over App: RunStack: [Main]<br/>Current: Main
+    Note over App: SessionStack: [Main]<br/>Current: Main
     
     Main->>Dialog: Run(dialog)
     activate Dialog
-    Note over App: RunStack: [Dialog, Main]<br/>Current: Dialog
+    Note over App: SessionStack: [Dialog, Main]<br/>Current: Dialog
     
     Dialog->>App: RequestStop()
     deactivate Dialog
-    Note over App: RunStack: [Main]<br/>Current: Main
+    Note over App: SessionStack: [Main]<br/>Current: Main
     
     Main->>App: RequestStop()
     deactivate Main
-    Note over App: RunStack: []<br/>Current: null
+    Note over App: SessionStack: []<br/>Current: null
 ```
 
 ## Terminology Evolution Path
@@ -194,7 +194,7 @@ graph LR
     
     subgraph Phase1["Phase 1: Add New APIs"]
         P1[Application.Current]
-        P2[Application.RunStack]
+        P2[Application.SessionStack]
         P3[Toplevel class]
         P1O["Application.Top<br/>[Obsolete]"]
         P2O["Application.TopLevels<br/>[Obsolete]"]
@@ -202,7 +202,7 @@ graph LR
     
     subgraph Phase2["Phase 2-4: Migration"]
         M1[Application.Current]
-        M2[Application.RunStack]
+        M2[Application.SessionStack]
         M3[Toplevel class]
         M1O["Application.Top<br/>[Obsolete Warning]"]
         M2O["Application.TopLevels<br/>[Obsolete Warning]"]
@@ -210,7 +210,7 @@ graph LR
     
     subgraph Future["Phase 5: Future State"]
         F1[Application.Current]
-        F2[Application.RunStack]
+        F2[Application.SessionStack]
         F3["IRunnable interface"]
         F4["Toplevel : IRunnable"]
     end
@@ -282,7 +282,7 @@ gantt
 
 ```mermaid
 mindmap
-  root((Application.Current<br/>& RunStack))
+  root((Application.Current<br/>& SessionStack))
     Clarity
       Self-documenting
       No ambiguity
@@ -309,13 +309,13 @@ mindmap
 
 These diagrams illustrate:
 
-1. **Clear Relationships**: The new terminology makes the relationship between `Current` and `RunStack` obvious
+1. **Clear Relationships**: The new terminology makes the relationship between `Current` and `SessionStack` obvious
 2. **Self-Documenting**: Names that immediately convey their purpose without documentation
 3. **.NET Alignment**: Consistency with established .NET framework patterns
 4. **Migration Safety**: Backward-compatible approach with clear phases
 5. **Future-Proof**: Supports evolution toward `IRunnable` interface
 
-The proposed terminology (`Application.Current` and `Application.RunStack`) provides immediate clarity while maintaining compatibility and supporting future architectural improvements.
+The proposed terminology (`Application.Current` and `Application.SessionStack`) provides immediate clarity while maintaining compatibility and supporting future architectural improvements.
 
 ---
 

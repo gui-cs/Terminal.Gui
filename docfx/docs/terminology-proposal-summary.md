@@ -11,7 +11,7 @@ This is a brief summary of the [full terminology proposal](terminology-proposal.
 | Current Name | Proposed Name | Rationale |
 |--------------|---------------|-----------|
 | `Application.Top` | `Application.Current` | Clear, follows .NET patterns (e.g., `Thread.CurrentThread`), indicates "currently active" |
-| `Application.TopLevels` | `Application.RunStack` | Descriptive of the stack structure, pairs well with `Current` |
+| `Application.TopLevels` | `Application.SessionStack` | Descriptive of the stack structure, pairs well with `Current` |
 | `Toplevel` class | Keep as-is (for now) | Too disruptive to rename; allow gradual evolution toward `IRunnable` |
 
 ## Why These Names?
@@ -22,9 +22,10 @@ This is a brief summary of the [full terminology proposal](terminology-proposal.
 - ✅ Short and memorable
 - ✅ Accurately describes the "currently active/running view"
 
-### Application.RunStack
-- ✅ Describes what it contains (running views)
+### Application.SessionStack
+- ✅ Describes what it contains (running sessions)
 - ✅ Describes its structure (stack)
+- ✅ Aligns with `SessionToken` terminology (consistency)
 - ✅ Works with future `IRunnable` interface
 - ✅ Clear relationship with `Current` (top of the stack)
 

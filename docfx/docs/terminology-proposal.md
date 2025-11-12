@@ -48,7 +48,7 @@ With the recent massive cleanup of legacy code (Issue #4374), Terminal.Gui v2's 
 
 4. **No legacy baggage**: Unlike before, there are no legacy MainLoop or old Driver APIs to worry about - the codebase is clean and modern, making terminology updates easier.
 
-5. **Consistency with modern patterns**: The cleaned-up codebase now follows modern .NET patterns more closely - `Application.Current` and `Application.RunStack` would complete this modernization.
+5. **Consistency with modern patterns**: The cleaned-up codebase now follows modern .NET patterns more closely - `Application.Current` and `Application.SessionStack` would complete this modernization.
 
 ## Proposed Terminology
 
@@ -67,12 +67,13 @@ With the recent massive cleanup of legacy code (Issue #4374), Terminal.Gui v2's 
 - `Application.Main` - Misleading, as it's not always the main/first view
 - `Application.CurrentRunnable` - Too verbose, assumes future IRunnable
 
-### 2. Application.TopLevels → Application.RunStack
+### 2. Application.TopLevels → Application.SessionStack
 
 **Rationale:**
-- **Descriptive**: Clearly indicates it's a stack of running views
+- **Descriptive**: Clearly indicates it's a stack of running sessions
 - **Technical**: Accurately represents the ConcurrentStack<T> implementation
-- **Paired**: Works well with `Application.Current` (Current from RunStack)
+- **Paired**: Works well with `Application.Current` (Current from SessionStack)
+- **Consistent**: Aligns with `SessionToken` terminology (renamed from `RunState` in Nov 2025)
 - **Future-proof**: Works whether items are `Toplevel` or `IRunnable`
 - **NOW PUBLIC** (Nov 2025): `TopLevels` was changed from internal to public, making its confusing name a **user-facing problem** that needs fixing
 
@@ -80,13 +81,15 @@ With the recent massive cleanup of legacy code (Issue #4374), Terminal.Gui v2's 
 - With `TopLevels` now public (as of November 2025), its confusing name directly impacts users
 - The rename would improve the public API without breaking existing code (via deprecation)
 - Completes the modernization pattern started with `RunState` → `SessionToken`
+- `SessionStack` follows the same terminology pattern as `SessionToken`
 
 **Alternative Names Considered:**
 - `Application.ViewStack` - Too generic, not all views are in this stack
 - `Application.RunnableStack` - Assumes future IRunnable interface
 - `Application.ModalStack` - Inaccurate, non-modal views can be in the stack
 - `Application.ActiveViews` - Doesn't convey the stack nature
-- `Application.Sessions` - Less clear about the stack nature
+- `Application.Sessions` - Less clear about the stack nature; doesn't indicate the collection type
+- `Application.RunStack` - Previous proposal; doesn't align with SessionToken terminology
 
 ### 3. Toplevel Class → (Keep as-is with evolution plan)
 
@@ -121,7 +124,7 @@ public static partial class Application
     // NEW: Current API
     /// <summary>
     /// Gets the currently active view with its own run loop.
-    /// This is the view at the top of the <see cref="RunStack"/>.
+    /// This is the view at the top of the <see cref="SessionStack"/>.
     /// </summary>
     /// <remarks>
     /// The current view receives all keyboard and mouse input and is responsible
@@ -142,16 +145,16 @@ public static partial class Application
         internal set => ApplicationImpl.Instance.Top = value;
     }
 
-    // NEW: RunStack API
+    // NEW: SessionStack API
     /// <summary>
     /// Gets the stack of all currently running views.
     /// Views are pushed onto this stack when <see cref="Run(Toplevel, Func{Exception, bool})"/> 
     /// is called and popped when <see cref="RequestStop(Toplevel)"/> is called.
     /// </summary>
-    internal static ConcurrentStack<Toplevel> RunStack => TopLevels;
+    internal static ConcurrentStack<Toplevel> SessionStack => TopLevels;
 
     // DEPRECATED: Keep for backward compatibility
-    [Obsolete("Use Application.RunStack instead. This property will be removed in a future version.", false)]
+    [Obsolete("Use Application.SessionStack instead. This property will be removed in a future version.", false)]
     internal static ConcurrentStack<Toplevel> TopLevels => ApplicationImpl.Instance.TopLevels;
 }
 ```
@@ -165,7 +168,7 @@ public static partial class Application
 
 ### Phase 3: Internal Refactoring (No API Changes)
 
-- Update internal code to use `Application.Current` and `Application.RunStack`
+- Update internal code to use `Application.Current` and `Application.SessionStack`
 - Keep old properties as simple forwards for compatibility
 - Update test code to use new APIs
 
@@ -210,9 +213,9 @@ if (Application.TopLevels.Count > 0)
 }
 
 // New Code (when internal API is made public)
-if (Application.RunStack.Count > 0)
+if (Application.SessionStack.Count > 0)
 {
-    foreach (Toplevel runnable in Application.RunStack)
+    foreach (Toplevel runnable in Application.SessionStack)
     {
         // process each running view
     }
@@ -223,7 +226,7 @@ if (Application.RunStack.Count > 0)
 
 ### 1. Improved Clarity
 - `Application.Current` is immediately understandable
-- `RunStack` clearly describes what it is and what it contains
+- `SessionStack` clearly describes what it is and what it contains
 - Reduces cognitive load for new developers
 
 ### 2. Better Code Readability
@@ -242,7 +245,7 @@ Application.Current?.DoSomething();
 ### 4. Future-Proof
 - Works with planned `IRunnable` interface
 - `Current` can return `IRunnable?` in the future
-- `RunStack` can become `ConcurrentStack<IRunnable>` in the future
+- `SessionStack` can become `ConcurrentStack<IRunnable>` in the future
 
 ### 5. Minimal Breaking Changes
 - Deprecated APIs remain functional
@@ -275,7 +278,7 @@ Application.Current?.DoSomething();
 ### Core API Changes
 - [ ] Add `Application.Current` property with forwarding to `Top`
 - [ ] Add `[Obsolete]` attribute to `Application.Top` (warning disabled initially)
-- [ ] Add `Application.RunStack` property with forwarding to `TopLevels`
+- [ ] Add `Application.SessionStack` property with forwarding to `TopLevels`
 - [ ] Add `[Obsolete]` attribute to `Application.TopLevels` (warning disabled initially)
 - [ ] Update XML documentation for new properties
 - [ ] Update IApplication interface if needed
@@ -290,7 +293,7 @@ Application.Current?.DoSomething();
 
 ### Code Updates
 - [ ] Update all internal code to use `Application.Current`
-- [ ] Update all internal code to use `Application.RunStack` (where appropriate)
+- [ ] Update all internal code to use `Application.SessionStack` (where appropriate)
 - [ ] Update test code to use new APIs
 - [ ] Update example applications (UICatalog, Example, etc.)
 
@@ -332,7 +335,7 @@ Application.Current?.DoSomething();
 
 This proposal recommends:
 1. **Rename `Application.Top` → `Application.Current`**: Clear, concise, familiar
-2. **Rename `Application.TopLevels` → `Application.RunStack`**: Descriptive and accurate
+2. **Rename `Application.TopLevels` → `Application.SessionStack`**: Descriptive and accurate
 3. **Keep `Toplevel` class as-is**: Allow for gradual evolution toward `IRunnable`
 4. **Phased migration**: Maintain backward compatibility with clear deprecation path
 

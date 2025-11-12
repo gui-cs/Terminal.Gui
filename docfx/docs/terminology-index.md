@@ -60,7 +60,7 @@ Complete, comprehensive proposal with all analysis, rationale, and implementatio
 | Current | Proposed | Why |
 |---------|----------|-----|
 | `Application.Top` | `Application.Current` | Clear, follows .NET patterns, self-documenting |
-| `Application.TopLevels` | `Application.RunStack` | Describes structure and content accurately |
+| `Application.TopLevels` | `Application.SessionStack` | Describes structure and content accurately |
 | `Toplevel` class | Keep (for now) | Allow evolution to `IRunnable` interface |
 
 ### Key Benefits

@@ -29,8 +29,8 @@ var focused = Application.Top.MostFocused;
 // Immediately clear: the currently active view
 Application.Current?.SetNeedsDraw();
 
-// Clear relationship: Current is from the RunStack
-if (Application.RunStack.Count > 0)
+// Clear relationship: Current is from the SessionStack
+if (Application.SessionStack.Count > 0)
 {
     var current = Application.Current;
 }
@@ -41,8 +41,8 @@ var focused = Application.Current.MostFocused;
 
 **Benefits:**
 - `Current` is immediately understandable
-- `RunStack` describes both structure (stack) and content (running views)
-- Clear relationship: `Current` is the top item in `RunStack`
+- `SessionStack` describes both structure (stack) and content (running views)
+- Clear relationship: `Current` is the top item in `SessionStack`
 
 ## Real-World Code Examples
 
@@ -86,10 +86,10 @@ public bool HasModalDialog()
 
 **After:**
 ```csharp
-// Clear: multiple items in the RunStack means we have modals/overlays
+// Clear: multiple items in the SessionStack means we have modals/overlays
 public bool HasModalDialog()
 {
-    return Application.RunStack.Count > 1 
+    return Application.SessionStack.Count > 1 
         && Application.Current?.Modal == true;
 }
 ```
@@ -132,7 +132,7 @@ public static Toplevel? Top { get; }
 ```csharp
 /// <summary>
 /// Gets the currently active view with its own run loop.
-/// This is the view at the top of the <see cref="RunStack"/>.
+/// This is the view at the top of the <see cref="SessionStack"/>.
 /// </summary>
 /// <remarks>
 /// The current view receives all keyboard and mouse input and is 
@@ -180,7 +180,7 @@ If Terminal.Gui used the .NET pattern:
 
 ## Conclusion
 
-The proposed terminology (`Application.Current` and `Application.RunStack`) provides:
+The proposed terminology (`Application.Current` and `Application.SessionStack`) provides:
 - **Immediate clarity** without needing to read documentation
 - **Consistency** with established .NET patterns
 - **Better code readability** through self-documenting names
