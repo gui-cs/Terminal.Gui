@@ -84,6 +84,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Analyzers.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A3CBA89-EDAB-4F75-811E-FE81B13A4836}"
 	ProjectSection(SolutionItems) = preProject
+		codecov.yml = codecov.yml
 		Scripts\Run-LocalCoverage.ps1 = Scripts\Run-LocalCoverage.ps1
 		Tests\UnitTests\runsettings.xml = Tests\UnitTests\runsettings.xml
 	EndProjectSection
