@@ -13,10 +13,10 @@ internal sealed class Menu : View
 {
     public Menu ()
     {
-        if (Application.Top is { })
+        if (Application.Current is { })
         {
-            Application.Top.DrawComplete += Top_DrawComplete;
-            Application.Top.SizeChanging += Current_TerminalResized;
+            Application.Current.DrawComplete += Top_DrawComplete;
+            Application.Current.SizeChanging += Current_TerminalResized;
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
@@ -232,10 +232,10 @@ internal sealed class Menu : View
     {
         RemoveKeyBindingsHotKey (_barItems);
 
-        if (Application.Top is { })
+        if (Application.Current is { })
         {
-            Application.Top.DrawComplete -= Top_DrawComplete;
-            Application.Top.SizeChanging -= Current_TerminalResized;
+            Application.Current.DrawComplete -= Top_DrawComplete;
+            Application.Current.SizeChanging -= Current_TerminalResized;
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;

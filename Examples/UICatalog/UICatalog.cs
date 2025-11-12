@@ -242,7 +242,7 @@ public class UICatalog
 
     /// <summary>
     ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
-    ///     killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
+    ///     killed and the Scenario is run as though it were Application.Current. When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel ()
@@ -332,7 +332,7 @@ public class UICatalog
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
-        if (Application.Top == null)
+        if (Application.Current == null)
         {
             return;
         }

@@ -296,14 +296,14 @@ public interface IApplication
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="Top"/> as the parameter.
+    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="Current"/> as the parameter.
     ///     </para>
     /// </remarks>
     void RequestStop ();
 
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <param name="top">
-    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running <see cref="Top"/>.
+    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running <see cref="Current"/>.
     /// </param>
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
@@ -351,22 +351,22 @@ public interface IApplication
 
     #region Toplevel Management
 
-    /// <summary>Gets or sets the current Toplevel.</summary>
+    /// <summary>Gets or sets the currently active Toplevel.</summary>
     /// <remarks>
     ///     <para>
     ///         This is set by <see cref="Begin(Toplevel)"/> and cleared by <see cref="End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
-    Toplevel? Top { get; set; }
+    Toplevel? Current { get; set; }
 
-    /// <summary>Gets the stack of all Toplevels.</summary>
+    /// <summary>Gets the stack of all active Toplevel sessions.</summary>
     /// <remarks>
     ///     <para>
     ///         Toplevels are added to this stack by <see cref="Begin(Toplevel)"/> and removed by
     ///         <see cref="End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
-    ConcurrentStack<Toplevel> TopLevels { get; }
+    ConcurrentStack<Toplevel> SessionStack { get; }
 
     /// <summary>
     ///     Caches the Toplevel associated with the current Session.
@@ -428,7 +428,7 @@ public interface IApplication
     /// <remarks>
     ///     <para>
     ///         This is typically set to <see langword="true"/> when a View's <see cref="View.Frame"/> changes and that view
-    ///         has no SuperView (e.g. when <see cref="Top"/> is moved or resized).
+    ///         has no SuperView (e.g. when <see cref="Current"/> is moved or resized).
     ///     </para>
     ///     <para>
     ///         Automatically reset to <see langword="false"/> after <see cref="LayoutAndDraw"/> processes it.

@@ -27,7 +27,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         Toplevel top = new ();
-        Application.Top = top;
+        Application.Current = top;
         Application.Navigation = new ();
 
         View otherView = new ()
@@ -118,7 +118,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         Toplevel top = new ();
-        Application.Top = top;
+        Application.Current = top;
         Application.Navigation = new ();
 
         View otherView = new ()
@@ -150,8 +150,8 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         // Ensure the view is Visible
         view.Visible = true;
 
-        Application.Top.SetFocus ();
-        Assert.True (Application.Top!.HasFocus);
+        Application.Current.SetFocus ();
+        Assert.True (Application.Current!.HasFocus);
         Assert.True (top.HasFocus);
 
         // Start with the focus on our test view
@@ -282,7 +282,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         Toplevel top = new ();
 
-        Application.Top = top;
+        Application.Current = top;
         Application.Navigation = new ();
 
         View otherView = new ()

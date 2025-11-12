@@ -91,10 +91,10 @@ public class CanFocusTests
         Label label = new () { Text = "label" };
         View view = new () { Text = "view", CanFocus = true };
         Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (label, view);
+        Application.Current = new ();
+        Application.Current.Add (label, view);
 
-        Application.Top.SetFocus ();
+        Application.Current.SetFocus ();
         Assert.Equal (view, Application.Navigation.GetFocused ());
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
@@ -124,7 +124,7 @@ public class CanFocusTests
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 }

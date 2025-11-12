@@ -119,9 +119,9 @@ internal class MouseImpl : IMouse
             return;
         }
 
-        // if the mouse is outside the Application.Top or Application.Popover hierarchy, we don't want to
+        // if the mouse is outside the Application.Current or Application.Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (Application?.Top, deepestViewUnderMouse, true) && !View.IsInHierarchy (Application?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+        if (!View.IsInHierarchy (Application?.Current, deepestViewUnderMouse, true) && !View.IsInHierarchy (Application?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }

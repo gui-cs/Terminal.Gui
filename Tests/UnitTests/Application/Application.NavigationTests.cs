@@ -86,7 +86,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         Application.Navigation = new ();
 
-        Application.Top = new ()
+        Application.Current = new ()
         {
             Id = "top",
             CanFocus = true
@@ -103,18 +103,18 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             Id = "subView2",
             CanFocus = true
         };
-        Application.Top.Add (subView1, subView2);
-        Assert.False (Application.Top.HasFocus);
+        Application.Current.Add (subView1, subView2);
+        Assert.False (Application.Current.HasFocus);
 
-        Application.Top.SetFocus ();
+        Application.Current.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, Application.Navigation.GetFocused ());
 
         Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null);
         Assert.Equal (subView2, Application.Navigation.GetFocused ());
 
-        Application.Top.Dispose ();
-        Application.Top = null;
+        Application.Current.Dispose ();
+        Application.Current = null;
         Application.Navigation = null;
     }
 
@@ -123,7 +123,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         Application.Navigation = new ();
 
-        Application.Top = new ()
+        Application.Current = new ()
         {
             Id = "top",
             CanFocus = true
@@ -135,24 +135,24 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        Application.Top.Add (subView1);
-        Assert.False (Application.Top.HasFocus);
+        Application.Current.Add (subView1);
+        Assert.False (Application.Current.HasFocus);
 
-        Application.Top.SetFocus ();
+        Application.Current.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, Application.Navigation.GetFocused ());
 
         subView1.HasFocus = false;
         Assert.False (subView1.HasFocus);
-        Assert.True (Application.Top.HasFocus);
-        Assert.Equal (Application.Top, Application.Navigation.GetFocused ());
+        Assert.True (Application.Current.HasFocus);
+        Assert.Equal (Application.Current, Application.Navigation.GetFocused ());
 
-        Application.Top.HasFocus = false;
-        Assert.False (Application.Top.HasFocus);
+        Application.Current.HasFocus = false;
+        Assert.False (Application.Current.HasFocus);
         Assert.Null (Application.Navigation.GetFocused ());
 
-        Application.Top.Dispose ();
-        Application.Top = null;
+        Application.Current.Dispose ();
+        Application.Current = null;
         Application.Navigation = null;
     }
 }

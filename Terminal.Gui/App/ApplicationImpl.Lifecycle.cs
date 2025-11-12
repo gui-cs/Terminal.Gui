@@ -157,7 +157,7 @@ public partial class ApplicationImpl
         // e.g. see Issue #537
 
         // === 1. Stop all running toplevels ===
-        foreach (Toplevel? t in TopLevels)
+        foreach (Toplevel? t in SessionStack)
         {
             t!.Running = false;
         }
@@ -174,25 +174,25 @@ public partial class ApplicationImpl
         Popover = null;
 
         // === 3. Clean up toplevels ===
-        TopLevels.Clear ();
+        SessionStack.Clear ();
 
 #if DEBUG_IDISPOSABLE
 
-        // Don't dispose the Top. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Top is { })
+        // Don't dispose the Current. It's up to caller dispose it
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Current is { })
         {
-            Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
+            Debug.Assert (Current.WasDisposed, $"Title = {Current.Title}, Id = {Current.Id}");
 
             // If End wasn't called _CachedSessionTokenToplevel may be null
             if (CachedSessionTokenToplevel is { })
             {
                 Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
-                Debug.Assert (CachedSessionTokenToplevel == Top);
+                Debug.Assert (CachedSessionTokenToplevel == Current);
             }
         }
 #endif
 
-        Top = null;
+        Current = null;
         CachedSessionTokenToplevel = null;
 
         // === 4. Clean up driver ===

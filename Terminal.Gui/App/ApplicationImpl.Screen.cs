@@ -133,7 +133,7 @@ public partial class ApplicationImpl
 
         ScreenChanged?.Invoke (this, new (screen));
 
-        foreach (Toplevel t in TopLevels)
+        foreach (Toplevel t in SessionStack)
         {
             t.OnSizeChanging (new (screen.Size));
             t.SetNeedsLayout ();
@@ -147,7 +147,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. TopLevels];
+        List<View> tops = [.. SessionStack];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {

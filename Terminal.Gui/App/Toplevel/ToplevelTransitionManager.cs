@@ -15,7 +15,7 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
     /// <inheritdoc/>
     public void RaiseReadyEventIfNeeded ()
     {
-        Toplevel? top = Application.Top;
+        Toplevel? top = Application.Current;
 
         if (top != null && !_readiedTopLevels.Contains (top))
         {
@@ -30,13 +30,13 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
     /// <inheritdoc/>
     public void HandleTopMaybeChanging ()
     {
-        Toplevel? newTop = Application.Top;
+        Toplevel? newTop = Application.Current;
 
         if (_lastTop != null && _lastTop != newTop && newTop != null)
         {
             newTop.SetNeedsDraw ();
         }
 
-        _lastTop = Application.Top;
+        _lastTop = Application.Current;
     }
 }

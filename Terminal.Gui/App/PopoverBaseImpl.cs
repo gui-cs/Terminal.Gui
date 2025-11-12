@@ -107,7 +107,7 @@ public abstract class PopoverBaseImpl : View, IPopover
             // Whenever visible is changing to false, we need to reset the focus
             if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation?.GetFocused ()))
             {
-                Application.Navigation?.SetFocused (Application.Top?.MostFocused);
+                Application.Navigation?.SetFocused (Application.Current?.MostFocused);
             }
         }
 

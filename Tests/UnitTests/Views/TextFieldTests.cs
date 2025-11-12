@@ -84,7 +84,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedRender, output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Misérables", output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Theory (Skip = "Broke with ContextMenuv2")]
@@ -132,7 +132,7 @@ public class TextFieldTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (content, output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class TextFieldTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // All characters in "Enter text" should have the caption attribute
         DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
         DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -255,7 +255,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
         DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -1686,7 +1686,7 @@ Les Miśerables",
         {
             base.Before (methodUnderTest);
 
-            //Application.Top.Scheme = Colors.Schemes ["Base"];
+            //Application.Current.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
                 //                1         2         3 

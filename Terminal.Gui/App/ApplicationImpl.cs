@@ -96,12 +96,12 @@ public partial class ApplicationImpl : IApplication
     public ApplicationNavigation? Navigation { get; set; }
 
     /// <inheritdoc/>
-    public Toplevel? Top { get; set; }
+    public Toplevel? Current { get; set; }
 
-    // BUGBUG: Technically, this is not the full lst of TopLevels. There be dragons here, e.g. see how Toplevel.Id is used. What
+    // BUGBUG: Technically, this is not the full lst of sessions. There be dragons here, e.g. see how Toplevel.Id is used. What
 
     /// <inheritdoc/>
-    public ConcurrentStack<Toplevel> TopLevels { get; } = new ();
+    public ConcurrentStack<Toplevel> SessionStack { get; } = new ();
 
     /// <inheritdoc/>
     public Toplevel? CachedSessionTokenToplevel { get; set; }

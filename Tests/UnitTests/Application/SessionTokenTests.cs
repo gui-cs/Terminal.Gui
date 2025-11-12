@@ -26,7 +26,7 @@ public class SessionTokenTests
         Assert.NotNull (rs);
         Application.End (rs);
 
-        Assert.NotNull (Application.Top);
+        Assert.NotNull (Application.Current);
 
         // v2 does not use main loop, it uses MainLoop<T> and its internal
         //Assert.NotNull (Application.MainLoop);

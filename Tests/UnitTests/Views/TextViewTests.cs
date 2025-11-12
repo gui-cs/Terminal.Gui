@@ -109,7 +109,7 @@ public class TextViewTests
                 Assert.Equal (leftCol, _textView.LeftColumn);
             }
 
-            Application.Top.Remove (_textView);
+            Application.Current.Remove (_textView);
             Application.RequestStop ();
         }
     }

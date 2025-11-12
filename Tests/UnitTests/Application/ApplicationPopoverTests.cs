@@ -200,14 +200,14 @@ public class ApplicationPopoverTests
             // Arrange
             Assert.Null (Application.Popover);
             Application.Init (null, "fake");
-            Application.Top = new Toplevel ();
+            Application.Current = new Toplevel ();
             PopoverTestClass? popover = new ();
 
             // Act
             Application.Popover?.Register (popover);
 
             // Assert
-            Assert.Equal (Application.Top, popover.Toplevel);
+            Assert.Equal (Application.Current, popover.Toplevel);
         }
         finally
         {
@@ -223,7 +223,7 @@ public class ApplicationPopoverTests
             // Arrange
             Assert.Null (Application.Popover);
             Application.Init (null, "fake");
-            Application.Top = new Toplevel () { Id = "initialTop" };
+            Application.Current = new Toplevel () { Id = "initialTop" };
             PopoverTestClass? popover = new ();
             int keyDownEvents = 0;
             popover.KeyDown += (s, e) =>
@@ -237,7 +237,7 @@ public class ApplicationPopoverTests
             // Act
             Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
 
-            Application.Top = new Toplevel () { Id = "secondaryTop" };
+            Application.Current = new Toplevel () { Id = "secondaryTop" };
             Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
 
             // Test
@@ -270,7 +270,7 @@ public class ApplicationPopoverTests
             // Arrange
             Assert.Null (Application.Popover);
             Application.Init (null, "fake");
-            Application.Top = new ()
+            Application.Current = new ()
             {
                 Frame = new (0, 0, 10, 10),
                 Id = "top"
@@ -285,7 +285,7 @@ public class ApplicationPopoverTests
                 Height = 2,
             };
 
-            Application.Top.Add (view);
+            Application.Current.Add (view);
 
             popover = new ()
             {
@@ -318,7 +318,7 @@ public class ApplicationPopoverTests
         finally
         {
             popover?.Dispose ();
-            Application.Top?.Dispose ();
+            Application.Current?.Dispose ();
             Application.ResetState (true);
         }
     }

@@ -40,13 +40,13 @@ public partial class GuiTestContext
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
         evaluator ??= _ => true;
-        Toplevel? t = Application.Top;
+        Toplevel? t = Application.Current;
 
         HashSet<View> seen = new ();
 
         if (t == null)
         {
-            Fail ("Application.Top was null when trying to set focus");
+            Fail ("Application.Current was null when trying to set focus");
 
             return this;
         }

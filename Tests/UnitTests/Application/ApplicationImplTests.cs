@@ -194,7 +194,7 @@ public class ApplicationImplTests
                                              TimeSpan.FromMilliseconds (150),
                                              () =>
                                              {
-                                                 if (Application.Top != null)
+                                                 if (Application.Current != null)
                                                  {
                                                      Application.RequestStop ();
 
@@ -204,7 +204,7 @@ public class ApplicationImplTests
                                                  return false;
                                              }
                                             );
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         // Blocks until the timeout call is hit
 
@@ -213,10 +213,10 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (v2.RemoveTimeout (timeoutToken));
 
-        Assert.NotNull (Application.Top);
-        Application.Top?.Dispose ();
+        Assert.NotNull (Application.Current);
+        Application.Current?.Dispose ();
         v2.Shutdown ();
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         ApplicationImpl.ChangeInstance (orig);
     }
@@ -242,7 +242,7 @@ public class ApplicationImplTests
                                              {
                                                  Assert.True (top!.Running);
 
-                                                 if (Application.Top != null)
+                                                 if (Application.Current != null)
                                                  {
                                                      Application.RequestStop ();
 
@@ -264,8 +264,8 @@ public class ApplicationImplTests
         Assert.False (top!.Running);
 
         // BUGBUG: Shutdown sets Top to null, not End.
-        //Assert.Null (Application.Top);
-        Application.Top?.Dispose ();
+        //Assert.Null (Application.Current);
+        Application.Current?.Dispose ();
         v2.Shutdown ();
 
         ApplicationImpl.ChangeInstance (orig);
@@ -280,7 +280,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
         Assert.Null (Application.Driver);
 
         v2.Init (null, "fake");
@@ -315,7 +315,7 @@ public class ApplicationImplTests
         Assert.Equal (1, closedCount);
         Assert.Equal (1, unloadedCount);
 
-        Application.Top?.Dispose ();
+        Application.Current?.Dispose ();
         v2.Shutdown ();
         Assert.Equal (1, closedCount);
         Assert.Equal (1, unloadedCount);
@@ -332,7 +332,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
         Assert.Null (Application.Driver);
 
         v2.Init (null, "fake");
@@ -356,7 +356,7 @@ public class ApplicationImplTests
                                              {
                                                  Assert.True (top!.Running);
 
-                                                 if (Application.Top != null)
+                                                 if (Application.Current != null)
                                                  {
                                                      Application.RequestStop ();
 
@@ -379,7 +379,7 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (v2.RemoveTimeout (timeoutToken));
 
-        Application.Top?.Dispose ();
+        Application.Current?.Dispose ();
         v2.Shutdown ();
         Assert.Equal (1, closedCount);
         Assert.Equal (1, unloadedCount);
@@ -408,7 +408,7 @@ public class ApplicationImplTests
                                              {
                                                  Assert.True (top!.Running);
 
-                                                 if (Application.Top != null)
+                                                 if (Application.Current != null)
                                                  {
                                                      Application.RaiseKeyDownEvent (Application.QuitKey);
                                                  }
@@ -427,10 +427,10 @@ public class ApplicationImplTests
 
         Assert.False (top!.Running);
 
-        Assert.NotNull (Application.Top);
+        Assert.NotNull (Application.Current);
         top.Dispose ();
         v2.Shutdown ();
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         ApplicationImpl.ChangeInstance (orig);
     }
@@ -446,16 +446,16 @@ public class ApplicationImplTests
         v2.Init (null, "fake");
 
         v2.AddTimeout (TimeSpan.Zero, IdleExit);
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         // Blocks until the timeout call is hit
 
         v2.Run<Window> ();
 
-        Assert.NotNull (Application.Top);
-        Application.Top?.Dispose ();
+        Assert.NotNull (Application.Current);
+        Application.Current?.Dispose ();
         v2.Shutdown ();
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         ApplicationImpl.ChangeInstance (orig);
     }
@@ -500,7 +500,7 @@ public class ApplicationImplTests
 
         v2.Run (t);
 
-        Application.Top?.Dispose ();
+        Application.Current?.Dispose ();
         v2.Shutdown ();
 
         ApplicationImpl.ChangeInstance (orig);
@@ -511,7 +511,7 @@ public class ApplicationImplTests
 
     private bool IdleExit ()
     {
-        if (Application.Top != null)
+        if (Application.Current != null)
         {
             Application.RequestStop ();
 
@@ -583,7 +583,7 @@ public class ApplicationImplTests
                        () =>
                        {
                            // Run asynchronous logic inside Task.Run
-                           if (Application.Top != null)
+                           if (Application.Current != null)
                            {
                                b.NewKeyDownEvent (Key.Enter);
                                b.NewKeyUpEvent (Key.Enter);
@@ -592,7 +592,7 @@ public class ApplicationImplTests
                            return false;
                        });
 
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         var w = new Window
         {
@@ -603,10 +603,10 @@ public class ApplicationImplTests
         // Blocks until the timeout call is hit
         v2.Run (w);
 
-        Assert.NotNull (Application.Top);
-        Application.Top?.Dispose ();
+        Assert.NotNull (Application.Current);
+        Application.Current?.Dispose ();
         v2.Shutdown ();
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         ApplicationImpl.ChangeInstance (orig);
 
@@ -645,8 +645,8 @@ public class ApplicationImplTests
         Assert.Equal (v2.Initialized, Application.Initialized);
         Assert.Equal (v2.Popover, Application.Popover);
         Assert.Equal (v2.Navigation, Application.Navigation);
-        Assert.Equal (v2.Top, Application.Top);
-        Assert.Same (v2.TopLevels, Application.TopLevels);
+        Assert.Equal (v2.Top, Application.Current);
+        Assert.Same (v2.TopLevels, Application.SessionStack);
 
         // Shutdown should clean up instance fields
         v2.Shutdown ();

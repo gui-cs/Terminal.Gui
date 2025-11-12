@@ -141,11 +141,11 @@ internal class KeyboardImpl : IKeyboard
             return true;
         }
 
-        if (Application?.Top is null)
+        if (Application?.Current is null)
         {
-            if (Application?.TopLevels is { })
+            if (Application?.SessionStack is { })
             {
-                foreach (Toplevel topLevel in Application.TopLevels.ToList ())
+                foreach (Toplevel topLevel in Application.SessionStack.ToList ())
                 {
                     if (topLevel.NewKeyDownEvent (key))
                     {
@@ -161,7 +161,7 @@ internal class KeyboardImpl : IKeyboard
         }
         else
         {
-            if (Application.Top.NewKeyDownEvent (key))
+            if (Application.Current.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -194,9 +194,9 @@ internal class KeyboardImpl : IKeyboard
 
         // TODO: Add Popover support
 
-        if (Application?.TopLevels is { })
+        if (Application?.SessionStack is { })
         {
-            foreach (Toplevel topLevel in Application.TopLevels.ToList ())
+            foreach (Toplevel topLevel in Application.SessionStack.ToList ())
             {
                 if (topLevel.NewKeyUpEvent (key))
                 {

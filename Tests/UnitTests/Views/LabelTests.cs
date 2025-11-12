@@ -1071,7 +1071,7 @@ e
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.Current.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1130,7 +1130,7 @@ e
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.Current.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1203,10 +1203,10 @@ e
             CanFocus = true
         };
         Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (otherView, label, nextView);
+        Application.Current = new ();
+        Application.Current.Add (otherView, label, nextView);
 
-        Application.Top.SetFocus ();
+        Application.Current.SetFocus ();
         Assert.True (otherView.HasFocus);
 
         Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
@@ -1214,7 +1214,7 @@ e
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 
@@ -1225,18 +1225,18 @@ e
         Label label = new () { X = 0, Y = 1, Text = "_label" };
         View nextView = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true };
         Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (otherView, label, nextView);
-        Application.Top.Layout ();
+        Application.Current = new ();
+        Application.Current.Add (otherView, label, nextView);
+        Application.Current.Layout ();
 
-        Application.Top.SetFocus ();
+        Application.Current.SetFocus ();
 
         // click on label
         Application.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 
@@ -1255,8 +1255,8 @@ e
             CanFocus = true
         };
         Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (label, view);
+        Application.Current = new ();
+        Application.Current.Add (label, view);
 
         view.SetFocus ();
         Assert.True (label.CanFocus);
@@ -1269,7 +1269,7 @@ e
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 
@@ -1296,14 +1296,14 @@ e
             CanFocus = true
         };
 
-        Application.Top = new ()
+        Application.Current = new ()
         {
             Width = 10,
             Height = 10
         };
-        Application.Top.Add (label, otherView);
-        Application.Top.SetFocus ();
-        Application.Top.Layout ();
+        Application.Current.Add (label, otherView);
+        Application.Current.SetFocus ();
+        Application.Current.Layout ();
 
         Assert.True (label.CanFocus);
         Assert.True (label.HasFocus);
@@ -1323,7 +1323,7 @@ e
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 

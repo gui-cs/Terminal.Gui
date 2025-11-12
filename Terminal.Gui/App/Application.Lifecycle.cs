@@ -16,7 +16,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
     ///     This function loads the right <see cref="IDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
-    ///     assigns it to <see cref="Top"/>
+    ///     assigns it to <see cref="Current"/>
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after

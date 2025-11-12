@@ -142,7 +142,7 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
 
                                                 top.Add (
                                                          new View ()
@@ -152,7 +152,7 @@ public class MenuBarv2Tests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
@@ -176,7 +176,7 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
 
                                                 top.Add (
                                                          new View ()
@@ -186,7 +186,7 @@ public class MenuBarv2Tests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
@@ -262,10 +262,10 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
 
                                                 // Call EnableForDesign
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
                                                 bool result = menuBar.EnableForDesign (ref top);
 
                                                 // Should return true
@@ -296,9 +296,9 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .ScreenShot ("MenuBar initial state", _out)
@@ -334,7 +334,7 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
 
                                                 top.Add (
                                                          new View ()
@@ -344,7 +344,7 @@ public class MenuBarv2Tests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
@@ -376,9 +376,9 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel? toplevel = Application.Top;
+                                                Toplevel? toplevel = Application.Current;
                                                 menuBar.EnableForDesign (ref toplevel!);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
@@ -405,7 +405,7 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
 
                                                 top.Add (
                                                          new View ()
@@ -415,18 +415,18 @@ public class MenuBarv2Tests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)
                                      .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
-                                     .AssertTrue (Application.Top!.Running)
+                                     .AssertTrue (Application.Current!.Running)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertTrue (Application.Top!.Running);
+                                     .AssertTrue (Application.Current!.Running);
     }
 
     [Theory]
@@ -439,7 +439,7 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
 
                                                 top.Add (
                                                          new View ()
@@ -456,7 +456,7 @@ public class MenuBarv2Tests
                                                     item.Key = Key.Empty;
                                                 }
 
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
@@ -466,7 +466,7 @@ public class MenuBarv2Tests
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (Application.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertTrue (Application.Top!.Running);
+                                     .AssertTrue (Application.Current!.Running);
     }
 
     [Theory]
@@ -492,9 +492,9 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .Add (testView)
                                      .WaitIteration ()
@@ -526,9 +526,9 @@ public class MenuBarv2Tests
                                      .Then (() =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Top!;
+                                                Toplevel top = Application.Current!;
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Top!.Add (menuBar);
+                                                Application.Current!.Add (menuBar);
                                             })
                                      .Add (testView)
                                      .WaitIteration ()

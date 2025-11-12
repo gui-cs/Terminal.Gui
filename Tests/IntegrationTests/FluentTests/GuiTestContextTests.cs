@@ -43,7 +43,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     public void With_New_A_Runs (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
-        Assert.True (Application.Top!.Running);
+        Assert.True (Application.Current!.Running);
         Assert.NotEqual (Rectangle.Empty, Application.Screen);
     }
 
