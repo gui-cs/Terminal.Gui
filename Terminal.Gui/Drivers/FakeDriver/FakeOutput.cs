@@ -13,12 +13,6 @@ public class FakeOutput : OutputBase, IOutput
     private int _cursorTop;
     private Size _consoleSize = new (80, 25);
 
-    public FakeOutput ()
-    {
-        LastBuffer = new OutputBuffer ();
-        LastBuffer.SetSize (80, 25);
-    }
-
     /// <summary>
     /// 
     /// </summary>
