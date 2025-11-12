@@ -627,8 +627,8 @@ public class ApplicationImplTests
         Assert.False (v2.Initialized);
         Assert.Null (v2.Popover);
         Assert.Null (v2.Navigation);
-        Assert.Null (v2.Top);
-        Assert.Empty (v2.TopLevels);
+        Assert.Null (v2.Current);
+        Assert.Empty (v2.SessionStack);
 
         // Init should populate instance fields
         v2.Init (null, "fake");
@@ -638,15 +638,15 @@ public class ApplicationImplTests
         Assert.True (v2.Initialized);
         Assert.NotNull (v2.Popover);
         Assert.NotNull (v2.Navigation);
-        Assert.Null (v2.Top); // Top is still null until Run
+        Assert.Null (v2.Current); // Top is still null until Run
 
         // Verify that static Application properties delegate to instance
         Assert.Equal (v2.Driver, Application.Driver);
         Assert.Equal (v2.Initialized, Application.Initialized);
         Assert.Equal (v2.Popover, Application.Popover);
         Assert.Equal (v2.Navigation, Application.Navigation);
-        Assert.Equal (v2.Top, Application.Current);
-        Assert.Same (v2.TopLevels, Application.SessionStack);
+        Assert.Equal (v2.Current, Application.Current);
+        Assert.Same (v2.SessionStack, Application.SessionStack);
 
         // Shutdown should clean up instance fields
         v2.Shutdown ();
@@ -655,8 +655,8 @@ public class ApplicationImplTests
         Assert.False (v2.Initialized);
         Assert.Null (v2.Popover);
         Assert.Null (v2.Navigation);
-        Assert.Null (v2.Top);
-        Assert.Empty (v2.TopLevels);
+        Assert.Null (v2.Current);
+        Assert.Empty (v2.SessionStack);
 
         ApplicationImpl.ChangeInstance (orig);
     }
