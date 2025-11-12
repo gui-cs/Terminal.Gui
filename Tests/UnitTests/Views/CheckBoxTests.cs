@@ -321,24 +321,24 @@ public class CheckBoxTests (ITestOutputHelper output)
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
     [InlineData (CheckState.None)]
-    public void Selected_Handle_Event_Does_Not_Prevent_Change (CheckState initialState)
+    public void Activated_Handle_Event_Prevents_Change (CheckState initialState)
     {
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
 
         ckb.CheckedState = initialState;
 
-        ckb.Selecting += OnSelecting;
+        ckb.Selecting += OnActivating;
 
         Assert.Equal (initialState, ckb.CheckedState);
         bool? ret = ckb.InvokeCommand (Command.Select);
         Assert.True (ret);
         Assert.True (checkedInvoked);
-        Assert.NotEqual (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.CheckedState);
 
         return;
 
-        void OnSelecting (object sender, CommandEventArgs e)
+        void OnActivating (object sender, CommandEventArgs e)
         {
             checkedInvoked = true;
             e.Handled = true;

@@ -11,7 +11,7 @@ public record struct MouseBinding : IInputBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
-    /// <param name="mouseFlags">The mouse flags that trigger this binding.</param>
+    /// <param name="mouseFlags">The mouse flags that triggered this binding.</param>
     public MouseBinding (Command [] commands, MouseFlags mouseFlags)
     {
         Commands = commands;
@@ -20,6 +20,16 @@ public record struct MouseBinding : IInputBinding
         {
             Flags = mouseFlags
         };
+    }
+
+
+    /// <summary>Initializes a new instance.</summary>
+    /// <param name="commands">The commands this mouse binding will invoke.</param>
+    /// <param name="args">The mouse event that triggered this binding.</param>
+    public MouseBinding (Command [] commands, MouseEventArgs args)
+    {
+        Commands = commands;
+        MouseEventArgs = args;
     }
 
     /// <summary>The commands this binding will invoke.</summary>
