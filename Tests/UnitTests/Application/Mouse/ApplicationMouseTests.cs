@@ -484,7 +484,7 @@ public class ApplicationMouseTests
     [InlineData (MouseState.PressedOutside)]
     public void RaiseMouseEvent_ButtonClicked_Raises_Activating_Once (MouseState states)
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (driverName: "fake");
 
         Application.Top = new Toplevel ()
         {

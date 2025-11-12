@@ -139,7 +139,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     public void WantContinuousButtonPressed_True_Clicked_Releases_Grab (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (driverName: "fake");
         Application.Top = new Toplevel ()
         {
             Width = 10,
@@ -202,7 +202,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_ButtonClick_Does_Not_Raise_Accept (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (driverName: "fake");
         Application.Top = new Toplevel ()
         {
             Width = 10,

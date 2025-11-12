@@ -213,7 +213,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
             Height = 5
         };
 
-        view.MouseClick += (s, e) => clickCount++;
+        view.MouseEvent += (s, e) => clickCount++;
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view);
@@ -240,7 +240,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
             Height = 5
         };
 
-        view.MouseClick += (s, e) => clickCount++;
+        view.MouseEvent += (s, e) => clickCount++;
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)

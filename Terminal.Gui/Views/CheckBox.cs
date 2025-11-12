@@ -31,12 +31,12 @@ public class CheckBox : View
         // Activate (Space key and single-click) - Raise Activate event and Advance
         // - DO NOT raise Accept
         // - DO NOT SetFocus
-        AddCommand (Command.Select, ActivateAndAdvance);
+        AddCommand (Command.Activate, ActivateAndAdvance);
 
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
         // The default Accept handler does that.
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -47,7 +47,7 @@ public class CheckBox : View
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         // Invoke Activate on ourselves
-        if (InvokeCommand (Command.Select, args.Context) is true)
+        if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Default behavior for View is to set Focus on hotkey. We need to return
             // true here to indicate Activate was handled. That will prevent the default
@@ -60,7 +60,7 @@ public class CheckBox : View
 
     private bool? ActivateAndAdvance (ICommandContext? commandContext)
     {
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }

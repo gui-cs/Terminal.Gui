@@ -145,7 +145,6 @@ public class CheckBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void AllowCheckStateNone_Get_Set ()
     {
         var checkBox = new CheckBox { Text = "Check this out 你" };
@@ -169,8 +168,6 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         checkBox.AllowCheckStateNone = false;
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
-
-        Application.ResetState();
     }
 
     [Fact]
@@ -307,7 +304,6 @@ public class CheckBoxTests (ITestOutputHelper output)
     #region Mouse Tests
 
     [Fact]
-    [SetupFakeDriver]
     public void Mouse_Click_Selects ()
     {
         var checkBox = new CheckBox { Text = "_Checkbox" };
@@ -350,7 +346,6 @@ public class CheckBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void Mouse_DoubleClick_Does_Not_Advance_And_Accepts ()
     {
         var checkBox = new CheckBox { Text = "_Checkbox" };
@@ -622,7 +617,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         ckb.CheckedState = initialState;
 
-        ckb.Selecting += OnActivating;
+        ckb.Activating += OnActivating;
 
         Assert.Equal (initialState, ckb.CheckedState);
         bool? ret = ckb.InvokeCommand (Command.Activate);

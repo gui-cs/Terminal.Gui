@@ -271,7 +271,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (driverName: "fake");
         Application.Top = new Toplevel ()
         {
             Width = 10,
