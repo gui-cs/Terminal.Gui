@@ -1,4 +1,6 @@
-﻿namespace UnitTests_Parallelizable.DrawingTests;
+﻿using System.Text;
+
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class CellTests
 {
@@ -7,9 +9,28 @@ public class CellTests
     {
         var c = new Cell ();
         Assert.True (c is { });
+        Assert.Empty (c.Runes);
         Assert.Null (c.Attribute);
         Assert.False (c.IsDirty);
         Assert.Null (c.Grapheme);
+    }
+
+    [Theory]
+    [InlineData (null, new uint [] { })]
+    [InlineData ("", new uint [] { })]
+    [InlineData ("a", new uint [] { 0x0061 })]
+    [InlineData ("👩‍❤️‍💋‍👨", new uint [] { 0x1F469, 0x200D, 0x2764, 0xFE0F, 0x200D, 0x1F48B, 0x200D, 0x1F468 })]
+    public void Runes_From_Grapheme (string grapheme, uint [] expected)
+    {
+        // Arrange
+        var c = new Cell { Grapheme = grapheme };
+
+        // Act
+        Rune [] runes = expected.Select (u => new Rune (u)).ToArray ();
+
+        // Assert
+        Assert.Equal (grapheme, c.Grapheme);
+        Assert.Equal (runes, c.Runes);
     }
 
     [Fact]

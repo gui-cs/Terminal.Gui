@@ -44,7 +44,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, st
     ///     In the case where <see cref="Grapheme"/> has more than one rune it is a combining sequence that is normalized to a
     ///     single Text which may occupies 1 or 2 columns.
     /// </remarks>
-    public IReadOnlyList<Rune> Runes => Grapheme.EnumerateRunes ().ToList ();
+    public IReadOnlyList<Rune> Runes => string.IsNullOrEmpty (Grapheme) ? [] : Grapheme.EnumerateRunes ().ToList ();
 
     /// <inheritdoc/>
     public override string ToString ()
