@@ -151,18 +151,15 @@ public class Dialogs : Scenario
         };
         frame.Add (label);
 
-        // Add hotkeys
-        var labels = Enum.GetNames<Alignment> ().Select (n => n = "_" + n);
-        var alignmentGroup = new RadioGroup
+        OptionSelector<Alignment> alignmentOptionSelector = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = labels.ToArray (),
             Title = "Ali_gn",
-            BorderStyle = LineStyle.Dashed
+            AssignHotKeys = true
         };
-        frame.Add (alignmentGroup);
-        alignmentGroup.SelectedItem = labels.ToList ().IndexOf ("_" + Dialog.DefaultButtonAlignment.ToString ());
+        frame.Add (alignmentOptionSelector);
+        alignmentOptionSelector.Value = Dialog.DefaultButtonAlignment;
 
         frame.ValidatePosDim = true;
 
@@ -192,7 +189,7 @@ public class Dialogs : Scenario
                                                                       titleEdit,
                                                                       numButtonsEdit,
                                                                       glyphsNotWords,
-                                                                      alignmentGroup,
+                                                                      alignmentOptionSelector,
                                                                       buttonPressedLabel
                                                                      );
                                        Application.Run (dlg);
@@ -216,7 +213,7 @@ public class Dialogs : Scenario
         TextField titleEdit,
         TextField numButtonsEdit,
         CheckBox glyphsNotWords,
-        RadioGroup alignmentRadioGroup,
+        OptionSelector alignmentGroup,
         Label buttonPressedLabel
     )
     {
@@ -269,7 +266,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring (1)),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [1..]),
 
                 Buttons = buttons.ToArray ()
             };
