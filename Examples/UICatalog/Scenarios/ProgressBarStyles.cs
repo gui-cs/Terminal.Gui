@@ -132,15 +132,15 @@ public class ProgressBarStyles : Scenario
         List<ProgressBarFormat> pbFormatEnum =
             Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
 
-        var rbPBFormat = new RadioGroup
+        OptionSelector<ProgressBarFormat> osPbFormat = new ()
         {
             BorderStyle = LineStyle.Single,
             Title = "ProgressBarFormat",
             X = Pos.Center (),
             Y = Pos.Align (Alignment.Start),
-            RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
+            AssignHotKeys = true
         };
-        container.Add (rbPBFormat);
+        container.Add (osPbFormat);
 
         var button = new Button
         {
@@ -161,7 +161,7 @@ public class ProgressBarStyles : Scenario
         };
         container.Add (blocksPB);
 
-        rbPBFormat.SelectedItem = (int)blocksPB.ProgressBarFormat;
+        osPbFormat.Value = blocksPB.ProgressBarFormat;
 
         var continuousPB = new ProgressBar
         {
@@ -256,13 +256,19 @@ public class ProgressBarStyles : Scenario
                                       };
 
 
-        rbPBFormat.SelectedItemChanged += (s, e) =>
-                                          {
-                                              blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                              continuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                              marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                              marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                          };
+        osPbFormat.ValueChanged += (s, e) =>
+                                   {
+                                       if (e.Value is null)
+                                       {
+                                           return;
+                                       }
+
+                                       blocksPB.ProgressBarFormat = e.Value.Value;
+                                       continuousPB.ProgressBarFormat = e.Value.Value;
+                                       marqueesBlocksPB.ProgressBarFormat = e.Value.Value;
+                                       marqueesContinuousPB.ProgressBarFormat = e.Value.Value;
+
+                                   };
 
         ckbBidirectional.CheckedStateChanging += (s, e) =>
                                    {
