@@ -1,21 +1,12 @@
-﻿namespace UnitTests_Parallelizable.DriverTests;
+namespace UnitTests_Parallelizable.DriverTests;
 
 public class WindowsKeyConverterTests
 {
     private readonly WindowsKeyConverter _converter = new ();
 
-    public WindowsKeyConverterTests()
-    {
-        // Skip all tests in this class if not on Windows
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new SkipException("WindowsKeyConverter tests require Windows platform");
-        }
-    }
-
     #region ToKey Tests - Null/Empty
 
-    [Fact]
+    [SkipOnNonWindowsFact]
     public void ToKey_NullKey_ReturnsEmpty ()
     {
         // Arrange
@@ -32,7 +23,7 @@ public class WindowsKeyConverterTests
 
     #region ToKey Tests - OEM Keys
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (';', ConsoleKey.Oem1, false, (KeyCode)';')]
     [InlineData (':', ConsoleKey.Oem1, true, (KeyCode)':')]
     [InlineData ('/', ConsoleKey.Oem2, false, (KeyCode)'/')]
@@ -66,7 +57,7 @@ public class WindowsKeyConverterTests
 
     #region CapsLock/NumLock Tests
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('a', ConsoleKey.A, false, true)] // CapsLock on, no shift
     [InlineData ('A', ConsoleKey.A, true, true)] // CapsLock on, shift (should be lowercase from mapping)
     public void ToKey_WithCapsLock_ReturnsExpectedKeyCode (
@@ -99,7 +90,7 @@ public class WindowsKeyConverterTests
 
     #region ToKey Tests - Modifiers
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('a', ConsoleKey.A, false, false, true, KeyCode.A | KeyCode.CtrlMask)] // Ctrl+A
     [InlineData ('A', ConsoleKey.A, true, false, true, KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask)] // Ctrl+Shift+A (Windows keeps ShiftMask)
     [InlineData ('a', ConsoleKey.A, false, true, false, KeyCode.A | KeyCode.AltMask)] // Alt+A
@@ -128,7 +119,7 @@ public class WindowsKeyConverterTests
 
     #region ToKeyInfo Tests - Scan Codes
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.A, 30)]
     [InlineData (KeyCode.Enter, 28)]
     [InlineData (KeyCode.Esc, 1)]
@@ -153,7 +144,7 @@ public class WindowsKeyConverterTests
 
     #region ToKeyInfo Tests - Modifiers
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.A | KeyCode.ShiftMask, WindowsConsole.ControlKeyState.ShiftPressed)]
     [InlineData (KeyCode.A | KeyCode.CtrlMask, WindowsConsole.ControlKeyState.LeftControlPressed)]
     [InlineData (KeyCode.A | KeyCode.AltMask, WindowsConsole.ControlKeyState.LeftAltPressed)]
@@ -184,7 +175,7 @@ public class WindowsKeyConverterTests
 
     #region ToKey Tests - Basic Characters
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('a', ConsoleKey.A, false, false, false, KeyCode.A)] // lowercase a
     [InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)] // uppercase A
     [InlineData ('z', ConsoleKey.Z, false, false, false, KeyCode.Z)]
@@ -208,7 +199,7 @@ public class WindowsKeyConverterTests
         Assert.Equal (expectedKeyCode, result.KeyCode);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('0', ConsoleKey.D0, false, false, false, KeyCode.D0)]
     [InlineData ('1', ConsoleKey.D1, false, false, false, KeyCode.D1)]
     [InlineData ('9', ConsoleKey.D9, false, false, false, KeyCode.D9)]
@@ -235,7 +226,7 @@ public class WindowsKeyConverterTests
 
     #region ToKey Tests - Special Keys
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (ConsoleKey.Enter, KeyCode.Enter)]
     [InlineData (ConsoleKey.Escape, KeyCode.Esc)]
     [InlineData (ConsoleKey.Tab, KeyCode.Tab)]
@@ -270,7 +261,7 @@ public class WindowsKeyConverterTests
         Assert.Equal (expectedKeyCode, result.KeyCode);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (ConsoleKey.F1, KeyCode.F1)]
     [InlineData (ConsoleKey.F2, KeyCode.F2)]
     [InlineData (ConsoleKey.F3, KeyCode.F3)]
@@ -299,7 +290,7 @@ public class WindowsKeyConverterTests
 
     #region ToKey Tests - VK_PACKET (Unicode/IME)
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('中')] // Chinese character
     [InlineData ('日')] // Japanese character
     [InlineData ('한')] // Korean character
@@ -318,7 +309,7 @@ public class WindowsKeyConverterTests
         Assert.Equal ((KeyCode)unicodeChar, result.KeyCode);
     }
 
-    [Fact]
+    [SkipOnNonWindowsFact]
     public void ToKey_VKPacket_ZeroChar_ReturnsNull ()
     {
         // Arrange
@@ -331,7 +322,7 @@ public class WindowsKeyConverterTests
         Assert.Equal (KeyCode.Null, result.KeyCode);
     }
 
-    [Fact]
+    [SkipOnNonWindowsFact]
     public void ToKey_VKPacket_SurrogatePair_DocumentsCurrentLimitation ()
     {
         // Emoji '😀' (U+1F600) requires a surrogate pair: High=U+D83D, Low=U+DE00
@@ -373,7 +364,7 @@ public class WindowsKeyConverterTests
 
     #region ToKey Tests - NumPad
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('0', ConsoleKey.NumPad0, KeyCode.D0)]
     [InlineData ('1', ConsoleKey.NumPad1, KeyCode.D1)]
     [InlineData ('5', ConsoleKey.NumPad5, KeyCode.D5)]
@@ -394,7 +385,7 @@ public class WindowsKeyConverterTests
         Assert.Equal (expectedKeyCode, result.KeyCode);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('*', ConsoleKey.Multiply, (KeyCode)'*')]
     [InlineData ('+', ConsoleKey.Add, (KeyCode)'+')]
     [InlineData ('-', ConsoleKey.Subtract, (KeyCode)'-')]
@@ -420,7 +411,7 @@ public class WindowsKeyConverterTests
 
     #region ToKeyInfo Tests - Basic Keys
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.A, ConsoleKey.A, 'a')]
     [InlineData (KeyCode.A | KeyCode.ShiftMask, ConsoleKey.A, 'A')]
     [InlineData (KeyCode.Z, ConsoleKey.Z, 'z')]
@@ -445,7 +436,7 @@ public class WindowsKeyConverterTests
         Assert.Equal ((ushort)1, result.KeyEvent.wRepeatCount);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.D0, ConsoleKey.D0, '0')]
     [InlineData (KeyCode.D1, ConsoleKey.D1, '1')]
     [InlineData (KeyCode.D9, ConsoleKey.D9, '9')]
@@ -470,7 +461,7 @@ public class WindowsKeyConverterTests
 
     #region ToKeyInfo Tests - Special Keys
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.Enter, ConsoleKey.Enter, '\r')]
     [InlineData (KeyCode.Esc, ConsoleKey.Escape, '\u001B')]
     [InlineData (KeyCode.Tab, ConsoleKey.Tab, '\t')]
@@ -493,7 +484,7 @@ public class WindowsKeyConverterTests
         Assert.Equal (expectedChar, result.KeyEvent.UnicodeChar);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.Delete, ConsoleKey.Delete)]
     [InlineData (KeyCode.Insert, ConsoleKey.Insert)]
     [InlineData (KeyCode.Home, ConsoleKey.Home)]
@@ -516,7 +507,7 @@ public class WindowsKeyConverterTests
         Assert.Equal ((VK)expectedConsoleKey, result.KeyEvent.wVirtualKeyCode);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.F1, ConsoleKey.F1)]
     [InlineData (KeyCode.F5, ConsoleKey.F5)]
     [InlineData (KeyCode.F10, ConsoleKey.F10)]
@@ -537,7 +528,7 @@ public class WindowsKeyConverterTests
 
     #region Round-Trip Tests
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData (KeyCode.A)]
     [InlineData (KeyCode.A | KeyCode.ShiftMask)]
     [InlineData (KeyCode.A | KeyCode.CtrlMask)]
@@ -560,7 +551,7 @@ public class WindowsKeyConverterTests
         Assert.Equal (originalKeyCode, roundTrippedKey.KeyCode);
     }
 
-    [Theory]
+    [SkipOnNonWindowsTheory]
     [InlineData ('a', ConsoleKey.A, false, false, false)]
     [InlineData ('A', ConsoleKey.A, true, false, false)]
     [InlineData ('a', ConsoleKey.A, false, false, true)] // Ctrl+A
