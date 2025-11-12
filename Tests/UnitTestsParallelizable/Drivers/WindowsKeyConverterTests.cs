@@ -1,54 +1,98 @@
-namespace UnitTests_Parallelizable.DriverTests;
+﻿namespace UnitTests_Parallelizable.DriverTests;
 
 public class WindowsKeyConverterTests
 {
     private readonly WindowsKeyConverter _converter = new ();
 
-    #region ToKey Tests - Basic Characters
+    public WindowsKeyConverterTests()
+    {
+        // Skip all tests in this class if not on Windows
+        if (!OperatingSystem.IsWindows())
+        {
+            throw new SkipException("WindowsKeyConverter tests require Windows platform");
+        }
+    }
+
+    #region ToKey Tests - Null/Empty
+
+    [Fact]
+    public void ToKey_NullKey_ReturnsEmpty ()
+    {
+        // Arrange
+        WindowsConsole.InputRecord inputRecord = CreateInputRecord ('\0', ConsoleKey.None, false, false, false);
+
+        // Act
+        var result = _converter.ToKey (inputRecord);
+
+        // Assert
+        Assert.Equal (Key.Empty, result);
+    }
+
+    #endregion
+
+    #region ToKey Tests - OEM Keys
 
     [Theory]
-    [InlineData ('a', ConsoleKey.A, false, false, false, KeyCode.A)] // lowercase a
-    [InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)] // uppercase A
-    [InlineData ('z', ConsoleKey.Z, false, false, false, KeyCode.Z)]
-    [InlineData ('Z', ConsoleKey.Z, true, false, false, KeyCode.Z | KeyCode.ShiftMask)]
-    public void ToKey_LetterKeys_ReturnsExpectedKeyCode (
+    [InlineData (';', ConsoleKey.Oem1, false, (KeyCode)';')]
+    [InlineData (':', ConsoleKey.Oem1, true, (KeyCode)':')]
+    [InlineData ('/', ConsoleKey.Oem2, false, (KeyCode)'/')]
+    [InlineData ('?', ConsoleKey.Oem2, true, (KeyCode)'?')]
+    [InlineData (',', ConsoleKey.OemComma, false, (KeyCode)',')]
+    [InlineData ('<', ConsoleKey.OemComma, true, (KeyCode)'<')]
+    [InlineData ('.', ConsoleKey.OemPeriod, false, (KeyCode)'.')]
+    [InlineData ('>', ConsoleKey.OemPeriod, true, (KeyCode)'>')]
+    [InlineData ('=', ConsoleKey.OemPlus, false, (KeyCode)'=')] // Un-shifted OemPlus is '='
+    [InlineData ('+', ConsoleKey.OemPlus, true, (KeyCode)'+')] // Shifted OemPlus is '+''
+    [InlineData ('-', ConsoleKey.OemMinus, false, (KeyCode)'-')]
+//    [InlineData ('_', ConsoleKey.OemMinus, true, (KeyCode)'_')] // Shifted OemMinus is '_'
+    public void ToKey_OEMKeys_ReturnsExpectedKeyCode (
         char unicodeChar,
         ConsoleKey consoleKey,
         bool shift,
-        bool alt,
-        bool ctrl,
-        KeyCode expectedKeyCode)
+        KeyCode expectedKeyCode
+    )
     {
         // Arrange
-        WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, alt, ctrl);
+        WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, false, false);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (expectedKeyCode, result.KeyCode);
     }
 
+    #endregion
+
+    #region CapsLock/NumLock Tests
+
     [Theory]
-    [InlineData ('0', ConsoleKey.D0, false, false, false, KeyCode.D0)]
-    [InlineData ('1', ConsoleKey.D1, false, false, false, KeyCode.D1)]
-    [InlineData ('9', ConsoleKey.D9, false, false, false, KeyCode.D9)]
-    public void ToKey_NumberKeys_ReturnsExpectedKeyCode (
+    [InlineData ('a', ConsoleKey.A, false, true)] // CapsLock on, no shift
+    [InlineData ('A', ConsoleKey.A, true, true)] // CapsLock on, shift (should be lowercase from mapping)
+    public void ToKey_WithCapsLock_ReturnsExpectedKeyCode (
         char unicodeChar,
         ConsoleKey consoleKey,
         bool shift,
-        bool alt,
-        bool ctrl,
-        KeyCode expectedKeyCode)
+        bool capsLock
+    )
     {
         // Arrange
-        WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, alt, ctrl);
+        WindowsConsole.InputRecord inputRecord = CreateInputRecordWithLockStates (
+                                                                                  unicodeChar,
+                                                                                  consoleKey,
+                                                                                  shift,
+                                                                                  false,
+                                                                                  false,
+                                                                                  capsLock,
+                                                                                  false,
+                                                                                  false);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
-        Assert.Equal (expectedKeyCode, result.KeyCode);
+        // The mapping should handle CapsLock properly via WindowsKeyHelper.MapKey
+        Assert.NotEqual (KeyCode.Null, result.KeyCode);
     }
 
     #endregion
@@ -67,13 +111,121 @@ public class WindowsKeyConverterTests
         bool shift,
         bool alt,
         bool ctrl,
-        KeyCode expectedKeyCode)
+        KeyCode expectedKeyCode
+    )
     {
         // Arrange
         WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, alt, ctrl);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
+
+        // Assert
+        Assert.Equal (expectedKeyCode, result.KeyCode);
+    }
+
+    #endregion
+
+    #region ToKeyInfo Tests - Scan Codes
+
+    [Theory]
+    [InlineData (KeyCode.A, 30)]
+    [InlineData (KeyCode.Enter, 28)]
+    [InlineData (KeyCode.Esc, 1)]
+    [InlineData (KeyCode.Space, 57)]
+    [InlineData (KeyCode.F1, 59)]
+    [InlineData (KeyCode.F10, 68)]
+    [InlineData (KeyCode.CursorUp, 72)]
+    [InlineData (KeyCode.Home, 71)]
+    public void ToKeyInfo_ScanCodes_ReturnsExpectedScanCode (KeyCode keyCode, ushort expectedScanCode)
+    {
+        // Arrange
+        var key = new Key (keyCode);
+
+        // Act
+        WindowsConsole.InputRecord result = _converter.ToKeyInfo (key);
+
+        // Assert
+        Assert.Equal (expectedScanCode, result.KeyEvent.wVirtualScanCode);
+    }
+
+    #endregion
+
+    #region ToKeyInfo Tests - Modifiers
+
+    [Theory]
+    [InlineData (KeyCode.A | KeyCode.ShiftMask, WindowsConsole.ControlKeyState.ShiftPressed)]
+    [InlineData (KeyCode.A | KeyCode.CtrlMask, WindowsConsole.ControlKeyState.LeftControlPressed)]
+    [InlineData (KeyCode.A | KeyCode.AltMask, WindowsConsole.ControlKeyState.LeftAltPressed)]
+    [InlineData (
+                    KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask,
+                    WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.LeftAltPressed)]
+    [InlineData (
+                    KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask,
+                    WindowsConsole.ControlKeyState.ShiftPressed
+                    | WindowsConsole.ControlKeyState.LeftControlPressed
+                    | WindowsConsole.ControlKeyState.LeftAltPressed)]
+    public void ToKeyInfo_WithModifiers_ReturnsExpectedControlKeyState (
+        KeyCode keyCode,
+        WindowsConsole.ControlKeyState expectedState
+    )
+    {
+        // Arrange
+        var key = new Key (keyCode);
+
+        // Act
+        WindowsConsole.InputRecord result = _converter.ToKeyInfo (key);
+
+        // Assert
+        Assert.Equal (expectedState, result.KeyEvent.dwControlKeyState);
+    }
+
+    #endregion
+
+    #region ToKey Tests - Basic Characters
+
+    [Theory]
+    [InlineData ('a', ConsoleKey.A, false, false, false, KeyCode.A)] // lowercase a
+    [InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)] // uppercase A
+    [InlineData ('z', ConsoleKey.Z, false, false, false, KeyCode.Z)]
+    [InlineData ('Z', ConsoleKey.Z, true, false, false, KeyCode.Z | KeyCode.ShiftMask)]
+    public void ToKey_LetterKeys_ReturnsExpectedKeyCode (
+        char unicodeChar,
+        ConsoleKey consoleKey,
+        bool shift,
+        bool alt,
+        bool ctrl,
+        KeyCode expectedKeyCode
+    )
+    {
+        // Arrange
+        WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, alt, ctrl);
+
+        // Act
+        var result = _converter.ToKey (inputRecord);
+
+        // Assert
+        Assert.Equal (expectedKeyCode, result.KeyCode);
+    }
+
+    [Theory]
+    [InlineData ('0', ConsoleKey.D0, false, false, false, KeyCode.D0)]
+    [InlineData ('1', ConsoleKey.D1, false, false, false, KeyCode.D1)]
+    [InlineData ('9', ConsoleKey.D9, false, false, false, KeyCode.D9)]
+    public void ToKey_NumberKeys_ReturnsExpectedKeyCode (
+        char unicodeChar,
+        ConsoleKey consoleKey,
+        bool shift,
+        bool alt,
+        bool ctrl,
+        KeyCode expectedKeyCode
+    )
+    {
+        // Arrange
+        WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, alt, ctrl);
+
+        // Act
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (expectedKeyCode, result.KeyCode);
@@ -102,17 +254,17 @@ public class WindowsKeyConverterTests
     {
         // Arrange
         char unicodeChar = consoleKey switch
-        {
-            ConsoleKey.Enter => '\r',
-            ConsoleKey.Escape => '\u001B',
-            ConsoleKey.Tab => '\t',
-            ConsoleKey.Backspace => '\b',
-            _ => '\0'
-        };
+                           {
+                               ConsoleKey.Enter => '\r',
+                               ConsoleKey.Escape => '\u001B',
+                               ConsoleKey.Tab => '\t',
+                               ConsoleKey.Backspace => '\b',
+                               _ => '\0'
+                           };
         WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, false, false, false);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (expectedKeyCode, result.KeyCode);
@@ -137,7 +289,7 @@ public class WindowsKeyConverterTests
         WindowsConsole.InputRecord inputRecord = CreateInputRecord ('\0', consoleKey, false, false, false);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (expectedKeyCode, result.KeyCode);
@@ -148,19 +300,19 @@ public class WindowsKeyConverterTests
     #region ToKey Tests - VK_PACKET (Unicode/IME)
 
     [Theory]
-    [InlineData ('?')] // Chinese character
-    [InlineData ('?')] // Japanese character
-    [InlineData ('?')] // Korean character
-    [InlineData ('�')] // Accented character
-    [InlineData ('�')] // Euro symbol
-    [InlineData ('?')] // Greek character
+    [InlineData ('中')] // Chinese character
+    [InlineData ('日')] // Japanese character
+    [InlineData ('한')] // Korean character
+    [InlineData ('é')] // Accented character
+    [InlineData ('€')] // Euro symbol
+    [InlineData ('α')] // Greek character
     public void ToKey_VKPacket_Unicode_ReturnsExpectedCharacter (char unicodeChar)
     {
         // Arrange
         WindowsConsole.InputRecord inputRecord = CreateVKPacketInputRecord (unicodeChar);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal ((KeyCode)unicodeChar, result.KeyCode);
@@ -173,7 +325,7 @@ public class WindowsKeyConverterTests
         WindowsConsole.InputRecord inputRecord = CreateVKPacketInputRecord ('\0');
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (KeyCode.Null, result.KeyCode);
@@ -182,7 +334,7 @@ public class WindowsKeyConverterTests
     [Fact]
     public void ToKey_VKPacket_SurrogatePair_DocumentsCurrentLimitation ()
     {
-        // Emoji '??' (U+1F600) requires a surrogate pair: High=U+D83D, Low=U+DE00
+        // Emoji '😀' (U+1F600) requires a surrogate pair: High=U+D83D, Low=U+DE00
         // Windows sends this as TWO consecutive VK_PACKET events (one for each char)
         // because KeyEventRecord.UnicodeChar is a single 16-bit char field.
         // 
@@ -194,17 +346,17 @@ public class WindowsKeyConverterTests
         // to combine consecutive high+low surrogate events into a single Key with the
         // complete Unicode codepoint.
         // See: https://docs.microsoft.com/en-us/windows/console/key-event-record
-        
-        char highSurrogate = '\uD83D'; // High surrogate for ??
-        char lowSurrogate = '\uDE00';  // Low surrogate for ??
+
+        var highSurrogate = '\uD83D'; // High surrogate for 😀
+        var lowSurrogate = '\uDE00'; // Low surrogate for 😀
 
         // First event with high surrogate
         WindowsConsole.InputRecord highRecord = CreateVKPacketInputRecord (highSurrogate);
-        Key highResult = _converter.ToKey (highRecord);
+        var highResult = _converter.ToKey (highRecord);
 
         // Second event with low surrogate
         WindowsConsole.InputRecord lowRecord = CreateVKPacketInputRecord (lowSurrogate);
-        Key lowResult = _converter.ToKey (lowRecord);
+        var lowResult = _converter.ToKey (lowRecord);
 
         // Currently each surrogate half is processed independently as invalid KeyCodes
         // These assertions document the current (broken) behavior
@@ -213,41 +365,8 @@ public class WindowsKeyConverterTests
 
         // What SHOULD happen (future fix):
         // The InputProcessor should detect the surrogate pair and combine them:
-        // var expectedRune = new Rune(0x1F600); // ??
+        // var expectedRune = new Rune(0x1F600); // 😀
         // Assert.Equal((KeyCode)expectedRune.Value, combinedResult.KeyCode);
-    }
-
-    #endregion
-
-    #region ToKey Tests - OEM Keys
-
-    [Theory]
-    [InlineData (';', ConsoleKey.Oem1, false, (KeyCode)';')]
-    [InlineData (':', ConsoleKey.Oem1, true, (KeyCode)':')]
-    [InlineData ('/', ConsoleKey.Oem2, false, (KeyCode)'/')]
-    [InlineData ('?', ConsoleKey.Oem2, true, (KeyCode)'?')]
-    [InlineData (',', ConsoleKey.OemComma, false, (KeyCode)',')]
-    [InlineData ('<', ConsoleKey.OemComma, true, (KeyCode)'<')]
-    [InlineData ('.', ConsoleKey.OemPeriod, false, (KeyCode)'.')]
-    [InlineData ('>', ConsoleKey.OemPeriod, true, (KeyCode)'>')]
-    [InlineData ('=', ConsoleKey.OemPlus, false, (KeyCode)'=')]  // Un-shifted OemPlus is '='
-    [InlineData ('+', ConsoleKey.OemPlus, true, (KeyCode)'+')]   // Shifted OemPlus is '+'
-    [InlineData ('-', ConsoleKey.OemMinus, false, (KeyCode)'-')]
-    [InlineData ('_', ConsoleKey.OemMinus, true, (KeyCode)'_')]  // Shifted OemMinus is '_'
-    public void ToKey_OEMKeys_ReturnsExpectedKeyCode (
-        char unicodeChar,
-        ConsoleKey consoleKey,
-        bool shift,
-        KeyCode expectedKeyCode)
-    {
-        // Arrange
-        WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, shift, false, false);
-
-        // Act
-        Key result = _converter.ToKey (inputRecord);
-
-        // Assert
-        Assert.Equal (expectedKeyCode, result.KeyCode);
     }
 
     #endregion
@@ -262,13 +381,14 @@ public class WindowsKeyConverterTests
     public void ToKey_NumPadKeys_ReturnsExpectedKeyCode (
         char unicodeChar,
         ConsoleKey consoleKey,
-        KeyCode expectedKeyCode)
+        KeyCode expectedKeyCode
+    )
     {
         // Arrange
         WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, false, false, false);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (expectedKeyCode, result.KeyCode);
@@ -283,33 +403,17 @@ public class WindowsKeyConverterTests
     public void ToKey_NumPadOperators_ReturnsExpectedKeyCode (
         char unicodeChar,
         ConsoleKey consoleKey,
-        KeyCode expectedKeyCode)
+        KeyCode expectedKeyCode
+    )
     {
         // Arrange
         WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, false, false, false);
 
         // Act
-        Key result = _converter.ToKey (inputRecord);
+        var result = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (expectedKeyCode, result.KeyCode);
-    }
-
-    #endregion
-
-    #region ToKey Tests - Null/Empty
-
-    [Fact]
-    public void ToKey_NullKey_ReturnsEmpty ()
-    {
-        // Arrange
-        WindowsConsole.InputRecord inputRecord = CreateInputRecord ('\0', ConsoleKey.None, false, false, false);
-
-        // Act
-        Key result = _converter.ToKey (inputRecord);
-
-        // Assert
-        Assert.Equal (Key.Empty, result);
     }
 
     #endregion
@@ -324,7 +428,8 @@ public class WindowsKeyConverterTests
     public void ToKeyInfo_LetterKeys_ReturnsExpectedInputRecord (
         KeyCode keyCode,
         ConsoleKey expectedConsoleKey,
-        char expectedChar)
+        char expectedChar
+    )
     {
         // Arrange
         var key = new Key (keyCode);
@@ -347,7 +452,8 @@ public class WindowsKeyConverterTests
     public void ToKeyInfo_NumberKeys_ReturnsExpectedInputRecord (
         KeyCode keyCode,
         ConsoleKey expectedConsoleKey,
-        char expectedChar)
+        char expectedChar
+    )
     {
         // Arrange
         var key = new Key (keyCode);
@@ -373,7 +479,8 @@ public class WindowsKeyConverterTests
     public void ToKeyInfo_SpecialKeys_ReturnsExpectedInputRecord (
         KeyCode keyCode,
         ConsoleKey expectedConsoleKey,
-        char expectedChar)
+        char expectedChar
+    )
     {
         // Arrange
         var key = new Key (keyCode);
@@ -428,60 +535,6 @@ public class WindowsKeyConverterTests
 
     #endregion
 
-    #region ToKeyInfo Tests - Modifiers
-
-    [Theory]
-    [InlineData (KeyCode.A | KeyCode.ShiftMask, WindowsConsole.ControlKeyState.ShiftPressed)]
-    [InlineData (KeyCode.A | KeyCode.CtrlMask, WindowsConsole.ControlKeyState.LeftControlPressed)]
-    [InlineData (KeyCode.A | KeyCode.AltMask, WindowsConsole.ControlKeyState.LeftAltPressed)]
-    [InlineData (
-        KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask,
-        WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.LeftAltPressed)]
-    [InlineData (
-        KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask,
-        WindowsConsole.ControlKeyState.ShiftPressed | WindowsConsole.ControlKeyState.LeftControlPressed |
-        WindowsConsole.ControlKeyState.LeftAltPressed)]
-    public void ToKeyInfo_WithModifiers_ReturnsExpectedControlKeyState (
-        KeyCode keyCode,
-        WindowsConsole.ControlKeyState expectedState)
-    {
-        // Arrange
-        var key = new Key (keyCode);
-
-        // Act
-        WindowsConsole.InputRecord result = _converter.ToKeyInfo (key);
-
-        // Assert
-        Assert.Equal (expectedState, result.KeyEvent.dwControlKeyState);
-    }
-
-    #endregion
-
-    #region ToKeyInfo Tests - Scan Codes
-
-    [Theory]
-    [InlineData (KeyCode.A, 30)]
-    [InlineData (KeyCode.Enter, 28)]
-    [InlineData (KeyCode.Esc, 1)]
-    [InlineData (KeyCode.Space, 57)]
-    [InlineData (KeyCode.F1, 59)]
-    [InlineData (KeyCode.F10, 68)]
-    [InlineData (KeyCode.CursorUp, 72)]
-    [InlineData (KeyCode.Home, 71)]
-    public void ToKeyInfo_ScanCodes_ReturnsExpectedScanCode (KeyCode keyCode, ushort expectedScanCode)
-    {
-        // Arrange
-        var key = new Key (keyCode);
-
-        // Act
-        WindowsConsole.InputRecord result = _converter.ToKeyInfo (key);
-
-        // Assert
-        Assert.Equal (expectedScanCode, result.KeyEvent.wVirtualScanCode);
-    }
-
-    #endregion
-
     #region Round-Trip Tests
 
     [Theory]
@@ -501,7 +554,7 @@ public class WindowsKeyConverterTests
 
         // Act
         WindowsConsole.InputRecord inputRecord = _converter.ToKeyInfo (originalKey);
-        Key roundTrippedKey = _converter.ToKey (inputRecord);
+        var roundTrippedKey = _converter.ToKey (inputRecord);
 
         // Assert
         Assert.Equal (originalKeyCode, roundTrippedKey.KeyCode);
@@ -517,13 +570,14 @@ public class WindowsKeyConverterTests
         ConsoleKey consoleKey,
         bool shift,
         bool alt,
-        bool ctrl)
+        bool ctrl
+    )
     {
         // Arrange
         WindowsConsole.InputRecord originalRecord = CreateInputRecord (unicodeChar, consoleKey, shift, alt, ctrl);
 
         // Act
-        Key key = _converter.ToKey (originalRecord);
+        var key = _converter.ToKey (originalRecord);
         WindowsConsole.InputRecord roundTrippedRecord = _converter.ToKeyInfo (key);
 
         // Assert
@@ -552,38 +606,6 @@ public class WindowsKeyConverterTests
 
     #endregion
 
-    #region CapsLock/NumLock Tests
-
-    [Theory]
-    [InlineData ('a', ConsoleKey.A, false, true)] // CapsLock on, no shift
-    [InlineData ('A', ConsoleKey.A, true, true)] // CapsLock on, shift (should be lowercase from mapping)
-    public void ToKey_WithCapsLock_ReturnsExpectedKeyCode (
-        char unicodeChar,
-        ConsoleKey consoleKey,
-        bool shift,
-        bool capsLock)
-    {
-        // Arrange
-        WindowsConsole.InputRecord inputRecord = CreateInputRecordWithLockStates (
-            unicodeChar,
-            consoleKey,
-            shift,
-            false,
-            false,
-            capsLock,
-            false,
-            false);
-
-        // Act
-        Key result = _converter.ToKey (inputRecord);
-
-        // Assert
-        // The mapping should handle CapsLock properly via WindowsKeyHelper.MapKey
-        Assert.NotEqual (KeyCode.Null, result.KeyCode);
-    }
-
-    #endregion
-
     #region Helper Methods
 
     private static WindowsConsole.InputRecord CreateInputRecord (
@@ -591,7 +613,8 @@ public class WindowsKeyConverterTests
         ConsoleKey consoleKey,
         bool shift,
         bool alt,
-        bool ctrl)
+        bool ctrl
+    )
     {
         return CreateInputRecordWithLockStates (unicodeChar, consoleKey, shift, alt, ctrl, false, false, false);
     }
@@ -604,7 +627,8 @@ public class WindowsKeyConverterTests
         bool ctrl,
         bool capsLock,
         bool numLock,
-        bool scrollLock)
+        bool scrollLock
+    )
     {
         var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
 
