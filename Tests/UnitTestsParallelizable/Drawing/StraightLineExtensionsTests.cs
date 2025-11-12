@@ -1,6 +1,7 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 
-namespace UnitTests.DrawingTests;
+namespace UnitTests_Parallelizable.DrawingTests;
 
 public class StraightLineExtensionsTests (ITestOutputHelper output)
 {

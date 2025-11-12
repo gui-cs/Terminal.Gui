@@ -7,7 +7,7 @@ namespace UnitTests.ViewsTests;
 public class ButtonTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Constructors_Defaults ()
     {
         // Override CM

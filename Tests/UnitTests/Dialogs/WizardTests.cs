@@ -27,12 +27,12 @@ public class WizardTests
         var closedFired = false;
         wizard.Closed += (s, e) => { closedFired = true; };
 
-        RunState runstate = Application.Begin (wizard);
+        SessionToken sessionToken = Application.Begin (wizard);
         AutoInitShutdownAttribute.RunIteration ();
 
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
         AutoInitShutdownAttribute.RunIteration ();
-        Application.End (runstate);
+        Application.End (sessionToken);
         Assert.True (finishedFired);
         Assert.True (closedFired);
         step1.Dispose ();
@@ -51,7 +51,7 @@ public class WizardTests
         closedFired = false;
         wizard.Closed += (s, e) => { closedFired = true; };
 
-        runstate = Application.Begin (wizard);
+        sessionToken = Application.Begin (wizard);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (step1.Title, wizard.CurrentStep.Title);
@@ -62,7 +62,7 @@ public class WizardTests
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.End (runstate);
+        Application.End (sessionToken);
         Assert.True (finishedFired);
         Assert.True (closedFired);
 
@@ -84,13 +84,13 @@ public class WizardTests
         closedFired = false;
         wizard.Closed += (s, e) => { closedFired = true; };
 
-        runstate = Application.Begin (wizard);
+        sessionToken = Application.Begin (wizard);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.End (runstate);
+        Application.End (sessionToken);
         Assert.True (finishedFired);
         Assert.True (closedFired);
         wizard.Dispose ();
@@ -419,7 +419,7 @@ public class WizardTests
         wizard.AddStep (new () { Title = stepTitle });
 
         //wizard.LayoutSubViews ();
-        RunState runstate = Application.Begin (wizard);
+        SessionToken sessionToken = Application.Begin (wizard);
         AutoInitShutdownAttribute.RunIteration ();
 
         // TODO: Disabled until Dim.Auto is used in Dialog
@@ -427,7 +427,7 @@ public class WizardTests
         //                                              $"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
         //                                              _output
         //                                             );
-        Application.End (runstate);
+        Application.End (sessionToken);
         wizard.Dispose ();
     }
 
@@ -604,14 +604,14 @@ public class WizardTests
             $"{Glyphs.LLCornerDbl}{new (Glyphs.HLineDbl.ToString () [0], width - 2)}{Glyphs.LRCornerDbl}";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
-        RunState runstate = Application.Begin (wizard);
+        SessionToken sessionToken = Application.Begin (wizard);
 
         // TODO: Disabled until Dim.Auto is used in Dialog
         //DriverAsserts.AssertDriverContentsWithFrameAre (
         //                                              $"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
         //                                              _output
         //                                             );
-        Application.End (runstate);
+        Application.End (sessionToken);
         wizard.Dispose ();
     }
 }

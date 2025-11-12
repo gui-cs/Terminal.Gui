@@ -13,7 +13,6 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
     ///     events: KeyDown and KeyDownNotHandled. Note that KeyUp is independent.
     /// </summary>
     [Theory]
-    //[SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewKeyDownEvent_All_EventsFire (Type viewType)
     {
@@ -56,7 +55,6 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
     ///     KeyUp
     /// </summary>
     [Theory]
-    //[SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewKeyUpEvent_All_EventsFire (Type viewType)
     {

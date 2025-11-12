@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace UICatalog.Scenarios;
 
@@ -7,12 +8,12 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("DateTime")]
 public class TimeAndDate : Scenario
 {
-    private Label _lblDateFmt;
-    private Label _lblNewDate;
-    private Label _lblNewTime;
-    private Label _lblOldDate;
-    private Label _lblOldTime;
-    private Label _lblTimeFmt;
+    private Label? _lblDateFmt;
+    private Label? _lblNewDate;
+    private Label? _lblNewTime;
+    private Label? _lblOldDate;
+    private Label? _lblOldTime;
+    private Label? _lblTimeFmt;
 
     public override void Main ()
     {
@@ -143,17 +144,13 @@ public class TimeAndDate : Scenario
         Application.Shutdown ();
     }
 
-    private void DateChanged (object sender, DateTimeEventArgs<DateTime> e)
+    private void DateChanged (object? sender, EventArgs<DateTime> e)
     {
-        _lblOldDate.Text = $"Old Date: {e.OldValue}";
-        _lblNewDate.Text = $"New Date: {e.NewValue}";
-        _lblDateFmt.Text = $"Date Format: {e.Format}";
+        _lblNewDate!.Text = $"New Date: {e.Value}";
     }
 
-    private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
+    private void TimeChanged (object? sender, EventArgs<TimeSpan> e)
     {
-        _lblOldTime.Text = $"Old Time: {e.OldValue}";
-        _lblNewTime.Text = $"New Time: {e.NewValue}";
-        _lblTimeFmt.Text = $"Time Format: {e.Format}";
+        _lblNewTime!.Text = $"New Time: {e.Value}";
     }
 }

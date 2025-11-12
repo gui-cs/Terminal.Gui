@@ -295,11 +295,11 @@ public static class EscSeqUtils
 
                 break;
             default:
-                uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
+                //uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
 
-                if (isConsoleKey)
-                {
-                    key = (ConsoleKey)ck;
+                //if (isConsoleKey)
+            {
+                key = consoleKeyInfo.Key;// (ConsoleKey)ck;
                 }
 
                 newConsoleKeyInfo = new (

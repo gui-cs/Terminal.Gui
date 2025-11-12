@@ -5,7 +5,7 @@ namespace UnitTests.ViewTests;
 public class BorderTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
     {
         var superView = new View { Width = 10, Height = 10, CanFocus = true };
@@ -48,7 +48,7 @@ public class BorderTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Uses_Parent_Scheme ()
     {
         var view = new View { Title = "A", Height = 2, Width = 5 };
@@ -95,7 +95,7 @@ public class BorderTests (ITestOutputHelper output)
         };
         win.Border!.Thickness = win.Border!.Thickness with { Top = 4 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 5);
         AutoInitShutdownAttribute.RunIteration ();
@@ -228,7 +228,7 @@ public class BorderTests (ITestOutputHelper output)
         };
         win.Border!.Thickness = win.Border!.Thickness with { Top = 3 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 4);
         AutoInitShutdownAttribute.RunIteration ();
@@ -361,7 +361,7 @@ public class BorderTests (ITestOutputHelper output)
         };
         win.Border!.Thickness = win.Border!.Thickness with { Top = 2 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 4);
         AutoInitShutdownAttribute.RunIteration ();
@@ -483,7 +483,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (20, height);
         AutoInitShutdownAttribute.RunIteration ();
@@ -544,7 +544,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (width, 3);
         AutoInitShutdownAttribute.RunIteration ();
@@ -727,7 +727,7 @@ public class BorderTests (ITestOutputHelper output)
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Application.Driver!.SetScreenSize (5, 5);
         AutoInitShutdownAttribute.RunIteration ();
@@ -754,7 +754,7 @@ public class BorderTests (ITestOutputHelper output)
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Application.Driver!.SetScreenSize (10, 4);
         AutoInitShutdownAttribute.RunIteration ();
@@ -776,7 +776,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
         Application.Driver!.SetScreenSize (3, 3);
         AutoInitShutdownAttribute.RunIteration ();
@@ -834,7 +834,7 @@ public class BorderTests (ITestOutputHelper output)
 ╠═╬┄┤
 │ ┊ ┊
 └─┴┄┘")]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SuperViewRendersLineCanvas_No_SubViews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
         var superView = new View
@@ -897,7 +897,7 @@ public class BorderTests (ITestOutputHelper output)
 │    ┊    ┊
 │    ┊    ┊
 └────┴┄┄┄┄┘")]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SuperViewRendersLineCanvas_Title_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
         var superView = new View

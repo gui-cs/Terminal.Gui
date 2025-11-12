@@ -695,7 +695,7 @@ public class TreeViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestBottomlessTreeView_MaxDepth_3 ()
     {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
@@ -734,7 +734,7 @@ public class TreeViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestBottomlessTreeView_MaxDepth_5 ()
     {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
@@ -803,7 +803,7 @@ public class TreeViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestGetObjectOnRow ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -859,7 +859,7 @@ public class TreeViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestGetObjectRow ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -930,7 +930,7 @@ public class TreeViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -997,7 +997,7 @@ public class TreeViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent_Handled ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1043,7 +1043,7 @@ FFFFFFFFFF
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent_WithScrolling ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1106,7 +1106,7 @@ oot two
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeView_Filter ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1194,7 +1194,7 @@ oot two
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeViewColor ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };

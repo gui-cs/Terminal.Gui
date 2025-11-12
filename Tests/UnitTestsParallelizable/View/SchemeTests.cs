@@ -1,11 +1,11 @@
 ﻿#nullable enable
-using UnitTests.Parallelizable;
+using UnitTests;
 using Xunit;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "View.Scheme")]
-public class SchemeTests : ParallelizableBase
+public class SchemeTests : FakeDriverBase
 {
 
     [Fact]

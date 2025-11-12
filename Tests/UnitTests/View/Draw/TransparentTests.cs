@@ -8,7 +8,7 @@ namespace UnitTests.ViewTests;
 public class TransparentTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     public void Transparent_Text_Occludes ()
     {
@@ -52,7 +52,7 @@ public class TransparentTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     public void Transparent_SubView_Occludes ()
     {

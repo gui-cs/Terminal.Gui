@@ -226,7 +226,9 @@ public class ScopeTests
                                  }));
         }
 
+#pragma warning disable xUnit1031
         Task.WaitAll (tasks.ToArray ());
+#pragma warning restore xUnit1031
 
         // Assert
         Assert.Equal (threadCount * itemsPerThread, scope.Count);

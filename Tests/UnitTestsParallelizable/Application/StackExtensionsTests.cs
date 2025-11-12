@@ -1,25 +1,27 @@
-﻿namespace UnitTests_Parallelizable.ApplicationTests;
+﻿using UnitTests;
 
-public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
+namespace UnitTests_Parallelizable.ApplicationTests;
+
+public class StackExtensionsTests : FakeDriverBase
 {
     [Fact]
-    public void Stack_Toplevels_Contains ()
+    public void Stack_topLevels_Contains ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
         var comparer = new ToplevelEqualityComparer ();
 
-        Assert.True (Toplevels.Contains (new Window { Id = "w2" }, comparer));
-        Assert.False (Toplevels.Contains (new Toplevel { Id = "top2" }, comparer));
+        Assert.True (topLevels.Contains (new Window { Id = "w2" }, comparer));
+        Assert.False (topLevels.Contains (new Toplevel { Id = "top2" }, comparer));
     }
 
     [Fact]
-    public void Stack_Toplevels_CreateToplevels ()
+    public void Stack_topLevels_CreatetopLevels ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
-        int index = Toplevels.Count - 1;
+        int index = topLevels.Count - 1;
 
-        foreach (Toplevel top in Toplevels)
+        foreach (Toplevel top in topLevels)
         {
             if (top.GetType () == typeof (Toplevel))
             {
@@ -33,7 +35,7 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
             index--;
         }
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("w4", tops [0].Id);
         Assert.Equal ("w3", tops [1].Id);
@@ -43,28 +45,28 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Stack_Toplevels_FindDuplicates ()
+    public void Stack_topLevels_FindDuplicates ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
         var comparer = new ToplevelEqualityComparer ();
 
-        Toplevels.Push (new Toplevel { Id = "w4" });
-        Toplevels.Push (new Toplevel { Id = "w1" });
+        topLevels.Push (new Toplevel { Id = "w4" });
+        topLevels.Push (new Toplevel { Id = "w1" });
 
-        Toplevel [] dup = Toplevels.FindDuplicates (comparer).ToArray ();
+        Toplevel [] dup = topLevels.FindDuplicates (comparer).ToArray ();
 
         Assert.Equal ("w4", dup [0].Id);
         Assert.Equal ("w1", dup [^1].Id);
     }
 
     [Fact]
-    public void Stack_Toplevels_MoveNext ()
+    public void Stack_topLevels_MoveNext ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
-        Toplevels.MoveNext ();
+        topLevels.MoveNext ();
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("w3", tops [0].Id);
         Assert.Equal ("w2", tops [1].Id);
@@ -74,13 +76,13 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Stack_Toplevels_MovePrevious ()
+    public void Stack_topLevels_MovePrevious ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
-        Toplevels.MovePrevious ();
+        topLevels.MovePrevious ();
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("Top", tops [0].Id);
         Assert.Equal ("w4", tops [1].Id);
@@ -90,16 +92,16 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Stack_Toplevels_MoveTo ()
+    public void Stack_topLevels_MoveTo ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
         var valueToMove = new Window { Id = "w1" };
         var comparer = new ToplevelEqualityComparer ();
 
-        Toplevels.MoveTo (valueToMove, 1, comparer);
+        topLevels.MoveTo (valueToMove, 1, comparer);
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("w4", tops [0].Id);
         Assert.Equal ("w1", tops [1].Id);
@@ -109,16 +111,16 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Stack_Toplevels_MoveTo_From_Last_To_Top ()
+    public void Stack_topLevels_MoveTo_From_Last_To_Top ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
         var valueToMove = new Window { Id = "Top" };
         var comparer = new ToplevelEqualityComparer ();
 
-        Toplevels.MoveTo (valueToMove, 0, comparer);
+        topLevels.MoveTo (valueToMove, 0, comparer);
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("Top", tops [0].Id);
         Assert.Equal ("w4", tops [1].Id);
@@ -128,17 +130,17 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Stack_Toplevels_Replace ()
+    public void Stack_topLevels_Replace ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
         var valueToReplace = new Window { Id = "w1" };
         var valueToReplaceWith = new Window { Id = "new" };
         var comparer = new ToplevelEqualityComparer ();
 
-        Toplevels.Replace (valueToReplace, valueToReplaceWith, comparer);
+        topLevels.Replace (valueToReplace, valueToReplaceWith, comparer);
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("w4", tops [0].Id);
         Assert.Equal ("w3", tops [1].Id);
@@ -148,16 +150,16 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     }
 
     [Fact]
-    public void Stack_Toplevels_Swap ()
+    public void Stack_topLevels_Swap ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
         var valueToSwapFrom = new Window { Id = "w3" };
         var valueToSwapTo = new Window { Id = "w1" };
         var comparer = new ToplevelEqualityComparer ();
-        Toplevels.Swap (valueToSwapFrom, valueToSwapTo, comparer);
+        topLevels.Swap (valueToSwapFrom, valueToSwapTo, comparer);
 
-        Toplevel [] tops = Toplevels.ToArray ();
+        Toplevel [] tops = topLevels.ToArray ();
 
         Assert.Equal ("w4", tops [0].Id);
         Assert.Equal ("w1", tops [1].Id);
@@ -169,27 +171,27 @@ public class StackExtensionsTests : UnitTests.Parallelizable.ParallelizableBase
     [Fact]
     public void ToplevelEqualityComparer_GetHashCode ()
     {
-        Stack<Toplevel> Toplevels = CreateToplevels ();
+        Stack<Toplevel> topLevels = CreatetopLevels ();
 
         // Only allows unique keys
         HashSet<int> hCodes = new ();
 
-        foreach (Toplevel top in Toplevels)
+        foreach (Toplevel top in topLevels)
         {
             Assert.True (hCodes.Add (top.GetHashCode ()));
         }
     }
 
-    private Stack<Toplevel> CreateToplevels ()
+    private Stack<Toplevel> CreatetopLevels ()
     {
-        Stack<Toplevel> Toplevels = new ();
+        Stack<Toplevel> topLevels = new ();
 
-        Toplevels.Push (new Toplevel { Id = "Top" });
-        Toplevels.Push (new Window { Id = "w1" });
-        Toplevels.Push (new Window { Id = "w2" });
-        Toplevels.Push (new Window { Id = "w3" });
-        Toplevels.Push (new Window { Id = "w4" });
+        topLevels.Push (new Toplevel { Id = "Top" });
+        topLevels.Push (new Window { Id = "w1" });
+        topLevels.Push (new Window { Id = "w2" });
+        topLevels.Push (new Window { Id = "w3" });
+        topLevels.Push (new Window { Id = "w4" });
 
-        return Toplevels;
+        return topLevels;
     }
 }
