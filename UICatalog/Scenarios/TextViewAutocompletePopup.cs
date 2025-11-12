@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit())
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			textViewTopLeft = new TextView () {
 				Width = width,
@@ -89,7 +89,7 @@ namespace UICatalog.Scenarios {
 				siMultiline = new StatusItem(Key.Null, "", null),
 				siWrap = new StatusItem(Key.Null, "", null)
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			Win.LayoutStarted += Win_LayoutStarted;
 		}

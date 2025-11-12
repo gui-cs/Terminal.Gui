@@ -1,0 +1,22 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<div id="sidetoggle">
+  <div>
+    {{^_disableSideFilter}}
+    <div class="sidefilter">
+      <form class="toc-filter">
+        <i class="bi bi-funnel-fill filter-icon"></i>
+        <i id="toc_filter_clear" class="bi bi-x-lg clear-icon"></i>
+        <input type="text" id="toc_filter_input" placeholder="{{__global.tocFilter}}" autocomplete="off" onkeypress="if(event.keyCode==13) {return false;}">
+      </form>
+    </div>
+    {{/_disableSideFilter}}
+    <div class="sidetoc">
+      <div class="toc" id="toc">
+        {{^leaf}}
+          {{>partials/li}}
+        {{/leaf}}
+      </div>
+    </div>
+  </div>
+</div>

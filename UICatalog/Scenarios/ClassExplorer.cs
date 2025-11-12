@@ -53,35 +53,60 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
+		MenuItem highlightModelTextOnly;
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Top.LayoutSubviews ();
+			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Quit()),
-				})
-				,
+				}),
 				new MenuBarItem ("_View", new MenuItem [] {
 					miShowPrivate = new MenuItem ("_Include Private", "", () => ShowPrivate()){
 						Checked = false,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				new MenuItem ("_Expand All", "", () => treeView.ExpandAll()),
-				new MenuItem ("_Collapse All", "", () => treeView.CollapseAll()) }),
+					new MenuItem ("_Expand All", "", () => treeView.ExpandAll()),
+					new MenuItem ("_Collapse All", "", () => treeView.CollapseAll())
+				}),
+				new MenuBarItem ("_Style", new MenuItem [] {
+					highlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "", () => OnCheckHighlightModelTextOnly()) {
+						CheckType = MenuItemCheckStyle.Checked
+					},
+				}) 
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			treeView = new TreeView<object> () {
 				X = 0,
-				Y = 0,
+				Y = 1,
 				Width = Dim.Percent (50),
 				Height = Dim.Fill (),
 			};
 
+			var lblSearch = new Label("Search");
+			var tfSearch = new TextField(){
+				Width = 20,
+				X = Pos.Right(lblSearch),
+			};
+
+			Win.Add(lblSearch);
+			Win.Add(tfSearch);
+
+			var filter = new TreeViewTextFilter<object>(treeView);
+			treeView.Filter = filter;
+			tfSearch.TextChanged += (s)=>{
+				filter.Text = tfSearch.Text.ToString();
+				if(treeView.SelectedObject != null)
+				{
+					treeView.EnsureVisible(treeView.SelectedObject);
+				}
+			};
 
 			treeView.AddObjects (AppDomain.CurrentDomain.GetAssemblies ());
 			treeView.AspectGetter = GetRepresentation;
@@ -98,6 +123,13 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.Add (textView);
+		}
+
+		private void OnCheckHighlightModelTextOnly ()
+		{
+			treeView.Style.HighlightModelTextOnly = !treeView.Style.HighlightModelTextOnly;
+			highlightModelTextOnly.Checked = treeView.Style.HighlightModelTextOnly;
+			treeView.SetNeedsDisplay ();
 		}
 
 		private void ShowPrivate ()

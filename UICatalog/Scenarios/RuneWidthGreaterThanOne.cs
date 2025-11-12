@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		private Window _win;
 		private string _lastRunesUsed;
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
 
@@ -38,19 +38,19 @@ namespace UICatalog.Scenarios {
 
 			_label = new Label () {
 				X = Pos.Center (),
-				Y = 0,
+				Y = 1,
 				ColorScheme = new ColorScheme () {
 					Normal = Colors.Base.Focus
 				}
 			};
 			_text = new TextField () {
 				X = Pos.Center (),
-				Y = 2,
+				Y = 3,
 				Width = 20
 			};
 			_button = new Button () {
 				X = Pos.Center (),
-				Y = 4
+				Y = 5
 			};
 			_labelR = new Label () {
 				X = Pos.AnchorEnd (30),

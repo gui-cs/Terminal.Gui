@@ -15,7 +15,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -237,6 +238,25 @@ namespace Terminal.Gui {
 		public virtual void OnVisibleChanged () { }
 
 		/// <summary>
+		/// Utilty function to determine <paramref name="method"/> is overridden in the <paramref name="subclass"/>.
+		/// </summary>
+		/// <param name="subclass">The view.</param>
+		/// <param name="method">The method name.</param>
+		/// <returns><see langword="true"/> if it's overridden, <see langword="false"/> otherwise.</returns>
+		internal static bool IsOverridden (Responder subclass, string method)
+		{
+			MethodInfo m = subclass.GetType ().GetMethod (method,
+				BindingFlags.Instance
+				| BindingFlags.Public
+				| BindingFlags.NonPublic
+				| BindingFlags.DeclaredOnly);
+			if (m == null) {
+				return false;
+			}
+			return m.GetBaseDefinition ().DeclaringType != m.DeclaringType;
+		}
+
+		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		/// <remarks>
@@ -271,6 +291,10 @@ namespace Terminal.Gui {
 			GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 			WasDisposed = true;
+
+			foreach (var instance in Instances.Where (x => x.WasDisposed).ToList ()) {
+				Instances.Remove (instance);
+			}
 #endif
 		}
 	}

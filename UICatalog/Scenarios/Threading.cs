@@ -96,9 +96,9 @@ namespace UICatalog.Scenarios {
 			void Top_Loaded ()
 			{
 				_btnActionCancel.SetFocus ();
-				Top.Loaded -= Top_Loaded;
+				Application.Top.Loaded -= Top_Loaded;
 			}
-			Top.Loaded += Top_Loaded;
+			Application.Top.Loaded += Top_Loaded;
 		}
 
 		private async void LoadData ()
@@ -157,7 +157,7 @@ namespace UICatalog.Scenarios {
 					LogJob ($"Returned from task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
 					_itemsList.SetSource (items);
 					LogJob ($"Finished populate list view Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
-					_btnActionCancel.Text = "Load Items";
+					_btnActionCancel.Text = "Cancelable Load Items";
 				} else {
 					LogJob ("Task was canceled!");
 				}

@@ -235,7 +235,10 @@ namespace Terminal.Gui {
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
 		{
-			Text = ustring.Make (obj.Lines [obj.CursorPosition.Y]);
+			if (obj == null)
+				return;
+
+			Text = ustring.Make (obj?.Lines [obj.CursorPosition.Y]);
 			CursorPosition = obj.CursorPosition.X;
 			Adjust ();
 		}
@@ -295,6 +298,7 @@ namespace Terminal.Gui {
 					}
 					return;
 				}
+				ClearAllSelection ();
 				text = TextModel.ToRunes (newText.NewText);
 
 				if (!Secret && !historyText.IsFromHistory) {
@@ -1060,8 +1064,8 @@ namespace Terminal.Gui {
 				EnsureHasFocus ();
 				int x = PositionCursor (ev);
 				int sbw = x;
-				if (x == text.Count || (x > 0 && (char)Text [x - 1] != ' '
-					|| (x > 0 && (char)Text [x] == ' '))) {
+				if (x == text.Count || (x > 0 && (char)text [x - 1] != ' ')
+					|| (x > 0 && (char)text [x] == ' ')) {
 
 					sbw = WordBackward (x);
 				}
@@ -1342,12 +1346,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		protected override string GetCurrentWord ()
+		protected override string GetCurrentWord (int columnOffset = 0)
 		{
 			var host = (TextField)HostControl;
 			var currentLine = host.Text.ToRuneList ();
-			var cursorPosition = Math.Min (host.CursorPosition, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition);
+			var cursorPosition = Math.Min (host.CursorPosition + columnOffset, currentLine.Count);
+			return IdxToWord (currentLine, cursorPosition, columnOffset);
 		}
 
 		/// <inheritdoc/>

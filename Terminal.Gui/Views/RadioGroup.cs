@@ -67,6 +67,7 @@ namespace Terminal.Gui {
 				Frame = rect;
 			}
 			CanFocus = true;
+			HotKeySpecifier = new Rune ('_');
 
 			// Things this view knows how to do
 			AddCommand (Command.LineUp, () => { MoveUp (); return true; });
@@ -215,9 +216,36 @@ namespace Terminal.Gui {
 					Move (horizontal [i].pos, 0);
 					break;
 				}
+				var rl = radioLabels [i];
 				Driver.SetAttribute (GetNormalColor ());
 				Driver.AddStr (ustring.Make (new Rune [] { i == selected ? Driver.Selected : Driver.UnSelected, ' ' }));
-				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
+				TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out Key hotKey);
+				if (hotPos != -1 && (hotKey != Key.Null || hotKey != Key.Unknown)) {
+					var rlRunes = rl.ToRunes ();
+					for (int j = 0; j < rlRunes.Length; j++) {
+						Rune rune = rlRunes [j];
+						if (j == hotPos && i == cursor) {
+							Application.Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : GetHotNormalColor ());
+						} else if (j == hotPos && i != cursor) {
+							Application.Driver.SetAttribute (GetHotNormalColor ());
+						} else if (HasFocus && i == cursor) {
+							Application.Driver.SetAttribute (ColorScheme.Focus);
+						}
+						if (rune == HotKeySpecifier && j + 1 < rlRunes.Length) {
+							j++;
+							rune = rlRunes [j];
+							if (i == cursor) {
+								Application.Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : GetHotNormalColor ());
+							} else if (i != cursor) {
+								Application.Driver.SetAttribute (GetHotNormalColor ());
+							}
+						}
+						Application.Driver.AddRune (rune);
+						Driver.SetAttribute (GetNormalColor ());
+					}
+				} else {
+					DrawHotString (rl, HasFocus && i == cursor, ColorScheme);
+				}
 			}
 		}
 
@@ -280,11 +308,12 @@ namespace Terminal.Gui {
 				key = Char.ToUpper ((char)key);
 				foreach (var l in radioLabels) {
 					bool nextIsHot = false;
-					foreach (var c in l) {
-						if (c == '_')
+					TextFormatter.FindHotKey (l, HotKeySpecifier, true, out _, out Key hotKey);
+					foreach (Rune c in l) {
+						if (c == HotKeySpecifier) {
 							nextIsHot = true;
-						else {
-							if (nextIsHot && c == key) {
+						} else {
+							if ((nextIsHot && Rune.ToUpper (c) == key) || (key == (uint)hotKey)) {
 								SelectedItem = i;
 								cursor = i;
 								if (!HasFocus)

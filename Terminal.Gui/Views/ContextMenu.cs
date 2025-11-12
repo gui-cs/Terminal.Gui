@@ -52,7 +52,10 @@ namespace Terminal.Gui {
 		public ContextMenu (int x, int y, MenuBarItem menuItems)
 		{
 			if (IsShow) {
-				Hide ();
+				if (menuBar.SuperView != null) {
+					Hide ();
+				}
+				IsShow = false;
 			}
 			MenuItems = menuItems;
 			Position = new Point (x, y);
@@ -76,7 +79,6 @@ namespace Terminal.Gui {
 			}
 			if (container != null) {
 				container.Closing -= Container_Closing;
-				container.Resized -= Container_Resized;
 			}
 		}
 
@@ -90,7 +92,6 @@ namespace Terminal.Gui {
 			}
 			container = Application.Current;
 			container.Closing += Container_Closing;
-			container.Resized += Container_Resized;
 			var frame = container.Frame;
 			var position = Position;
 			if (Host != null) {
@@ -126,7 +127,7 @@ namespace Terminal.Gui {
 			} else if (ForceMinimumPosToZero && position.Y < 0) {
 				position.Y = 0;
 			}
-			
+
 			menuBar = new MenuBar (new [] { MenuItems }) {
 				X = position.X,
 				Y = position.Y,
@@ -142,13 +143,6 @@ namespace Terminal.Gui {
 			menuBar.OpenMenu ();
 		}
 
-		private void Container_Resized (Size obj)
-		{
-			if (IsShow) {
-				Show ();
-			}
-		}
-
 		private void Container_Closing (ToplevelClosingEventArgs obj)
 		{
 			Hide ();
@@ -159,7 +153,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Hide ()
 		{
-			menuBar.CleanUp ();
+			menuBar?.CleanUp ();
 			Dispose ();
 		}
 

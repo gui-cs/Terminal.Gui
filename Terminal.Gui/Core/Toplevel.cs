@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
+	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screen and
 	/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
 	/// </summary>
 	/// <remarks>
@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begin loaded.
+		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
 		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
 		/// </summary>
@@ -77,13 +77,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Invoked when a child of the Toplevel <see cref="Application.RunState"/> is closed by  
-		/// <see cref="Application.End(View)"/>.
+		/// <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action<Toplevel> ChildClosed;
 
 		/// <summary>
 		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
-		/// by <see cref="Application.End(View)"/>.
+		/// by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action AllChildClosed;
 
@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 		public event Action<ToplevelClosingEventArgs> Closing;
 
 		/// <summary>
-		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(View)"/>.
+		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
 		public event Action<Toplevel> Closed;
 
@@ -220,6 +220,9 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.TopLevel;
 
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
 			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
@@ -253,6 +256,24 @@ namespace Terminal.Gui {
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+		}
+
+		private bool  Application_UnGrabbingMouse (View e)
+		{
+			if (dragPosition.HasValue) {
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool Application_GrabbingMouse (View e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -426,6 +447,32 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessHotKey (keyEvent)) {
+				return true;
+			}
+
+			if (this.IsMdiChild && Application.Top.ProcessHotKey (keyEvent)) {
+				return true;
+			}
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessColdKey (keyEvent)) {
+				return true;
+			}
+
+			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
+				return true;
+			}
+			return false;
+		}
+
 		private void MovePreviousViewOrTop ()
 		{
 			if (Application.MdiTop == null) {
@@ -484,24 +531,13 @@ namespace Terminal.Gui {
 
 		private void QuitToplevel ()
 		{
-			if (Application.MdiTop != null) {
+			if (IsMdiChild) {
+				RequestStop ();
+			} else if (Application.MdiTop != null) {
 				Application.MdiTop.RequestStop ();
 			} else {
 				Application.RequestStop ();
 			}
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent keyEvent)
-		{
-			if (base.ProcessColdKey (keyEvent)) {
-				return true;
-			}
-
-			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
-				return true;
-			}
-			return false;
 		}
 
 		View GetDeepestFocusedSubview (View view)
@@ -552,6 +588,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Add (View view)
 		{
+			CanFocus = true;
 			AddMenuStatusBar (view);
 			base.Add (view);
 		}
@@ -603,67 +640,92 @@ namespace Terminal.Gui {
 			out int nx, out int ny, out View mb, out View sb)
 		{
 			int l;
-			View superView;
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			View superView = GetSuperView (top);
+			if (superView == null || top == Application.Top || superView == Application.Top) {
 				l = Driver.Cols;
 				superView = Application.Top;
 			} else {
-				l = top.SuperView.Frame.Width;
-				superView = top.SuperView;
+				l = superView.Frame.Width;
 			}
+			mb = null; sb = null;
+			if (!(superView is Toplevel)) {
+				nx = Math.Max (Math.Min (x, top.Frame.Right - 1), 0);
+				ny = Math.Max (Math.Min (y, top.Frame.Bottom - 1), 0);
+				return superView;
+			}
+			var superViewBorder = superView.Border != null ? (superView.Border.DrawMarginFrame ? 1 : 0) : 0;
+			var topBorder = top.Modal ? 0 : top.Border != null ? (top.Border.DrawMarginFrame ? 1 : 0) : 0;
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
-			var canChange = SetWidth (top.Frame.Width, out int rWidth);
-			if (canChange && rWidth < 0 && nx >= top.Frame.X) {
-				nx = Math.Max (top.Frame.Right - 2, 0);
-			} else if (rWidth < 0 && nx >= top.Frame.X) {
-				nx = Math.Min (nx + 1, top.Frame.Right - 2);
+			nx = !top.IsMdiChild && !top.Modal && nx + superViewBorder * 2 + top.Frame.Width >= l ? Math.Max (l - top.Frame.Width - superViewBorder * 2, 0) : nx;
+			nx = top.Modal && nx == 0 ? superViewBorder : nx;
+			nx = top.IsMdiChild && nx < superViewBorder ? superViewBorder : nx;
+			nx = top.Modal && nx + superViewBorder + top.Frame.Width >= l ? l - top.Frame.Width - superViewBorder : nx;
+			nx = top.IsMdiChild && nx + superViewBorder + top.Frame.Width >= l ? l - top.Frame.Width - superViewBorder : nx;
+			if (nx + topBorder * 2 > top.Frame.X + top.Frame.Width) {
+				nx = Math.Max (top.Frame.Right - topBorder * 2, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-			bool m, s;
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			bool m = false, s = false;
+			if (!(top is Window && top == Application.Top) && (superView == null || top == Application.Top || superView == Application.Top)) {
 				m = Application.Top.MenuBar?.Visible == true;
 				mb = Application.Top.MenuBar;
-			} else {
-				var t = top.SuperView;
+			} else if (!(top is Window && top == Application.Top)) {
+				var t = superView;
 				while (!(t is Toplevel)) {
-					t = t.SuperView;
+					t = GetSuperView (t);
 				}
 				m = ((Toplevel)t).MenuBar?.Visible == true;
 				mb = ((Toplevel)t).MenuBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = m ? 1 : 0;
+			if (superView == null || top == Application.Top || superView == Application.Top) {
+				l = m ? 1 + (top.Modal ? superViewBorder - topBorder : 0) : 0;
 			} else {
 				l = 0;
 			}
 			ny = Math.Max (y, l);
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			ny = top.Modal && ny == 0 ? superViewBorder : ny;
+			ny = top.IsMdiChild && ny < superViewBorder + l ? ny + superViewBorder : ny;
+			if (!(top is Window && top == Application.Top) && (superView == null || top == Application.Top || superView == Application.Top)) {
 				s = Application.Top.StatusBar?.Visible == true;
 				sb = Application.Top.StatusBar;
-			} else {
-				var t = top.SuperView;
+			} else if (!(top is Window && top == Application.Top)) {
+				var t = superView;
 				while (!(t is Toplevel)) {
-					t = t.SuperView;
+					t = GetSuperView (t);
 				}
 				s = ((Toplevel)t).StatusBar?.Visible == true;
 				sb = ((Toplevel)t).StatusBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = s ? Driver.Rows - 1 : Driver.Rows;
+			if (superView == null || top == Application.Top || superView == Application.Top) {
+				l = (s ? Driver.Rows - 1 : Driver.Rows);
 			} else {
-				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+				l = (s ? superView.Frame.Height - 1 : superView.Frame.Height);
 			}
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			canChange = SetHeight (top.Frame.Height, out int rHeight);
-			if (canChange && rHeight < 0 && ny >= top.Frame.Y) {
-				ny = Math.Max (top.Frame.Bottom - 2, 0);
-			} else if (rHeight < 0 && ny >= top.Frame.Y) {
-				ny = Math.Min (ny + 1, top.Frame.Bottom - 2);
+			ny = !top.IsMdiChild && !top.Modal && ny + superViewBorder * 2 + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height - superViewBorder * 2, m ? 1 : 0) : ny;
+			ny = top.Modal && ny + superViewBorder * 2 + top.Frame.Height >= l ? l - top.Frame.Height - superViewBorder : ny;
+			ny = top.IsMdiChild && ny + superViewBorder + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height - superViewBorder, m ? 1 : 0) : ny;
+			if (ny + topBorder * 2 > top.Frame.Y + top.Frame.Height) {
+				ny = Math.Max (top.Frame.Bottom - topBorder * 2, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
+			if (superView != null && superView == top && superView == Application.Top) {
+				nx = superView.Frame.X; ny = superView.Frame.Y;
+			}
+
+			return superView;
+		}
+
+		View GetSuperView (View view)
+		{
+			if (view.SuperView == null) {
+				return Application.Top;
+			}
+			var superView = view.SuperView;
+			if (superView.GetType ().Name == "ContentView") {
+				return superView.SuperView;
+			}
 			return superView;
 		}
 
@@ -673,6 +735,10 @@ namespace Terminal.Gui {
 			foreach (var top in Subviews) {
 				if (top is Toplevel) {
 					PositionToplevel ((Toplevel)top);
+				} else if (top.GetType ().Name == "ContentView") {
+					foreach (var subTop in top.Subviews.Where (v => v is Toplevel)) {
+						PositionToplevel ((Toplevel)subTop);
+					}
 				}
 			}
 		}
@@ -685,23 +751,26 @@ namespace Terminal.Gui {
 		{
 			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
 				out int nx, out int ny, out _, out View sb);
+			if (superView != null && superView == top && superView == Application.Top) {
+				return;
+			}
 			bool layoutSubviews = false;
-			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
-				|| (top?.SuperView == null && top.IsMdiChild))
-				&& (nx > top.Frame.X || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+			if ((superView != null || (top != Application.Top && top.Modal)
+				|| (superView == null && top.IsMdiChild))
+				&& (nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
 
-				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
+				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 					top.X = nx;
 					layoutSubviews = true;
 				}
-				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
+				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny) {
 					top.Y = ny;
 					layoutSubviews = true;
 				}
 			}
 
 			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-					&& top.Height is Dim.DimFill) {
+				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
 				top.Height = Dim.Fill (sb.Visible ? 1 : 0);
 				layoutSubviews = true;
@@ -757,7 +826,7 @@ namespace Terminal.Gui {
 			base.Redraw (Bounds);
 		}
 
-		bool OutsideTopFrame (Toplevel top)
+		internal bool OutsideTopFrame (Toplevel top)
 		{
 			if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows) {
 				return true;
@@ -775,6 +844,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
+
 			int nx, ny;
 			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
 				|| mouseEvent.Flags == MouseFlags.Button2Pressed
@@ -786,11 +857,10 @@ namespace Terminal.Gui {
 				// Only start grabbing if the user clicks on the title bar.
 				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
 					start = new Point (mouseEvent.X, mouseEvent.Y);
-					dragPosition = new Point ();
+					Application.GrabMouse (this);
 					nx = mouseEvent.X - mouseEvent.OfX;
 					ny = mouseEvent.Y - mouseEvent.OfY;
 					dragPosition = new Point (nx, ny);
-					Application.GrabMouse (this);
 				}
 
 				//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
@@ -809,32 +879,26 @@ namespace Terminal.Gui {
 						SuperView.SetNeedsDisplay ();
 					}
 					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
-						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y),
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - start.Y : Frame.Y - start.Y),
 						out nx, out ny, out _, out _);
 
 					dragPosition = new Point (nx, ny);
-					LayoutSubviews ();
-					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
-					if (X == null || X is Pos.PosAbsolute) {
-						X = nx;
-					}
-					if (Y == null || Y is Pos.PosAbsolute) {
-						Y = ny;
-					}
-					//System.Diagnostics.Debug.WriteLine ($"nx:{nx},ny:{ny}");
+					X = nx;
+					Y = ny;
+					//System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
 
 					SetNeedsDisplay ();
 					return true;
 				}
 			}
 
-			if (mouseEvent.Flags == MouseFlags.Button1Released && dragPosition.HasValue) {
-				Application.UngrabMouse ();
-				Driver.UncookMouse ();
+			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 				dragPosition = null;
+				Application.UngrabMouse ();
 			}
 
-			//System.Diagnostics.Debug.WriteLine (mouseEvent.ToString ());
+			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
+			//System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
 			return false;
 		}
 
@@ -917,6 +981,12 @@ namespace Terminal.Gui {
 		{
 			if (!IsMdiContainer) {
 				base.PositionCursor ();
+				if (Focused == null) {
+					EnsureFocus ();
+					if (Focused == null) {
+						Driver.SetCursorVisibility (CursorVisibility.Invisible);
+					}
+				}
 				return;
 			}
 
@@ -929,6 +999,9 @@ namespace Terminal.Gui {
 				}
 			}
 			base.PositionCursor ();
+			if (Focused == null) {
+				Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			}
 		}
 
 		/// <summary>
@@ -967,6 +1040,28 @@ namespace Terminal.Gui {
 				return Application.ShowChild (top == null ? this : top);
 			}
 			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			return MostFocused?.OnEnter (view) ?? base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
+		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			Application.GrabbingMouse -= Application_GrabbingMouse;
+			Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+			dragPosition = null;
+			base.Dispose (disposing);
 		}
 	}
 

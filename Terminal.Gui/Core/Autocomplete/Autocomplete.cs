@@ -324,6 +324,7 @@ namespace Terminal.Gui {
 			if (IsWordChar ((char)kb.Key)) {
 				Visible = true;
 				closed = false;
+				return false;
 			}
 
 			if (kb.Key == Reopen) {
@@ -332,6 +333,9 @@ namespace Terminal.Gui {
 
 			if (closed || Suggestions.Count == 0) {
 				Visible = false;
+				if (!closed) {
+					Close ();
+				}
 				return false;
 			}
 
@@ -343,6 +347,17 @@ namespace Terminal.Gui {
 			if (kb.Key == Key.CursorUp) {
 				MoveUp ();
 				return true;
+			}
+
+			if (kb.Key == Key.CursorLeft || kb.Key == Key.CursorRight) {
+				GenerateSuggestions (kb.Key == Key.CursorLeft ? -1 : 1);
+				if (Suggestions.Count == 0) {
+					Visible = false;
+					if (!closed) {
+						Close ();
+					}
+				}
+				return false;
 			}
 
 			if (kb.Key == SelectionKey) {
@@ -368,6 +383,9 @@ namespace Terminal.Gui {
 		public virtual bool MouseEvent (MouseEvent me, bool fromHost = false)
 		{
 			if (fromHost) {
+				if (!Visible) {
+					return false;
+				}
 				GenerateSuggestions ();
 				if (Visible && Suggestions.Count == 0) {
 					Visible = false;
@@ -444,7 +462,8 @@ namespace Terminal.Gui {
 		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
 		/// match with the current cursor position/text in the <see cref="HostControl"/>
 		/// </summary>
-		public virtual void GenerateSuggestions ()
+		/// <param name="columnOffset">The column offset.</param>
+		public virtual void GenerateSuggestions (int columnOffset = 0)
 		{
 			// if there is nothing to pick from
 			if (AllSuggestions.Count == 0) {
@@ -452,7 +471,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var currentWord = GetCurrentWord ();
+			var currentWord = GetCurrentWord (columnOffset);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
 				ClearSuggestions ();
@@ -524,11 +543,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns the currently selected word from the <see cref="HostControl"/>.
 		/// <para>
-		/// When overriding this method views can make use of <see cref="IdxToWord(List{Rune}, int)"/>
+		/// When overriding this method views can make use of <see cref="IdxToWord(List{Rune}, int, int)"/>
 		/// </para>
 		/// </summary>
+		/// <param name="columnOffset">The column offset.</param>
 		/// <returns></returns>
-		protected abstract string GetCurrentWord ();
+		protected abstract string GetCurrentWord (int columnOffset = 0);
 
 		/// <summary>
 		/// <para>
@@ -536,37 +556,40 @@ namespace Terminal.Gui {
 		/// or null.  Also returns null if the <paramref name="idx"/> is positioned in the middle of a word.
 		/// </para>
 		/// 
-		/// <para>Use this method to determine whether autocomplete should be shown when the cursor is at
-		/// a given point in a line and to get the word from which suggestions should be generated.</para>
+		/// <para>
+		/// Use this method to determine whether autocomplete should be shown when the cursor is at
+		/// a given point in a line and to get the word from which suggestions should be generated.
+		/// Use the <paramref name="columnOffset"/> to indicate if search the word at left (negative),
+		/// at right (positive) or at the current column (zero) which is the default.
+		/// </para>
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
+		/// <param name="columnOffset"></param>
 		/// <returns></returns>
-		protected virtual string IdxToWord (List<Rune> line, int idx)
+		protected virtual string IdxToWord (List<Rune> line, int idx, int columnOffset = 0)
 		{
 			StringBuilder sb = new StringBuilder ();
+			var endIdx = idx;
 
-			// do not generate suggestions if the cursor is positioned in the middle of a word
-			bool areMidWord;
-
-			if (idx == line.Count) {
-				// the cursor positioned at the very end of the line
-				areMidWord = false;
-			} else {
-				// we are in the middle of a word if the cursor is over a letter/number
-				areMidWord = IsWordChar (line [idx]);
+			// get the ending word index
+			while (endIdx < line.Count) {
+				if (IsWordChar (line [endIdx])) {
+					endIdx++;
+				} else {
+					break;
+				}
 			}
 
-			// if we are in the middle of a word then there is no way to autocomplete that word
-			if (areMidWord) {
+			// It isn't a word char then there is no way to autocomplete that word
+			if (endIdx == idx && columnOffset != 0) {
 				return null;
 			}
 
 			// we are at the end of a word.  Work out what has been typed so far
-			while (idx-- > 0) {
-
-				if (IsWordChar (line [idx])) {
-					sb.Insert (0, (char)line [idx]);
+			while (endIdx-- > 0) {
+				if (IsWordChar (line [endIdx])) {
+					sb.Insert (0, (char)line [endIdx]);
 				} else {
 					break;
 				}

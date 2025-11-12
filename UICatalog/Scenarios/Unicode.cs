@@ -34,14 +34,14 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Paste", "", null)
 				})
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Выход", () => Application.RequestStop()),
 				new StatusItem (Key.Unknown, "~F2~ Создать", null),
 				new StatusItem(Key.Unknown, "~F3~ Со_хранить", null),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			var label = new Label ("Label:") { X = 0, Y = 1 };
 			Win.Add (label);
@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 
 			label = new Label ("RadioGroup:") { X = Pos.X (label), Y = Pos.Bottom (listView) + 1 };
 			Win.Add (label);
-			var radioGroup = new RadioGroup (new ustring [] { "item #1", gitString, "Со_хранить" }, selected: 0) {
+			var radioGroup = new RadioGroup (new ustring [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }, selected: 0) {
 				X = 20,
 				Y = Pos.Y (label),
 				Width = Dim.Percent (60),

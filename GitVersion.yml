@@ -1,0 +1,69 @@
+# V1 0 This file configures GitVersion 6.x to work with Terminal.Gui's GitFlow branching strategy.
+#
+# Terminal.Gui v1 uses the GitFlow branching strategy.
+# https://gitversion.net/docs/learn/branching-strategies/gitflow/
+#
+# - We have two main branches: `v1_release` and `v1_develop`.
+# - `v1_release` is the main branch for V1 releases and matches the latest NuGet release package (e.g., 1.0.0);
+#   prior to release, it uses pre-release labels (e.g., 1.0.0-prealpha.1).
+# - `v1_develop` is the development branch for V2 and always carries a pre-release label (e.g., 1.1.0-develop.1).
+# - Development happens on feature branches off `v1_develop`.
+# - For releases, we merge feature branches into `v1_develop`, then `v1_develop` into `v1_release`.
+# - The ./.github/workflows/publish.yml builds and publishes on pushes to `v1_develop` and `v1_release`.
+#
+# Branches
+# - v1_release: Main branch for V1 (historical)
+# - v1_develop: Develop branch for V1 (historical)
+#
+# Package Naming:
+# - from v1_develop: 1.1.0-develop.1 (minor version increments)
+# - from v1_release (pre-release): 1.0.0-prealpha.1 or 1.0.0-beta.1
+# - from v1_release (release): 1.0.0 (patch version increments)
+#
+mode: ContinuousDelivery   # GitVersion 6.x uses Mainline mode for GitFlow, focusing on main branch releases
+
+# We prefix our tags with 'v' or 'V' (e.g., v1.0.0)
+tag-prefix: '[vV]'
+
+branches:
+
+  # V1 Release Branch
+  main:
+    # Matches the v1_release branch
+    regex: ^v1_release$
+    # Increments patch version (x.y.z+1) on commits
+    increment: Patch
+    # Specifies v1_develop as the source branch
+    source-branches: ['develop']
+
+  # V1 Development Branch
+  develop:
+    # Matches the v1_develop branch
+    regex: v1_develop
+    # Adds 'develop' as pre-release label (e.g., 2.1.0-develop.1)
+    label: develop
+    # Increments minor version (x.y+1.z) on commits
+    increment: Minor
+    # No source branches specified as this is the root of development
+    source-branches: []
+    # Indicates this branch feeds into release branches
+    tracks-release-branches: true
+
+  # Pull Request Branches
+  # Configures versioning for PRs (e.g., 2.0.0-pr.feature-123.1)
+  pull-request:
+    # Matches typical PR branch names
+    regex: ^(pull|pull\-requests|pr)[/-]
+    # Uses 'pr' prefix with branch name in the label (e.g., pr.feature-123)
+    label: pr.{BranchName}
+    # Inherits increment strategy from source branch
+    increment: Inherit
+    source-branches:
+      - develop
+      - main
+    # High weight ensures PR versions sort after regular pre-releases
+    pre-release-weight: 30000
+
+# Ignore specific commits if needed (currently empty)
+ignore:
+  sha: []

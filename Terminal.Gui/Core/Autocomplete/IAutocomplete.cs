@@ -109,6 +109,7 @@ namespace Terminal.Gui {
 		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
 		/// match with the current cursor position/text in the <see cref="HostControl"/>.
 		/// </summary>
-		void GenerateSuggestions ();
+		/// <param name="columnOffset">The column offset. Current (zero - default), left (negative), right (positive).</param>
+		void GenerateSuggestions (int columnOffset = 0);
 	}
 }

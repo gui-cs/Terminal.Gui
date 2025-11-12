@@ -25,12 +25,12 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 			});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			//Top.LayoutStyle = LayoutStyle.Computed;
 			// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width

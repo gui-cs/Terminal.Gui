@@ -12,17 +12,10 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Controls")]
 	public class BackgroundWorkerCollection : Scenario {
-		public override void Init (Toplevel top, ColorScheme colorScheme)
-		{
-			Application.Top.Dispose ();
-
-			Application.Run<MdiMain> ();
-
-			Application.Top.Dispose ();
-		}
 
 		public override void Run ()
 		{
+			Application.Run<MdiMain> ();
 		}
 
 		class MdiMain : Toplevel {
@@ -334,7 +327,7 @@ namespace UICatalog.Scenarios {
 				};
 				Add (listView);
 
-				start = new Button ("Start") { IsDefault = true };
+				start = new Button ("Start") { IsDefault = true, ClearOnVisibleFalse = false };
 				start.Clicked += () => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();

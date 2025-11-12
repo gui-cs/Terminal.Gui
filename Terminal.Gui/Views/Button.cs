@@ -129,6 +129,10 @@ namespace Terminal.Gui {
 		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
 		/// </summary>
 		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
+		/// <remarks>
+		/// If is <see langword="true"/> the current focused view
+		/// will remain focused if the window is not closed.
+		/// </remarks>
 		public bool IsDefault {
 			get => is_default;
 			set {
@@ -219,7 +223,7 @@ namespace Terminal.Gui {
 
 		bool AcceptKey ()
 		{
-			if (!HasFocus) {
+			if (!IsDefault && !HasFocus) {
 				SetFocus ();
 			}
 			OnClicked ();
@@ -248,8 +252,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags == MouseFlags.Button1TripleClicked) {
+			if (me.Flags == MouseFlags.Button1Clicked) {
 				if (CanFocus && Enabled) {
 					if (!HasFocus) {
 						SetFocus ();

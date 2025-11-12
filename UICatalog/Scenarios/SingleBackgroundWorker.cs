@@ -11,11 +11,11 @@ namespace UICatalog.Scenarios {
 	public class SingleBackgroundWorker : Scenario {
 		public override void Run ()
 		{
-			Top.Dispose ();
+			Application.Top.Dispose ();
 
 			Application.Run<MainApp> ();
 
-			Top.Dispose ();
+			System.Diagnostics.Debug.Assert (Application.Top == null);
 		}
 
 		public class MainApp : Toplevel {

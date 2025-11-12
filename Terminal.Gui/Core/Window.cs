@@ -10,7 +10,7 @@
 // Any udpates done here should probably be done in FrameView as well; TODO: Merge these classes
 
 using System;
-using System.Collections;
+using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
@@ -35,6 +35,9 @@ namespace Terminal.Gui {
 				if (!OnTitleChanging (title, value)) {
 					var old = title;
 					title = value;
+					if (Border != null) {
+						Border.Title = title;
+					}
 					OnTitleChanged (old, title);
 				}
 				SetNeedsDisplay ();
@@ -85,16 +88,23 @@ namespace Terminal.Gui {
 
 			public ContentView (Rect frame, Window instance) : base (frame)
 			{
-				this.instance = instance;
+				Initialize (instance);
 			}
 			public ContentView (Window instance) : base ()
 			{
+				Initialize (instance);
+			}
+
+			private void Initialize (Window instance)
+			{
 				this.instance = instance;
+				CanFocus = this.instance.CanFocus;
+				Driver?.SetCursorVisibility (CursorVisibility.Invisible);
 			}
 
 			public override void OnCanFocusChanged ()
 			{
-				if (MostFocused == null && CanFocus && Visible) {
+				if (HasFocus && MostFocused == null && CanFocus && Visible) {
 					EnsureFocus ();
 				}
 
@@ -180,10 +190,13 @@ namespace Terminal.Gui {
 				Border = new Border () {
 					BorderStyle = BorderStyle.Single,
 					Padding = new Thickness (padding),
-					BorderBrush = ColorScheme.Normal.Background
+					Title = title
 				};
 			} else {
 				Border = border;
+				if (ustring.IsNullOrEmpty (border.Title)) {
+					border.Title = title;
+				}
 			}
 			AdjustContentView (frame);
 		}
@@ -242,10 +255,12 @@ namespace Terminal.Gui {
 			contentView.Add (view);
 			if (view.CanFocus) {
 				CanFocus = true;
+				if (contentView.HasFocus && contentView.MostFocused == null) {
+					view.SetFocus ();
+				}
 			}
 			AddMenuStatusBar (view);
 		}
-
 
 		/// <inheritdoc/>
 		public override void Remove (View view)
@@ -255,11 +270,12 @@ namespace Terminal.Gui {
 			}
 
 			SetNeedsDisplay ();
-			contentView.Remove (view);
-
-			if (contentView.InternalSubviews.Count < 1) {
-				CanFocus = false;
+			if (view == contentView) {
+				base.Remove (view);
+			} else {
+				contentView.Remove (view);
 			}
+
 			RemoveMenuStatusBar (view);
 			if (view != contentView && Focused == null) {
 				FocusFirst ();
@@ -275,40 +291,44 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var padding = Border.GetSumThickness ();
-			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
-			//var borderLength = Border.DrawMarginFrame ? 1 : 0;
-
-			// FIXED: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
-			if (!NeedDisplay.IsEmpty) {
+			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
+				var savedFrame = Frame;
+				PositionToplevels ();
+				if (Application.MdiTop != null && SuperView == null && this != Application.Top && LayoutStyle == LayoutStyle.Computed) {
+					SetRelativeLayout (Application.Top.Frame);
+					if (Frame != savedFrame) {
+						Application.Top.SetNeedsDisplay ();
+						Application.Top.Redraw (Application.Top.Bounds);
+						Redraw (Bounds);
+					}
+				}
+				LayoutSubviews ();
+				if (this == Application.MdiTop) {
+					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+						if (top.Frame.IntersectsWith (bounds)) {
+							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
+								top.SetNeedsLayout ();
+								top.SetNeedsDisplay (top.Bounds);
+								top.Redraw (top.Bounds);
+							}
+						}
+					}
+				}
+				contentView.SetNeedsDisplay ();
 			}
 			var savedClip = contentView.ClipToBounds ();
 
 			// Redraw our contentView
-			// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
-			contentView.Redraw (!NeedDisplay.IsEmpty ? contentView.Bounds : bounds);
+			contentView.Redraw (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 
 			Driver.SetAttribute (GetNormalColor ());
-			//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
-			//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
 			Border.DrawContent (this, false);
-			if (HasFocus)
-				Driver.SetAttribute (ColorScheme.HotNormal);
-			if (Border.DrawMarginFrame)
-				Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-			Driver.SetAttribute (GetNormalColor ());
-
-			// Checks if there are any SuperView view which intersect with this window.
-			if (SuperView != null) {
-				SuperView.SetNeedsLayout ();
-				SuperView.SetNeedsDisplay ();
-			}
 		}
 
 		/// <inheritdoc/>

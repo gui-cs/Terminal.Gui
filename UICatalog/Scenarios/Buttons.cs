@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 
 			//View prev = colorButtonsLabel;
 
-			//With this method there is no need to call Top.Ready += () => Top.Redraw (Top.Bounds);
+			//With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
 			var x = Pos.Right (colorButtonsLabel) + 2;
 			foreach (var colorScheme in Colors.ColorSchemes) {
 				var colorButton = new Button ($"{colorScheme.Key}") {
@@ -272,7 +272,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Top.Ready += () => radioGroup.Refresh ();
+			Application.Top.Ready += () => radioGroup.Refresh ();
 		}
 	}
 }

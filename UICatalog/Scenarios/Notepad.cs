@@ -11,11 +11,10 @@ namespace UICatalog.Scenarios {
 		private int numbeOfNewTabs = 1;
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top != null ? top : Application.Top;
-			Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.Base;
 		}
 
 		public override void Setup ()
@@ -30,7 +29,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				})
 				});
-			Top.Add (menu);
+			Application.Top.Add (menu);
 
 			tabView = new TabView () {
 				X = 0,
@@ -39,10 +38,12 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
+			tabView.TabClicked += TabView_TabClicked;
+
 			tabView.Style.ShowBorder = true;
 			tabView.ApplyStyleChanges ();
 
-			Top.Add (tabView);
+			Application.Top.Add (tabView);
 
 			var lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
@@ -59,9 +60,37 @@ namespace UICatalog.Scenarios {
 
 			tabView.SelectedTabChanged += (s, e) => lenStatusItem.Title = $"Len:{(e.NewTab?.View?.Text?.Length ?? 0)}";
 
-			Top.Add (statusBar);
+			Application.Top.Add (statusBar);
 
 			New ();
+		}
+
+		private void TabView_TabClicked (object sender, TabView.TabMouseEventArgs e)
+		{
+			// we are only interested in right clicks
+			if(!e.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {
+				return;
+			}
+
+			MenuBarItem items;
+
+			if (e.Tab == null) {
+				items = new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Open", "", () => Open()),
+				});
+
+			} else {
+				items = new MenuBarItem (new MenuItem [] {
+					new MenuItem ($"Save", "", () => Save(e.Tab)),
+					new MenuItem ($"Close", "", () => Close(e.Tab)),
+				});
+			}
+
+
+			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1, items);
+
+			contextMenu.Show ();
+			e.MouseEvent.Handled = true;
 		}
 
 		private void New ()
@@ -71,7 +100,11 @@ namespace UICatalog.Scenarios {
 
 		private void Close ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
+			Close (tabView.SelectedTab);
+		}
+		private void Close (TabView.Tab tabToClose)
+		{
+			var tab = tabToClose as OpenedFile;
 
 			if (tab == null) {
 				return;
@@ -159,7 +192,11 @@ namespace UICatalog.Scenarios {
 
 		public void Save ()
 		{
-			var tab = tabView.SelectedTab as OpenedFile;
+			Save (tabView.SelectedTab);
+		}
+		public void Save (TabView.Tab tabToSave)
+		{
+			var tab = tabToSave as OpenedFile;
 
 			if (tab == null) {
 				return;

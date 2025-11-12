@@ -5,53 +5,70 @@
 
 using Terminal.Gui;
 
-// Initialize the console
-Application.Init();
+Application.Run<ExampleWindow> ();
 
-// Creates the top-level window with border and title
-var win = new Window("Example App (Ctrl+Q to quit)");
+// Before the application exits, reset Terminal.Gui for clean shutdown
+Application.Shutdown ();
 
-// Create input components and labels
+System.Console.WriteLine ($@"Username: {ExampleWindow.Username}");
 
-var usernameLabel = new Label("Username:");
-var usernameText = new TextField("")
-{
-    // Position text field adjacent to label
-    X = Pos.Right(usernameLabel) + 1,
+// Defines a top-level window with border and title
+public class ExampleWindow : Window {
+	public static string Username { get; internal set; }
+	public TextField usernameText;
 
-    // Fill remaining horizontal space with a margin of 1
-    Width = Dim.Fill(1),
-};
+	public ExampleWindow ()
+	{
+		Title = "Example App (Ctrl+Q to quit)";
 
-var passwordLabel = new Label(0,2,"Password:");
-var passwordText = new TextField("")
-{
-    Secret = true,
-    // align with the text box above
-    X = Pos.Left(usernameText),
-    Y = 2,
-    Width = Dim.Fill(1),
-};
+		// Create input components and labels
+		var usernameLabel = new Label () {
+			Text = "Username:"
+		};
 
-// Create login button
-var btnLogin = new Button("Login")
-{
-    Y = 4,
-    // center the login button horizontally
-    X = Pos.Center(),
-    IsDefault = true,
-};
+		usernameText = new TextField ("") {
+			// Position text field adjacent to the label
+			X = Pos.Right (usernameLabel) + 1,
 
-// When login button is clicked display a message popup
-btnLogin.Clicked += () => MessageBox.Query("Logging In", "Login Successful", "Ok");
+			// Fill remaining horizontal space
+			Width = Dim.Fill (),
+		};
 
-// Add all the views to the window
-win.Add(
-    usernameLabel, usernameText, passwordLabel, passwordText,btnLogin
-);
+		var passwordLabel = new Label () {
+			Text = "Password:",
+			X = Pos.Left (usernameLabel),
+			Y = Pos.Bottom (usernameLabel) + 1
+		};
 
-// Show the application
-Application.Run(win);
+		var passwordText = new TextField ("") {
+			Secret = true,
+			// align with the text box above
+			X = Pos.Left (usernameText),
+			Y = Pos.Top (passwordLabel),
+			Width = Dim.Fill (),
+		};
 
-// After the application exits, release and reset console for clean shutdown
-Application.Shutdown();
+		// Create login button
+		var btnLogin = new Button () {
+			Text = "Login",
+			Y = Pos.Bottom (passwordLabel) + 1,
+			// center the login button horizontally
+			X = Pos.Center (),
+			IsDefault = true,
+		};
+
+		// When login button is clicked display a message popup
+		btnLogin.Clicked += () => {
+			if (usernameText.Text == "admin" && passwordText.Text == "password") {
+				MessageBox.Query ("Logging In", "Login Successful", "Ok");
+				Username = usernameText.Text.ToString ();
+				Application.RequestStop ();
+			} else {
+				MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+			}
+		};
+
+		// Add the views to the Window
+		Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
+	}
+}

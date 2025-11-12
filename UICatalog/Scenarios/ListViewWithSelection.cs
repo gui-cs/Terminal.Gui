@@ -21,7 +21,7 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			_scenarios = Scenario.GetScenarios ().OrderBy (s => s.GetName ()).ToList ();
+			_scenarios = Scenario.GetScenarios ();
 
 			_customRenderCB = new CheckBox ("Use custom rendering") {
 				X = 0,
@@ -79,9 +79,9 @@ namespace UICatalog.Scenarios {
 			};
 
 			_listView.DrawContent += (e) => {
-				_scrollBar.Size = _listView.Source.Count - 1;
+				_scrollBar.Size = _listView.Source.Count;
 				_scrollBar.Position = _listView.TopItem;
-				_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
+				_scrollBar.OtherScrollBarView.Size = _listView.Maxlength;
 				_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
 				_scrollBar.Refresh ();
 			};

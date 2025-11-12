@@ -32,6 +32,7 @@ namespace Terminal.Gui {
 		private class ContentView : View {
 			public ContentView (Rect frame) : base (frame)
 			{
+				CanFocus = true;
 			}
 		}
 
@@ -236,6 +237,39 @@ namespace Terminal.Gui {
 			SetNeedsLayout ();
 		}
 
+		/// <summary>
+		/// Removes the view from the scrollview.
+		/// </summary>
+		/// <param name="view">The view to remove from the scrollview.</param>
+		public override void Remove (View view)
+		{
+			if (view == null) {
+				return;
+			}
+
+			SetNeedsDisplay ();
+			var container = view?.SuperView;
+			if (container == this) {
+				base.Remove (view);
+			} else {
+				container?.Remove (view);
+			}
+
+			if (contentView.InternalSubviews.Count < 1) {
+				this.CanFocus = false;
+			}
+		}
+
+		/// <summary>
+		///   Removes all widgets from this container.
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		public override void RemoveAll ()
+		{
+			contentView.RemoveAll ();
+		}
+
 		void View_MouseLeave (MouseEventArgs e)
 		{
 			if (Application.MouseGrabView != null && Application.MouseGrabView != vertical && Application.MouseGrabView != horizontal) {
@@ -277,16 +311,6 @@ namespace Terminal.Gui {
 				}
 				vertical.Height = Dim.Fill (showHorizontalScrollIndicator ? 1 : 0);
 			}
-		}
-
-		/// <summary>
-		///   Removes all widgets from this container.
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
-		public override void RemoveAll ()
-		{
-			contentView.RemoveAll ();
 		}
 
 		/// <summary>
@@ -348,7 +372,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// Fill in the bottom left corner
+			// Fill in the bottom right corner
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}
@@ -507,7 +531,7 @@ namespace Terminal.Gui {
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
 				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft &&
-				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
 			}

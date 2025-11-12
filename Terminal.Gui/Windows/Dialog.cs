@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 	///  or buttons added to the dialog calls <see cref="Application.RequestStop"/>.
 	/// </remarks>
 	public class Dialog : Window {
-		List<Button> buttons = new List<Button> ();
+		internal List<Button> buttons = new List<Button> ();
 		const int padding = 0;
 
 		/// <summary>
@@ -164,7 +164,11 @@ namespace Terminal.Gui {
 				for (int i = buttons.Count - 1; i >= 0; i--) {
 					Button button = buttons [i];
 					shiftLeft += button.Frame.Width + (i == buttons.Count - 1 ? 0 : 1);
-					button.X = Pos.AnchorEnd (shiftLeft);
+					if (shiftLeft > -1) {
+						button.X = Pos.AnchorEnd (shiftLeft);
+					} else {
+						button.X = Frame.Width - shiftLeft;
+					}
 					button.Y = Pos.AnchorEnd (1);
 				}
 				break;
@@ -173,7 +177,7 @@ namespace Terminal.Gui {
 				// Justify Buttons
 				// leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
-				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth - 2) / (buttons.Count - 1));
+				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth - (Border.DrawMarginFrame ? 2 : 0)) / (buttons.Count - 1));
 				for (int i = buttons.Count - 1; i >= 0; i--) {
 					Button button = buttons [i];
 					if (i == buttons.Count - 1) {
@@ -183,7 +187,7 @@ namespace Terminal.Gui {
 						if (i == 0) {
 							// first (leftmost) button - always hard flush left
 							var left = Bounds.Width - ((Border.DrawMarginFrame ? 2 : 0) + Border.BorderThickness.Left + Border.BorderThickness.Right);
-							button.X = Pos.AnchorEnd (left);
+							button.X = Pos.AnchorEnd (Math.Max (left, 0));
 						} else {
 							shiftLeft += button.Frame.Width + (spacing);
 							button.X = Pos.AnchorEnd (shiftLeft);

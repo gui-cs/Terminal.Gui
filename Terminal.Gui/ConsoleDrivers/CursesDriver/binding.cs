@@ -41,21 +41,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
+//#define USE_IOCTL
+
 using System;
 using System.Runtime.InteropServices;
+using Terminal.Gui;
 
 namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 	public partial class Curses {
-		//[StructLayout (LayoutKind.Sequential)]
-		//public struct winsize {
-		//	public ushort ws_row;
-		//	public ushort ws_col;
-		//	public ushort ws_xpixel;   /* unused */
-		//	public ushort ws_ypixel;   /* unused */
-		//};
+#if USE_IOCTL
 
+		[StructLayout (LayoutKind.Sequential)]
+		public struct winsize {
+			public ushort ws_row;
+			public ushort ws_col;
+			public ushort ws_xpixel;   /* unused */
+			public ushort ws_ypixel;   /* unused */
+		};
+#endif
 		[StructLayout (LayoutKind.Sequential)]
 		public struct MouseEvent {
 			public short ID;
@@ -76,15 +81,33 @@ namespace Unix.Terminal {
 
 		[DllImport ("libc")]
 		public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
+#if USE_IOCTL
 
-		//[DllImport ("libc")]
-		//public extern static int ioctl (int fd, int cmd, out winsize argp);
-
+		[DllImport ("libc")]
+		public extern static int ioctl (int fd, int cmd, out winsize argp);
+#endif
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
-			curses_library = new UnmanagedLibrary (libs, false);
-			methods = new NativeMethods (curses_library);
+			var attempts = 1;
+			while (true) {
+				try {
+					curses_library = new UnmanagedLibrary (libs, false);
+					methods = new NativeMethods (curses_library);
+					break;
+				} catch (Exception ex) {
+
+					if (attempts == 1) {
+						attempts++;
+						var (exitCode, result) = ClipboardProcessRunner.Bash ("cat /etc/os-release", waitForOutput: true);
+						if (exitCode == 0 && result.Contains ("opensuse")) {
+							libs [0] = "libncursesw.so.5";
+						}
+					} else {
+						throw ex.GetBaseException ();
+					}
+				}
+			}
 		}
 
 		static void FindNCurses ()
@@ -142,14 +165,12 @@ namespace Unix.Terminal {
 
 			console_sharp_get_dims (out l, out c);
 
-			if (l == 1 || l != lines || c != cols) {
+			if (l < 1) {
+				l = 1;
+			}
+			if (l != lines || c != cols) {
 				lines = l;
 				cols = c;
-				//if (l <= 0 || c <= 0) {
-				//	Console.Out.Write ($"\x1b[8;50;{c}t");
-				//	Console.Out.Flush ();
-				//	return false;
-				//}
 				return true;
 			}
 			return false;
@@ -211,9 +232,32 @@ namespace Unix.Terminal {
 
 		internal static void console_sharp_get_dims (out int lines, out int cols)
 		{
+#if USE_IOCTL
+
+			if (UnmanagedLibrary.IsMacOSPlatform) {
+				int cmd = TIOCGWINSZ_MAC;
+
+				if (ioctl (1, cmd, out winsize ws) == 0) {
+					lines = ws.ws_row;
+					cols = ws.ws_col;
+
+					if (lines == Lines && cols == Cols) {
+						return;
+					}
+
+					resizeterm (lines, cols);
+				} else {
+					lines = Lines;
+					cols = Cols;
+				}
+			} else {
+				lines = Marshal.ReadInt32 (lines_ptr);
+				cols = Marshal.ReadInt32 (cols_ptr);
+			}
+#else
 			lines = Marshal.ReadInt32 (lines_ptr);
 			cols = Marshal.ReadInt32 (cols_ptr);
-
+#endif
 			//int cmd;
 			//if (UnmanagedLibrary.IsMacOSPlatform) {
 			//	cmd = TIOCGWINSZ_MAC;
@@ -331,11 +375,13 @@ namespace Unix.Terminal {
 		static public int savetty () => methods.savetty ();
 		static public int resetty () => methods.resetty ();
 		static public int set_escdelay (int size) => methods.set_escdelay (size);
+		static public int nodelay (IntPtr win, bool bf) => methods.nodelay (win, bf);
 	}
 
 #pragma warning disable RCS1102 // Make class static.
 	internal class Delegates {
 #pragma warning restore RCS1102 // Make class static.
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 		public delegate IntPtr initscr ();
 		public delegate int endwin ();
 		public delegate bool isendwin ();
@@ -407,6 +453,7 @@ namespace Unix.Terminal {
 		public delegate int savetty ();
 		public delegate int resetty ();
 		public delegate int set_escdelay (int size);
+		public delegate int nodelay (IntPtr win, bool bf);
 	}
 
 	internal class NativeMethods {
@@ -481,6 +528,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.savetty savetty;
 		public readonly Delegates.resetty resetty;
 		public readonly Delegates.set_escdelay set_escdelay;
+		public readonly Delegates.nodelay nodelay;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -557,7 +605,9 @@ namespace Unix.Terminal {
 			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
 			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
 			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
+			nodelay = lib.GetNativeMethodDelegate<Delegates.nodelay> ("nodelay");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 }

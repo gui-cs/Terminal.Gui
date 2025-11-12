@@ -2,7 +2,9 @@
 # the repo. Unless a later match takes precedence,
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
-*       @migueldeicaza @tig
+* @tig
+
+/docfx/ @tig @tznind @bdisp
 
 # Order is important; the last matching pattern takes the most
 # precedence. When someone opens a pull request that only
@@ -29,7 +31,6 @@
 # The `docs/*` pattern will match files like
 # `docs/getting-started.md` but not further nested files like
 # `docs/build-app/troubleshooting.md`.
-#docs/*  docs@example.com
 
 # In this example, @octocat owns any file in an apps directory
 # anywhere in your repository.

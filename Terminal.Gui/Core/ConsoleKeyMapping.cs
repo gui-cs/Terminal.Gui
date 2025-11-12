@@ -334,6 +334,25 @@ namespace Terminal.Gui {
 			return (Key)consoleKey;
 		}
 
+		/// <summary>
+		/// Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="Key"/>.
+		/// </summary>
+		/// <param name="keyInfo">The console key info.</param>
+		/// <param name="key">The key.</param>
+		/// <returns>The <see cref="Key"/> with <see cref="ConsoleModifiers"/> or the <paramref name="key"/></returns>
+		public static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		{
+			Key keyMod = new Key ();
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+				keyMod = Key.ShiftMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+				keyMod |= Key.CtrlMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+				keyMod |= Key.AltMask;
+
+			return keyMod != Key.Null ? keyMod | key : key;
+		}
+
 		private static HashSet<ScanCodeMapping> scanCodes = new HashSet<ScanCodeMapping> {
 			new ScanCodeMapping (1,27,0,27),	// Escape
 			new ScanCodeMapping (1,27,ConsoleModifiers.Shift,27),

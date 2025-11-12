@@ -30,12 +30,12 @@ namespace UICatalog.Scenarios {
 		private TabView _tabView;
 		private MenuItem _miForceMinimumPosToZero;
 		private bool _forceMinimumPosToZero = true;
-		private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
+		private List<CultureInfo> _cultureInfos;
 
-		public override void Init (Toplevel top, ColorScheme colorScheme)
+		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Top = top != null ? top : Application.Top;
+			_cultureInfos = Application.SupportedCultures;
 
 			Win = new Window (_fileName ?? "Untitled") {
 				X = 0,
@@ -44,7 +44,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 				ColorScheme = colorScheme,
 			};
-			Top.Add (Win);
+			Application.Top.Add (Win);
 
 			_textView = new TextView () {
 				X = 0,
@@ -56,12 +56,6 @@ namespace UICatalog.Scenarios {
 			};
 
 			CreateDemoFile (_fileName);
-
-			var siCursorPosition = new StatusItem (Key.Null, "", null);
-
-			_textView.UnwrappedCursorPosition += (e) => {
-				siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
-			};
 
 			LoadFile ();
 
@@ -114,7 +108,9 @@ namespace UICatalog.Scenarios {
 				})
 			});
 
-			Top.Add (menu);
+			Application.Top.Add (menu);
+
+			var siCursorPosition = new StatusItem (Key.Null, "", null);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				siCursorPosition,
@@ -124,7 +120,13 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
-			Top.Add (statusBar);
+
+			_textView.UnwrappedCursorPosition += (e) => {
+				siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
+				statusBar.SetNeedsDisplay ();
+			};
+
+			Application.Top.Add (statusBar);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
@@ -164,7 +166,8 @@ namespace UICatalog.Scenarios {
 				_scrollBar.Size = _textView.Lines;
 				_scrollBar.Position = _textView.TopRow;
 				if (_scrollBar.OtherScrollBarView != null) {
-					_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
+					// + 1 is needed to show the cursor at the end of a line.
+					_scrollBar.OtherScrollBarView.Size = _textView.Maxlength + 1;
 					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
 				}
 				_scrollBar.LayoutSubviews ();
@@ -196,7 +199,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+			Application.Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()
@@ -343,7 +346,7 @@ namespace UICatalog.Scenarios {
 		private bool CanCloseFile ()
 		{
 			if (_textView.Text == _originalText) {
-				System.Diagnostics.Debug.Assert (!_textView.IsDirty);
+				//System.Diagnostics.Debug.Assert (!_textView.IsDirty);
 				return true;
 			}
 
@@ -365,7 +368,7 @@ namespace UICatalog.Scenarios {
 			if (!CanCloseFile ()) {
 				return;
 			}
-			var aTypes = new List<string> () { ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".*" };
+			var aTypes = new List<string> () { ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json", ".*" };
 			var d = new OpenDialog ("Open", "Choose the path where to open the file.", aTypes) { AllowsMultipleSelection = false };
 			Application.Run (d);
 

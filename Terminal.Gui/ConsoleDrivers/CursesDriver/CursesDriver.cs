@@ -1,11 +1,9 @@
 ﻿//
 // Driver.cs: Curses-based Driver
 //
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -22,6 +20,9 @@ namespace Terminal.Gui {
 		public override int Rows => Curses.Lines;
 		public override int Left => 0;
 		public override int Top => 0;
+		[Obsolete ("This API is deprecated", false)]
+		public override bool EnableConsoleScrolling { get; set; }
+		[Obsolete ("This API is deprecated", false)]
 		public override bool HeightAsBuffer { get; set; }
 		public override IClipboard Clipboard { get => clipboard; }
 
@@ -61,50 +62,72 @@ namespace Terminal.Gui {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					Curses.mvaddch (crow, ccol - 1, (int)(uint)c);
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
 
-					var curAtttib = currentAttribute;
-					Curses.attrset (contents [crow, ccol - 1, 1]);
-					Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
-
-					var curAtttib = currentAttribute;
-					Curses.attrset (contents [crow, ccol + 1, 1]);
-					Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					Curses.move (crow, ccol);
-					Curses.attrset (curAtttib);
-
-				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					Curses.addch ((int)(uint)' ');
-					contents [crow, ccol, 0] = (int)(uint)' ';
 				} else {
-					Curses.addch ((int)(uint)rune);
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-			} else
-				needMove = true;
+					if (runeWidth < 2 && ccol > 0
+						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
 
-			ccol++;
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol - 1, 1]);
+						Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+
+						var curAtttib = CurrentAttribute;
+						Curses.attrset (contents [crow, ccol + 1, 1]);
+						Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						Curses.move (crow, ccol);
+						Curses.attrset (curAtttib);
+
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						Curses.addch ((int)(uint)' ');
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						Curses.addch ((int)(uint)rune);
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+				}
+			} else {
+				needMove = true;
+			}
+
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
 			}
 
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -135,36 +158,22 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
-			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition)) {
-				StopReportingMouseMoves ();
-			}
-
+			StopReportingMouseMoves ();
 			SetCursorVisibility (CursorVisibility.Default);
 
+			// throws away any typeahead that has been typed by
+			// the user and has not yet been read by the program.
+			Curses.flushinp ();
+
 			Curses.endwin ();
-
-			// I'm commenting this because was used in a trying to fix the Linux hanging and forgot to exclude it.
-			// Clear and reset entire screen.
-			//Console.Out.Write ("\x1b[2J");
-			//Console.Out.Flush ();
-
-			// Set top and bottom lines of a window.
-			//Console.Out.Write ("\x1b[1;25r");
-			//Console.Out.Flush ();
-
-			//Set cursor key to cursor.
-			//Console.Out.Write ("\x1b[?1l");
-			//Console.Out.Flush ();
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
 
-		Attribute currentAttribute;
-
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
-			Curses.attrset (currentAttribute);
+			base.SetAttribute (c);
+			Curses.attrset (CurrentAttribute);
 		}
 
 		public Curses.Window window;
@@ -200,6 +209,7 @@ namespace Terminal.Gui {
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int f = (short)foreground;
 			int b = (short)background;
 			var v = colorPairs [f, b];
@@ -217,6 +227,7 @@ namespace Terminal.Gui {
 		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
 		public override void SetColors (short foreColorId, short backgroundColorId)
 		{
+			// BUGBUG: This code is never called ?? See Issue #2300
 			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
 			if (!rawPairs.TryGetValue (key, out var v)) {
 				v = MakeColor (foreColorId, backgroundColorId);
@@ -301,305 +312,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Curses.Event? lastMouseButtonPressed;
-		bool isButtonPressed;
-		bool cancelButtonClicked;
-		bool isReportMousePosition;
-		Point point;
-		int buttonPressedCount;
-
-		MouseEvent ToDriverMouse (Curses.MouseEvent cev)
-		{
-			MouseFlags mouseFlag = MouseFlags.AllEvents;
-
-			if (lastMouseButtonPressed != null && cev.ButtonState != Curses.Event.ReportMousePosition) {
-				lastMouseButtonPressed = null;
-				isButtonPressed = false;
-			}
-
-			if (cev.ButtonState == Curses.Event.Button1Pressed
-				|| cev.ButtonState == Curses.Event.Button2Pressed
-				|| cev.ButtonState == Curses.Event.Button3Pressed) {
-
-				isButtonPressed = true;
-				buttonPressedCount++;
-			} else {
-				buttonPressedCount = 0;
-			}
-			//System.Diagnostics.Debug.WriteLine ($"buttonPressedCount: {buttonPressedCount}");
-
-			if (buttonPressedCount == 2
-				&& (cev.ButtonState == Curses.Event.Button1Pressed
-				|| cev.ButtonState == Curses.Event.Button2Pressed
-				|| cev.ButtonState == Curses.Event.Button3Pressed)) {
-
-				switch (cev.ButtonState) {
-				case Curses.Event.Button1Pressed:
-					mouseFlag = MouseFlags.Button1DoubleClicked;
-					break;
-
-				case Curses.Event.Button2Pressed:
-					mouseFlag = MouseFlags.Button2DoubleClicked;
-					break;
-
-				case Curses.Event.Button3Pressed:
-					mouseFlag = MouseFlags.Button3DoubleClicked;
-					break;
-				}
-				cancelButtonClicked = true;
-
-			} else if (buttonPressedCount == 3
-			       && (cev.ButtonState == Curses.Event.Button1Pressed
-			       || cev.ButtonState == Curses.Event.Button2Pressed
-			       || cev.ButtonState == Curses.Event.Button3Pressed)) {
-
-				switch (cev.ButtonState) {
-				case Curses.Event.Button1Pressed:
-					mouseFlag = MouseFlags.Button1TripleClicked;
-					break;
-
-				case Curses.Event.Button2Pressed:
-					mouseFlag = MouseFlags.Button2TripleClicked;
-					break;
-
-				case Curses.Event.Button3Pressed:
-					mouseFlag = MouseFlags.Button3TripleClicked;
-					break;
-				}
-				buttonPressedCount = 0;
-
-			} else if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
-			       cev.ButtonState == Curses.Event.Button3Clicked) &&
-			       lastMouseButtonPressed == null) {
-
-				isButtonPressed = false;
-				mouseFlag = ProcessButtonClickedEvent (cev);
-
-			} else if (((cev.ButtonState == Curses.Event.Button1Pressed || cev.ButtonState == Curses.Event.Button2Pressed ||
-				cev.ButtonState == Curses.Event.Button3Pressed) && lastMouseButtonPressed == null) ||
-				isButtonPressed && lastMouseButtonPressed != null && cev.ButtonState == Curses.Event.ReportMousePosition) {
-
-				mouseFlag = MapCursesButton (cev.ButtonState);
-				if (cev.ButtonState != Curses.Event.ReportMousePosition)
-					lastMouseButtonPressed = cev.ButtonState;
-				isButtonPressed = true;
-				isReportMousePosition = false;
-
-				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
-					mouseFlag = MapCursesButton ((Curses.Event)lastMouseButtonPressed) | MouseFlags.ReportMousePosition;
-					cancelButtonClicked = true;
-				}
-				point = new Point () {
-					X = cev.X,
-					Y = cev.Y
-				};
-
-				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Application.MainLoop.AddIdle (() => {
-						Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
-						return false;
-					});
-				}
-
-
-			} else if ((cev.ButtonState == Curses.Event.Button1Released || cev.ButtonState == Curses.Event.Button2Released ||
-				cev.ButtonState == Curses.Event.Button3Released)) {
-
-				mouseFlag = ProcessButtonReleasedEvent (cev);
-				isButtonPressed = false;
-
-			} else if (cev.ButtonState == Curses.Event.ButtonWheeledUp) {
-
-				mouseFlag = MouseFlags.WheeledUp;
-
-			} else if (cev.ButtonState == Curses.Event.ButtonWheeledDown) {
-
-				mouseFlag = MouseFlags.WheeledDown;
-
-			} else if ((cev.ButtonState & (Curses.Event.ButtonWheeledUp & Curses.Event.ButtonShift)) != 0) {
-
-				mouseFlag = MouseFlags.WheeledLeft;
-
-			} else if ((cev.ButtonState & (Curses.Event.ButtonWheeledDown & Curses.Event.ButtonShift)) != 0) {
-
-				mouseFlag = MouseFlags.WheeledRight;
-
-			} else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
-				if (cev.X != point.X || cev.Y != point.Y) {
-					mouseFlag = MouseFlags.ReportMousePosition;
-					isReportMousePosition = true;
-					point = new Point ();
-				} else {
-					mouseFlag = 0;
-				}
-
-			} else {
-				mouseFlag = 0;
-				var eFlags = cev.ButtonState;
-				foreach (Enum value in Enum.GetValues (eFlags.GetType ())) {
-					if (eFlags.HasFlag (value)) {
-						mouseFlag |= MapCursesButton ((Curses.Event)value);
-					}
-				}
-			}
-
-			mouseFlag = SetControlKeyStates (cev, mouseFlag);
-
-			return new MouseEvent () {
-				X = cev.X,
-				Y = cev.Y,
-				//Flags = MapCursesButton (cev.ButtonState)
-				Flags = mouseFlag
-			};
-		}
-
-		MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
-		{
-			lastMouseButtonPressed = cev.ButtonState;
-			var mf = GetButtonState (cev, true);
-			mouseHandler (ProcessButtonState (cev, mf));
-			if (lastMouseButtonPressed != null && lastMouseButtonPressed == cev.ButtonState) {
-				mf = GetButtonState (cev, false);
-				mouseHandler (ProcessButtonState (cev, mf));
-				if (lastMouseButtonPressed != null && lastMouseButtonPressed == cev.ButtonState) {
-					mf = MapCursesButton (cev.ButtonState);
-				}
-			}
-			lastMouseButtonPressed = null;
-			isButtonPressed = false;
-			return mf;
-		}
-
-		MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
-		{
-			var mf = MapCursesButton (cev.ButtonState);
-			if (!cancelButtonClicked && lastMouseButtonPressed == null && !isReportMousePosition) {
-				mouseHandler (ProcessButtonState (cev, mf));
-				mf = GetButtonState (cev);
-			} else if (isReportMousePosition) {
-				mf = MouseFlags.ReportMousePosition;
-			}
-			cancelButtonClicked = false;
-			return mf;
-		}
-
-		async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
-		{
-			while (isButtonPressed) {
-				await Task.Delay (100);
-				var me = new MouseEvent () {
-					X = point.X,
-					Y = point.Y,
-					Flags = mouseFlag
-				};
-
-				var view = Application.WantContinuousButtonPressedView;
-				if (view == null)
-					break;
-				if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Application.MainLoop.Invoke (() => mouseHandler (me));
-				}
-			}
-		}
-
-		MouseFlags GetButtonState (Curses.MouseEvent cev, bool pressed = false)
-		{
-			MouseFlags mf = default;
-			switch (cev.ButtonState) {
-			case Curses.Event.Button1Clicked:
-				if (pressed)
-					mf = MouseFlags.Button1Pressed;
-				else
-					mf = MouseFlags.Button1Released;
-				break;
-
-			case Curses.Event.Button2Clicked:
-				if (pressed)
-					mf = MouseFlags.Button2Pressed;
-				else
-					mf = MouseFlags.Button2Released;
-				break;
-
-			case Curses.Event.Button3Clicked:
-				if (pressed)
-					mf = MouseFlags.Button3Pressed;
-				else
-					mf = MouseFlags.Button3Released;
-				break;
-
-			case Curses.Event.Button1Released:
-				mf = MouseFlags.Button1Clicked;
-				break;
-
-			case Curses.Event.Button2Released:
-				mf = MouseFlags.Button2Clicked;
-				break;
-
-			case Curses.Event.Button3Released:
-				mf = MouseFlags.Button3Clicked;
-				break;
-
-			}
-			return mf;
-		}
-
-		MouseEvent ProcessButtonState (Curses.MouseEvent cev, MouseFlags mf)
-		{
-			return new MouseEvent () {
-				X = cev.X,
-				Y = cev.Y,
-				Flags = mf
-			};
-		}
-
-		MouseFlags MapCursesButton (Curses.Event cursesButton)
-		{
-			switch (cursesButton) {
-			case Curses.Event.Button1Pressed: return MouseFlags.Button1Pressed;
-			case Curses.Event.Button1Released: return MouseFlags.Button1Released;
-			case Curses.Event.Button1Clicked: return MouseFlags.Button1Clicked;
-			case Curses.Event.Button1DoubleClicked: return MouseFlags.Button1DoubleClicked;
-			case Curses.Event.Button1TripleClicked: return MouseFlags.Button1TripleClicked;
-			case Curses.Event.Button2Pressed: return MouseFlags.Button2Pressed;
-			case Curses.Event.Button2Released: return MouseFlags.Button2Released;
-			case Curses.Event.Button2Clicked: return MouseFlags.Button2Clicked;
-			case Curses.Event.Button2DoubleClicked: return MouseFlags.Button2DoubleClicked;
-			case Curses.Event.Button2TrippleClicked: return MouseFlags.Button2TripleClicked;
-			case Curses.Event.Button3Pressed: return MouseFlags.Button3Pressed;
-			case Curses.Event.Button3Released: return MouseFlags.Button3Released;
-			case Curses.Event.Button3Clicked: return MouseFlags.Button3Clicked;
-			case Curses.Event.Button3DoubleClicked: return MouseFlags.Button3DoubleClicked;
-			case Curses.Event.Button3TripleClicked: return MouseFlags.Button3TripleClicked;
-			case Curses.Event.ButtonWheeledUp: return MouseFlags.WheeledUp;
-			case Curses.Event.ButtonWheeledDown: return MouseFlags.WheeledDown;
-			case Curses.Event.Button4Pressed: return MouseFlags.Button4Pressed;
-			case Curses.Event.Button4Released: return MouseFlags.Button4Released;
-			case Curses.Event.Button4Clicked: return MouseFlags.Button4Clicked;
-			case Curses.Event.Button4DoubleClicked: return MouseFlags.Button4DoubleClicked;
-			case Curses.Event.Button4TripleClicked: return MouseFlags.Button4TripleClicked;
-			case Curses.Event.ButtonShift: return MouseFlags.ButtonShift;
-			case Curses.Event.ButtonCtrl: return MouseFlags.ButtonCtrl;
-			case Curses.Event.ButtonAlt: return MouseFlags.ButtonAlt;
-			case Curses.Event.ReportMousePosition: return MouseFlags.ReportMousePosition;
-			case Curses.Event.AllEvents: return MouseFlags.AllEvents;
-			default: return 0;
-			}
-		}
-
-		static MouseFlags SetControlKeyStates (Curses.MouseEvent cev, MouseFlags mouseFlag)
-		{
-			if ((cev.ButtonState & Curses.Event.ButtonCtrl) != 0 && (mouseFlag & MouseFlags.ButtonCtrl) == 0)
-				mouseFlag |= MouseFlags.ButtonCtrl;
-
-			if ((cev.ButtonState & Curses.Event.ButtonShift) != 0 && (mouseFlag & MouseFlags.ButtonShift) == 0)
-				mouseFlag |= MouseFlags.ButtonShift;
-
-			if ((cev.ButtonState & Curses.Event.ButtonAlt) != 0 && (mouseFlag & MouseFlags.ButtonAlt) == 0)
-				mouseFlag |= MouseFlags.ButtonAlt;
-			return mouseFlag;
-		}
-
-
 		KeyModifiers keyModifiers;
 
 		KeyModifiers MapKeyModifiers (Key key)
@@ -629,13 +341,27 @@ namespace Terminal.Gui {
 			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
-				if (wch == Curses.KeyResize) {
+				var lastWch = wch;
+				while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
 					ProcessWinChange ();
+					code = Curses.get_wch (out wch);
+				}
+				if (wch == 0) {
+					return;
 				}
 				if (wch == Curses.KeyMouse) {
-					Curses.getmouse (out Curses.MouseEvent ev);
-					//System.Diagnostics.Debug.WriteLine ($"ButtonState: {ev.ButtonState}; ID: {ev.ID}; X: {ev.X}; Y: {ev.Y}; Z: {ev.Z}");
-					mouseHandler (ToDriverMouse (ev));
+					int wch2 = wch;
+
+					while (wch2 == Curses.KeyMouse) {
+						KeyEvent key = null;
+						ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
+							new ConsoleKeyInfo ((char)Key.Esc, 0, false, false, false),
+							new ConsoleKeyInfo ('[', 0, false, false, false),
+							new ConsoleKeyInfo ('<', 0, false, false, false)
+						};
+						code = 0;
+						GetEscSeq (ref code, ref k, ref wch2, ref key, ref cki);
+					}
 					return;
 				}
 				k = MapCursesKey (wch);
@@ -654,6 +380,25 @@ namespace Terminal.Gui {
 				} else if (wch >= 325 && wch <= 327) { // Shift+Alt+(F1 - F3)
 					wch -= 60;
 					k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
+				} else {
+					code = Curses.get_wch (out wch);
+					if (code == 0) {
+						switch (wch) {
+						// Shift code.
+						case 16:
+							keyModifiers.Shift = true;
+							break;
+						default:
+							if (lastWch == Curses.KeyResize && wch == 91) {
+								// Returns this keys to the std input which is a CSI (\x1b[).
+								Curses.ungetch (91); // [
+								Curses.ungetch (27); // Esc
+								return;
+							} else {
+								throw new Exception ();
+							}
+						}
+					}
 				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
@@ -663,15 +408,13 @@ namespace Terminal.Gui {
 
 			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
 			if (wch == 27) {
-				Curses.timeout (10);
-
 				code = Curses.get_wch (out int wch2);
 
 				if (code == Curses.KEY_CODE_YES) {
 					k = Key.AltMask | MapCursesKey (wch);
 				}
 				if (code == 0) {
-					KeyEvent key;
+					KeyEvent key = null;
 
 					// The ESC-number handling, debatable.
 					// Simulates the AltMask itself by pressing Alt + Space.
@@ -683,55 +426,13 @@ namespace Terminal.Gui {
 						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + (wch2 + 64));
 					} else if (wch2 >= (uint)Key.D0 && wch2 <= (uint)Key.D9) {
 						k = (Key)((uint)Key.AltMask + (uint)Key.D0 + (wch2 - (uint)Key.D0));
-					} else if (wch2 == 27) {
-						k = (Key)wch2;
-					} else if (wch2 == Curses.KEY_CODE_SEQ) {
-						int [] c = null;
-						while (code == 0) {
-							code = Curses.get_wch (out wch2);
-							if (wch2 > 0) {
-								Array.Resize (ref c, c == null ? 1 : c.Length + 1);
-								c [c.Length - 1] = wch2;
-							}
-						}
-						if (c [0] == 49 && c [1] == 59 && c [2] == 55 && c [3] >= 80 && c [3] <= 83) { // Ctrl+Alt+(F1 - F4)
-							wch2 = c [3] + 185;
-							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [2] == 59 && c [3] == 55 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) { // Ctrl+Alt+(F5 - F8)
-							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
-							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 50 && c [2] == 59 && c [3] == 55 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) { // Ctrl+Alt+(F9 - F12)
-							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
-							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] >= 80 && c [3] <= 83) { // Ctrl+Shift+Alt+(F1 - F4)
-							wch2 = c [3] + 185;
-							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [2] == 59 && c [3] == 56 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) { // Ctrl+Shift+Alt+(F5 - F8)
-							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
-							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 50 && c [2] == 59 && c [3] == 56 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) {  // Ctrl+Shift+Alt+(F9 - F12)
-							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
-							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [1] == 59 && c [2] == 52 && c [3] == 83) {  // Shift+Alt+(F4)
-							wch2 = 268;
-							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [2] == 59 && c [3] == 52 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) {  // Shift+Alt+(F5 - F8)
-							wch2 = c [1] < 55 ? c [1] + 216 : c [1] + 215;
-							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 50 && c [2] == 59 && c [3] == 52 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) {  // Shift+Alt+(F9 - F12)
-							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
-							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 54 && c [1] == 59 && c [2] == 56 && c [3] == 126) {  // Shift+Ctrl+Alt+KeyNPage
-							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.PageDown;
-						} else if (c [0] == 53 && c [1] == 59 && c [2] == 56 && c [3] == 126) {  // Shift+Ctrl+Alt+KeyPPage
-							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.PageUp;
-						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] == 72) {  // Shift+Ctrl+Alt+KeyHome
-							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Home;
-						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] == 70) {  // Shift+Ctrl+Alt+KeyEnd
-							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.End;
-						} else {
-							k = MapCursesKey (wch2);
-						}
+					} else if (wch2 == Curses.KeyCSI) {
+						ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
+							new ConsoleKeyInfo ((char)Key.Esc, 0, false, false, false),
+							new ConsoleKeyInfo ('[', 0, false, false, false)
+						};
+						GetEscSeq (ref code, ref k, ref wch2, ref key, ref cki);
+						return;
 					} else {
 						// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
 						if (((Key)wch2 & Key.CtrlMask) != 0) {
@@ -742,6 +443,56 @@ namespace Terminal.Gui {
 						} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 							keyModifiers.Shift = true;
 							keyModifiers.Alt = true;
+						} else if (wch2 == Curses.KeySS3) {
+							while (code > -1) {
+								code = Curses.get_wch (out wch2);
+								if (code == 0) {
+									switch (wch2) {
+									case 16:
+										keyModifiers.Shift = true;
+										break;
+									case 108:
+										k = (Key)'+';
+										break;
+									case 109:
+										k = (Key)'-';
+										break;
+									case 112:
+										k = Key.InsertChar;
+										break;
+									case 113:
+										k = Key.End;
+										break;
+									case 114:
+										k = Key.CursorDown;
+										break;
+									case 115:
+										k = Key.PageDown;
+										break;
+									case 116:
+										k = Key.CursorLeft;
+										break;
+									case 117:
+										k = Key.Clear;
+										break;
+									case 118:
+										k = Key.CursorRight;
+										break;
+									case 119:
+										k = Key.Home;
+										break;
+									case 120:
+										k = Key.CursorUp;
+										break;
+									case 121:
+										k = Key.PageUp;
+										break;
+									default:
+										k = (Key)wch2;
+										break;
+									}
+								}
+							}
 						} else if (wch2 < 256) {
 							k = (Key)wch2;
 							keyModifiers.Alt = true;
@@ -754,6 +505,7 @@ namespace Terminal.Gui {
 					keyHandler (key);
 				} else {
 					k = Key.Esc;
+					keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				}
 			} else if (wch == Curses.KeyTab) {
@@ -786,6 +538,88 @@ namespace Terminal.Gui {
 			//}
 		}
 
+		void GetEscSeq (ref int code, ref Key k, ref int wch2, ref KeyEvent key, ref ConsoleKeyInfo [] cki)
+		{
+			ConsoleKey ck = 0;
+			ConsoleModifiers mod = 0;
+			while (code == 0) {
+				code = Curses.get_wch (out wch2);
+				var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
+				if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse) {
+					EscSeqUtils.DecodeEscSeq (null, ref consoleKeyInfo, ref ck, cki, ref mod, out _, out _, out _, out _, out bool isKeyMouse, out List<MouseFlags> mouseFlags, out Point pos, out _, ProcessContinuousButtonPressed);
+					if (isKeyMouse) {
+						foreach (var mf in mouseFlags) {
+							ProcessMouseEvent (mf, pos);
+						}
+						cki = null;
+						if (wch2 == 27) {
+							cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)Key.Esc, 0,
+								false, false, false), cki);
+						}
+					} else {
+						k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
+						k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
+						key = new KeyEvent (k, MapKeyModifiers (k));
+						keyDownHandler (key);
+						keyHandler (key);
+					}
+				} else {
+					cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
+				}
+			}
+		}
+
+		MouseFlags lastMouseFlags;
+
+		void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
+		{
+			bool WasButtonReleased (MouseFlags flag)
+			{
+				return flag.HasFlag (MouseFlags.Button1Released) ||
+					flag.HasFlag (MouseFlags.Button2Released) ||
+					flag.HasFlag (MouseFlags.Button3Released) ||
+					flag.HasFlag (MouseFlags.Button4Released);
+			}
+
+			bool IsButtonNotPressed (MouseFlags flag)
+			{
+				return !flag.HasFlag (MouseFlags.Button1Pressed) &&
+					!flag.HasFlag (MouseFlags.Button2Pressed) &&
+					!flag.HasFlag (MouseFlags.Button3Pressed) &&
+					!flag.HasFlag (MouseFlags.Button4Pressed);
+			}
+
+			bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
+			{
+				return flag.HasFlag (MouseFlags.Button1Clicked) ||
+					flag.HasFlag (MouseFlags.Button2Clicked) ||
+					flag.HasFlag (MouseFlags.Button3Clicked) ||
+					flag.HasFlag (MouseFlags.Button4Clicked) ||
+					flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button4DoubleClicked);
+			}
+
+			if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (lastMouseFlags)) ||
+				(IsButtonClickedOrDoubleClicked (mouseFlag) && lastMouseFlags == 0)) {
+				return;
+			}
+
+			lastMouseFlags = mouseFlag;
+			var me = new MouseEvent () {
+				Flags = mouseFlag,
+				X = pos.X,
+				Y = pos.Y
+			};
+			mouseHandler (me);
+		}
+
+		void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
+		{
+			ProcessMouseEvent (mouseFlag, pos);
+		}
+
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyUpHandler;
@@ -794,7 +628,6 @@ namespace Terminal.Gui {
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			Curses.timeout (0);
 			this.keyHandler = keyHandler;
 			this.keyDownHandler = keyDownHandler;
 			this.keyUpHandler = keyUpHandler;
@@ -807,24 +640,18 @@ namespace Terminal.Gui {
 				return true;
 			});
 
-			mLoop.WinChanged += () => {
-				ProcessWinChange ();
-			};
+			mLoop.WinChanged += () => ProcessWinChange ();
 		}
 
-		Curses.Event oldMouseEvents, reportableMouseEvents;
 		public override void Init (Action terminalResized)
 		{
 			if (window != null)
 				return;
 
 			try {
-				//Set cursor key to application.
-				//Console.Out.Write ("\x1b[?1h");
-				//Console.Out.Flush ();
-
 				window = Curses.initscr ();
 				Curses.set_escdelay (10);
+				Curses.nodelay (window.Handle, true);
 			} catch (Exception e) {
 				throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
 			}
@@ -869,39 +696,21 @@ namespace Terminal.Gui {
 			Curses.noecho ();
 
 			Curses.Window.Standard.keypad (true);
-			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			TerminalResized = terminalResized;
-			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
-				StartReportingMouseMoves ();
+			StartReportingMouseMoves ();
 
-			ResizeScreen ();
-			UpdateOffScreen ();
-
-			//HLine = Curses.ACS_HLINE;
-			//VLine = Curses.ACS_VLINE;
-			//Stipple = Curses.ACS_CKBOARD;
-			//Diamond = Curses.ACS_DIAMOND;
-			//ULCorner = Curses.ACS_ULCORNER;
-			//LLCorner = Curses.ACS_LLCORNER;
-			//URCorner = Curses.ACS_URCORNER;
-			//LRCorner = Curses.ACS_LRCORNER;
-			//LeftTee = Curses.ACS_LTEE;
-			//RightTee = Curses.ACS_RTEE;
-			//TopTee = Curses.ACS_TTEE;
-			//BottomTee = Curses.ACS_BTEE;
-			//RightArrow = Curses.ACS_RARROW;
-			//LeftArrow = Curses.ACS_LARROW;
-			//UpArrow = Curses.ACS_UARROW;
-			//DownArrow = Curses.ACS_DARROW;
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
 
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				CreateColors ();
+				InitalizeColorSchemes ();
 			} else {
-				CreateColors (false);
+				InitalizeColorSchemes (false);
 
+				// BUGBUG: This is a hack to make the colors work on the Mac?
+				// The new Theme support overwrites these colors, so this is not needed?
 				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
 				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
 				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
@@ -928,13 +737,14 @@ namespace Terminal.Gui {
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
+
+			ResizeScreen ();
+			UpdateOffScreen ();
 		}
 
 		public override void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
-			Console.Out.Write ("\x1b[3J");
-			Console.Out.Flush ();
 		}
 
 		public override void UpdateOffScreen ()
@@ -942,9 +752,9 @@ namespace Terminal.Gui {
 			contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Cols; col++) {
-					//Curses.move (row, col);
-					//Curses.attrset (Colors.TopLevel.Normal);
-					//Curses.addch ((int)(uint)' ');
+					Curses.move (row, col);
+					Curses.attrset (Colors.TopLevel.Normal);
+					Curses.addch ((int)(uint)' ');
 					contents [row, col, 0] = ' ';
 					contents [row, col, 1] = Colors.TopLevel.Normal;
 					contents [row, col, 2] = 0;
@@ -954,11 +764,13 @@ namespace Terminal.Gui {
 
 		public static bool Is_WSL_Platform ()
 		{
-			if (new CursesClipboard ().IsSupported) {
-				return false;
-			}
-			var result = BashRunner.Run ("uname -a", runCurses: false);
-			if (result.Contains ("microsoft") && result.Contains ("WSL")) {
+			// xclip does not work on WSL, so we need to use the Windows clipboard vis Powershell
+			//if (new CursesClipboard ().IsSupported) {
+			//	// If xclip is installed on Linux under WSL, this will return true.
+			//	return false;
+			//}
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
+			if (exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL")) {
 				return true;
 			}
 			return false;
@@ -1052,25 +864,21 @@ namespace Terminal.Gui {
 
 		public override void Suspend ()
 		{
-			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
-				StopReportingMouseMoves ();
+			StopReportingMouseMoves ();
 			Platform.Suspend ();
 			Curses.Window.Standard.redrawwin ();
 			Curses.refresh ();
-			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
-				StartReportingMouseMoves ();
+			StartReportingMouseMoves ();
 		}
 
 		public override void StartReportingMouseMoves ()
 		{
-			Console.Out.Write ("\x1b[?1003h");
-			Console.Out.Flush ();
+			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
-			Console.Out.Write ("\x1b[?1003l");
-			Console.Out.Flush ();
+			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
 		}
 
 		//int lastMouseInterval;
@@ -1088,11 +896,6 @@ namespace Terminal.Gui {
 		{
 			//mouseGrabbed = false;
 			//Curses.mouseinterval (lastMouseInterval);
-		}
-
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
 		}
 
 		/// <inheritdoc/>
@@ -1118,7 +921,6 @@ namespace Terminal.Gui {
 
 			if (visibility != CursorVisibility.Invisible) {
 				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
-				Console.Out.Flush ();
 			}
 
 			currentCursorVisibility = visibility;
@@ -1183,8 +985,8 @@ namespace Terminal.Gui {
 			background = default;
 			int back = -1;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains ((value >> 12) & 0xffff)) {
 				hasColor = true;
 				back = (value >> 12) & 0xffff;
@@ -1259,134 +1061,81 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	///  A clipboard implementation for Linux.
+	///  This implementation uses the xclip command to access the clipboard.
+	/// </summary>	
+	/// <remarks>
+	/// If xclip is not installed, this implementation will not work.
+	/// </remarks>
 	class CursesClipboard : ClipboardBase {
 		public CursesClipboard ()
 		{
 			IsSupported = CheckSupport ();
 		}
 
+		string xclipPath = string.Empty;
 		public override bool IsSupported { get; }
 
 		bool CheckSupport ()
 		{
+#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
 			try {
-				var result = BashRunner.Run ("which xclip", runCurses: false);
-				return result.FileExists ();
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip", waitForOutput: true);
+				if (exitCode == 0 && result.FileExists ()) {
+					xclipPath = result;
+					return true;
+				}
 			} catch (Exception) {
 				// Permissions issue.
-				return false;
 			}
+#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
+			return false;
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
 			var tempFileName = System.IO.Path.GetTempFileName ();
+			var xclipargs = "-selection clipboard -o";
+
 			try {
-				// BashRunner.Run ($"xsel -o --clipboard > {tempFileName}");
-				BashRunner.Run ($"xclip -selection clipboard -o > {tempFileName}");
-				return System.IO.File.ReadAllText (tempFileName);
+				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
+				if (exitCode == 0) {
+					if (Application.Driver is CursesDriver) {
+						Curses.raw ();
+						Curses.noecho ();
+					}
+					return System.IO.File.ReadAllText (tempFileName);
+				}
+			} catch (Exception e) {
+				throw new NotSupportedException ($"\"{xclipPath} {xclipargs}\" failed.", e);
 			} finally {
 				System.IO.File.Delete (tempFileName);
 			}
+			return string.Empty;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
 		{
-			// var tempFileName = System.IO.Path.GetTempFileName ();
-			// System.IO.File.WriteAllText (tempFileName, text);
-			// try {
-			// 	// BashRunner.Run ($"cat {tempFileName} | xsel -i --clipboard");
-			// 	BashRunner.Run ($"cat {tempFileName} | xclip -selection clipboard");
-			// } finally {
-			// 	System.IO.File.Delete (tempFileName);
-			// }
-
-			BashRunner.Run ("xclip -selection clipboard -i", false, text);
+			var xclipargs = "-selection clipboard -i";
+			try {
+				var (exitCode, _) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs}", text, waitForOutput: false);
+				if (exitCode == 0 && Application.Driver is CursesDriver) {
+					Curses.raw ();
+					Curses.noecho ();
+				}
+			} catch (Exception e) {
+				throw new NotSupportedException ($"\"{xclipPath} {xclipargs} < {text}\" failed", e);
+			}
 		}
 	}
 
-	static class BashRunner {
-		public static string Run (string commandLine, bool output = true, string inputText = "", bool runCurses = true)
-		{
-			var arguments = $"-c \"{commandLine}\"";
-
-			if (output) {
-				var errorBuilder = new System.Text.StringBuilder ();
-				var outputBuilder = new System.Text.StringBuilder ();
-
-				using (var process = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = "bash",
-						Arguments = arguments,
-						RedirectStandardOutput = true,
-						RedirectStandardError = true,
-						UseShellExecute = false,
-						CreateNoWindow = false,
-					}
-				}) {
-					process.Start ();
-					process.OutputDataReceived += (sender, args) => { outputBuilder.AppendLine (args.Data); };
-					process.BeginOutputReadLine ();
-					process.ErrorDataReceived += (sender, args) => { errorBuilder.AppendLine (args.Data); };
-					process.BeginErrorReadLine ();
-					if (!process.DoubleWaitForExit ()) {
-						var timeoutError = $@"Process timed out. Command line: bash {arguments}.
-							Output: {outputBuilder}
-							Error: {errorBuilder}";
-						throw new Exception (timeoutError);
-					}
-					if (process.ExitCode == 0) {
-						if (runCurses && Application.Driver is CursesDriver) {
-							Curses.raw ();
-							Curses.noecho ();
-						}
-						return outputBuilder.ToString ();
-					}
-
-					var error = $@"Could not execute process. Command line: bash {arguments}.
-						Output: {outputBuilder}
-						Error: {errorBuilder}";
-					throw new Exception (error);
-				}
-			} else {
-				using (var process = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = "bash",
-						Arguments = arguments,
-						RedirectStandardInput = true,
-						RedirectStandardError = true,
-						UseShellExecute = false,
-						CreateNoWindow = false
-					}
-				}) {
-					process.Start ();
-					process.StandardInput.Write (inputText);
-					process.StandardInput.Close ();
-					process.WaitForExit ();
-					if (runCurses && Application.Driver is CursesDriver) {
-						Curses.raw ();
-						Curses.noecho ();
-					}
-					return inputText;
-				}
-			}
-		}
-
-		public static bool DoubleWaitForExit (this System.Diagnostics.Process process)
-		{
-			var result = process.WaitForExit (500);
-			if (result) {
-				process.WaitForExit ();
-			}
-			return result;
-		}
-
-		public static bool FileExists (this string value)
-		{
-			return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
-		}
-	}
-
+	/// <summary>
+	///  A clipboard implementation for MacOSX. 
+	///  This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste.
+	///  The existance of the Mac pbcopy and pbpaste commands 
+	///  is used to determine if copy/paste is supported.
+	/// </summary>	
 	class MacOSXClipboard : ClipboardBase {
 		IntPtr nsString = objc_getClass ("NSString");
 		IntPtr nsPasteboard = objc_getClass ("NSPasteboard");
@@ -1413,12 +1162,12 @@ namespace Terminal.Gui {
 
 		bool CheckSupport ()
 		{
-			var result = BashRunner.Run ("which pbcopy");
-			if (!result.FileExists ()) {
+			var (exitCode, result) = ClipboardProcessRunner.Bash ("which pbcopy", waitForOutput: true);
+			if (exitCode != 0 || !result.FileExists ()) {
 				return false;
 			}
-			result = BashRunner.Run ("which pbpaste");
-			return result.FileExists ();
+			(exitCode, result) = ClipboardProcessRunner.Bash ("which pbpaste", waitForOutput: true);
+			return exitCode == 0 && result.FileExists ();
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1461,95 +1210,77 @@ namespace Terminal.Gui {
 		static extern IntPtr sel_registerName (string selectorName);
 	}
 
+	/// <summary>
+	///  A clipboard implementation for Linux, when running under WSL. 
+	///  This implementation uses the Windows clipboard to store the data, and uses Windows'
+	///  powershell.exe (launched via WSL interop services) to set/get the Windows
+	///  clipboard. 
+	/// </summary>
 	class WSLClipboard : ClipboardBase {
+		bool isSupported = false;
 		public WSLClipboard ()
 		{
-			IsSupported = CheckSupport ();
+			isSupported = CheckSupport ();
 		}
 
-		public override bool IsSupported { get; }
+		public override bool IsSupported {
+			get {
+				return isSupported = CheckSupport ();
+			}
+		}
+
+		private static string powershellPath = string.Empty;
 
 		bool CheckSupport ()
 		{
-			try {
-				var result = BashRunner.Run ("which powershell.exe");
-				return result.FileExists ();
-			} catch (System.Exception) {
-				return false;
-			}
+			if (string.IsNullOrEmpty (powershellPath)) {
+				// Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
+				var (exitCode, result) = ClipboardProcessRunner.Bash ("which pwsh.exe", waitForOutput: true);
+				if (exitCode > 0) {
+					(exitCode, result) = ClipboardProcessRunner.Bash ("which powershell.exe", waitForOutput: true);
+				}
 
-			//var result = BashRunner.Run ("which powershell.exe");
-			//if (!result.FileExists ()) {
-			//	return false;
-			//}
-			//result = BashRunner.Run ("which clip.exe");
-			//return result.FileExists ();
+				if (exitCode == 0) {
+					powershellPath = result;
+				}
+			}
+			return !string.IsNullOrEmpty (powershellPath);
 		}
 
 		protected override string GetClipboardDataImpl ()
 		{
-			using (var powershell = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					RedirectStandardOutput = true,
-					FileName = "powershell.exe",
-					Arguments = "-noprofile -command \"Get-Clipboard\"",
-					UseShellExecute = false,
-					CreateNoWindow = true
-				}
-			}) {
-				powershell.Start ();
-				var result = powershell.StandardOutput.ReadToEnd ();
-				powershell.StandardOutput.Close ();
-				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new Exception (timeoutError);
-				}
+			if (!IsSupported) {
+				return string.Empty;
+			}
+
+			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, "-noprofile -command \"Get-Clipboard\"");
+			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
-				if (result.EndsWith ("\r\n")) {
-					result = result.Substring (0, result.Length - 2);
+
+				if (output.EndsWith ("\r\n")) {
+					output = output.Substring (0, output.Length - 2);
 				}
-				return result;
+				return output;
 			}
+			return string.Empty;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
 		{
-			using (var powershell = new System.Diagnostics.Process {
-				StartInfo = new System.Diagnostics.ProcessStartInfo {
-					FileName = "powershell.exe",
-					Arguments = $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
-				}
-			}) {
-				powershell.Start ();
-				powershell.WaitForExit ();
-				if (!powershell.DoubleWaitForExit ()) {
-					var timeoutError = $@"Process timed out. Command line: bash {powershell.StartInfo.Arguments}.
-							Output: {powershell.StandardOutput.ReadToEnd ()}
-							Error: {powershell.StandardError.ReadToEnd ()}";
-					throw new Exception (timeoutError);
-				}
+			if (!IsSupported) {
+				return;
+			}
+
+			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
+			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
 			}
-
-			//using (var clipExe = new System.Diagnostics.Process {
-			//	StartInfo = new System.Diagnostics.ProcessStartInfo {
-			//		FileName = "clip.exe",
-			//		RedirectStandardInput = true
-			//	}
-			//}) {
-			//	clipExe.Start ();
-			//	clipExe.StandardInput.Write (text);
-			//	clipExe.StandardInput.Close ();
-			//	clipExe.WaitForExit ();
-			//}
 		}
 	}
 }
