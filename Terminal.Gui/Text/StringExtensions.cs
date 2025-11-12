@@ -70,7 +70,7 @@ public static class StringExtensions
         {
             string element = enumerator.GetTextElement ();
 
-            // Sum all runes' display widths within this grapheme cluster
+            // Get the maximum rune width within this grapheme cluster
             int width = element
                         .EnumerateRunes ()
                         .Max (r => Math.Max (r.GetColumns (), 0));
