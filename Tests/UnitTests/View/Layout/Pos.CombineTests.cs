@@ -109,6 +109,7 @@ public class PosCombineTests (ITestOutputHelper output)
         Application.StopAfterFirstIteration = true;
 
         Assert.Throws<LayoutException> (() => Application.Run ());
+        Application.Top.Dispose ();
         top.Dispose ();
         Application.Shutdown ();
     }
