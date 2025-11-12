@@ -92,10 +92,8 @@ public static partial class Application // Mouse handling
     /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    internal static void RaiseMouseEvent (MouseEventArgs mouseEvent) { Mouse.RaiseMouseEvent (mouseEvent); }
-
-    /// <summary>
-    ///     INTERNAL: Clears mouse state during application reset.
-    /// </summary>
-    internal static void ResetMouseState () { Mouse.ResetState (); }
+    internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
+    {
+        Mouse.RaiseMouseEvent (mouseEvent);
+    }
 }

@@ -25,35 +25,16 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
-    /// <param name="useFakeClipboard">
-    ///     If true, will force the use of <see cref="FakeClipboard"/>. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only
-    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardIsSupportedAlwaysTrue">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
         string forceDriver = null,
-        bool useFakeClipboard = true,
-        bool fakeClipboardAlwaysThrowsNotSupportedException = false,
-        bool fakeClipboardIsSupportedAlwaysTrue = false,
         bool verifyShutdown = false
     )
     {
         AutoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         _forceDriver = forceDriver;
-        FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-        FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
-            fakeClipboardAlwaysThrowsNotSupportedException;
-        FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
         _verifyShutdown = verifyShutdown;
     }
 
@@ -140,11 +121,12 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             {
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
+
             }
             else
             {
                 Assert.Fail ("Specifying driver name not yet supported");
-                //Application.Init ((IConsoleDriver)Activator.CreateInstance (_forceDriver));
+                //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
             }
         }
     }

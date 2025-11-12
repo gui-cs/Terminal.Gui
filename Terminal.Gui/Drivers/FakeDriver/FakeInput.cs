@@ -4,39 +4,44 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Fake console input for testing that can return predefined input or wait indefinitely.
+///     <see cref="IInput{TInputRecord}"/> implementation that uses a fake input source for testing.
+///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>.
 /// </summary>
-public class FakeInput : ConsoleInput<ConsoleKeyInfo>, IFakeInput
+public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>
 {
-    private readonly FakeConsoleInput<ConsoleKeyInfo>? _predefinedInput;
+    // Queue for storing injected input that will be returned by Peek/Read
+    private readonly ConcurrentQueue<ConsoleKeyInfo> _testInput = new ();
 
     /// <summary>
-    /// Creates a new FakeConsoleInput with optional predefined input.
+    ///     Creates a new FakeInput.
     /// </summary>
-    /// <param name="predefinedInput">Optional queue of predefined input to return.</param>
-    public FakeInput (FakeConsoleInput<ConsoleKeyInfo>? predefinedInput = null)
+    public FakeInput ()
+    { }
+
+    /// <inheritdoc/>
+    public override bool Peek ()
     {
-        _predefinedInput = predefinedInput;
+        // Will be called on the input thread.
+        return !_testInput.IsEmpty;
     }
 
     /// <inheritdoc/>
-    protected override bool Peek ()
+    public override IEnumerable<ConsoleKeyInfo> Read ()
     {
-        if (_predefinedInput is { InputBuffer.IsEmpty: false })
+        // Will be called on the input thread.
+        while (_testInput.TryDequeue (out ConsoleKeyInfo input))
         {
-            return true;
+            yield return input;
         }
-
-        // No input available
-        return false;
     }
 
-    /// <inheritdoc/>
-    protected override IEnumerable<ConsoleKeyInfo> Read ()
+    /// <inheritdoc />
+    public void AddInput (ConsoleKeyInfo input)
     {
-        if (_predefinedInput is { InputBuffer: { } } && _predefinedInput.InputBuffer.TryDequeue (out ConsoleKeyInfo key))
-        {
-            yield return key;
-        }
+        //Logging.Trace ($"Enqueuing input: {input.Key}");
+
+        // Will be called on the main loop thread.
+        _testInput.Enqueue (input);
     }
 }

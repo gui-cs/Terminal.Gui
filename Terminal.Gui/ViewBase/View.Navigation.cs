@@ -30,6 +30,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
+        //Logging.Trace ($"{Id} - {direction} {behavior}");
         if (!CanBeVisible (this)) // TODO: is this check needed?
         {
             return false;
@@ -582,6 +583,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         Debug.Assert (SuperView is null || IsInHierarchy (SuperView, this));
 
+        //Logging.Trace ($"{Id} - {currentFocusedView?.Id} -> {Id}");
+
         // Pre-conditions
         if (_hasFocus)
         {
@@ -604,7 +607,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (CanFocus && superViewOrParent is { CanFocus: false })
         {
-            Debug.WriteLine ($@"WARNING: Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
+            Logging.Warning ($@"Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
 
             return (false, false);
         }

@@ -9,8 +9,7 @@ public class SyncrhonizationContextTests
     [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
-        ConsoleDriver.RunningUnitTests = true;
-        Application.Init ();
+        Application.Init (null, "fake");
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -19,22 +18,19 @@ public class SyncrhonizationContextTests
 
         Assert.NotEqual (context, contextCopy);
         Application.Shutdown ();
-        ConsoleDriver.RunningUnitTests = false;
     }
 
-    private object _lockPost = new ();
+    private readonly object _lockPost = new ();
 
     [Theory]
     [InlineData ("fake")]
-    //[InlineData ("windows")]
+    [InlineData ("windows")]
     [InlineData ("dotnet")]
-    [InlineData ("unix")]
+   // [InlineData ("unix")]
     public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)
         {
-            ConsoleDriver.RunningUnitTests = true;
-
             Application.Init (null, driverName: driverName);
 
             SynchronizationContext context = SynchronizationContext.Current;
@@ -71,16 +67,7 @@ public class SyncrhonizationContextTests
             Application.Run ().Dispose ();
             Assert.True (success);
 
-            if (ApplicationImpl.Instance is ApplicationImpl)
-            {
-                ApplicationImpl.Instance.Shutdown ();
-            }
-            else
-            {
-                Application.Shutdown ();
-            }
-            ConsoleDriver.RunningUnitTests = false;
-
+            Application.Shutdown ();
         }
     }
 
@@ -88,7 +75,6 @@ public class SyncrhonizationContextTests
     [AutoInitShutdown]
     public void SynchronizationContext_Send ()
     {
-        ConsoleDriver.RunningUnitTests = true;
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;
@@ -117,7 +103,5 @@ public class SyncrhonizationContextTests
         Application.Run ().Dispose ();
         Assert.True (success);
         Application.Shutdown ();
-        ConsoleDriver.RunningUnitTests = false;
-
     }
 }

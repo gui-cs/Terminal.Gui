@@ -32,12 +32,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
-		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\build-validation.yml = .github\workflows\build-validation.yml
 		.github\workflows\check-duplicates.yml = .github\workflows\check-duplicates.yml
 		copilot-instructions.md = copilot-instructions.md
 		GitVersion.yml = GitVersion.yml
 		.github\workflows\integration-tests.yml = .github\workflows\integration-tests.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
+		.github\workflows\quick-build.yml = .github\workflows\quick-build.yml
 		.github\workflows\stress-tests.yml = .github\workflows\stress-tests.yml
 		.github\workflows\unit-tests.yml = .github\workflows\unit-tests.yml
 	EndProjectSection
@@ -81,7 +82,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Analyzers", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Analyzers.Tests", "Terminal.Gui.Analyzers.Tests\Terminal.Gui.Analyzers.Tests.csproj", "{8C643A64-2A77-4432-987A-2E72BD9708E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputView", "docfx\scripts\OutputView\OutputView.csproj", "{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A3CBA89-EDAB-4F75-811E-FE81B13A4836}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\Run-LocalCoverage.ps1 = Scripts\Run-LocalCoverage.ps1
+		Tests\UnitTests\runsettings.xml = Tests\UnitTests\runsettings.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,6 +174,7 @@ Global
 		{B8F48EE8-34A6-43B7-B00E-CD91CDD93962} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 		{13BB2C46-B324-4B9C-92EB-CE6184D4736E} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 		{C7A51224-5E0F-4986-AB37-A6BF89966C12} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
+		{1A3CBA89-EDAB-4F75-811E-FE81B13A4836} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F8F8A4D-7B8D-4C2A-AC5E-CD7117F74C03}

@@ -10,11 +10,22 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 internal class UnixKeyConverter : IKeyConverter<char>
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Key ToKey (char value)
     {
         ConsoleKeyInfo adjustedInput = EscSeqUtils.MapChar (value);
 
         return EscSeqUtils.MapKey (adjustedInput);
+    }
+
+    /// <inheritdoc/>
+    public char ToKeyInfo (Key key)
+    {
+        // Convert Key to ConsoleKeyInfo using the cross-platform mapping utility
+        ConsoleKeyInfo consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key.KeyCode);
+
+        // Return the character representation
+        // For Unix, we primarily care about the KeyChar as Unix deals with character input
+        return consoleKeyInfo.KeyChar;
     }
 }

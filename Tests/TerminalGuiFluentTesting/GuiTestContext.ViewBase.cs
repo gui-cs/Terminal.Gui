@@ -23,6 +23,8 @@ public partial class GuiTestContext
         return this;
     }
 
+    private View? _lastView;
+
     /// <summary>
     ///     The last view added (e.g. with <see cref="Add"/>) or the root/current top.
     /// </summary>

@@ -1,10 +1,12 @@
+using UnitTests;
+
 namespace UnitTests_Parallelizable.ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="ColorPicker"/> that don't require Application.Driver or View context.
 /// These tests can run in parallel without interference.
 /// </summary>
-public class ColorPickerTests : UnitTests.Parallelizable.ParallelizableBase
+public class ColorPickerTests : FakeDriverBase
 {
     [Fact]
     public void ColorPicker_ChangedEvent_Fires ()

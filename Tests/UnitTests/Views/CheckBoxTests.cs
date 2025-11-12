@@ -155,7 +155,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 6);
 
         Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);

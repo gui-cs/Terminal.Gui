@@ -402,7 +402,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Cell? GetCellForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
+    private Cell? GetCellForIntersects (IDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
     {
         if (intersects.IsEmpty)
         {
@@ -422,7 +422,7 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
+    private Rune? GetRuneForIntersects (IDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
     {
         if (intersects.IsEmpty)
         {
@@ -769,7 +769,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         protected IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
+        public Rune? GetRuneForIntersects (IDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
         {
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
 

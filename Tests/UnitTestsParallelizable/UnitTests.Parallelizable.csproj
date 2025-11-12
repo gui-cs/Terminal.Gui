@@ -29,7 +29,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\UnitTests\TestsAllViews.cs" Link="TestsAllViews.cs" />
         <Compile Include="..\UnitTests\DriverAssert.cs" Link="DriverAssert.cs" />
         <Compile Include="..\UnitTests\OutputAssert.cs" Link="OutputAssert.cs" />
     </ItemGroup>
@@ -53,9 +52,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
         </ProjectReference>
         <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
+        <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -68,23 +69,4 @@
         <Using Include="Terminal.Gui" />
         <Using Include="Xunit" />
     </ItemGroup>
-    <PropertyGroup Label="FineCodeCoverage">
-        <Enabled>
-            False
-        </Enabled>
-        <Exclude>
-            [UICatalog]*
-        </Exclude>
-        <Include></Include>
-        <ExcludeByFile>
-            <!--**/Migrations/*
-      **/Hacks/*.cs-->
-        </ExcludeByFile>
-        <ExcludeByAttribute>
-            <!--MyCustomExcludeFromCodeCoverage-->
-        </ExcludeByAttribute>
-        <IncludeTestAssembly>
-            False
-        </IncludeTestAssembly>
-    </PropertyGroup>
 </Project>
