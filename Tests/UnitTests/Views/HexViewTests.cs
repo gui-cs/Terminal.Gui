@@ -72,7 +72,6 @@ public class HexViewTests
 
         Application.Top.Dispose ();
         Application.ResetState (true);
-
     }
 
     [Fact]
@@ -321,6 +320,7 @@ public class HexViewTests
     [Fact]
     public void PositionChanged_Event ()
     {
+        Application.Navigation = new ApplicationNavigation ();
         var hv = new HexView (LoadStream (null, out _)) { Width = 20, Height = 10 };
         Application.Top = new Toplevel ();
         Application.Top.Add (hv);
@@ -346,6 +346,7 @@ public class HexViewTests
     [Fact]
     public void Source_Sets_Address_To_Zero_If_Greater_Than_Source_Length ()
     {
+        Application.Navigation = new ApplicationNavigation ();
         var hv = new HexView (LoadStream (null, out _)) { Width = 10, Height = 5 };
         Application.Top = new Toplevel ();
         Application.Top.Add (hv);
