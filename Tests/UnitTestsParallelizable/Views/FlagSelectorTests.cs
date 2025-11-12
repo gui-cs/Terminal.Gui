@@ -289,19 +289,6 @@ public class FlagSelectorTests
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
-        var flagSelector = new FlagSelector<SelectorStyles> ();
-
-        bool eventRaised = false;
-        flagSelector.ValueChanged += (sender, args) => eventRaised = true;
-
-        flagSelector.Value = SelectorStyles.ShowNoneFlag;
-
-        Assert.True (eventRaised);
-    }
-
-    [Fact]
-    public void Constructors_Defaults ()
-    {
         var flagSelector = new FlagSelector ();
         flagSelector.Values = [0, 1];
         flagSelector.Labels = ["_Left", "_Right"];
@@ -347,8 +334,6 @@ public class FlagSelectorTests
         {
             newValue = e.Value;
         };
-        flagSelector.Values = [1];
-        flagSelector.Labels = ["Flag1"];
 
         flagSelector.Value = 1;
         Assert.Equal (newValue, flagSelector.Value);
@@ -395,114 +380,26 @@ public class FlagSelectorTests
 
 
     [Fact]
-    public void HotKey_SetsFocus ()
+    public void Mouse_Click_On_NotActivated_NoneFlag_Toggles ()
     {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-        superView.Add (new View { CanFocus = true });
+        FlagSelector selector = new ();
+        selector.Styles = SelectorStyles.ShowNoneFlag;
+        List<string> options = ["Flag1", "Flag2"];
 
-        var flagSelector = new FlagSelector ()
-        {
-            Title = "_FlagSelector",
-        };
-        flagSelector.Values = [0, 1];
-        flagSelector.Labels = ["_Left", "_Right"];
+        selector.Labels = options;
+        selector.Layout ();
 
-        superView.Add (flagSelector);
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag1");
+        Assert.Null (selector.Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        selector.Value = 0;
+        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        Assert.False (flagSelector.HasFocus);
-        Assert.Equal ((int)0, flagSelector.Value);
-
-        flagSelector.NewKeyDownEvent (Key.F.WithAlt);
-
-        Assert.Equal ((int)0, flagSelector.Value);
-        Assert.True (flagSelector.HasFocus);
-    }
-
-    [Fact]
-    public void HotKey_Null_Value_Does_Not_Change_Value ()
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-        superView.Add (new View { CanFocus = true });
-
-        var flagSelector = new FlagSelector ()
-        {
-            Title = "_FlagSelector",
-        };
-        flagSelector.Values = [0, 1];
-        flagSelector.Labels = ["_Left", "_Right"];
-        flagSelector.Value = null;
-
-        superView.Add (flagSelector);
-
-        Assert.False (flagSelector.HasFocus);
-        Assert.Null (flagSelector.Value);
-
-        flagSelector.InvokeCommand (Command.HotKey, new KeyBinding ());
-
-        Assert.True (flagSelector.HasFocus);
-        Assert.Null (flagSelector.Value);
-    }
-
-
-    [Fact]
-    public void Set_Value_Sets ()
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
-        superView.Add (new View { CanFocus = true });
-        var flagSelector = new FlagSelector ();
-        flagSelector.Labels = ["_Left", "_Right"];
-        superView.Add (flagSelector);
-
-        Assert.False (flagSelector.HasFocus);
-        Assert.Null (flagSelector.Value);
-
-        flagSelector.Value = 1;
-
-        Assert.False (flagSelector.HasFocus);
-        Assert.Equal (1, flagSelector.Value);
-    }
-
-    [Fact]
-    public void Item_HotKey_Null_Value_Changes_Value_And_SetsFocus ()
-    {
-        var superView = new View
+        var mouseEvent = new MouseEventArgs
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked
         };
-        superView.Add (new View { CanFocus = true });
-        var flagSelector = new FlagSelector ();
-        flagSelector.Labels = ["_Left", "_Right"];
-        superView.Add (flagSelector);
-
-        Assert.False (flagSelector.HasFocus);
-        Assert.Null (flagSelector.Value);
-
-        flagSelector.NewKeyDownEvent (Key.R);
-
-        Assert.True (flagSelector.HasFocus);
-        Assert.Equal (1, flagSelector.Value);
-    }
-
-    [Fact]
-    public void HotKey_Command_Does_Not_Accept ()
-    {
-        var flagSelector = new FlagSelector ();
-        flagSelector.Values = [0, 1];
-        flagSelector.Labels = ["_Left", "_Right"];
-        var accepted = false;
-
-        flagSelector.Accepting += OnAccept;
-        flagSelector.InvokeCommand (Command.HotKey);
 
         checkBox.NewMouseEvent (mouseEvent);
 
@@ -714,9 +611,6 @@ public class FlagSelectorTests
         Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => (int)cb.Data! == 0));
     }
 
-    #region Mouse Tests
-
-
     [Fact]
     public void Mouse_DoubleClick_TogglesAndAccepts ()
     {
@@ -789,7 +683,6 @@ public class FlagSelectorTests
         Assert.NotNull (selector.Labels);
         Assert.Equal (Enum.GetValues<SelectorStyles> ().Length, selector.Values.Count);
     }
-
 
     [Fact]
     public void Generic_NullValue_UnchecksAll ()
