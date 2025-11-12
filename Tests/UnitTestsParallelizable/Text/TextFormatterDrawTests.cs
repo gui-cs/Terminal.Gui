@@ -676,6 +676,8 @@ Nice       Work")]
         string expectedDraw
     )
     {
+        IDriver driver = CreateFakeDriver ();
+
         TextFormatter tf = new ()
         {
             Direction = direction,
@@ -685,9 +687,9 @@ Nice       Work")]
         };
         Assert.Equal (width, text.GetColumns ());
 
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
+        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
     }
 
     #endregion
