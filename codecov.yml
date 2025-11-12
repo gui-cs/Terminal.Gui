@@ -31,9 +31,9 @@ comment:
   require_changes: false      # Always comment
   require_base: true           # Require base coverage to compare
   require_head: true           # Require head coverage
-  branches:
-    - v2_develop
-    - v2_release
+  # branches:
+  #   - v2_develop
+  #   - v2_release
 
 # Flag-based coverage grouping (matches your workflow flags)
 flags:
