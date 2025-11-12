@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DrawingTests;
@@ -11,7 +10,7 @@ namespace UnitTests_Parallelizable.DrawingTests;
 ///     Note: Tests that verify rendered output (ToString()) cannot be parallelized because LineCanvas
 ///     depends on Application.Driver for glyph resolution and configuration. Those tests remain in UnitTests.
 /// </summary>
-public class LineCanvasTests (ITestOutputHelper output) : ParallelizableBase
+public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
 {
     #region Basic API Tests
 
@@ -548,7 +547,7 @@ public class LineCanvasTests (ITestOutputHelper output) : ParallelizableBase
         string expected
     )
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
         View v = GetCanvas (driver, out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
@@ -1483,7 +1482,7 @@ public class LineCanvasTests (ITestOutputHelper output) : ParallelizableBase
     /// <param name="offsetX">How far to offset drawing in X</param>
     /// <param name="offsetY">How far to offset drawing in Y</param>
     /// <returns></returns>
-    private View GetCanvas (IConsoleDriver driver, out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
+    private View GetCanvas (IDriver driver, out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
     {
         var v = new View { Width = 10, Height = 5, Viewport = new (0, 0, 10, 5) };
         v.Driver = driver;

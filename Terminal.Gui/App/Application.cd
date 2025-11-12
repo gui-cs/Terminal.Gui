@@ -36,19 +36,19 @@
       <FileName>App\MainLoopSyncContext.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Terminal.Gui.App.RunState" Collapsed="true" BaseTypeListCollapsed="true">
+  <Class Name="Terminal.Gui.App.SessionToken" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="15.25" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACACAgAAAAAAAAAAAAAAAAACQAAAAAAAAAA=</HashCode>
-      <FileName>App\RunState.cs</FileName>
+      <FileName>App\SessionToken.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="Terminal.Gui.App.RunStateEventArgs" Collapsed="true">
+  <Class Name="Terminal.Gui.App.SessionTokenEventArgs" Collapsed="true">
     <Position X="17" Y="4" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
-      <FileName>App\RunStateEventArgs.cs</FileName>
+      <FileName>App\SessionTokenEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Terminal.Gui.App.Timeout" Collapsed="true">

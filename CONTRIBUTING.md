@@ -23,11 +23,10 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ## Project Overview
 
-**Terminal.Gui** is a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET. It's a large codebase (~1,050 C# files, 333MB) providing a comprehensive framework for building interactive console applications with support for keyboard and mouse input, customizable views, and a robust event system.
+**Terminal.Gui** is a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET. It's a large codebase (~1,050 C# files) providing a comprehensive framework for building interactive console applications with support for keyboard and mouse input, customizable views, and a robust event system.
 
 **Key characteristics:**
 - **Language**: C# (net8.0)
-- **Size**: ~496 source files in core library, ~1,050 total C# files
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 - **Architecture**: Console UI toolkit with driver-based architecture
 - **Version**: v2 (Alpha), v1 (maintenance mode)
@@ -88,24 +87,11 @@ Welcome! This guide provides everything you need to know to contribute effective
    dotnet test Tests/IntegrationTests --no-build --verbosity normal
    ```
 
-**Important**: Tests may take significant time. CI uses blame flags for crash detection:
-```bash
---diag:logs/UnitTests/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always
-```
-
 ### Common Build Issues
 
 #### Issue: Build Warnings
-- **Expected**: ~326 warnings (nullable refs, unused vars, xUnit suggestions)
+- **Expected**: None warnings (~100 currently).
 - **Action**: Don't add new warnings; fix warnings in code you modify
-
-#### Issue: Test Timeouts
-- **Expected**: Tests can take 5-10 minutes
-- **Action**: Use appropriate timeout values (60-120 seconds for test commands)
-
-#### Issue: Restore Failures
-- **Solution**: Ensure `dotnet restore` completes before building
-- **Note**: Takes 15-20 seconds on first run
 
 #### Issue: NativeAot/SelfContained Build
 - **Solution**: Restore these projects explicitly:
@@ -135,19 +121,18 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 
 ### Code Formatting
 
+**⚠️ CRITICAL - These rules MUST be followed in ALL new or modified code:**
+
 - **Do NOT add formatting tools** - Use existing `.editorconfig` and `Terminal.sln.DotSettings`
 - Format code with:
   1. ReSharper/Rider (`Ctrl-E-C`)
   2. JetBrains CleanupCode CLI tool (free)
   3. Visual Studio (`Ctrl-K-D`) as fallback
 - **Only format files you modify**
-
-### Critical Coding Rules
-
-**⚠️ CRITICAL - These rules MUST be followed in ALL new or modified code:**
-
-#### Type Declarations and Object Creation
-
+- Follow `.editorconfig` settings (e.g., braces on new lines, spaces after keywords)
+- 4-space indentation
+- No trailing whitespace
+- File-scoped namespaces
 - **ALWAYS use explicit types** - Never use `var` except for built-in simple types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
   ```csharp
   // ✅ CORRECT - Explicit types
@@ -163,7 +148,7 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
   var views = new List<View?>();
   ```
 
-- **ALWAYS use target-typed `new()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
+- **ALWAYS use target-typed `new ()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
   ```csharp
   // ✅ CORRECT - Target-typed new
   View view = new () { Width = 10 };
@@ -173,13 +158,6 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
   View view = new View() { Width = 10 };
   MouseEventArgs args = new MouseEventArgs();
   ```
-
-#### Other Conventions
-
-- Follow `.editorconfig` settings (e.g., braces on new lines, spaces after keywords)
-- 4-space indentation
-- No trailing whitespace
-- File-scoped namespaces
 
 **⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, and samples.**
 
@@ -191,6 +169,11 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 
 - **Never decrease code coverage** - PRs must maintain or increase coverage
 - Target: 70%+ coverage for new code
+- **Coverage collection**:
+- Centralized in `TestResults/` directory at repository root
+- Collected only on Linux (ubuntu-latest) runners in CI for performance
+- Windows and macOS runners skip coverage collection to reduce execution time
+- Coverage reports uploaded to Codecov automatically from Linux runner
 - CI monitors coverage on each PR
 
 ### Test Patterns
@@ -258,39 +241,65 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`); supports `workflow_call`
 - **Runner/timeout**: `ubuntu-latest`, 10 minutes
 - **Steps**:
-  - Checkout and setup .NET 8.x GA
-  - `dotnet restore`
-  - Build Debug: `dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612`
-  - Build Release (library): `dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -property:NoWarn=0618%3B0612`
-  - Pack Release: `dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612`
-  - Restore NativeAot/SelfContained examples, then restore solution again
-  - Build Release for `Examples/NativeAot` and `Examples/SelfContained`
-  - Build Release solution
-  - Upload artifacts named `build-artifacts`, retention 1 day
+- Checkout and setup .NET 8.x GA
+- `dotnet restore`
+- Build Debug: `dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612`
+- Build Release (library): `dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -property:NoWarn=0618%3B0612`
+- Pack Release: `dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612`
+- Restore NativeAot/SelfContained examples, then restore solution again
+- Build Release for `Examples/NativeAot` and `Examples/SelfContained`
+- Build Release solution
+- Upload artifacts named `build-artifacts`, retention 1 day
 
 ### 2) Build & Run Unit Tests (`.github/workflows/unit-tests.yml`)
 
 - **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
-- **Process**: Calls build workflow, then runs:
-  - Non-parallel UnitTests on Ubuntu/Windows/macOS matrix with coverage and blame/diag flags; `xunit.stopOnFail=false`
-  - Parallel UnitTestsParallelizable similarly with coverage; `xunit.stopOnFail=false`
-  - Uploads logs per-OS
+- **Matrix**: Ubuntu/Windows/macOS
+- **Timeout**: 15 minutes per job
+- **Process**:
+1. Calls build workflow to build solution once
+2. Downloads build artifacts
+3. Runs `dotnet restore` (required for `--no-build` to work)
+4. **Performance optimizations**:
+   - Disables Windows Defender on Windows runners (significant speedup)
+   - Collects code coverage **only on Linux** (ubuntu-latest) for performance
+   - Windows and macOS skip coverage collection to reduce test time
+   - Increased blame-hang-timeout to 120s for Windows/macOS (60s for Linux)
+5. Runs two test jobs:
+   - **Non-parallel UnitTests**: `Tests/UnitTests` with blame/diag flags; `xunit.stopOnFail=false`
+   - **Parallel UnitTestsParallelizable**: `Tests/UnitTestsParallelizable` with blame/diag flags; `xunit.stopOnFail=false`
+6. Uploads test logs and diagnostic data from all runners
+7. **Uploads code coverage to Codecov only from Linux runner**
+
+**Test results**: All tests output to unified `TestResults/` directory at repository root
 
 ### 3) Build & Run Integration Tests (`.github/workflows/integration-tests.yml`)
 
 - **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
-- **Process**: Calls build workflow, then runs IntegrationTests on matrix with blame/diag; `xunit.stopOnFail=true`
-- Uploads logs per-OS
+- **Matrix**: Ubuntu/Windows/macOS
+- **Timeout**: 15 minutes
+- **Process**:
+1. Calls build workflow
+2. Downloads build artifacts
+3. Runs `dotnet restore`
+4. **Performance optimizations** (same as unit tests):
+   - Disables Windows Defender on Windows runners
+   - Collects code coverage **only on Linux**
+   - Increased blame-hang-timeout to 120s for Windows/macOS
+5. Runs IntegrationTests with blame/diag flags; `xunit.stopOnFail=true`
+6. Uploads logs per-OS
+7. **Uploads coverage to Codecov only from Linux runner**
 
 ### 4) Publish to NuGet (`.github/workflows/publish.yml`)
 
-- **Triggers**: push to `v2_release`, `v2_develop`, and tags `v*` (ignores `**.md`)
+- **Triggers**: push to `v2_release`, `v2_develop`, and tags `v*`(ignores `**.md`)
 - Uses GitVersion to compute SemVer, builds Release, packs with symbols, and pushes to NuGet.org using `NUGET_API_KEY`
 
 ### 5) Build and publish API docs (`.github/workflows/api-docs.yml`)
 
 - **Triggers**: push to `v1_release` and `v2_develop`
 - Builds DocFX site on Windows and deploys to GitHub Pages when `ref_name` is `v2_release` or `v2_develop`
+
 
 ### Replicating CI Locally
 
@@ -323,9 +332,9 @@ dotnet build --configuration Release --no-restore
 ### Main Directories
 
 **`/Terminal.Gui/`** - Core library (496 C# files):
-- `App/` - Application lifecycle (`Application.cs` static class, `RunState`, `MainLoop`)
+- `App/` - Application lifecycle (`Application.cs` static class, `SessionToken`, `MainLoop`)
 - `Configuration/` - `ConfigurationManager` for settings
-- `Drivers/` - Console driver implementations (`IConsoleDriver`, `NetDriver`, `UnixDriver`, `WindowsDriver`)
+- `Drivers/` - Console driver implementations (`Dotnet`, `Windows`, `Unix`, `Fake`)
 - `Drawing/` - Rendering system (attributes, colors, glyphs)
 - `Input/` - Keyboard and mouse input handling
 - `ViewBase/` - Core `View` class hierarchy and layout

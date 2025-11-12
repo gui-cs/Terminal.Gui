@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Describes a request to render a given <see cref="SixelData"/> at a given <see cref="ScreenPosition"/>.
-///     Requires that the terminal and <see cref="IConsoleDriver"/> both support sixel.
+///     Requires that the terminal and <see cref="IDriver"/> both support sixel.
 /// </summary>
 public class SixelToRender
 {

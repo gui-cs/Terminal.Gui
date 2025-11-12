@@ -36,12 +36,12 @@ public class MouseTests : TestsAllViews
         };
         testView.Margin!.Thickness = new (marginThickness);
         testView.Border!.Thickness = new (borderThickness);
-        testView.Padding.Thickness = new (paddingThickness);
+        testView.Padding!.Thickness = new (paddingThickness);
 
         var top = new Toplevel ();
         top.Add (testView);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.Equal (4, testView.Frame.X);
 
         Assert.Equal (new (4, 4), testView.Frame.Location);
@@ -307,11 +307,11 @@ public class MouseTests : TestsAllViews
 
         // Mouse is held down so timer should be ticking
         Assert.NotEmpty (timed.Timeouts);
-        Assert.Equal (clickedCount, 0);
+        Assert.Equal (0, clickedCount);
 
         // Don't wait, just force it to expire
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
-        Assert.Equal (clickedCount, 1);
+        Assert.Equal (1, clickedCount);
 
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
@@ -319,7 +319,7 @@ public class MouseTests : TestsAllViews
         view.NewMouseEvent (me);
 
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
-        Assert.Equal (clickedCount, 2);
+        Assert.Equal (2, clickedCount);
 
         me.Handled = false;
 

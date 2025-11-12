@@ -125,26 +125,25 @@ public class ColorPickers : Scenario
         app.Add (_demoView);
 
 
-        // Radio for switching color models
-        var rgColorModel = new RadioGroup ()
+        var osColorModel = new OptionSelector ()
         {
             Y = Pos.Bottom (_demoView),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            RadioLabels = new []
-            {
+            Labels =
+            [
                 "_RGB",
                 "_HSV",
                 "H_SL",
                 "_16 Colors"
-            },
-            SelectedItem = (int)foregroundColorPicker.Style.ColorModel,
+            ],
+            Value = (int)foregroundColorPicker.Style.ColorModel,
         };
 
-        rgColorModel.SelectedItemChanged += (_, e) =>
+        osColorModel.ValueChanged += (_, e) =>
                                             {
                                                 // 16 colors
-                                                if (e.SelectedItem == 3)
+                                                if (e.Value == 3)
                                                 {
 
                                                     foregroundColorPicker16.Visible = true;
@@ -161,12 +160,17 @@ public class ColorPickers : Scenario
                                                 {
                                                     foregroundColorPicker16.Visible = false;
                                                     foregroundColorPicker.Visible = true;
-                                                    foregroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
-                                                    foregroundColorPicker.ApplyStyleChanges ();
 
-                                                    backgroundColorPicker16.Visible = false;
-                                                    backgroundColorPicker.Visible = true;
-                                                    backgroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
+                                                    if (e.Value is { })
+                                                    {
+                                                        foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                                                        foregroundColorPicker.ApplyStyleChanges ();
+
+                                                        backgroundColorPicker16.Visible = false;
+                                                        backgroundColorPicker.Visible = true;
+                                                        backgroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                                                    }
+
                                                     backgroundColorPicker.ApplyStyleChanges ();
 
 
@@ -176,13 +180,13 @@ public class ColorPickers : Scenario
                                                 }
                                             };
 
-        app.Add (rgColorModel);
+        app.Add (osColorModel);
 
         // Checkbox for switching show text fields on and off
         var cbShowTextFields = new CheckBox ()
         {
             Text = "Show _Text Fields",
-            Y = Pos.Bottom (rgColorModel) + 1,
+            Y = Pos.Bottom (osColorModel) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             CheckedState = foregroundColorPicker.Style.ShowTextFields ? CheckState.Checked : CheckState.UnChecked,

@@ -12,7 +12,7 @@ public class MarginEditor : AdornmentEditor
         AdornmentChanged += MarginEditor_AdornmentChanged;
     }
 
-    private RadioGroup? _rgShadow;
+    private OptionSelector<ShadowStyle>? _optionsShadow;
 
     private FlagSelector? _flagSelectorTransparent;
 
@@ -20,18 +20,18 @@ public class MarginEditor : AdornmentEditor
     {
         if (AdornmentToEdit is { })
         {
-            _rgShadow!.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+            _optionsShadow!.Value = ((Margin)AdornmentToEdit).ShadowStyle;
         }
 
         if (AdornmentToEdit is { })
         {
-            _flagSelectorTransparent!.Value = (uint)((Margin)AdornmentToEdit).ViewportSettings;
+            _flagSelectorTransparent!.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
     }
 
     private void MarginEditor_Initialized (object? sender, EventArgs e)
     {
-        _rgShadow = new RadioGroup
+        _optionsShadow = new ()
         {
             X = 0,
             Y = Pos.Bottom (SubViews.ElementAt(SubViews.Count-1)),
@@ -39,44 +39,36 @@ public class MarginEditor : AdornmentEditor
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
             BorderStyle = LineStyle.Single,
-            RadioLabels = Enum.GetNames (typeof (ShadowStyle)),
+            AssignHotKeys = true
         };
 
         if (AdornmentToEdit is { })
         {
-            _rgShadow.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+            _optionsShadow.Value = ((Margin)AdornmentToEdit).ShadowStyle;
         }
 
-        _rgShadow.SelectedItemChanged += (_, args) =>
-                                        {
-                                            ((Margin)AdornmentToEdit!).ShadowStyle = (ShadowStyle)args.SelectedItem!;
-                                        };
+        _optionsShadow.ValueChanged += (_, args) => ((Margin)AdornmentToEdit!).ShadowStyle = args.Value!.Value;
 
-        Add (_rgShadow);
+        Add (_optionsShadow);
 
-        var flags = new Dictionary<uint, string> ()
-        {
-            { (uint)Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent, "Transparent" },
-            { (uint)Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse, "TransparentMouse" }
-        };
-
-        _flagSelectorTransparent = new FlagSelector ()
+        _flagSelectorTransparent = new FlagSelector<ViewportSettingsFlags> ()
         {
             X = 0,
-            Y = Pos.Bottom (_rgShadow),
+            Y = Pos.Bottom (_optionsShadow),
 
             SuperViewRendersLineCanvas = true,
             Title = "_ViewportSettings",
             BorderStyle = LineStyle.Single,
         };
-        _flagSelectorTransparent.SetFlags(flags.AsReadOnly ());
-
+        _flagSelectorTransparent.Values = [(int)ViewportSettingsFlags.Transparent, (int)ViewportSettingsFlags.TransparentMouse];
+        _flagSelectorTransparent.Labels = ["Transparent", "TransparentMouse"];
+        _flagSelectorTransparent.AssignHotKeys = true;
 
         Add (_flagSelectorTransparent);
 
         if (AdornmentToEdit is { })
         {
-            _flagSelectorTransparent.Value = (uint)((Margin)AdornmentToEdit).ViewportSettings;
+            _flagSelectorTransparent.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
 
         _flagSelectorTransparent.ValueChanged += (_, args) =>

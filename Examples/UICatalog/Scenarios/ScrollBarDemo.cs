@@ -118,23 +118,19 @@ public class ScrollBarDemo : Scenario
         };
         demoFrame.Add (lblOrientationLabel);
 
-        var rgOrientation = new RadioGroup
+        OptionSelector<Orientation> osOrientation = new ()
         {
             X = Pos.Right (lblOrientationLabel) + 1,
             Y = Pos.Top (lblOrientationLabel),
-            RadioLabels = ["Vertical", "Horizontal"],
+            AssignHotKeys = true,
             Orientation = Orientation.Horizontal
         };
-        demoFrame.Add (rgOrientation);
+        demoFrame.Add (osOrientation);
 
-        rgOrientation.SelectedItemChanged += (s, e) =>
+        osOrientation.ValueChanged += (s, e) =>
                                              {
-                                                 if (e.SelectedItem == e.PreviousSelectedItem)
-                                                 {
-                                                     return;
-                                                 }
 
-                                                 if (rgOrientation.SelectedItem == 0)
+                                                 if (osOrientation.Value == Orientation.Horizontal)
                                                  {
                                                      scrollBar.Orientation = Orientation.Vertical;
                                                      scrollBar.X = Pos.AnchorEnd () - 5;
