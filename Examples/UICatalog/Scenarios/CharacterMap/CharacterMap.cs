@@ -371,34 +371,15 @@ public class CharacterMap : Scenario
         options [0] = "All";
         Array.Copy (allCategoryNames, 0, options, 1, allCategoryNames.Length);
 
-        var selector = new OptionSelector<UnicodeCategory> ();
+        // TODO: Add a "None" option
+        OptionSelector<UnicodeCategory> selector = new ();
 
         _unicodeCategorySelector = selector;
 
-        // Default to "All"
-        selector.SelectedItem = 0;
+        selector.Value = null;
         _charMap!.ShowUnicodeCategory = null;
 
-        selector.SelectedItemChanged += (s, e) =>
-                                        {
-                                            int? idx = selector.SelectedItem;
-
-                                            if (idx is null)
-                                            {
-                                                return;
-                                            }
-
-                                            if (idx.Value == 0)
-                                            {
-                                                _charMap.ShowUnicodeCategory = null;
-                                            }
-                                            else
-                                            {
-                                                // Map index to UnicodeCategory (offset by 1 because 0 is "All")
-                                                UnicodeCategory cat = Enum.GetValues<UnicodeCategory> () [idx.Value - 1];
-                                                _charMap.ShowUnicodeCategory = cat;
-                                            }
-                                        };
+        selector.ValueChanged += (_, e) => _charMap.ShowUnicodeCategory = e.Value;
 
         return new () { CommandView = selector };
     }

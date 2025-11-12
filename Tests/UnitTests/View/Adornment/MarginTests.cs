@@ -6,7 +6,7 @@ namespace UnitTests.ViewTests;
 public class MarginTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Margin_Is_Transparent ()
     {
         Application.Driver!.SetScreenSize (5, 5);
@@ -41,7 +41,7 @@ public class MarginTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
     {
         Application.Driver!.SetScreenSize (5, 5);

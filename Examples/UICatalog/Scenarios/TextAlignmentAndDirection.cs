@@ -495,18 +495,18 @@ public class TextAlignmentAndDirection : Scenario
 
         // JUSTIFY OPTIONS
 
-        var justifyOptions = new RadioGroup
+        var justifyOptions = new OptionSelector
         {
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
             Width = Dim.Fill (9),
-            RadioLabels = ["Current direction", "Opposite direction", "FIll Both"],
+            Labels = ["Current direction", "Opposite direction", "FIll Both"],
             Enabled = false
         };
 
         justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.Result != CheckState.Checked);
 
-        justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
+        justifyOptions.ValueChanged += (_, _) => { ToggleJustify (false, true); };
 
         app.Add (justifyOptions);
 
@@ -544,17 +544,17 @@ public class TextAlignmentAndDirection : Scenario
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
-        var directionOptions = new RadioGroup
+        var directionOptions = new OptionSelector
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Bottom (wrapCheckbox) + 1,
             Width = Dim.Fill (10),
             Height = Dim.Fill (1),
             HotKeySpecifier = (Rune)'\xffff',
-            RadioLabels = directionsEnum.Select (e => e.ToString ()).ToArray ()
+            Labels = directionsEnum.Select (e => e.ToString ()).ToArray ()
         };
 
-        directionOptions.SelectedItemChanged += (s, ev) =>
+        directionOptions.ValueChanged += (s, ev) =>
                                                 {
                                                     bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
 
@@ -563,9 +563,9 @@ public class TextAlignmentAndDirection : Scenario
                                                         ToggleJustify (true);
                                                     }
 
-                                                    foreach (View v in multiLineLabels)
+                                                    foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
                                                     {
-                                                        v.TextDirection = (TextDirection)ev.SelectedItem;
+                                                        v.TextDirection = (TextDirection)ev.Value!.Value;
                                                     }
 
                                                     if (justChecked)
@@ -615,7 +615,7 @@ public class TextAlignmentAndDirection : Scenario
 
                     if (TextFormatter.IsVerticalDirection (t.TextDirection))
                     {
-                        switch (justifyOptions.SelectedItem)
+                        switch (justifyOptions.Value)
                         {
                             case 0:
                                 t.VerticalTextAlignment = Alignment.Fill;
@@ -633,7 +633,7 @@ public class TextAlignmentAndDirection : Scenario
                     }
                     else
                     {
-                        switch (justifyOptions.SelectedItem)
+                        switch (justifyOptions.Value)
                         {
                             case 0:
                                 t.TextAlignment = Alignment.Fill;

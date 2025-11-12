@@ -13,10 +13,7 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
     /// </summary>
     public OptionSelector ()
     {
-        List<string> labels = Enum.GetValues<TEnum> ()
-                                  .Select (f => f.ToString ())
-                                  .ToList ();
-        base.Labels = labels;
+        base.Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray (); ;
     }
 
     /// <summary>
@@ -35,5 +32,22 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
     {
         get => base.Values;
         set => throw new InvalidOperationException ("Setting Values directly is not allowed.");
+    }
+
+    /// <summary>
+    ///     Raised when <see cref="Value"/> has changed. Provides the new value as <typeparamref name="TEnum"/>?.
+    /// </summary>
+    public new event EventHandler<EventArgs<TEnum?>>? ValueChanged;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed. Raises the generic <see cref="ValueChanged"/> event.
+    /// </summary>
+    protected override void OnValueChanged (int? value, int? previousValue)
+    {
+        base.OnValueChanged (value, previousValue);
+
+        TEnum? newValue = value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), value.Value) : null;
+
+        ValueChanged?.Invoke (this, new (newValue));
     }
 }

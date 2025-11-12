@@ -207,17 +207,17 @@ public class Shortcuts : Scenario
             CommandView = new OptionSelector ()
             {
                 Orientation = Orientation.Vertical,
-                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
+                Labels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
                 HighlightStates = MouseState.None,
             },
         };
 
-        ((OptionSelector)optionSelectorShortcut.CommandView).SelectedItemChanged += (o, args) =>
+        ((OptionSelector)optionSelectorShortcut.CommandView).ValueChanged += (o, args) =>
                                                                                 {
                                                                                     if (o is { })
                                                                                     {
                                                                                         eventSource.Add (
-                                                                                                         $"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
+                                                                                                         $"ValueChanged: {o.GetType ().Name} - {args.Value}");
                                                                                         eventLog.MoveDown ();
                                                                                     }
                                                                                 };
@@ -324,7 +324,7 @@ public class Shortcuts : Scenario
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
-        framedShortcut.Border.Settings = BorderSettings.Title;
+        framedShortcut.Border!.Settings = BorderSettings.Title;
         //framedShortcut.Orientation = Orientation.Horizontal;
 
         if (framedShortcut.Padding is { })
@@ -543,25 +543,21 @@ public class Shortcuts : Scenario
         {
             var max = 0;
 
-            IEnumerable<View> toAlign = Application.Top!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _));
-            IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
+            IEnumerable<Shortcut> toAlign = Application.Top!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _)).Cast<Shortcut>();
+            IEnumerable<Shortcut> enumerable = toAlign as Shortcut [] ?? toAlign.ToArray ();
 
             if (align)
             {
                 max = (from Shortcut? peer in enumerable
-                       select peer.Key.ToString ().GetColumns ()).Prepend (max)
-                                                                 .Max ();
+                       select peer!.Key.ToString ().GetColumns ()).Prepend (max)
+                                                                  .Max ();
 
-                foreach (View view in enumerable)
-                {
-                    var peer = (Shortcut)view;
-                    max = Math.Max (max, peer.KeyView.Text.GetColumns ());
-                }
+                max = enumerable.Select (peer => peer.KeyView.Text.GetColumns ()).Prepend (max).Max ();
             }
 
-            foreach (View view in enumerable)
+            foreach (Shortcut shortcut in enumerable)
             {
-                var peer = (Shortcut)view;
+                Shortcut peer = shortcut;
                 peer.MinimumKeyTextSize = max;
             }
         }

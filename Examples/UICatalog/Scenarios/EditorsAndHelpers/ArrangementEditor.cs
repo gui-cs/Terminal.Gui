@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using Terminal.Gui.ViewBase;
-
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -20,9 +16,9 @@ public sealed class ArrangementEditor : EditorBase
         Add (_arrangementSelector);
     }
 
-    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new()
+    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new ()
     {
-        Orientation = Orientation.Vertical,
+        Orientation = Orientation.Vertical
     };
 
     protected override void OnViewToEditChanged ()
@@ -40,7 +36,7 @@ public sealed class ArrangementEditor : EditorBase
         _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
     }
 
-    private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<int?> e)
+    private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<ViewArrangement?> e)
     {
         if (ViewToEdit is { } && e.Value is { })
         {
@@ -57,47 +53,9 @@ public sealed class ArrangementEditor : EditorBase
                 ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
             }
 
-            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable))
-            {
-                ViewToEdit.BorderStyle = LineStyle.Double;
-            }
-            else
-            {
-                ViewToEdit.BorderStyle = LineStyle.Single;
-            }
+            ViewToEdit.BorderStyle = ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable) ? LineStyle.Double : LineStyle.Single;
         }
     }
 
-    private void ArrangementEditor_Initialized (object? sender, EventArgs e)
-    {
-        _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
-    }
-
-    private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<uint?> e)
-    {
-        if (ViewToEdit is { } && e.Value is {})
-        {
-            ViewToEdit.Arrangement = (ViewArrangement)e.Value;
-
-            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
-            {
-                ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
-                ViewToEdit.SchemeName = "Toplevel";
-            }
-            else
-            {
-                ViewToEdit.ShadowStyle = ShadowStyle.None;
-                ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
-            }
-
-            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable))
-            {
-                ViewToEdit.BorderStyle = LineStyle.Double;
-            }
-            else
-            {
-                ViewToEdit.BorderStyle = LineStyle.Single;
-            }
-        }
-    }
+    private void ArrangementEditor_Initialized (object? sender, EventArgs e) { _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged; }
 }

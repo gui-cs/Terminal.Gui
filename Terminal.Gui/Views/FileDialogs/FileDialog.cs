@@ -601,7 +601,10 @@ public class FileDialog : Dialog, IDesignable
                                                     FileDialogTableSource.GetRawColumnValue (_currentSortColumn, f)
                                                );
 
-        State!.Children = ordered.ToArray ();
+        if (State is { })
+        {
+            State.Children = ordered.ToArray ();
+        }
 
         _tableView.Update ();
     }
@@ -667,7 +670,7 @@ public class FileDialog : Dialog, IDesignable
         // Don't include ".." (IsParent) in multi-selections
         MultiSelected = toMultiAccept
                         .Where (s => !s.IsParent)
-                        .Select (s => s.FileSystemInfo.FullName)
+                        .Select (s => s.FileSystemInfo!.FullName)
                         .ToList ()
                         .AsReadOnly ();
 
@@ -743,7 +746,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.ClearAllSelection ();
         _tbPath.Autocomplete.ClearSuggestions ();
 
-        State!.RefreshChildren ();
+        State?.RefreshChildren ();
         WriteStateToTableView ();
     }
 
@@ -877,7 +880,7 @@ public class FileDialog : Dialog, IDesignable
 
     private string GetBackButtonText () { return Glyphs.LeftArrow + "-"; }
 
-    private IFileSystemInfo []? GetFocusedFiles ()
+    private IFileSystemInfo? []? GetFocusedFiles ()
     {
         if (!_tableView.HasFocus || !_tableView.CanFocus)
         {
@@ -1355,9 +1358,9 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (obj.NewRow);
+        FileSystemInfoStats? stats = RowToStats (obj.NewRow);
 
-        IFileSystemInfo dest;
+        IFileSystemInfo? dest;
 
         if (stats.IsParent)
         {
@@ -1425,10 +1428,10 @@ public class FileDialog : Dialog, IDesignable
         }
 
         if (fileSystemInfoStatsEnumerable.All (
-                                               m => IsCompatibleWithOpenMode (
-                                                                              m.FileSystemInfo.FullName,
-                                                                              out reason
-                                                                             )
+                                               m => m.FileSystemInfo is { } && IsCompatibleWithOpenMode (
+                                                                                                         m.FileSystemInfo.FullName,
+                                                                                                         out reason
+                                                                                                        )
                                               ))
         {
             Accept (fileSystemInfoStatsEnumerable);

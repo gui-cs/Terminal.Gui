@@ -1,10 +1,12 @@
+using UnitTests;
+
 namespace UnitTests_Parallelizable.ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Label"/> that don't require Application.Driver or Application context.
 /// These tests can run in parallel without interference.
 /// </summary>
-public class LabelTests : UnitTests.Parallelizable.ParallelizableBase
+public class LabelTests : FakeDriverBase
 {
     [Fact]
     public void Text_Mirrors_Title ()

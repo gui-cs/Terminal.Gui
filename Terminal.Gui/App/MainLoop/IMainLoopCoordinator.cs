@@ -8,7 +8,6 @@
 ///     <list type="bullet">
 ///         <item>Starting the asynchronous input reading thread</item>
 ///         <item>Initializing the main UI loop on the application thread</item>
-///         <item>Building the <see cref="IConsoleDriver"/> facade</item>
 ///         <item>Coordinating clean shutdown of both threads</item>
 ///     </list>
 /// </remarks>
@@ -26,7 +25,7 @@ public interface IMainLoopCoordinator
     ///     </list>
     /// </remarks>
     /// <returns>A task that completes when initialization is done</returns>
-    public Task StartAsync ();
+    public Task StartInputTaskAsync ();
 
     /// <summary>
     ///     Stops the input thread and performs cleanup.

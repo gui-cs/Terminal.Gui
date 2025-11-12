@@ -103,25 +103,25 @@ public partial class Toplevel : View
     public bool IsLoaded { get; private set; }
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Activating/Activate
-    /// <summary>Invoked when the Toplevel <see cref="RunState"/> active.</summary>
+    /// <summary>Invoked when the Toplevel <see cref="SessionToken"/> active.</summary>
     public event EventHandler<ToplevelEventArgs>? Activate;
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Deactivating/Deactivate?
-    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be active.</summary>
+    /// <summary>Invoked when the Toplevel<see cref="SessionToken"/> ceases to be active.</summary>
     public event EventHandler<ToplevelEventArgs>? Deactivate;
 
-    /// <summary>Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.</summary>
+    /// <summary>Invoked when the Toplevel's <see cref="SessionToken"/> is closed by <see cref="Application.End(SessionToken)"/>.</summary>
     public event EventHandler<ToplevelEventArgs>? Closed;
 
     /// <summary>
-    ///     Invoked when the Toplevel's <see cref="RunState"/> is being closed by
+    ///     Invoked when the Toplevel's <see cref="SessionToken"/> is being closed by
     ///     <see cref="Application.RequestStop(Toplevel)"/>.
     /// </summary>
     public event EventHandler<ToplevelClosingEventArgs>? Closing;
 
     /// <summary>
-    ///     Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded. A Loaded event handler
-    ///     is a good place to finalize initialization before calling <see cref="Application.RunLoop(RunState)"/>.
+    ///     Invoked when the <see cref="Toplevel"/> <see cref="SessionToken"/> has begun to be loaded. A Loaded event handler
+    ///     is a good place to finalize initialization before calling Run.
     /// </summary>
     public event EventHandler? Loaded;
 
@@ -166,8 +166,8 @@ public partial class Toplevel : View
     }
 
     /// <summary>
-    ///     Invoked when the Toplevel <see cref="RunState"/> has been unloaded. A Unloaded event handler is a good place
-    ///     to dispose objects after calling <see cref="Application.End(RunState)"/>.
+    ///     Invoked when the Toplevel <see cref="SessionToken"/> has been unloaded. A Unloaded event handler is a good place
+    ///     to dispose objects after calling <see cref="Application.End(SessionToken)"/>.
     /// </summary>
     public event EventHandler? Unloaded;
 
@@ -185,7 +185,7 @@ public partial class Toplevel : View
     internal virtual void OnDeactivate (Toplevel activated) { Deactivate?.Invoke (this, new (activated)); }
 
     /// <summary>
-    ///     Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the first iteration
+    ///     Called from run loop after the <see cref="Toplevel"/> has entered the first iteration
     ///     of the loop.
     /// </summary>
     internal virtual void OnReady ()
@@ -199,7 +199,7 @@ public partial class Toplevel : View
         Ready?.Invoke (this, EventArgs.Empty);
     }
 
-    /// <summary>Called from <see cref="Application.End(RunState)"/> before the <see cref="Toplevel"/> is disposed.</summary>
+    /// <summary>Called from <see cref="Application.End(SessionToken)"/> before the <see cref="Toplevel"/> is disposed.</summary>
     internal virtual void OnUnloaded ()
     {
         foreach (var view in SubViews.Where (v => v is Toplevel))

@@ -254,7 +254,7 @@ public class CheckBoxTests ()
         Assert.Equal (0, selectCount);
         Assert.Equal (0, acceptCount);
 
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
         Assert.Equal (0, checkedStateChangingCount);

@@ -78,21 +78,18 @@ public abstract class SelectorBase : View, IOrientation
             return base.OnHandlingHotKey (args);
         }
 
-        if (HasFocus || !CanFocus)
+        if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
         {
-            if (HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
-            {
-                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
-                return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
-            }
+            // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+            return Focused?.InvokeCommand (Command.Select, args.Context) is true;
         }
         return base.OnHandlingHotKey (args);
     }
 
     /// <inheritdoc />
-    protected override bool OnActivating (CommandEventArgs args)
+    protected override bool OnSelecting (CommandEventArgs args)
     {
-        return base.OnActivating (args);
+        return base.OnSelecting (args);
     }
 
     private int? _value;
@@ -245,9 +242,13 @@ public abstract class SelectorBase : View, IOrientation
     }
 
     /// <summary>
-    ///     Gets the list of hotkeys already used by the labels or that should not be used if
-    ///     <see cref="AssignHotKeys"/>
-    ///     is enabled.
+    ///     Gets or sets the set of hotkeys that are already used by labels or should not be used when
+    ///     <see cref="AssignHotKeys"/> is enabled.
+    ///     <para>
+    ///         This property is used to ensure that automatically assigned hotkeys do not conflict with
+    ///         hotkeys used elsewhere in the application. Set <see cref="UsedHotKeys"/> before setting
+    ///         <see cref="Labels"/> if there are hotkeys that may conflict with other views.
+    ///     </para>
     /// </summary>
     public HashSet<Key> UsedHotKeys { get; set; } = [];
 
@@ -347,6 +348,24 @@ public abstract class SelectorBase : View, IOrientation
         {
             string label = subView.Title ?? string.Empty;
 
+            // Check if there's already a hotkey defined
+            if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
+            {
+                // Label already has a hotkey - preserve it if available
+                if (!UsedHotKeys.Contains (existingHotKey))
+                {
+                    subView.HotKey = existingHotKey;
+                    UsedHotKeys.Add (existingHotKey);
+                    continue; // Keep existing hotkey specifier in label
+                }
+                else
+                {
+                    // Existing hotkey is already used, remove it and assign new one
+                    label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
+                }
+            }
+
+            // Assign a new hotkey
             Rune [] runes = label.EnumerateRunes ().ToArray ();
 
             for (var i = 0; i < runes.Count (); i++)
@@ -364,11 +383,6 @@ public abstract class SelectorBase : View, IOrientation
                     continue;
                 }
 
-                if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key hotKey))
-                {
-                    label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
-                }
-
                 subView.Title = label.Insert (i, HotKeySpecifier.ToString ());
                 subView.HotKey = newKey;
                 UsedHotKeys.Add (subView.HotKey);
@@ -381,7 +395,7 @@ public abstract class SelectorBase : View, IOrientation
     private int _horizontalSpace = 2;
 
     /// <summary>
-    ///     Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="Orientation"/> is
+    ///     Gets or sets the horizontal space for this <see cref="OptionSelector"/> if the <see cref="Orientation"/> is
     ///     <see cref="Orientation.Horizontal"/>
     /// </summary>
     public int HorizontalSpace
@@ -443,15 +457,6 @@ public abstract class SelectorBase : View, IOrientation
     /// <exception cref="InvalidOperationException"></exception>
     public abstract void UpdateChecked ();
 
-    /// <inheritdoc />
-    protected override void OnHighlightStatesChanged (ValueChangedEventArgs<MouseState> args)
-    {
-        foreach (CheckBox checkbox in SubViews.OfType<CheckBox> ())
-        {
-            //   checkbox.HighlightStates = HighlightStates;
-        }
-        base.OnHighlightStatesChanged (args);
-    }
 
     /// <summary>
     ///     Gets or sets whether double-clicking on an Item will cause the <see cref="View.Accepting"/> event to be

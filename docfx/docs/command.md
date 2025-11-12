@@ -208,12 +208,49 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
   - **Context**: `ICommandContext` provides invocation details.
 
 - **Use Cases**:
-  - **ListView**: Activating an item (e.g., via arrow keys or mouse click) raises `Activating` to update the highlighted item.
-  - **CheckBox**: Toggling the checked state (e.g., via spacebar) raises `Activating` to change the state, as seen in the `AdvanceAndSelect` method.
-  - **RadioGroup**: Activating a radio button raises `Activating` to update the selected option.
-  - **Menuv2** and **MenuBarv2**: Activating a `MenuItemv2` (e.g., via mouse enter or arrow keys) sets focus, tracked by `SelectedMenuItem` and raising `SelectedMenuItemChanged`.
-  - **FlagSelector**: Activating a `CheckBox` subview toggles a flag, updating the `Value` property and raising `ValueChanged`, though it incorrectly triggers `Accepting`.
-  - **Views without State**: For views like `Button`, `Activating` typically sets focus but does not change state, making it less relevant.
+  - **ListView**: Selecting an item (e.g., via arrow keys or mouse click) raises `Selecting` to update the highlighted item.
+  - **CheckBox**: Toggling the checked state (e.g., via spacebar) raises `Selecting` to change the state, as seen in the `AdvanceAndSelect` method:
+    ```csharp
+    private bool? AdvanceAndSelect(ICommandContext? commandContext)
+    {
+        bool? cancelled = AdvanceCheckState();
+        if (cancelled is true)
+        {
+            return true;
+        }
+        if (RaiseSelecting(commandContext) is true)
+        {
+            return true;
+        }
+        return commandContext?.Command == Command.HotKey ? cancelled : cancelled is false;
+    }
+    ```
+  - **OptionSelector**: Selecting an OpitonSelector option raises `Selecting` to update the selected option.
+  - **Menuv2** and **MenuBarv2**: Selecting a `MenuItemv2` (e.g., via mouse enter or arrow keys) sets focus, tracked by `SelectedMenuItem` and raising `SelectedMenuItemChanged`:
+    ```csharp
+    protected override void OnFocusedChanged(View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged(previousFocused, focused);
+        SelectedMenuItem = focused as MenuItemv2;
+        RaiseSelectedMenuItemChanged(SelectedMenuItem);
+    }
+    ```
+  - **FlagSelector**: Selecting a `CheckBox` subview toggles a flag, updating the `Value` property and raising `ValueChanged`, though it incorrectly triggers `Accepting`:
+    ```csharp
+    checkbox.Selecting += (sender, args) =>
+    {
+        if (RaiseSelecting(args.Context) is true)
+        {
+            args.Cancel = true;
+            return;
+        }
+        if (RaiseAccepting(args.Context) is true)
+        {
+            args.Cancel = true;
+        }
+    };
+    ```
+  - **Views without State**: For views like `Button`, `Selecting` typically sets focus but does not change state, making it less relevant.
 
 - **Propagation**: `Command.Activate` is handled locally by the target view. If the command is unhandled (`null` or `false`), processing stops without propagating to the superview or other views. This is evident in `Menuv2`, where `SelectedMenuItemChanged` is used for hierarchical coordination, and in `CheckBox` and `FlagSelector`, where state changes are internal.
 

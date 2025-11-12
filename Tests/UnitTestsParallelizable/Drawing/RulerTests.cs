@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DrawingTests;
@@ -11,7 +10,7 @@ namespace UnitTests_Parallelizable.DrawingTests;
 ///
 /// Note: Tests that verify rendered output (Draw methods) require Application.Driver and remain in UnitTests as integration tests.
 /// </summary>
-public class RulerTests (ITestOutputHelper output): ParallelizableBase
+public class RulerTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -52,7 +51,7 @@ public class RulerTests (ITestOutputHelper output): ParallelizableBase
     [Fact]
     public void Draw_Default ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var r = new Ruler ();
         r.Draw (Point.Empty, driver: driver);
@@ -62,7 +61,7 @@ public class RulerTests (ITestOutputHelper output): ParallelizableBase
     [Fact]
     public void Draw_Horizontal ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var len = 15;
 
@@ -108,7 +107,7 @@ public class RulerTests (ITestOutputHelper output): ParallelizableBase
     [Fact]
     public void Draw_Vertical ()
     {
-        IConsoleDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var len = 15;
 

@@ -14,9 +14,12 @@ public static class With
     /// <param name="testDriver">Which v2 testDriver to use for the test</param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : Toplevel, new ()
+    public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : Toplevel, new()
     {
-        return new (() => new T (), width, height, testDriver, logWriter, Timeout);
+        return new (() => new T ()
+        {
+            //Id = $"{typeof (T).Name}"
+        }, width, height, testDriver, logWriter, Timeout);
     }
 
     /// <summary>
@@ -36,5 +39,5 @@ public static class With
     /// </summary>
     public static TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds (30);
 
-    
+
 }

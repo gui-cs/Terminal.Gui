@@ -29,7 +29,7 @@ public class TableStyle
 
     /// <summary>
     ///     True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>. This gives
-    ///     the appearance of a cursor for when the <see cref="IConsoleDriver"/> doesn't otherwise show this
+    ///     the appearance of a cursor for when the <see cref="IDriver"/> doesn't otherwise show this
     /// </summary>
     public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 

@@ -844,7 +844,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         The next iteration will cause <see cref="Layout()"/> to be called on the next
-    ///         <see cref="Application.Iteration"/> so there is normally no reason to call see <see cref="Layout()"/>.
+    ///         <see cref="IApplication.Iteration"/> so there is normally no reason to call see <see cref="Layout()"/>.
     ///     </para>
     /// </remarks>
     public void SetNeedsLayout ()

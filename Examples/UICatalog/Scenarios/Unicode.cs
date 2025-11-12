@@ -71,8 +71,7 @@ public class UnicodeInMenu : Scenario
         appWindow.Add (menu);
 
         var statusBar = new StatusBar (
-                                       new Shortcut []
-                                       {
+                                       [
                                            new (
                                                 Application.QuitKey,
                                                 "Выход",
@@ -80,7 +79,7 @@ public class UnicodeInMenu : Scenario
                                                ),
                                            new (Key.F2, "Создать", null),
                                            new (Key.F3, "Со_хранить", null)
-                                       }
+                                       ]
                                       );
         appWindow.Add (statusBar);
 
@@ -145,13 +144,13 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (checkBox, checkBoxRight);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
-        appWindow.Add (label);
-        var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
-        comboBox.SetSource (new ObservableCollection<string> { gitString, "Со_хранить" });
+        //label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
+        //appWindow.Add (label);
+        //var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
+        //comboBox.SetSource (new ObservableCollection<string> { gitString, "Со_хранить" });
 
-        appWindow.Add (comboBox);
-        comboBox.Text = gitString;
+        //appWindow.Add (comboBox);
+        //comboBox.Text = gitString;
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
         appWindow.Add (label);
@@ -177,19 +176,19 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (listView);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "OptionSelector:" };
         appWindow.Add (label);
 
-        var radioGroup = new RadioGroup
+        var optionSelector = new OptionSelector
         {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
-            RadioLabels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
+            Labels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
         };
-        appWindow.Add (radioGroup);
+        appWindow.Add (optionSelector);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (optionSelector) + 1, Text = "TextField:" };
         appWindow.Add (label);
 
         var textField = new TextField

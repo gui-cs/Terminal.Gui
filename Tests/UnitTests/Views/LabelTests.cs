@@ -103,7 +103,7 @@ public class LabelTests (ITestOutputHelper output)
 
         Toplevel top = new ();
         top.Add (label);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (label.TextFormatter.FillRemaining);
@@ -298,7 +298,7 @@ e
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Full_Border ()
     {
         var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
@@ -708,7 +708,7 @@ e
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
 
         Assert.Equal (29, label.Text.Length);
@@ -755,7 +755,7 @@ e
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -856,22 +856,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > -1)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-
-                                         if (count == 0)
-                                         {
-                                             field.NewKeyDownEvent (Key.Enter);
-
-                                             break;
-                                         }
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -880,16 +865,36 @@ e
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, count);
         Assert.Equal (count, listLabels.Count);
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count > -1)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+
+                if (count == 0)
+                {
+                    field.NewKeyDownEvent (Key.Enter);
+
+                    break;
+                }
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This is a Label test. Move to Label tests.
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Label_Height_Zero_Stays_Zero ()
     {
         Application.Driver!.SetScreenSize (10, 4);
@@ -1008,22 +1013,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count < 21)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-
-                                         if (count == 20)
-                                         {
-                                             field.NewKeyDownEvent (Key.Enter);
-
-                                             break;
-                                         }
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -1032,10 +1022,30 @@ e
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (20, count);
         Assert.Equal (count, listLabels.Count);
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count < 21)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+
+                if (count == 20)
+                {
+                    field.NewKeyDownEvent (Key.Enter);
+
+                    break;
+                }
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -1319,7 +1329,7 @@ e
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3893
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestLabelUnderscoreMinus ()
     {
         var lbl = new Label
