@@ -179,6 +179,44 @@ public class WindowsKeyConverterTests
         Assert.Equal (KeyCode.Null, result.KeyCode);
     }
 
+    [Fact]
+    public void ToKey_VKPacket_SurrogatePair_DocumentsCurrentLimitation ()
+    {
+        // Emoji '??' (U+1F600) requires a surrogate pair: High=U+D83D, Low=U+DE00
+        // Windows sends this as TWO consecutive VK_PACKET events (one for each char)
+        // because KeyEventRecord.UnicodeChar is a single 16-bit char field.
+        // 
+        // CURRENT LIMITATION: WindowsKeyConverter processes each event independently
+        // and does not combine surrogate pairs into a single Rune/KeyCode.
+        // This test documents the current (incorrect) behavior.
+        //
+        // TODO: Implement proper surrogate pair handling at the InputProcessor level
+        // to combine consecutive high+low surrogate events into a single Key with the
+        // complete Unicode codepoint.
+        // See: https://docs.microsoft.com/en-us/windows/console/key-event-record
+        
+        char highSurrogate = '\uD83D'; // High surrogate for ??
+        char lowSurrogate = '\uDE00';  // Low surrogate for ??
+
+        // First event with high surrogate
+        WindowsConsole.InputRecord highRecord = CreateVKPacketInputRecord (highSurrogate);
+        Key highResult = _converter.ToKey (highRecord);
+
+        // Second event with low surrogate
+        WindowsConsole.InputRecord lowRecord = CreateVKPacketInputRecord (lowSurrogate);
+        Key lowResult = _converter.ToKey (lowRecord);
+
+        // Currently each surrogate half is processed independently as invalid KeyCodes
+        // These assertions document the current (broken) behavior
+        Assert.Equal ((KeyCode)highSurrogate, highResult.KeyCode);
+        Assert.Equal ((KeyCode)lowSurrogate, lowResult.KeyCode);
+
+        // What SHOULD happen (future fix):
+        // The InputProcessor should detect the surrogate pair and combine them:
+        // var expectedRune = new Rune(0x1F600); // ??
+        // Assert.Equal((KeyCode)expectedRune.Value, combinedResult.KeyCode);
+    }
+
     #endregion
 
     #region ToKey Tests - OEM Keys
