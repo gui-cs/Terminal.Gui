@@ -30,10 +30,30 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, st
         {
             if (GraphemeHelper.GetGraphemes(value).ToArray().Length > 1)
             {
-                throw new InvalidOperationException ($"Only a single grapheme cluster is allowed per Cell in {nameof (Grapheme)}.");
+                throw new InvalidOperationException ($"Only a single {nameof (Grapheme)} cluster is allowed per Cell.");
             }
 
-            _grapheme = value;
+            if (!string.IsNullOrEmpty (value) && value.Length == 1 && char.IsSurrogate (value [0]))
+            {
+                throw new ArgumentException ($"Only valid Unicode scalar values are allowed in a single {nameof (Grapheme)} cluster.");
+            }
+
+            try
+            {
+                if (!string.IsNullOrEmpty (value) && !value.IsNormalized (NormalizationForm.FormC))
+                {
+                    _grapheme = value.Normalize (NormalizationForm.FormC);
+                }
+                else
+                {
+                    _grapheme = value;
+                }
+            }
+            catch (ArgumentException)
+            {
+                // leave text unnormalized
+                _grapheme = value;
+            }
         }
     }
 

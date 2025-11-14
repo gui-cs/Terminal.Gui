@@ -20,6 +20,9 @@ public class CellTests
     [InlineData ("", new uint [] { })]
     [InlineData ("a", new uint [] { 0x0061 })]
     [InlineData ("👩‍❤️‍💋‍👨", new uint [] { 0x1F469, 0x200D, 0x2764, 0xFE0F, 0x200D, 0x1F48B, 0x200D, 0x1F468 })]
+    [InlineData ("æ", new uint [] { 0x00E6 })]
+    [InlineData ("a︠", new uint [] { 0x0061, 0xFE20 })]
+    [InlineData ("e︡", new uint [] { 0x0065, 0xFE21 })]
     public void Runes_From_Grapheme (string grapheme, uint [] expected)
     {
         // Arrange
@@ -86,4 +89,92 @@ public class CellTests
         yield return ["A", new Attribute (Color.Red) { Style = TextStyle.Blink }, "[\"A\":[Red,Red,Blink]]"];
         yield return ["\U0001F469\u200D\u2764\uFE0F\u200D\U0001F48B\u200D\U0001F468", null, "[\"👩‍❤️‍💋‍👨\":]"];
     }
+
+    [Fact]
+    public void Graphemes_Decomposed_Normalize ()
+    {
+        Cell c1 = new ()
+        {
+            // 'e' + '◌́' COMBINING ACUTE ACCENT (U+0301)
+            Grapheme = "e\u0301" // visually "é"
+        };
+
+        Cell c2 = new ()
+        {
+            // NFC single code point (U+00E9)
+            Grapheme = "é"
+        };
+
+        // Validation
+        Assert.Equal ("é", c1.Grapheme); // Proper normalized grapheme
+        Assert.Equal (c1.Grapheme, c2.Grapheme);
+        Assert.Equal (c1.Runes.Count, c2.Runes.Count);
+        Assert.Equal (new (0x00E9), c2.Runes [0]);
+    }
+
+    [Fact]
+    public void Cell_IsDirty_Flag_Works ()
+    {
+        var c = new Cell ();
+        Assert.False (c.IsDirty);
+        c.IsDirty = true;
+        Assert.True (c.IsDirty);
+        c.IsDirty = false;
+        Assert.False (c.IsDirty);
+    }
+
+    [Theory]
+    [InlineData ("\uFDD0", false)]
+    [InlineData ("\uFDEF", false)]
+    [InlineData ("\uFFFE", true)]
+    [InlineData ("\uFFFF", false)]
+    [InlineData ("\U0001FFFE", false)]
+    [InlineData ("\U0001FFFF", false)]
+    [InlineData ("\U0010FFFE", false)]
+    [InlineData ("\U0010FFFF", false)]
+    public void IsNormalized_ArgumentException (string text, bool throws)
+    {
+        try
+        {
+            bool normalized = text.IsNormalized (NormalizationForm.FormC);
+
+            Assert.True (normalized);
+            Assert.False (throws);
+        }
+        catch (ArgumentException)
+        {
+            Assert.True (throws);
+        }
+
+        Cell c = new () { Grapheme = text };
+    }
+
+    [Fact]
+    public void Surrogate_Normalize_Throws_And_Cell_Setter_Throws ()
+    {
+        // Create the lone high surrogate at runtime (safe)
+        string s = new string ((char)0xD800, 1);
+
+        // Confirm the runtime string actually contains the surrogate
+        Assert.Equal (0xD800, s [0]);
+
+        // Normalize should throw
+        Assert.Throws<ArgumentException> (() => s.Normalize (NormalizationForm.FormC));
+
+        // And if your Grapheme setter normalizes, assignment should throw as well
+        Assert.Throws<ArgumentException> (() => new Cell () { Grapheme = s });
+
+        // Create the lone low surrogate at runtime (safe)
+        s = new string ((char)0xDC00, 1);
+
+        // Confirm the runtime string actually contains the surrogate
+        Assert.Equal (0xDC00, s [0]);
+
+        // Normalize should throw
+        Assert.Throws<ArgumentException> (() => s.Normalize (NormalizationForm.FormC));
+
+        // And if your Grapheme setter normalizes, assignment should throw as well
+        Assert.Throws<ArgumentException> (() => new Cell () { Grapheme = s });
+    }
+
 }
