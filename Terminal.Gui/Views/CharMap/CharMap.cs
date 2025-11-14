@@ -781,6 +781,7 @@ public class CharMap : View, IDesignable
                     {
                         AddStr (grapheme);
                     }
+
                     break;
 
                 // These report width of 0, but render as 1
