@@ -39,7 +39,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         driver.ClearContents ();
         driver.Move (0, 0);
 
-        expected = "ắ";
+        expected = "ắ";
         text = "\u0103\u0301";
         driver.AddStr (text);
         Assert.Equal (expected, driver.Contents [0, 0].Grapheme);
@@ -48,7 +48,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         driver.ClearContents ();
         driver.Move (0, 0);
 
-        expected = "ắ";
+        expected = "ắ";
         text = "\u0061\u0306\u0301";
         driver.AddStr (text);
         Assert.Equal (expected, driver.Contents [0, 0].Grapheme);
