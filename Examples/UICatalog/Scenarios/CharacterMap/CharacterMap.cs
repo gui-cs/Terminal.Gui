@@ -85,7 +85,7 @@ public class CharacterMap : Scenario
             X = Pos.Right (jumpLabel) + 1,
             Y = Pos.Y (_charMap),
             Width = 17,
-            Caption = "e.g. 01BE3 or ✈"
+            Title = "e.g. 01BE3 or ✈"
 
             //SchemeName = "Dialog"
         };
@@ -365,40 +365,16 @@ public class CharacterMap : Scenario
         options [0] = "All";
         Array.Copy (allCategoryNames, 0, options, 1, allCategoryNames.Length);
 
-        // TODO: When #4126 is merged update this to use OptionSelector<UnicodeCategory?>
-        var selector = new OptionSelector
-        {
-            AssignHotKeysToCheckBoxes = true,
-            Options = options
-        };
+        // TODO: Add a "None" option
+        OptionSelector<UnicodeCategory> selector = new ();
 
         _unicodeCategorySelector = selector;
 
-        // Default to "All"
-        selector.SelectedItem = 0;
+        selector.Value = null;
         _charMap!.ShowUnicodeCategory = null;
 
-        selector.SelectedItemChanged += (s, e) =>
-                                        {
-                                            int? idx = selector.SelectedItem;
+        selector.ValueChanged += (_, e) => _charMap.ShowUnicodeCategory = e.Value;
 
-                                            if (idx is null)
-                                            {
-                                                return;
-                                            }
-
-                                            if (idx.Value == 0)
-                                            {
-                                                _charMap.ShowUnicodeCategory = null;
-                                            }
-                                            else
-                                            {
-                                                // Map index to UnicodeCategory (offset by 1 because 0 is "All")
-                                                UnicodeCategory cat = Enum.GetValues<UnicodeCategory> () [idx.Value - 1];
-                                                _charMap.ShowUnicodeCategory = cat;
-                                            }
-                                        };
-
-        return new() { CommandView = selector };
+        return new () { CommandView = selector };
     }
 }

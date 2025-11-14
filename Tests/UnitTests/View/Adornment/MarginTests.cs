@@ -1,15 +1,15 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class MarginTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Margin_Is_Transparent ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        Application.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
         view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
@@ -41,10 +41,10 @@ public class MarginTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        Application.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
         view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;

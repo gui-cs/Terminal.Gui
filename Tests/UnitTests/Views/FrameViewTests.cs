@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class FrameViewTests (ITestOutputHelper output)
 {
@@ -13,12 +13,12 @@ public class FrameViewTests (ITestOutputHelper output)
         Assert.Equal (string.Empty, fv.Text);
         Assert.Equal (LineStyle.Rounded, fv.BorderStyle);
 
-        fv = new() { Title = "Test" };
+        fv = new () { Title = "Test" };
         Assert.Equal ("Test", fv.Title);
         Assert.Equal (string.Empty, fv.Text);
         Assert.Equal (LineStyle.Rounded, fv.BorderStyle);
 
-        fv = new()
+        fv = new ()
         {
             X = 1,
             Y = 2,
@@ -38,7 +38,7 @@ public class FrameViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_Defaults ()
     {
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 10));
+        Application.Driver!.SetScreenSize (10, 10);
         var fv = new FrameView () { BorderStyle = LineStyle.Single };
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);

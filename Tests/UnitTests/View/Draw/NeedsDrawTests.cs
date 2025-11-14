@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class NeedsDrawTests ()
@@ -37,7 +37,9 @@ public class NeedsDrawTests ()
 
         top.Add (frame);
 
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
+
+        Application.Driver!.SetScreenSize (80,25);
 
         top.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 80, 25), top.NeedsDrawRect); };
 
@@ -46,7 +48,6 @@ public class NeedsDrawTests ()
         label.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 38, 1), label.NeedsDrawRect); };
 
         view.SubViewsLaidOut += (s, e) => { Assert.Equal (new (0, 0, 13, 1), view.NeedsDrawRect); };
-
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
         Assert.Equal (new (20, 8, 40, 8), frame.Frame);
 
@@ -61,7 +62,7 @@ public class NeedsDrawTests ()
                      );
         Assert.Equal (new (0, 0, 30, 1), label.Frame);
         Assert.Equal (new (0, 1, 9, 1), view.Frame); // this proves frame was set
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 }

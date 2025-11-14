@@ -3,7 +3,7 @@ using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class ClearViewportTests (ITestOutputHelper output)
@@ -98,7 +98,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_ClearsEntireViewport ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -146,7 +146,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -209,7 +209,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
+        Application.Driver!.SetScreenSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -274,7 +274,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
+        Application.Driver!.SetScreenSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -321,7 +321,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     {
         ConfigurationManager.Enable (ConfigLocations.LibraryResources);
 
-        var root = new View { Width = 20, Height = 10 };
+        View root = new () { Width = 20, Height = 10 };
 
         string text = new ('c', 100);
 
@@ -335,10 +335,10 @@ public class ClearViewportTests (ITestOutputHelper output)
 
         root.Add (v);
 
-        var top = new Toplevel ();
+        Toplevel top = new ();
         top.Add (root);
-        RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        SessionToken sessionToken = Application.Begin (top);
+        AutoInitShutdownAttribute.RunIteration ();
 
         if (label)
         {
@@ -406,7 +406,7 @@ cccccccccccccccccccc",
                                                    );
         }
 
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
 
         CM.Disable (resetToHardCodedDefaults: true);

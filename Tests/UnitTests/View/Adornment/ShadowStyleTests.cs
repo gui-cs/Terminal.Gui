@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class ShadowStyleTests (ITestOutputHelper output)
 {
@@ -27,10 +27,10 @@ public class ShadowStyleTests (ITestOutputHelper output)
                     221
                     111
                     """)]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        Application.Driver!.SetScreenSize (5, 5);
         Color fg = Color.Red;
         Color bg = Color.Green;
 
@@ -97,10 +97,10 @@ public class ShadowStyleTests (ITestOutputHelper output)
                     !@#$
                     !@#$
                     """)]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Visual_Test (ShadowStyle style, string expected)
     {
-        ((IFakeDriverV2)Application.Driver!).SetBufferSize (5, 5);
+        Application.Driver!.SetScreenSize (5, 5);
 
         var superView = new Toplevel
         {
@@ -131,9 +131,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.None, 0, 0, 0, 0)]
     [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
+    [AutoInitShutdown]
     public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
-        Application.Init (new FakeDriver ());
         var superView = new View
         {
             Height = 10, Width = 10
@@ -160,7 +160,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // Button1Pressed, Button1Released cause Application.MouseGrabHandler.MouseGrabView to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 }

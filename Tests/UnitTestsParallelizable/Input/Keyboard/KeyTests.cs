@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.InputTests;
+namespace UnitTests_Parallelizable.InputTests;
 
 public class KeyTests
 {
@@ -572,5 +572,39 @@ public class KeyTests
         a.Handled = true;
         Key b = Key.A;
         Assert.False (a.Equals (b));
+    }
+
+
+    [Fact]
+    public void KeyPressed_Handled_True_Cancels_KeyPress ()
+    {
+        var r = new View ();
+        var args = new Key { KeyCode = KeyCode.Null };
+
+        Assert.False (r.NewKeyDownEvent (args));
+        Assert.False (args.Handled);
+
+        r.KeyDown += (s, a) => a.Handled = true;
+        Assert.True (r.NewKeyDownEvent (args));
+        Assert.True (args.Handled);
+
+        r.Dispose ();
+    }
+
+    [Fact]
+    public void Set_Key_Separator_With_Rune_Default_Ensure_Using_The_Default_Plus ()
+    {
+        Key key = new (Key.A.WithCtrl);
+        Assert.Equal ((Rune)'+', Key.Separator);
+        Assert.Equal ("Ctrl+A", key.ToString ());
+
+        // NOTE: This means this test can't be parallelized
+        Key.Separator = new ('-');
+        Assert.Equal ((Rune)'-', Key.Separator);
+        Assert.Equal ("Ctrl-A", key.ToString ());
+
+        Key.Separator = new ();
+        Assert.Equal ((Rune)'+', Key.Separator);
+        Assert.Equal ("Ctrl+A", key.ToString ());
     }
 }

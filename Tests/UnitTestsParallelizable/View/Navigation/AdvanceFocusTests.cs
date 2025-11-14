@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Intrinsics;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class AdvanceFocusTests ()
 {
@@ -127,17 +127,11 @@ public class AdvanceFocusTests ()
 
         // Cycle through v1 & v2
         top.AdvanceFocus (NavigationDirection.Forward, behavior);
-        Assert.True (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
+        Assert.Equal (v1, compoundSubView.Focused);
         top.AdvanceFocus (NavigationDirection.Forward, behavior);
-        Assert.False (v1.HasFocus);
-        Assert.True (v2.HasFocus);
-        Assert.False (v3.HasFocus);
+        Assert.Equal (v2, compoundSubView.Focused);
         top.AdvanceFocus (NavigationDirection.Forward, behavior);
-        Assert.True (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
+        Assert.Equal (v1, compoundSubView.Focused);
 
         // Add another subview
         View otherSubView = new ()
@@ -182,6 +176,12 @@ public class AdvanceFocusTests ()
     [Fact]
     public void AdvanceFocus_CompoundCompound_SubView_TabStop ()
     {
+        //top
+        //    ├── topv1, topv2, topv3 (only topv1 and topv2 are focusable)
+        //    └── compoundSubView
+        //        ├── v1, v2, v3 (v3 is not focusable)
+        //        └── compoundCompoundSubView
+        //            └── v4, v5, v6 (v6 is not focusable)
         TabBehavior behavior = TabBehavior.TabStop;
         var top = new View { Id = "top", CanFocus = true };
         var topv1 = new View { Id = "topv1", CanFocus = true, TabStop = behavior };
@@ -237,9 +237,9 @@ public class AdvanceFocusTests ()
 
         // Should cycle back to topv1
         top.AdvanceFocus (NavigationDirection.Forward, behavior);
-        Assert.True (topv1.HasFocus);
+        Assert.Equal (topv1, top.Focused);
         top.AdvanceFocus (NavigationDirection.Forward, behavior);
-        Assert.True (topv2.HasFocus);
+        Assert.Equal (topv2, top.Focused);
 
         // Add another top subview. Should cycle to it after v5
         View otherSubView = new ()
@@ -273,6 +273,80 @@ public class AdvanceFocusTests ()
 
         top.Dispose ();
     }
+
+    [Fact]
+    public void FocusNavigation_Should_Cycle_Back_To_Top_Level_Views ()
+    {
+        // Create a simplified version of the hierarchy from CompoundCompound test
+        // top
+        //  ├── topButton1, topButton2
+        //  └── nestedContainer
+        //       └── innerButton
+
+        // Create top-level view
+        View top = new ()
+        {
+            Id = "top",
+            CanFocus = true
+        };
+
+        // Create top-level buttons
+        View topButton1 = new ()
+        {
+            Id = "topButton1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        View topButton2 = new ()
+        {
+            Id = "topButton2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        // Create nested container with a button inside
+        View nestedContainer = new ()
+        {
+            Id = "nestedContainer",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        View innerButton = new ()
+        {
+            Id = "innerButton",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        // Build the view hierarchy
+        nestedContainer.Add (innerButton);
+        top.Add (topButton1, topButton2, nestedContainer);
+
+        // Initial focus on topButton1
+        topButton1.SetFocus ();
+        Assert.Equal (topButton1, top.Focused);
+
+        // Advance focus to topButton2
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (topButton2, top.Focused);
+
+        // Advance focus to innerButton
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (innerButton, nestedContainer.Focused);
+        Assert.Equal (nestedContainer, top.Focused);
+
+        // THIS IS WHERE THE BUG OCCURS
+        // Advancing focus from innerButton should go back to topButton1
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+
+        // This assertion will fail with current implementation
+        Assert.Equal (topButton1, top.Focused);
+
+        top.Dispose ();
+    }
+
 
     [Fact]
     public void AdvanceFocus_Compound_SubView_TabGroup ()
@@ -322,7 +396,7 @@ public class AdvanceFocusTests ()
         // TabGroup navs to the other subview
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
         Assert.Equal (compoundSubView, top.Focused);
-        Assert.True (tabStopView.HasFocus); 
+        Assert.True (tabStopView.HasFocus);
 
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
         Assert.Equal (compoundSubView, top.Focused);
@@ -330,7 +404,7 @@ public class AdvanceFocusTests ()
 
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
         Assert.Equal (compoundSubView, top.Focused);
-        Assert.True (tabGroupView2.HasFocus); 
+        Assert.True (tabGroupView2.HasFocus);
 
         // Now go backwards
         top.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
@@ -643,5 +717,49 @@ public class AdvanceFocusTests ()
 
         Assert.Equal (canFocus, view.CanFocus);
         Assert.Equal (tabStop, view.TabStop);
+    }
+
+    [Fact]
+    public void AdvanceFocus_Cycles_Through_Peers_And_All_Nested_SubViews_When_Multiple ()
+    {
+        var top = new View { Id = "top", CanFocus = true };
+
+        View peer1 = new View
+        {
+            CanFocus = true,
+            Id = "peer1",
+        };
+
+        var peer2 = new View
+        {
+            CanFocus = true,
+            Id = "peer2",
+        };
+        var peer2SubView = new View
+        {
+            Id = "peer2SubView", CanFocus = true
+        };
+        var v1 = new View { Id = "v1", CanFocus = true };
+        var v2 = new View { Id = "v2", CanFocus = true };
+        peer2SubView.Add (v1, v2);
+
+        peer2.Add (peer2SubView);
+
+        top.Add (peer1, peer2);
+        top.SetFocus ();
+
+        Assert.Equal (peer1, top.MostFocused);
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (v1, top.MostFocused);
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (v2, top.MostFocused);
+
+        // This should cycle to peer1 - previously it incorrectly cycled to v1
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.Equal (peer1, top.MostFocused);
+
+        top.Dispose ();
     }
 }

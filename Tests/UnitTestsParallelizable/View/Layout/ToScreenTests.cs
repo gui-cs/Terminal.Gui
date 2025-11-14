@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests_Parallelizable.LayoutTests;
 
 /// <summary>
 ///     Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
@@ -119,7 +119,7 @@ public class ToScreenTests ()
             Height = 1
         };
 
-        view.Border.Add (subviewOfBorder);
+        view.Border!.Add (subviewOfBorder);
         view.BeginInit ();
         view.EndInit ();
 

@@ -23,21 +23,9 @@ public interface ITimedEvents
 
     /// <summary>
     ///     Invoked when a new timeout is added. To be used in the case when
-    ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
+    ///     <see cref="IApplication.StopAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
     event EventHandler<TimeoutEventArgs>? Added;
-
-    /// <summary>
-    ///     Called from <see cref="IMainLoopDriver.EventsPending"/> to check if there are any outstanding timer handlers.
-    /// </summary>
-    /// <param name="waitTimeout">
-    ///     Returns the number of milliseconds remaining in the current timer (if any). Will be -1 if
-    ///     there are no active timers.
-    /// </param>
-    /// <returns>
-    ///     <see langword="true"/> if there is a timer active; otherwise, <see langword="false"/>.
-    /// </returns>
-    bool CheckTimers (out int waitTimeout);
 
     /// <summary>
     ///     Removes a previously scheduled timeout.

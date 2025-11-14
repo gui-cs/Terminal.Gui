@@ -1,38 +1,62 @@
 #nullable enable
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Terminal.Gui.App;
 
 public static partial class Application // Driver abstractions
 {
-    internal static bool _forceFakeConsole;
+    /// <inheritdoc cref="IApplication.Driver"/>
+    public static IDriver? Driver
+    {
+        get => ApplicationImpl.Instance.Driver;
+        internal set => ApplicationImpl.Instance.Driver = value;
+    }
 
-    /// <summary>Gets the <see cref="IConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
-    public static IConsoleDriver? Driver { get; internal set; }
-
-    // BUGBUG: Force16Colors should be nullable.
-    /// <summary>
-    ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
-    ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
-    ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
-    /// </summary>
+    /// <inheritdoc cref="IApplication.Force16Colors"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool Force16Colors { get; set; }
+    public static bool Force16Colors
+    {
+        get => ApplicationImpl.Instance.Force16Colors;
+        set => ApplicationImpl.Instance.Force16Colors = value;
+    }
 
-    // BUGBUG: ForceDriver should be nullable.
-    /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not
-    ///     specified, the driver is selected based on the platform.
-    /// </summary>
-    /// <remarks>
-    ///     Note, <see cref="Application.Init(IConsoleDriver, string)"/> will override this configuration setting if called
-    ///     with either `driver` or `driverName` specified.
-    /// </remarks>
+    /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static string ForceDriver { get; set; } = string.Empty;
+    public static string ForceDriver
+    {
+        get => ApplicationImpl.Instance.ForceDriver;
+        set => ApplicationImpl.Instance.ForceDriver = value;
+    }
 
-    /// <summary>
-    /// Collection of sixel images to write out to screen when updating.
-    /// Only add to this collection if you are sure terminal supports sixel format.
-    /// </summary>
-    public static List<SixelToRender> Sixel = new List<SixelToRender> ();
+    /// <inheritdoc cref="IApplication.Sixel"/>
+    public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Sixel;
+
+    /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
+    /// <returns></returns>
+    [RequiresUnreferencedCode ("AOT")]
+    public static (List<Type?>, List<string?>) GetDriverTypes ()
+    {
+        // use reflection to get the list of drivers
+        List<Type?> driverTypes = new ();
+
+        // Only inspect the IDriver assembly
+        var asm = typeof (IDriver).Assembly;
+
+        foreach (Type? type in asm.GetTypes ())
+        {
+            if (typeof (IDriver).IsAssignableFrom (type) && type is { IsAbstract: false, IsClass: true })
+            {
+                driverTypes.Add (type);
+            }
+        }
+
+        List<string?> driverTypeNames = driverTypes
+                                        .Where (d => !typeof (IDriver).IsAssignableFrom (d))
+                                        .Select (d => d!.Name)
+                                        .Union (["dotnet", "windows", "unix", "fake"])
+                                        .ToList ()!;
+
+        return (driverTypes, driverTypeNames);
+    }
 }

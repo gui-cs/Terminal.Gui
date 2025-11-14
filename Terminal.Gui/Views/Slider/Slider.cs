@@ -441,13 +441,13 @@ public class Slider<T> : View, IOrientation
     private void MoveAndAdd (int x, int y, Rune rune)
     {
         Move (x, y);
-        Driver?.AddRune (rune);
+        AddRune (rune);
     }
 
     private void MoveAndAdd (int x, int y, string str)
     {
         Move (x, y);
-        Driver?.AddStr (str);
+        AddStr (str);
     }
 
     /// <summary>Sets the dimensions of the Slider to the ideal values.</summary>
@@ -1311,7 +1311,7 @@ public class Slider<T> : View, IOrientation
             {
                 _dragPosition = mouseEvent.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
-                Application.MouseGrabHandler.GrabMouse (this);
+                Application.Mouse.GrabMouse (this);
             }
 
             SetNeedsDraw ();
@@ -1357,7 +1357,7 @@ public class Slider<T> : View, IOrientation
             || mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             // End Drag
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
             _dragPosition = null;
             _moveRenderPosition = null;
 

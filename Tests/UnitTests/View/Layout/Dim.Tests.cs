@@ -4,7 +4,7 @@ using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class DimTests
 {
@@ -127,7 +127,7 @@ public class DimTests
                        Assert.Equal (49, f2.Frame.Width); // 50-1=49
                        Assert.Equal (5, f2.Frame.Height);
 
-                       Assert.Equal ($"Combine(View(Width,FrameView(){f1.Border.Frame})-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(){f1.Border!.Frame})-Absolute(2))", v1.Width.ToString ());
                        Assert.Equal ("Combine(Fill(Absolute(0))-Absolute(2))", v1.Height.ToString ());
                        Assert.Equal (47, v1.Frame.Width); // 49-2=47
                        Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
@@ -217,7 +217,7 @@ public class DimTests
                        Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();

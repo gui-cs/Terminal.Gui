@@ -7,43 +7,27 @@ public static partial class Application // Navigation stuff
     /// <summary>
     ///     Gets the <see cref="ApplicationNavigation"/> instance for the current <see cref="Application"/>.
     /// </summary>
-    public static ApplicationNavigation? Navigation { get; internal set; }
-
-    private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrides
-    private static Key _nextTabKey = Key.Tab; // Resources/config.json overrides
-    private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrides
-    private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrides
+    public static ApplicationNavigation? Navigation
+    {
+        get => ApplicationImpl.Instance.Navigation;
+        internal set => ApplicationImpl.Instance.Navigation = value;
+    }
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key NextTabGroupKey
     {
-        get => _nextTabGroupKey;
-        set
-        {
-            //if (_nextTabGroupKey != value)
-            {
-                KeyBindings.Replace (_nextTabGroupKey, value);
-                _nextTabGroupKey = value;
-            }
-        }
+        get => ApplicationImpl.Instance.Keyboard.NextTabGroupKey;
+        set => ApplicationImpl.Instance.Keyboard.NextTabGroupKey = value;
     }
 
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
+    /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key NextTabKey
     {
-        get => _nextTabKey;
-        set
-        {
-            //if (_nextTabKey != value)
-            {
-                KeyBindings.Replace (_nextTabKey, value);
-                _nextTabKey = value;
-            }
-        }
+        get => ApplicationImpl.Instance.Keyboard.NextTabKey;
+        set => ApplicationImpl.Instance.Keyboard.NextTabKey = value;
     }
-
 
     /// <summary>
     ///     Raised when the user releases a key.
@@ -53,38 +37,29 @@ public static partial class Application // Navigation stuff
     ///     </para>
     /// </summary>
     /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
+    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Unix) do not support firing the
     ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
     ///     <para>Fired after <see cref="KeyDown"/>.</para>
     /// </remarks>
-    public static event EventHandler<Key>? KeyUp;
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabGroupKey
+    public static event EventHandler<Key>? KeyUp
     {
-        get => _prevTabGroupKey;
-        set
-        {
-            //if (_prevTabGroupKey != value)
-            {
-                KeyBindings.Replace (_prevTabGroupKey, value);
-                _prevTabGroupKey = value;
-            }
-        }
+        add => ApplicationImpl.Instance.Keyboard.KeyUp += value;
+        remove => ApplicationImpl.Instance.Keyboard.KeyUp -= value;
     }
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key PrevTabGroupKey
+    {
+        get => ApplicationImpl.Instance.Keyboard.PrevTabGroupKey;
+        set => ApplicationImpl.Instance.Keyboard.PrevTabGroupKey = value;
+    }
+
+    /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key PrevTabKey
     {
-        get => _prevTabKey;
-        set
-        {
-            //if (_prevTabKey != value)
-            {
-                KeyBindings.Replace (_prevTabKey, value);
-                _prevTabKey = value;
-            }
-        }
+        get => ApplicationImpl.Instance.Keyboard.PrevTabKey;
+        set => ApplicationImpl.Instance.Keyboard.PrevTabKey = value;
     }
 }

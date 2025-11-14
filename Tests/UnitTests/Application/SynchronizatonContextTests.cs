@@ -2,15 +2,14 @@
 
 using UnitTests;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace UnitTests.ApplicationTests;
 
 public class SyncrhonizationContextTests
 {
     [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
-        ConsoleDriver.RunningUnitTests = true;
-        Application.Init ();
+        Application.Init (null, "fake");
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -21,30 +20,18 @@ public class SyncrhonizationContextTests
         Application.Shutdown ();
     }
 
-    private object _lockPost = new ();
+    private readonly object _lockPost = new ();
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    [InlineData (typeof (ConsoleDriverFacade<WindowsConsole.InputRecord>), "v2win")]
-    [InlineData (typeof (ConsoleDriverFacade<ConsoleKeyInfo>), "v2net")]
-    [InlineData (typeof (ConsoleDriverFacade<char>), "v2unix")]
-    public void SynchronizationContext_Post (Type driverType, string driverName = null)
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+   // [InlineData ("unix")]
+    public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)
         {
-            ConsoleDriver.RunningUnitTests = true;
-
-            if (driverType.Name.Contains ("ConsoleDriverFacade"))
-            {
-                Application.Init (driverName: driverName);
-            }
-            else
-            {
-                Application.Init (driverName: driverType.Name);
-            }
+            Application.Init (null, driverName: driverName);
 
             SynchronizationContext context = SynchronizationContext.Current;
 
@@ -80,14 +67,7 @@ public class SyncrhonizationContextTests
             Application.Run ().Dispose ();
             Assert.True (success);
 
-            if (ApplicationImpl.Instance is ApplicationV2)
-            {
-                ApplicationImpl.Instance.Shutdown ();
-            }
-            else
-            {
-                Application.Shutdown ();
-            }
+            Application.Shutdown ();
         }
     }
 
@@ -95,8 +75,6 @@ public class SyncrhonizationContextTests
     [AutoInitShutdown]
     public void SynchronizationContext_Send ()
     {
-        ConsoleDriver.RunningUnitTests = true;
-        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;

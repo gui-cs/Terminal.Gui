@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Terminal.Gui.ViewMouseTests;
+namespace UnitTests.ViewMouseTests;
 
 [Trait ("Category", "Input")]
 public class ApplicationMouseEnterLeaveTests

@@ -1,12 +1,12 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ScrollSliderTests (ITestOutputHelper output)
 {
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData (
                     3,
                     10,

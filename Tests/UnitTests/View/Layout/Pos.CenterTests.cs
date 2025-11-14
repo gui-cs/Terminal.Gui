@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 using static Terminal.Gui.ViewBase.Pos;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class PosCenterTests (ITestOutputHelper output)
 {
@@ -32,10 +32,9 @@ public class PosCenterTests (ITestOutputHelper output)
 
         win.Add (subview);
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        AutoInitShutdownAttribute.FakeResize(new Size(20, height));
+        Application.Driver!.SetScreenSize (20, height);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
@@ -179,10 +178,9 @@ public class PosCenterTests (ITestOutputHelper output)
 
         win.Add (subview);
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        AutoInitShutdownAttribute.FakeResize(new Size(width, 7));
+        Application.Driver!.SetScreenSize (width, 7);
         AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 

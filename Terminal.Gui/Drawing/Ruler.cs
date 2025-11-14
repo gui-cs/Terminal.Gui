@@ -23,7 +23,8 @@ internal class Ruler
     /// <summary>Draws the <see cref="Ruler"/>.</summary>
     /// <param name="location">The location to start drawing the ruler, in screen-relative coordinates.</param>
     /// <param name="start">The start value of the ruler.</param>
-    public void Draw (Point location, int start = 0)
+    /// <param name="driver">Optional Driver. If not provided, driver will be used.</param>
+    public void Draw (Point location, int start = 0, IDriver? driver = null)
     {
         if (start < 0)
         {
@@ -35,14 +36,16 @@ internal class Ruler
             return;
         }
 
+        driver ??= driver;
+
         if (Orientation == Orientation.Horizontal)
         {
             string hrule =
                 _hTemplate.Repeat ((int)Math.Ceiling (Length + 2 / (double)_hTemplate.Length))! [start..(Length + start)];
 
             // Top
-            Application.Driver?.Move (location.X, location.Y);
-            Application.Driver?.AddStr (hrule);
+            driver?.Move (location.X, location.Y);
+            driver?.AddStr (hrule);
         }
         else
         {
@@ -52,8 +55,8 @@ internal class Ruler
 
             for (int r = location.Y; r < location.Y + Length; r++)
             {
-                Application.Driver?.Move (location.X, r);
-                Application.Driver?.AddRune ((Rune)vrule [r - location.Y]);
+                driver?.Move (location.X, r);
+                driver?.AddRune ((Rune)vrule [r - location.Y]);
             }
         }
     }

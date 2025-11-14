@@ -1,14 +1,14 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ScrollBarTests (ITestOutputHelper output)
 {
     #region Draw
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     #region Horizontal
 
@@ -549,7 +549,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         };
 
         top.Add (scrollBar);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Scroll to end
         scrollBar.Position = 19;
@@ -598,7 +598,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         };
 
         top.Add (scrollBar);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Scroll to top
         scrollBar.Position = 0;

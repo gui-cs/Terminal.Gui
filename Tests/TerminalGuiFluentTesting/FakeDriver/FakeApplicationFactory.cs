@@ -1,10 +1,11 @@
-﻿#nullable enable
-using System.Drawing;
+﻿using System.Drawing;
 using TerminalGuiFluentTesting;
 
 namespace Terminal.Gui.Drivers;
 
-#pragma warning disable CS1591
+/// <summary>
+///     Provides methods to create and manage a fake application for testing purposes.
+/// </summary>
 public class FakeApplicationFactory
 {
     /// <summary>
@@ -14,32 +15,23 @@ public class FakeApplicationFactory
     /// <returns></returns>
     public IDisposable SetupFakeApplication ()
     {
-        var cts = new CancellationTokenSource ();
-        var fakeInput = new FakeNetInput (cts.Token);
+        CancellationTokenSource hardStopTokenSource = new CancellationTokenSource ();
+        FakeInput fakeInput = new FakeInput ();
+        fakeInput.ExternalCancellationTokenSource = hardStopTokenSource;
         FakeOutput output = new ();
-        output.Size = new (25, 25);
+        output.SetSize (80, 25);
 
         IApplication origApp = ApplicationImpl.Instance;
 
-        var sizeMonitor = new FakeSizeMonitor ();
+        SizeMonitorImpl sizeMonitor = new (output);
 
-        var v2 = new ApplicationV2 (new FakeNetComponentFactory (fakeInput, output, sizeMonitor));
+        ApplicationImpl impl = new (new FakeComponentFactory (fakeInput, output, sizeMonitor));
 
-        ApplicationImpl.ChangeInstance (v2);
-        v2.Init (null, "v2net");
+        ApplicationImpl.ChangeInstance (impl);
 
-        ConsoleDriverFacade<ConsoleKeyInfo> d = (ConsoleDriverFacade<ConsoleKeyInfo>)Application.Driver!;
+        // Initialize with a fake driver
+        impl.Init (null, "fake");
 
-        sizeMonitor.SizeChanging += (_, e) =>
-                                    {
-                                        if (e.Size != null)
-                                        {
-                                            Size s = e.Size.Value;
-                                            output.Size = s;
-                                            d.OutputBuffer.SetWindowSize (s.Width, s.Height);
-                                        }
-                                    };
-
-        return new FakeApplicationLifecycle (origApp, cts);
+        return new FakeApplicationLifecycle (origApp, hardStopTokenSource);
     }
 }

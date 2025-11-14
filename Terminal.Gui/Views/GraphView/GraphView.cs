@@ -213,7 +213,7 @@ public class GraphView : View, IDesignable
         for (var i = 0; i < Viewport.Height; i++)
         {
             Move (0, i);
-            Driver?.AddStr (new (' ', Viewport.Width));
+            AddStr (new (' ', Viewport.Width));
         }
 
         // If there is no data do not display a graph

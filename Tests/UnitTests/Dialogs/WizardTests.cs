@@ -1,9 +1,6 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿namespace UnitTests.DialogTests;
 
-namespace Terminal.Gui.DialogTests;
-
-public class WizardTests ()
+public class WizardTests
 {
     // =========== Wizard Tests
     [Fact]
@@ -20,8 +17,8 @@ public class WizardTests ()
     public void Finish_Button_Closes ()
     {
         // https://github.com/gui-cs/Terminal.Gui/issues/1833
-        var wizard = new Wizard ();
-        var step1 = new WizardStep { Title = "step1" };
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "step1" };
         wizard.AddStep (step1);
 
         var finishedFired = false;
@@ -30,13 +27,12 @@ public class WizardTests ()
         var closedFired = false;
         wizard.Closed += (s, e) => { closedFired = true; };
 
-        RunState runstate = Application.Begin (wizard);
-        var firstIteration = true;
-        Application.RunIteration (ref runstate, firstIteration);
+        SessionToken sessionToken = Application.Begin (wizard);
+        AutoInitShutdownAttribute.RunIteration ();
 
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.RunIteration (ref runstate, firstIteration);
-        Application.End (runstate);
+        AutoInitShutdownAttribute.RunIteration ();
+        Application.End (sessionToken);
         Assert.True (finishedFired);
         Assert.True (closedFired);
         step1.Dispose ();
@@ -44,10 +40,9 @@ public class WizardTests ()
 
         // Same test, but with two steps
         wizard = new ();
-        firstIteration = false;
-        step1 = new() { Title = "step1" };
+        step1 = new () { Title = "step1" };
         wizard.AddStep (step1);
-        var step2 = new WizardStep { Title = "step2" };
+        WizardStep step2 = new () { Title = "step2" };
         wizard.AddStep (step2);
 
         finishedFired = false;
@@ -56,8 +51,8 @@ public class WizardTests ()
         closedFired = false;
         wizard.Closed += (s, e) => { closedFired = true; };
 
-        runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, firstIteration);
+        sessionToken = Application.Begin (wizard);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (step1.Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
@@ -67,7 +62,7 @@ public class WizardTests ()
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.End (runstate);
+        Application.End (sessionToken);
         Assert.True (finishedFired);
         Assert.True (closedFired);
 
@@ -77,10 +72,9 @@ public class WizardTests ()
 
         // Same test, but with two steps but the 1st one disabled
         wizard = new ();
-        firstIteration = false;
-        step1 = new() { Title = "step1" };
+        step1 = new () { Title = "step1" };
         wizard.AddStep (step1);
-        step2 = new() { Title = "step2" };
+        step2 = new () { Title = "step2" };
         wizard.AddStep (step2);
         step1.Enabled = false;
 
@@ -90,13 +84,13 @@ public class WizardTests ()
         closedFired = false;
         wizard.Closed += (s, e) => { closedFired = true; };
 
-        runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, firstIteration);
+        sessionToken = Application.Begin (wizard);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.End (runstate);
+        Application.End (sessionToken);
         Assert.True (finishedFired);
         Assert.True (closedFired);
         wizard.Dispose ();
@@ -392,43 +386,22 @@ public class WizardTests ()
     // and that the title is correct
     public void OneStepWizard_Shows ()
     {
-
         var title = "1234";
         var stepTitle = "ABCD";
 
         var width = 30;
         var height = 7;
-        AutoInitShutdownAttribute.FakeResize (new Size (width, height));
+        Application.Driver?.SetScreenSize (width, height);
 
         //	var btnBackText = "Back";
         var btnBack = string.Empty; // $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
         var btnNextText = "Finish"; // "Next";
 
         var btnNext =
-            $"{
-                Glyphs.LeftBracket
-            }{
-                Glyphs.LeftDefaultIndicator
-            } {
-                btnNextText
-            } {
-                Glyphs.RightDefaultIndicator
-            }{
-                Glyphs.RightBracket
-            }";
+            $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btnNextText} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
         var topRow =
-            $"{
-                Glyphs.ULCornerDbl
-            }╡{
-                title
-            } - {
-                stepTitle
-            }╞{
-                new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 7)
-            }{
-                Glyphs.URCornerDbl
-            }";
+            $"{Glyphs.ULCornerDbl}╡{title} - {stepTitle}╞{new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 7)}{Glyphs.URCornerDbl}";
         var row2 = $"{Glyphs.VLineDbl}{new (' ', width - 2)}{Glyphs.VLineDbl}";
         string row3 = row2;
         string row4 = row3;
@@ -437,41 +410,24 @@ public class WizardTests ()
             $"{Glyphs.VLineDbl}{new (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VLineDbl}";
 
         var buttonRow =
-            $"{
-                Glyphs.VLineDbl
-            }{
-                btnBack
-            }{
-                new (' ', width - btnBack.Length - btnNext.Length - 2)
-            }{
-                btnNext
-            }{
-                Glyphs.VLineDbl
-            }";
+            $"{Glyphs.VLineDbl}{btnBack}{new (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{Glyphs.VLineDbl}";
 
         var bottomRow =
-            $"{
-                Glyphs.LLCornerDbl
-            }{
-                new (Glyphs.HLineDbl.ToString () [0], width - 2)
-            }{
-                Glyphs.LRCornerDbl
-            }";
+            $"{Glyphs.LLCornerDbl}{new (Glyphs.HLineDbl.ToString () [0], width - 2)}{Glyphs.LRCornerDbl}";
 
-        var wizard = new Wizard { Title = title, Width = width, Height = height };
-        wizard.AddStep (new() { Title = stepTitle });
+        Wizard wizard = new () { Title = title, Width = width, Height = height };
+        wizard.AddStep (new () { Title = stepTitle });
 
         //wizard.LayoutSubViews ();
-        var firstIteration = false;
-        RunState runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, firstIteration);
+        SessionToken sessionToken = Application.Begin (wizard);
+        AutoInitShutdownAttribute.RunIteration ();
 
         // TODO: Disabled until Dim.Auto is used in Dialog
         //DriverAsserts.AssertDriverContentsWithFrameAre (
         //                                              $"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
         //                                              _output
         //                                             );
-        Application.End (runstate);
+        Application.End (sessionToken);
         wizard.Dispose ();
     }
 
@@ -481,42 +437,22 @@ public class WizardTests ()
     // this test is needed because Wizard overrides Dialog's title behavior ("Title - StepTitle")
     public void Setting_Title_Works ()
     {
-        var d = (IConsoleDriverFacade)Application.Driver;
-        
+        var d = Application.Driver;
+
         var title = "1234";
         var stepTitle = " - ABCD";
 
         var width = 40;
         var height = 4;
-        d.OutputBuffer.SetWindowSize (width,height);
+        d.SetScreenSize (width, height);
 
         var btnNextText = "Finish";
 
         var btnNext =
-            $"{
-                Glyphs.LeftBracket
-            }{
-                Glyphs.LeftDefaultIndicator
-            } {
-                btnNextText
-            } {
-                Glyphs.RightDefaultIndicator
-            }{
-                Glyphs.RightBracket
-            }";
+            $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btnNextText} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
         var topRow =
-            $"{
-                Glyphs.ULCornerDbl
-            }╡{
-                title
-            }{
-                stepTitle
-            }╞{
-                new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)
-            }{
-                Glyphs.URCornerDbl
-            }";
+            $"{Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)}{Glyphs.URCornerDbl}";
 
         var separatorRow =
             $"{Glyphs.VLineDbl}{new (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VLineDbl}";
@@ -527,16 +463,10 @@ public class WizardTests ()
 
         //var buttonRow = $"{Glyphs.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{Glyphs.VDLine}";
         var bottomRow =
-            $"{
-                Glyphs.LLCornerDbl
-            }{
-                new (Glyphs.HLineDbl.ToString () [0], width - 2)
-            }{
-                Glyphs.LRCornerDbl
-            }";
+            $"{Glyphs.LLCornerDbl}{new (Glyphs.HLineDbl.ToString () [0], width - 2)}{Glyphs.LRCornerDbl}";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
-        wizard.AddStep (new() { Title = "ABCD" });
+        wizard.AddStep (new () { Title = "ABCD" });
 
         Application.End (Application.Begin (wizard));
         wizard.Dispose ();
@@ -650,37 +580,17 @@ public class WizardTests ()
 
         var width = 30;
         var height = 6;
-        AutoInitShutdownAttribute.FakeResize (new Size (width, height));
+        Application.Driver?.SetScreenSize (width, height);
 
         var btnBackText = "Back";
         var btnBack = $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
         var btnNextText = "Finish";
 
         var btnNext =
-            $"{
-                Glyphs.LeftBracket
-            }{
-                Glyphs.LeftDefaultIndicator
-            } {
-                btnNextText
-            } {
-                Glyphs.RightDefaultIndicator
-            }{
-                Glyphs.RightBracket
-            }";
+            $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btnNextText} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
         var topRow =
-            $"{
-                Glyphs.ULCornerDbl
-            }╡{
-                title
-            }{
-                stepTitle
-            }╞{
-                new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)
-            }{
-                Glyphs.URCornerDbl
-            }";
+            $"{Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)}{Glyphs.URCornerDbl}";
         var row2 = $"{Glyphs.VLineDbl}{new (' ', width - 2)}{Glyphs.VLineDbl}";
         string row3 = row2;
 
@@ -688,36 +598,20 @@ public class WizardTests ()
             $"{Glyphs.VLineDbl}{new (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VLineDbl}";
 
         var buttonRow =
-            $"{
-                Glyphs.VLineDbl
-            }{
-                btnBack
-            }{
-                new (' ', width - btnBack.Length - btnNext.Length - 2)
-            }{
-                btnNext
-            }{
-                Glyphs.VLineDbl
-            }";
+            $"{Glyphs.VLineDbl}{btnBack}{new (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{Glyphs.VLineDbl}";
 
         var bottomRow =
-            $"{
-                Glyphs.LLCornerDbl
-            }{
-                new (Glyphs.HLineDbl.ToString () [0], width - 2)
-            }{
-                Glyphs.LRCornerDbl
-            }";
+            $"{Glyphs.LLCornerDbl}{new (Glyphs.HLineDbl.ToString () [0], width - 2)}{Glyphs.LRCornerDbl}";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
-        RunState runstate = Application.Begin (wizard);
+        SessionToken sessionToken = Application.Begin (wizard);
 
         // TODO: Disabled until Dim.Auto is used in Dialog
         //DriverAsserts.AssertDriverContentsWithFrameAre (
         //                                              $"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
         //                                              _output
         //                                             );
-        Application.End (runstate);
+        Application.End (sessionToken);
         wizard.Dispose ();
     }
 }

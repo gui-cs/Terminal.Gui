@@ -11,8 +11,8 @@ public class TreeViewFluentTests
     public TreeViewFluentTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void TreeView_AllowReOrdering (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void TreeView_AllowReOrdering (TestDriver d)
     {
         var tv = new TreeView
         {
@@ -36,14 +36,14 @@ public class TreeViewFluentTests
         tv.AddObject (root);
 
         using GuiTestContext context =
-            With.A<Window> (40, 10, d)
+            With.A<Window> (40, 10, d, _out)
                 .Add (tv)
                 .Focus (tv)
                 .WaitIteration ()
                 .ScreenShot ("Before expanding", _out)
                 .AssertEqual (root, tv.GetObjectOnRow (0))
                 .AssertNull (tv.GetObjectOnRow (1))
-                .Right ()
+                .EnqueueKeyEvent (Key.CursorRight)
                 .ScreenShot ("After expanding", _out)
                 .AssertMultiple (
                                  () =>
@@ -77,8 +77,8 @@ public class TreeViewFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (V2TestDrivers))]
-    public void TreeViewReOrder_PreservesExpansion (V2TestDriver d)
+    [ClassData (typeof (TestDrivers))]
+    public void TreeViewReOrder_PreservesExpansion (TestDriver d)
     {
         var tv = new TreeView
         {

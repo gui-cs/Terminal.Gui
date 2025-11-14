@@ -1,12 +1,12 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class AdornmentTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Is_Cleared_After_Margin_Thickness_Change ()
     {
         View view = new () { Text = "View", Width = 6, Height = 3, BorderStyle = LineStyle.Rounded };

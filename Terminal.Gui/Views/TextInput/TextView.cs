@@ -3,7 +3,6 @@
 // TextView.cs: multi-line text editing
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui.Views;
 
@@ -1677,15 +1676,15 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
-            if (Application.MouseGrabHandler.MouseGrabView is null)
+            if (Application.Mouse.MouseGrabView is null)
             {
-                Application.MouseGrabHandler.GrabMouse (this);
+                Application.Mouse.GrabMouse (this);
             }
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1Released))
         {
             _isButtonReleased = true;
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
@@ -1887,9 +1886,9 @@ public class TextView : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (Application.MouseGrabHandler.MouseGrabView is { } && Application.MouseGrabHandler.MouseGrabView == this)
+        if (Application.Mouse.MouseGrabView is { } && Application.Mouse.MouseGrabView == this)
         {
-            Application.MouseGrabHandler.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
     }
 
@@ -1969,7 +1968,7 @@ public class TextView : View, IDesignable
         SetWrapModel ();
         string? contents = Clipboard.Contents;
 
-        if (_copyWithoutSelection && contents.FirstOrDefault (x => x is '\n' or '\r') == 0)
+        if (_copyWithoutSelection && contents!.FirstOrDefault (x => x is '\n' or '\r') == 0)
         {
             List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
             List<Cell> currentLine = GetCurrentLine ();
@@ -2004,7 +2003,7 @@ public class TextView : View, IDesignable
             }
 
             _copyWithoutSelection = false;
-            InsertAllText (contents, true);
+            InsertAllText (contents!, true);
 
             if (IsSelecting)
             {
@@ -2033,7 +2032,7 @@ public class TextView : View, IDesignable
             return null;
         }
 
-        if (Application.MouseGrabHandler.MouseGrabView == this && IsSelecting)
+        if (Application.Mouse.MouseGrabView == this && IsSelecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);

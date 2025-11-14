@@ -100,7 +100,6 @@ public class Clipping : Scenario
                                  {
                                      tiledProgressBar1.Pulse ();
                                      tiledProgressBar2.Pulse ();
-                                     Application.Wakeup ();
                                  };
 
         progressTimer.Start ();
@@ -152,7 +151,7 @@ public class Clipping : Scenario
         //tiled.Padding.Thickness = new (1);
         //tiled.Padding.Diagnostics =  ViewDiagnosticFlags.Thickness;
 
-        //tiled.Margin.Thickness = new (1);
+        //tiled.Margin!.Thickness = new (1);
 
         FrameView fv = new ()
         {

@@ -2,7 +2,7 @@
 
 //using static Terminal.Gui.ViewTests.MenuTests;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class MenuItemTests ()
 {

@@ -5,7 +5,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("A Mazing", "Illustrates how to make a basic maze game.")]
 [ScenarioCategory ("Drawing")]
-[ScenarioCategory ("Mouse and KeyBoard")]
+[ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Games")]
 public class Mazing : Scenario
 {
@@ -33,7 +33,7 @@ public class Mazing : Scenario
         _top.KeyBindings.Add (Key.CursorDown, Command.Down);
 
         // Changing the key-bindings of a View is not allowed, however,
-        // by default, Toplevel does't bind any of our movement keys, so
+        // by default, Toplevel doesn't bind any of our movement keys, so
         // we can take advantage of the CommandNotBound event to handle them
         // 
         // An alternative implementation would be to create a TopLevel subclass that
@@ -129,7 +129,7 @@ public class Mazing : Scenario
             return;
         }
 
-        Point newPos = _m.Player;
+        Point newPos = _m!.Player;
 
         Command? command = e.Context?.Command;
 

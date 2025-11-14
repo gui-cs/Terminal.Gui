@@ -56,7 +56,7 @@ public class DimAutoDemo : Scenario
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
             Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10)
         };
-        dimAutoFrameView.Margin.Thickness = new Thickness (1);
+        dimAutoFrameView.Margin!.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
         var textEdit = new TextView
@@ -163,15 +163,15 @@ public class DimAutoDemo : Scenario
         dimAutoFrameView.Add (resetButton);
 
 
-        var radioGroup = new RadioGroup ()
+        var optionSelector = new OptionSelector ()
         {
-            RadioLabels = ["One", "Two", "Three"],
+            Labels = ["One", "Two", "Three"],
             X = 0,
             Y = Pos.AnchorEnd (),
-            Title = "Radios",
+            Title = "Options",
             BorderStyle = LineStyle.Dotted
         };
-        dimAutoFrameView.Add (radioGroup);
+        dimAutoFrameView.Add (optionSelector);
         return dimAutoFrameView;
     }
 

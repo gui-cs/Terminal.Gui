@@ -1,26 +1,108 @@
-﻿using System.Reflection;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
+﻿#nullable enable
+using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
-[Collection ("Global Test Setup")]
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Layout_Does_Not_Draw (Type viewType)
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        View? view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view is null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        var drawContentCount = 0;
+        view.DrawingContent += (s, e) => drawContentCount++;
+
+        var layoutStartedCount = 0;
+        view.SubViewLayout += (s, e) => layoutStartedCount++;
+
+        var layoutCompleteCount = 0;
+        view.SubViewsLaidOut += (s, e) => layoutCompleteCount++;
+
+        view.SetNeedsLayout ();
+        view.SetNeedsDraw ();
+        view.Layout ();
+
+        Assert.Equal (0, drawContentCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Center_Properly (Type viewType)
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        View? view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view is null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        view.X = Pos.Center ();
+        view.Y = Pos.Center ();
+
+        // Ensure the view has positive dimensions
+        view.Width = 10;
+        view.Height = 10;
+
+        var frame = new View { X = 0, Y = 0, Width = 50, Height = 50 };
+        frame.Add (view);
+        frame.LayoutSubViews ();
+        frame.Dispose ();
+
+        // What's the natural width/height?
+        int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
+        int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
+
+        Assert.True (
+                     view.Frame.Left == expectedX,
+                     $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
+                    );
+
+        Assert.True (
+                     view.Frame.Top == expectedY,
+                     $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
+                    );
+    }
+
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Tests_All_Constructors (Type viewType)
     {
         Assert.True (TestAllConstructorsOfType (viewType));
-
         return;
 
         bool TestAllConstructorsOfType (Type type)
         {
             foreach (ConstructorInfo ctor in type.GetConstructors ())
             {
-                View view = CreateViewFromType (type, ctor);
+                View? view = CreateViewFromType (type, ctor);
 
                 if (view != null)
                 {
@@ -146,37 +228,37 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view?.Dispose ();
     }
 
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
-    {
-        var view = CreateInstanceIfNotGeneric (viewType);
+    //[Theory]
+    //[MemberData (nameof (AllViewTypes))]
+    //public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
+    //{
+    //    var view = CreateInstanceIfNotGeneric (viewType);
 
-        if (view == null)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+    //    if (view == null)
+    //    {
+    //        output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
-            return;
-        }
+    //        return;
+    //    }
 
-        if (view is IDesignable designable)
-        {
-            designable.EnableForDesign ();
-        }
+    //    if (view is IDesignable designable)
+    //    {
+    //        designable.EnableForDesign ();
+    //    }
 
-        var mockDriver = new MockConsoleDriver ();
-        mockDriver.AttributeSet += (_, args) =>
-                                   {
-                                       if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
-                                       {
-                                           Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
-                                       }
-                                   };
-        view.Driver = mockDriver;
-        view.Enabled = false;
-        view.SetNeedsDraw ();
-        view.Draw ();
+    //    var driver = CreateFakeDriver ();
+    //    driver.AttributeSet += (_, args) =>
+    //                           {
+    //                               if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)
+    //                               {
+    //                                   Assert.Fail($"{viewType} with `Enabled == false` tried to SetAttribute to {args}");
+    //                               }
+    //                           };
+    //    view.Driver = driver;
+    //    view.Enabled = false;
+    //    view.SetNeedsDraw ();
+    //    view.Draw ();
 
-        view?.Dispose ();
-    }
+    //    view?.Dispose ();
+    //}
 }

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
@@ -74,6 +75,8 @@ public class ConfigProperty
             {
                 // Use DeepCloner to create a deep copy of PropertyValue
                 object? val = DeepCloner.DeepClone (PropertyValue);
+
+                Debug.Assert (!Immutable);
                 PropertyInfo.SetValue (null, val);
 
             }

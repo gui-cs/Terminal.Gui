@@ -182,18 +182,19 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var styleRadioGroup = new RadioGroup
+        var styleOptionSelector = new OptionSelector ()
         {
-            X = Pos.Right (label) + 1, 
-            Y = Pos.Top (label), 
-            RadioLabels = ["_Query", "_Error"],
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Labels = ["_Query", "_Error"],
+            Title = "Sty_le"
         };
-        frame.Add (styleRadioGroup);
+        frame.Add (styleOptionSelector);
 
         label = new ()
         {
             X = 0,
-            Y = Pos.Bottom (styleRadioGroup),
+            Y = Pos.Bottom (styleOptionSelector),
 
             Width = Dim.Width (label),
             Height = 1,
@@ -202,7 +203,7 @@ public class MessageBoxes : Scenario
         };
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup),
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleOptionSelector),
             CheckedState = CheckState.Checked,
             Text = "_Wrap Message",
         };
@@ -246,7 +247,7 @@ public class MessageBoxes : Scenario
                                                    btns.Add ($"_{NumberToWords.Convert (i)}");
                                                }
 
-                                               if (styleRadioGroup.SelectedItem == 0)
+                                               if (styleOptionSelector.Value == 0)
                                                {
                                                    buttonPressedLabel.Text =
                                                        $"{MessageBox.Query (
