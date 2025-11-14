@@ -24,8 +24,8 @@ public class GlobalTestSetup : IDisposable
         // Reset application state just in case a test changed something.
         // TODO: Add an Assert to ensure none of the state of Application changed.
         // TODO: Add an Assert to ensure none of the state of ConfigurationManager changed.
-        CheckDefaultState ();
         Application.ResetState (true);
+        CheckDefaultState ();
     }
 
     // IMPORTANT: Ensure this matches the code in Init_ResetState_Resets_Properties
