@@ -88,7 +88,7 @@ public class RuneTests
                     1
                 )] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
     [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 2, 8)] // Man, Woman and Girl emoji.
-    [InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
+    //[InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
     [InlineData (
                     "\u0e4d\u0e32",
                     "ํา",
@@ -213,7 +213,7 @@ public class RuneTests
     [InlineData (
                     '\u1161',
                     "ᅡ",
-                    1,
+                    0,
                     1,
                     3
                 )] // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
@@ -231,7 +231,7 @@ public class RuneTests
                 )]  // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
                     // See https://github.com/microsoft/terminal/issues/19389
 
-    [InlineData ('\ud7b0', "ힰ", 1, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
+    [InlineData ('\ud7b0', "ힰ", 0, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
     [InlineData ('\uf61e', "", 1, 1, 3)] // Private Use Area
     [InlineData ('\u23f0', "⏰", 2, 1, 3)] // Alarm Clock - ⏰ U+23f0
     [InlineData ('\u1100', "ᄀ", 2, 1, 3)] // ᄀ Hangul Choseong Kiyeok

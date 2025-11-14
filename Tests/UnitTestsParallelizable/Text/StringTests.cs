@@ -5,9 +5,30 @@
 public class StringTests
 {
     [Fact]
+    public void TestGetColumns_Null ()
+    {
+        string? str = null;
+        Assert.Equal (0, str!.GetColumns ());
+    }
+
+    [Fact]
     public void TestGetColumns_Empty ()
     {
         var str = string.Empty;
+        Assert.Equal (0, str.GetColumns ());
+    }
+
+    [Fact]
+    public void TestGetColumns_SingleRune ()
+    {
+        var str = "a";
+        Assert.Equal (1, str.GetColumns ());
+    }
+
+    [Fact]
+    public void TestGetColumns_Zero_Width ()
+    {
+        var str = "\u200D";
         Assert.Equal (0, str.GetColumns ());
     }
 
@@ -30,44 +51,37 @@ public class StringTests
 
     // Test known wide codepoints
     [Theory]
-    [InlineData ("🙂", 1, 2)]
-    [InlineData ("a🙂", 2, 3)]
-    [InlineData ("🙂a", 2, 3)]
-    [InlineData ("👨‍👩‍👦‍👦", 1, 2)]
-    [InlineData ("👨‍👩‍👦‍👦🙂", 2, 4)]
-    [InlineData ("👨‍👩‍👦‍👦🙂a", 3, 5)]
-    [InlineData ("👨‍👩‍👦‍👦a🙂", 3, 5)]
-    [InlineData ("👨‍👩‍👦‍👦👨‍👩‍👦‍👦", 2, 4)]
-    [InlineData ("าำ", 1, 2)] // า U+0E32 - THAI CHARACTER SARA AA with ำ U+0E33 - THAI CHARACTER SARA AM
-    [InlineData ("山", 1, 2)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
-    [InlineData ("山🙂", 2, 4)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
-    //[InlineData ("\ufe20\ufe21", 2)] // Combining Ligature Left Half ︠ - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
-    //				 // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
-    public void TestGetColumns_MultiRune_WideBMP_Graphemes (string str, int graphemesCount, int expected)
+    [InlineData ("🙂", 2, 1, 2)]
+    [InlineData ("a🙂", 3, 2, 3)]
+    [InlineData ("🙂a", 3, 2, 3)]
+    [InlineData ("👨‍👩‍👦‍👦", 8, 1, 2)]
+    [InlineData ("👨‍👩‍👦‍👦🙂", 10, 2, 4)]
+    [InlineData ("👨‍👩‍👦‍👦🙂a", 11, 3, 5)]
+    [InlineData ("👨‍👩‍👦‍👦a🙂", 11, 3, 5)]
+    [InlineData ("👨‍👩‍👦‍👦👨‍👩‍👦‍👦", 16, 2, 4)]
+    [InlineData ("าำ", 2, 1, 2)] // า U+0E32 - THAI CHARACTER SARA AA with ำ U+0E33 - THAI CHARACTER SARA AM
+    [InlineData ("山", 2, 1, 2)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
+    [InlineData ("山🙂", 4, 2, 4)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
+    [InlineData ("a\ufe20e\ufe21", 2, 2, 2)] // Combining Ligature Left Half ︠ - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+    // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+    //[InlineData ("क", 1, 1, 1)] // क U+0915 Devanagari Letter Ka
+    //[InlineData ("ि", 1, 1, 1)] // U+093F Devanagari Vowel Sign I ि (i-kar).
+    //[InlineData ("कि", 2, 1, 2)] // "कि" is U+0915 for the base consonant "क" with U+093F for the vowel sign "ि" (i-kar).
+    [InlineData ("ᄀ", 2, 1, 2)] // ᄀ U+1100 HANGUL CHOSEONG KIYEOK (consonant)
+    [InlineData ("ᅡ", 0, 1, 0)] // ᅡ U+1161 HANGUL JUNGSEONG A (vowel)
+    [InlineData ("가", 2, 1, 2)] // ᄀ U+1100 HANGUL CHOSEONG KIYEOK (consonant) with ᅡ U+1161 HANGUL JUNGSEONG A (vowel)
+    [InlineData ("ᄒ", 2, 1, 2)] // ᄒ U+1112 Hangul Choseong Hieuh
+    [InlineData ("ᅵ", 0, 1, 0)] // ᅵ U+1175 Hangul Jungseong I
+    [InlineData ("ᇂ", 0, 1, 0)] // ᇂ U+11C2 Hangul Jongseong Hieuh
+    [InlineData ("힣", 2, 1, 2)] // ᄒ (choseong h) + ᅵ (jungseong i) + ᇂ (jongseong h)
+    [InlineData ("ힰ", 0, 1, 0)]    // U+D7B0 ힰ Hangul Jungseong O-Yeo
+    [InlineData ("ᄀힰ", 2, 1, 2)]  // ᄀ U+1100 HANGUL CHOSEONG KIYEOK (consonant) with U+D7B0 ힰ Hangul Jungseong O-Yeo
+    //[InlineData ("षि", 2, 1, 2)] // U+0937 ष DEVANAGARI LETTER SSA with U+093F ि COMBINING DEVANAGARI VOWEL SIGN I
+    public void TestGetColumns_MultiRune_WideBMP_Graphemes (string str, int expectedRunesWidth, int expectedGraphemesCount, int expectedWidth)
     {
-        Assert.Equal (graphemesCount, GraphemeHelper.GetGraphemes (str).ToArray ().Length);
-        Assert.Equal (expected, str.GetColumns ());
-    }
-
-    [Fact]
-    public void TestGetColumns_Null ()
-    {
-        string? str = null;
-        Assert.Equal (0, str!.GetColumns ());
-    }
-
-    [Fact]
-    public void TestGetColumns_SingleRune ()
-    {
-        var str = "a";
-        Assert.Equal (1, str.GetColumns ());
-    }
-
-    [Fact]
-    public void TestGetColumns_Zero_Width ()
-    {
-        var str = "\u200D";
-        Assert.Equal (0, str.GetColumns ());
+        Assert.Equal (expectedRunesWidth, str.EnumerateRunes ().Sum (r => r.GetColumns ()));
+        Assert.Equal (expectedGraphemesCount, GraphemeHelper.GetGraphemes (str).ToArray ().Length);
+        Assert.Equal (expectedWidth, str.GetColumns ());
     }
 
     [Theory]
@@ -75,14 +89,8 @@ public class StringTests
     [InlineData ("")]
     public void TestGetColumns_Does_Not_Throws_With_Null_And_Empty_String (string? text)
     {
-        if (text is null)
-        {
-            Assert.Equal (0, StringExtensions.GetColumns (text!));
-        }
-        else
-        {
-            Assert.Equal (0, text.GetColumns ());
-        }
+        // ReSharper disable once InvokeAsExtensionMethod
+        Assert.Equal (0, StringExtensions.GetColumns (text!));
     }
 
     public class ReadOnlySpanExtensionsTests
