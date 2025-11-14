@@ -226,7 +226,7 @@ public class ClipTests (ITestOutputHelper _output)
         //                            01 2345678901234 56 78 90 12 34 56 
         //                            │� |0123456989│� ン  ラ イ ン で  す 。
         expectedOutput = """
-                         │�│0123456789│�ンラインです。
+                         │�│0123456789│ ンラインです。
                          """;
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);
