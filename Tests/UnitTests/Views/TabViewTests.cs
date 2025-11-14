@@ -1055,7 +1055,7 @@ public class TabViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭──────────────╮    
-│Les Misérables│    
+│Les Misérables│    
 ◄              ╰───╮
 │hi2               │
 └──────────────────┘",
@@ -1231,7 +1231,7 @@ public class TabViewTests (ITestOutputHelper output)
 ┌──────────────────┐
 │hi2               │
 ◄              ╭───╯
-│Les Misérables│    
+│Les Misérables│    
 ╰──────────────╯    ",
                                                       output
                                                      );

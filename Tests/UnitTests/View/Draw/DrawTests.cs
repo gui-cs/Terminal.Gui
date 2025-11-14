@@ -14,19 +14,19 @@ public class DrawTests (ITestOutputHelper output)
     [Trait ("Category", "Unicode")]
     public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
     {
-        const string us = "\U0000f900";
+        const string s = "\U0000f900";
         var r = (Rune)0xf900;
 
-        Assert.Equal ("豈", us);
+        Assert.Equal ("豈", s);
         Assert.Equal ("豈", r.ToString ());
-        Assert.Equal (us, r.ToString ());
+        Assert.Equal (s, r.ToString ());
 
-        Assert.Equal (2, us.GetColumns ());
+        Assert.Equal (2, s.GetColumns ());
         Assert.Equal (2, r.GetColumns ());
 
-        var win = new Window { Title = us };
+        var win = new Window { Title = s };
         var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill () };
-        var tf = new TextField { Text = us, Y = 1, Width = 3 };
+        var tf = new TextField { Text = s, Y = 1, Width = 3 };
         win.Add (view, tf);
         Toplevel top = new ();
         top.Add (win);
@@ -36,9 +36,9 @@ public class DrawTests (ITestOutputHelper output)
 
         const string expectedOutput = """
 
-                                      ┌┤豈├────┐
-                                      │豈      │
-                                      │豈      │
+                                      ┌┤豈├────┐
+                                      │豈      │
+                                      │豈      │
                                       └────────┘
                                       """;
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, output);
