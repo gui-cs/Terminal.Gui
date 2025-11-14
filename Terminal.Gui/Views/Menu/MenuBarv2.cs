@@ -31,11 +31,11 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    (ctx) =>
                     {
                         // Logging.Debug ($"{Title} - Command.HotKey");
 
-                        if (RaiseHandlingHotKey () is true)
+                        if (RaiseHandlingHotKey (ctx) is true)
                         {
                             return true;
                         }
@@ -526,8 +526,8 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
         {
-            Options = ["G_ood", "_Bad", "U_gly"],
-            SelectedItem = 0
+            Labels = ["G_ood", "_Bad", "U_gly"],
+            Value = 0
         };
 
         var menuBgColorCp = new ColorPicker

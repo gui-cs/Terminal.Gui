@@ -1,13 +1,13 @@
 ﻿#nullable enable
-using System.Drawing;
 using System.Reflection;
+using System.Drawing;
 
 namespace UnitTests;
 
 /// <summary>
 ///     Base class for tests that need to test all views.
 /// </summary>
-public class TestsAllViews
+public class TestsAllViews : FakeDriverBase
 {
     /// <summary>
     ///     Gets all view types.
@@ -15,13 +15,12 @@ public class TestsAllViews
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (
-                             type => type is { IsClass: true, IsAbstract: false, IsPublic: true }
+                     .Where (type => type is { IsClass: true, IsAbstract: false, IsPublic: true }
                                      && (type.IsSubclassOf (typeof (View)) || type == typeof (View)))
                      .Select (type => new object [] { type });
 
     /// <summary>
-    ///    Creates an instance of a view if it is not a generic type.
+    ///     Creates an instance of a view if it is not a generic type.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -43,8 +42,7 @@ public class TestsAllViews
     public static List<Type> GetAllViewClasses ()
     {
         return typeof (View).Assembly.GetTypes ()
-                            .Where (
-                                    myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
+                            .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
                                               && myType.IsSubclassOf (typeof (View))
                                    )
                             .ToList ();
@@ -83,6 +81,7 @@ public class TestsAllViews
             if (type.ContainsGenericParameters)
             {
                 Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+
                 //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
                 return null;
             }

@@ -1,23 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TerminalGuiFluentTesting;
+﻿namespace TerminalGuiFluentTesting;
 
 /// <summary>
-/// Which driver simulation should be used for testing
+///     Which driver simulation should be used for testing
 /// </summary>
 public enum TestDriver
 {
     /// <summary>
-    /// The Windows driver with simulation I/O but core driver classes
+    ///     The Windows driver with simulation I/O but core driver classes
     /// </summary>
     Windows,
 
     /// <summary>
-    /// The DotNet driver with simulation I/O but core driver classes
+    ///     The DotNet driver with simulation I/O but core driver classes
     /// </summary>
-    DotNet
+    DotNet,
+
+    /// <summary>
+    ///     The Unix driver with simulation I/O but core driver classes
+    /// </summary>
+    Unix,
+
+    /// <summary>
+    ///     The Fake driver that does not use any core driver classes
+    /// </summary>
+    Fake
 }

@@ -80,7 +80,7 @@ public class UICatalog
         // Get allowed driver names
         string? [] allowedDrivers = Application.GetDriverTypes ().Item2.ToArray ();
 
-        Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.")
+        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.")
             .FromAmong (allowedDrivers!);
         driverOption.SetDefaultValue (string.Empty);
         driverOption.AddAlias ("-d");
@@ -451,7 +451,7 @@ public class UICatalog
             scenario.StartBenchmark ();
         }
 
-        Application.Init (driverName: _forceDriver);
+        Application.ForceDriver = _forceDriver!;
 
         scenario.Main ();
 
@@ -517,7 +517,7 @@ public class UICatalog
 
         if (benchmarkWindow.Border is { })
         {
-            benchmarkWindow.Border.Thickness = new (0, 0, 0, 0);
+            benchmarkWindow.Border!.Thickness = new (0, 0, 0, 0);
         }
 
         TableView resultsTableView = new ()
@@ -635,7 +635,7 @@ public class UICatalog
         if (!View.EnableDebugIDisposableAsserts)
         {
             View.Instances.Clear ();
-            RunState.Instances.Clear ();
+            SessionToken.Instances.Clear ();
 
             return;
         }
@@ -650,15 +650,15 @@ public class UICatalog
 
         View.Instances.Clear ();
 
-        // Validate there are no outstanding Application.RunState-based instances 
+        // Validate there are no outstanding Application sessions
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
-        foreach (RunState? inst in RunState.Instances)
+        foreach (SessionToken? inst in SessionToken.Instances)
         {
             Debug.Assert (inst.WasDisposed);
         }
 
-        RunState.Instances.Clear ();
+        SessionToken.Instances.Clear ();
 #endif
     }
 }

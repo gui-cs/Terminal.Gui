@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 public class BorderEditor : AdornmentEditor
 {
     private CheckBox? _ckbTitle;
-    private RadioGroup? _rbBorderStyle;
+    private OptionSelector<LineStyle>? _osBorderStyle;
     private CheckBox? _ckbGradient;
 
     public BorderEditor ()
@@ -21,34 +21,31 @@ public class BorderEditor : AdornmentEditor
     private void BorderEditor_AdornmentChanged (object? sender, EventArgs e)
     {
         _ckbTitle!.CheckedState = ((Border)AdornmentToEdit!).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
-        _rbBorderStyle!.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
+        _osBorderStyle!.Value = ((Border)AdornmentToEdit).LineStyle;
         _ckbGradient!.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
     }
 
     private void BorderEditor_Initialized (object? sender, EventArgs e)
     {
-        List<LineStyle> borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
-
-        _rbBorderStyle = new ()
+        _osBorderStyle = new ()
         {
             X = 0,
 
-            Y = Pos.Bottom (SubViews.ToArray() [^1]),
+            Y = Pos.Bottom (SubViews.ToArray () [^1]),
             Width = Dim.Fill (),
-            SelectedItem = (int)(((Border)AdornmentToEdit!)?.LineStyle ?? LineStyle.None),
+            Value = ((Border)AdornmentToEdit!)?.LineStyle ?? LineStyle.None,
             BorderStyle = LineStyle.Single,
             Title = "Border St_yle",
             SuperViewRendersLineCanvas = true,
-            RadioLabels = borderStyleEnum.Select (style => style.ToString ()).ToArray ()
         };
-        Add (_rbBorderStyle);
+        Add (_osBorderStyle);
 
-        _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
+        _osBorderStyle.ValueChanged += OnRbBorderStyleOnValueChanged;
 
         _ckbTitle = new ()
         {
             X = 0,
-            Y = Pos.Bottom (_rbBorderStyle),
+            Y = Pos.Bottom (_osBorderStyle),
 
             CheckedState = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
@@ -73,10 +70,14 @@ public class BorderEditor : AdornmentEditor
 
         return;
 
-        void OnRbBorderStyleOnSelectedItemChanged (object? s, SelectedItemChangedArgs args)
+        void OnRbBorderStyleOnValueChanged (object? s, EventArgs<LineStyle?> args)
         {
             LineStyle prevBorderStyle = AdornmentToEdit!.BorderStyle;
-            ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.SelectedItem!;
+
+            if (args.Value is { })
+            {
+                ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.Value;
+            }
 
             if (((Border)AdornmentToEdit).LineStyle == LineStyle.None)
             {

@@ -1,8 +1,10 @@
 ﻿// Alias Console to MockConsole so we don't accidentally use Console
 
+using UnitTests;
+
 namespace UnitTests_Parallelizable.DrawingTests;
 
-public class AttributeTests
+public class AttributeTests : FakeDriverBase
 {
     [Fact]
     public void Constructor_ParsesNamedColorsAndStyle ()
@@ -36,7 +38,7 @@ public class AttributeTests
     public void Constructor_DefaultsToNoneStyle_WhenStyleIsNullOrEmpty ()
     {
         var attr1 = new Attribute ("White", "Black");
-        var attr2 = new Attribute ("White", "Black", null);
+        var attr2 = new Attribute ("White", "Black");
         var attr3 = new Attribute ("White", "Black", "");
         Assert.Equal (TextStyle.None, attr1.Style);
         Assert.Equal (TextStyle.None, attr2.Style);
@@ -103,8 +105,7 @@ public class AttributeTests
     [Fact]
     public void Constructors_Construct ()
     {
-        var driver = new FakeDriver ();
-        driver.Init ();
+        IDriver driver = CreateFakeDriver ();
 
         // Test parameterless constructor
         var attr = new Attribute ();
@@ -218,24 +219,6 @@ public class AttributeTests
     }
 
     [Fact]
-    public void Implicit_Assign ()
-    {
-        var driver = new FakeDriver ();
-        driver.Init ();
-
-        var attr = new Attribute ();
-
-        var value = 42;
-        var fg = new Color ();
-        fg = new (Color.Red);
-
-        var bg = new Color ();
-        bg = new (Color.Blue);
-
-        driver.End ();
-    }
-
-    [Fact]
     public void InequalityOperator_ShouldReturnFalseForEqualAttributes ()
     {
         // Arrange
@@ -276,8 +259,7 @@ public class AttributeTests
     [Fact]
     public void Make_Creates ()
     {
-        var driver = new FakeDriver ();
-        driver.Init ();
+        IDriver driver = CreateFakeDriver ();
 
         var fg = new Color ();
         fg = new (Color.Red);

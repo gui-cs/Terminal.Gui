@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Tui = Terminal.Gui.Drivers;
 
-namespace Terminal.Gui.Benchmarks.ConsoleDrivers.EscSeqUtils;
+namespace Terminal.Gui.Benchmarks.Drivers.EscSeqUtils;
 
 [MemoryDiagnoser]
 // Hide useless column from results.

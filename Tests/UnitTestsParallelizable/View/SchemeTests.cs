@@ -1,10 +1,11 @@
 ﻿#nullable enable
+using UnitTests;
 using Xunit;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "View.Scheme")]
-public class SchemeTests
+public class SchemeTests : FakeDriverBase
 {
 
     [Fact]
@@ -63,7 +64,7 @@ public class SchemeTests
     public void GetAttribute_ReturnsCorrectAttribute_Via_Mock ()
     {
         var view = new View { SchemeName = "Base" };
-        view.Driver = new MockConsoleDriver ();
+        view.Driver = CreateFakeDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         // Act
@@ -103,7 +104,7 @@ public class SchemeTests
     public void SetAttributeForRole_SetsCorrectAttribute ()
     {
         var view = new View { SchemeName = "Base" };
-        view.Driver = new MockConsoleDriver ();
+        view.Driver = CreateFakeDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);
@@ -316,16 +317,16 @@ public class SchemeTests
         // Border (an Adornment) doesn't have a SuperView but should use its Parent's scheme
         var view = new View { SchemeName = "Dialog" };
         var border = view.Border!;
-        
+
         Assert.NotNull (border);
         Assert.Null (border.SuperView); // Adornments don't have SuperView
         Assert.NotNull (border.Parent);
-        
+
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
-        
+
         // Border should use its Parent's scheme, not Base
         Assert.Equal (dialogScheme!.Normal, border.GetAttributeForRole (VisualRole.Normal));
-        
+
         view.Dispose ();
     }
 
@@ -365,11 +366,11 @@ public class SchemeTests
     {
         // Test: grandchild without explicit scheme defers through parent to grandparent
         // Would fail without the SuperView deferral fix (commit 154ac15)
-        
+
         var grandparentView = new View { SchemeName = "Base" };
         var parentView = new View (); // No scheme or SchemeName
         var childView = new View (); // No scheme or SchemeName
-        
+
         grandparentView.Add (parentView);
         parentView.Add (childView);
 
@@ -386,7 +387,7 @@ public class SchemeTests
 
         // Child should get attribute from grandparent through parent
         Assert.Equal (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
-        
+
         // Parent should also get attribute from grandparent
         Assert.Equal (customAttribute, parentView.GetAttributeForRole (VisualRole.Normal));
 
@@ -400,11 +401,11 @@ public class SchemeTests
     {
         // Test: parent with SchemeName stops deferral chain
         // Would fail without the SchemeName check (commit 866e002)
-        
+
         var grandparentView = new View { SchemeName = "Base" };
         var parentView = new View { SchemeName = "Dialog" }; // Sets SchemeName
         var childView = new View (); // No scheme or SchemeName
-        
+
         grandparentView.Add (parentView);
         parentView.Add (childView);
 
@@ -423,7 +424,7 @@ public class SchemeTests
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         Assert.NotEqual (customAttribute, parentView.GetAttributeForRole (VisualRole.Normal));
         Assert.Equal (dialogScheme!.Normal, parentView.GetAttributeForRole (VisualRole.Normal));
-        
+
         // Child should get parent's Dialog scheme (defers to parent, parent uses Dialog scheme)
         Assert.Equal (dialogScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
 
@@ -437,7 +438,7 @@ public class SchemeTests
     {
         // Test: view's own OnGettingAttributeForRole takes precedence over parent
         // This should work with or without the fix, but validates precedence
-        
+
         var parentView = new View { SchemeName = "Base" };
         var childView = new TestViewWithAttributeOverride ();
         parentView.Add (childView);
@@ -456,7 +457,7 @@ public class SchemeTests
         // Child's own override should take precedence
         var childOverrideAttribute = new Attribute (Color.BrightRed, Color.BrightCyan);
         childView.OverrideAttribute = childOverrideAttribute;
-        
+
         Assert.Equal (childOverrideAttribute, childView.GetAttributeForRole (VisualRole.Normal));
 
         childView.Dispose ();
@@ -468,7 +469,7 @@ public class SchemeTests
     {
         // Test: multiple VisualRoles all defer correctly
         // Would fail without the SuperView deferral fix for any role
-        
+
         var parentView = new View { SchemeName = "Base" };
         var childView = new View ();
         parentView.Add (childView);

@@ -37,7 +37,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will result in <see cref="NeedsLayout"/> and <see cref="NeedsDraw"/> to be set,
     ///         resulting in the
-    ///         view being laid out and redrawn as appropriate in the next iteration of the <see cref="MainLoop"/>.
+    ///         view being laid out and redrawn as appropriate in the next iteration.
     ///     </para>
     /// </remarks>
     public Rectangle Frame
@@ -219,7 +219,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will result in <see cref="NeedsLayout"/> and <see cref="NeedsDraw"/> to be set,
     ///         resulting in the
-    ///         view being laid out and redrawn as appropriate in the next iteration of the <see cref="MainLoop"/>.
+    ///         view being laid out and redrawn as appropriate in the next iteration.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -264,7 +264,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will result in <see cref="NeedsLayout"/> and <see cref="NeedsDraw"/> to be set,
     ///         resulting in the
-    ///         view being laid out and redrawn as appropriate in the next iteration of the <see cref="MainLoop"/>.
+    ///         view being laid out and redrawn as appropriate in the next iteration.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -308,7 +308,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will result in <see cref="NeedsLayout"/> and <see cref="NeedsDraw"/> to be set,
     ///         resulting in the
-    ///         view being laid out and redrawn as appropriate in the next iteration of the <see cref="MainLoop"/>.
+    ///         view being laid out and redrawn as appropriate in the next iteration.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -328,7 +328,7 @@ public partial class View // Layout APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
-                                              _height,
+                                              ref _height,
                                               value,
                                               OnHeightChanging,
                                               HeightChanging,
@@ -396,7 +396,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will result in <see cref="NeedsLayout"/> and <see cref="NeedsDraw"/> to be set,
     ///         resulting in the
-    ///         view being laid out and redrawn as appropriate in the next iteration of the <see cref="MainLoop"/>.
+    ///         view being laid out and redrawn as appropriate in the next iteration.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -416,7 +416,7 @@ public partial class View // Layout APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
-                                              _width,
+                                              ref _width,
                                               value,
                                               OnWidthChanging,
                                               WidthChanging,
@@ -843,8 +843,8 @@ public partial class View // Layout APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="MainLoop"/> will cause <see cref="Layout()"/> to be called on the next
-    ///         <see cref="Application.Iteration"/> so there is normally no reason to call see <see cref="Layout()"/>.
+    ///         The next iteration will cause <see cref="Layout()"/> to be called on the next
+    ///         <see cref="IApplication.Iteration"/> so there is normally no reason to call see <see cref="Layout()"/>.
     ///     </para>
     /// </remarks>
     public void SetNeedsLayout ()
@@ -882,12 +882,12 @@ public partial class View // Layout APIs
 
                 if (current.Margin is { SubViews.Count: > 0 })
                 {
-                    current.Margin.SetNeedsLayout ();
+                    current.Margin!.SetNeedsLayout ();
                 }
 
                 if (current.Border is { SubViews.Count: > 0 })
                 {
-                    current.Border.SetNeedsLayout ();
+                    current.Border!.SetNeedsLayout ();
                 }
 
                 if (current.Padding is { SubViews.Count: > 0 })

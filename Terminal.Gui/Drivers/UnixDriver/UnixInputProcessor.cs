@@ -5,12 +5,12 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Input processor for <see cref="UnixInput"/>, deals in <see cref="char"/> stream.
 /// </summary>
-internal class UnixInputProcessor : InputProcessor<char>
+internal class UnixInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc />
     public UnixInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter ())
     {
-        DriverName = "Unix";
+        DriverName = "unix";
     }
 
     /// <inheritdoc />
@@ -21,18 +21,5 @@ internal class UnixInputProcessor : InputProcessor<char>
             ProcessAfterParsing (released.Item2);
         }
 
-    }
-
-    /// <inheritdoc />
-    protected override void ProcessAfterParsing (char input)
-    {
-        var key = KeyConverter.ToKey (input);
-
-        // If the key is not valid, we don't want to raise any events.
-        if (IsValidInput (key, out key))
-        {
-            OnKeyDown (key);
-            OnKeyUp (key);
-        }
     }
 }

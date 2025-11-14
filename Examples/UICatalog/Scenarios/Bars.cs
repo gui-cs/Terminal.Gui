@@ -40,7 +40,7 @@ public class Bars : Scenario
             SchemeName = "Toplevel",
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border.Thickness = new (0, 1, 0, 0);
+        eventLog.Border!.Thickness = new (0, 1, 0, 0);
         Application.Top.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
@@ -185,9 +185,9 @@ public class Bars : Scenario
 
         menuLikeExamples.Add (popOverMenu);
 
-        menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
+        menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
 
-        void MenuLikeExamplesMouseClick (object sender, MouseEventArgs e)
+        void MenuLikeExamplesMouseEvent (object _, MouseEventArgs e)
         {
             if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {

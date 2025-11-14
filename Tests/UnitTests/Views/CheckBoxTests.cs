@@ -96,7 +96,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        Application.Driver?.SetScreenSize (30, 5);
 
         Assert.Equal (Alignment.Center, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -155,8 +155,8 @@ public class CheckBoxTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
 
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 6));
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (30, 6);
 
         Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
@@ -217,7 +217,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         Assert.Equal (Alignment.Start, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -268,7 +268,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         Assert.Equal (Alignment.End, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -321,24 +321,24 @@ public class CheckBoxTests (ITestOutputHelper output)
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
     [InlineData (CheckState.None)]
-    public void Selected_Handle_Event_Does_Not_Prevent_Change (CheckState initialState)
+    public void Activated_Handle_Event_Prevents_Change (CheckState initialState)
     {
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
 
         ckb.CheckedState = initialState;
 
-        ckb.Selecting += OnSelecting;
+        ckb.Selecting += OnActivating;
 
         Assert.Equal (initialState, ckb.CheckedState);
         bool? ret = ckb.InvokeCommand (Command.Select);
         Assert.True (ret);
         Assert.True (checkedInvoked);
-        Assert.NotEqual (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.CheckedState);
 
         return;
 
-        void OnSelecting (object sender, CommandEventArgs e)
+        void OnActivating (object sender, CommandEventArgs e)
         {
             checkedInvoked = true;
             e.Handled = true;

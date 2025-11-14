@@ -1,4 +1,7 @@
 ﻿namespace Terminal.Gui.Drivers;
 
-internal interface INetInput : IConsoleInput<ConsoleKeyInfo>
+/// <summary>
+///     Wraps IConsoleInput for .NET console input events (ConsoleKeyInfo). Needed to support Mocking in tests.
+/// </summary>
+internal interface INetInput : IInput<ConsoleKeyInfo>
 { }

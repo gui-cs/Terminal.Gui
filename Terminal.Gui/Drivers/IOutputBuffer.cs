@@ -3,66 +3,27 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Describes the screen state that you want the console to be in.
-///     Is designed to be drawn to repeatedly then manifest into the console
-///     once at the end of iteration after all drawing is finalized.
+///     Represents the desired screen state for console rendering. This interface provides methods for building up
+///     visual content (text, attributes, fills) in a buffer that can be efficiently written to the terminal
+///     in a single operation at the end of each iteration. Final output is handled by <see cref="IOutput"/>.
 /// </summary>
+/// <remarks>
+///     <para>
+///         The <see cref="IOutputBuffer"/> acts as an intermediary between Terminal.Gui's high-level drawing operations
+///         and the low-level console output. Rather than writing directly to the console for each operation, views
+///         draw to this buffer during layout and rendering. The buffer is then flushed to the terminal by
+///         <see cref="IOutput"/> after all drawing is complete, minimizing flicker and improving performance.
+///     </para>
+///     <para>
+///         The buffer maintains a 2D array of <see cref="Cell"/> objects in <see cref="Contents"/>, where each cell
+///         represents a single character position on screen with its associated character, attributes, and dirty state.
+///         Drawing operations like <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> modify cells at the
+///         current cursor position (tracked by <see cref="Col"/> and <see cref="Row"/>), respecting any active
+///         <see cref="Clip"/> region.
+///     </para>
+/// </remarks>
 public interface IOutputBuffer
 {
-    /// <summary>
-    ///     The contents of the application output. The driver outputs this buffer to the terminal when UpdateScreen is called.
-    /// </summary>
-    Cell [,]? Contents { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
-    ///     to.
-    /// </summary>
-    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
-    public Region? Clip { get; set; }
-
-    /// <summary>
-    ///     The <see cref="Attribute"/> that will be used for the next AddRune or AddStr call.
-    /// </summary>
-    Attribute CurrentAttribute { get; set; }
-
-    /// <summary>The number of rows visible in the terminal.</summary>
-    int Rows { get; set; }
-
-    /// <summary>The number of columns visible in the terminal.</summary>
-    int Cols { get; set; }
-
-    /// <summary>
-    ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
-    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
-    /// </summary>
-    public int Row { get; }
-
-    /// <summary>
-    ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
-    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
-    /// </summary>
-    public int Col { get; }
-
-    /// <summary>
-    ///     The first cell index on left of screen - basically always 0.
-    ///     Changing this may have unexpected consequences.
-    /// </summary>
-    int Left { get; set; }
-
-    /// <summary>
-    ///     The first cell index on top of screen - basically always 0.
-    ///     Changing this may have unexpected consequences.
-    /// </summary>
-    int Top { get; set; }
-
-    /// <summary>
-    ///     Updates the column and row to the specified location in the buffer.
-    /// </summary>
-    /// <param name="col">The column to move to.</param>
-    /// <param name="row">The row to move to.</param>
-    void Move (int col, int row);
-
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <param name="rune">Rune to add.</param>
     void AddRune (Rune rune);
@@ -82,22 +43,30 @@ public interface IOutputBuffer
     void ClearContents ();
 
     /// <summary>
-    ///     Tests whether the specified coordinate is valid for drawing the specified Rune.
+    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
+    ///     to.
     /// </summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <returns>
-    ///     True if the coordinate is valid for the Rune; false otherwise.
-    /// </returns>
-    bool IsValidLocation (Rune rune, int col, int row);
+    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
+    public Region? Clip { get; set; }
 
     /// <summary>
-    ///     Changes the size of the buffer to the given size
+    ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
+    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>
-    /// <param name="cols"></param>
-    /// <param name="rows"></param>
-    void SetWindowSize (int cols, int rows);
+    public int Col { get; }
+
+    /// <summary>The number of columns visible in the terminal.</summary>
+    int Cols { get; set; }
+
+    /// <summary>
+    ///     The contents of the application output. The driver outputs this buffer to the terminal when UpdateScreen is called.
+    /// </summary>
+    Cell [,]? Contents { get; set; }
+
+    /// <summary>
+    ///     The <see cref="Attribute"/> that will be used for the next AddRune or AddStr call.
+    /// </summary>
+    Attribute CurrentAttribute { get; set; }
 
     /// <summary>
     ///     Fills the given <paramref name="rect"/> with the given
@@ -114,4 +83,50 @@ public interface IOutputBuffer
     /// <param name="rect"></param>
     /// <param name="rune"></param>
     void FillRect (Rectangle rect, char rune);
+
+    /// <summary>
+    ///     Tests whether the specified coordinate is valid for drawing the specified Rune.
+    /// </summary>
+    /// <param name="rune">Used to determine if one or two columns are required.</param>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <returns>
+    ///     True if the coordinate is valid for the Rune; false otherwise.
+    /// </returns>
+    bool IsValidLocation (Rune rune, int col, int row);
+
+    /// <summary>
+    ///     The first cell index on left of screen - basically always 0.
+    ///     Changing this may have unexpected consequences.
+    /// </summary>
+    int Left { get; set; }
+
+    /// <summary>
+    ///     Updates the column and row to the specified location in the buffer.
+    /// </summary>
+    /// <param name="col">The column to move to.</param>
+    /// <param name="row">The row to move to.</param>
+    void Move (int col, int row);
+
+    /// <summary>
+    ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
+    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
+    /// </summary>
+    public int Row { get; }
+
+    /// <summary>The number of rows visible in the terminal.</summary>
+    int Rows { get; set; }
+
+    /// <summary>
+    ///     Changes the size of the buffer to the given size
+    /// </summary>
+    /// <param name="cols"></param>
+    /// <param name="rows"></param>
+    void SetSize (int cols, int rows);
+
+    /// <summary>
+    ///     The first cell index on top of screen - basically always 0.
+    ///     Changing this may have unexpected consequences.
+    /// </summary>
+    int Top { get; set; }
 }

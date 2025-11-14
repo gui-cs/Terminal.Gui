@@ -1,0 +1,604 @@
+#nullable enable
+namespace UnitTests_Parallelizable.ViewsTests;
+
+/// <summary>
+///     Tests for <see cref="SelectorBase"/> functionality that applies to all selector implementations.
+///     These tests use <see cref="OptionSelector"/> as a concrete implementation to test the base class.
+/// </summary>
+public class SelectorBaseTests
+{
+    #region Initialization Tests
+
+    [Fact]
+    public void Constructor_SetsDefaults ()
+    {
+        var selector = new OptionSelector ();
+
+        Assert.True (selector.CanFocus);
+        Assert.Equal (Dim.Auto (DimAutoStyle.Content), selector.Width);
+        Assert.Equal (Dim.Auto (DimAutoStyle.Content), selector.Height);
+        Assert.Equal (Orientation.Vertical, selector.Orientation);
+        Assert.Null (selector.Labels);
+        Assert.Null (selector.Values);
+        Assert.False (selector.AssignHotKeys);
+        Assert.Empty (selector.UsedHotKeys);
+        Assert.Equal (SelectorStyles.None, selector.Styles);
+        Assert.True (selector.DoubleClickAccepts);
+        Assert.Equal (2, selector.HorizontalSpace);
+    }
+
+    #endregion
+
+    #region Value Property Tests
+
+    [Fact]
+    public void Value_Set_ValidValue_UpdatesValue ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Value = 1;
+
+        Assert.Equal (1, selector.Value);
+    }
+
+    [Fact]
+    public void Value_Set_InvalidValue_ThrowsArgumentOutOfRangeException ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        Assert.Throws<ArgumentOutOfRangeException> (() => selector.Value = 5);
+        Assert.Throws<ArgumentOutOfRangeException> (() => selector.Value = -1);
+    }
+
+    [Fact]
+    public void Value_Set_Null_Succeeds ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Value = null;
+
+        Assert.Null (selector.Value);
+    }
+
+    [Fact]
+    public void Value_Set_SameValue_DoesNotRaiseEvent ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Value = 1;
+
+        var eventRaisedCount = 0;
+        selector.ValueChanged += (s, e) => eventRaisedCount++;
+
+        selector.Value = 1; // Set to same value
+
+        Assert.Equal (0, eventRaisedCount);
+    }
+
+    [Fact]
+    public void Value_Changed_RaisesValueChangedEvent ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        int? capturedValue = null;
+        selector.ValueChanged += (s, e) => capturedValue = e.Value;
+
+        selector.Value = 1;
+
+        Assert.Equal (1, capturedValue);
+    }
+
+    #endregion
+
+    #region Values Property Tests
+
+    [Fact]
+    public void Values_Get_WhenNull_ReturnsSequentialValues ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2", "Option3"];
+
+        IReadOnlyList<int>? values = selector.Values;
+
+        Assert.NotNull (values);
+        Assert.Equal (3, values.Count);
+        Assert.Equal ([0, 1, 2], values);
+    }
+
+    [Fact]
+    public void Values_Set_UpdatesValues ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Values = [10, 20];
+
+        Assert.Equal ([10, 20], selector.Values);
+    }
+
+    [Fact]
+    public void Values_Set_SetsDefaultValue ()
+    {
+        var selector = new OptionSelector ();
+        selector.Value = null;
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Values = [10, 20];
+
+        Assert.Equal (10, selector.Value); // Should default to first value
+    }
+
+    #endregion
+
+    #region Labels Property Tests
+
+    [Fact]
+    public void Labels_Set_CreatesSubViews ()
+    {
+        var selector = new OptionSelector ();
+
+        selector.Labels = ["Option1", "Option2"];
+
+        Assert.Equal (2, selector.SubViews.OfType<CheckBox> ().Count ());
+    }
+
+    [Fact]
+    public void Labels_Set_Null_RemovesSubViews ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Labels = null;
+
+        Assert.Empty (selector.SubViews.OfType<CheckBox> ());
+    }
+
+    [Fact]
+    public void Labels_Values_CountMismatch_DoesNotCreateSubViews ()
+    {
+        var selector = new OptionSelector ();
+
+        selector.Values = [0, 1, 2];
+        selector.Labels = ["Option1", "Option2"]; // Mismatch
+
+        Assert.Empty (selector.SubViews.OfType<CheckBox> ());
+    }
+
+    #endregion
+
+    #region SetValuesAndLabels Tests
+
+    [Fact]
+    public void SetValuesAndLabels_FromEnum_SetsValuesAndLabels ()
+    {
+        var selector = new OptionSelector ();
+
+        selector.SetValuesAndLabels<SelectorStyles> ();
+
+        Assert.NotNull (selector.Values);
+        Assert.NotNull (selector.Labels);
+        Assert.Equal (Enum.GetValues<SelectorStyles> ().Length, selector.Values.Count);
+        Assert.Equal (Enum.GetNames<SelectorStyles> (), selector.Labels);
+    }
+
+    [Fact]
+    public void SetValuesAndLabels_SetsCorrectIntegerValues ()
+    {
+        var selector = new OptionSelector ();
+
+        selector.SetValuesAndLabels<SelectorStyles> ();
+
+        // Verify values match enum integer values
+        var expectedValues = Enum.GetValues<SelectorStyles> ().Select (e => (int)e).ToList ();
+        Assert.Equal (expectedValues, selector.Values);
+    }
+
+    #endregion
+
+    #region Styles Property Tests
+
+    [Fact]
+    public void Styles_Set_None_NoExtraSubViews ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Styles = SelectorStyles.None;
+
+        Assert.Equal (2, selector.SubViews.Count);
+        Assert.Null (selector.SubViews.FirstOrDefault (v => v.Id == "valueField"));
+    }
+
+    [Fact]
+    public void Styles_Set_ShowValue_AddsValueField ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        selector.Styles = SelectorStyles.ShowValue;
+
+        View? valueField = selector.SubViews.FirstOrDefault (v => v.Id == "valueField");
+        Assert.NotNull (valueField);
+        Assert.IsType<TextField> (valueField);
+    }
+
+    [Fact]
+    public void Styles_Set_ShowValue_ValueFieldDisplaysCurrentValue ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Value = 1;
+
+        selector.Styles = SelectorStyles.ShowValue;
+
+        var valueField = (TextField?)selector.SubViews.FirstOrDefault (v => v.Id == "valueField");
+        Assert.NotNull (valueField);
+        Assert.Equal ("1", valueField.Text);
+    }
+
+    [Fact]
+    public void Styles_Set_ShowValue_ValueFieldUpdatesOnValueChange ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Styles = SelectorStyles.ShowValue;
+
+        selector.Value = 1;
+
+        var valueField = (TextField?)selector.SubViews.FirstOrDefault (v => v.Id == "valueField");
+        Assert.NotNull (valueField);
+        Assert.Equal ("1", valueField.Text);
+    }
+
+    [Fact]
+    public void Styles_Set_SameValue_DoesNotRecreateSubViews ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Styles = SelectorStyles.ShowValue;
+
+        CheckBox firstCheckBox = selector.SubViews.OfType<CheckBox> ().First ();
+
+        selector.Styles = SelectorStyles.ShowValue; // Set to same value
+
+        // Should be the same instance
+        Assert.Same (firstCheckBox, selector.SubViews.OfType<CheckBox> ().First ());
+    }
+
+    #endregion
+
+    #region AssignHotKeys Tests
+
+    [Fact]
+    public void AssignHotKeys_True_AssignsHotKeysToCheckBoxes ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = true };
+
+        selector.Labels = ["Option1", "Option2"];
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.NotEqual (Key.Empty, checkBoxes [0].HotKey);
+        Assert.NotEqual (Key.Empty, checkBoxes [1].HotKey);
+    }
+
+    [Fact]
+    public void AssignHotKeys_True_AddsHotKeySpecifierToTitles ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = true };
+
+        selector.Labels = ["Option1", "Option2"];
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Contains ('_', checkBoxes [0].Title);
+        Assert.Contains ('_', checkBoxes [1].Title);
+    }
+
+    [Fact]
+    public void AssignHotKeys_True_AssignsUniqueHotKeys ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = true };
+
+        selector.Labels = ["Option1", "Option2", "Option3"];
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        var hotKeys = checkBoxes.Select (cb => cb.HotKey).ToList ();
+        Assert.Equal (3, hotKeys.Distinct ().Count ()); // All unique
+    }
+
+    [Fact]
+    public void AssignHotKeys_False_DoesNotAssignHotKeys ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = false };
+
+        selector.Labels = ["Option1", "Option2"];
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Equal (Key.Empty, checkBoxes [0].HotKey);
+        Assert.Equal (Key.Empty, checkBoxes [1].HotKey);
+    }
+
+    [Fact]
+    public void AssignHotKeys_PreservesExistingHotKeys ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = true };
+
+        selector.Labels = ["_Alt Option", "Option2"];
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        // Should use 'A' from "_Alt"
+        Assert.Equal (Key.A, checkBoxes [0].HotKey);
+    }
+
+    #endregion
+
+    #region UsedHotKeys Tests
+
+    [Fact]
+    public void UsedHotKeys_SkipsMarkedKeys ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = true };
+
+        selector.UsedHotKeys.Add (Key.O); // Mark 'O' as used
+        selector.Labels = ["Option1", "Option2"];
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        // Should skip 'O' and use next available character
+        Assert.NotEqual (Key.O, checkBoxes [0].HotKey);
+    }
+
+    [Fact]
+    public void UsedHotKeys_PopulatedWhenHotKeysAssigned ()
+    {
+        var selector = new OptionSelector { AssignHotKeys = true };
+
+        selector.Labels = ["Option1", "Option2"];
+
+        // UsedHotKeys should contain the assigned hotkeys
+        Assert.NotEmpty (selector.UsedHotKeys);
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+
+        foreach (CheckBox cb in checkBoxes)
+        {
+            Assert.Contains (cb.HotKey, selector.UsedHotKeys);
+        }
+    }
+
+    #endregion
+
+    #region Orientation Tests
+
+    [Fact]
+    public void Orientation_Vertical_CheckBoxesStackedVertically ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Orientation = Orientation.Vertical;
+        selector.Layout ();
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Equal (0, checkBoxes [0].Frame.Y);
+        Assert.True (checkBoxes [1].Frame.Y > checkBoxes [0].Frame.Y);
+    }
+
+    [Fact]
+    public void Orientation_Horizontal_CheckBoxesArrangedHorizontally ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Orientation = Orientation.Horizontal;
+        selector.Layout ();
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Equal (0, checkBoxes [0].Frame.Y);
+        Assert.Equal (0, checkBoxes [1].Frame.Y);
+        Assert.True (checkBoxes [1].Frame.X > checkBoxes [0].Frame.X);
+    }
+
+    [Fact]
+    public void Orientation_Change_TriggersLayout ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+        selector.Layout ();
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        int originalYDiff = checkBoxes [1].Frame.Y - checkBoxes [0].Frame.Y;
+
+        selector.Orientation = Orientation.Horizontal;
+        selector.Layout ();
+
+        int newYDiff = checkBoxes [1].Frame.Y - checkBoxes [0].Frame.Y;
+        Assert.NotEqual (originalYDiff, newYDiff);
+        Assert.Equal (0, newYDiff); // Both should be at Y=0 now
+    }
+
+    #endregion
+
+    #region HorizontalSpace Tests
+
+    [Fact]
+    public void HorizontalSpace_Default_Is2 ()
+    {
+        var selector = new OptionSelector ();
+
+        Assert.Equal (2, selector.HorizontalSpace);
+    }
+
+    [Fact]
+    public void HorizontalSpace_Set_UpdatesSpacing ()
+    {
+        var selector = new OptionSelector { Orientation = Orientation.Horizontal };
+        selector.Labels = ["Option1", "Option2"];
+        selector.HorizontalSpace = 2;
+        selector.Layout ();
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        // HorizontalSpace is applied via Margin.Thickness.Right
+        int spacing2 = checkBoxes [0].Margin!.Thickness.Right;
+
+        selector.HorizontalSpace = 5;
+        selector.Layout ();
+
+        int spacing5 = checkBoxes [0].Margin!.Thickness.Right;
+        Assert.True (spacing5 > spacing2);
+        Assert.Equal (2, spacing2);
+        Assert.Equal (5, spacing5);
+    }
+
+    [Fact]
+    public void HorizontalSpace_OnlyAppliesToHorizontalOrientation ()
+    {
+        var selector = new OptionSelector { Orientation = Orientation.Vertical };
+        selector.Labels = ["Option1", "Option2"];
+        selector.HorizontalSpace = 10;
+        selector.Layout ();
+
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        // In vertical mode, checkboxes should be at same X
+        Assert.Equal (checkBoxes [0].Frame.X, checkBoxes [1].Frame.X);
+    }
+
+    #endregion
+
+    #region DoubleClickAccepts Tests
+
+    [Fact]
+    public void DoubleClickAccepts_Default_IsTrue ()
+    {
+        var selector = new OptionSelector ();
+
+        Assert.True (selector.DoubleClickAccepts);
+    }
+
+    [Fact]
+    public void DoubleClickAccepts_True_AcceptOnDoubleClick ()
+    {
+        var selector = new OptionSelector { DoubleClickAccepts = true };
+        selector.Labels = ["Option1", "Option2"];
+        selector.Layout ();
+
+        var acceptCount = 0;
+        selector.Accepting += (s, e) => acceptCount++;
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
+
+        Assert.Equal (1, acceptCount);
+    }
+
+    [Fact]
+    public void DoubleClickAccepts_False_DoesNotAcceptOnDoubleClick ()
+    {
+        var selector = new OptionSelector { DoubleClickAccepts = false };
+        selector.Labels = ["Option1", "Option2"];
+        selector.Layout ();
+
+        var acceptCount = 0;
+        selector.Accepting += (s, e) => acceptCount++;
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
+
+        Assert.Equal (0, acceptCount);
+    }
+
+    #endregion
+
+    #region CreateSubViews Tests
+
+    [Fact]
+    public void CreateSubViews_RemovesOldSubViewsAndCreatesNew ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        int oldCount = selector.SubViews.Count;
+
+        selector.Labels = ["New1", "New2", "New3"];
+
+        Assert.NotEqual (oldCount, selector.SubViews.Count);
+        Assert.Equal (3, selector.SubViews.OfType<CheckBox> ().Count ());
+        Assert.Contains (selector.SubViews.OfType<CheckBox> (), cb => cb.Title == "New1");
+    }
+
+    [Fact]
+    public void CreateSubViews_SetsCheckBoxProperties ()
+    {
+        var selector = new OptionSelector ();
+
+        selector.Labels = ["Test Option"];
+        selector.Values = [42];
+
+        CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
+        Assert.Equal ("Test Option", checkBox.Title);
+        Assert.Equal ("Test Option", checkBox.Id);
+        Assert.Equal (42, checkBox.Data);
+        Assert.True (checkBox.CanFocus);
+    }
+
+    #endregion
+
+    #region HotKey Command Tests
+
+    [Fact]
+    public void HotKey_Command_DoesNotFireAccept ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        var acceptCount = 0;
+        selector.Accepting += (s, e) => acceptCount++;
+
+        selector.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (0, acceptCount);
+    }
+
+    [Fact]
+    public void Accept_Command_FiresAccept ()
+    {
+        var selector = new OptionSelector ();
+        selector.Labels = ["Option1", "Option2"];
+
+        var acceptCount = 0;
+        selector.Accepting += (s, e) => acceptCount++;
+
+        selector.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, acceptCount);
+    }
+
+    #endregion
+
+    #region Edge Cases
+
+    [Fact]
+    public void EmptyLabels_CreatesNoSubViews ()
+    {
+        var selector = new OptionSelector ();
+
+        selector.Labels = [];
+
+        Assert.Empty (selector.SubViews);
+    }
+
+    [Fact]
+    public void Value_WithNoLabels_CanBeSet ()
+    {
+        var selector = new OptionSelector ();
+
+        // This should work even without labels
+        var exception = Record.Exception (() => selector.Value = null);
+
+        Assert.Null (exception);
+        Assert.Null (selector.Value);
+    }
+
+    #endregion
+}

@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ApplicationTests.NavigationTests;
+namespace UnitTests.ApplicationTests;
 
 public class ApplicationNavigationTests (ITestOutputHelper output)
 {
@@ -35,14 +35,12 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         };
         subView.Add (subSubView);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.True (top.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.True (subSubView.HasFocus);
 
         top.Dispose ();
-
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -52,11 +50,10 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         var top = new Toplevel ();
         Assert.False (top.HasFocus);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.True (top.HasFocus);
 
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -117,7 +114,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.Equal (subView2, Application.Navigation.GetFocused ());
 
         Application.Top.Dispose ();
-        Application.ResetState ();
+        Application.Top = null;
+        Application.Navigation = null;
     }
 
     [Fact]
@@ -154,6 +152,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.Null (Application.Navigation.GetFocused ());
 
         Application.Top.Dispose ();
-        Application.ResetState ();
+        Application.Top = null;
+        Application.Navigation = null;
     }
 }

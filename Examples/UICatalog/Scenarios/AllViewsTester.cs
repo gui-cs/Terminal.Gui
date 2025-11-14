@@ -38,7 +38,7 @@ public class AllViewsTester : Scenario
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
         app.Border!.LineStyle = LineStyle.Heavy;
-        app.Border.Thickness = new (0);
+        app.Border!.Thickness = new (0);
 
 
         _viewClasses = GetAllViewClassesCollection ()
@@ -158,16 +158,13 @@ public class AllViewsTester : Scenario
 
         _eventLog = new ()
         {
-            // X = Pos.Right(_layoutEditor),
+            X = Pos.AnchorEnd () - 1,
+            Y = 0,
+            Width = 30,
+            Height = Dim.Fill (),
             SuperViewRendersLineCanvas = true
         };
         _eventLog.Border!.Thickness = new (1);
-        _eventLog.X = Pos.AnchorEnd () - 1;
-        _eventLog.Y = 0;
-
-        _eventLog.Height = Dim.Height (_classListView);
-
-        //_eventLog.Width = 30;
 
         _layoutEditor.Width = Dim.Fill (
                                         Dim.Func (
@@ -194,7 +191,6 @@ public class AllViewsTester : Scenario
             Height = Dim.Fill (),
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            //SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
@@ -228,7 +224,7 @@ public class AllViewsTester : Scenario
         if (type.IsGenericType)
         {
             // For each of the <T> arguments
-            List<Type> typeArguments = new ();
+            List<Type> typeArguments = [];
 
             // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())

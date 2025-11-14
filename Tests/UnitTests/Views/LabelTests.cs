@@ -18,7 +18,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
         AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
@@ -59,7 +59,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -103,7 +103,7 @@ public class LabelTests (ITestOutputHelper output)
 
         Toplevel top = new ();
         top.Add (label);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.False (label.TextFormatter.FillRemaining);
@@ -245,7 +245,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -277,7 +277,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -298,7 +298,7 @@ e
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Full_Border ()
     {
         var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
@@ -326,8 +326,8 @@ e
     public void With_Top_Margin_Without_Top_Border ()
     {
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin.Thickness = new (0, 1, 0, 0);
-        label.Border.Thickness = new (1, 0, 1, 1);
+        label.Margin!.Thickness = new (0, 1, 0, 0);
+        label.Border!.Thickness = new (1, 0, 1, 1);
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -351,7 +351,7 @@ e
     public void Without_Top_Border ()
     {
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border.Thickness = new (1, 0, 1, 1);
+        label.Border!.Thickness = new (1, 0, 1, 1);
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -708,8 +708,8 @@ e
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (40, 10);
 
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -755,8 +755,8 @@ e
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (40, 10));
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (40, 10);
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -828,7 +828,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
+                                 Application.Driver!.SetScreenSize (22, count + 4);
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -856,22 +856,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > -1)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-
-                                         if (count == 0)
-                                         {
-                                             field.NewKeyDownEvent (Key.Enter);
-
-                                             break;
-                                         }
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -880,19 +865,39 @@ e
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, count);
         Assert.Equal (count, listLabels.Count);
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count > -1)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+
+                if (count == 0)
+                {
+                    field.NewKeyDownEvent (Key.Enter);
+
+                    break;
+                }
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This is a Label test. Move to Label tests.
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (10, 4);
+        Application.Driver!.SetScreenSize (10, 4);
         var text = "Label";
 
         var label = new Label
@@ -979,7 +984,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 AutoInitShutdownAttribute.FakeResize (new Size (22, count + 4));
+                                 Application.Driver!.SetScreenSize (22, count + 4);
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1008,22 +1013,7 @@ e
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count < 21)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-
-                                         if (count == 20)
-                                         {
-                                             field.NewKeyDownEvent (Key.Enter);
-
-                                             break;
-                                         }
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -1032,10 +1022,30 @@ e
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (20, count);
         Assert.Equal (count, listLabels.Count);
         top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            while (count < 21)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+
+                if (count == 20)
+                {
+                    field.NewKeyDownEvent (Key.Enter);
+
+                    break;
+                }
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -1054,7 +1064,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
+        Application.Driver!.SetScreenSize (10, 4);
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1113,7 +1123,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size (10, 4));
+        Application.Driver!.SetScreenSize (10, 4);
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1319,7 +1329,7 @@ e
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3893
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestLabelUnderscoreMinus ()
     {
         var lbl = new Label

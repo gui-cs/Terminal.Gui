@@ -1,3 +1,4 @@
+using TerminalGuiFluentTesting;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -6,7 +7,7 @@ namespace UnitTests.ViewsTests;
 public class ButtonTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Constructors_Defaults ()
     {
         // Override CM
@@ -243,7 +244,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver?.SetScreenSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);

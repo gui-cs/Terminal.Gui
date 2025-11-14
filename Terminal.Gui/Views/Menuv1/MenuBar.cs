@@ -692,7 +692,7 @@ public class MenuBar : View, IDesignable
         return true;
     }
 
-    /// <summary>Gets the superview location offset relative to the <see cref="IConsoleDriver"/> location.</summary>
+    /// <summary>Gets the superview location offset relative to the <see cref="IDriver"/> location.</summary>
     /// <returns>The location offset.</returns>
     internal Point GetScreenOffset ()
     {
@@ -1441,8 +1441,8 @@ public class MenuBar : View, IDesignable
 
             if (SuperView is { })
             {
-                locationOffset.X += SuperView.Border.Thickness.Left;
-                locationOffset.Y += SuperView.Border.Thickness.Top;
+                locationOffset.X += SuperView.Border!.Thickness.Left;
+                locationOffset.Y += SuperView.Border!.Thickness.Top;
             }
 
             int cx = me.Position.X - locationOffset.X;
