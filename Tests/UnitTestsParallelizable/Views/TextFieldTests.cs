@@ -591,7 +591,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
-ắ",
+ắ",
                                                        output,
                                                        driver
                                                       );
@@ -602,7 +602,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
-ắ",
+ắ",
                                                        output,
                                                        driver
                                                       );

@@ -104,7 +104,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
-        DriverAssert.AssertDriverContentsAre ("Misérables", output);
+        DriverAssert.AssertDriverContentsAre ("Misérables", output);
         Application.Top.Dispose ();
     }
 
@@ -1647,7 +1647,7 @@ Les Misérables",
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
-Les Miśerables",
+Les Miśerables",
                                                       output
                                                      );
     }
