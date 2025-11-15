@@ -54,7 +54,7 @@ public class NeedsDrawTests
         var view = new View { Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
 
-        view = new() { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        view = new () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         Assert.True (view.NeedsDraw);
     }
 
@@ -90,7 +90,7 @@ public class NeedsDrawTests
         view.EndInit ();
         Assert.True (view.NeedsDraw);
 
-        view = new() { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        view = new () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.NeedsDraw = false;
         view.EndInit ();
@@ -128,14 +128,14 @@ public class NeedsDrawTests
         Assert.False (view.NeedsLayout);
 
         // SRL won't change anything since the view frame wasn't changed
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.False (view.NeedsDraw);
 
         view.SetNeedsLayout ();
 
         // SRL won't change anything since the view frame wasn't changed
         // SRL doesn't depend on NeedsLayout, but LayoutSubViews does
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.False (view.NeedsDraw);
         Assert.True (view.NeedsLayout);
 
@@ -178,7 +178,7 @@ public class NeedsDrawTests
         Assert.True (view.NeedsDraw);
         Assert.True (superView.NeedsDraw);
 
-        superView.SetRelativeLayout (Application.Screen.Size);
+        superView.SetRelativeLayout (new (100, 100));
         Assert.True (view.NeedsDraw);
         Assert.True (superView.NeedsDraw);
     }
@@ -214,7 +214,7 @@ public class NeedsDrawTests
         view.EndInit ();
         Assert.True (view.NeedsDraw);
 
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.True (view.NeedsDraw);
 
         view.LayoutSubViews ();
@@ -233,7 +233,7 @@ public class NeedsDrawTests
         view.EndInit ();
         Assert.True (view.NeedsDraw);
 
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.True (view.NeedsDraw);
 
         view.LayoutSubViews ();

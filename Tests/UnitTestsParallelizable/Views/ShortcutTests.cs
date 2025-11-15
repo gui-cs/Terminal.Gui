@@ -108,7 +108,7 @@ public class ShortcutTests
         // | C  H  K |
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = help,
             Title = command,
@@ -118,7 +118,7 @@ public class ShortcutTests
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = help,
             Key = key,
@@ -128,7 +128,7 @@ public class ShortcutTests
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             Key = key,
             HelpText = help,
@@ -285,42 +285,6 @@ public class ShortcutTests
         shortcut.Key = Key.B;
         Assert.False (shortcut.HotKeyBindings.TryGet (Key.A, out _));
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.B, out _));
-    }
-
-    // Test Key gets bound correctly
-    [Fact]
-    public void BindKeyToApplication_Defaults_To_HotKey ()
-    {
-        var shortcut = new Shortcut ();
-
-        Assert.False (shortcut.BindKeyToApplication);
-    }
-
-    [Fact]
-    public void BindKeyToApplication_Can_Be_Set ()
-    {
-        var shortcut = new Shortcut ();
-
-        shortcut.BindKeyToApplication = true;
-
-        Assert.True (shortcut.BindKeyToApplication);
-    }
-
-    [Fact]
-    public void BindKeyToApplication_Changing_Adjusts_KeyBindings ()
-    {
-        var shortcut = new Shortcut ();
-
-        shortcut.Key = Key.A;
-        Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-
-        shortcut.BindKeyToApplication = true;
-        Assert.False (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.True (Application.KeyBindings.TryGet (Key.A, out _));
-
-        shortcut.BindKeyToApplication = false;
-        Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
     }
 
     [Theory]

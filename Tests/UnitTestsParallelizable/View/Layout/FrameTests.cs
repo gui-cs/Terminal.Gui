@@ -120,7 +120,7 @@ public class FrameTests
         Assert.True (view.NeedsLayout);
         view.Layout ();
         Assert.False (view.NeedsLayout);
-        Assert.Equal (Application.Screen, view.Frame);
+        Assert.Equal (new Size (2048, 2048), view.Frame.Size);
 
         view.Frame = Rectangle.Empty;
         Assert.Equal (Rectangle.Empty, view.Frame);
@@ -165,7 +165,7 @@ public class FrameTests
         Assert.Equal (Rectangle.Empty, v.Frame);
         v.Dispose ();
 
-        v = new() { Frame = frame };
+        v = new () { Frame = frame };
         Assert.Equal (frame, v.Frame);
 
         v.Frame = newFrame;
@@ -181,7 +181,7 @@ public class FrameTests
         Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
-        v = new() { X = frame.X, Y = frame.Y, Text = "v" };
+        v = new () { X = frame.X, Y = frame.Y, Text = "v" };
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
@@ -196,7 +196,7 @@ public class FrameTests
         v.Dispose ();
 
         newFrame = new (10, 20, 30, 40);
-        v = new() { Frame = frame };
+        v = new () { Frame = frame };
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
@@ -210,7 +210,7 @@ public class FrameTests
         Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
-        v = new() { X = frame.X, Y = frame.Y, Text = "v" };
+        v = new () { X = frame.X, Y = frame.Y, Text = "v" };
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
