@@ -4,43 +4,68 @@ using System.Collections.Specialized;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
+/// <summary>
+///     Provides data and rendering for <see cref="ListView"/>. Implement this interface to provide custom rendering
+///     or to wrap custom data sources.
+/// </summary>
+/// <remarks>
+///     <para>
+///         The default implementation is <see cref="ListWrapper{T}"/> which renders items using
+///         <see cref="object.ToString()"/>.
+///     </para>
+///     <para>
+///         Implementors must manage their own marking state and raise <see cref="CollectionChanged"/> when the
+///         underlying data changes.
+///     </para>
+/// </remarks>
 public interface IListDataSource : IDisposable
 {
     /// <summary>
-    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    ///     Raised when items are added, removed, moved, or the entire collection is refreshed.
     /// </summary>
+    /// <remarks>
+    ///     <see cref="ListView"/> subscribes to this event to update its display and content size when the data
+    ///     changes. Implementations should raise this event whenever the underlying collection changes, unless
+    ///     <see cref="SuspendCollectionChangedEvent"/> is <see langword="true"/>.
+    /// </remarks>
     event NotifyCollectionChangedEventHandler CollectionChanged;
 
-    /// <summary>Returns the number of elements to display</summary>
+    /// <summary>Gets the number of items in the data source.</summary>
     int Count { get; }
 
-    /// <summary>Returns the maximum length of elements to display</summary>
-    int Length { get; }
-
-    /// <summary>
-    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
-    /// if <see langword="true"/>, otherwise is <see langword="false"/>.
-    /// </summary>
-    bool SuspendCollectionChangedEvent { get; set; }
-
-    /// <summary>Should return whether the specified item is currently marked.</summary>
-    /// <returns><see langword="true"/>, if marked, <see langword="false"/> otherwise.</returns>
-    /// <param name="item">Item index.</param>
+    /// <summary>Determines whether the specified item is marked.</summary>
+    /// <param name="item">The zero-based index of the item.</param>
+    /// <returns><see langword="true"/> if the item is marked; otherwise <see langword="false"/>.</returns>
+    /// <remarks>
+    ///     <see cref="ListView"/> calls this method to determine whether to render the item with a mark indicator when
+    ///     <see cref="ListView.AllowsMarking"/> is <see langword="true"/>.
+    /// </remarks>
     bool IsMarked (int item);
 
-    /// <summary>This method is invoked to render a specified item, the method should cover the entire provided width.</summary>
-    /// <returns>The render.</returns>
-    /// <param name="listView">The list view to render.</param>
-    /// <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
-    /// <param name="item">The index of the item to render, zero for the first item and so on.</param>
-    /// <param name="col">The column where the rendering will start</param>
-    /// <param name="line">The line where the rendering will be done.</param>
-    /// <param name="width">The width that must be filled out.</param>
-    /// <param name="viewportXOffset">The index of the string to be displayed.</param>
+    /// <summary>Gets the width in columns of the widest item in the data source.</summary>
     /// <remarks>
-    ///     The default color will be set before this method is invoked, and will be based on whether the item is selected
-    ///     or not.
+    ///     <see cref="ListView"/> uses this value to set its horizontal content size for scrolling.
+    /// </remarks>
+    int Length { get; }
+
+    /// <summary>Renders the specified item to the <see cref="ListView"/>.</summary>
+    /// <param name="listView">The <see cref="ListView"/> to render to.</param>
+    /// <param name="selected">
+    ///     <see langword="true"/> if the item is currently selected; otherwise <see langword="false"/>.
+    /// </param>
+    /// <param name="item">The zero-based index of the item to render.</param>
+    /// <param name="col">The column in <paramref name="listView"/> where rendering starts.</param>
+    /// <param name="line">The line in <paramref name="listView"/> where rendering occurs.</param>
+    /// <param name="width">The width available for rendering.</param>
+    /// <param name="viewportX">The horizontal scroll offset.</param>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="ListView"/> calls this method for each visible item during rendering. The color scheme will be
+    ///         set based on selection state before this method is called.
+    ///     </para>
+    ///     <para>
+    ///         Implementations must fill the entire <paramref name="width"/> to avoid rendering artifacts.
+    ///     </para>
     /// </remarks>
     void Render (
         ListView listView,
@@ -49,15 +74,33 @@ public interface IListDataSource : IDisposable
         int col,
         int line,
         int width,
-        int viewportXOffset = 0
+        int viewportX = 0
     );
 
-    /// <summary>Flags the item as marked.</summary>
-    /// <param name="item">Item index.</param>
-    /// <param name="value">If set to <see langword="true"/> value.</param>
+    /// <summary>Sets the marked state of the specified item.</summary>
+    /// <param name="item">The zero-based index of the item.</param>
+    /// <param name="value"><see langword="true"/> to mark the item; <see langword="false"/> to unmark it.</param>
+    /// <remarks>
+    ///     <see cref="ListView"/> calls this method when the user toggles marking (e.g., via the SPACE key) if
+    ///     <see cref="ListView.AllowsMarking"/> is <see langword="true"/>.
+    /// </remarks>
     void SetMark (int item, bool value);
 
-    /// <summary>Return the source as IList.</summary>
-    /// <returns></returns>
+    /// <summary>
+    ///     Gets or sets whether the <see cref="CollectionChanged"/> event should be suppressed.
+    /// </summary>
+    /// <remarks>
+    ///     Set to <see langword="true"/> to prevent <see cref="CollectionChanged"/> from being raised during bulk
+    ///     operations. Set back to <see langword="false"/> to resume event notifications.
+    /// </remarks>
+    bool SuspendCollectionChangedEvent { get; set; }
+
+    /// <summary>Returns the underlying data source as an <see cref="IList"/>.</summary>
+    /// <returns>The data source as an <see cref="IList"/>.</returns>
+    /// <remarks>
+    ///     <see cref="ListView"/> uses this method to access individual items for events like
+    ///     <see cref="ListView.SelectedItemChanged"/> and to enable keyboard search via
+    ///     <see cref="ListView.KeystrokeNavigator"/>.
+    /// </remarks>
     IList ToList ();
 }
