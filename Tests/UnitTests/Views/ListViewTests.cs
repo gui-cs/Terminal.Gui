@@ -756,7 +756,7 @@ Item 6",
             int col,
             int line,
             int width,
-            int start = 0
+            int viewportXOffset = 0
         )
         {
             throw new NotImplementedException ();

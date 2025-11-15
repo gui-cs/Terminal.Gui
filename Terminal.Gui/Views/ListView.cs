@@ -1044,10 +1044,10 @@ public class ListWrapper<T> : IListDataSource, IDisposable
         int col,
         int line,
         int width,
-        int start = 0
+        int viewportXOffset = 0
     )
     {
-        container.Move (Math.Max (col - start, 0), line);
+        container.Move (Math.Max (col - viewportXOffset, 0), line);
 
         if (_source is { })
         {
@@ -1061,11 +1061,11 @@ public class ListWrapper<T> : IListDataSource, IDisposable
             {
                 if (t is string s)
                 {
-                    RenderUstr (container, s, col, line, width, start);
+                    RenderUstr (container, s, col, line, width, viewportXOffset);
                 }
                 else
                 {
-                    RenderUstr (container, t.ToString (), col, line, width, start);
+                    RenderUstr (container, t.ToString (), col, line, width, viewportXOffset);
                 }
             }
         }
@@ -1161,9 +1161,9 @@ public class ListWrapper<T> : IListDataSource, IDisposable
         return maxLength;
     }
 
-    private void RenderUstr (View driver, string ustr, int col, int line, int width, int start = 0)
+    private void RenderUstr (View driver, string ustr, int col, int line, int width, int viewportXOffset = 0)
     {
-        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
+        string str = viewportXOffset > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (viewportXOffset, ustr.ToRunes ().Length - 1));
         string u = TextFormatter.ClipAndJustify (str, width, Alignment.Start);
         driver.AddStr (u);
         width -= u.GetColumns ();

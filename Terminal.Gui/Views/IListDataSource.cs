@@ -37,7 +37,7 @@ public interface IListDataSource : IDisposable
     /// <param name="col">The column where the rendering will start</param>
     /// <param name="line">The line where the rendering will be done.</param>
     /// <param name="width">The width that must be filled out.</param>
-    /// <param name="start">The index of the string to be displayed.</param>
+    /// <param name="viewportXOffset">The index of the string to be displayed.</param>
     /// <remarks>
     ///     The default color will be set before this method is invoked, and will be based on whether the item is selected
     ///     or not.
@@ -49,7 +49,7 @@ public interface IListDataSource : IDisposable
         int col,
         int line,
         int width,
-        int start = 0
+        int viewportXOffset = 0
     );
 
     /// <summary>Flags the item as marked.</summary>
