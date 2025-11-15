@@ -16,17 +16,32 @@ public class ForceDriverTests
     }
 
     /// <summary>
-    ///     Tests that ForceDriver persists when opening a scenario after Init/Shutdown cycles.
-    ///     This verifies the fix for issue #4391.
+    ///     Tests that ForceDriver persists when running UICatalogTop and then opening a scenario.
+    ///     This simulates the actual UICatalog flow and verifies the fix for issue #4391.
     /// </summary>
     [Fact]
-    public void ForceDriver_Persists_Across_Init_Shutdown_Cycles ()
+    public void ForceDriver_Persists_From_UICatalogTop_To_Scenario ()
     {
         // Arrange
         const string expectedDriver = "fake";
         
         ConfigurationManager.Disable (true);
         Application.ResetState (true);
+
+        // Initialize UICatalog.Options (required by UICatalogTop)
+        global::UICatalog.UICatalog.Options = new UICatalogCommandLineOptions
+        {
+            Driver = expectedDriver,
+            DontEnableConfigurationManagement = false,
+            Scenario = "none",
+            BenchmarkTimeout = 2500,
+            Benchmark = false,
+            ResultsFile = string.Empty,
+            DebugLogLevel = "Warning"
+        };
+
+        // Initialize cached scenarios (required by UICatalogTop)
+        UICatalogTop.CachedScenarios = Scenario.GetScenarios ();
 
         // Set ForceDriver in RuntimeConfig (simulating what UICatalog does with --driver option)
         ConfigurationManager.RuntimeConfig = $$"""
@@ -38,54 +53,136 @@ public class ForceDriverTests
         // Enable ConfigurationManager with all locations (as UICatalog does)
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        var firstDriverName = string.Empty;
-        var secondDriverName = string.Empty;
+        var topLevelDriverName = string.Empty;
+        var scenarioDriverName = string.Empty;
+        var iterationCount = 0;
+        EventHandler<IterationEventArgs>? iterationHandler = null;
 
         try
         {
-            // Act - Cycle 1: Init and check driver
-            _output.WriteLine ("Cycle 1: First Init");
+            // Phase 1: Run UICatalogTop (simulating main UI)
+            _output.WriteLine ("=== Phase 1: Running UICatalogTop ===");
             Application.Init ();
-            firstDriverName = Application.Driver?.GetName () ?? string.Empty;
-            _output.WriteLine ($"Cycle 1 driver: {firstDriverName}");
-            Application.Shutdown ();
+            topLevelDriverName = Application.Driver?.GetName () ?? string.Empty;
+            _output.WriteLine ($"UICatalogTop driver: {topLevelDriverName}");
 
-            // Act - Cycle 2: Reload RuntimeConfig and Init again (simulating scenario opening)
-            _output.WriteLine ("Cycle 2: Reload RuntimeConfig and Init again");
+            var top = new UICatalogTop ();
             
-            // This simulates what the fix does before each scenario
-            ConfigurationManager.Load (ConfigLocations.Runtime);
-            ConfigurationManager.Apply ();
+            // Set up to automatically select a scenario and stop
+            iterationHandler = (sender, e) =>
+            {
+                iterationCount++;
+                
+                // On first iteration, select a scenario and request stop
+                if (iterationCount == 1)
+                {
+                    // Select the first scenario
+                    if (UICatalogTop.CachedScenarios is { Count: > 0 })
+                    {
+                        UICatalogTop.CachedSelectedScenario = 
+                            (Scenario)Activator.CreateInstance (UICatalogTop.CachedScenarios[0].GetType ())!;
+                        Application.RequestStop ();
+                    }
+                }
+            };
+            
+            Application.Iteration += iterationHandler;
+            Application.Run (top);
+            Application.Iteration -= iterationHandler;
 
-            // Scenario calls Application.Init() without parameters
-            Application.Init ();
-            secondDriverName = Application.Driver?.GetName () ?? string.Empty;
-            _output.WriteLine ($"Cycle 2 driver: {secondDriverName}");
+            top.Dispose ();
             Application.Shutdown ();
+            
+            _output.WriteLine ($"Selected scenario: {UICatalogTop.CachedSelectedScenario?.GetName ()}");
+            _output.WriteLine ($"UICatalogTop completed after {iterationCount} iterations");
+
+            // Phase 2: Run the selected scenario (simulating what UICatalog.cs does)
+            if (UICatalogTop.CachedSelectedScenario is { } scenario)
+            {
+                _output.WriteLine ($"\n=== Phase 2: Running scenario '{scenario.GetName ()}' ===");
+                
+                // Reload RuntimeConfig before scenario (as the fix does)
+                if (!global::UICatalog.UICatalog.Options.DontEnableConfigurationManagement)
+                {
+                    ConfigurationManager.Load (ConfigLocations.Runtime);
+                    ConfigurationManager.Apply ();
+                    _output.WriteLine ("Reloaded RuntimeConfig");
+                }
+
+                // Track the driver used inside the scenario
+                string? driverInsideScenario = null;
+                EventHandler<EventArgs<bool>>? initHandler = null;
+                EventHandler<IterationEventArgs>? scenarioIterationHandler = null;
+                
+                initHandler = (s, e) =>
+                {
+                    if (e.Value)
+                    {
+                        driverInsideScenario = Application.Driver?.GetName ();
+                        
+                        // Request stop immediately so the scenario doesn't actually run
+                        scenarioIterationHandler = (_, _) =>
+                        {
+                            Application.RequestStop ();
+                            // Remove immediately to avoid assertions in Shutdown
+                            if (scenarioIterationHandler != null)
+                            {
+                                Application.Iteration -= scenarioIterationHandler;
+                                scenarioIterationHandler = null;
+                            }
+                        };
+                        Application.Iteration += scenarioIterationHandler;
+                    }
+                };
+                
+                Application.InitializedChanged += initHandler;
+
+                // Run the scenario's Main() method (this is what UICatalog does)
+                scenario.Main ();
+                scenarioDriverName = driverInsideScenario ?? string.Empty;
+                
+                Application.InitializedChanged -= initHandler;
+                scenario.Dispose ();
+                
+                _output.WriteLine ($"Scenario driver: {scenarioDriverName}");
+                _output.WriteLine ("Scenario completed and disposed");
+            }
+            else
+            {
+                _output.WriteLine ("ERROR: No scenario was selected");
+                Assert.Fail ("No scenario was selected");
+            }
 
             // Assert
-            Assert.Equal (expectedDriver, firstDriverName);
-            Assert.Equal (expectedDriver, secondDriverName);
-            _output.WriteLine ($"SUCCESS: Driver '{expectedDriver}' persisted across Init/Shutdown cycles");
+            _output.WriteLine ($"\n=== Results ===");
+            _output.WriteLine ($"UICatalogTop driver: {topLevelDriverName}");
+            _output.WriteLine ($"Scenario driver: {scenarioDriverName}");
+            
+            Assert.Equal (expectedDriver, topLevelDriverName);
+            Assert.Equal (expectedDriver, scenarioDriverName);
+            _output.WriteLine ($"SUCCESS: Driver '{expectedDriver}' persisted from UICatalogTop to scenario");
         }
         finally
         {
+            if (iterationHandler != null)
+            {
+                Application.Iteration -= iterationHandler;
+            }
             ConfigurationManager.Disable (true);
             Application.ResetState (true);
         }
     }
 
     /// <summary>
-    ///     Tests that ForceDriver is used when a scenario calls Application.Init() without parameters.
-    ///     This simulates the actual UICatalog scenario execution flow.
+    ///     Tests that ForceDriver persists when running multiple scenarios in sequence.
+    ///     This verifies the scenario loop in UICatalog works correctly.
     /// </summary>
     [Fact]
-    public void ForceDriver_Used_By_Scenario_Init ()
+    public void ForceDriver_Persists_Across_Multiple_Scenarios ()
     {
         // Arrange
         const string expectedDriver = "fake";
-        Scenario? scenario = null;
-
+        
         ConfigurationManager.Disable (true);
         Application.ResetState (true);
 
@@ -99,34 +196,106 @@ public class ForceDriverTests
         // Enable ConfigurationManager
         ConfigurationManager.Enable (ConfigLocations.All);
 
+        string? driver1 = null;
+        string? driver2 = null;
+        EventHandler<EventArgs<bool>>? initHandler1 = null;
+        EventHandler<EventArgs<bool>>? initHandler2 = null;
+        EventHandler<IterationEventArgs>? iterHandler1 = null;
+        EventHandler<IterationEventArgs>? iterHandler2 = null;
+
         try
         {
-            // Get the first available scenario
+            // Get two different scenarios to test
             var scenarios = Scenario.GetScenarios ();
-            Assert.NotEmpty (scenarios);
+            Assert.True (scenarios.Count >= 2, "Need at least 2 scenarios for this test");
             
-            scenario = scenarios[0];
-            var scenarioName = scenario.GetName ();
-            _output.WriteLine ($"Testing with scenario: {scenarioName}");
+            var scenario1 = scenarios[0];
+            var scenario2 = scenarios[1];
+            
+            _output.WriteLine ($"Testing with scenarios: {scenario1.GetName ()} and {scenario2.GetName ()}");
 
-            // Reload RuntimeConfig before scenario (as the fix does)
+            // Run scenario 1
+            initHandler1 = (s, e) =>
+            {
+                if (e.Value)
+                {
+                    driver1 = Application.Driver?.GetName ();
+                    iterHandler1 = (_, _) =>
+                    {
+                        Application.RequestStop ();
+                        // Remove immediately to avoid assertions in Shutdown
+                        if (iterHandler1 != null)
+                        {
+                            Application.Iteration -= iterHandler1;
+                            iterHandler1 = null;
+                        }
+                    };
+                    Application.Iteration += iterHandler1;
+                }
+            };
+            
+            Application.InitializedChanged += initHandler1;
+            scenario1.Main ();
+            Application.InitializedChanged -= initHandler1;
+            scenario1.Dispose ();
+            _output.WriteLine ($"Scenario 1 completed with driver: {driver1}");
+
+            // Reload RuntimeConfig before scenario 2 (as the fix does)
             ConfigurationManager.Load (ConfigLocations.Runtime);
             ConfigurationManager.Apply ();
+            _output.WriteLine ("Reloaded RuntimeConfig");
 
-            // Scenario calls Application.Init() - it should use ForceDriver
-            Application.Init ();
-            var driverName = Application.Driver?.GetName () ?? string.Empty;
-            _output.WriteLine ($"Scenario driver: {driverName}");
+            // Run scenario 2
+            initHandler2 = (s, e) =>
+            {
+                if (e.Value)
+                {
+                    driver2 = Application.Driver?.GetName ();
+                    iterHandler2 = (_, _) =>
+                    {
+                        Application.RequestStop ();
+                        // Remove immediately to avoid assertions in Shutdown
+                        if (iterHandler2 != null)
+                        {
+                            Application.Iteration -= iterHandler2;
+                            iterHandler2 = null;
+                        }
+                    };
+                    Application.Iteration += iterHandler2;
+                }
+            };
+            
+            Application.InitializedChanged += initHandler2;
+            scenario2.Main ();
+            Application.InitializedChanged -= initHandler2;
+            scenario2.Dispose ();
+            _output.WriteLine ($"Scenario 2 completed with driver: {driver2}");
 
             // Assert
-            Assert.Equal (expectedDriver, driverName);
-            _output.WriteLine ($"SUCCESS: Scenario uses ForceDriver '{expectedDriver}'");
-
-            Application.Shutdown ();
+            Assert.Equal (expectedDriver, driver1);
+            Assert.Equal (expectedDriver, driver2);
+            _output.WriteLine ($"SUCCESS: Driver '{expectedDriver}' persisted across both scenarios");
         }
         finally
         {
-            scenario?.Dispose ();
+            // Cleanup any remaining handlers
+            if (initHandler1 != null)
+            {
+                Application.InitializedChanged -= initHandler1;
+            }
+            if (iterHandler2 != null)
+            {
+                Application.InitializedChanged -= initHandler2;
+            }
+            if (iterHandler1 != null)
+            {
+                Application.Iteration -= iterHandler1;
+            }
+            if (iterHandler2 != null)
+            {
+                Application.Iteration -= iterHandler2;
+            }
+            
             ConfigurationManager.Disable (true);
             Application.ResetState (true);
         }
