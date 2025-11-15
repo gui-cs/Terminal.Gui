@@ -468,6 +468,12 @@ public class UICatalog
             scenario.StartBenchmark ();
         }
 
+        // For benchmarking without ConfigurationManager, set ForceDriver directly
+        if (!ConfigurationManager.IsEnabled && !string.IsNullOrEmpty (_forceDriver))
+        {
+            Application.ForceDriver = _forceDriver;
+        }
+
         scenario.Main ();
 
         BenchmarkResults? results = null;
