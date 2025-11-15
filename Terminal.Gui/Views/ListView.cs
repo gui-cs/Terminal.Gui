@@ -559,7 +559,7 @@ public class ListView : View, IDesignable
     {
         if (SelectedItem != _lastSelectedItem)
         {
-            object? value = SelectedItem != -1 && Source?.Count > 0 ? Source.ToList () [SelectedItem] : null;
+            object? value = SelectedItem >= 0 && Source?.Count > 0 ? Source.ToList () [SelectedItem] : null;
             SelectedItemChanged?.Invoke (this, new (SelectedItem, value));
             _lastSelectedItem = SelectedItem;
             EnsureSelectedItemVisible ();

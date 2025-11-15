@@ -46,9 +46,9 @@ public class ComboBox : View, IDesignable
                               };
         _listview.SelectedItemChanged += (sender, e) =>
                                          {
-                                             if (!HideDropdownListOnClick && _searchSet.Count > 0)
+                                             if (e.Item >= 0 && !HideDropdownListOnClick && _searchSet.Count > 0)
                                              {
-                                                 SetValue (_searchSet [_listview.SelectedItem]);
+                                                 SetValue (_searchSet [e.Item]);
                                              }
                                          };
         Add (_search, _listview);
