@@ -43,7 +43,7 @@ public class UICatalogTop : Toplevel
         Unloaded += UnloadedHandler;
 
         // Restore previous selections
-        _categoryList.SelectedItem = _cachedCategoryIndex;
+        _categoryList.SelectedItem = _cachedCategoryIndex ?? 0;
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
         SchemeName = CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
@@ -509,7 +509,7 @@ public class UICatalogTop : Toplevel
     #region Category List
 
     private readonly ListView? _categoryList;
-    private static int _cachedCategoryIndex;
+    private static int? _cachedCategoryIndex;
     public static ObservableCollection<string>? CachedCategories { get; set; }
 
     private ListView CreateCategoryList ()
@@ -539,7 +539,11 @@ public class UICatalogTop : Toplevel
 
     private void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
     {
-        string item = CachedCategories! [e!.Item];
+        if (e is null or { Item: null })
+        {
+            return;
+        }
+        string item = CachedCategories! [e.Item.Value];
         ObservableCollection<Scenario> newScenarioList;
 
         if (e.Item == 0)

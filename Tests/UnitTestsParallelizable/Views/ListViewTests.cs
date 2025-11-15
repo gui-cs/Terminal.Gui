@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#nullable enable
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Moq;
@@ -10,14 +11,14 @@ public class ListViewTests
     [Fact]
     public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
-        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
         var lv = new ListView { Source = new ListWrapper<string> (source) };
 
         lv.SetFocus ();
 
         lv.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (lv.NewKeyDownEvent (Key.B));
@@ -34,14 +35,14 @@ public class ListViewTests
     [Fact]
     public void ListView_CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
-        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
         var lv = new ListView { Source = new ListWrapper<string> (source) };
 
         lv.SetFocus ();
 
         lv.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (lv.NewKeyDownEvent (Key.B));
@@ -58,7 +59,7 @@ public class ListViewTests
     [Fact]
     public void ListViewCollectionNavigatorMatcher_DefaultBehaviour ()
     {
-        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
         var lv = new ListView { Source = new ListWrapper<string> (source) };
 
         // Keys are consumed during navigation
@@ -66,13 +67,13 @@ public class ListViewTests
         Assert.True (lv.NewKeyDownEvent (Key.A));
         Assert.True (lv.NewKeyDownEvent (Key.T));
 
-        Assert.Equal ("bat", (string)lv.Source.ToList () [lv.SelectedItem]);
+        Assert.Equal ("bat", (string)lv.Source.ToList () [lv.SelectedItem!.Value]!);
     }
 
     [Fact]
     public void ListViewCollectionNavigatorMatcher_IgnoreKeys ()
     {
-        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
         var lv = new ListView { Source = new ListWrapper<string> (source) };
 
         Mock<ICollectionNavigatorMatcher> matchNone = new ();
@@ -94,7 +95,7 @@ public class ListViewTests
     [Fact]
     public void ListViewCollectionNavigatorMatcher_OverrideMatching ()
     {
-        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
         var lv = new ListView { Source = new ListWrapper<string> (source) };
 
         Mock<ICollectionNavigatorMatcher> matchNone = new ();
@@ -116,7 +117,7 @@ public class ListViewTests
         Assert.True (lv.NewKeyDownEvent (Key.T));
         Assert.Equal (5, lv.SelectedItem);
 
-        Assert.Equal ("candle", (string)lv.Source.ToList () [lv.SelectedItem]);
+        Assert.Equal ("candle", (string)lv.Source.ToList () [lv.SelectedItem!.Value]!);
     }
 
     #region ListView Tests (from ListViewTests.cs - parallelizable)
@@ -127,28 +128,28 @@ public class ListViewTests
         var lv = new ListView ();
         Assert.Null (lv.Source);
         Assert.True (lv.CanFocus);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
         Assert.False (lv.AllowsMultipleSelection);
 
         lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         lv = new () { Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         lv = new ()
         {
             Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"])
         };
         Assert.NotNull (lv.Source);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
         Assert.Equal (new (0, 1, 10, 20), lv.Frame);
 
         lv = new () { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
         Assert.Equal (new (0, 1, 10, 20), lv.Frame);
     }
 
@@ -195,7 +196,7 @@ public class ListViewTests
         var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper<string> (source) };
         lv.BeginInit ();
         lv.EndInit ();
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.CursorUp));
@@ -206,9 +207,9 @@ public class ListViewTests
         Assert.True (lv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (0, lv.SelectedItem);
         Assert.Equal (0, lv.TopItem);
-        Assert.False (lv.Source.IsMarked (lv.SelectedItem));
+        Assert.False (lv.Source.IsMarked (lv.SelectedItem!.Value));
         Assert.True (lv.NewKeyDownEvent (Key.Space));
-        Assert.True (lv.Source.IsMarked (lv.SelectedItem));
+        Assert.True (lv.Source.IsMarked (lv.SelectedItem!.Value));
         var opened = false;
         lv.OpenSelectedItem += (s, _) => opened = true;
         Assert.True (lv.NewKeyDownEvent (Key.Enter));
@@ -243,7 +244,7 @@ public class ListViewTests
 
         return;
 
-        void OnAccepted (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccepted (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -320,7 +321,7 @@ public class ListViewTests
         Assert.NotNull (lv.Source);
 
         // first item should be deselected by default
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         // bind shift down to move down twice in control
         lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.Down, Command.Down);
@@ -329,7 +330,7 @@ public class ListViewTests
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
-        // After moving down twice from -1 we should be at 'Two'
+        // After moving down twice from null we should be at 'Two'
         Assert.Equal (1, lv.SelectedItem);
 
         // clear the items
@@ -349,7 +350,7 @@ public class ListViewTests
         Assert.NotNull (lv.Source);
 
         // first item should be deselected by default
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         // nothing is ticked
         Assert.False (lv.Source.IsMarked (0));
@@ -410,7 +411,7 @@ public class ListViewTests
         Assert.NotNull (lv.Source);
 
         // first item should be deselected by default
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         // nothing is ticked
         Assert.False (lv.Source.IsMarked (0));
@@ -497,9 +498,9 @@ public class ListViewTests
     public void SelectedItem_Get_Set ()
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
-        Exception exception = Record.Exception (() => lv.SelectedItem = -1);
+        Exception exception = Record.Exception (() => lv.SelectedItem = null);
         Assert.Null (exception);
     }
 

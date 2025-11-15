@@ -25,7 +25,7 @@ public class ListViewTests (ITestOutputHelper output)
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (1), lv.Border!.Thickness);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
         Assert.Equal ("", lv.Text);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -39,7 +39,7 @@ public class ListViewTests (ITestOutputHelper output)
 
         Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Equal ("", selected);
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         Application.RaiseMouseEvent (
                                      new ()
@@ -95,7 +95,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.Driver!.SetScreenSize (12, 12);
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -116,7 +116,7 @@ public class ListViewTests (ITestOutputHelper output)
 
         Assert.True (lv.ScrollVertical (10));
         AutoInitShutdownAttribute.RunIteration ();
-        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Null (lv.SelectedItem);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

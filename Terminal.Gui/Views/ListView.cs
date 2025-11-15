@@ -108,7 +108,7 @@ public class ListView : View, IDesignable
                     Command.HotKey,
                     ctx =>
                     {
-                        if (SelectedItem != -1)
+                        if (SelectedItem is { })
                         {
                             return !SetFocus ();
                         }
@@ -160,11 +160,7 @@ public class ListView : View, IDesignable
     }
 
     private bool _allowsMarking;
-
     private bool _allowsMultipleSelection;
-
-    private int _selectedItem = -1;
-    private int _lastSelectedItem = -1;
 
     private IListDataSource? _source;
 
@@ -209,7 +205,7 @@ public class ListView : View, IDesignable
                 // Clear all selections except selected
                 for (var i = 0; i < Source.Count; i++)
                 {
-                    if (Source.IsMarked (i) && i != SelectedItem)
+                    if (Source.IsMarked (i) && SelectedItem.HasValue && i != SelectedItem.Value)
                     {
                         Source.SetMark (i, false);
                     }
@@ -228,18 +224,18 @@ public class ListView : View, IDesignable
     /// <summary>Ensures the selected item is always visible on the screen.</summary>
     public void EnsureSelectedItemVisible ()
     {
-        if (SelectedItem == -1)
+        if (SelectedItem is null)
         {
             return;
         }
 
         if (SelectedItem < Viewport.Y)
         {
-            Viewport = Viewport with { Y = SelectedItem };
+            Viewport = Viewport with { Y = SelectedItem.Value };
         }
         else if (Viewport.Height > 0 && SelectedItem >= Viewport.Y + Viewport.Height)
         {
-            Viewport = Viewport with { Y = SelectedItem - Viewport.Height + 1 };
+            Viewport = Viewport with { Y = SelectedItem.Value - Viewport.Height + 1 };
         }
     }
 
@@ -301,15 +297,15 @@ public class ListView : View, IDesignable
     /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
     public bool MarkUnmarkSelectedItem ()
     {
-        if (Source is null || !UnmarkAllButSelected ())
+        if (Source is null || SelectedItem is null || !UnmarkAllButSelected ())
         {
             return false;
         }
 
-        Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
+        Source.SetMark (SelectedItem.Value, !Source.IsMarked (SelectedItem.Value));
         SetNeedsDraw ();
 
-        return Source.IsMarked (SelectedItem);
+        return Source.IsMarked (SelectedItem.Value);
 
         // BUGBUG: Shouldn't this return Source.IsMarked (SelectedItem)
     }
@@ -323,16 +319,15 @@ public class ListView : View, IDesignable
     {
         if (Source is null || Source.Count == 0)
         {
-            // Do we set lastSelectedItem to -1 here?
             return false; //Nothing for us to move to
         }
 
-        if (SelectedItem >= Source.Count)
+        if (SelectedItem is null || SelectedItem >= Source.Count)
         {
-            // If for some reason we are currently outside the
-            // valid values range, we should select the bottommost valid value.
+            // If SelectedItem is null or for some reason we are currently outside the
+            // valid values range, we should select the first or bottommost valid value.
             // This can occur if the backing data source changes.
-            SelectedItem = Source.Count - 1;
+            SelectedItem = SelectedItem is null ? 0 : Source.Count - 1;
         }
         else if (SelectedItem + 1 < Source.Count)
         {
@@ -345,7 +340,7 @@ public class ListView : View, IDesignable
             }
             else if (SelectedItem < Viewport.Y)
             {
-                Viewport = Viewport with { Y = SelectedItem };
+                Viewport = Viewport with { Y = SelectedItem.Value };
             }
         }
         else if (SelectedItem >= Viewport.Y + Viewport.Height)
@@ -369,8 +364,8 @@ public class ListView : View, IDesignable
                 Viewport = Viewport with
                 {
                     Y = SelectedItem < Viewport.Height - 1
-                            ? Math.Max (Viewport.Height - SelectedItem + 1, 0)
-                            : Math.Max (SelectedItem - Viewport.Height + 1, 0)
+                            ? Math.Max (Viewport.Height - SelectedItem.Value + 1, 0)
+                            : Math.Max (SelectedItem.Value - Viewport.Height + 1, 0)
                 };
             }
         }
@@ -385,7 +380,7 @@ public class ListView : View, IDesignable
         if (SelectedItem != 0)
         {
             SelectedItem = 0;
-            Viewport = Viewport with { Y = SelectedItem };
+            Viewport = Viewport with { Y = SelectedItem.Value };
         }
 
         return true;
@@ -398,12 +393,12 @@ public class ListView : View, IDesignable
     /// <returns></returns>
     public virtual bool MovePageDown ()
     {
-        if (Source is null)
+        if (Source is null || Source.Count == 0)
         {
-            return true;
+            return false;
         }
 
-        int n = SelectedItem + Viewport.Height;
+        int n = (SelectedItem ?? 0) + Viewport.Height;
 
         if (n >= Source.Count)
         {
@@ -416,7 +411,7 @@ public class ListView : View, IDesignable
 
             if (Source.Count >= Viewport.Height)
             {
-                Viewport = Viewport with { Y = SelectedItem };
+                Viewport = Viewport with { Y = SelectedItem.Value };
             }
             else
             {
@@ -431,17 +426,22 @@ public class ListView : View, IDesignable
     /// <returns></returns>
     public virtual bool MovePageUp ()
     {
-        int n = SelectedItem - Viewport.Height;
+        if (Source is null || Source.Count == 0)
+        {
+            return false;
+        }
+
+        int n = (SelectedItem ?? 0) - Viewport.Height;
 
         if (n < 0)
         {
             n = 0;
         }
 
-        if (n != SelectedItem)
+        if (n != SelectedItem && n < Source?.Count)
         {
             SelectedItem = n;
-            Viewport = Viewport with { Y = SelectedItem };
+            Viewport = Viewport with { Y = SelectedItem.Value };
         }
 
         return true;
@@ -453,13 +453,12 @@ public class ListView : View, IDesignable
     {
         if (Source is null || Source.Count == 0)
         {
-            // Do we set lastSelectedItem to -1 here?
             return false; //Nothing for us to move to
         }
 
-        if (SelectedItem >= Source.Count)
+        if (SelectedItem is null || SelectedItem >= Source.Count)
         {
-            // If for some reason we are currently outside the
+            // If SelectedItem is null or for some reason we are currently outside the
             // valid values range, we should select the bottommost valid value.
             // This can occur if the backing data source changes.
             SelectedItem = Source.Count - 1;
@@ -475,16 +474,16 @@ public class ListView : View, IDesignable
 
             if (SelectedItem < Viewport.Y)
             {
-                Viewport = Viewport with { Y = SelectedItem };
+                Viewport = Viewport with { Y = SelectedItem.Value };
             }
             else if (SelectedItem > Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = SelectedItem - Viewport.Height + 1 };
+                Viewport = Viewport with { Y = SelectedItem.Value - Viewport.Height + 1 };
             }
         }
         else if (SelectedItem < Viewport.Y)
         {
-            Viewport = Viewport with { Y = SelectedItem };
+            Viewport = Viewport with { Y = SelectedItem.Value };
         }
 
         return true;
@@ -494,14 +493,14 @@ public class ListView : View, IDesignable
     /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
     public bool OnOpenSelectedItem ()
     {
-        if (Source is null || Source.Count <= SelectedItem || SelectedItem < 0 || OpenSelectedItem is null)
+        if (Source is null || SelectedItem is null || Source.Count <= SelectedItem || SelectedItem < 0 || OpenSelectedItem is null)
         {
             return false;
         }
 
-        object? value = Source.ToList () [SelectedItem];
+        object? value = Source.ToList () [SelectedItem.Value];
 
-        OpenSelectedItem?.Invoke (this, new (SelectedItem, value));
+        OpenSelectedItem?.Invoke (this, new (SelectedItem.Value, value!));
 
         // BUGBUG: this should not blindly return true.
         return true;
@@ -529,19 +528,22 @@ public class ListView : View, IDesignable
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs>? RowRender;
 
+    private int? _selectedItem = null;
+    private int? _lastSelectedItem = null;
+
     /// <summary>Gets or sets the index of the currently selected item.</summary>
-    /// <value>The selected item.</value>
-    public int SelectedItem
+    /// <value>The selected item or null if no item is selected.</value>
+    public int? SelectedItem
     {
         get => _selectedItem;
         set
         {
-            if (Source is null || Source.Count == 0)
+            if (Source is null)
             {
                 return;
             }
 
-            if (value < -1 || value >= Source.Count)
+            if (value.HasValue && (value < 0 || value >= Source.Count))
             {
                 throw new ArgumentException ("value");
             }
@@ -559,7 +561,7 @@ public class ListView : View, IDesignable
     {
         if (SelectedItem != _lastSelectedItem)
         {
-            object? value = SelectedItem >= 0 && Source?.Count > 0 ? Source.ToList () [SelectedItem] : null;
+            object? value = SelectedItem.HasValue && Source?.Count > 0 ? Source.ToList () [SelectedItem.Value] : null;
             SelectedItemChanged?.Invoke (this, new (SelectedItem, value));
             _lastSelectedItem = SelectedItem;
             EnsureSelectedItemVisible ();
@@ -642,8 +644,8 @@ public class ListView : View, IDesignable
                 KeystrokeNavigator.Collection = _source?.ToList ();
             }
 
-            SelectedItem = -1;
-            _lastSelectedItem = -1;
+            SelectedItem = null;
+            _lastSelectedItem = null;
             SetNeedsDraw ();
         }
     }
@@ -810,7 +812,7 @@ public class ListView : View, IDesignable
         // Enable user to find & select an item by typing text
         if (KeystrokeNavigator.Matcher.IsCompatibleKey (key))
         {
-            int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)key);
+            int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem ?? null, (char)key);
 
             if (newItem is { } && newItem != -1)
             {
@@ -913,7 +915,7 @@ public class ListView : View, IDesignable
     {
         SetContentSize (new Size (Source?.Length ?? Viewport.Width, Source?.Count ?? Viewport.Width));
 
-        if (Source is { Count: > 0 } && SelectedItem > Source.Count - 1)
+        if (Source is { Count: > 0 } && SelectedItem.HasValue && SelectedItem > Source.Count - 1)
         {
             SelectedItem = Source.Count - 1;
         }

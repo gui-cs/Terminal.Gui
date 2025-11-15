@@ -137,8 +137,8 @@ public class IListDataSourceTests (ITestOutputHelper output)
     [Fact]
     public void ListWrapper_Render_NullItem_RendersEmpty ()
     {
-        ObservableCollection<string> source = [null, "Item2"];
-        ListWrapper<string> wrapper = new (source);
+        ObservableCollection<string?> source = [null, "Item2"];
+        ListWrapper<string?> wrapper = new (source);
         var listView = new ListView { Width = 20, Height = 2 };
         listView.BeginInit ();
         listView.EndInit ();
