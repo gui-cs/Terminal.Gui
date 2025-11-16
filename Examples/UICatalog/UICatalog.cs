@@ -62,6 +62,40 @@ public class UICatalog
     public const string LOGFILE_LOCATION = "logs";
     public static UICatalogCommandLineOptions Options { get; set; }
 
+    /// <summary>
+    ///     Sets up the ForceDriver configuration for testing purposes.
+    ///     This is called by UICatalogMain and can also be called by tests.
+    /// </summary>
+    /// <param name="driver">The driver name to force</param>
+    internal static void SetupForceDriverConfig (string? driver)
+    {
+        _forceDriver = driver;
+
+        // If a driver has been specified, set it in RuntimeConfig so it persists through Init/Shutdown cycles
+        if (!string.IsNullOrEmpty (_forceDriver))
+        {
+            ConfigurationManager.RuntimeConfig = $$"""
+                {
+                    "Application.ForceDriver": "{{_forceDriver}}"
+                }
+                """;
+        }
+    }
+
+    /// <summary>
+    ///     Reloads RuntimeConfig to ensure ForceDriver persists before running a scenario.
+    ///     This is called in the scenario loop and can also be called by tests.
+    /// </summary>
+    internal static void ReloadForceDriverConfig ()
+    {
+        // Ensure RuntimeConfig is applied before each scenario to preserve ForceDriver setting
+        if (!Options.DontEnableConfigurationManagement && !string.IsNullOrEmpty (_forceDriver))
+        {
+            ConfigurationManager.Load (ConfigLocations.Runtime);
+            ConfigurationManager.Apply ();
+        }
+    }
+
     private static int Main (string [] args)
     {
         Console.OutputEncoding = Encoding.Default;
@@ -342,21 +376,11 @@ public class UICatalog
         ConfigurationManager.Apply ();
     }
 
-    private static void UICatalogMain (UICatalogCommandLineOptions options)
+    internal static void UICatalogMain (UICatalogCommandLineOptions options)
     {
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
-        _forceDriver = options.Driver;
-
-        // If a driver has been specified, set it in RuntimeConfig so it persists through Init/Shutdown cycles
-        if (!string.IsNullOrEmpty (_forceDriver))
-        {
-            ConfigurationManager.RuntimeConfig = $$"""
-                {
-                    "Application.ForceDriver": "{{_forceDriver}}"
-                }
-                """;
-        }
+        SetupForceDriverConfig (options.Driver);
 
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.
@@ -422,12 +446,8 @@ public class UICatalog
             Application.InitializedChanged += ApplicationOnInitializedChanged;
 #endif
 
-            // Ensure RuntimeConfig is applied before each scenario to preserve ForceDriver setting
-            if (!Options.DontEnableConfigurationManagement && !string.IsNullOrEmpty (_forceDriver))
-            {
-                ConfigurationManager.Load (ConfigLocations.Runtime);
-                ConfigurationManager.Apply ();
-            }
+            // Reload RuntimeConfig to ensure ForceDriver persists (part 2 of the fix)
+            ReloadForceDriverConfig ();
 
             scenario.Main ();
             scenario.Dispose ();

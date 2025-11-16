@@ -11,6 +11,9 @@
         <InformationalVersion>2.0</InformationalVersion>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="IntegrationTests" />
+    </ItemGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
