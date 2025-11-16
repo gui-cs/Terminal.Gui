@@ -1,9 +1,9 @@
-#nullable disable
-﻿
+namespace Terminal.Gui.Drawing;
+
 /// <summary>
 ///     Simple fast palette building algorithm which uses the frequency that a color is seen
-///     to determine whether it will appear in the final palette. Includes a threshold where
-///     by colors will be considered 'the same'. This reduces the chance of under represented
+///     to determine whether it will appear in the final palette. Includes a threshold whereby
+///     colors will be considered 'the same'. This reduces the chance of underrepresented
 ///     colors being missed completely.
 /// </summary>
 public class PopularityPaletteWithThreshold : IPaletteBuilder
@@ -23,11 +23,11 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
     }
 
     /// <inheritdoc/>
-    public List<Color> BuildPalette (List<Color> colors, int maxColors)
+    public List<Color> BuildPalette (List<Color>? colors, int maxColors)
     {
-        if (colors == null || colors.Count == 0 || maxColors <= 0)
+        if (colors is null || colors.Count == 0 || maxColors <= 0)
         {
-            return new ();
+            return [];
         }
 
         // Step 1: Build the histogram of colors (count occurrences)
@@ -35,13 +35,9 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
 
         foreach (Color color in colors)
         {
-            if (colorHistogram.ContainsKey (color))
+            if (!colorHistogram.TryAdd (color, 1))
             {
                 colorHistogram [color]++;
-            }
-            else
-            {
-                colorHistogram [color] = 1;
             }
         }
 

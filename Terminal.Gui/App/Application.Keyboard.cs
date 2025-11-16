@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Terminal.Gui.App;
+﻿namespace Terminal.Gui.App;
 
 public static partial class Application // Keyboard handling
 {

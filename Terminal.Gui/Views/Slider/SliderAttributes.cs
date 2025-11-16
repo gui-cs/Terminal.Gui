@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="Slider{T}"/> Legend Style</summary>

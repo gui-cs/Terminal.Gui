@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.App;
 
 /// <summary>Definition to interact with the OS clipboard.</summary>

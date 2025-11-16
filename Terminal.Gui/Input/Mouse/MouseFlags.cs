@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Input;
 
 /// <summary>Mouse flags reported in <see cref="MouseEventArgs"/>.</summary>

@@ -1,5 +1,4 @@
-#nullable disable
-﻿#nullable enable
+
 
 using System.CodeDom.Compiler;
 using System.Diagnostics;

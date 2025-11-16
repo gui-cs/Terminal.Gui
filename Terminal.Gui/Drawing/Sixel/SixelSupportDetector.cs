@@ -1,5 +1,5 @@
-#nullable disable
-﻿using System.Text.RegularExpressions;
+﻿#nullable disable
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drawing;
 

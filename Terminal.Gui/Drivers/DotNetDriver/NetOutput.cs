@@ -1,6 +1,3 @@
-#nullable disable
-﻿using Microsoft.Extensions.Logging;
-
 namespace Terminal.Gui.Drivers;
 
 /// <summary>

@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Drawing;
 
 internal class IntersectionDefinition

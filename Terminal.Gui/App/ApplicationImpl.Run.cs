@@ -232,7 +232,7 @@ public partial class ApplicationImpl
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
         }
 
-        sessionToken.Toplevel.OnUnloaded ();
+        sessionToken.Toplevel?.OnUnloaded ();
 
         // End the Session
         // First, take it off the Toplevel Stack

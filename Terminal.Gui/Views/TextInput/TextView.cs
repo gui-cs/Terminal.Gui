@@ -1,6 +1,3 @@
-#nullable enable
-
-// TextView.cs: multi-line text editing
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -4790,15 +4787,15 @@ public class TextView : View, IDesignable
 public class TextViewAutocomplete : PopupAutocomplete
 {
     /// <inheritdoc/>
-    protected override void DeleteTextBackwards () { ((TextView)HostControl).DeleteCharLeft (); }
+    protected override void DeleteTextBackwards () { ((TextView)HostControl!).DeleteCharLeft (); }
 
     /// <inheritdoc/>
-    protected override void InsertText (string accepted) { ((TextView)HostControl).InsertText (accepted); }
+    protected override void InsertText (string accepted) { ((TextView)HostControl!).InsertText (accepted); }
 
     /// <inheritdoc/>
     protected override void SetCursorPosition (int column)
     {
-        ((TextView)HostControl).CursorPosition =
+        ((TextView)HostControl!).CursorPosition =
             new (column, ((TextView)HostControl).CurrentRow);
     }
 }

@@ -1,5 +1,3 @@
-#nullable disable
-﻿
 namespace Terminal.Gui.Input;
 
 /// <summary>Args GrabMouse related events.</summary>

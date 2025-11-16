@@ -1,13 +1,9 @@
-
-
-#nullable disable
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 /// Determines the settings for <see cref="Border"/>.
 /// </summary>
 [Flags]
-
 public enum BorderSettings
 {
     /// <summary>

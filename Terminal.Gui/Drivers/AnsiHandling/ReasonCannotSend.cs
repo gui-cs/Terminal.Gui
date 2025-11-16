@@ -1,5 +1,3 @@
-#nullable disable
-﻿#nullable enable
 namespace Terminal.Gui.Drivers;
 
 internal enum ReasonCannotSend

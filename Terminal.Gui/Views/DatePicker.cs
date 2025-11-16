@@ -1,5 +1,4 @@
-#nullable disable
-﻿#nullable enable
+
 
 //
 // DatePicker.cs: DatePicker control

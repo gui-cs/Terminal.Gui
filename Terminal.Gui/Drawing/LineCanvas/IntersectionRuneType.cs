@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Drawing;
 
 /// <summary>The type of Rune that we will use before considering double width, curved borders etc</summary>

@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.App;
 
 /// <summary><see cref="EventArgs"/> for timeout events (e.g. <see cref="TimedEvents.Added"/>)</summary>

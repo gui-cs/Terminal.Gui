@@ -1,5 +1,3 @@
-#nullable disable
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 #pragma warning disable CS1711

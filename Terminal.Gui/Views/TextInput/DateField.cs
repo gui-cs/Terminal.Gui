@@ -1,5 +1,4 @@
-#nullable disable
-﻿#nullable enable
+
 
 //
 // DateField.cs: text entry for date

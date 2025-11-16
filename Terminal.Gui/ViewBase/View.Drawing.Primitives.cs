@@ -121,8 +121,8 @@ public partial class View
         {
             DrawHotString (
                            text,
-                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ()!.Disabled,
-                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ()!.Disabled
+                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ().Disabled,
+                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ().Disabled
                           );
         }
     }
@@ -137,7 +137,7 @@ public partial class View
             return;
         }
 
-        Region prevClip = AddViewportToClip ();
+        Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
@@ -155,7 +155,7 @@ public partial class View
             return;
         }
 
-        Region prevClip = AddViewportToClip ();
+        Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Driver.FillRect (toClear, rune);
         SetClip (prevClip);

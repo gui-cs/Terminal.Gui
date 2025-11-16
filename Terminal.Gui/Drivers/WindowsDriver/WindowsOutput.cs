@@ -1,5 +1,3 @@
-#nullable disable
-﻿#nullable enable
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;

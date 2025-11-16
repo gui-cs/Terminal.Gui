@@ -1,5 +1,4 @@
-#nullable disable
-﻿#nullable enable
+
 
 //------------------------------------------------------------------------------
 // Windows Terminal supports Unicode and Emoji characters, but by default

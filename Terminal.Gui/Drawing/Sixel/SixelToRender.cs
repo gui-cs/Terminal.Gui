@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>
@@ -11,7 +10,7 @@ public class SixelToRender
     ///     gets or sets the encoded sixel data. Use <see cref="SixelEncoder"/> to convert bitmaps
     ///     into encoded sixel data.
     /// </summary>
-    public string SixelData { get; set; }
+    public string? SixelData { get; set; }
 
     /// <summary>
     ///     gets or sets where to move the cursor to before outputting the <see cref="SixelData"/>.

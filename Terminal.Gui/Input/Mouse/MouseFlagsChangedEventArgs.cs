@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Input;
 
 // TODO: This class is unnecessary. Replace it with CancelEventArgs<T> from Terminal.Gui.View\CancelEventArgs.cs

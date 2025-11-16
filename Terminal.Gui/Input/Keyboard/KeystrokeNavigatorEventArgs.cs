@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Input;
 
 /// <summary>Event arguments for the <see cref="CollectionNavigatorBase.SearchStringChanged"/> event.</summary>

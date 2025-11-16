@@ -10,7 +10,7 @@ public class SessionToken : IDisposable
     public SessionToken (Toplevel view) { Toplevel = view; }
 
     /// <summary>The <see cref="Toplevel"/> belonging to this <see cref="SessionToken"/>.</summary>
-    public Toplevel Toplevel { get; internal set; }
+    public Toplevel? Toplevel { get; internal set; }
 
     /// <summary>Releases all resource used by the <see cref="SessionToken"/> object.</summary>
     /// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="SessionToken"/>.</remarks>

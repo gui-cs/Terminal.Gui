@@ -1,8 +1,3 @@
-#nullable disable
-﻿#nullable enable
-
-using System.Collections.Immutable;
-
 namespace Terminal.Gui.Views;
 
 // DoubleClick - Focus, Select (Toggle), and Accept the item under the mouse.

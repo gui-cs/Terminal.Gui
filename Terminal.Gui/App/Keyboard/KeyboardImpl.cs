@@ -1,7 +1,3 @@
-#nullable disable
-﻿#nullable enable
-using System.Diagnostics;
-
 namespace Terminal.Gui.App;
 
 /// <summary>

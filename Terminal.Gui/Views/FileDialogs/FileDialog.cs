@@ -1,4 +1,3 @@
-#nullable enable
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 
@@ -827,7 +826,7 @@ public class FileDialog : Dialog, IDesignable
             return _tableView.GetScheme ();
         }
 
-        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);
+        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? new Color (Color.White);
         var black = new Color (Color.Black);
 
         // TODO: Add some kind of cache for this
@@ -1034,7 +1033,7 @@ public class FileDialog : Dialog, IDesignable
     private void New ()
     {
         {
-            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem, State!.Directory);
+            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem!, State!.Directory);
 
             if (created is { })
             {
@@ -1175,7 +1174,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (toRename?.Length == 1)
         {
-            IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem, toRename.Single ());
+            IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem!, toRename.Single ());
 
             if (newNamed is { })
             {
@@ -1569,7 +1568,7 @@ public class FileDialog : Dialog, IDesignable
                     }
                 }
 
-                if (Parent.SearchMatcher.IsMatch (f.FileSystemInfo))
+                if (Parent.SearchMatcher.IsMatch (f.FileSystemInfo!))
                 {
                     lock (_oLockFound)
                     {

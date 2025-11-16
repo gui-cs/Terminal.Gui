@@ -1,5 +1,3 @@
-#nullable disable
-﻿#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui.App;
@@ -203,7 +201,7 @@ public class TimedEvents : ITimedEvents
         {
             if (k < now)
             {
-                if (timeout.Callback ())
+                if (timeout.Callback! ())
                 {
                     AddTimeout (timeout.Span, timeout);
                 }

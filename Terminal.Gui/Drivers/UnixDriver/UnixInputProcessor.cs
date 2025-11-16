@@ -1,4 +1,3 @@
-#nullable disable
 ﻿using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;

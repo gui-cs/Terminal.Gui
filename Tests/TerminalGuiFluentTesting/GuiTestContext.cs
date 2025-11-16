@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -518,7 +517,7 @@ public partial class GuiTestContext : IDisposable
 
         Application.ResetState (true);
         ApplicationImpl.ChangeInstance (_originalApplicationInstance);
-        Logging.Logger = _originalLogger;
+        Logging.Logger = _originalLogger!;
         Finished = true;
 
         Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;

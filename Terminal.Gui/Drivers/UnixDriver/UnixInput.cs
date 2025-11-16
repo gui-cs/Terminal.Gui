@@ -1,5 +1,3 @@
-#nullable disable
-﻿#nullable enable
 using System.Runtime.InteropServices;
 
 // ReSharper disable IdentifierTypo
