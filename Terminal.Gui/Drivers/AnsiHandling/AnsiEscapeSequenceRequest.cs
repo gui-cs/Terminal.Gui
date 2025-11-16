@@ -18,12 +18,12 @@ public class AnsiEscapeSequenceRequest : AnsiEscapeSequence
     /// </summary>
     public Action? Abandoned { get; init; }
 
-
     /// <summary>
     ///     Sends the <see cref="AnsiEscapeSequence.Request"/> to the raw output stream of the current <see cref="IDriver"/>.
     ///     Only call this method from the main UI thread. You should use <see cref="AnsiRequestScheduler"/> if
     ///     sending many requests.
     /// </summary>
-    public void Send () { Application.Driver?.WriteRaw (Request); }
+    /// <param name="driver"></param>
+    public void Send (IDriver? driver) { driver?.WriteRaw (Request); }
 
 }

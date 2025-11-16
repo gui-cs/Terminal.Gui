@@ -485,7 +485,7 @@ internal class DriverImpl : IDriver
     ///     The request is sent immediately if possible, or queued for later execution
     ///     by the <see cref="AnsiRequestScheduler"/> to prevent overwhelming the console.
     /// </remarks>
-    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (request); }
+    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
 
     /// <summary>
     ///     Gets the <see cref="AnsiRequestScheduler"/> instance used by this driver.

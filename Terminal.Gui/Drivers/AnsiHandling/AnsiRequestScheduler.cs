@@ -69,15 +69,17 @@ public class AnsiRequestScheduler
     ///     Sends the <paramref name="request"/> immediately or queues it if there is already
     ///     an outstanding request for the given <see cref="AnsiEscapeSequence.Terminator"/>.
     /// </summary>
+    /// <param name="driverImpl"></param>
+    /// <param name="driver"></param>
     /// <param name="request"></param>
     /// <returns><see langword="true"/> if request was sent immediately. <see langword="false"/> if it was queued.</returns>
-    public bool SendOrSchedule (AnsiEscapeSequenceRequest request) { return SendOrSchedule (request, true); }
+    public bool SendOrSchedule (IDriver? driver, AnsiEscapeSequenceRequest request) { return SendOrSchedule (driver, request, true); }
 
-    private bool SendOrSchedule (AnsiEscapeSequenceRequest request, bool addToQueue)
+    private bool SendOrSchedule (IDriver? driver, AnsiEscapeSequenceRequest request, bool addToQueue)
     {
         if (CanSend (request, out ReasonCannotSend reason))
         {
-            Send (request);
+            Send (driver, request);
 
             return true;
         }
@@ -90,7 +92,7 @@ public class AnsiRequestScheduler
                 // Try again after evicting
                 if (CanSend (request, out _))
                 {
-                    Send (request);
+                    Send (driver, request);
 
                     return true;
                 }
@@ -141,6 +143,7 @@ public class AnsiRequestScheduler
     ///     Identifies and runs any <see cref="_queuedRequests"/> that can be sent based on the
     ///     current outstanding requests of the parser.
     /// </summary>
+    /// <param name="driver"></param>
     /// <param name="force">
     ///     Repeated requests to run the schedule over short period of time will be ignored.
     ///     Pass <see langword="true"/> to override this behaviour and force evaluation of outstanding requests.
@@ -149,7 +152,7 @@ public class AnsiRequestScheduler
     ///     <see langword="true"/> if a request was found and run. <see langword="false"/>
     ///     if no outstanding requests or all have existing outstanding requests underway in parser.
     /// </returns>
-    public bool RunSchedule (bool force = false)
+    public bool RunSchedule (IDriver? driver, bool force = false)
     {
         if (!force && Now () - _lastRun < _runScheduleThrottle)
         {
@@ -162,7 +165,7 @@ public class AnsiRequestScheduler
         if (opportunity != null)
         {
             // Give it another go
-            if (SendOrSchedule (opportunity.Item1, false))
+            if (SendOrSchedule (driver, opportunity.Item1, false))
             {
                 _queuedRequests.Remove (opportunity);
 
@@ -175,11 +178,11 @@ public class AnsiRequestScheduler
         return false;
     }
 
-    private void Send (AnsiEscapeSequenceRequest r)
+    private void Send (IDriver? driver, AnsiEscapeSequenceRequest r)
     {
         _lastSend.AddOrUpdate (r.Terminator!, _ => Now (), (_, _) => Now ());
         _parser.ExpectResponse (r.Terminator, r.ResponseReceived, r.Abandoned, false);
-        r.Send ();
+        r.Send (driver);
     }
 
     private bool CanSend (AnsiEscapeSequenceRequest r, out ReasonCannotSend reason)
