@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>Helper class to handle mapping between <see cref="KeyCode"/> and <see cref="ConsoleKeyInfo"/>.</summary>

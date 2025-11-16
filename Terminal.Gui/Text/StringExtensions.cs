@@ -1,4 +1,3 @@
-#nullable disable
 ﻿#nullable enable
 using System.Buffers;
 using System.Globalization;

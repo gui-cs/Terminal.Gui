@@ -1,4 +1,3 @@
-#nullable disable
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Drawing;

@@ -1,4 +1,3 @@
-#nullable disable
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo

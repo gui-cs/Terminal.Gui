@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 internal static class ViewCollectionHelpers

@@ -1,4 +1,3 @@
-#nullable disable
 ﻿#nullable enable
 using System.Text.Json.Serialization;
 

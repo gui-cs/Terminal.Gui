@@ -1,5 +1,4 @@
 
-#nullable disable
 namespace Terminal.Gui.App;
 
 public partial class ApplicationImpl

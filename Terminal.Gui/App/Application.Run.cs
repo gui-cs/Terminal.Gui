@@ -1,4 +1,3 @@
-#nullable disable
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;

@@ -1,4 +1,3 @@
-#nullable disable
 ﻿#nullable enable
 namespace Terminal.Gui.Configuration;
 

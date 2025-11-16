@@ -1,6 +1,5 @@
 // This code is adapted from https://github.com/devblackops/Terminal-Icons (which also uses the MIT license).
 
-#nullable disable
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 

@@ -1,5 +1,4 @@
 
-#nullable disable
 namespace Terminal.Gui.App;
 
 public static partial class Application // Screen related stuff; intended to hide Driver details

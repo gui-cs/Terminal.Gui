@@ -1,4 +1,3 @@
-#nullable disable
 ﻿#nullable enable
 using Microsoft.Extensions.Logging;
 

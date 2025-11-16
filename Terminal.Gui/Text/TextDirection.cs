@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Text;
 
 /// <summary>Text direction enumeration, controls how text is displayed.</summary>

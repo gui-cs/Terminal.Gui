@@ -1,5 +1,4 @@
 
-#nullable disable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>

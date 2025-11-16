@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.App;
 
 /// <summary>Event arguments for events about <see cref="SessionToken"/></summary>
