@@ -1,3 +1,4 @@
+#nullable enable
 using Xunit;
 using Xunit.Abstractions;
 
@@ -6,380 +7,492 @@ namespace UnitTests.ApplicationTests;
 /// <summary>
 /// Comprehensive tests for ApplicationImpl.Begin/End logic that manages Current and SessionStack.
 /// These tests ensure the fragile state management logic is robust and catches regressions.
+/// Tests work directly with ApplicationImpl instances to avoid global Application state issues.
 /// </summary>
-[Collection ("Sequential")]  // Ensures tests run sequentially, not in parallel
-public class ApplicationImplBeginEndTests : IDisposable
+public class ApplicationImplBeginEndTests
 {
     private readonly ITestOutputHelper _output;
 
     public ApplicationImplBeginEndTests (ITestOutputHelper output)
     {
         _output = output;
-        // Ensure clean state before each test
-        if (Application.Initialized)
-        {
-            Application.Shutdown ();
-        }
     }
 
-    public void Dispose ()
+    private ApplicationImpl NewApplicationImpl ()
     {
-        // Ensure Application is shutdown after each test
-        if (Application.Initialized)
-        {
-            Application.Shutdown ();
-        }
+        var app = new ApplicationImpl ();
+        return app;
     }
 
     [Fact]
     public void Begin_WithNullToplevel_ThrowsArgumentNullException ()
     {
-        Application.Init (driverName: "fake");
-        Assert.Throws<ArgumentNullException> (() => Application.Begin (null!));
+        ApplicationImpl app = NewApplicationImpl ();
+        try
+        {
+            Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
+        }
+        finally
+        {
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void Begin_SetsCurrent_WhenCurrentIsNull ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel = null;
         
-        var toplevel = new Toplevel ();
-        Assert.Null (Application.Current);
-        
-        Application.Begin (toplevel);
-        
-        Assert.NotNull (Application.Current);
-        Assert.Same (toplevel, Application.Current);
-        Assert.Single (Application.SessionStack);
-        
-        toplevel.Dispose ();
+        try
+        {
+            toplevel = new Toplevel ();
+            Assert.Null (app.Current);
+            
+            app.Begin (toplevel);
+            
+            Assert.NotNull (app.Current);
+            Assert.Same (toplevel, app.Current);
+            Assert.Single (app.SessionStack);
+        }
+        finally
+        {
+            toplevel?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void Begin_PushesToSessionStack ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
         
-        var toplevel1 = new Toplevel { Id = "1" };
-        var toplevel2 = new Toplevel { Id = "2" };
-        
-        Application.Begin (toplevel1);
-        Assert.Single (Application.SessionStack);
-        Assert.Same (toplevel1, Application.Current);
-        
-        Application.Begin (toplevel2);
-        Assert.Equal (2, Application.SessionStack.Count);
-        Assert.Same (toplevel2, Application.Current);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1" };
+            toplevel2 = new Toplevel { Id = "2" };
+            
+            app.Begin (toplevel1);
+            Assert.Single (app.SessionStack);
+            Assert.Same (toplevel1, app.Current);
+            
+            app.Begin (toplevel2);
+            Assert.Equal (2, app.SessionStack.Count);
+            Assert.Same (toplevel2, app.Current);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void Begin_SetsUniqueToplevelId_WhenIdIsEmpty ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
+        Toplevel? toplevel3 = null;
         
-        var toplevel1 = new Toplevel ();
-        var toplevel2 = new Toplevel ();
-        var toplevel3 = new Toplevel ();
-        
-        Assert.Empty (toplevel1.Id);
-        Assert.Empty (toplevel2.Id);
-        Assert.Empty (toplevel3.Id);
-        
-        Application.Begin (toplevel1);
-        Application.Begin (toplevel2);
-        Application.Begin (toplevel3);
-        
-        Assert.NotEmpty (toplevel1.Id);
-        Assert.NotEmpty (toplevel2.Id);
-        Assert.NotEmpty (toplevel3.Id);
-        
-        // IDs should be unique
-        Assert.NotEqual (toplevel1.Id, toplevel2.Id);
-        Assert.NotEqual (toplevel2.Id, toplevel3.Id);
-        Assert.NotEqual (toplevel1.Id, toplevel3.Id);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
-        toplevel3.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel ();
+            toplevel2 = new Toplevel ();
+            toplevel3 = new Toplevel ();
+            
+            Assert.Empty (toplevel1.Id);
+            Assert.Empty (toplevel2.Id);
+            Assert.Empty (toplevel3.Id);
+            
+            app.Begin (toplevel1);
+            app.Begin (toplevel2);
+            app.Begin (toplevel3);
+            
+            Assert.NotEmpty (toplevel1.Id);
+            Assert.NotEmpty (toplevel2.Id);
+            Assert.NotEmpty (toplevel3.Id);
+            
+            // IDs should be unique
+            Assert.NotEqual (toplevel1.Id, toplevel2.Id);
+            Assert.NotEqual (toplevel2.Id, toplevel3.Id);
+            Assert.NotEqual (toplevel1.Id, toplevel3.Id);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            toplevel3?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void End_WithNullSessionToken_ThrowsArgumentNullException ()
     {
-        Application.Init (driverName: "fake");
-        Assert.Throws<ArgumentNullException> (() => Application.End (null!));
+        ApplicationImpl app = NewApplicationImpl ();
+        try
+        {
+            Assert.Throws<ArgumentNullException> (() => app.End (null!));
+        }
+        finally
+        {
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void End_PopsSessionStack ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
         
-        var toplevel1 = new Toplevel { Id = "1" };
-        var toplevel2 = new Toplevel { Id = "2" };
-        
-        SessionToken token1 = Application.Begin (toplevel1);
-        SessionToken token2 = Application.Begin (toplevel2);
-        
-        Assert.Equal (2, Application.SessionStack.Count);
-        
-        Application.End (token2);
-        
-        Assert.Single (Application.SessionStack);
-        Assert.Same (toplevel1, Application.Current);
-        
-        Application.End (token1);
-        
-        Assert.Empty (Application.SessionStack);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1" };
+            toplevel2 = new Toplevel { Id = "2" };
+            
+            SessionToken token1 = app.Begin (toplevel1);
+            SessionToken token2 = app.Begin (toplevel2);
+            
+            Assert.Equal (2, app.SessionStack.Count);
+            
+            app.End (token2);
+            
+            Assert.Single (app.SessionStack);
+            Assert.Same (toplevel1, app.Current);
+            
+            app.End (token1);
+            
+            Assert.Empty (app.SessionStack);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void End_ThrowsArgumentException_WhenNotBalanced ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
         
-        var toplevel1 = new Toplevel { Id = "1" };
-        var toplevel2 = new Toplevel { Id = "2" };
-        
-        SessionToken token1 = Application.Begin (toplevel1);
-        SessionToken token2 = Application.Begin (toplevel2);
-        
-        // Trying to end token1 when token2 is on top should throw
-        Assert.Throws<ArgumentException> (() => Application.End (token1));
-        
-        // Cleanup
-        Application.End (token2);
-        Application.End (token1);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1" };
+            toplevel2 = new Toplevel { Id = "2" };
+            
+            SessionToken token1 = app.Begin (toplevel1);
+            SessionToken token2 = app.Begin (toplevel2);
+            
+            // Trying to end token1 when token2 is on top should throw
+            Assert.Throws<ArgumentException> (() => app.End (token1));
+            
+            // Cleanup
+            app.End (token2);
+            app.End (token1);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void End_RestoresCurrentToPreviousToplevel ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
+        Toplevel? toplevel3 = null;
         
-        var toplevel1 = new Toplevel { Id = "1" };
-        var toplevel2 = new Toplevel { Id = "2" };
-        var toplevel3 = new Toplevel { Id = "3" };
-        
-        SessionToken token1 = Application.Begin (toplevel1);
-        SessionToken token2 = Application.Begin (toplevel2);
-        SessionToken token3 = Application.Begin (toplevel3);
-        
-        Assert.Same (toplevel3, Application.Current);
-        
-        Application.End (token3);
-        Assert.Same (toplevel2, Application.Current);
-        
-        Application.End (token2);
-        Assert.Same (toplevel1, Application.Current);
-        
-        Application.End (token1);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
-        toplevel3.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1" };
+            toplevel2 = new Toplevel { Id = "2" };
+            toplevel3 = new Toplevel { Id = "3" };
+            
+            SessionToken token1 = app.Begin (toplevel1);
+            SessionToken token2 = app.Begin (toplevel2);
+            SessionToken token3 = app.Begin (toplevel3);
+            
+            Assert.Same (toplevel3, app.Current);
+            
+            app.End (token3);
+            Assert.Same (toplevel2, app.Current);
+            
+            app.End (token2);
+            Assert.Same (toplevel1, app.Current);
+            
+            app.End (token1);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            toplevel3?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void MultipleBeginEnd_MaintainsStackIntegrity ()
     {
-        Application.Init (driverName: "fake");
-        
+        ApplicationImpl app = NewApplicationImpl ();
         var toplevels = new List<Toplevel> ();
         var tokens = new List<SessionToken> ();
         
-        // Begin multiple toplevels
-        for (int i = 0; i < 5; i++)
+        try
         {
-            var toplevel = new Toplevel { Id = $"toplevel-{i}" };
-            toplevels.Add (toplevel);
-            tokens.Add (Application.Begin (toplevel));
-        }
-        
-        Assert.Equal (5, Application.SessionStack.Count);
-        Assert.Same (toplevels [4], Application.Current);
-        
-        // End them in reverse order (LIFO)
-        for (int i = 4; i >= 0; i--)
-        {
-            Application.End (tokens [i]);
             
-            if (i > 0)
+            // Begin multiple toplevels
+            for (int i = 0; i < 5; i++)
             {
-                Assert.Equal (i, Application.SessionStack.Count);
-                Assert.Same (toplevels [i - 1], Application.Current);
+                var toplevel = new Toplevel { Id = $"toplevel-{i}" };
+                toplevels.Add (toplevel);
+                tokens.Add (app.Begin (toplevel));
             }
-            else
+            
+            Assert.Equal (5, app.SessionStack.Count);
+            Assert.Same (toplevels [4], app.Current);
+            
+            // End them in reverse order (LIFO)
+            for (int i = 4; i >= 0; i--)
             {
-                Assert.Empty (Application.SessionStack);
+                app.End (tokens [i]);
+                
+                if (i > 0)
+                {
+                    Assert.Equal (i, app.SessionStack.Count);
+                    Assert.Same (toplevels [i - 1], app.Current);
+                }
+                else
+                {
+                    Assert.Empty (app.SessionStack);
+                }
             }
         }
-        
-        foreach (var toplevel in toplevels)
+        finally
         {
-            toplevel.Dispose ();
+            foreach (var toplevel in toplevels)
+            {
+                toplevel.Dispose ();
+            }
+            app.Shutdown ();
         }
     }
 
     [Fact]
     public void End_UpdatesCachedSessionTokenToplevel ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel = null;
         
-        var toplevel = new Toplevel ();
-        
-        SessionToken token = Application.Begin (toplevel);
-        Assert.Null (ApplicationImpl.Instance.CachedSessionTokenToplevel);
-        
-        Application.End (token);
-        
-        Assert.Same (toplevel, ApplicationImpl.Instance.CachedSessionTokenToplevel);
-        
-        toplevel.Dispose ();
+        try
+        {
+            toplevel = new Toplevel ();
+            
+            SessionToken token = app.Begin (toplevel);
+            Assert.Null (app.CachedSessionTokenToplevel);
+            
+            app.End (token);
+            
+            Assert.Same (toplevel, app.CachedSessionTokenToplevel);
+        }
+        finally
+        {
+            toplevel?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void End_NullsSessionTokenToplevel ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel = null;
         
-        var toplevel = new Toplevel ();
-        
-        SessionToken token = Application.Begin (toplevel);
-        Assert.Same (toplevel, token.Toplevel);
-        
-        Application.End (token);
-        
-        Assert.Null (token.Toplevel);
-        
-        toplevel.Dispose ();
+        try
+        {
+            toplevel = new Toplevel ();
+            
+            SessionToken token = app.Begin (toplevel);
+            Assert.Same (toplevel, token.Toplevel);
+            
+            app.End (token);
+            
+            Assert.Null (token.Toplevel);
+        }
+        finally
+        {
+            toplevel?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void ResetState_ClearsSessionStack ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
         
-        var toplevel1 = new Toplevel { Id = "1" };
-        var toplevel2 = new Toplevel { Id = "2" };
-        
-        Application.Begin (toplevel1);
-        Application.Begin (toplevel2);
-        
-        Assert.Equal (2, Application.SessionStack.Count);
-        Assert.NotNull (Application.Current);
-        
-        ApplicationImpl.Instance.ResetState ();
-        
-        Assert.Empty (Application.SessionStack);
-        Assert.Null (Application.Current);
-        Assert.Null (ApplicationImpl.Instance.CachedSessionTokenToplevel);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1" };
+            toplevel2 = new Toplevel { Id = "2" };
+            
+            app.Begin (toplevel1);
+            app.Begin (toplevel2);
+            
+            Assert.Equal (2, app.SessionStack.Count);
+            Assert.NotNull (app.Current);
+            
+            app.ResetState ();
+            
+            Assert.Empty (app.SessionStack);
+            Assert.Null (app.Current);
+            Assert.Null (app.CachedSessionTokenToplevel);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void ResetState_StopsAllRunningToplevels ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
         
-        var toplevel1 = new Toplevel { Id = "1", Running = true };
-        var toplevel2 = new Toplevel { Id = "2", Running = true };
-        
-        Application.Begin (toplevel1);
-        Application.Begin (toplevel2);
-        
-        Assert.True (toplevel1.Running);
-        Assert.True (toplevel2.Running);
-        
-        ApplicationImpl.Instance.ResetState ();
-        
-        Assert.False (toplevel1.Running);
-        Assert.False (toplevel2.Running);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1", Running = true };
+            toplevel2 = new Toplevel { Id = "2", Running = true };
+            
+            app.Begin (toplevel1);
+            app.Begin (toplevel2);
+            
+            Assert.True (toplevel1.Running);
+            Assert.True (toplevel2.Running);
+            
+            app.ResetState ();
+            
+            Assert.False (toplevel1.Running);
+            Assert.False (toplevel2.Running);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void Begin_ActivatesNewToplevel_WhenCurrentExists ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel1 = null;
+        Toplevel? toplevel2 = null;
         
-        var toplevel1 = new Toplevel { Id = "1" };
-        var toplevel2 = new Toplevel { Id = "2" };
-        
-        bool toplevel1Deactivated = false;
-        bool toplevel2Activated = false;
-        
-        toplevel1.Deactivate += (s, e) => toplevel1Deactivated = true;
-        toplevel2.Activate += (s, e) => toplevel2Activated = true;
-        
-        Application.Begin (toplevel1);
-        Application.Begin (toplevel2);
-        
-        Assert.True (toplevel1Deactivated);
-        Assert.True (toplevel2Activated);
-        Assert.Same (toplevel2, Application.Current);
-        
-        toplevel1.Dispose ();
-        toplevel2.Dispose ();
+        try
+        {
+            toplevel1 = new Toplevel { Id = "1" };
+            toplevel2 = new Toplevel { Id = "2" };
+            
+            bool toplevel1Deactivated = false;
+            bool toplevel2Activated = false;
+            
+            toplevel1.Deactivate += (s, e) => toplevel1Deactivated = true;
+            toplevel2.Activate += (s, e) => toplevel2Activated = true;
+            
+            app.Begin (toplevel1);
+            app.Begin (toplevel2);
+            
+            Assert.True (toplevel1Deactivated);
+            Assert.True (toplevel2Activated);
+            Assert.Same (toplevel2, app.Current);
+        }
+        finally
+        {
+            toplevel1?.Dispose ();
+            toplevel2?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void Begin_DoesNotDuplicateToplevel_WhenIdAlreadyExists ()
     {
-        Application.Init (driverName: "fake");
+        ApplicationImpl app = NewApplicationImpl ();
+        Toplevel? toplevel = null;
         
-        var toplevel = new Toplevel { Id = "test-id" };
-        
-        Application.Begin (toplevel);
-        Assert.Single (Application.SessionStack);
-        
-        // Calling Begin again with same toplevel should not duplicate
-        Application.Begin (toplevel);
-        Assert.Single (Application.SessionStack);
-        
-        toplevel.Dispose ();
+        try
+        {
+            toplevel = new Toplevel { Id = "test-id" };
+            
+            app.Begin (toplevel);
+            Assert.Single (app.SessionStack);
+            
+            // Calling Begin again with same toplevel should not duplicate
+            app.Begin (toplevel);
+            Assert.Single (app.SessionStack);
+        }
+        finally
+        {
+            toplevel?.Dispose ();
+            app.Shutdown ();
+        }
     }
 
     [Fact]
     public void SessionStack_ContainsAllBegunToplevels ()
     {
-        Application.Init (driverName: "fake");
-        
+        ApplicationImpl app = NewApplicationImpl ();
         var toplevels = new List<Toplevel> ();
         
-        for (int i = 0; i < 10; i++)
+        try
         {
-            var toplevel = new Toplevel { Id = $"toplevel-{i}" };
-            toplevels.Add (toplevel);
-            Application.Begin (toplevel);
+            
+            for (int i = 0; i < 10; i++)
+            {
+                var toplevel = new Toplevel { Id = $"toplevel-{i}" };
+                toplevels.Add (toplevel);
+                app.Begin (toplevel);
+            }
+            
+            // All toplevels should be in the stack
+            Assert.Equal (10, app.SessionStack.Count);
+            
+            // Verify stack contains all toplevels
+            var stackList = app.SessionStack.ToList ();
+            foreach (var toplevel in toplevels)
+            {
+                Assert.Contains (toplevel, stackList);
+            }
         }
-        
-        // All toplevels should be in the stack
-        Assert.Equal (10, Application.SessionStack.Count);
-        
-        // Verify stack contains all toplevels
-        var stackList = Application.SessionStack.ToList ();
-        foreach (var toplevel in toplevels)
+        finally
         {
-            Assert.Contains (toplevel, stackList);
-        }
-        
-        foreach (var toplevel in toplevels)
-        {
-            toplevel.Dispose ();
+            foreach (var toplevel in toplevels)
+            {
+                toplevel.Dispose ();
+            }
+            app.Shutdown ();
         }
     }
 }
