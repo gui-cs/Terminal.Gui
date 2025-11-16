@@ -28,11 +28,11 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void ViewArrangement_Resizable_IsCombinationOfAllResizableFlags ()
     {
-        ViewArrangement expected = ViewArrangement.LeftResizable 
-            | ViewArrangement.RightResizable 
-            | ViewArrangement.TopResizable 
+        ViewArrangement expected = ViewArrangement.LeftResizable
+            | ViewArrangement.RightResizable
+            | ViewArrangement.TopResizable
             | ViewArrangement.BottomResizable;
-        
+
         Assert.Equal (ViewArrangement.Resizable, expected);
     }
 
@@ -40,7 +40,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void ViewArrangement_CanCombineFlags ()
     {
         ViewArrangement arrangement = ViewArrangement.Movable | ViewArrangement.LeftResizable;
-        
+
         Assert.True (arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.False (arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -67,11 +67,11 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanSetMultipleFlags ()
     {
-        var view = new View 
-        { 
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable 
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -83,7 +83,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void View_Arrangement_Overlapped_CanBeSetIndependently ()
     {
         var view = new View { Arrangement = ViewArrangement.Overlapped };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Overlapped));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Resizable));
@@ -92,11 +92,11 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanCombineOverlappedWithOtherFlags ()
     {
-        var view = new View 
-        { 
-            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable 
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Overlapped));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
     }
@@ -108,12 +108,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void TopResizable_WithoutMovable_IsAllowed ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.TopResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Movable));
     }
@@ -123,16 +123,16 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         // According to docs and Border.Arrangment.cs line 569:
         // TopResizable is only checked if NOT Movable
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Movable | ViewArrangement.TopResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         // Both flags can be set on the property
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
-        
+
         // But the behavior in Border.DetermineArrangeModeFromClick 
         // will prioritize Movable over TopResizable
     }
@@ -140,12 +140,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Resizable_WithMovable_IncludesTopResizable ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -160,12 +160,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_WithNoArrangement_HasNoArrangementOptions ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Fixed,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.NotNull (view.Border);
         Assert.Equal (ViewArrangement.Fixed, view.Arrangement);
     }
@@ -174,8 +174,8 @@ public class ArrangementTests (ITestOutputHelper output)
     public void Border_WithMovableArrangement_CanEnterArrangeMode ()
     {
         var superView = new View ();
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Movable,
             BorderStyle = LineStyle.Single,
             X = 0,
@@ -184,7 +184,7 @@ public class ArrangementTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         Assert.NotNull (view.Border);
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
     }
@@ -192,12 +192,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_WithResizableArrangement_HasResizableOptions ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Resizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.NotNull (view.Border);
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -212,15 +212,15 @@ public class ArrangementTests (ITestOutputHelper output)
     [InlineData (ViewArrangement.BottomResizable)]
     public void Border_WithSingleResizableDirection_OnlyHasThatOption (ViewArrangement arrangement)
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = arrangement,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.NotNull (view.Border);
         Assert.True (view.Arrangement.HasFlag (arrangement));
-        
+
         // Verify other directions are not set
         if (arrangement != ViewArrangement.LeftResizable)
             Assert.False (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -239,12 +239,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_BottomRightResizable_CombinesBothFlags ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
@@ -254,12 +254,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_BottomLeftResizable_CombinesBothFlags ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.BottomResizable | ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
@@ -269,12 +269,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_TopRightResizable_CombinesBothFlags ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.TopResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
@@ -284,12 +284,12 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_TopLeftResizable_CombinesBothFlags ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.TopResizable | ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
@@ -326,8 +326,8 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Overlapped_AllowsSubViewsToOverlap ()
     {
-        var superView = new View 
-        { 
+        var superView = new View
+        {
             Arrangement = ViewArrangement.Overlapped,
             Width = 20,
             Height = 20
@@ -351,7 +351,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void LeftResizable_CanBeUsedForHorizontalSplitter ()
     {
         var container = new View { Width = 80, Height = 25 };
-        
+
         var leftPane = new View
         {
             X = 0,
@@ -359,7 +359,7 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = 40,
             Height = Dim.Fill ()
         };
-        
+
         var rightPane = new View
         {
             X = 40,
@@ -369,9 +369,9 @@ public class ArrangementTests (ITestOutputHelper output)
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         container.Add (leftPane, rightPane);
-        
+
         Assert.True (rightPane.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.NotNull (rightPane.Border);
     }
@@ -380,7 +380,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void TopResizable_CanBeUsedForVerticalSplitter ()
     {
         var container = new View { Width = 80, Height = 25 };
-        
+
         var topPane = new View
         {
             X = 0,
@@ -388,7 +388,7 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = Dim.Fill (),
             Height = 10
         };
-        
+
         var bottomPane = new View
         {
             X = 0,
@@ -398,9 +398,9 @@ public class ArrangementTests (ITestOutputHelper output)
             Arrangement = ViewArrangement.TopResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         container.Add (topPane, bottomPane);
-        
+
         Assert.True (bottomPane.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.NotNull (bottomPane.Border);
     }
@@ -412,11 +412,11 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_WithoutBorderStyle_CanHaveArrangement ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Movable
         };
-        
+
         // Arrangement can be set even without a border style
         // Border object still exists but has no visible style
         Assert.Equal (ViewArrangement.Movable, view.Arrangement);
@@ -427,11 +427,11 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_WithNoBorderStyle_ResizableCanBeSet ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Resizable
         };
-        
+
         // Arrangement is set but has limited effect without a visible border style
         Assert.Equal (ViewArrangement.Resizable, view.Arrangement);
         Assert.NotNull (view.Border);
@@ -448,8 +448,8 @@ public class ArrangementTests (ITestOutputHelper output)
         // This test verifies the documented behavior that TopResizable is ignored
         // when Movable is also set (line 569 in Border.Arrangment.cs)
         var superView = new View { Width = 80, Height = 25 };
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.TopResizable | ViewArrangement.Movable,
             BorderStyle = LineStyle.Single,
             X = 10,
@@ -458,11 +458,11 @@ public class ArrangementTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         // The view has both flags set
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
-        
+
         // But Movable takes precedence in Border.DetermineArrangeModeFromClick
         // This is verified by the code at line 569 checking !Parent!.Arrangement.HasFlag(ViewArrangement.Movable)
     }
@@ -471,8 +471,8 @@ public class ArrangementTests (ITestOutputHelper output)
     public void DetermineArrangeModeFromClick_TopResizableWorksWithoutMovable ()
     {
         var superView = new View { Width = 80, Height = 25 };
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.TopResizable,
             BorderStyle = LineStyle.Single,
             X = 10,
@@ -481,7 +481,7 @@ public class ArrangementTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         // Only TopResizable is set
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Movable));
@@ -491,20 +491,20 @@ public class ArrangementTests (ITestOutputHelper output)
     public void DetermineArrangeModeFromClick_AllCornerCombinationsSupported ()
     {
         var superView = new View { Width = 80, Height = 25 };
-        
+
         // Test that all 4 corner combinations are recognized
-        var cornerCombinations = new[]
+        var cornerCombinations = new []
         {
             ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             ViewArrangement.BottomResizable | ViewArrangement.LeftResizable,
             ViewArrangement.TopResizable | ViewArrangement.RightResizable,
             ViewArrangement.TopResizable | ViewArrangement.LeftResizable
         };
-        
+
         foreach (var arrangement in cornerCombinations)
         {
-            var view = new View 
-            { 
+            var view = new View
+            {
                 Arrangement = arrangement,
                 BorderStyle = LineStyle.Single,
                 X = 10,
@@ -513,10 +513,10 @@ public class ArrangementTests (ITestOutputHelper output)
                 Height = 10
             };
             superView.Add (view);
-            
+
             // Verify the flags are set correctly
             Assert.True (view.Arrangement == arrangement);
-            
+
             superView.Remove (view);
         }
     }
@@ -530,10 +530,10 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var view = new View { Arrangement = ViewArrangement.Fixed };
         Assert.Equal (ViewArrangement.Fixed, view.Arrangement);
-        
+
         view.Arrangement = ViewArrangement.Movable;
         Assert.Equal (ViewArrangement.Movable, view.Arrangement);
-        
+
         view.Arrangement = ViewArrangement.Resizable;
         Assert.Equal (ViewArrangement.Resizable, view.Arrangement);
     }
@@ -542,7 +542,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void View_Arrangement_CanAddFlags ()
     {
         var view = new View { Arrangement = ViewArrangement.Movable };
-        
+
         view.Arrangement |= ViewArrangement.LeftResizable;
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -551,11 +551,11 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanRemoveFlags ()
     {
-        var view = new View 
-        { 
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable 
+        var view = new View
+        {
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
         };
-        
+
         view.Arrangement &= ~ViewArrangement.Movable;
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Resizable));
@@ -568,15 +568,15 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void SuperView_CanHaveMultipleArrangeableSubViews ()
     {
-        var superView = new View 
-        { 
+        var superView = new View
+        {
             Arrangement = ViewArrangement.Overlapped,
             Width = 80,
             Height = 25
         };
-        
-        var movableView = new View 
-        { 
+
+        var movableView = new View
+        {
             Arrangement = ViewArrangement.Movable,
             BorderStyle = LineStyle.Single,
             X = 0,
@@ -584,9 +584,9 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = 20,
             Height = 10
         };
-        
-        var resizableView = new View 
-        { 
+
+        var resizableView = new View
+        {
             Arrangement = ViewArrangement.Resizable,
             BorderStyle = LineStyle.Single,
             X = 25,
@@ -594,9 +594,9 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = 20,
             Height = 10
         };
-        
-        var fixedView = new View 
-        { 
+
+        var fixedView = new View
+        {
             Arrangement = ViewArrangement.Fixed,
             BorderStyle = LineStyle.Single,
             X = 50,
@@ -604,9 +604,9 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = 20,
             Height = 10
         };
-        
+
         superView.Add (movableView, resizableView, fixedView);
-        
+
         Assert.Equal (3, superView.SubViews.Count);
         Assert.Equal (ViewArrangement.Movable, movableView.Arrangement);
         Assert.Equal (ViewArrangement.Resizable, resizableView.Arrangement);
@@ -618,9 +618,9 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var superView = new View { Arrangement = ViewArrangement.Fixed };
         var subView = new View { Arrangement = ViewArrangement.Movable };
-        
+
         superView.Add (subView);
-        
+
         // SubView arrangement is independent of SuperView arrangement
         Assert.Equal (ViewArrangement.Fixed, superView.Arrangement);
         Assert.Equal (ViewArrangement.Movable, subView.Arrangement);
@@ -633,30 +633,30 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_WithDefaultThickness_SupportsArrangement ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.Movable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.NotNull (view.Border);
         // Default thickness should be (1,1,1,1) for Single line style
-        Assert.True (view.Border.Thickness.Left > 0 || view.Border.Thickness.Right > 0 
+        Assert.True (view.Border.Thickness.Left > 0 || view.Border.Thickness.Right > 0
             || view.Border.Thickness.Top > 0 || view.Border.Thickness.Bottom > 0);
     }
 
     [Fact]
     public void Border_WithCustomThickness_SupportsArrangement ()
     {
-        var view = new View 
-        { 
+        var view = new View
+        {
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         // Set custom thickness - only left border
         view.Border!.Thickness = new Thickness (2, 0, 0, 0);
-        
+
         Assert.Equal (2, view.Border.Thickness.Left);
         Assert.Equal (0, view.Border.Thickness.Top);
         Assert.Equal (0, view.Border.Thickness.Right);
@@ -696,7 +696,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // View.Navigation.cs checks Arrangement.HasFlag(ViewArrangement.Overlapped)
         var overlappedView = new View { Arrangement = ViewArrangement.Overlapped };
         var tiledView = new View { Arrangement = ViewArrangement.Fixed };
-        
+
         Assert.True (overlappedView.Arrangement.HasFlag (ViewArrangement.Overlapped));
         Assert.False (tiledView.Arrangement.HasFlag (ViewArrangement.Overlapped));
     }
@@ -708,9 +708,9 @@ public class ArrangementTests (ITestOutputHelper output)
         var parent = new View { Arrangement = ViewArrangement.Overlapped };
         var child1 = new View { X = 0, Y = 0, Width = 10, Height = 10 };
         var child2 = new View { X = 5, Y = 5, Width = 10, Height = 10 };
-        
+
         parent.Add (child1, child2);
-        
+
         Assert.True (parent.Arrangement.HasFlag (ViewArrangement.Overlapped));
         Assert.Equal (2, parent.SubViews.Count);
     }
@@ -719,209 +719,7 @@ public class ArrangementTests (ITestOutputHelper output)
 
     #region Mouse Interaction Tests
 
-    [Fact]
-    public void MouseGrabHandler_WorksWithMovableView_UsingNewMouseEvent ()
-    {
-        // This test proves that MouseGrabHandler works correctly with concurrent unit tests
-        // using NewMouseEvent directly on views, without requiring Application.Init
-        
-        var superView = new View 
-        { 
-            Width = 80, 
-            Height = 25 
-        };
-        
-        var movableView = new View 
-        { 
-            Arrangement = ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single,
-            X = 10,
-            Y = 10,
-            Width = 20,
-            Height = 10
-        };
-        
-        superView.Add (movableView);
-        
-        // Verify initial state
-        Assert.NotNull (movableView.Border);
-        Assert.Null (Application.Mouse.MouseGrabView);
-        
-        // Simulate mouse press on the border to start dragging
-        var pressEvent = new MouseEventArgs 
-        { 
-            Position = new (1, 0), // Top border area
-            Flags = MouseFlags.Button1Pressed 
-        };
-        
-        bool? result = movableView.Border.NewMouseEvent (pressEvent);
-        
-        // The border should have grabbed the mouse
-        Assert.True (result);
-        Assert.Equal (movableView.Border, Application.Mouse.MouseGrabView);
-        
-        // Simulate mouse drag
-        var dragEvent = new MouseEventArgs 
-        { 
-            Position = new (5, 2),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-        };
-        
-        result = movableView.Border.NewMouseEvent (dragEvent);
-        Assert.True (result);
-        
-        // Mouse should still be grabbed
-        Assert.Equal (movableView.Border, Application.Mouse.MouseGrabView);
-        
-        // Simulate mouse release to end dragging
-        var releaseEvent = new MouseEventArgs 
-        { 
-            Position = new (5, 2),
-            Flags = MouseFlags.Button1Released
-        };
-        
-        result = movableView.Border.NewMouseEvent (releaseEvent);
-        Assert.True (result);
-        
-        // Mouse should be released
-        Assert.Null (Application.Mouse.MouseGrabView);
-    }
-
-    [Fact]
-    public void MouseGrabHandler_WorksWithResizableView_UsingNewMouseEvent ()
-    {
-        // This test proves MouseGrabHandler works for resizing operations
-        
-        var superView = new View 
-        { 
-            Width = 80, 
-            Height = 25 
-        };
-        
-        var resizableView = new View 
-        { 
-            Arrangement = ViewArrangement.RightResizable,
-            BorderStyle = LineStyle.Single,
-            X = 10,
-            Y = 10,
-            Width = 20,
-            Height = 10
-        };
-        
-        superView.Add (resizableView);
-        
-        // Verify initial state
-        Assert.NotNull (resizableView.Border);
-        Assert.Null (Application.Mouse.MouseGrabView);
-        
-        // Calculate position on right border (border is at right edge)
-        // Border.Frame.X is relative to parent, so we use coordinates relative to the border
-        var pressEvent = new MouseEventArgs 
-        { 
-            Position = new (resizableView.Border.Frame.Width - 1, 5), // Right border area
-            Flags = MouseFlags.Button1Pressed 
-        };
-        
-        bool? result = resizableView.Border.NewMouseEvent (pressEvent);
-        
-        // The border should have grabbed the mouse for resizing
-        Assert.True (result);
-        Assert.Equal (resizableView.Border, Application.Mouse.MouseGrabView);
-        
-        // Simulate dragging to resize
-        var dragEvent = new MouseEventArgs 
-        { 
-            Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-        };
-        
-        result = resizableView.Border.NewMouseEvent (dragEvent);
-        Assert.True (result);
-        Assert.Equal (resizableView.Border, Application.Mouse.MouseGrabView);
-        
-        // Simulate mouse release
-        var releaseEvent = new MouseEventArgs 
-        { 
-            Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.Button1Released
-        };
-        
-        result = resizableView.Border.NewMouseEvent (releaseEvent);
-        Assert.True (result);
-        
-        // Mouse should be released
-        Assert.Null (Application.Mouse.MouseGrabView);
-    }
-
-    [Fact]
-    public void MouseGrabHandler_ReleasesOnMultipleViews ()
-    {
-        // This test verifies MouseGrabHandler properly releases when switching between views
-        
-        var superView = new View { Width = 80, Height = 25 };
-        
-        var view1 = new View 
-        { 
-            Arrangement = ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single,
-            X = 10,
-            Y = 10,
-            Width = 15,
-            Height = 8
-        };
-        
-        var view2 = new View 
-        { 
-            Arrangement = ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single,
-            X = 30,
-            Y = 10,
-            Width = 15,
-            Height = 8
-        };
-        
-        superView.Add (view1, view2);
-        
-        // Grab mouse on first view
-        var pressEvent1 = new MouseEventArgs 
-        { 
-            Position = new (1, 0),
-            Flags = MouseFlags.Button1Pressed 
-        };
-        
-        view1.Border!.NewMouseEvent (pressEvent1);
-        Assert.Equal (view1.Border, Application.Mouse.MouseGrabView);
-        
-        // Release on first view
-        var releaseEvent1 = new MouseEventArgs 
-        { 
-            Position = new (1, 0),
-            Flags = MouseFlags.Button1Released
-        };
-        
-        view1.Border.NewMouseEvent (releaseEvent1);
-        Assert.Null (Application.Mouse.MouseGrabView);
-        
-        // Grab mouse on second view
-        var pressEvent2 = new MouseEventArgs 
-        { 
-            Position = new (1, 0),
-            Flags = MouseFlags.Button1Pressed 
-        };
-        
-        view2.Border!.NewMouseEvent (pressEvent2);
-        Assert.Equal (view2.Border, Application.Mouse.MouseGrabView);
-        
-        // Release on second view
-        var releaseEvent2 = new MouseEventArgs 
-        { 
-            Position = new (1, 0),
-            Flags = MouseFlags.Button1Released
-        };
-        
-        view2.Border.NewMouseEvent (releaseEvent2);
-        Assert.Null (Application.Mouse.MouseGrabView);
-    }
+    // Not parallelizable due to Application.Mouse dependency in MouseGrabHandler
 
     #endregion
 
@@ -954,13 +752,13 @@ public class ArrangementTests (ITestOutputHelper output)
         // This test verifies that all the arrangement tests in this file
         // can run without Application.Init, making them parallelizable.
         // If this test passes, it confirms no Application dependencies leaked in.
-        
-        var view = new View 
-        { 
+
+        var view = new View
+        {
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             BorderStyle = LineStyle.Single
         };
-        
+
         Assert.NotNull (view);
         Assert.NotNull (view.Border);
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
@@ -974,9 +772,9 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void ViewArrangement_CanCombineAllResizableDirections ()
     {
-        ViewArrangement arrangement = ViewArrangement.TopResizable 
-                                    | ViewArrangement.BottomResizable 
-                                    | ViewArrangement.LeftResizable 
+        ViewArrangement arrangement = ViewArrangement.TopResizable
+                                    | ViewArrangement.BottomResizable
+                                    | ViewArrangement.LeftResizable
                                     | ViewArrangement.RightResizable;
 
         Assert.True (arrangement.HasFlag (ViewArrangement.TopResizable));
@@ -1090,7 +888,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void View_MultipleSubviewsWithDifferentArrangements_EachIndependent ()
     {
         var container = new View ();
-        
+
         var fixedView = new View { Id = "fixed", Arrangement = ViewArrangement.Fixed };
         var movableView = new View { Id = "movable", Arrangement = ViewArrangement.Movable };
         var resizableView = new View { Id = "resizable", Arrangement = ViewArrangement.Resizable };
@@ -1112,7 +910,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void Overlapped_ViewCanBeMovedToFront ()
     {
         var container = new View { Arrangement = ViewArrangement.Overlapped };
-        
+
         var view1 = new View { Id = "view1" };
         var view2 = new View { Id = "view2" };
         var view3 = new View { Id = "view3" };
@@ -1133,7 +931,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void Overlapped_ViewCanBeMovedToBack ()
     {
         var container = new View { Arrangement = ViewArrangement.Overlapped };
-        
+
         var view1 = new View { Id = "view1" };
         var view2 = new View { Id = "view2" };
         var view3 = new View { Id = "view3" };
@@ -1142,12 +940,12 @@ public class ArrangementTests (ITestOutputHelper output)
 
         // Initial order: [view1, view2, view3]
         Assert.Equal ([view1, view2, view3], container.SubViews.ToArray ());
-        
+
         // Move view3 to end (top of Z-order)
         container.MoveSubViewToEnd (view3);
         Assert.Equal (view3, container.SubViews.ToArray () [^1]);
         Assert.Equal ([view1, view2, view3], container.SubViews.ToArray ());
-        
+
         // Now move view1 to end (making it on top, pushing view3 down)
         container.MoveSubViewToEnd (view1);
         Assert.Equal ([view2, view3, view1], container.SubViews.ToArray ());
@@ -1157,7 +955,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void Fixed_ViewAddOrderMattersForLayout ()
     {
         var container = new View { Arrangement = ViewArrangement.Fixed };
-        
+
         var view1 = new View { Id = "view1", X = 0, Y = 0, Width = 10, Height = 5 };
         var view2 = new View { Id = "view2", X = 5, Y = 2, Width = 10, Height = 5 };
 
