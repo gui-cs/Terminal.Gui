@@ -118,9 +118,15 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// </summary>
     public IApplication? App
     {
-        get => _app ?? SuperView?.App;
+        get => GetApp ();
         internal set => _app = value;
     }
+
+    /// <summary>
+    ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by <see cref="Adornment"/>.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual IApplication? GetApp () => _app ?? SuperView?.App;
 
     private IDriver? _driver;
 

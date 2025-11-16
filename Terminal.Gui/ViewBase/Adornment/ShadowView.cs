@@ -144,9 +144,9 @@ internal class ShadowView : View
     {
         if (SuperView is not Adornment adornment
             || location.X < 0
-            || location.X >= Application.Screen.Width
+            || location.X >= App?.Screen.Width
             || location.Y < 0
-            || location.Y >= Application.Screen.Height)
+            || location.Y >= App?.Screen.Height)
         {
             return Attribute.Default;
         }

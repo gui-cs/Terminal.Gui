@@ -84,6 +84,10 @@ public class Adornment : View, IDesignable
 
     #region View Overrides
 
+    /// <inheritdoc />
+    protected override IApplication? GetApp () { return Parent?.App; }
+
+
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
     private Scheme? _scheme;
 

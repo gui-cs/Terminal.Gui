@@ -414,9 +414,6 @@ internal class DriverImpl : IDriver
             Logging.Error ($"Error suspending terminal: {ex.Message}");
         }
 
-        Application.LayoutAndDraw ();
-
-
         Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }
 

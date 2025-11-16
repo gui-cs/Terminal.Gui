@@ -48,10 +48,6 @@ public partial class Border : Adornment
         Parent = parent;
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
-
-        Application.Mouse.GrabbingMouse += Application_GrabbingMouse;
-        Application.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
-
         ThicknessChanged += OnThicknessChanged;
     }
 
@@ -111,6 +107,12 @@ public partial class Border : Adornment
     public override void BeginInit ()
     {
         base.BeginInit ();
+
+        if (App is { })
+        {
+            App.Mouse.GrabbingMouse += Application_GrabbingMouse;
+            App.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
+        }
 
         if (Parent is null)
         {
