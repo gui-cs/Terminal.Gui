@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;

@@ -1,5 +1,5 @@
-#nullable enable
 
+#nullable disable
 namespace Terminal.Gui.App;
 
 /// <summary>

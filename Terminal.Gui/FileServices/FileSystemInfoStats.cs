@@ -1,3 +1,4 @@
+#nullable disable
 ﻿#nullable enable
 using System.Globalization;
 using System.IO.Abstractions;

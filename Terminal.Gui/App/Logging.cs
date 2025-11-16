@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;

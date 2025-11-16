@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;

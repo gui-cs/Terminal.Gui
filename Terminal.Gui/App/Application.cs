@@ -1,8 +1,8 @@
-#nullable enable
 
 // We use global using directives to simplify the code and avoid repetitive namespace declarations.
 // Put them here so they are available throughout the application.
 // Do not put them in AssemblyInfo.cs as it will break GitVersion's /updateassemblyinfo
+#nullable disable
 global using Attribute = Terminal.Gui.Drawing.Attribute;
 global using Color = Terminal.Gui.Drawing.Color;
 global using CM = Terminal.Gui.Configuration.ConfigurationManager;

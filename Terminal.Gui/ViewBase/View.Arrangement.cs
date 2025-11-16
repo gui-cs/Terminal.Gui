@@ -1,3 +1,4 @@
+#nullable disable
 ﻿#nullable enable
 namespace Terminal.Gui.ViewBase;
 

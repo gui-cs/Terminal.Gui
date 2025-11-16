@@ -1,6 +1,6 @@
-#nullable enable
 
 
+#nullable disable
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Text Property APIs

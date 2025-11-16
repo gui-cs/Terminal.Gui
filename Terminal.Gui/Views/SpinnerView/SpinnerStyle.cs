@@ -1,3 +1,4 @@
+#nullable disable
 ﻿//------------------------------------------------------------------------------
 // SpinnerStyles below are derived from
 // <https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json>

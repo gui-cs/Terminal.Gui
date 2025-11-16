@@ -1,3 +1,4 @@
+#nullable disable
 ﻿// This code is based on http://objectlistview.sourceforge.net (GPLv3 tree/list controls 
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.

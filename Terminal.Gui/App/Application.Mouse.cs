@@ -1,4 +1,4 @@
-#nullable enable
+#nullable disable
 using System.ComponentModel;
 
 namespace Terminal.Gui.App;

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Transactions;
 
 namespace Terminal.Gui.Views;

@@ -1,4 +1,4 @@
-#nullable enable
+#nullable disable
 using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;

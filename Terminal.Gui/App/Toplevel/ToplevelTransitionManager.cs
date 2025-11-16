@@ -1,3 +1,4 @@
+#nullable disable
 ﻿#nullable enable
 using Terminal.Gui.Drivers;
 

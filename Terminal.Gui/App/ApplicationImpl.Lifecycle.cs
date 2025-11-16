@@ -1,4 +1,4 @@
-#nullable enable
+#nullable disable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>Event arguments for the <see cref="View.SubViewsLaidOut"/> event.</summary>

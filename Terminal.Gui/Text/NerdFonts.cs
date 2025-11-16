@@ -1,6 +1,7 @@
 // This code is adapted from https://github.com/devblackops/Terminal-Icons (which also uses the MIT license).
 // Nerd fonts can be installed by following the instructions on the Nerd Fonts repository: https://github.com/ryanoasis/nerd-fonts
 
+#nullable disable
 using System.IO.Abstractions;
 
 namespace Terminal.Gui.Text;

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>Args for events that relate to a specific <see cref="Cell"/>.</summary>

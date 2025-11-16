@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>Args for events that relate to specific <see cref="View"/></summary>

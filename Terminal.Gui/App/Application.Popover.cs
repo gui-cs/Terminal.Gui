@@ -1,5 +1,5 @@
-#nullable enable
 
+#nullable disable
 namespace Terminal.Gui.App;
 
 public static partial class Application // Popover handling

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿// 
 // FileDialog.cs: File system dialogs for open and save
 //

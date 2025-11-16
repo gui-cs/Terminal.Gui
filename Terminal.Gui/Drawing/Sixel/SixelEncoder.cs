@@ -1,3 +1,4 @@
+#nullable disable
 ﻿// This code is based on existing implementations of sixel algorithm in MIT licensed open source libraries
 // node-sixel (Typescript) - https://github.com/jerch/node-sixel/tree/master/src
 // Copyright (c) 2019, Joerg Breitbart @license MIT

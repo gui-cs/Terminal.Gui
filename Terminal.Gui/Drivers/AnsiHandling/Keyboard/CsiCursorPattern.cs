@@ -1,3 +1,4 @@
+#nullable disable
 ﻿#nullable enable
 using System.Text.RegularExpressions;
 

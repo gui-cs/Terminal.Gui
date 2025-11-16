@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>Args for events about Size (e.g. Resized)</summary>

@@ -1,5 +1,6 @@
 // This code is a C# port from python library Terminal Text Effects  https://github.com/ChrisBuilds/terminaltexteffects/
 
+#nullable disable
 namespace Terminal.Gui.Drawing;
 
 /// <summary>

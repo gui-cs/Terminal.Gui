@@ -1,3 +1,4 @@
+#nullable disable
 ﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;

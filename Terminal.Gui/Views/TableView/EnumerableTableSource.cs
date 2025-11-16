@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="ITableSource"/> implementation that wraps arbitrary data.</summary>

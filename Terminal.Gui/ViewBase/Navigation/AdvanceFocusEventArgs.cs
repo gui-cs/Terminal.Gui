@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>The event arguments for <see cref="View.AdvanceFocus"/> events.</summary>

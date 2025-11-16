@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 // TODO: CWP: FocusChanging should use an event arg type derived from ResultEventArgs<bool> so that its more obvious

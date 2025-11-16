@@ -1,4 +1,4 @@
-#nullable enable
+#nullable disable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Terminal Cursor Visibility settings.</summary>
