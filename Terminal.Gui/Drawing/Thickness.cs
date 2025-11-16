@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Drawing;

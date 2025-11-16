@@ -543,7 +543,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="column"></param>
     protected abstract void SetCursorPosition (int column);
 
-#nullable enable
     private Point? LastPopupPos { get; set; }
 #nullable restore
 

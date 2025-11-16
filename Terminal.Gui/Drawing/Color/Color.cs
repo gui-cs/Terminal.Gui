@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Frozen;
 using System.Globalization;
 using System.Numerics;

@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 
 namespace Terminal.Gui.Drivers;

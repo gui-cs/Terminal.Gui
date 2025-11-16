@@ -1,6 +1,4 @@
-#nullable enable
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 

@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.Drawing;
 
 /// <summary>Draws a ruler on the screen.</summary>
