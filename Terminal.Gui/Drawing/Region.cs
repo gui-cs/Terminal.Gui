@@ -50,10 +50,10 @@ public class Region
     private readonly List<Rectangle> _rectangles = [];
 
     // Add a single reusable list for temp operations
-    private readonly List<Rectangle> _tempRectangles = new();
+    private readonly List<Rectangle> _tempRectangles = new ();
 
     // Object used for synchronization
-    private readonly object _syncLock = new object();
+    private readonly object _syncLock = new object ();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Region"/> class.
@@ -120,12 +120,12 @@ public class Region
     {
         lock (_syncLock)
         {
-            CombineInternal(region, operation);
+            CombineInternal (region, operation);
         }
     }
 
     // Private method to implement the combine logic within a lock
-    private void CombineInternal(Region? region, RegionOp operation)
+    private void CombineInternal (Region? region, RegionOp operation)
     {
         if (region is null || region._rectangles.Count == 0)
         {
@@ -188,36 +188,36 @@ public class Region
 
             case RegionOp.Union:
                 // Avoid collection initialization with spread operator
-                _tempRectangles.Clear();
-                _tempRectangles.AddRange(_rectangles);
+                _tempRectangles.Clear ();
+                _tempRectangles.AddRange (_rectangles);
                 if (region != null)
                 {
                     // Get the region's rectangles safely
                     lock (region._syncLock)
                     {
-                        _tempRectangles.AddRange(region._rectangles);
+                        _tempRectangles.AddRange (region._rectangles);
                     }
                 }
-                List<Rectangle> mergedUnion = MergeRectangles(_tempRectangles, false);
-                _rectangles.Clear();
-                _rectangles.AddRange(mergedUnion);
+                List<Rectangle> mergedUnion = MergeRectangles (_tempRectangles, false);
+                _rectangles.Clear ();
+                _rectangles.AddRange (mergedUnion);
                 break;
 
             case RegionOp.MinimalUnion:
                 // Avoid collection initialization with spread operator
-                _tempRectangles.Clear();
-                _tempRectangles.AddRange(_rectangles);
+                _tempRectangles.Clear ();
+                _tempRectangles.AddRange (_rectangles);
                 if (region != null)
                 {
                     // Get the region's rectangles safely
                     lock (region._syncLock)
                     {
-                        _tempRectangles.AddRange(region._rectangles);
+                        _tempRectangles.AddRange (region._rectangles);
                     }
                 }
-                List<Rectangle> mergedMinimalUnion = MergeRectangles(_tempRectangles, true);
-                _rectangles.Clear();
-                _rectangles.AddRange(mergedMinimalUnion);
+                List<Rectangle> mergedMinimalUnion = MergeRectangles (_tempRectangles, true);
+                _rectangles.Clear ();
+                _rectangles.AddRange (mergedMinimalUnion);
                 break;
 
             case RegionOp.XOR:
@@ -587,17 +587,26 @@ public class Region
                      {
                          // 1. Sort by X
                          int cmp = a.x.CompareTo (b.x);
-                         if (cmp != 0) return cmp;
+                         if (cmp != 0)
+                         {
+                             return cmp;
+                         }
 
                          // 2. Sort End events before Start events
                          bool aIsEnd = !a.isStart;
                          bool bIsEnd = !b.isStart;
                          cmp = aIsEnd.CompareTo (bIsEnd); // True (End) comes after False (Start)
-                         if (cmp != 0) return -cmp; // Reverse: End (true) should come before Start (false)
+                         if (cmp != 0)
+                         {
+                             return -cmp; // Reverse: End (true) should come before Start (false)
+                         }
 
                          // 3. Tie-breaker: Sort by yTop
                          cmp = a.yTop.CompareTo (b.yTop);
-                         if (cmp != 0) return cmp;
+                         if (cmp != 0)
+                         {
+                             return cmp;
+                         }
 
                          // 4. Final Tie-breaker: Sort by yBottom
                          return a.yBottom.CompareTo (b.yBottom);
@@ -900,12 +909,13 @@ public class Region
     /// <summary>
     ///     Fills the interior of all rectangles in the region with the specified attribute and fill rune.
     /// </summary>
+    /// <param name="driver"></param>
     /// <param name="attribute">The attribute (color/style) to use.</param>
     /// <param name="fillRune">
     ///     The rune to fill the interior of the rectangles with. If <cref langword="null"/> space will be
     ///     used.
     /// </param>
-    public void FillRectangles (Attribute attribute, Rune? fillRune = null)
+    public void FillRectangles (IDriver? driver, Attribute? attribute, Rune? fillRune = null)
     {
         if (_rectangles.Count == 0)
         {
@@ -919,14 +929,14 @@ public class Region
                 continue;
             }
 
-            Application.Driver?.SetAttribute (attribute);
+            driver?.SetAttribute (attribute!.Value);
 
             for (int y = rect.Top; y < rect.Bottom; y++)
             {
                 for (int x = rect.Left; x < rect.Right; x++)
                 {
-                    Application.Driver?.Move (x, y);
-                    Application.Driver?.AddRune (fillRune ?? (Rune)' ');
+                    driver?.Move (x, y);
+                    driver?.AddRune (fillRune ?? (Rune)' ');
                 }
             }
         }
@@ -1045,7 +1055,7 @@ public class Region
         if (bounds.Width > 1000 || bounds.Height > 1000)
         {
             // Fall back to drawing each rectangle's boundary
-            DrawBoundaries(lineCanvas, style, attribute);
+            DrawBoundaries (lineCanvas, style, attribute);
             return;
         }
 

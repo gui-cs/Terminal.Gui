@@ -89,19 +89,19 @@ public class RegionScenario : Scenario
                                   switch (_drawStyle)
                                   {
                                       case RegionDrawStyles.FillOnly:
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, _previewFillRune);
+                                          _region.FillRectangles (Application.Driver, tools.CurrentAttribute!.Value, _previewFillRune);
 
                                           break;
 
                                       case RegionDrawStyles.InnerBoundaries:
                                           _region.DrawBoundaries (app.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                          _region.FillRectangles (Application.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                           break;
 
                                       case RegionDrawStyles.OuterBoundary:
                                           _region.DrawOuterBoundary (app.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                          _region.FillRectangles (Application.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                           break;
                                   }
@@ -113,7 +113,7 @@ public class RegionScenario : Scenario
                                       Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
                                       var previewRegion = new Region (previewRect);
 
-                                      previewRegion.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                      previewRegion.FillRectangles (Application.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                       previewRegion.DrawBoundaries (
                                                                     app.LineCanvas,

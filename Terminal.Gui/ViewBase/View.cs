@@ -103,10 +103,24 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>This property is not used internally.</remarks>
     public object? Data { get; set; }
 
+
+
     /// <summary>Gets or sets an identifier for the view;</summary>
     /// <value>The identifier.</value>
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
+
+
+    private IApplication? _app;
+
+    /// <summary>
+    ///     Gets the <see cref="IApplication"/> instance this view is running in.
+    /// </summary>
+    public IApplication? App
+    {
+        get => _app ?? SuperView?.App;
+        internal set => _app = value;
+    }
 
     private IDriver? _driver;
 
@@ -117,15 +131,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// </summary>
     internal IDriver? Driver
     {
-        get
-        {
-            if (_driver is { })
-            {
-                return _driver;
-            }
-
-            return Application.Driver;
-        }
+        get => _driver ?? Application.Driver;
         set => _driver = value;
     }
 

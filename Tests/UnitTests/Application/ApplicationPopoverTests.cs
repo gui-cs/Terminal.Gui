@@ -207,7 +207,7 @@ public class ApplicationPopoverTests
             Application.Popover?.Register (popover);
 
             // Assert
-            Assert.Equal (Application.Current, popover.Toplevel);
+            Assert.Equal (Application.Current, popover.Current);
         }
         finally
         {

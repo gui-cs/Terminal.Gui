@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drawing;
 
@@ -7,8 +6,19 @@ namespace Terminal.Gui.Drawing;
 ///     Uses Ansi escape sequences to detect whether sixel is supported
 ///     by the terminal.
 /// </summary>
-public class SixelSupportDetector
+public class SixelSupportDetector ()
 {
+    private readonly IDriver? _driver;
+
+    /// <summary>
+    ///     Creates a new instance of the <see cref="SixelSupportDetector"/> class.
+    /// </summary>
+    /// <param name="driver"></param>
+    public SixelSupportDetector (IDriver? driver) : this ()
+    {
+        _driver = driver;
+    }
+
     /// <summary>
     ///     Sends Ansi escape sequences to the console to determine whether
     ///     sixel is supported (and <see cref="SixelSupportResult.Resolution"/>
@@ -128,17 +138,17 @@ public class SixelSupportDetector
                       () => resultCallback (result));
     }
 
-    private static void QueueRequest (AnsiEscapeSequence req, Action<string> responseCallback, Action abandoned)
+    private void QueueRequest (AnsiEscapeSequence req, Action<string> responseCallback, Action abandoned)
     {
         var newRequest = new AnsiEscapeSequenceRequest
         {
             Request = req.Request,
             Terminator = req.Terminator,
-            ResponseReceived = responseCallback,
+            ResponseReceived = responseCallback!,
             Abandoned = abandoned
         };
 
-        Application.Driver?.QueueAnsiRequest (newRequest);
+        _driver?.QueueAnsiRequest (newRequest);
     }
 
     private static bool ResponseIndicatesSupport (string response) { return response.Split (';').Contains ("4"); }
@@ -146,14 +156,12 @@ public class SixelSupportDetector
     private static bool IsVirtualTerminal ()
     {
         return !string.IsNullOrWhiteSpace (Environment.GetEnvironmentVariable ("WT_SESSION"));
-
-        ;
     }
 
     private static bool IsXtermWithTransparency ()
     {
         // Check if running in real xterm (XTERM_VERSION is more reliable than TERM)
-        string xtermVersionStr = Environment.GetEnvironmentVariable ("XTERM_VERSION");
+        string xtermVersionStr = Environment.GetEnvironmentVariable (@"XTERM_VERSION")!;
 
         // If XTERM_VERSION exists, we are in a real xterm
         if (!string.IsNullOrWhiteSpace (xtermVersionStr) && int.TryParse (xtermVersionStr, out int xtermVersion) && xtermVersion >= 370)

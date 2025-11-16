@@ -114,6 +114,9 @@ public partial class ApplicationImpl
                 Current?.OnDeactivate (toplevel);
                 Toplevel previousTop = Current!;
 
+                previousTop.App = null;
+
+                toplevel.App = Instance;
                 Current = toplevel;
                 Current.OnActivate (previousTop);
             }
@@ -194,7 +197,7 @@ public partial class ApplicationImpl
 
         Current = view;
 
-        SessionToken rs = Application.Begin (view);
+        SessionToken rs = Begin (view);
 
         Current.Running = true;
 
@@ -219,7 +222,7 @@ public partial class ApplicationImpl
         }
 
         Logging.Information ("Run - Calling End");
-        Application.End (rs);
+        End (rs);
     }
 
     /// <inheritdoc/>

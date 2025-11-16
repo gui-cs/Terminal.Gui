@@ -74,7 +74,7 @@ public abstract class PopoverBaseImpl : View, IPopover
     }
 
     /// <inheritdoc/>
-    public Toplevel? Toplevel { get; set; }
+    public Toplevel? Current { get; set; }
 
     /// <summary>
     ///     Called when the <see cref="View.Visible"/> property is changing.
