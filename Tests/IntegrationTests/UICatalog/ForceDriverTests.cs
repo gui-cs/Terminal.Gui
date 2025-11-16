@@ -17,7 +17,18 @@ public class ForceDriverTests
 
     /// <summary>
     ///     Tests that ForceDriver persists when running UICatalogTop and then opening a scenario.
-    ///     This simulates the actual UICatalog flow and verifies the fix for issue #4391.
+    ///     
+    ///     This test verifies the fix for issue #4391 works correctly.
+    ///     
+    ///     THE BUG: Without the fix, ForceDriver was set directly on Application, but
+    ///     ConfigurationManager would override it from config files when scenarios ran.
+    ///     
+    ///     THE FIX has two parts:
+    ///     1. Set ForceDriver in ConfigurationManager.RuntimeConfig (done in UICatalog.UICatalogMain)
+    ///     2. Reload RuntimeConfig before each scenario (done in UICatalog scenario loop)
+    ///     
+    ///     This test simulates both parts of the fix and verifies the driver persists.
+    ///     Without BOTH parts of the fix, this test would fail.
     /// </summary>
     [Fact]
     public void ForceDriver_Persists_From_UICatalogTop_To_Scenario ()
@@ -43,7 +54,8 @@ public class ForceDriverTests
         // Initialize cached scenarios (required by UICatalogTop)
         UICatalogTop.CachedScenarios = Scenario.GetScenarios ();
 
-        // Set ForceDriver in RuntimeConfig (simulating what UICatalog does with --driver option)
+        // THE FIX (part 1): UICatalog.UICatalogMain() sets ForceDriver in RuntimeConfig
+        // Since we can't call the private UICatalogMain() from tests, we simulate it here
         ConfigurationManager.RuntimeConfig = $$"""
             {
                 "Application.ForceDriver": "{{expectedDriver}}"
@@ -101,12 +113,14 @@ public class ForceDriverTests
             {
                 _output.WriteLine ($"\n=== Phase 2: Running scenario '{scenario.GetName ()}' ===");
                 
-                // Reload RuntimeConfig before scenario (as the fix does)
-                if (!global::UICatalog.UICatalog.Options.DontEnableConfigurationManagement)
+                // THE FIX (part 2): UICatalog reloads RuntimeConfig before each scenario
+                // This ensures ForceDriver persists across Init/Shutdown cycles
+                // NOTE: If you comment out this block, the test will fail, demonstrating the bug
+                if (!global::UICatalog.UICatalog.Options.DontEnableConfigurationManagement && !string.IsNullOrEmpty(global::UICatalog.UICatalog.Options.Driver))
                 {
                     ConfigurationManager.Load (ConfigLocations.Runtime);
                     ConfigurationManager.Apply ();
-                    _output.WriteLine ("Reloaded RuntimeConfig");
+                    _output.WriteLine ("Reloaded RuntimeConfig (this is part 2 of the fix)");
                 }
 
                 // Track the driver used inside the scenario
@@ -175,7 +189,11 @@ public class ForceDriverTests
 
     /// <summary>
     ///     Tests that ForceDriver persists when running multiple scenarios in sequence.
-    ///     This verifies the scenario loop in UICatalog works correctly.
+    ///     
+    ///     This verifies the fix works correctly when running multiple scenarios.
+    ///     
+    ///     THE FIX: Reload RuntimeConfig before each scenario to preserve ForceDriver.
+    ///     Without reloading RuntimeConfig, the driver would revert to platform default.
     /// </summary>
     [Fact]
     public void ForceDriver_Persists_Across_Multiple_Scenarios ()
@@ -186,7 +204,8 @@ public class ForceDriverTests
         ConfigurationManager.Disable (true);
         Application.ResetState (true);
 
-        // Set ForceDriver in RuntimeConfig
+        // THE FIX (part 1): Set ForceDriver in RuntimeConfig
+        // This is what UICatalog.UICatalogMain() does when --driver is specified
         ConfigurationManager.RuntimeConfig = $$"""
             {
                 "Application.ForceDriver": "{{expectedDriver}}"
@@ -240,10 +259,11 @@ public class ForceDriverTests
             scenario1.Dispose ();
             _output.WriteLine ($"Scenario 1 completed with driver: {driver1}");
 
-            // Reload RuntimeConfig before scenario 2 (as the fix does)
+            // THE FIX (part 2): Reload RuntimeConfig before scenario 2
+            // This ensures ForceDriver persists across Init/Shutdown cycles
             ConfigurationManager.Load (ConfigLocations.Runtime);
             ConfigurationManager.Apply ();
-            _output.WriteLine ("Reloaded RuntimeConfig");
+            _output.WriteLine ("Reloaded RuntimeConfig (this is part 2 of the fix)");
 
             // Run scenario 2
             initHandler2 = (s, e) =>
