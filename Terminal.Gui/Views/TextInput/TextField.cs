@@ -1734,7 +1734,8 @@ public class TextField : View, IDesignable
         TitleTextFormatter.Draw (
                                  ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
                                  captionAttribute,
-                                 hotKeyAttribute);
+                                 hotKeyAttribute,
+                                 driver: Driver);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)

@@ -30,6 +30,8 @@ public partial class View
     /// <param name="region"></param>
     public static void SetClip (IDriver? driver, Region? region)
     {
+        // BUGBUG: If region is null we should set the clip to null.
+        // BUGBUG: Fixing  this probably breaks other things.
         if (driver is { } && region is { })
         {
             driver.Clip = region;

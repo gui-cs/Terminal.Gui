@@ -449,7 +449,8 @@ public partial class View // Drawing APIs
                              drawRect,
                              HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
                              HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
-                             Rectangle.Empty
+                             Rectangle.Empty,
+                             Driver
                             );
 
         // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.

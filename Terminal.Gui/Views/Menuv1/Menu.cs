@@ -970,7 +970,8 @@ internal sealed class Menu : View
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
                              i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
-                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
+                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty,
+                             driver: Driver
                             );
                 }
                 else

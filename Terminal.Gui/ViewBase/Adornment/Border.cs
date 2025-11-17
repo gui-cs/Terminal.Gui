@@ -325,7 +325,8 @@ public partial class Border : Adornment
             Parent.TitleTextFormatter.Draw (
                                             titleRect,
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal),
+                                            driver: Driver);
             Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
@@ -508,7 +509,8 @@ public partial class Border : Adornment
                     Parent!.TitleTextFormatter.Draw (
                                                      new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                      Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal),
-                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal));
+                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal),
+                                                     driver: Driver);
                 }
 
                 //Left
