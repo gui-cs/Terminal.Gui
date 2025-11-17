@@ -15,7 +15,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <returns>The current Clip.</returns>
-    public static Region? GetClip (IDriver? driver) => driver?.Clip;
+    public Region? GetClip () => Driver?.Clip;
 
     /// <summary>
     ///     Sets the Clip to the specified region.
@@ -26,22 +26,20 @@ public partial class View
     ///         region.
     ///     </para>
     /// </remarks>
-    /// <param name="driver"></param>
     /// <param name="region"></param>
-    public static void SetClip (IDriver? driver, Region? region)
+    public void SetClip (Region? region)
     {
         // BUGBUG: If region is null we should set the clip to null.
         // BUGBUG: Fixing  this probably breaks other things.
         if (driver is { } && region is { })
         {
-            driver.Clip = region;
+            Driver.Clip = region;
         }
     }
 
     /// <summary>
     ///     Sets the Clip to be the rectangle of the screen.
     /// </summary>
-    /// <param name="driver"></param>
     /// <remarks>
     ///     <para>
     ///         There is a single clip region for the entire application. This method sets the clip region to the screen.
@@ -54,13 +52,13 @@ public partial class View
     /// <returns>
     ///     The current Clip, which can be then re-applied <see cref="View.SetClip"/>
     /// </returns>
-    public static Region? SetClipToScreen (IDriver? driver)
+    public Region? SetClipToScreen ()
     {
-        Region? previous = GetClip (driver);
+        Region? previous = GetClip ();
 
-        if (Application.Driver is { })
+        if (Driver is { })
         {
-            Application.Driver.Clip = new (driver!.Screen);
+            Driver.Clip = new (Driver!.Screen);
         }
 
         return previous;
@@ -75,7 +73,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="rectangle"></param>
-    public static void ExcludeFromClip (Rectangle rectangle) { Application.Driver?.Clip?.Exclude (rectangle); }
+    public void ExcludeFromClip (Rectangle rectangle) { Driver?.Clip?.Exclude (rectangle); }
 
     /// <summary>
     ///     Removes the specified rectangle from the Clip.
@@ -86,7 +84,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="region"></param>
-    public static void ExcludeFromClip (Region? region) { Application.Driver?.Clip?.Exclude (region); }
+    public void ExcludeFromClip (Region? region) { Driver?.Clip?.Exclude (region); }
 
     /// <summary>
     ///     Changes the Clip to the intersection of the current Clip and the <see cref="Frame"/> of this View.
@@ -107,7 +105,7 @@ public partial class View
             return null;
         }
 
-        Region previous = GetClip (Driver) ?? new (Application.Screen);
+        Region previous = GetClip () ?? new (Driver.Screen);
 
         Region frameRegion = previous.Clone ();
 
@@ -121,7 +119,7 @@ public partial class View
             frameRegion.Exclude (adornment.Thickness.GetInside (FrameToScreen()));
         }
 
-        SetClip (Driver, frameRegion);
+        SetClip (frameRegion);
 
         return previous;
     }
@@ -154,7 +152,7 @@ public partial class View
             return null;
         }
 
-        Region previous = GetClip (Driver) ?? new (Application.Screen);
+        Region previous = GetClip () ?? new (App!.Screen);
 
         Region viewportRegion = previous.Clone ();
 
@@ -174,7 +172,7 @@ public partial class View
             viewportRegion?.Exclude (adornment.Thickness.GetInside (viewport));
         }
 
-        SetClip (Driver, viewportRegion);
+        SetClip (viewportRegion);
 
         return previous;
     }

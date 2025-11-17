@@ -71,9 +71,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
-            if (Application.Mouse.MouseGrabView == this)
+            if (App?.Mouse.MouseGrabView == this)
             {
-                Application.Mouse.UngrabMouse ();
+                App.Mouse.UngrabMouse ();
             }
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
@@ -136,9 +136,16 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// </summary>
     internal IDriver? Driver
     {
-        get => _driver ?? App?.Driver ?? Application.Driver;
+        get => GetDriver ();
         set => _driver = value;
     }
+
+    /// <summary>
+    ///     Gets the <see cref="IDriver"/> instance for this view. Used internally to allow overrides by
+    ///     <see cref="Adornment"/>.
+    /// </summary>
+    /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
+    protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver ?? Application.Driver;
 
     /// <summary>
     ///     Gets the screen buffer contents. This is a convenience property for Views that need direct access to the

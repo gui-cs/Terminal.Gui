@@ -142,7 +142,7 @@ public partial class View
         Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
         SetAttribute (prev);
-        SetClip (Driver, prevClip);
+        SetClip (prevClip);
     }
 
     /// <summary>Fills the specified <see cref="Viewport"/>-relative rectangle.</summary>
@@ -158,7 +158,7 @@ public partial class View
         Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Driver.FillRect (toClear, rune);
-        SetClip (Driver, prevClip);
+        SetClip (prevClip);
     }
 
 }

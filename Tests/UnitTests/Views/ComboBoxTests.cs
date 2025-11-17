@@ -565,7 +565,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -584,7 +584,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -609,7 +609,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -628,7 +628,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -647,7 +647,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -928,7 +928,7 @@ One
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -944,7 +944,7 @@ Two
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
 
-        View.SetClipToScreen (Application.Driver);
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (

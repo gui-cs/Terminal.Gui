@@ -57,7 +57,7 @@ public class SpinnerViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.AdvanceAnimation ();
-        View.SetClipToScreen (Application.Driver);
+        view.SetClipToScreen ();
         view.Draw ();
 
         expected = "/";

@@ -39,7 +39,7 @@ public class BorderTests (ITestOutputHelper output)
 
         view.CanFocus = true;
         view.SetFocus ();
-        View.SetClipToScreen (Application.Driver);
+        view.SetClipToScreen ();
         view.Draw ();
         Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
         Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground);

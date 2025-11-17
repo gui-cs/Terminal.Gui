@@ -99,14 +99,17 @@ public abstract class PopoverBaseImpl : View, IPopover
         {
             // Whenever visible is changing to true, we need to resize;
             // it's our only chance because we don't get laid out until we're visible
-            Layout (Application.Screen.Size);
+            if (App is { })
+            {
+                Layout (App.Screen.Size);
+            }
         }
         else
         {
             // Whenever visible is changing to false, we need to reset the focus
-            if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation?.GetFocused ()))
+            if (ApplicationNavigation.IsInHierarchy (this, App?.Navigation?.GetFocused ()))
             {
-                Application.Navigation?.SetFocused (Application.Current?.MostFocused);
+                App?.Navigation?.SetFocused (App?.Current?.MostFocused);
             }
         }
 

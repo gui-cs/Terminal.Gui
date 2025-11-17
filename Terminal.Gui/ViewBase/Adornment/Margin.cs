@@ -58,7 +58,7 @@ public class Margin : Adornment
         if (Thickness != Thickness.Empty /*&& ShadowStyle != ShadowStyle.None*/)
         {
             // PERFORMANCE: How expensive are these clones?
-            _cachedClip = GetClip (Driver)?.Clone ();
+            _cachedClip = GetClip ()?.Clone ();
         }
     }
 
@@ -80,10 +80,10 @@ public class Margin : Adornment
             if (view.Margin?.GetCachedClip () != null)
             {
                 view.Margin!.NeedsDraw = true;
-                Region? saved = GetClip (view.Driver);
-                View.SetClip (view.Driver, view.Margin!.GetCachedClip ());
-                view.Margin!.Draw ();
-                View.SetClip (view.Driver, saved);
+                Region? saved = view.GetClip ();
+                view.SetClip (view.Margin!.GetCachedClip ());
+                view.Margin!.Draw (); 
+                view.SetClip (saved);
                 view.Margin!.ClearCachedClip ();
             }
 

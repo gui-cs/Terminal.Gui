@@ -123,13 +123,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
 
         // but disapear when text is added
         tf.Text = content;
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (content, output);
         Application.Current.Dispose ();
@@ -147,14 +147,14 @@ public class TextFieldTests (ITestOutputHelper output)
         // Caption has no effect when focused
         tf.Title = "Enter txt";
         Assert.True (tf.HasFocus);
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
         Application.RaiseKeyDownEvent ('\t');
 
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
         Application.Current.Dispose ();
@@ -173,7 +173,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         
         // Verify the caption text is rendered
@@ -203,7 +203,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         
         // The hotkey character 'F' should be rendered (without the underscore in the actual text)
@@ -237,7 +237,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
         
         // The underscore should not be rendered, 'T' should be underlined
@@ -1641,7 +1641,7 @@ Les Misérables",
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
-        View.SetClipToScreen (Application.Driver);
+        tf.SetClipToScreen ();
         tf.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (

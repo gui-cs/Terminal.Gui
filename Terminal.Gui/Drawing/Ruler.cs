@@ -35,7 +35,7 @@ internal class Ruler
             return;
         }
 
-        driver ??= driver;
+        driver ??= Application.Driver;
 
         if (Orientation == Orientation.Horizontal)
         {

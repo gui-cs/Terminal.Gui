@@ -91,7 +91,7 @@ public class ClipTests (ITestOutputHelper _output)
                                                        _output);
 
         Rectangle toFill = new (x, y, width, height);
-        View.SetClipToScreen (Application.Driver);
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -133,7 +133,7 @@ public class ClipTests (ITestOutputHelper _output)
                                                        _output);
         toFill = new (-1, -1, width + 1, height + 1);
 
-        View.SetClipToScreen (Application.Driver);
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -154,7 +154,7 @@ public class ClipTests (ITestOutputHelper _output)
  └─┘",
                                                        _output);
         toFill = new (0, 0, width * 2, height * 2);
-        View.SetClipToScreen (Application.Driver);
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -193,7 +193,7 @@ public class ClipTests (ITestOutputHelper _output)
         frameView.Border!.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
-        View.SetClipToScreen (Application.Driver);
+        top.SetClipToScreen ();
         top.Layout ();
         top.Draw ();
 
@@ -217,7 +217,7 @@ public class ClipTests (ITestOutputHelper _output)
 
         top.Add (view);
         top.Layout ();
-        View.SetClipToScreen (Application.Driver);
+        top.SetClipToScreen ();
         top.Draw ();
 
         //                            012345678901234567890123456789012345678
@@ -258,13 +258,13 @@ public class ClipTests (ITestOutputHelper _output)
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip (Application.Driver)!.GetBounds ());
+        Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
 
         // Act
         view.AddViewportToClip ();
 
         // Assert
-        Assert.Equal (expectedClip, View.GetClip (Application.Driver)!.GetBounds ());
+        Assert.Equal (expectedClip, view.GetClip ()!.GetBounds ());
         view.Dispose ();
     }
 
@@ -292,14 +292,14 @@ public class ClipTests (ITestOutputHelper _output)
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip (Application.Driver)!.GetBounds ());
+        Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 
         // Act
         view.AddViewportToClip ();
 
         // Assert
-        Assert.Equal (expectedClip, View.GetClip (Application.Driver)!.GetBounds ());
+        Assert.Equal (expectedClip, view.GetClip ()!.GetBounds ());
         view.Dispose ();
     }
 }

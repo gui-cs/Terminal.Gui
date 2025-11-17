@@ -760,7 +760,7 @@ At 0,0
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
-        View.SetClipToScreen (Application.Driver);
+        view.SetClipToScreen ();
         top.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -859,7 +859,7 @@ At 0,0
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
-        View.SetClipToScreen (Application.Driver);
+        view.SetClipToScreen ();
 
         top.Draw ();
 

@@ -40,7 +40,7 @@ Y
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
         top.LayoutSubViews ();
-        View.SetClipToScreen (Application.Driver);
+        top.SetClipToScreen ();
         top.Draw ();
 
         expected = @"
@@ -1077,7 +1077,7 @@ w ";
         verticalView.Width = 2;
         verticalView.TextFormatter.ConstrainToSize = new (2, 20);
         Assert.True (verticalView.TextFormatter.NeedsFormat);
-        View.SetClipToScreen (Application.Driver);
+        top.SetClipToScreen ();
         top.Draw ();
         Assert.Equal (new (0, 3, 2, 20), verticalView.Frame);
 
