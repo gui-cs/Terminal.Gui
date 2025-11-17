@@ -269,6 +269,8 @@ public class UICatalog
     {
         if (_iterationHandlerRemoved)
         {
+            _iterationHandlerRemoved = false;
+
             return null!;
         }
 
