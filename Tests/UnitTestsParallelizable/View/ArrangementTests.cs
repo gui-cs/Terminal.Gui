@@ -1,8 +1,9 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests.Parallelizable;
+using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
-public class ArrangementTests (ITestOutputHelper output)
+public class ArrangementTests (ITestOutputHelper output) : GlobalTestSetup
 {
     private readonly ITestOutputHelper _output = output;
 

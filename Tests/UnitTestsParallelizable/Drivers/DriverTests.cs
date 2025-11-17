@@ -2,4 +2,5 @@
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class DriverTests : FakeDriverBase { }
+public class DriverTests : FakeDriverBase
+{ }
