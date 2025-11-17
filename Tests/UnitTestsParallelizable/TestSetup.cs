@@ -16,6 +16,7 @@ public class GlobalTestSetup : IDisposable
         CheckDefaultState ();
     }
 
+    /// <inheritdoc />
     public void Dispose ()
     {
         // Optionally reset EnableDebugIDisposableAsserts after tests. Don't do this.
@@ -26,6 +27,7 @@ public class GlobalTestSetup : IDisposable
         // TODO: Add an Assert to ensure none of the state of ConfigurationManager changed.
         Application.ResetState (true);
         CheckDefaultState ();
+        GC.SuppressFinalize (this);
     }
 
     // IMPORTANT: Ensure this matches the code in Init_ResetState_Resets_Properties
