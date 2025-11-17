@@ -1,9 +1,10 @@
 ﻿#nullable enable
 using Moq;
+using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ApplicationTests;
 
-public class ApplicationPopoverTests
+public class ApplicationPopoverTests : GlobalTestSetup
 {
     [Fact]
     public void Register_AddsPopover ()

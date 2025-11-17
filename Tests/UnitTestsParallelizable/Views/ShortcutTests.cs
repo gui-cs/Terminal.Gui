@@ -1,11 +1,12 @@
 ﻿using JetBrains.Annotations;
+using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
 [Collection ("Global Test Setup")]
 
 [TestSubject (typeof (Shortcut))]
-public class ShortcutTests
+public class ShortcutTests : GlobalTestSetup
 {
     [Fact]
     public void Constructor_Defaults ()

@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
+using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ConfigurationTests;
 
@@ -11,7 +12,7 @@ namespace UnitTests_Parallelizable.ConfigurationTests;
 ///     Unit tests for the <see cref="DeepCloner"/> class, ensuring robust deep cloning for
 ///     Terminal.Gui's configuration system.
 /// </summary>
-public class DeepClonerTests
+public class DeepClonerTests : GlobalTestSetup
 {
     // Test classes for complex scenarios
     private class SimpleValueType

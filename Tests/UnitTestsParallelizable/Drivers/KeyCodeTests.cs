@@ -1,8 +1,9 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests.Parallelizable;
+using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class KeyCodeTests
+public class KeyCodeTests : GlobalTestSetup
 {
     private readonly ITestOutputHelper _output;
     public KeyCodeTests (ITestOutputHelper output) { _output = output; }
