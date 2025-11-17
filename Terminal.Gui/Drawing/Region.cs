@@ -917,6 +917,8 @@ public class Region
     /// </param>
     public void FillRectangles (IDriver? driver, Attribute? attribute, Rune? fillRune = null)
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         if (_rectangles.Count == 0)
         {
             return;

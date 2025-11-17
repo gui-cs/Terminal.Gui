@@ -16,6 +16,8 @@ public class SixelSupportDetector ()
     /// <param name="driver"></param>
     public SixelSupportDetector (IDriver? driver) : this ()
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         _driver = driver;
     }
 

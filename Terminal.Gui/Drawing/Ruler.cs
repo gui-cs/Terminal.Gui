@@ -26,6 +26,7 @@ internal class Ruler
     public void Draw (IDriver? driver, Point location, int start = 0)
     {
         ArgumentNullException.ThrowIfNull (driver);
+
         if (start < 0)
         {
             throw new ArgumentException ("start must be greater than or equal to 0");
