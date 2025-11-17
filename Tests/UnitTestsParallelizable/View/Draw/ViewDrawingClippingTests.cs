@@ -629,7 +629,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     }
 
     [Fact]
-    public void Draw_RestoresOriginalClip ()
+    public void Draw_Excludes_View_From_Clip ()
     {
         IDriver driver = CreateFakeDriver (80, 25);
         var originalClip = new Region (driver.Screen);
@@ -647,10 +647,12 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         view.EndInit ();
         view.LayoutSubViews ();
 
+        Region clipWithViewExcluded = originalClip.Clone ();
+        clipWithViewExcluded.Exclude (view.Frame);
+
         view.Draw ();
 
-        Assert.Equal (originalClip, driver.Clip);
-        // After draw, clip should be restored (though it may be modified)
+        Assert.Equal (clipWithViewExcluded, driver.Clip);
         Assert.NotNull (driver.Clip);
     }
 
