@@ -26,7 +26,16 @@ public static partial class Application // Driver abstractions
     public static string ForceDriver
     {
         get => ApplicationImpl.Instance.ForceDriver;
-        set => ApplicationImpl.Instance.ForceDriver = value;
+        set
+        {
+            if (!string.IsNullOrEmpty (ApplicationImpl.Instance.ForceDriver))
+            {
+                // ForceDriver cannot be changed if it has a valid value
+                return;
+            }
+
+            ApplicationImpl.Instance.ForceDriver = value;
+        }
     }
 
     /// <inheritdoc cref="IApplication.Sixel"/>

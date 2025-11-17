@@ -665,4 +665,19 @@ public class ScenarioTests : TestsAllViews
 
         void LayoutCompleteHandler (object? sender, LayoutEventArgs args) { UpdateTitle (curView); }
     }
+
+    [Fact]
+    public void ForceDriver_persists_On_Open_Scenario_With_Args ()
+    {
+        string driverName = "fake";
+
+        string [] args = ["-d", driverName];
+
+        (string? UiCatalogDriver, string? ScenarioDriver) driverNames = global::UICatalog.UICatalog.Run (args);
+
+        Assert.Equal (string.Empty, Application.ForceDriver);
+        Assert.Equal (driverName, driverNames.UiCatalogDriver);
+        Assert.Equal (driverName, driverNames.ScenarioDriver);
+        Assert.Equal (driverNames.UiCatalogDriver, driverNames.ScenarioDriver);
+    }
 }
