@@ -43,7 +43,7 @@ public class GlobalTestSetup : IDisposable
         Assert.Null (Application.Mouse.MouseGrabView);
 
         // Don't check Application.ForceDriver
-        // Assert.Empty (Application.ForceDriver);
+        Assert.Empty (Application.ForceDriver);
         // Don't check Application.Force16Colors
         //Assert.False (Application.Force16Colors);
         Assert.Null (Application.Driver);

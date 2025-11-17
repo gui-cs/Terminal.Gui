@@ -154,9 +154,13 @@ public partial class ApplicationImpl
     }
 #endif
 
+    private bool _isResetingState;
+
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
     {
+        _isResetingState = true;
+
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
@@ -237,6 +241,10 @@ public partial class ApplicationImpl
         Sixel.Clear ();
 
         // === 10. Reset ForceDriver ===
+        // Note: ForceDriver and Force16Colors are reset
+        // If they need to persist across Init/Shutdown cycles
+        // then the user of the library should manage that state
+        Force16Colors = false;
         ForceDriver = string.Empty;
 
         // === 11. Reset synchronization context ===
@@ -248,8 +256,7 @@ public partial class ApplicationImpl
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
 
-        // Note: ForceDriver and Force16Colors are NOT reset; 
-        // they need to persist across Init/Shutdown cycles
+        _isResetingState = false;
     }
 
     /// <summary>
