@@ -75,7 +75,7 @@ public partial class ApplicationImpl : IApplication
         {
             if (_keyboard is null)
             {
-                _keyboard = new KeyboardImpl { Application = this };
+                _keyboard = new KeyboardImpl { App = this };
             }
 
             return _keyboard;
@@ -90,8 +90,22 @@ public partial class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ApplicationPopover? Popover { get; set; }
 
+    private ApplicationNavigation? _navigation;
+
     /// <inheritdoc/>
-    public ApplicationNavigation? Navigation { get; set; }
+    public ApplicationNavigation? Navigation
+    {
+        get
+        {
+            if (_navigation is null)
+            {
+                _navigation = new () { App = this };
+            }
+
+            return _navigation;
+        }
+        set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
+    }
 
     /// <inheritdoc/>
     public Toplevel? Current { get; set; }

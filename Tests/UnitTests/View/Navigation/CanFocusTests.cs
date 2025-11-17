@@ -88,20 +88,21 @@ public class CanFocusTests
     [Fact]
     public void CanFocus_Set_True_Get_AdvanceFocus_Works ()
     {
+        IApplication app = new ApplicationImpl ();
+        app.Current = new () { App = app };
+
         Label label = new () { Text = "label" };
         View view = new () { Text = "view", CanFocus = true };
-        Application.Navigation = new ();
-        Application.Current = new ();
-        Application.Current.Add (label, view);
+        app.Current.Add (label, view);
 
-        Application.Current.SetFocus ();
-        Assert.Equal (view, Application.Navigation.GetFocused ());
+        app.Current.SetFocus ();
+        Assert.Equal (view, app.Navigation!.GetFocused ());
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
         Assert.True (view.CanFocus);
         Assert.True (view.HasFocus);
 
-        Assert.False (Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.False (app.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
@@ -111,7 +112,7 @@ public class CanFocusTests
         Assert.True (view.HasFocus);
 
         // label can now be focused, so AdvanceFocus should move to it.
-        Assert.True (Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.True (app.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
@@ -120,11 +121,11 @@ public class CanFocusTests
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
-        Application.Current.Dispose ();
-        Application.ResetState ();
+        app.Current.Dispose ();
+        app.ResetState ();
     }
 }

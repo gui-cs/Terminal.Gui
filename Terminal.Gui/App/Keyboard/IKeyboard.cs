@@ -3,7 +3,7 @@ namespace Terminal.Gui.App;
 /// <summary>
 ///     Defines a contract for managing keyboard input and key bindings at the Application level.
 ///     <para>
-///         This interface decouples keyboard handling state from the static <see cref="Application"/> class,
+///         This interface decouples keyboard handling state from the static <see cref="App"/> class,
 ///         enabling parallelizable unit tests and better testability.
 ///     </para>
 /// </summary>
@@ -13,7 +13,7 @@ public interface IKeyboard
     /// Sets the application instance that this keyboard handler is associated with.
     /// This provides access to application state without coupling to static Application class.
     /// </summary>
-    IApplication? Application { get; set; }
+    IApplication? App { get; set; }
 
     /// <summary>
     ///     Called when the user presses a key (by the <see cref="IDriver"/>). Raises the cancelable

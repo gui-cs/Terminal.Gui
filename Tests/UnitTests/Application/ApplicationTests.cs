@@ -358,7 +358,7 @@ public class ApplicationTests
             //Assert.Null (Application._lastMousePosition);
 
             // Navigation
-            Assert.Null (Application.Navigation);
+           // Assert.Null (Application.Navigation);
 
             // Popover
             Assert.Null (Application.Popover);

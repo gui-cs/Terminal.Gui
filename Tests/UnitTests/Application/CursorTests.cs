@@ -121,12 +121,12 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_Focused_With_Position_Returns_True ()
     {
-        Application.Navigation = new ();
         TestView view = new ()
         {
             CanFocus = false,
             Width = 1,
             Height = 1,
+            App = ApplicationImpl.Instance
         };
         view.CanFocus = true;
         view.SetFocus ();

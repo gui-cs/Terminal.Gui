@@ -33,8 +33,8 @@ public partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        Debug.Assert (Navigation is null);
-        Navigation = new ();
+       // Debug.Assert (Navigation is null);
+       // Navigation = new ();
 
         Debug.Assert (Popover is null);
         Popover = new ();
@@ -49,7 +49,7 @@ public partial class ApplicationImpl
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new KeyboardImpl { Application = this };
+        _keyboard = new KeyboardImpl { App = this };
 
         // Restore previously set keys if they existed and were different from defaults
         if (hasExistingKeyboard)
@@ -221,7 +221,7 @@ public partial class ApplicationImpl
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
-        Navigation = null;
+        //Navigation = null;
 
         // === 8. Reset initialization state ===
         Initialized = false;

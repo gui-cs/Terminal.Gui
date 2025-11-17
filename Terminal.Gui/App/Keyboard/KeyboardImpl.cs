@@ -3,7 +3,7 @@ namespace Terminal.Gui.App;
 /// <summary>
 ///     INTERNAL: Implements <see cref="IKeyboard"/> to manage keyboard input and key bindings at the Application level.
 ///     <para>
-///         This implementation decouples keyboard handling state from the static <see cref="Application"/> class,
+///         This implementation decouples keyboard handling state from the static <see cref="App"/> class,
 ///         enabling parallelizable unit tests and better testability.
 ///     </para>
 ///     <para>
@@ -25,7 +25,7 @@ internal class KeyboardImpl : IKeyboard
     private readonly Dictionary<Command, View.CommandImplementation> _commandImplementations = new ();
 
     /// <inheritdoc/>
-    public IApplication? Application { get; set; }
+    public IApplication? App { get; set; }
 
     /// <inheritdoc/>
     public KeyBindings KeyBindings { get; internal set; } = new (null);
@@ -133,16 +133,16 @@ internal class KeyboardImpl : IKeyboard
             return true;
         }
 
-        if (Application?.Popover?.DispatchKeyDown (key) is true)
+        if (App?.Popover?.DispatchKeyDown (key) is true)
         {
             return true;
         }
 
-        if (Application?.Current is null)
+        if (App?.Current is null)
         {
-            if (Application?.SessionStack is { })
+            if (App?.SessionStack is { })
             {
-                foreach (Toplevel topLevel in Application.SessionStack.ToList ())
+                foreach (Toplevel topLevel in App.SessionStack.ToList ())
                 {
                     if (topLevel.NewKeyDownEvent (key))
                     {
@@ -158,7 +158,7 @@ internal class KeyboardImpl : IKeyboard
         }
         else
         {
-            if (Application.Current.NewKeyDownEvent (key))
+            if (App.Current.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -176,7 +176,7 @@ internal class KeyboardImpl : IKeyboard
     /// <inheritdoc/>
     public bool RaiseKeyUpEvent (Key key)
     {
-        if (Application?.Initialized != true)
+        if (App?.Initialized != true)
         {
             return true;
         }
@@ -191,9 +191,9 @@ internal class KeyboardImpl : IKeyboard
 
         // TODO: Add Popover support
 
-        if (Application?.SessionStack is { })
+        if (App?.SessionStack is { })
         {
-            foreach (Toplevel topLevel in Application.SessionStack.ToList ())
+            foreach (Toplevel topLevel in App.SessionStack.ToList ())
             {
                 if (topLevel.NewKeyUpEvent (key))
                 {
@@ -291,7 +291,7 @@ internal class KeyboardImpl : IKeyboard
                     Command.Quit,
                     () =>
                     {
-                        Application?.RequestStop ();
+                        App?.RequestStop ();
 
                         return true;
                     }
@@ -300,32 +300,32 @@ internal class KeyboardImpl : IKeyboard
                     Command.Suspend,
                     () =>
                     {
-                        Application?.Driver?.Suspend ();
+                        App?.Driver?.Suspend ();
 
                         return true;
                     }
                    );
         AddCommand (
                     Command.NextTabStop,
-                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
+                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.PreviousTabStop,
-                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
+                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.NextTabGroup,
-                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
+                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.PreviousTabGroup,
-                    () => Application?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
+                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.Refresh,
                     () =>
                     {
-                        Application?.LayoutAndDraw (true);
+                        App?.LayoutAndDraw (true);
 
                         return true;
                     }
@@ -335,7 +335,7 @@ internal class KeyboardImpl : IKeyboard
                     Command.Arrange,
                     () =>
                     {
-                        View? viewToArrange = Application?.Navigation?.GetFocused ();
+                        View? viewToArrange = App?.Navigation?.GetFocused ();
 
                         // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
                         while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })
