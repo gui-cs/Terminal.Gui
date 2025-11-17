@@ -28,10 +28,15 @@ public static partial class Application // Driver abstractions
         get => ApplicationImpl.Instance.ForceDriver;
         set
         {
-            if (!string.IsNullOrEmpty (ApplicationImpl.Instance.ForceDriver))
+            if (!string.IsNullOrEmpty (ApplicationImpl.Instance.ForceDriver) && value != Driver?.GetName ())
             {
                 // ForceDriver cannot be changed if it has a valid value
                 return;
+            }
+
+            if (ApplicationImpl.Instance.Initialized && value != Driver?.GetName ())
+            {
+                throw new InvalidOperationException ($"The {nameof (ForceDriver)} can only be set before initialized.");
             }
 
             ApplicationImpl.Instance.ForceDriver = value;

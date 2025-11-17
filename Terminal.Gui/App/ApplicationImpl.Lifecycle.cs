@@ -34,6 +34,11 @@ public partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
+        if (string.IsNullOrWhiteSpace (_driverName) && driver is { })
+        {
+            _driverName = driver.GetName ();
+        }
+
         Debug.Assert (Navigation is null);
         Navigation = new ();
 
@@ -63,7 +68,7 @@ public partial class ApplicationImpl
             _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
         }
 
-        CreateDriver (driverName ?? _driverName);
+        CreateDriver (_driverName);
         Screen = Driver!.Screen;
         Initialized = true;
 
