@@ -52,7 +52,6 @@ public partial class ApplicationImpl
                 // clean it up here if is the same as _CachedSessionTokenToplevel
                 if (Current == CachedSessionTokenToplevel)
                 {
-                    Current.App = null;
                     Current = null;
                 }
                 else
@@ -115,8 +114,6 @@ public partial class ApplicationImpl
 
                 Current?.OnDeactivate (toplevel);
                 Toplevel previousTop = Current!;
-
-                previousTop.App = null;
 
                 Current = toplevel;
                 Current.App = Instance;
@@ -256,11 +253,6 @@ public partial class ApplicationImpl
 
         if (SessionStack.TryPeek (out Toplevel? newTop))
         {
-            if (Current is { })
-            {
-                Current.App = null;
-            }
-
             newTop.App = Instance;
             Current = newTop;
             Current?.SetNeedsDraw ();
