@@ -128,7 +128,7 @@ public class Margin : Adornment
             // This just draws/clears the thickness, not the insides.
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             //SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            Thickness.Draw (screen, Diagnostics, ToString ());
+            Thickness.Draw (Driver, screen, Diagnostics, ToString ());
         }
 
         if (ShadowStyle != ShadowStyle.None)

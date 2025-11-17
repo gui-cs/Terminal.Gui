@@ -205,7 +205,7 @@ public partial class View // Drawing APIs
         if (Margin?.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
-            Margin?.Thickness.Draw (FrameToScreen ());
+            Margin?.Thickness.Draw (Driver, FrameToScreen ());
             Margin?.Parent?.SetSubViewNeedsDraw ();
         }
 
