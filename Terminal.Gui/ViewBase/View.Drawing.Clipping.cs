@@ -31,7 +31,7 @@ public partial class View
     {
         // BUGBUG: If region is null we should set the clip to null.
         // BUGBUG: Fixing  this probably breaks other things.
-        if (driver is { } && region is { })
+        if (Driver is { } && region is { })
         {
             Driver.Clip = region;
         }
