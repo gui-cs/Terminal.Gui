@@ -1,9 +1,8 @@
 using System.Globalization;
-using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class NumericUpDownTests : GlobalTestSetup
+public class NumericUpDownTests
 {
     [Fact]
     public void WhenCreated_ShouldHaveDefaultValues_int ()

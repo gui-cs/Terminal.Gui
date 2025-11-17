@@ -1,10 +1,9 @@
 #nullable enable
-using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "Output")]
-public class NeedsDrawTests : GlobalTestSetup
+public class NeedsDrawTests
 {
     [Fact]
     public void NeedsDraw_False_If_Width_Height_Zero ()

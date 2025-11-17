@@ -1,8 +1,6 @@
-﻿using UnitTests.Parallelizable;
+﻿namespace UnitTests_Parallelizable.LayoutTests;
 
-namespace UnitTests_Parallelizable.LayoutTests;
-
-public class FrameTests : GlobalTestSetup
+public class FrameTests
 {
     [Fact]
     public void Frame_Empty_Default ()

@@ -2,7 +2,7 @@
 
 namespace UnitTests_Parallelizable.LayoutTests;
 
-public partial class DimAutoTests : GlobalTestSetup
+public partial class DimAutoTests
 {
     // Tests all the Pos Types in SubView scenarios to ensure DimAutoStyle.Content is calculated correctly
 

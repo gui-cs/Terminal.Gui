@@ -4,7 +4,7 @@ using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ApplicationTests;
 
-public class ApplicationPopoverTests : GlobalTestSetup
+public class ApplicationPopoverTests
 {
     [Fact]
     public void Register_AddsPopover ()

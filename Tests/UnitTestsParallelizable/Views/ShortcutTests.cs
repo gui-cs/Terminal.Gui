@@ -6,7 +6,7 @@ namespace UnitTests_Parallelizable.ViewsTests;
 [Collection ("Global Test Setup")]
 
 [TestSubject (typeof (Shortcut))]
-public class ShortcutTests : GlobalTestSetup
+public class ShortcutTests
 {
     [Fact]
     public void Constructor_Defaults ()

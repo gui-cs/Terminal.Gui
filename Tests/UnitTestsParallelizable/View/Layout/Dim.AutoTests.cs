@@ -1,13 +1,11 @@
 ﻿using System.Text;
-using UnitTests;
-using UnitTests.Parallelizable;
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
 namespace UnitTests_Parallelizable.LayoutTests;
 
 [Trait ("Category", "Layout")]
-public partial class DimAutoTests (ITestOutputHelper output) : GlobalTestSetup
+public partial class DimAutoTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 

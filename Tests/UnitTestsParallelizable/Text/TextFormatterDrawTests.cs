@@ -1,11 +1,12 @@
 ﻿#nullable enable
 using System.Text;
 using UICatalog;
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.TextTests;
+namespace UnitTests_Parallelizable.TextTests;
 
 public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 {
