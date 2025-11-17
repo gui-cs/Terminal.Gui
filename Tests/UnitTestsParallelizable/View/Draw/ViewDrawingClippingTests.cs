@@ -22,7 +22,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         Assert.NotNull (result);
         Assert.Equal (region, result);
     }
-    
+
     [Fact]
     public void SetClip_NullRegion_DoesNothing ()
     {
@@ -649,6 +649,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
 
         view.Draw ();
 
+        Assert.Equal (originalClip, driver.Clip);
         // After draw, clip should be restored (though it may be modified)
         Assert.NotNull (driver.Clip);
     }

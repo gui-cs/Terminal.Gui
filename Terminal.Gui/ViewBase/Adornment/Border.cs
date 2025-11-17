@@ -500,7 +500,7 @@ public partial class Border : Adornment
 
                 if (drawTop)
                 {
-                    hruler.Draw (new (screenBounds.X, screenBounds.Y));
+                    hruler.Draw (new (screenBounds.X, screenBounds.Y), driver: Driver);
                 }
 
                 // Redraw title 
@@ -518,19 +518,19 @@ public partial class Border : Adornment
 
                 if (drawLeft)
                 {
-                    vruler.Draw (new (screenBounds.X, screenBounds.Y + 1), 1);
+                    vruler.Draw (new (screenBounds.X, screenBounds.Y + 1), 1, driver: Driver);
                 }
 
                 // Bottom
                 if (drawBottom)
                 {
-                    hruler.Draw (new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+                    hruler.Draw (new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), driver: Driver);
                 }
 
                 // Right
                 if (drawRight)
                 {
-                    vruler.Draw (new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+                    vruler.Draw (new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1, driver: Driver);
                 }
             }
 
