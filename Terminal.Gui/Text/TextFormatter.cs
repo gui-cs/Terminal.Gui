@@ -51,20 +51,22 @@ public class TextFormatter
     ///     Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to
     ///     <c>false</c>.
     /// </remarks>
+    /// <param name="driver">The console driver currently used by the application.</param>
     /// <param name="screen">Specifies the screen-relative location and maximum size for drawing the text.</param>
     /// <param name="normalColor">The color to use for all text except the hotkey</param>
     /// <param name="hotColor">The color to use to draw the hotkey</param>
     /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>
-    /// <param name="driver">The console driver currently used by the application.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Draw (
+        IDriver? driver,
         Rectangle screen,
         Attribute normalColor,
         Attribute hotColor,
-        Rectangle maximum = default,
-        IDriver? driver = null
+        Rectangle maximum = default
     )
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         // With this check, we protect against subclasses with overrides of Text (like Button)
         if (string.IsNullOrEmpty (Text))
         {

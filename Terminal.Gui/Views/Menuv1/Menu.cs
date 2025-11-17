@@ -967,12 +967,11 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
-                             i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
-                             i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
-                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty,
-                             driver: Driver
-                            );
+                             driver: Driver,
+                             screen: ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
+                             normalColor: i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                             hotColor: i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                             maximum: SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty);
                 }
                 else
                 {

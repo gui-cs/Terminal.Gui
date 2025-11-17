@@ -186,12 +186,11 @@ public class ProgressBar : View, IDesignable
             }
 
             tf.Draw (
-                     ViewportToScreen (Viewport),
-                     attr,
-                     GetAttributeForRole (VisualRole.Normal),
-                     SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle),
-                     driver: Driver
-                    );
+                     driver: Driver,
+                     screen: ViewportToScreen (Viewport),
+                     normalColor: attr,
+                     hotColor: GetAttributeForRole (VisualRole.Normal),
+                     maximum: SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle));
         }
 
         return true;

@@ -44,7 +44,7 @@ internal class FakeVAxis : VerticalAxis
 
 #endregion
 
-public class GraphViewTests
+public class GraphViewTests : FakeDriverBase
 {
     /// <summary>
     ///     A cell size of 0 would result in mapping all graph space into the same cell of the console.  Since
@@ -74,7 +74,10 @@ public class GraphViewTests
     /// <returns></returns>
     public static GraphView GetGraph ()
     {
-        var gv = new GraphView ();
+        var gv = new GraphView ()
+        {
+            Driver = Application.Driver ?? CreateFakeDriver ()
+        };
         gv.BeginInit ();
         gv.EndInit ();
 
@@ -677,12 +680,13 @@ public class MultiBarSeriesTests
     }
 }
 
-public class BarSeriesTests
+public class BarSeriesTests : FakeDriverBase
 {
     [Fact]
     public void TestOneLongOneShortHorizontalBars_WithOffset ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+        graph.Driver = CreateFakeDriver ();
         graph.Draw ();
 
         // no bars

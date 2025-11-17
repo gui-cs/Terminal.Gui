@@ -1731,11 +1731,7 @@ public class TextField : View, IDesignable
                                              GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // Use TitleTextFormatter to render the caption with hotkey support
-        TitleTextFormatter.Draw (
-                                 ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)),
-                                 captionAttribute,
-                                 hotKeyAttribute,
-                                 driver: Driver);
+        TitleTextFormatter.Draw (driver: Driver, screen: ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), normalColor: captionAttribute, hotColor: hotKeyAttribute);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)

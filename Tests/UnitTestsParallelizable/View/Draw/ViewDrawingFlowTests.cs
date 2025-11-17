@@ -59,7 +59,7 @@ public class ViewDrawingFlowTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void SetNeedsDraw_WithRectangle_UpdatesNeedsDrawRect ()
     {
-        var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
+        var view = new View { Driver = CreateFakeDriver (), X = 0, Y = 0, Width = 20, Height = 20 };
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();

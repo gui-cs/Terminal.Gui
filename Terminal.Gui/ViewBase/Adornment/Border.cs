@@ -322,11 +322,7 @@ public partial class Border : Adornment
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
-            Parent.TitleTextFormatter.Draw (
-                                            titleRect,
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal),
-                                            driver: Driver);
+            Parent.TitleTextFormatter.Draw (driver: Driver, screen: titleRect, normalColor: GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal), hotColor: GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
             Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
@@ -500,17 +496,13 @@ public partial class Border : Adornment
 
                 if (drawTop)
                 {
-                    hruler.Draw (new (screenBounds.X, screenBounds.Y), driver: Driver);
+                    hruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y));
                 }
 
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
                 {
-                    Parent!.TitleTextFormatter.Draw (
-                                                     new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal),
-                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal),
-                                                     driver: Driver);
+                    Parent!.TitleTextFormatter.Draw (driver: Driver, screen: new (borderBounds.X + 2, titleY, maxTitleWidth, 1), normalColor: Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal), hotColor: Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal));
                 }
 
                 //Left
@@ -518,19 +510,19 @@ public partial class Border : Adornment
 
                 if (drawLeft)
                 {
-                    vruler.Draw (new (screenBounds.X, screenBounds.Y + 1), 1, driver: Driver);
+                    vruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y + 1), start: 1);
                 }
 
                 // Bottom
                 if (drawBottom)
                 {
-                    hruler.Draw (new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), driver: Driver);
+                    hruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
                 }
 
                 // Right
                 if (drawRight)
                 {
-                    vruler.Draw (new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1, driver: Driver);
+                    vruler.Draw (driver: Driver, location: new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), start: 1);
                 }
             }
 

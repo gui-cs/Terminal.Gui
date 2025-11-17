@@ -20,11 +20,12 @@ internal class Ruler
     private string _vTemplate { get; } = "-123456789";
 
     /// <summary>Draws the <see cref="Ruler"/>.</summary>
+    /// <param name="driver">Optional Driver. If not provided, driver will be used.</param>
     /// <param name="location">The location to start drawing the ruler, in screen-relative coordinates.</param>
     /// <param name="start">The start value of the ruler.</param>
-    /// <param name="driver">Optional Driver. If not provided, driver will be used.</param>
-    public void Draw (Point location, int start = 0, IDriver? driver = null)
+    public void Draw (IDriver? driver, Point location, int start = 0)
     {
+        ArgumentNullException.ThrowIfNull (driver);
         if (start < 0)
         {
             throw new ArgumentException ("start must be greater than or equal to 0");
@@ -34,8 +35,6 @@ internal class Ruler
         {
             return;
         }
-
-        driver ??= Application.Driver;
 
         if (Orientation == Orientation.Horizontal)
         {

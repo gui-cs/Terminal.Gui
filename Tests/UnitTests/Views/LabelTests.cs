@@ -1,5 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
@@ -112,9 +111,9 @@ public class LabelTests (ITestOutputHelper output)
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+        tf1.Draw (driver: Application.Driver, screen: new (new (0, 1), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
 
-        tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+        tf2.Draw (driver: Application.Driver, screen: new (new (0, 2), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -135,10 +134,12 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
-        tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+
+        tf1.Draw (driver: Application.Driver, screen: new (new (0, 1), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+
+        tf2.Draw (driver: Application.Driver, screen: new (new (0, 2), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -703,6 +704,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
+
             //Width = Dim.Fill (),
             X = 0, // keep unit test focused; don't use Center here
             Y = Pos.AnchorEnd (1)
@@ -749,6 +751,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
+
             //Width = Dim.Fill (),
             X = 0,
             Y = Pos.Bottom (win)
