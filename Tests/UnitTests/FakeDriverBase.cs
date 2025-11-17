@@ -34,6 +34,5 @@ public abstract class FakeDriverBase : IDisposable
     public void Dispose ()
     {
         Application.ResetState (true);
-        GC.SuppressFinalize(this);
     }
 }
