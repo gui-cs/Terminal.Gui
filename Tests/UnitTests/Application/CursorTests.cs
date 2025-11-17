@@ -21,7 +21,7 @@ public class CursorTests
         {
             if (TestLocation.HasValue && HasFocus)
             {
-                Driver.SetCursorVisibility (CursorVisibility.Default);
+                Driver?.SetCursorVisibility (CursorVisibility.Default);
             }
             return TestLocation;
         }

@@ -133,7 +133,7 @@ public class ClearViewportTests (ITestOutputHelper output)
  └─┘",
                                                        output);
 
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
 
         view.ClearViewport ();
 
@@ -172,7 +172,7 @@ public class ClearViewportTests (ITestOutputHelper output)
  │X│
  └─┘",
                                                        output);
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         view.ClearViewport ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -203,7 +203,7 @@ public class ClearViewportTests (ITestOutputHelper output)
                                        }
                                    }
 
-                                   View.SetClip (savedClip);
+                                   View.SetClip (Application.Driver, savedClip);
                                    e.Cancel = true;
                                };
         var top = new Toplevel ();
@@ -268,7 +268,7 @@ public class ClearViewportTests (ITestOutputHelper output)
                                        }
                                    }
 
-                                   View.SetClip (savedClip);
+                                   View.SetClip (Application.Driver, savedClip);
                                    e.Cancel = true;
                                };
         var top = new Toplevel ();

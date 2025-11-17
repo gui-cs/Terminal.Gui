@@ -51,7 +51,7 @@ public partial class View // Drawing APIs
         {
             return;
         }
-        Region? originalClip = GetClip ();
+        Region? originalClip = GetClip (Driver);
 
         // TODO: This can be further optimized by checking NeedsDraw below and only
         // TODO: clearing, drawing text, drawing content, etc. if it is true.
@@ -62,7 +62,7 @@ public partial class View // Drawing APIs
             // Note Margin with a Shadow is special-cased and drawn in a separate pass to support
             // transparent shadows.
             DoDrawAdornments (originalClip);
-            SetClip (originalClip);
+            SetClip (Driver, originalClip);
 
             // ------------------------------------
             // Clear the Viewport
@@ -98,7 +98,7 @@ public partial class View // Drawing APIs
             // Draw the line canvas
             // Restore the clip before rendering the line canvas and adornment subviews
             // because they may draw outside the viewport.
-            SetClip (originalClip);
+            SetClip (Driver, originalClip);
             originalClip = AddFrameToClip ();
             DoRenderLineCanvas ();
 
@@ -141,7 +141,7 @@ public partial class View // Drawing APIs
 
         // ------------------------------------
         // Reset the clip to what it was when we started
-        SetClip (originalClip);
+        SetClip (Driver, originalClip);
 
         // ------------------------------------
         // We're done drawing - The Clip is reset to what it was before we started.
@@ -169,7 +169,7 @@ public partial class View // Drawing APIs
 
             Region? saved = Border?.AddFrameToClip ();
             Border?.DoDrawSubViews ();
-            SetClip (saved);
+            SetClip (Driver, saved);
         }
 
         if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
@@ -181,7 +181,7 @@ public partial class View // Drawing APIs
 
             Region? saved = Padding?.AddFrameToClip ();
             Padding?.DoDrawSubViews ();
-            SetClip (saved);
+            SetClip (Driver, saved);
         }
     }
 
@@ -199,7 +199,7 @@ public partial class View // Drawing APIs
             clipAdornments?.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
             clipAdornments?.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
             clipAdornments?.Combine (originalClip, RegionOp.Intersect);
-            SetClip (clipAdornments);
+            SetClip (Driver, clipAdornments);
         }
 
         if (Margin?.NeedsLayout == true)

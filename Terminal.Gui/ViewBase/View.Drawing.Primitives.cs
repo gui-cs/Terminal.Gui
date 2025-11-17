@@ -63,7 +63,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         When the method returns, the draw position will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="GetClip()"/> or <see cref="Application.Screen"/>.
+    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="GetClip"/> or <see cref="Application.Screen"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
@@ -142,7 +142,7 @@ public partial class View
         Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
         SetAttribute (prev);
-        SetClip (prevClip);
+        SetClip (Driver, prevClip);
     }
 
     /// <summary>Fills the specified <see cref="Viewport"/>-relative rectangle.</summary>
@@ -158,7 +158,7 @@ public partial class View
         Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Driver.FillRect (toClear, rune);
-        SetClip (prevClip);
+        SetClip (Driver, prevClip);
     }
 
 }

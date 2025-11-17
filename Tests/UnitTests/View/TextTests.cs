@@ -13,6 +13,7 @@ public class TextTests (ITestOutputHelper output)
     public void Setting_With_Height_Horizontal ()
     {
         var top = new View { Width = 25, Height = 25 };
+        top.App = ApplicationImpl.Instance;
 
         var label = new Label { Text = "Hello", /* Width = 10, Height = 2, */ ValidatePosDim = true };
         var viewX = new View { Text = "X", X = Pos.Right (label), Width = 1, Height = 1 };
@@ -39,7 +40,7 @@ Y
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
         top.LayoutSubViews ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         top.Draw ();
 
         expected = @"
@@ -1000,6 +1001,7 @@ w ";
     {
         Application.Driver!.SetScreenSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
+        top.App = ApplicationImpl.Instance;
 
         var text = $"First line{Environment.NewLine}Second line";
         var horizontalView = new View { Width = 20, Height = 1, Text = text };
@@ -1075,7 +1077,7 @@ w ";
         verticalView.Width = 2;
         verticalView.TextFormatter.ConstrainToSize = new (2, 20);
         Assert.True (verticalView.TextFormatter.NeedsFormat);
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         top.Draw ();
         Assert.Equal (new (0, 3, 2, 20), verticalView.Frame);
 

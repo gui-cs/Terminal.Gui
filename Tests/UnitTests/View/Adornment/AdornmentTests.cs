@@ -59,7 +59,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (6, view.Width);
         Assert.Equal (3, view.Height);
 
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         view.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (

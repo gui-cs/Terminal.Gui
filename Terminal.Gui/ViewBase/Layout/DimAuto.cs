@@ -30,8 +30,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         var textSize = 0;
         var maxCalculatedSize = 0;
 
+        // 2048 x 2048 supports unit testing where no App is running.
+        Size screenSize = us.App?.Screen.Size ?? new (2048, 2048);
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-        int screenX4 = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
+        int screenX4 = dimension == Dimension.Width ? screenSize.Width * 4 : screenSize.Height * 4;
         int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4;
 
         //Debug.WriteLineIf (autoMin > autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");

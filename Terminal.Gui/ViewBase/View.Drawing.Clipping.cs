@@ -15,7 +15,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <returns>The current Clip.</returns>
-    public static Region? GetClip () { return Application.Driver?.Clip; }
+    public static Region? GetClip (IDriver? driver) => driver?.Clip;
 
     /// <summary>
     ///     Sets the Clip to the specified region.
@@ -26,18 +26,20 @@ public partial class View
     ///         region.
     ///     </para>
     /// </remarks>
+    /// <param name="driver"></param>
     /// <param name="region"></param>
-    public static void SetClip (Region? region)
+    public static void SetClip (IDriver? driver, Region? region)
     {
-        if (Application.Driver is { } && region is { })
+        if (driver is { } && region is { })
         {
-            Application.Driver.Clip = region;
+            driver.Clip = region;
         }
     }
 
     /// <summary>
     ///     Sets the Clip to be the rectangle of the screen.
     /// </summary>
+    /// <param name="driver"></param>
     /// <remarks>
     ///     <para>
     ///         There is a single clip region for the entire application. This method sets the clip region to the screen.
@@ -50,13 +52,13 @@ public partial class View
     /// <returns>
     ///     The current Clip, which can be then re-applied <see cref="View.SetClip"/>
     /// </returns>
-    public static Region? SetClipToScreen ()
+    public static Region? SetClipToScreen (IDriver? driver)
     {
-        Region? previous = GetClip ();
+        Region? previous = GetClip (driver);
 
         if (Application.Driver is { })
         {
-            Application.Driver.Clip = new (Application.Screen);
+            Application.Driver.Clip = new (driver!.Screen);
         }
 
         return previous;
@@ -103,7 +105,7 @@ public partial class View
             return null;
         }
 
-        Region previous = GetClip () ?? new (Application.Screen);
+        Region previous = GetClip (Driver) ?? new (Application.Screen);
 
         Region frameRegion = previous.Clone ();
 
@@ -117,7 +119,7 @@ public partial class View
             frameRegion.Exclude (adornment.Thickness.GetInside (FrameToScreen()));
         }
 
-        SetClip (frameRegion);
+        SetClip (Driver, frameRegion);
 
         return previous;
     }
@@ -150,7 +152,7 @@ public partial class View
             return null;
         }
 
-        Region previous = GetClip () ?? new (Application.Screen);
+        Region previous = GetClip (Driver) ?? new (Application.Screen);
 
         Region viewportRegion = previous.Clone ();
 
@@ -170,7 +172,7 @@ public partial class View
             viewportRegion?.Exclude (adornment.Thickness.GetInside (viewport));
         }
 
-        SetClip (viewportRegion);
+        SetClip (Driver, viewportRegion);
 
         return previous;
     }

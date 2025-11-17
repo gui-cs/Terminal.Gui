@@ -6827,7 +6827,7 @@ line.
         tv.CursorPosition = new (6, 2);
         Assert.Equal (new (5, 2), tv.CursorPosition);
         top.LayoutSubViews ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (

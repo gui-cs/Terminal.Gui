@@ -836,7 +836,7 @@ internal sealed class Menu : View
         RenderLineCanvas ();
 
         // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
-        Region? savedClip = SetClipToScreen ();
+        Region? savedClip = SetClipToScreen (Driver);
 
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
@@ -1004,6 +1004,6 @@ internal sealed class Menu : View
             }
         }
 
-        SetClip (savedClip);
+        SetClip (Driver, savedClip);
     }
 }

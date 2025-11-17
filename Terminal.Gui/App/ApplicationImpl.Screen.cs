@@ -168,9 +168,9 @@ public partial class ApplicationImpl
             Driver?.ClearContents ();
         }
 
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Driver);
         View.Draw (tops, neededLayout || forceRedraw);
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Driver);
         Driver?.Refresh ();
     }
 }

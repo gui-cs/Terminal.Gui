@@ -650,7 +650,7 @@ public class MultiBarSeriesTests
         fakeXAxis.LabelPoints.Clear ();
         gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         gv.Draw ();
 
         Assert.Equal (3, fakeXAxis.LabelPoints.Count);
@@ -1125,7 +1125,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         gv.Draw ();
 
         // we expect the text annotation to go down one line since
@@ -1222,7 +1222,7 @@ public class TextAnnotationTests
                             new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
                            );
         gv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         gv.Draw ();
 
         var expected =
@@ -1238,7 +1238,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1257,7 +1257,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        View.SetClipToScreen (Application.Driver);
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1528,7 +1528,7 @@ public class PathAnnotationTests
             // change the text and redraw
             view.Text = "ff1234";
             mount.SetNeedsDraw ();
-            View.SetClipToScreen ();
+            View.SetClipToScreen (Application.Driver);
             mount.Draw ();
 
             // should have the new text rendered
