@@ -30,136 +30,129 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         var scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
         var propertyName = string.Empty;
 
-        try
+        while (reader.Read ())
         {
-            while (reader.Read ())
+            if (reader.TokenType == JsonTokenType.EndObject)
             {
-                if (reader.TokenType == JsonTokenType.EndObject)
+                return scope!;
+            }
+
+            if (reader.TokenType != JsonTokenType.PropertyName)
+            {
+                throw new JsonException ($"After {propertyName}: Expected a JSON property name, but got \"{reader.TokenType}\"");
+            }
+
+            propertyName = reader.GetString ();
+            reader.Read ();
+
+            // Get the hardcoded property from the TscopeT (e.g. ThemeScope.GetHardCodedProperty)
+            ConfigProperty? configProperty = scope.GetHardCodedProperty (propertyName!);
+
+            if (propertyName is { } && configProperty is { })
+            {
+                // This property name was found in the cached hard-coded scope dict.
+
+                // Add it, with no value
+                configProperty.HasValue = false;
+                configProperty.PropertyValue = null;
+                scope.TryAdd (propertyName, configProperty);
+
+                // Figure out if it needs a JsonConverter and if so, create one
+                Type? propertyType = configProperty?.PropertyInfo?.PropertyType!;
+
+                if (configProperty?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
+                    JsonConverterAttribute jca)
                 {
-                    return scope!;
-                }
+                    object? converter = Activator.CreateInstance (jca.ConverterType!)!;
 
-                if (reader.TokenType != JsonTokenType.PropertyName)
-                {
-                    throw new JsonException ($"After {propertyName}: Expected a JSON property name, but got \"{reader.TokenType}\"");
-                }
-
-                propertyName = reader.GetString ();
-                reader.Read ();
-
-                // Get the hardcoded property from the TscopeT (e.g. ThemeScope.GetHardCodedProperty)
-                ConfigProperty? configProperty = scope.GetHardCodedProperty (propertyName!);
-
-                if (propertyName is { } && configProperty is { })
-                {
-                    // This property name was found in the cached hard-coded scope dict.
-
-                    // Add it, with no value
-                    configProperty.HasValue = false;
-                    configProperty.PropertyValue = null;
-                    scope.TryAdd (propertyName, configProperty);
-
-                    // Figure out if it needs a JsonConverter and if so, create one
-                    Type? propertyType = configProperty?.PropertyInfo?.PropertyType!;
-
-                    if (configProperty?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
-                        JsonConverterAttribute jca)
+                    if (converter.GetType ().BaseType == typeof (JsonConverterFactory))
                     {
-                        object? converter = Activator.CreateInstance (jca.ConverterType!)!;
+                        var factory = (JsonConverterFactory)converter;
 
-                        if (converter.GetType ().BaseType == typeof (JsonConverterFactory))
+                        if (factory.CanConvert (propertyType))
                         {
-                            var factory = (JsonConverterFactory)converter;
-
-                            if (factory.CanConvert (propertyType))
-                            {
-                                converter = factory.CreateConverter (propertyType, options);
-                            }
-                        }
-
-                        try
-                        {
-                            var type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
-                            var readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
-
-                            scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
-                        }
-                        catch (NotSupportedException e)
-                        {
-                            throw new JsonException (
-                                                     $"{propertyName}: Error reading property of type \"{propertyType?.Name}\".",
-                                                     e
-                                                    );
-                        }
-                        catch (TargetInvocationException)
-                        {
-                            // QUESTION: Should we try/catch here?
-                            scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
+                            converter = factory.CreateConverter (propertyType, options);
                         }
                     }
-                    else
+
+                    try
+                    {
+                        var type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
+                        var readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
+
+                        scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
+                    }
+                    catch (NotSupportedException e)
+                    {
+                        throw new JsonException (
+                                                 $"{propertyName}: Error reading property of type \"{propertyType?.Name}\".",
+                                                 e
+                                                );
+                    }
+                    catch (TargetInvocationException)
                     {
                         // QUESTION: Should we try/catch here?
-                        scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
+                        scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
                     }
-
-                    //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
                 }
                 else
                 {
-                    // It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
-                    // like ScopeSettings.$schema.
-                    // If so, don't add it to the dictionary but apply it to the underlying property on
-                    // the scopeT.
-                    // BUGBUG: This is terrible design. The only time it's used is for $schema though.
-                    PropertyInfo? property = scope!.GetType ()
-                                                   .GetProperties ()
-                                                   .Where (p =>
+                    // QUESTION: Should we try/catch here?
+                    scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
+                }
+
+                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
+            }
+            else
+            {
+                // It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
+                // like ScopeSettings.$schema.
+                // If so, don't add it to the dictionary but apply it to the underlying property on
+                // the scopeT.
+                // BUGBUG: This is terrible design. The only time it's used is for $schema though.
+                PropertyInfo? property = scope!.GetType ()
+                                               .GetProperties ()
+                                               .Where (p =>
+                                                       {
+                                                           if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
                                                            {
-                                                               if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
+                                                               var jsonPropertyNameAttribute =
+                                                                   p.GetCustomAttribute (
+                                                                                         typeof (JsonPropertyNameAttribute)
+                                                                                        ) as
+                                                                       JsonPropertyNameAttribute;
+
+                                                               if (jsonPropertyNameAttribute?.Name == propertyName)
                                                                {
-                                                                   var jsonPropertyNameAttribute =
-                                                                       p.GetCustomAttribute (
-                                                                                             typeof (JsonPropertyNameAttribute)
-                                                                                            ) as
-                                                                           JsonPropertyNameAttribute;
+                                                                   // Bit of a hack, modifying propertyName in an enumerator...
+                                                                   propertyName = p.Name;
 
-                                                                   if (jsonPropertyNameAttribute?.Name == propertyName)
-                                                                   {
-                                                                       // Bit of a hack, modifying propertyName in an enumerator...
-                                                                       propertyName = p.Name;
-
-                                                                       return true;
-                                                                   }
-
-                                                                   return p.Name == propertyName;
+                                                                   return true;
                                                                }
 
-                                                               return false;
+                                                               return p.Name == propertyName;
                                                            }
-                                                          )
-                                                   .FirstOrDefault ();
 
-                    if (property is { })
-                    {
-                        // Set the value of propertyName on the scopeT.
-                        PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
+                                                           return false;
+                                                       }
+                                                      )
+                                               .FirstOrDefault ();
 
-                        prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
-                    }
-                    else
-                    {
-                        // Unknown property
-                        // TODO: To support forward compatibility, we should just ignore unknown properties?
-                        // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
-                        throw new JsonException ($"{propertyName}: Unknown property name.");
-                    }
+                if (property is { })
+                {
+                    // Set the value of propertyName on the scopeT.
+                    PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
+
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
+                }
+                else
+                {
+                    // Unknown property
+                    // TODO: To support forward compatibility, we should just ignore unknown properties?
+                    // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
+                    throw new JsonException ($"{propertyName}: Unknown property name.");
                 }
             }
-        }
-        catch (Exception)
-        {
-            // ignored
         }
 
         throw new JsonException ($"{propertyName}: Json error in ScopeJsonConverter");
