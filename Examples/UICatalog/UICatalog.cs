@@ -56,8 +56,6 @@ namespace UICatalog;
 public class UICatalog
 {
     private static string? _forceDriver;
-    private static bool _forTesting;
-    private static bool _iterationHandlerRemoved;
     private static string? _uiCatalogDriver;
     private static string? _scenarioDriver;
 
@@ -65,20 +63,6 @@ public class UICatalog
     public static LoggingLevelSwitch LogLevelSwitch { get; } = new ();
     public const string LOGFILE_LOCATION = "logs";
     public static UICatalogCommandLineOptions Options { get; set; }
-
-    public static (string? UiCatalogDriver, string? ScenarioDriver) Run (string [] args)
-    {
-        // Flag for testing
-        _forTesting = true;
-
-        // Start app
-        Main (args);
-
-        // Unset testing flag
-        _forTesting = false;
-
-        return new (_uiCatalogDriver, _scenarioDriver);
-    }
 
     private static int Main (string [] args)
     {
@@ -267,13 +251,6 @@ public class UICatalog
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel ()
     {
-        if (_iterationHandlerRemoved)
-        {
-            _iterationHandlerRemoved = false;
-
-            return null!;
-        }
-
         // Run UI Catalog UI. When it exits, if _selectedScenario is != null then
         // a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
 
@@ -282,22 +259,9 @@ public class UICatalog
 
         Application.Init (driverName: _forceDriver);
 
-        Toplevel top;
+        _uiCatalogDriver = Application.Driver!.GetName ();
 
-        if (_forTesting)
-        {
-            top = new UICatalogTop ();
-            SessionToken sessionToken = Application.Begin (top);
-            UICatalogTop.CachedSelectedScenario = Scenario.GetScenarios () [0];
-            Application.End (sessionToken);
-
-            _uiCatalogDriver = Application.Driver!.GetName ();
-        }
-        else
-        {
-            top = Application.Run<UICatalogTop> ();
-        }
-
+        Toplevel top = Application.Run<UICatalogTop> ();
         top.Dispose ();
         Application.Shutdown ();
         VerifyObjectsWereDisposed ();
@@ -474,43 +438,8 @@ public class UICatalog
                 if (e.Value)
                 {
                     sw.Start ();
-
-                    if (_forTesting)
-                    {
-                        int iterationCount = 0;
-                        Key quitKey;
-
-                        Application.Iteration += OnApplicationOnIteration;
-
-                        void OnApplicationOnIteration (object? s, IterationEventArgs a)
-                        {
-                            iterationCount++;
-
-                            if (Application.Initialized)
-                            {
-                                // Press QuitKey
-                                quitKey = Application.QuitKey;
-
-                                Logging.Trace (
-                                               $"Attempting to quit with {quitKey} after {iterationCount} iterations.");
-
-                                try
-                                {
-                                    Application.RaiseKeyDownEvent (quitKey);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logging.Trace (
-                                                   $"Exception raising quit key: {ex.Message}");
-                                }
-
-                                Application.Iteration -= OnApplicationOnIteration;
-                                _iterationHandlerRemoved = true;
-
-                                _scenarioDriver = Application.Driver?.GetName ();
-                            }
-                        }
-                    }
+                    _scenarioDriver = Application.Driver!.GetName ();
+                    Debug.Assert (_scenarioDriver == _uiCatalogDriver);
                 }
                 else
                 {
