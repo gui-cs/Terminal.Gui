@@ -406,4 +406,10 @@ internal class DriverImpl : IDriver
 
         return sb.ToString ();
     }
+
+    /// <inheritdoc />
+    public string ToAnsi ()
+    {
+        return _output.ToAnsi (OutputBuffer);
+    }
 }

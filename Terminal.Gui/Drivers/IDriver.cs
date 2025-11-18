@@ -301,4 +301,11 @@ public interface IDriver
     /// </summary>
     /// <returns></returns>
     public string ToString ();
+
+    /// <summary>
+    ///     Gets an ANSI escape sequence representation of <see cref="Contents"/>. This is the
+    ///     same output as would be written to the terminal to recreate the current screen contents.
+    /// </summary>
+    /// <returns></returns>
+    public string ToAnsi ();
 }
