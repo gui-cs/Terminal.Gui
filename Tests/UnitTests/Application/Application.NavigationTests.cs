@@ -61,9 +61,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         var raised = false;
 
-        Application.Navigation = new ();
-
-        Application.Navigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
+        Application.Navigation!.FocusedChanged += ApplicationNavigationOnFocusedChanged;
 
         Application.Navigation.SetFocused (new () { CanFocus = true, HasFocus = true });
 

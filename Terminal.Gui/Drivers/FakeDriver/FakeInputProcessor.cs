@@ -37,7 +37,7 @@ public class FakeInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
         if (Application.MainThreadId is { })
         {
             // Application is running - use Invoke to defer to next iteration
-            Application.Invoke (() => RaiseMouseEvent (mouseEvent));
+            ApplicationImpl.Instance.Invoke ((_) => RaiseMouseEvent (mouseEvent));
         }
         else
         {

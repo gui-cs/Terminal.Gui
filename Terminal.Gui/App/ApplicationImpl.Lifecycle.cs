@@ -36,8 +36,8 @@ public partial class ApplicationImpl
        // Debug.Assert (Navigation is null);
        // Navigation = new ();
 
-        Debug.Assert (Popover is null);
-        Popover = new ();
+        //Debug.Assert (Popover is null);
+        //Popover = new ();
 
         // Preserve existing keyboard settings if they exist
         bool hasExistingKeyboard = _keyboard is { };
@@ -169,6 +169,7 @@ public partial class ApplicationImpl
             popover.Visible = false;
         }
 
+        // Any popovers added to Popover have their lifetime controlled by Popover
         Popover?.Dispose ();
         Popover = null;
 

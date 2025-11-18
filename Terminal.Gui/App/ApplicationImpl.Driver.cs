@@ -79,7 +79,7 @@ public partial class ApplicationImpl
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");
 
-        Coordinator.StartInputTaskAsync ().Wait ();
+        Coordinator.StartInputTaskAsync (this).Wait ();
 
         if (Driver == null)
         {

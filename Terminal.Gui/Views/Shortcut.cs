@@ -1,5 +1,6 @@
 
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
@@ -101,6 +102,15 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        base.EndInit ();
+        App ??= SuperView?.App;
+        Debug.Assert (App is { });
+        UpdateKeyBindings (Key.Empty);
+    }
+
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto ()
     {
@@ -168,14 +178,15 @@ public class Shortcut : View, IOrientation, IDesignable
     private void ForceCalculateNaturalWidth ()
     {
         // Get the natural size of each subview
-        CommandView.SetRelativeLayout (Application.Screen.Size);
-        HelpView.SetRelativeLayout (Application.Screen.Size);
-        KeyView.SetRelativeLayout (Application.Screen.Size);
+        Size screenSize = App?.Screen.Size ?? new (2048, 2048);
+        CommandView.SetRelativeLayout (screenSize);
+        HelpView.SetRelativeLayout (screenSize);
+        KeyView.SetRelativeLayout (screenSize);
 
         _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, SubViews, Dimension.Width);
 
         // Reset our relative layout
-        SetRelativeLayout (SuperView?.GetContentSize () ?? Application.Screen.Size);
+        SetRelativeLayout (SuperView?.GetContentSize () ?? screenSize);
     }
 
     // TODO: Enable setting of the margin thickness
@@ -615,6 +626,8 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _bindKeyToApplication;
         set
         {
+            App ??= SuperView?.App;
+
             if (value == _bindKeyToApplication)
             {
                 return;
@@ -622,7 +635,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (_bindKeyToApplication)
             {
-                Application.KeyBindings.Remove (Key);
+                App?.Keyboard.KeyBindings.Remove (Key);
             }
             else
             {
@@ -709,11 +722,11 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             if (oldKey != Key.Empty)
             {
-                Application.KeyBindings.Remove (oldKey);
+                App?.Keyboard.KeyBindings.Remove (oldKey);
             }
 
-            Application.KeyBindings.Remove (Key);
-            Application.KeyBindings.Add (Key, this, Command.HotKey);
+            App?.Keyboard.KeyBindings.Remove (Key);
+            App?.Keyboard.KeyBindings.Add (Key, this, Command.HotKey);
         }
         else
         {

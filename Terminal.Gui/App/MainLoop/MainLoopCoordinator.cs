@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;
 
@@ -47,24 +46,25 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     private readonly ITimedEvents _timedEvents;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
-    private IInput<TInputRecord> _input;
-    private Task _inputTask;
-    private IOutput _output;
-    private DriverImpl _driver;
+    private IInput<TInputRecord>? _input;
+    private Task? _inputTask;
+    private IOutput? _output;
+    private DriverImpl? _driver;
 
     private bool _stopCalled;
 
     /// <summary>
     ///     Starts the input loop thread in separate task (returning immediately).
     /// </summary>
-    public async Task StartInputTaskAsync ()
+    /// <param name="app">The <see cref="IApplication"/> instance that is running the input loop.</param>
+    public async Task StartInputTaskAsync (IApplication? app)
     {
         Logging.Trace ("Booting... ()");
 
-        _inputTask = Task.Run (RunInput);
+        _inputTask = Task.Run (() => RunInput (app));
 
         // Main loop is now booted on same thread as rest of users application
-        BootMainLoop ();
+        BootMainLoop (app);
 
         // Wait asynchronously for the semaphore or task failure.
         Task waitForSemaphore = _startupSemaphore.WaitAsync ();
@@ -108,13 +108,13 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         _stopCalled = true;
 
         _runCancellationTokenSource.Cancel ();
-        _output.Dispose ();
+        _output?.Dispose ();
 
         // Wait for input infinite loop to exit
-        _inputTask.Wait ();
+        _inputTask?.Wait ();
     }
 
-    private void BootMainLoop ()
+    private void BootMainLoop (IApplication? app)
     {
         //Logging.Trace ($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
 
@@ -122,13 +122,13 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             // Instance must be constructed on the thread in which it is used.
             _output = _componentFactory.CreateOutput ();
-            _loop.Initialize (_timedEvents, _inputQueue, _inputProcessor, _output, _componentFactory);
+            _loop.Initialize (_timedEvents, _inputQueue, _inputProcessor, _output, _componentFactory, app);
 
-            BuildDriverIfPossible ();
+            BuildDriverIfPossible (app);
         }
     }
 
-    private void BuildDriverIfPossible ()
+    private void BuildDriverIfPossible (IApplication? app)
     {
 
         if (_input != null && _output != null)
@@ -140,7 +140,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                            _loop.AnsiRequestScheduler,
                            _loop.SizeMonitor);
 
-            Application.Driver = _driver;
+            app!.Driver = _driver;
 
             _startupSemaphore.Release ();
             Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
@@ -150,7 +150,8 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <summary>
     ///     INTERNAL: Runs the IInput read loop on a new thread called the "Input Thread".
     /// </summary>
-    private void RunInput ()
+    /// <param name="app"></param>
+    private void RunInput (IApplication? app)
     {
         try
         {
@@ -166,7 +167,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                     impl.InputImpl = _input;
                 }
 
-                BuildDriverIfPossible ();
+                BuildDriverIfPossible (app);
             }
 
             try

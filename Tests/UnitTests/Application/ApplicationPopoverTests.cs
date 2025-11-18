@@ -9,7 +9,6 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
             Application.Init (null, "fake");
 
             // Act
@@ -27,7 +26,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
+
             Application.Init (null, "fake");
 
             // Act
@@ -36,7 +35,6 @@ public class ApplicationPopoverTests
             Application.Shutdown ();
 
             // Test
-            Assert.Null (Application.Popover);
         }
         finally
         {
@@ -52,12 +50,11 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
             Application.Init (null, "fake");
             Assert.NotNull (Application.Popover);
             Application.StopAfterFirstIteration = true;
 
-            top = new Toplevel ();
+            top = new ();
             SessionToken rs = Application.Begin (top);
 
             // Act
@@ -81,15 +78,15 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
             Application.Init (null, "fake");
             Application.StopAfterFirstIteration = true;
 
-            top = new Toplevel ();
+            top = new ();
             SessionToken rs = Application.Begin (top);
 
             PopoverTestClass? popover = new ();
 
+            Application.Popover?.Register (popover);
             Application.Popover?.Show (popover);
             Assert.True (popover.Visible);
 
@@ -116,7 +113,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
+
             Application.Init (null, "fake");
 
             PopoverTestClass? popover = new ();
@@ -140,7 +137,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
+
             Application.Init (null, "fake");
 
             PopoverTestClass? popover = new ();
@@ -169,11 +166,11 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
+
             Application.Init (null, "fake");
 
             PopoverTestClass? popover = new ();
-
+            Application.Popover?.Register (popover);
             Application.Popover?.Show (popover);
             Application.Popover?.DeRegister (popover);
 
@@ -198,9 +195,9 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
+
             Application.Init (null, "fake");
-            Application.Current = new Toplevel ();
+            Application.Current = new ();
             PopoverTestClass? popover = new ();
 
             // Act
@@ -221,23 +218,23 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
             Application.Init (null, "fake");
-            Application.Current = new Toplevel () { Id = "initialTop" };
-            PopoverTestClass? popover = new ();
-            int keyDownEvents = 0;
+            Application.Current = new() { Id = "initialTop" };
+            PopoverTestClass? popover = new () { };
+            var keyDownEvents = 0;
+
             popover.KeyDown += (s, e) =>
-            {
-                keyDownEvents++;
-                e.Handled = true;
-            }; // Ensure it handles the key
+                               {
+                                   keyDownEvents++;
+                                   e.Handled = true;
+                               }; // Ensure it handles the key
 
             Application.Popover?.Register (popover);
 
             // Act
             Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
 
-            Application.Current = new Toplevel () { Id = "secondaryTop" };
+            Application.Current = new() { Id = "secondaryTop" };
             Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
 
             // Test
@@ -268,8 +265,8 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Assert.Null (Application.Popover);
             Application.Init (null, "fake");
+
             Application.Current = new ()
             {
                 Frame = new (0, 0, 10, 10),
@@ -282,7 +279,7 @@ public class ApplicationPopoverTests
                 X = 1,
                 Y = 1,
                 Width = 2,
-                Height = 2,
+                Height = 2
             };
 
             Application.Current.Add (view);
@@ -293,7 +290,7 @@ public class ApplicationPopoverTests
                 X = 5,
                 Y = 5,
                 Width = 3,
-                Height = 3,
+                Height = 3
             }; // at 5,5 to 8,8 (screen)
 
             View? popoverSubView = new ()
@@ -302,14 +299,15 @@ public class ApplicationPopoverTests
                 X = 1,
                 Y = 1,
                 Width = 1,
-                Height = 1,
+                Height = 1
             };
 
             popover.Add (popoverSubView);
+            Application.Popover?.Register (popover);
 
             Application.Popover?.Show (popover);
 
-            List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
+            List<View?> found = view.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
 
             string [] foundIds = found.Select (v => v!.Id).ToArray ();
 

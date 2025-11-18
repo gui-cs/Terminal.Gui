@@ -31,6 +31,12 @@ public partial class GuiTestContext : IDisposable
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
+
+    /// <summary>
+    ///     The IApplication instance that was created.
+    /// </summary>
+    public IApplication App => _applicationImpl!;
+
     private TestDriver _driverType;
 
     // ===== Application State Preservation (for restoration) =====
@@ -277,7 +283,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="doAction"></param>
     /// <returns></returns>
-    public GuiTestContext Then (Action doAction)
+    public GuiTestContext Then (Action<IApplication> doAction)
     {
         try
         {
@@ -301,7 +307,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public GuiTestContext WaitIteration (Action? action = null)
+    public GuiTestContext WaitIteration (Action<IApplication>? action = null)
     {
         // If application has already exited don't wait!
         if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
@@ -317,25 +323,28 @@ public partial class GuiTestContext : IDisposable
         }
 
         Logging.Trace ($"WaitIteration started");
-        action ??= () => { };
+        if (action is null)
+        {
+            action = (app) => { };
+        }
         CancellationTokenSource ctsActionCompleted = new ();
 
-        Application.Invoke (() =>
-        {
-            try
-            {
-                action ();
+        Application.Invoke (app =>
+                            {
+                                try
+                                {
+                                    action (app);
 
-                //Logging.Trace ("Action completed");
-                ctsActionCompleted.Cancel ();
-            }
-            catch (Exception e)
-            {
-                Logging.Warning ($"Action failed with exception: {e}");
-                _backgroundException = e;
-                _fakeInput.ExternalCancellationTokenSource?.Cancel ();
-            }
-        });
+                                    //Logging.Trace ("Action completed");
+                                    ctsActionCompleted.Cancel ();
+                                }
+                                catch (Exception e)
+                                {
+                                    Logging.Warning ($"Action failed with exception: {e}");
+                                    _backgroundException = e;
+                                    _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+                                }
+                            });
 
         // Blocks until either the token or the hardStopToken is cancelled.
         // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
@@ -383,15 +392,15 @@ public partial class GuiTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); }); }
+    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); }); }
 
     public GuiTestContext ScreenShot (string title, TextWriter? writer)
     {
         //Logging.Trace ($"{title}");
-        return WaitIteration (() =>
+        return WaitIteration ((app) =>
                               {
                                   writer?.WriteLine (title + ":");
-                                  var text = Application.ToString ();
+                                  var text = app.ToString ();
 
                                   writer?.WriteLine (text);
                               });
@@ -424,7 +433,7 @@ public partial class GuiTestContext : IDisposable
             return this;
         }
 
-        WaitIteration (() => { Application.RequestStop (); });
+        WaitIteration ((app) => { app.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         const int WAIT_TIMEOUT_MS = 1000;

@@ -43,7 +43,7 @@ public class Progress : Scenario
                                                                       {
                                                                           // Note the check for Mainloop being valid. System.Timers can run after they are Disposed.
                                                                           // This code must be defensive for that. 
-                                                                          Application.Invoke (() => systemTimerDemo.Pulse ());
+                                                                          Application.Invoke ((_) => systemTimerDemo.Pulse ());
                                                                       },
                                                                       null,
                                                                       0,

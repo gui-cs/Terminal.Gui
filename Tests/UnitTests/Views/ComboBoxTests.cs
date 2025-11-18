@@ -1013,7 +1013,6 @@ Three
     [Fact]
     public void Source_Equal_Null_Or_Count_Equal_Zero_Sets_SelectedItem_Equal_To_Minus_One ()
     {
-        Application.Navigation = new ();
         var cb = new ComboBox ();
         var top = new Toplevel ();
         Application.Current = top;

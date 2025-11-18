@@ -419,9 +419,6 @@ public class TextField : View, IDesignable
         KeyBindings.Remove (Key.Space);
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-        CreateContextMenu ();
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
     }
 
     /// <summary>
@@ -865,16 +862,16 @@ public class TextField : View, IDesignable
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (Application.Mouse.MouseGrabView is null)
+            if (App?.Mouse.MouseGrabView is null)
             {
-                Application.Mouse.GrabMouse (this);
+                App?.Mouse.GrabMouse (this);
             }
         }
         else if (ev.Flags == MouseFlags.Button1Released)
         {
             _isButtonReleased = true;
             _isButtonPressed = false;
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
         }
         else if (ev.Flags == MouseFlags.Button1DoubleClicked)
         {
@@ -1017,13 +1014,10 @@ public class TextField : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        if (Application.Mouse.MouseGrabView is { } && Application.Mouse.MouseGrabView == this)
+        if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
         {
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
         }
-
-        //if (SelectedLength != 0 && !(Application.Mouse.MouseGrabView is MenuBar))
-        //	ClearAllSelection ();
     }
 
     /// <inheritdoc/>
@@ -1255,6 +1249,7 @@ public class TextField : View, IDesignable
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
+        App?.Popover.Register (ContextMenu);
     }
 
     private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
@@ -1768,11 +1763,6 @@ public class TextField : View, IDesignable
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            if (ContextMenu is { })
-            {
-                CreateContextMenu ();
-            }
         }
 
         if (keyboard)
@@ -1815,6 +1805,10 @@ public class TextField : View, IDesignable
             Autocomplete.HostControl = this;
             Autocomplete.PopupInsideContainer = false;
         }
+
+        CreateContextMenu ();
+        KeyBindings.Add (ContextMenu?.Key, Command.Context);
+
     }
 
     private void DisposeContextMenu ()

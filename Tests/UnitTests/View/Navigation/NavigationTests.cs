@@ -28,7 +28,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         Toplevel top = new ();
         Application.Current = top;
-        Application.Navigation = new ();
 
         View otherView = new ()
         {
@@ -119,7 +118,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         Toplevel top = new ();
         Application.Current = top;
-        Application.Navigation = new ();
 
         View otherView = new ()
         {
@@ -283,7 +281,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Toplevel top = new ();
 
         Application.Current = top;
-        Application.Navigation = new ();
 
         View otherView = new ()
         {

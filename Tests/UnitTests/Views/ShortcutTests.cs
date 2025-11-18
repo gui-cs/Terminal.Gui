@@ -349,16 +349,16 @@ public class ShortcutTests
     [InlineData (KeyCode.F1, 0)]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        Application.Current = new ();
+        Application.Current = new () { App = new ApplicationImpl () };
 
         var shortcut = new Shortcut
         {
             Key = Key.A,
-            BindKeyToApplication = true,
             Text = "0",
             Title = "_C"
         };
         Application.Current.Add (shortcut);
+        shortcut.BindKeyToApplication = true;
         Application.Current.SetFocus ();
 
         var accepted = 0;
@@ -431,14 +431,19 @@ public class ShortcutTests
 
         var shortcut = new Shortcut
         {
-            Key = Key.A,
             BindKeyToApplication = true,
+            Key = Key.A,
             Text = "0",
             Title = "_C",
             CanFocus = canFocus
         };
 
         Application.Current.Add (shortcut);
+
+        // Shortcut requires Init for App scoped hotkeys to work
+        Application.Current.BeginInit ();
+        Application.Current.EndInit();
+
         Application.Current.SetFocus ();
 
         var action = 0;
@@ -457,7 +462,7 @@ public class ShortcutTests
     public void Scheme_SetScheme_Does_Not_Fault_3664 ()
     {
         Application.Current = new ();
-        Application.Navigation = new ();
+
         var shortcut = new Shortcut ();
 
         Application.Current.SetScheme (null);

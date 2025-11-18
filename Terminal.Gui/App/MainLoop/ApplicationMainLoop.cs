@@ -28,6 +28,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     private ISizeMonitor? _sizeMonitor;
 
     /// <inheritdoc/>
+    public IApplication? App { get; private set; }
+
+    /// <inheritdoc/>
     public ITimedEvents TimedEvents
     {
         get => _timedEvents ?? throw new NotInitializedException (nameof (TimedEvents));
@@ -79,7 +82,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     }
 
     /// <summary>
-    ///     Handles raising events and setting required draw status etc when <see cref="Application.Current"/> changes
+    ///     Handles raising events and setting required draw status etc when <see cref="IApplication.Current"/> changes
     /// </summary>
     public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
 
@@ -91,14 +94,17 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
     /// <param name="componentFactory"></param>
+    /// <param name="app"></param>
     public void Initialize (
         ITimedEvents timedEvents,
         ConcurrentQueue<TInputRecord> inputBuffer,
         IInputProcessor inputProcessor,
         IOutput consoleOutput,
-        IComponentFactory<TInputRecord> componentFactory
+        IComponentFactory<TInputRecord> componentFactory,
+        IApplication? app
     )
     {
+        App = app;
         InputQueue = inputBuffer;
         Output = consoleOutput;
         InputProcessor = inputProcessor;
@@ -113,10 +119,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     /// <inheritdoc/>
     public void Iteration ()
     {
-        Application.RaiseIteration ();
+        App?.RaiseIteration ();
 
         DateTime dt = DateTime.Now;
-        int timeAllowed = 1000 / Math.Max(1,(int)Application.MaximumIterationsPerSecond);
+        int timeAllowed = 1000 / Math.Max (1, (int)Application.MaximumIterationsPerSecond);
 
         IterationImpl ();
 
@@ -139,11 +145,11 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         ToplevelTransitionManager.RaiseReadyEventIfNeeded ();
         ToplevelTransitionManager.HandleTopMaybeChanging ();
 
-        if (Application.Current != null)
+        if (App?.Current != null)
         {
-            bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (Application.Current)
-                                     || (Application.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (Application.Mouse.MouseGrabView));
+            bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
+                                     || AnySubViewsNeedDrawn (App?.Current)
+                                     || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
             bool sizeChanged = SizeMonitor.Poll ();
 
@@ -151,7 +157,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             {
                 Logging.Redraws.Add (1);
 
-                Application.LayoutAndDraw (true);
+                App?.LayoutAndDraw (true);
 
                 Output.Write (OutputBuffer);
 
@@ -170,7 +176,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = Application.Current!.MostFocused;
+        View? mostFocused = App?.Current!.MostFocused;
 
         if (mostFocused == null)
         {
@@ -202,7 +208,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
         if (v.NeedsDraw || v.NeedsLayout)
         {
-           // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
+            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 
             return true;
         }

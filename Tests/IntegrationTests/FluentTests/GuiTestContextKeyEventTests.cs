@@ -19,7 +19,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         Assert.True (Application.Current!.Running);
 
         Toplevel top = Application.Current;
-        context.Then (() => Application.RaiseKeyDownEvent (Application.QuitKey));
+        context.Then ((_) => Application.RaiseKeyDownEvent (Application.QuitKey));
         Assert.False (top!.Running);
     }
 
@@ -46,7 +46,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ())
+                                           .Then ((_) => view.SetFocus ())
                                            .ResizeConsole (50, 20)
                                            .EnqueueKeyEvent (Key.A);
 
@@ -62,7 +62,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
                                            .Focus (textField)
-                                           .Then (() => textField.CursorPosition = textField.Text.Length)
+                                           .Then ((_) => textField.CursorPosition = textField.Text.Length)
                                            .EnqueueKeyEvent (Key.Backspace)
                                            .EnqueueKeyEvent (Key.Backspace);
 
@@ -81,14 +81,14 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
                                            .Add (button)
-                                           .Then (() => textField.SetFocus ())
+                                           .Then ((_) => textField.SetFocus ())
                                            .EnqueueKeyEvent (Key.T.WithShift)
                                            .EnqueueKeyEvent (Key.E)
                                            .EnqueueKeyEvent (Key.S)
                                            .EnqueueKeyEvent (Key.T)
                                            .AssertEqual ("Test", textField.Text)
                                            .EnqueueKeyEvent (Key.Tab)
-                                           .Then (() => Assert.True (button.HasFocus))
+                                           .Then ((_) => Assert.True (button.HasFocus))
                                            .EnqueueKeyEvent (Key.Enter)
                                            .AssertEqual (1, clickedCount);
     }
@@ -110,7 +110,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ())
+                                           .Then ((_) => view.SetFocus ())
                                            .EnqueueKeyEvent (Key.A);
 
         Assert.True (keyReceived, "Key was not received by the view");
@@ -128,7 +128,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ())
+                                           .Then ((_) => view.SetFocus ())
                                            .EnqueueKeyEvent (Key.F1)
                                            .EnqueueKeyEvent (Key.F5)
                                            .EnqueueKeyEvent (Key.F12);
@@ -150,7 +150,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ())
+                                           .Then ((_) => view.SetFocus ())
                                            .EnqueueKeyEvent (Key.A)
                                            .EnqueueKeyEvent (Key.B)
                                            .EnqueueKeyEvent (Key.C);
@@ -171,7 +171,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view1)
                                            .Add (view2)
-                                           .Then (() => view1.SetFocus ())
+                                           .Then ((_) => view1.SetFocus ())
                                            .AssertTrue (view1.HasFocus)
                                            .AssertFalse (view2.HasFocus)
                                            .EnqueueKeyEvent (Key.Tab)
@@ -190,7 +190,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
-                                           .Then (() => textField.SetFocus ())
+                                           .Then ((_) => textField.SetFocus ())
                                            .EnqueueKeyEvent (Key.D1)
                                            .EnqueueKeyEvent (Key.D2)
                                            .EnqueueKeyEvent (Key.D3)
@@ -210,7 +210,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ());
+                                           .Then ((_) => view.SetFocus ());
 
         // Send 10 keys rapidly
         for (var i = 0; i < 10; i++)
@@ -237,7 +237,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ())
+                                           .Then ((_) => view.SetFocus ())
                                            .EnqueueKeyEvent (Key.Enter)
                                            .EnqueueKeyEvent (Key.Tab)
                                            .EnqueueKeyEvent (Key.CursorUp)
@@ -266,7 +266,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (listView)
-                                           .Then (() => listView.SetFocus ())
+                                           .Then ((_) => listView.SetFocus ())
                                            .AssertEqual (0, listView.SelectedItem)
                                            .EnqueueKeyEvent (Key.CursorDown)
                                            .AssertEqual (1, listView.SelectedItem)
@@ -293,7 +293,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
-                                           .Then (() => view.SetFocus ())
+                                           .Then ((_) => view.SetFocus ())
                                            .EnqueueKeyEvent (Key.A.WithCtrl);
 
         Assert.True (keyReceived);

@@ -147,7 +147,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
             }
 
             // Force 16 colors if not in virtual terminal mode.
-            Application.Force16Colors = true;
+            ApplicationImpl.Instance.Force16Colors = true;
 
         }
 
@@ -262,7 +262,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public override void Write (IOutputBuffer outputBuffer)
     {
-        _force16Colors = Application.Driver!.Force16Colors;
+        _force16Colors = ApplicationImpl.Instance.Driver!.Force16Colors;
         _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
@@ -344,7 +344,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        bool force16Colors = Application.Force16Colors;
+        bool force16Colors = ApplicationImpl.Instance.Force16Colors;
 
         if (force16Colors)
         {

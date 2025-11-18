@@ -58,13 +58,13 @@ public partial class GuiTestContext
     private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
             // Enqueue the mouse event
-        WaitIteration (() =>
+        WaitIteration ((app) =>
         {
-            if (Application.Driver is { })
+            if (app.Driver is { })
             {
                 mouseEvent.Position = mouseEvent.ScreenPosition;
 
-                Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+                app.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
             }
             else
             {
@@ -81,7 +81,7 @@ public partial class GuiTestContext
     {
         var screen = Point.Empty;
 
-        GuiTestContext ctx = WaitIteration (() =>
+        GuiTestContext ctx = WaitIteration ((_) =>
                                             {
                                                 TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));

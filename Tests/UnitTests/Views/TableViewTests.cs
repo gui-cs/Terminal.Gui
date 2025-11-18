@@ -3397,7 +3397,7 @@ A B C
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        Application.Navigation = new ();
+
         Application.Current = new ();
         tf1 = new ();
         tf2 = new ();

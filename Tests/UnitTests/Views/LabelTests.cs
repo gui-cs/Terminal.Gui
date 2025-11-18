@@ -111,9 +111,17 @@ public class LabelTests (ITestOutputHelper output)
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        tf1.Draw (driver: Application.Driver, screen: new (new (0, 1), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
+        tf1.Draw (
+                  Application.Driver,
+                  new (new (0, 1), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
-        tf2.Draw (driver: Application.Driver, screen: new (new (0, 2), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
+        tf2.Draw (
+                  Application.Driver,
+                  new (new (0, 2), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -135,11 +143,19 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
 
-        tf1.Draw (driver: Application.Driver, screen: new (new (0, 1), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
+        tf1.Draw (
+                  Application.Driver,
+                  new (new (0, 1), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
 
-        tf2.Draw (driver: Application.Driver, screen: new (new (0, 2), tfSize), normalColor: label.GetAttributeForRole (VisualRole.Normal), hotColor: label.GetAttributeForRole (VisualRole.HotNormal));
+        tf2.Draw (
+                  Application.Driver,
+                  new (new (0, 2), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -916,6 +932,7 @@ e
 
         var win = new View
         {
+            App = ApplicationImpl.Instance,
             CanFocus = true, BorderStyle = LineStyle.Single, Width = Dim.Fill (), Height = Dim.Fill ()
         };
         win.Add (label);
@@ -1212,7 +1229,7 @@ e
             Text = "nextView",
             CanFocus = true
         };
-        Application.Navigation = new ();
+
         Application.Current = new ();
         Application.Current.Add (otherView, label, nextView);
 
@@ -1234,7 +1251,6 @@ e
         View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
         Label label = new () { X = 0, Y = 1, Text = "_label" };
         View nextView = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true };
-        Application.Navigation = new ();
         Application.Current = new ();
         Application.Current.Add (otherView, label, nextView);
         Application.Current.Layout ();
@@ -1264,7 +1280,7 @@ e
             Text = "view",
             CanFocus = true
         };
-        Application.Navigation = new ();
+
         Application.Current = new ();
         Application.Current.Add (label, view);
 
@@ -1286,8 +1302,6 @@ e
     [Fact]
     public void CanFocus_True_MouseClick_Focuses ()
     {
-        Application.Navigation = new ();
-
         Label label = new ()
         {
             Text = "label",

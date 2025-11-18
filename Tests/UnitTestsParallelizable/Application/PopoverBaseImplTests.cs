@@ -59,11 +59,11 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Show_DoesNotThrow_BasePopoverImpl ()
+    public void Show_Throw_If_Not_Registered ()
     {
         var popover = new TestPopover ();
 
         var popoverManager = new ApplicationPopover ();
-        popoverManager.Show (popover);
+        Assert.Throws<InvalidOperationException> (() => popoverManager.Show (popover));
     }
 }

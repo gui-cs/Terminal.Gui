@@ -772,8 +772,6 @@ public class ColorPickerTests
         cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
 
-        Application.Navigation = new ();
-
         Application.Current = new () { Width = 20, Height = 5 };
         Application.Current.Add (cp);
 

@@ -1,5 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.ApplicationTests;
 
@@ -7,22 +6,20 @@ public class CursorTests
 {
     private readonly ITestOutputHelper _output;
 
-    public CursorTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    public CursorTests (ITestOutputHelper output) { _output = output; }
 
     private class TestView : View
     {
         public Point? TestLocation { get; set; }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override Point? PositionCursor ()
         {
             if (TestLocation.HasValue && HasFocus)
             {
                 Driver?.SetCursorVisibility (CursorVisibility.Default);
             }
+
             return TestLocation;
         }
     }
@@ -31,7 +28,6 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_No_Focus_Returns_False ()
     {
-        Application.Navigation = new ();
         Application.Navigation.SetFocused (null);
 
         Assert.False (Application.PositionCursor ());
@@ -40,7 +36,7 @@ public class CursorTests
         {
             CanFocus = false,
             Width = 1,
-            Height = 1,
+            Height = 1
         };
         view.TestLocation = new Point (0, 0);
         Assert.False (Application.PositionCursor ());
@@ -50,12 +46,11 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_No_Position_Returns_False ()
     {
-        Application.Navigation = new ();
         TestView view = new ()
         {
             CanFocus = false,
             Width = 1,
-            Height = 1,
+            Height = 1
         };
 
         view.CanFocus = true;
@@ -67,11 +62,10 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_No_IntersectSuperView_Returns_False ()
     {
-        Application.Navigation = new ();
         View superView = new ()
         {
             Width = 1,
-            Height = 1,
+            Height = 1
         };
 
         TestView view = new ()
@@ -80,7 +74,7 @@ public class CursorTests
             X = 1,
             Y = 1,
             Width = 1,
-            Height = 1,
+            Height = 1
         };
         superView.Add (view);
 
@@ -94,11 +88,10 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_Position_OutSide_SuperView_Returns_False ()
     {
-        Application.Navigation = new ();
         View superView = new ()
         {
             Width = 1,
-            Height = 1,
+            Height = 1
         };
 
         TestView view = new ()
@@ -107,7 +100,7 @@ public class CursorTests
             X = 0,
             Y = 0,
             Width = 2,
-            Height = 2,
+            Height = 2
         };
         superView.Add (view);
 
@@ -138,12 +131,11 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_Defaults_Invisible ()
     {
-        Application.Navigation = new ();
         View view = new ()
         {
             CanFocus = true,
             Width = 1,
-            Height = 1,
+            Height = 1
         };
         view.SetFocus ();
 

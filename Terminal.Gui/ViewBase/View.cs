@@ -112,8 +112,14 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>
     ///     Gets the <see cref="IApplication"/> instance this view is running in. If this view is at the top of the view
-    ///     hierarchy, returns <see langword="null"/>
+    ///     hierarchy, returns <see langword="null"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If not explicitly set on an instance, this property will retrieve the value from the view at the top
+    ///         of the View hierarchy (the top-most SuperView).
+    ///     </para>
+    /// </remarks>
     public IApplication? App
     {
         get => GetApp ();
@@ -124,8 +130,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
     ///     <see cref="Adornment"/>.
     /// </summary>
-    /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
-    protected virtual IApplication? GetApp () => _app ?? SuperView?.App;
+    /// <returns>
+    ///     If this view is at the top of the view hierarchy, and <see cref="App"/> was not explicitly set,
+    ///     returns <see langword="null"/>.
+    /// </returns>
+    protected virtual IApplication? GetApp () => _app ?? SuperView?.App ?? null;
 
     private IDriver? _driver;
 
@@ -145,7 +154,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     <see cref="Adornment"/>.
     /// </summary>
     /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
-    protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver ?? Application.Driver;
+    protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver ?? ApplicationImpl.Instance.Driver;
 
     /// <summary>
     ///     Gets the screen buffer contents. This is a convenience property for Views that need direct access to the

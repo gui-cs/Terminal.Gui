@@ -49,7 +49,11 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <inheritdoc cref="IApplication.TimedEvents"/>
     /// 
     public static ITimedEvents? TimedEvents => ApplicationImpl.Instance?.TimedEvents;
-    /// <inheritdoc cref="IApplication.Invoke"/>
+
+    /// <inheritdoc cref="IApplication.Invoke(Action{IApplication})"/>
+    public static void Invoke (Action<IApplication> action) => ApplicationImpl.Instance.Invoke (action);
+
+    /// <inheritdoc cref="IApplication.Invoke(Action)"/>
     public static void Invoke (Action action) => ApplicationImpl.Instance.Invoke (action);
 
     /// <inheritdoc cref="IApplication.LayoutAndDraw"/>

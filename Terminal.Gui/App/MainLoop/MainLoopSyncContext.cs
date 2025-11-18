@@ -26,13 +26,13 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
         {
             var wasExecuted = false;
 
-            Application.Invoke (
-                                () =>
-                                {
-                                    d (state);
-                                    wasExecuted = true;
-                                }
-                               );
+            ApplicationImpl.Instance.Invoke (
+                                             () =>
+                                             {
+                                                 d (state);
+                                                 wasExecuted = true;
+                                             }
+                                            );
 
             while (!wasExecuted)
             {

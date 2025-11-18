@@ -313,8 +313,6 @@ public class ApplicationTests
         // Mouse
         Application.LastMousePosition = new Point (1, 1);
 
-        Application.Navigation = new ();
-
         Application.ResetState ();
         CheckReset ();
 
@@ -361,7 +359,7 @@ public class ApplicationTests
            // Assert.Null (Application.Navigation);
 
             // Popover
-            Assert.Null (Application.Popover);
+            //Assert.Null (Application.Popover);
 
             // Events - Can't check
             //Assert.Null (GetEventSubscribers (typeof (Application), "InitializedChanged"));
@@ -509,7 +507,7 @@ public class ApplicationTests
         SessionToken rs = Application.Begin (top);
 
         var actionCalled = 0;
-        Application.Invoke (() => { actionCalled++; });
+        Application.Invoke ((_) => { actionCalled++; });
         Application.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();
@@ -968,7 +966,7 @@ public class ApplicationTests
                            (t, _) =>
                            {
                                // no longer loading
-                               Application.Invoke (() => { Application.RequestStop (); });
+                               Application.Invoke ((app) => { app.RequestStop (); });
                            },
                            TaskScheduler.FromCurrentSynchronizationContext ());
         Application.Run<TestToplevel> ();

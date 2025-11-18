@@ -12,7 +12,7 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
     /// <inheritdoc/>
     public void RaiseReadyEventIfNeeded ()
     {
-        Toplevel? top = Application.Current;
+        Toplevel? top = ApplicationImpl.Instance.Current;
 
         if (top != null && !_readiedTopLevels.Contains (top))
         {
@@ -27,13 +27,13 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
     /// <inheritdoc/>
     public void HandleTopMaybeChanging ()
     {
-        Toplevel? newTop = Application.Current;
+        Toplevel? newTop = ApplicationImpl.Instance.Current;
 
         if (_lastTop != null && _lastTop != newTop && newTop != null)
         {
             newTop.SetNeedsDraw ();
         }
 
-        _lastTop = Application.Current;
+        _lastTop = ApplicationImpl.Instance.Current;
     }
 }

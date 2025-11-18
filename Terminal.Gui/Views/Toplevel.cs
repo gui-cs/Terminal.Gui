@@ -152,7 +152,7 @@ public partial class Toplevel : View
     /// </summary>
     public virtual void RequestStop ()
     {
-        Application.RequestStop (Application.Current);
+        App?.RequestStop (App?.Current);
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ public partial class Toplevel : View
         }
 
         // BUGBUG: The && true is a temp hack
-        if ((superView != top || top?.SuperView is { } || (top != Application.Current && top!.Modal) || (top == Application.Current && top?.SuperView is null))
+        if ((superView != top || top?.SuperView is { } || (top != App?.Current && top!.Modal) || (top == App?.Current && top?.SuperView is null))
             && (top!.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
 
         {

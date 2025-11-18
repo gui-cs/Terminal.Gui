@@ -1232,7 +1232,7 @@ public class FileDialog : Dialog, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        App!.Popover?.Register (contextMenu);
 
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
@@ -1260,7 +1260,7 @@ public class FileDialog : Dialog, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        App!.Popover?.Register (contextMenu);
 
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
@@ -1611,7 +1611,7 @@ public class FileDialog : Dialog, IDesignable
                     UpdateChildrenToFound ();
                 }
 
-                Application.Invoke (() => { Parent._spinnerView.Visible = false; });
+                Application.Invoke ((_) => { Parent._spinnerView.Visible = false; });
             }
         }
 
@@ -1623,7 +1623,7 @@ public class FileDialog : Dialog, IDesignable
             }
 
             Application.Invoke (
-                                () =>
+                                (_) =>
                                 {
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (
                                                                                      new AutocompleteFilepathContext (

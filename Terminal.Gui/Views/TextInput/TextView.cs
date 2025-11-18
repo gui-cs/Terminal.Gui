@@ -113,7 +113,7 @@ public class TextView : View, IDesignable
         Used = true;
 
         // By default, disable hotkeys (in case someone sets Title)
-        HotKeySpecifier = new ('\xffff');
+        base.HotKeySpecifier = new ('\xffff');
 
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText!;
@@ -626,9 +626,6 @@ public class TextView : View, IDesignable
 #endif
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-        ContextMenu = CreateContextMenu ();
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
     }
 
     // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
@@ -1673,15 +1670,15 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
-            if (Application.Mouse.MouseGrabView is null)
+            if (App?.Mouse.MouseGrabView is null)
             {
-                Application.Mouse.GrabMouse (this);
+                App?.Mouse.GrabMouse (this);
             }
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1Released))
         {
             _isButtonReleased = true;
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
@@ -1883,9 +1880,9 @@ public class TextView : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (Application.Mouse.MouseGrabView is { } && Application.Mouse.MouseGrabView == this)
+        if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
         {
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
         }
     }
 
@@ -2024,12 +2021,12 @@ public class TextView : View, IDesignable
     {
         ProcessAutocomplete ();
 
-        if (!CanFocus || !Enabled || Application.Driver is null)
+        if (!CanFocus || !Enabled || Driver is null)
         {
             return null;
         }
 
-        if (Application.Mouse.MouseGrabView == this && IsSelecting)
+        if (App?.Mouse.MouseGrabView == this && IsSelecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
@@ -4575,6 +4572,7 @@ public class TextView : View, IDesignable
         {
             mousePosition = ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y));
         }
+
         ContextMenu?.MakeVisible (mousePosition);
     }
 
@@ -4649,6 +4647,11 @@ public class TextView : View, IDesignable
         {
             Autocomplete.HostControl = this;
         }
+
+
+        ContextMenu = CreateContextMenu ();
+        App?.Popover?.Register (ContextMenu);
+        KeyBindings.Add (ContextMenu.Key, Command.Context);
 
         OnContentsChanged ();
     }

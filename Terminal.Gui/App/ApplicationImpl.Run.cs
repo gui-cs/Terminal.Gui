@@ -324,12 +324,12 @@ public partial class ApplicationImpl
     public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
 
     /// <inheritdoc/>
-    public void Invoke (Action action)
+    public void Invoke (Action<IApplication>? action)
     {
         // If we are already on the main UI thread
         if (Current is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
-            action ();
+            action?.Invoke (this);
 
             return;
         }
@@ -338,7 +338,30 @@ public partial class ApplicationImpl
                           TimeSpan.Zero,
                           () =>
                           {
-                              action ();
+                              action?.Invoke (this);
+
+                              return false;
+                          }
+                         );
+    }
+
+
+    /// <inheritdoc/>
+    public void Invoke (Action action)
+    {
+        // If we are already on the main UI thread
+        if (Current is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action?.Invoke ();
+
+            return;
+        }
+
+        _timedEvents.Add (
+                          TimeSpan.Zero,
+                          () =>
+                          {
+                              action?.Invoke ();
 
                               return false;
                           }

@@ -437,10 +437,10 @@ public partial class View // Layout APIs
 
     private void NeedsClearScreenNextIteration ()
     {
-        if (Application.Current is { } && Application.Current == this && Application.SessionStack.Count == 1)
+        if (App is { Current: { } } && App.Current == this && App.SessionStack.Count == 1)
         {
             // If this is the only TopLevel, we need to redraw the screen
-            Application.ClearScreenNextIteration = true;
+            App.ClearScreenNextIteration = true;
         }
     }
 
@@ -531,7 +531,7 @@ public partial class View // Layout APIs
 
     /// <summary>
     ///     Performs layout of the view and its subviews using the content size of either the <see cref="SuperView"/> or
-    ///     <see cref="Application.Screen"/>.
+    ///     <see cref="IApplication.Screen"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -544,7 +544,7 @@ public partial class View // Layout APIs
     ///     </para>
     /// </remarks>
     /// <returns><see langword="false"/>If the view could not be laid out (typically because dependency was not ready). </returns>
-    public bool Layout () { return Layout (GetContainerSize ()); }
+    public bool Layout () => Layout (GetContainerSize ());
 
     /// <summary>
     ///     Sets the position and size of this view, relative to the SuperView's ContentSize (nominally the same as
@@ -1113,11 +1113,12 @@ public partial class View // Layout APIs
     {
         // TODO: Get rid of refs to Top
         Size superViewContentSize = SuperView?.GetContentSize ()
-                                    ?? (Application.Current is { } && Application.Current != this && Application.Current.IsInitialized
-                                            ? Application.Current.GetContentSize ()
-                                            : Application.Screen.Size);
+                                    ?? (App?.Current is { } && App?.Current != this && App!.Current.IsInitialized
+                                            ? App.Current.GetContentSize ()
+                                            : App?.Screen.Size ?? new (2048, 2048));
 
         return superViewContentSize;
+
     }
 
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
@@ -1129,7 +1130,7 @@ public partial class View // Layout APIs
     /// </summary>
     /// <remarks>
     ///     If <paramref name="viewToMove"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
-    ///     <see cref="Application.Current"/> the position will be bound by  <see cref="Application.Screen"/>.
+    ///     <see cref="IApplication.Current"/> the position will be bound by  <see cref="IApplication.Screen"/>.
     /// </remarks>
     /// <param name="viewToMove">The View that is to be moved.</param>
     /// <param name="targetX">The target x location.</param>
@@ -1137,7 +1138,7 @@ public partial class View // Layout APIs
     /// <param name="nx">The new x location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <param name="ny">The new y location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <returns>
-    ///     Either <see cref="Application.Current"/> (if <paramref name="viewToMove"/> does not have a Super View) or
+    ///     Either <see cref="IApplication.Current"/> (if <paramref name="viewToMove"/> does not have a Super View) or
     ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubViews is called on the correct View.
     /// </returns>
     internal static View? GetLocationEnsuringFullVisibility (
@@ -1151,10 +1152,12 @@ public partial class View // Layout APIs
         int maxDimension;
         View? superView;
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Current || viewToMove?.SuperView == Application.Current)
+        IApplication? app = viewToMove.App;
+
+        if (viewToMove?.SuperView is null || viewToMove == app?.Current || viewToMove?.SuperView == app?.Current)
         {
-            maxDimension = Application.Screen.Width;
-            superView = Application.Current;
+            maxDimension = app?.Screen.Width ?? 0;
+            superView = app?.Current;
         }
         else
         {
@@ -1187,9 +1190,9 @@ public partial class View // Layout APIs
         var menuVisible = false;
         var statusVisible = false;
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Current || viewToMove?.SuperView == Application.Current)
+        if (viewToMove?.SuperView is null || viewToMove == app?.Current || viewToMove?.SuperView == app?.Current)
         {
-            menuVisible = Application.Current?.MenuBar?.Visible == true;
+            menuVisible = app?.Current?.MenuBar?.Visible == true;
         }
         else
         {
@@ -1206,7 +1209,7 @@ public partial class View // Layout APIs
             }
         }
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Current || viewToMove?.SuperView == Application.Current)
+        if (viewToMove?.SuperView is null || viewToMove == app?.Current || viewToMove?.SuperView == app?.Current)
         {
             maxDimension = menuVisible ? 1 : 0;
         }
@@ -1217,9 +1220,16 @@ public partial class View // Layout APIs
 
         ny = Math.Max (targetY, maxDimension);
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Current || viewToMove?.SuperView == Application.Current)
+        if (viewToMove?.SuperView is null || viewToMove == app?.Current || viewToMove?.SuperView == app?.Current)
         {
-            maxDimension = statusVisible ? Application.Screen.Height - 1 : Application.Screen.Height;
+            if (app is { })
+            {
+                maxDimension = statusVisible ? app.Screen.Height - 1 : app.Screen.Height;
+            }
+            else
+            {
+                maxDimension = 0;
+            }
         }
         else
         {
@@ -1266,10 +1276,10 @@ public partial class View // Layout APIs
     ///     <see cref="ViewportSettingsFlags.TransparentMouse"/>
     ///     flags set in their ViewportSettings.
     /// </param>
-    public static List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
+    public List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
     {
         // PopoverHost - If visible, start with it instead of Top
-        if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
+        if (App?.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
         {
             // BUGBUG: We do not traverse all visible toplevels if there's an active popover. This may be a bug.
             List<View?> result = [];
@@ -1285,9 +1295,9 @@ public partial class View // Layout APIs
         var checkedTop = false;
 
         // Traverse all visible toplevels, topmost first (reverse stack order)
-        if (Application.SessionStack.Count > 0)
+        if (App?.SessionStack.Count > 0)
         {
-            foreach (Toplevel toplevel in Application.SessionStack)
+            foreach (Toplevel toplevel in App.SessionStack)
             {
                 if (toplevel.Visible && toplevel.Contains (screenLocation))
                 {
@@ -1300,7 +1310,7 @@ public partial class View // Layout APIs
                     }
                 }
 
-                if (toplevel == Application.Current)
+                if (toplevel == App.Current)
                 {
                     checkedTop = true;
                 }
@@ -1308,7 +1318,7 @@ public partial class View // Layout APIs
         }
 
         // Fallback: If TopLevels is empty or Top is not in TopLevels, check Top directly (for test compatibility)
-        if (!checkedTop && Application.Current is { Visible: true } top)
+        if (!checkedTop && App?.Current is { Visible: true } top)
         {
             // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
             List<View?> result = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);

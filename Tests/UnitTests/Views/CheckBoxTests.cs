@@ -15,7 +15,6 @@ public class CheckBoxTests (ITestOutputHelper output)
     [Fact]
     public void Commands_Select ()
     {
-        Application.Navigation = new ();
         Application.Current = new ();
         View otherView = new () { CanFocus = true };
         var ckb = new CheckBox ();

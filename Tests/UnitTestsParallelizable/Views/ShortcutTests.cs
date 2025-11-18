@@ -108,7 +108,7 @@ public class ShortcutTests
         // | C  H  K |
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = help,
             Title = command,
@@ -118,7 +118,7 @@ public class ShortcutTests
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = help,
             Key = key,
@@ -128,7 +128,7 @@ public class ShortcutTests
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             Key = key,
             HelpText = help,
@@ -314,13 +314,16 @@ public class ShortcutTests
         shortcut.Key = Key.A;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
 
+        shortcut.App = new ApplicationImpl ();
         shortcut.BindKeyToApplication = true;
+        shortcut.BeginInit ();
+        shortcut.EndInit ();
         Assert.False (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.True (Application.KeyBindings.TryGet (Key.A, out _));
+        Assert.True (shortcut.App?.Keyboard.KeyBindings.TryGet (Key.A, out _));
 
         shortcut.BindKeyToApplication = false;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
+        Assert.False (shortcut.App?.Keyboard.KeyBindings.TryGet (Key.A, out _));
     }
 
     [Theory]

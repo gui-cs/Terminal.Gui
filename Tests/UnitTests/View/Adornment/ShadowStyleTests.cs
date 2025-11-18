@@ -136,7 +136,8 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         var superView = new View
         {
-            Height = 10, Width = 10
+            Height = 10, Width = 10,
+            App = ApplicationImpl.Instance
         };
 
         View view = new ()

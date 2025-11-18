@@ -625,7 +625,7 @@ public class ApplicationImplTests
         // Before Init, all fields should be null/default
         Assert.Null (v2.Driver);
         Assert.False (v2.Initialized);
-        Assert.Null (v2.Popover);
+        //Assert.Null (v2.Popover);
         //Assert.Null (v2.Navigation);
         Assert.Null (v2.Current);
         Assert.Empty (v2.SessionStack);
@@ -653,7 +653,7 @@ public class ApplicationImplTests
 
         Assert.Null (v2.Driver);
         Assert.False (v2.Initialized);
-        Assert.Null (v2.Popover);
+        //Assert.Null (v2.Popover);
         //Assert.Null (v2.Navigation);
         Assert.Null (v2.Current);
         Assert.Empty (v2.SessionStack);

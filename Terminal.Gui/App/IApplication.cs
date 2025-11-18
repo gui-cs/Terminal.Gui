@@ -274,6 +274,17 @@ public interface IApplication
     ///         iteration.
     ///     </para>
     /// </remarks>
+    void Invoke (Action<IApplication>? action);
+
+    /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
+    /// <param name="action">The action to be invoked on the main processing thread.</param>
+    /// <remarks>
+    ///     <para>
+    ///         If called from the main thread, the action is executed immediately. Otherwise, it is queued via
+    ///         <see cref="AddTimeout"/> with <see cref="TimeSpan.Zero"/> and will be executed on the next main loop
+    ///         iteration.
+    ///     </para>
+    /// </remarks>
     void Invoke (Action action);
 
     /// <summary>
@@ -538,4 +549,17 @@ public interface IApplication
     ITimedEvents? TimedEvents { get; }
 
     #endregion Timeouts
+
+    /// <summary>
+    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
+    /// </summary>
+    /// <returns>A string representation of the Application </returns>
+    public string ToString ();
+
+    /// <summary>
+    ///     Gets a string representation of the Application rendered by the provided <see cref="IDriver"/>.
+    /// </summary>
+    /// <param name="driver">The driver to use to render the contents.</param>
+    /// <returns>A string representation of the Application </returns>
+    public string ToString (IDriver? driver);
 }

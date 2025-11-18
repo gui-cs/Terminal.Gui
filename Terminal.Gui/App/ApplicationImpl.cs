@@ -56,7 +56,7 @@ public partial class ApplicationImpl : IApplication
         {
             if (_mouse is null)
             {
-                _mouse = new MouseImpl { Application = this };
+                _mouse = new MouseImpl { App = this };
             }
 
             return _mouse;
@@ -87,8 +87,22 @@ public partial class ApplicationImpl : IApplication
 
     #region View Management
 
+    private ApplicationPopover? _popover;
+
     /// <inheritdoc/>
-    public ApplicationPopover? Popover { get; set; }
+    public ApplicationPopover? Popover
+    {
+        get
+        {
+            if (_popover is null)
+            {
+                _popover = new () { App = this };
+            }
+
+            return _popover;
+        }
+        set => _popover = value;
+    }
 
     private ApplicationNavigation? _navigation;
 
@@ -107,8 +121,22 @@ public partial class ApplicationImpl : IApplication
         set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
     }
 
+    private Toplevel? _current;
+
     /// <inheritdoc/>
-    public Toplevel? Current { get; set; }
+    public Toplevel? Current
+    {
+        get => _current;
+        set
+        {
+            _current = value;
+
+            if (_current is { })
+            {
+                _current.App = this;
+            }
+        }
+    }
 
     // BUGBUG: Technically, this is not the full lst of sessions. There be dragons here, e.g. see how Toplevel.Id is used. What
 
@@ -119,4 +147,62 @@ public partial class ApplicationImpl : IApplication
     public Toplevel? CachedSessionTokenToplevel { get; set; }
 
     #endregion View Management
+
+    /// <inheritdoc/>
+    public new string ToString ()
+    {
+        IDriver? driver = Driver;
+
+        if (driver is null)
+        {
+            return string.Empty;
+        }
+
+        return ToString (driver);
+    }
+
+    /// <inheritdoc/>
+    public string ToString (IDriver? driver)
+    {
+        if (driver is null)
+        {
+            return string.Empty;
+        }
+
+        var sb = new StringBuilder ();
+
+        Cell [,] contents = driver?.Contents!;
+
+        for (var r = 0; r < driver!.Rows; r++)
+        {
+            for (var c = 0; c < driver.Cols; c++)
+            {
+                Rune rune = contents [r, c].Rune;
+
+                if (rune.DecodeSurrogatePair (out char []? sp))
+                {
+                    sb.Append (sp);
+                }
+                else
+                {
+                    sb.Append ((char)rune.Value);
+                }
+
+                if (rune.GetColumns () > 1)
+                {
+                    c++;
+                }
+
+                // See Issue #2616
+                //foreach (var combMark in contents [r, c].CombiningMarks) {
+                //	sb.Append ((char)combMark.Value);
+                //}
+            }
+
+            sb.AppendLine ();
+        }
+
+        return sb.ToString ();
+    }
+
 }

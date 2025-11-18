@@ -21,7 +21,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
         var v6 = new View { Id = "v6", CanFocus = true };
 
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then (() =>
+                                     .Then ((_) =>
                                             {
                                                 var w1 = new Window { Id = "w1" };
                                                 w1.Add (v1, v2);
