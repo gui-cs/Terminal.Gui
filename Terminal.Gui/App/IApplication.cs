@@ -555,11 +555,4 @@ public interface IApplication
     /// </summary>
     /// <returns>A string representation of the Application </returns>
     public string ToString ();
-
-    /// <summary>
-    ///     Gets a string representation of the Application rendered by the provided <see cref="IDriver"/>.
-    /// </summary>
-    /// <param name="driver">The driver to use to render the contents.</param>
-    /// <returns>A string representation of the Application </returns>
-    public string ToString (IDriver? driver);
 }

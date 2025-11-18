@@ -294,4 +294,11 @@ public interface IDriver
     /// </summary>
     /// <returns></returns>
     public AnsiRequestScheduler GetRequestScheduler ();
+
+
+    /// <summary>
+    ///     Gets a string representation of <see cref="Contents"/>.
+    /// </summary>
+    /// <returns></returns>
+    public string ToString ();
 }

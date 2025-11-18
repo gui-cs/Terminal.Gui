@@ -74,9 +74,7 @@ internal class DriverImpl : IDriver
         CreateClipboard ();
     }
 
-    /// <summary>
-    ///     The event fired when the screen changes (size, position, etc.).
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc/>
@@ -87,7 +85,6 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public ISizeMonitor SizeMonitor { get; }
-
 
     private void CreateClipboard ()
     {
@@ -119,27 +116,18 @@ internal class DriverImpl : IDriver
         // Clipboard is set to FakeClipboard at initialization
     }
 
-    /// <summary>Gets the location and size of the terminal screen.</summary>
-    public Rectangle Screen
-    {
-        get
-        {
-            //if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
-            //{
-            //    // In unit tests, we don't have a real output, so we return an empty rectangle.
-            //    return Rectangle.Empty;
-            //}
+    /// <inheritdoc/>
 
-            return new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
-        }
-    }
+    public Rectangle Screen =>
 
-    /// <summary>
-    ///     Sets the screen size for testing purposes. Only supported by FakeDriver.
-    /// </summary>
-    /// <param name="width">The new width in columns.</param>
-    /// <param name="height">The new height in rows.</param>
-    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
+        //if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
+        //{
+        //    // In unit tests, we don't have a real output, so we return an empty rectangle.
+        //    return Rectangle.Empty;
+        //}
+        new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
+
+    /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
     {
         OutputBuffer.SetSize (width, height);
@@ -147,64 +135,60 @@ internal class DriverImpl : IDriver
         SizeChanged?.Invoke (this, new (new (width, height)));
     }
 
-    /// <summary>
-    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
-    ///     to.
-    /// </summary>
-    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
+    /// <inheritdoc/>
+
     public Region? Clip
     {
         get => OutputBuffer.Clip;
         set => OutputBuffer.Clip = value;
     }
 
-    /// <summary>Get the operating system clipboard.</summary>
+    /// <inheritdoc/>
+
     public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
 
-    /// <summary>
-    ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
-    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
-    /// </summary>
+    /// <inheritdoc/>
+
     public int Col => OutputBuffer.Col;
 
-    /// <summary>The number of columns visible in the terminal.</summary>
+    /// <inheritdoc/>
+
     public int Cols
     {
         get => OutputBuffer.Cols;
         set => OutputBuffer.Cols = value;
     }
 
-    /// <summary>
-    ///     The contents of the application output. The driver outputs this buffer to the terminal.
-    ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
-    /// </summary>
+    /// <inheritdoc/>
+
     public Cell [,]? Contents
     {
         get => OutputBuffer.Contents;
         set => OutputBuffer.Contents = value;
     }
 
-    /// <summary>The leftmost column in the terminal.</summary>
+    /// <inheritdoc/>
+
     public int Left
     {
         get => OutputBuffer.Left;
         set => OutputBuffer.Left = value;
     }
 
-    /// <summary>
-    ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
-    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
-    /// </summary>
+    /// <inheritdoc/>
+
     public int Row => OutputBuffer.Row;
 
-    /// <summary>The number of rows visible in the terminal.</summary>
+    /// <inheritdoc/>
+
     public int Rows
     {
         get => OutputBuffer.Rows;
         set => OutputBuffer.Rows = value;
     }
 
-    /// <summary>The topmost row in the terminal.</summary>
+    /// <inheritdoc/>
+
     public int Top
     {
         get => OutputBuffer.Top;
@@ -213,75 +197,33 @@ internal class DriverImpl : IDriver
 
     // TODO: Probably not everyone right?
 
-    /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
+    /// <inheritdoc/>
+
     public bool SupportsTrueColor => true;
 
-    // TODO: Currently ignored
-    /// <summary>
-    ///     Gets or sets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
-    ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Will be forced to <see langword="true"/> if <see cref="IDriver.SupportsTrueColor"/> is
-    ///         <see langword="false"/>, indicating that the <see cref="IDriver"/> cannot support TrueColor.
-    ///     </para>
-    /// </remarks>
+    /// <inheritdoc/>
+
     public bool Force16Colors
     {
         get => Application.Force16Colors || !SupportsTrueColor;
         set => Application.Force16Colors = value || !SupportsTrueColor;
     }
 
-    /// <summary>
-    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or
-    ///     <see cref="AddStr"/>
-    ///     call.
-    /// </summary>
+    /// <inheritdoc/>
+
     public Attribute CurrentAttribute
     {
         get => OutputBuffer.CurrentAttribute;
         set => OutputBuffer.CurrentAttribute = value;
     }
 
-    /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="rune"/> required, even if the new column value is outside of the
-    ///         <see cref="IDriver.Clip"/> or screen
-    ///         dimensions defined by <see cref="IDriver.Cols"/>.
-    ///     </para>
-    ///     <para>
-    ///         If <paramref name="rune"/> requires more than one column, and <see cref="IDriver.Col"/> plus the number
-    ///         of columns
-    ///         needed exceeds the <see cref="IDriver.Clip"/> or screen dimensions, the default Unicode replacement
-    ///         character (U+FFFD)
-    ///         will be added instead.
-    ///     </para>
-    /// </remarks>
-    /// <param name="rune">Rune to add.</param>
+    /// <inheritdoc/>
     public void AddRune (Rune rune) { OutputBuffer.AddRune (rune); }
 
-    /// <summary>
-    ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
-    ///     convenience method that calls <see cref="IDriver.AddRune(System.Text.Rune)"/> with the <see cref="Rune"/>
-    ///     constructor.
-    /// </summary>
-    /// <param name="c">Character to add.</param>
+    /// <inheritdoc/>
     public void AddRune (char c) { OutputBuffer.AddRune (c); }
 
-    /// <summary>Adds the <paramref name="str"/> to the display at the cursor position.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="IDriver.Clip"/>
-    ///         or screen
-    ///         dimensions defined by <see cref="IDriver.Cols"/>.
-    ///     </para>
-    ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
-    /// </remarks>
-    /// <param name="str">String.</param>
+    /// <inheritdoc/>
     public void AddStr (string str) { OutputBuffer.AddStr (str); }
 
     /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
@@ -291,28 +233,13 @@ internal class DriverImpl : IDriver
         ClearedContents?.Invoke (this, new MouseEventArgs ());
     }
 
-    /// <summary>
-    ///     Raised each time <see cref="IDriver.ClearContents"/> is called. For benchmarking.
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<EventArgs>? ClearedContents;
 
-    /// <summary>
-    ///     Fills the specified rectangle with the specified rune, using <see cref="IDriver.CurrentAttribute"/>
-    /// </summary>
-    /// <remarks>
-    ///     The value of <see cref="IDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be
-    ///     drawn.
-    /// </remarks>
-    /// <param name="rect">The Screen-relative rectangle.</param>
-    /// <param name="rune">The Rune used to fill the rectangle</param>
+    /// <inheritdoc/>
     public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
 
-    /// <summary>
-    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
-    ///     that calls <see cref="IDriver.FillRect(System.Drawing.Rectangle,System.Text.Rune)"/>.
-    /// </summary>
-    /// <param name="rect"></param>
-    /// <param name="c"></param>
+    /// <inheritdoc/>
     public void FillRect (Rectangle rect, char c) { OutputBuffer.FillRect (rect, c); }
 
     /// <inheritdoc/>
@@ -323,48 +250,18 @@ internal class DriverImpl : IDriver
         return type;
     }
 
-    /// <summary>Tests if the specified rune is supported by the driver.</summary>
-    /// <param name="rune"></param>
-    /// <returns>
-    ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
-    ///     support displaying this rune.
-    /// </returns>
-    public bool IsRuneSupported (Rune rune) { return Rune.IsValid (rune.Value); }
+    /// <inheritdoc/>
+    public bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
 
-    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
-    ///     <see cref="IDriver.Clip"/>.
-    ///     <see langword="true"/> otherwise.
-    /// </returns>
-    public bool IsValidLocation (Rune rune, int col, int row) { return OutputBuffer.IsValidLocation (rune, col, row); }
+    /// <inheritdoc/>
+    public bool IsValidLocation (Rune rune, int col, int row) => OutputBuffer.IsValidLocation (rune, col, row);
 
-    /// <summary>
-    ///     Updates <see cref="IDriver.Col"/> and <see cref="IDriver.Row"/> to the specified column and row in
-    ///     <see cref="IDriver.Contents"/>.
-    ///     Used by <see cref="IDriver.AddRune(System.Text.Rune)"/> and <see cref="IDriver.AddStr"/> to determine
-    ///     where to add content.
-    /// </summary>
-    /// <remarks>
-    ///     <para>This does not move the cursor on the screen, it only updates the internal state of the driver.</para>
-    ///     <para>
-    ///         If <paramref name="col"/> or <paramref name="row"/> are negative or beyond  <see cref="IDriver.Cols"/>
-    ///         and
-    ///         <see cref="IDriver.Rows"/>, the method still sets those properties.
-    ///     </para>
-    /// </remarks>
-    /// <param name="col">Column to move to.</param>
-    /// <param name="row">Row to move to.</param>
+    /// <inheritdoc/>
     public void Move (int col, int row) { OutputBuffer.Move (col, row); }
 
     // TODO: Probably part of output
 
-    /// <summary>Sets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
+    /// <inheritdoc/>
     public bool SetCursorVisibility (CursorVisibility visibility)
     {
         _lastCursor = visibility;
@@ -417,25 +314,19 @@ internal class DriverImpl : IDriver
         Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }
 
-    /// <summary>
-    ///     Sets the position of the terminal cursor to <see cref="IDriver.Col"/> and
-    ///     <see cref="IDriver.Row"/>.
-    /// </summary>
+    /// <inheritdoc/>
     public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
 
-    /// <summary>Initializes the driver</summary>
+    /// <inheritdoc/>
     public void Init () { throw new NotSupportedException (); }
 
-    /// <summary>Ends the execution of the console driver.</summary>
+    /// <inheritdoc/>
     public void End ()
     {
         // TODO: Nope
     }
 
-    /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
-    /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
-    /// <param name="newAttribute">C.</param>
-    /// <returns>The previously set Attribute.</returns>
+    /// <inheritdoc/>
     public Attribute SetAttribute (Attribute newAttribute)
     {
         Attribute currentAttribute = OutputBuffer.CurrentAttribute;
@@ -444,51 +335,29 @@ internal class DriverImpl : IDriver
         return currentAttribute;
     }
 
-    /// <summary>Gets the current <see cref="Attribute"/>.</summary>
-    /// <returns>The current attribute.</returns>
-    public Attribute GetAttribute () { return OutputBuffer.CurrentAttribute; }
+    /// <inheritdoc/>
+    public Attribute GetAttribute () => OutputBuffer.CurrentAttribute;
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
-    /// <summary>Event fired when a key is released.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="IDriver.KeyDown"/>
-    ///     processing is
-    ///     complete.
-    /// </remarks>
+    /// <inheritdoc/>
     public event EventHandler<Key>? KeyUp;
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
-    /// <summary>
-    ///     Provide proper writing to send escape sequence recognized by the <see cref="IDriver"/>.
-    /// </summary>
-    /// <param name="ansi"></param>
+    /// <inheritdoc/>
     public void WriteRaw (string ansi) { _output.Write (ansi); }
 
     /// <inheritdoc/>
-    public void EnqueueKeyEvent (Key key)
-    {
-        InputProcessor.EnqueueKeyDownEvent (key);
-    }
+    public void EnqueueKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
 
-    /// <summary>
-    ///     Queues the specified ANSI escape sequence request for execution.
-    /// </summary>
-    /// <param name="request">The ANSI request to queue.</param>
-    /// <remarks>
-    ///     The request is sent immediately if possible, or queued for later execution
-    ///     by the <see cref="AnsiRequestScheduler"/> to prevent overwhelming the console.
-    /// </remarks>
+    /// <inheritdoc/>
     public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
 
-    /// <summary>
-    ///     Gets the <see cref="AnsiRequestScheduler"/> instance used by this driver.
-    /// </summary>
-    /// <returns>The ANSI request scheduler.</returns>
-    public AnsiRequestScheduler GetRequestScheduler () { return _ansiRequestScheduler; }
+    /// <inheritdoc/>
+    public AnsiRequestScheduler GetRequestScheduler () => _ansiRequestScheduler;
 
     /// <inheritdoc/>
     public void Refresh ()
@@ -496,8 +365,45 @@ internal class DriverImpl : IDriver
         // No need we will always draw when dirty
     }
 
-    public string? GetName ()
+    /// <inheritdoc/>
+    public string? GetName () => InputProcessor.DriverName?.ToLowerInvariant ();
+
+    /// <inheritdoc/>
+    public new string ToString ()
     {
-        return InputProcessor.DriverName?.ToLowerInvariant ();
+        StringBuilder sb = new ();
+
+        Cell [,] contents = Contents!;
+
+        for (var r = 0; r < Rows; r++)
+        {
+            for (var c = 0; c < Cols; c++)
+            {
+                Rune rune = contents [r, c].Rune;
+
+                if (rune.DecodeSurrogatePair (out char []? sp))
+                {
+                    sb.Append (sp);
+                }
+                else
+                {
+                    sb.Append ((char)rune.Value);
+                }
+
+                if (rune.GetColumns () > 1)
+                {
+                    c++;
+                }
+
+                // See Issue #2616
+                //foreach (var combMark in contents [r, c].CombiningMarks) {
+                //	sb.Append ((char)combMark.Value);
+                //}
+            }
+
+            sb.AppendLine ();
+        }
+
+        return sb.ToString ();
     }
 }

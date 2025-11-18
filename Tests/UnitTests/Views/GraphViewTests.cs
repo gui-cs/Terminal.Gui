@@ -1389,7 +1389,7 @@ public class PathAnnotationTests
          
          
           ";
-        DriverAssert.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output, gv.Driver);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1414,7 +1414,7 @@ public class PathAnnotationTests
          
          
           ";
-        DriverAssert.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output, gv.Driver);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();

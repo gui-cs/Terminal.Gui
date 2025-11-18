@@ -400,7 +400,7 @@ public partial class GuiTestContext : IDisposable
         return WaitIteration ((app) =>
                               {
                                   writer?.WriteLine (title + ":");
-                                  var text = app.ToString ();
+                                  var text = app.Driver?.ToString ();
 
                                   writer?.WriteLine (text);
                               });
