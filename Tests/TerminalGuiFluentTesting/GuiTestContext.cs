@@ -73,7 +73,7 @@ public partial class GuiTestContext : IDisposable
             _booting.Release ();
 
             // After Init, Application.Screen should be set by the driver
-            if (_applicationImpl.Screen == Rectangle.Empty)
+            if (_applicationImpl?.Screen == Rectangle.Empty)
             {
                 throw new InvalidOperationException (
                                                      "Driver bug: Application.Screen is empty after Init. The driver should set the screen size during Init.");
@@ -126,11 +126,11 @@ public partial class GuiTestContext : IDisposable
 
                                      Toplevel t = topLevelBuilder ();
                                      t.Closed += (s, e) => { Finished = true; };
-                                     _applicationImpl.Run (t); // This will block, but it's on a background thread now
+                                     _applicationImpl?.Run (t); // This will block, but it's on a background thread now
 
                                      t.Dispose ();
                                      Logging.Trace ("Application.Run completed");
-                                     _applicationImpl.Shutdown ();
+                                     _applicationImpl?.Shutdown ();
                                      _runCancellationTokenSource.Cancel ();
                                  }
                                  catch (OperationCanceledException)
@@ -327,7 +327,7 @@ public partial class GuiTestContext : IDisposable
         }
         CancellationTokenSource ctsActionCompleted = new ();
 
-        _applicationImpl.Invoke (app =>
+        _applicationImpl?.Invoke (app =>
                                  {
                                      try
                                      {
@@ -430,7 +430,7 @@ public partial class GuiTestContext : IDisposable
             {
                 try
                 {
-                    _applicationImpl.Shutdown ();
+                    _applicationImpl?.Shutdown ();
                 }
                 catch
                 {
@@ -458,8 +458,8 @@ public partial class GuiTestContext : IDisposable
             // If this doesn't work there will be test failures as the main loop continues to run during next test.
             try
             {
-                _applicationImpl.RequestStop ();
-                _applicationImpl.Shutdown ();
+                _applicationImpl?.RequestStop ();
+                _applicationImpl?.Shutdown ();
             }
             catch (Exception ex)
             {
@@ -534,7 +534,7 @@ public partial class GuiTestContext : IDisposable
         Logging.Trace ("CleanupApplication");
         _fakeInput.ExternalCancellationTokenSource = null;
 
-        _applicationImpl.ResetState (true);
+        _applicationImpl?.ResetState (true);
         ApplicationImpl.ChangeInstance (_originalApplicationInstance);
         Logging.Logger = _originalLogger!;
         Finished = true;

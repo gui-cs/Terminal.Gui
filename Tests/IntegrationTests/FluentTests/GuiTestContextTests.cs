@@ -51,20 +51,16 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void AnsiScreenShot_Renders_Ansi_Stream (TestDriver d)
     {
-        IApplication? app = null;
-
         using GuiTestContext context = With.A<Window> (10, 3, d, _out)
-                                           .Then ((a) =>
+                                           .Then ((app) =>
                                                   {
-                                                      a.Current.BorderStyle = LineStyle.None;
-                                                      a.Current.Border.Thickness = Thickness.Empty;
-                                                      a.Current.Text = "hello";
-                                                      a.Current.Draw ();
+                                                      app.Current!.BorderStyle = LineStyle.None;
+                                                      app.Current!.Border!.Thickness = Thickness.Empty;
+                                                      app.Current.Text = "hello";
                                                   })
-                                           .WaitIteration ()
-                                           .ScreenShot ("ScreenShot1", _out)
+                                           .ScreenShot ("ScreenShot", _out)
                                            .AnsiScreenShot ("AnsiScreenShot", _out)
-                                           .ScreenShot ("ScreenShot", _out);
+;
     }
 
     [Theory]
