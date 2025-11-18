@@ -2,6 +2,68 @@
 
 Terminal.Gui v2 uses an instance-based application architecture that decouples views from the global application state, improving testability and enabling multiple application contexts.
 
+## View Hierarchy and Run Stack
+
+```mermaid
+graph TB
+    subgraph ViewTree["View Hierarchy (SuperView/SubView)"]
+        direction TB
+        Top[Application.Current<br/>Window]
+        Menu[MenuBar]
+        Status[StatusBar]
+        Content[Content View]
+        Button1[Button]
+        Button2[Button]
+        
+        Top --> Menu
+        Top --> Status
+        Top --> Content
+        Content --> Button1
+        Content --> Button2
+    end
+    
+    subgraph Stack["Application.SessionStack"]
+        direction TB
+        S1[Window<br/>Currently Active]
+        S2[Previous Toplevel<br/>Waiting]
+        S3[Base Toplevel<br/>Waiting]
+        
+        S1 -.-> S2 -.-> S3
+    end
+    
+    Top -.->|"same instance"| S1
+    
+    style Top fill:#ccffcc,stroke:#339933,stroke-width:3px
+    style S1 fill:#ccffcc,stroke:#339933,stroke-width:3px
+```
+
+## Usage Example Flow
+
+```mermaid
+sequenceDiagram
+    participant App as Application
+    participant Main as Main Window
+    participant Dialog as Dialog
+    
+    Note over App: Initially empty SessionStack
+    
+    App->>Main: Run(mainWindow)
+    activate Main
+    Note over App: SessionStack: [Main]<br/>Current: Main
+    
+    Main->>Dialog: Run(dialog)
+    activate Dialog
+    Note over App: SessionStack: [Dialog, Main]<br/>Current: Dialog
+    
+    Dialog->>App: RequestStop()
+    deactivate Dialog
+    Note over App: SessionStack: [Main]<br/>Current: Main
+    
+    Main->>App: RequestStop()
+    deactivate Main
+    Note over App: SessionStack: []<br/>Current: null
+```
+
 ## Key Concepts
 
 ### Instance-Based vs Static
