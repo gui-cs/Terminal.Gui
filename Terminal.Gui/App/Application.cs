@@ -53,16 +53,11 @@ public static partial class Application
     public const ushort DefaultMaximumIterationsPerSecond = 25;
 
     /// <summary>
-    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
-    /// </summary>
-    /// <returns>A string representation of the Application </returns>
-    public new static string ToString () => ApplicationImpl.Instance.ToString ();
-
-    /// <summary>
     ///     Gets a string representation of the Application rendered by the provided <see cref="IDriver"/>.
     /// </summary>
     /// <param name="driver">The driver to use to render the contents.</param>
     /// <returns>A string representation of the Application </returns>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static string ToString (IDriver? driver) => ApplicationImpl.Instance.ToString (driver);
 
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>

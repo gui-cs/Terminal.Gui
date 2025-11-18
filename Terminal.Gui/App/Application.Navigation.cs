@@ -6,6 +6,7 @@ public static partial class Application // Navigation stuff
     /// <summary>
     ///     Gets the <see cref="ApplicationNavigation"/> instance for the current <see cref="Application"/>.
     /// </summary>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static ApplicationNavigation? Navigation
     {
         get => ApplicationImpl.Instance.Navigation;
@@ -14,7 +15,7 @@ public static partial class Application // Navigation stuff
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabGroupKey
+      [Obsolete ("The legacy static Application object is going away.")]public static Key NextTabGroupKey
     {
         get => ApplicationImpl.Instance.Keyboard.NextTabGroupKey;
         set => ApplicationImpl.Instance.Keyboard.NextTabGroupKey = value;
@@ -40,6 +41,7 @@ public static partial class Application // Navigation stuff
     ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
     ///     <para>Fired after <see cref="KeyDown"/>.</para>
     /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<Key>? KeyUp
     {
         add => ApplicationImpl.Instance.Keyboard.KeyUp += value;

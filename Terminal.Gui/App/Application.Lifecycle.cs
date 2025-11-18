@@ -41,6 +41,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
+    [Obsolete ("The legacy static Application object is going away.")]
     public static void Init (IDriver? driver = null, string? driverName = null)
     {
         ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
@@ -49,6 +50,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <summary>
     ///     Gets or sets the main thread ID for the application.
     /// </summary>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static int? MainThreadId
     {
         get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
@@ -62,6 +64,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
 
     /// <summary>
@@ -72,6 +75,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
     /// </para>
     /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static bool Initialized
     {
         get => ApplicationImpl.Instance.Initialized;
@@ -79,6 +83,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     }
 
     /// <inheritdoc cref="IApplication.InitializedChanged"/>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<EventArgs<bool>>? InitializedChanged
     {
         add => ApplicationImpl.Instance.InitializedChanged += value;
@@ -90,5 +95,6 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     // this in a function like this ensures we don't make mistakes in
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
+    [Obsolete ("The legacy static Application object is going away.")]
     internal static void ResetState (bool ignoreDisposed = false) => ApplicationImpl.Instance?.ResetState (ignoreDisposed);
 }

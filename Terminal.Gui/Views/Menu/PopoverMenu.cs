@@ -188,7 +188,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
     public void SetPosition (Point? idealScreenPosition = null)
     {
-        idealScreenPosition ??= App?.Mouse.GetLastMousePosition ();
+        idealScreenPosition ??= App?.Mouse.LastMousePosition;
 
         if (idealScreenPosition is null || Root is null)
         {

@@ -23,11 +23,6 @@ public interface IMouse : IMouseGrabHandler
     Point? LastMousePosition { get; set; }
 
     /// <summary>
-    ///     Gets the most recent position of the mouse.
-    /// </summary>
-    Point? GetLastMousePosition ();
-
-    /// <summary>
     ///     Gets or sets whether the mouse is disabled. The mouse is enabled by default.
     /// </summary>
     bool IsMouseDisabled { get; set; }

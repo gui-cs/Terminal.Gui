@@ -1,3 +1,4 @@
+#nullable enable
 using UnitTests;
 using Xunit.Abstractions;
 

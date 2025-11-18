@@ -23,9 +23,6 @@ internal class MouseImpl : IMouse
     public Point? LastMousePosition { get; set; }
 
     /// <inheritdoc/>
-    public Point? GetLastMousePosition () { return LastMousePosition; }
-
-    /// <inheritdoc/>
     public bool IsMouseDisabled { get; set; }
 
     /// <inheritdoc/>

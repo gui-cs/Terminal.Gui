@@ -107,9 +107,9 @@ public partial class ApplicationImpl
                 }
 
                 // Force leave events for any entered views in the old Current
-                if (Mouse.GetLastMousePosition () is { })
+                if (Mouse.LastMousePosition is { })
                 {
-                    Mouse.RaiseMouseEnterLeaveEvents (Mouse.GetLastMousePosition ()!.Value, new ());
+                    Mouse.RaiseMouseEnterLeaveEvents (Mouse.LastMousePosition!.Value, new ());
                 }
 
                 Current?.OnDeactivate (toplevel);
