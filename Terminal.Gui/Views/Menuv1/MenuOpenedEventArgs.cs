@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 #pragma warning disable CS0618 // Type or member is obsolete
 

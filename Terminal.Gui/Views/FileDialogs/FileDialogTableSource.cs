@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 namespace Terminal.Gui.Views;
 
 internal class FileDialogTableSource (

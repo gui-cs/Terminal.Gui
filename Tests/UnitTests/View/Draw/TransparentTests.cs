@@ -14,6 +14,7 @@ public class TransparentTests (ITestOutputHelper output)
     {
         var super = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "super",
             Width = 20,
             Height = 5,
@@ -58,6 +59,7 @@ public class TransparentTests (ITestOutputHelper output)
     {
         var super = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "super",
             Width = 20,
             Height = 5,

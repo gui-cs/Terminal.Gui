@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Terminal.Gui.Input;
+﻿namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Abstract class for <see cref="KeyBindings"/> and <see cref="MouseBindings"/>.

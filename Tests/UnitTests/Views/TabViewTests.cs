@@ -664,7 +664,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, tv.SubViews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -683,7 +683,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "13";
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -700,7 +700,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -717,7 +717,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -810,7 +810,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, tv.SubViews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -830,7 +830,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "13";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -847,7 +847,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -865,7 +865,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -910,7 +910,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Layout ();
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -952,7 +952,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -972,7 +972,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "13";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -989,7 +989,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1007,7 +1007,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1049,7 +1049,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1144,7 +1144,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "13";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1161,7 +1161,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1179,7 +1179,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1223,7 +1223,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1337,7 +1337,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1354,7 +1354,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab3;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1404,7 +1404,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1421,7 +1421,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab3;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1489,7 +1489,11 @@ public class TabViewTests (ITestOutputHelper output)
 
     private TabView GetTabView (out Tab tab1, out Tab tab2)
     {
-        var tv = new TabView () { Id = "tv " };
+        var tv = new TabView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Id = "tv "
+        };
         tv.BeginInit ();
         tv.EndInit ();
         //tv.Scheme = new ();

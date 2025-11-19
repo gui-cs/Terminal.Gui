@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;
@@ -18,6 +17,11 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events processed by the loop, e.g. <see cref="ConsoleKeyInfo"/> for cross-platform .NET driver</typeparam>
 public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRecord : struct
 {
+    /// <summary>
+    ///     The Application this loop is associated with.
+    /// </summary>
+    public IApplication? App { get; }
+
     /// <summary>
     ///     Gets the <see cref="ITimedEvents"/> implementation that manages user-defined timeouts and periodic events.
     /// </summary>
@@ -73,6 +77,7 @@ public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRe
     ///     The factory for creating driver-specific components. Used here to create the <see cref="ISizeMonitor"/>
     ///     that tracks terminal size changes.
     /// </param>
+    /// <param name="app"></param>
     /// <remarks>
     ///     <para>
     ///         This method is called by <see cref="MainLoopCoordinator{TInputRecord}"/> during application startup
@@ -98,7 +103,8 @@ public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRe
         ConcurrentQueue<TInputRecord> inputQueue,
         IInputProcessor inputProcessor,
         IOutput output,
-        IComponentFactory<TInputRecord> componentFactory
+        IComponentFactory<TInputRecord> componentFactory,
+        IApplication? app
     );
 
     /// <summary>

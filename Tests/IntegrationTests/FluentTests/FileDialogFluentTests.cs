@@ -191,7 +191,7 @@ public class FileDialogFluentTests
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
         using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
+                          .Then ((_) => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)
@@ -230,7 +230,7 @@ public class FileDialogFluentTests
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
         using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
+                          .Then ((_) => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)
@@ -267,7 +267,7 @@ public class FileDialogFluentTests
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
         using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
+                          .Then ((_) => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)

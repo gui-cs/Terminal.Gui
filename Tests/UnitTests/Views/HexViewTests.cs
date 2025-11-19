@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Text;
-using JetBrains.Annotations;
 
 namespace UnitTests.ViewsTests;
 
@@ -32,10 +31,10 @@ public class HexViewTests
     public void ReadOnly_Prevents_Edits ()
     {
         var hv = new HexView (LoadStream (null, out _, true)) { Width = 20, Height = 20 };
-        Application.Navigation = new ApplicationNavigation ();
-        Application.Top = new Toplevel ();
-        Application.Top.Add (hv);
-        Application.Top.SetFocus ();
+
+        Application.Current = new ();
+        Application.Current.Add (hv);
+        Application.Current.SetFocus ();
 
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubViews ();
@@ -70,15 +69,14 @@ public class HexViewTests
         Assert.Empty (hv.Edits);
         Assert.Equal (127, hv.Source.Length);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
     [Fact]
     public void ApplyEdits_With_Argument ()
     {
-        Application.Navigation = new ApplicationNavigation ();
-        Application.Top = new Toplevel ();
+        Application.Current = new ();
 
         byte [] buffer = Encoding.Default.GetBytes ("Fest");
         var original = new MemoryStream ();
@@ -89,8 +87,8 @@ public class HexViewTests
         original.CopyTo (copy);
         copy.Flush ();
         var hv = new HexView (copy) { Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (hv);
-        Application.Top.SetFocus ();
+        Application.Current.Add (hv);
+        Application.Current.SetFocus ();
 
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubViews ();
@@ -107,7 +105,7 @@ public class HexViewTests
         Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // Move to right side
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft)); 
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
         Assert.True (Application.RaiseKeyDownEvent (Key.Z.WithShift));
         readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
         Assert.Equal ("Zest", Encoding.Default.GetString (readBuffer));
@@ -121,7 +119,7 @@ public class HexViewTests
         Assert.Equal ("Zest", Encoding.Default.GetString (readBuffer));
         Assert.Equal (Encoding.Default.GetString (buffer), Encoding.Default.GetString (readBuffer));
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
@@ -144,13 +142,11 @@ public class HexViewTests
     [Fact]
     public void Position_Encoding_Default ()
     {
-        Application.Navigation = new ApplicationNavigation ();
-
         var hv = new HexView (LoadStream (null, out _)) { Width = 100, Height = 100 };
-        Application.Top = new Toplevel ();
-        Application.Top.Add (hv);
+        Application.Current = new ();
+        Application.Current.Add (hv);
 
-        Application.Top.LayoutSubViews ();
+        Application.Current.LayoutSubViews ();
 
         Assert.Equal (63, hv.Source!.Length);
         Assert.Equal (20, hv.BytesPerLine);
@@ -175,18 +171,16 @@ public class HexViewTests
         Assert.Equal (new (3, 3), hv.GetPosition (hv.Address));
 
         Assert.Equal (hv.Source!.Length, hv.Address);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
     [Fact]
     public void Position_Encoding_Unicode ()
     {
-        Application.Navigation = new ApplicationNavigation ();
-
-        var hv = new HexView (LoadStream (null, out _, unicode: true)) { Width = 100, Height = 100 };
-        Application.Top = new Toplevel ();
-        Application.Top.Add (hv);
+        var hv = new HexView (LoadStream (null, out _, true)) { Width = 100, Height = 100 };
+        Application.Current = new ();
+        Application.Current.Add (hv);
 
         hv.LayoutSubViews ();
 
@@ -212,7 +206,7 @@ public class HexViewTests
         Assert.Equal (new (6, 6), hv.GetPosition (hv.Address));
 
         Assert.Equal (hv.Source!.Length, hv.Address);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
@@ -264,10 +258,9 @@ public class HexViewTests
     [Fact]
     public void KeyBindings_Test_Movement_LeftSide ()
     {
-        Application.Navigation = new ApplicationNavigation ();
-        Application.Top = new Toplevel ();
+        Application.Current = new ();
         var hv = new HexView (LoadStream (null, out _)) { Width = 20, Height = 10 };
-        Application.Top.Add (hv);
+        Application.Current.Add (hv);
 
         hv.LayoutSubViews ();
 
@@ -313,19 +306,18 @@ public class HexViewTests
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal (0, hv.Address);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
     [Fact]
     public void PositionChanged_Event ()
     {
-        Application.Navigation = new ApplicationNavigation ();
         var hv = new HexView (LoadStream (null, out _)) { Width = 20, Height = 10 };
-        Application.Top = new Toplevel ();
-        Application.Top.Add (hv);
+        Application.Current = new ();
+        Application.Current.Add (hv);
 
-        Application.Top.LayoutSubViews ();
+        Application.Current.LayoutSubViews ();
 
         HexViewEventArgs hexViewEventArgs = null!;
         hv.PositionChanged += (s, e) => hexViewEventArgs = e;
@@ -339,41 +331,40 @@ public class HexViewTests
         Assert.Equal (4, hexViewEventArgs.BytesPerLine);
         Assert.Equal (new (1, 1), hexViewEventArgs.Position);
         Assert.Equal (5, hexViewEventArgs.Address);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
     [Fact]
     public void Source_Sets_Address_To_Zero_If_Greater_Than_Source_Length ()
     {
-        Application.Navigation = new ApplicationNavigation ();
         var hv = new HexView (LoadStream (null, out _)) { Width = 10, Height = 5 };
-        Application.Top = new Toplevel ();
-        Application.Top.Add (hv);
+        Application.Current = new ();
+        Application.Current.Add (hv);
 
-        Application.Top.Layout ();
+        Application.Current.Layout ();
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
         hv.Source = new MemoryStream ();
-        Application.Top.Layout ();
+        Application.Current.Layout ();
         Assert.Equal (0, hv.Address);
 
         hv.Source = LoadStream (null, out _);
         hv.Width = Dim.Fill ();
         hv.Height = Dim.Fill ();
-        Application.Top.Layout ();
+        Application.Current.Layout ();
         Assert.Equal (0, hv.Address);
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
         hv.Source = new MemoryStream ();
-        Application.Top.Layout ();
+        Application.Current.Layout ();
         Assert.Equal (0, hv.Address);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 
@@ -400,6 +391,7 @@ public class HexViewTests
         {
             bArray = Encoding.Default.GetBytes (memString);
         }
+
         numBytesInMemString = bArray.Length;
 
         stream.Write (bArray);
@@ -421,8 +413,8 @@ public class HexViewTests
         }
 
         public override void Flush () { baseStream.Flush (); }
-        public override int Read (byte [] buffer, int offset, int count) { return baseStream.Read (buffer, offset, count); }
-        public override long Seek (long offset, SeekOrigin origin) { throw new NotImplementedException (); }
+        public override int Read (byte [] buffer, int offset, int count) => baseStream.Read (buffer, offset, count);
+        public override long Seek (long offset, SeekOrigin origin) => throw new NotImplementedException ();
         public override void SetLength (long value) { throw new NotSupportedException (); }
         public override void Write (byte [] buffer, int offset, int count) { baseStream.Write (buffer, offset, count); }
     }

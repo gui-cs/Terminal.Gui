@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -15,7 +14,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IDriver? driver = null, string? driverName = null)
+    public void Init (string? driverName = null)
     {
         if (Initialized)
         {
@@ -34,11 +33,11 @@ public partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        Debug.Assert (Navigation is null);
-        Navigation = new ();
+       // Debug.Assert (Navigation is null);
+       // Navigation = new ();
 
-        Debug.Assert (Popover is null);
-        Popover = new ();
+        //Debug.Assert (Popover is null);
+        //Popover = new ();
 
         // Preserve existing keyboard settings if they exist
         bool hasExistingKeyboard = _keyboard is { };
@@ -50,7 +49,7 @@ public partial class ApplicationImpl
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Key.F6.WithShift;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new KeyboardImpl { Application = this };
+        _keyboard = new KeyboardImpl { App = this };
 
         // Restore previously set keys if they existed and were different from defaults
         if (hasExistingKeyboard)
@@ -114,9 +113,6 @@ public partial class ApplicationImpl
 
         // Clear the event to prevent memory leaks
         InitializedChanged = null;
-
-        // Create a new lazy instance for potential future Init
-        _lazyInstance = new (() => new ApplicationImpl ());
     }
 
 #if DEBUG
@@ -156,8 +152,11 @@ public partial class ApplicationImpl
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
 
+        // === 0. Stop all timers ===
+        TimedEvents?.StopAll ();
+
         // === 1. Stop all running toplevels ===
-        foreach (Toplevel? t in TopLevels)
+        foreach (Toplevel? t in SessionStack)
         {
             t!.Running = false;
         }
@@ -170,29 +169,30 @@ public partial class ApplicationImpl
             popover.Visible = false;
         }
 
+        // Any popovers added to Popover have their lifetime controlled by Popover
         Popover?.Dispose ();
         Popover = null;
 
         // === 3. Clean up toplevels ===
-        TopLevels.Clear ();
+        SessionStack.Clear ();
 
 #if DEBUG_IDISPOSABLE
 
-        // Don't dispose the Top. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Top is { })
+        // Don't dispose the Current. It's up to caller dispose it
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Current is { })
         {
-            Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
+            Debug.Assert (Current.WasDisposed, $"Title = {Current.Title}, Id = {Current.Id}");
 
             // If End wasn't called _CachedSessionTokenToplevel may be null
             if (CachedSessionTokenToplevel is { })
             {
                 Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
-                Debug.Assert (CachedSessionTokenToplevel == Top);
+                Debug.Assert (CachedSessionTokenToplevel == Current);
             }
         }
 #endif
 
-        Top = null;
+        Current = null;
         CachedSessionTokenToplevel = null;
 
         // === 4. Clean up driver ===
@@ -222,7 +222,7 @@ public partial class ApplicationImpl
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
-        Navigation = null;
+        //Navigation = null;
 
         // === 8. Reset initialization state ===
         Initialized = false;
