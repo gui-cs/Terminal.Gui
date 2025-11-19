@@ -1,4 +1,3 @@
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -49,4 +48,14 @@ public interface ITimedEvents
     ///     for each timeout that is not actively executing.
     /// </summary>
     SortedList<long, Timeout> Timeouts { get; }
+
+    /// <summary>
+    ///     Gets the timeout for the specified event.
+    /// </summary>
+    /// <param name="token">The token of the event.</param>
+    /// <returns>The <see cref="TimeSpan"/> for the event, or <see lang="null"/> if the event is not found.</returns>
+    TimeSpan? GetTimeout (object token);
+
+    /// <summary>Stops and removes all timed events.</summary>
+    void StopAll ();
 }

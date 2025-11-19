@@ -698,7 +698,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Assert.Equal (new (0, 0, 40, 15), View.GetClip ()!.GetBounds ());
+        Assert.Equal (new (0, 0, 40, 15), Application.Current!.GetClip ()!.GetBounds ());
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         List<string> items = new ()
@@ -1100,11 +1100,11 @@ wo
         Assert.False (copyAction);
 
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
-        Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
-        Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
-        Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
+        Assert.False (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+        Assert.False (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+        Assert.True (Application.Current.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
         Assert.True (menu.IsMenuOpen);
-        Application.Top.Draw ();
+        Application.Current.Draw ();
 
         string expected = @"
  File  Edit
@@ -1113,26 +1113,26 @@ wo
         var pos = DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 11, 1), pos);
 
-        Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
+        Assert.True (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.N)));
         AutoInitShutdownAttribute.RunIteration ();
         Assert.False (newAction); // not yet, hot keys don't work if the item is not visible
 
-        Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.F)));
+        Assert.True (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.F)));
         AutoInitShutdownAttribute.RunIteration ();
-        Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
+        Assert.True (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.N)));
         AutoInitShutdownAttribute.RunIteration ();
         Assert.True (newAction);
-        Application.Top.Draw ();
+        Application.Current.Draw ();
 
         expected = @"
  File  Edit
 ";
 
-        Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
-        Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
-        Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
+        Assert.False (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+        Assert.True (Application.Current.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
+        Assert.True (Application.Current.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
         Assert.True (menu.IsMenuOpen);
-        Application.Top.Draw ();
+        Application.Current.Draw ();
 
         expected = @"
  File  Edit
@@ -1141,8 +1141,8 @@ wo
         pos = DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 11, 1), pos);
 
-        Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
-        Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.C)));
+        Assert.True (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+        Assert.True (Application.Current.ProcessKeyDown (new KeyEventArgs (Key.C)));
         AutoInitShutdownAttribute.RunIteration ();
         Assert.True (copyAction);
 #endif
@@ -1211,19 +1211,19 @@ wo
 
         Assert.True (menu.NewKeyDownEvent (Key.F.WithAlt));
         Assert.True (menu.IsMenuOpen);
-        Application.Top.Draw ();
+        Application.Current.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.N));
+        Assert.True (Application.Current.SubViews.ElementAt (1).NewKeyDownEvent (Key.N));
         AutoInitShutdownAttribute.RunIteration ();
         Assert.True (newAction);
 
         Assert.True (menu.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (menu.IsMenuOpen);
-        Application.Top.Draw ();
+        Application.Current.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.C));
+        Assert.True (Application.Current.SubViews.ElementAt (1).NewKeyDownEvent (Key.C));
         AutoInitShutdownAttribute.RunIteration ();
         Assert.True (copyAction);
         top.Dispose ();
@@ -1594,7 +1594,7 @@ wo
 
         Assert.True (menu.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.False (menu.IsMenuOpen);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
@@ -1692,7 +1692,7 @@ wo
                                                      );
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1804,7 +1804,7 @@ wo
                                                                );
 
                                                            Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
-                                                           View.SetClipToScreen ();
+                                                           top.SetClipToScreen ();
                                                            top.Draw ();
 
                                                            DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1945,7 +1945,7 @@ wo
 
         Application.AddTimeout (TimeSpan.Zero, () =>
                                                        {
-                                                           Toplevel top = Application.Top;
+                                                           Toplevel top = Application.Current;
 
                                                            AutoInitShutdownAttribute.RunIteration ();
 
@@ -2015,7 +2015,7 @@ wo
                                                            Assert.True (
                                                                         ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
                                                                        );
-                                                           View.SetClipToScreen ();
+                                                           top.SetClipToScreen ();
                                                            top.Draw ();
 
                                                            DriverAssert.AssertDriverContentsWithFrameAre (
@@ -2090,16 +2090,16 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Open second
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorRight));
+        Assert.True (Application.Current.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         // Close menu
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
@@ -2133,21 +2133,21 @@ wo
         // Open first
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu.IsMenuOpen);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Open second
         Assert.True (top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
-        View.SetClipToScreen ();
-        Application.Top.Draw ();
+        top.SetClipToScreen ();
+        Application.Current.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         // Close menu
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
@@ -2216,7 +2216,7 @@ wo
         top.Add (menu);
         Application.Begin (top);
 
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
@@ -2224,7 +2224,7 @@ wo
         {
             menu.OpenMenu (i);
             Assert.True (menu.IsMenuOpen);
-            View.SetClipToScreen ();
+            top.SetClipToScreen ();
             top.Draw ();
             DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (i), output);
         }
@@ -2483,7 +2483,7 @@ Edit
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu.IsMenuOpen);
         Assert.False (isMenuClosed);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         expected = @"
@@ -2498,7 +2498,7 @@ Edit
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         Assert.True (isMenuClosed);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         expected = @"
@@ -2655,7 +2655,7 @@ Edit
         Assert.Equal (1, menu._selected);
         Assert.Equal (-1, menu._selectedSub);
         Assert.Null (menu._openSubMenu);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
@@ -2663,7 +2663,7 @@ Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), output);
 
@@ -2671,21 +2671,21 @@ Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorLeft));
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorLeft));
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (Application.RaiseKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
@@ -2756,7 +2756,7 @@ Edit
                     );
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
@@ -2767,7 +2767,7 @@ Edit
                     );
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), output);
 
@@ -2778,7 +2778,7 @@ Edit
                     );
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
@@ -2789,14 +2789,14 @@ Edit
                     );
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (menu.NewMouseEvent (new () { Position = new (8, 0), Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
@@ -3075,7 +3075,7 @@ Edit
 
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
+        Assert.True (Application.Current.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
 
         expected = @"
@@ -3090,7 +3090,7 @@ Edit
 
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.True (Application.Top.SubViews.ElementAt (2).NewKeyDownEvent (Key.CursorLeft));
+        Assert.True (Application.Current.SubViews.ElementAt (2).NewKeyDownEvent (Key.CursorLeft));
         top.Draw ();
 
         expected = @"
@@ -3104,7 +3104,7 @@ Edit
 
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.Esc));
+        Assert.True (Application.Current.SubViews.ElementAt (1).NewKeyDownEvent (Key.Esc));
         top.Draw ();
 
         expected = @"
@@ -3186,7 +3186,7 @@ Edit
         menu.NewMouseEvent (
                             new ()
                             {
-                                Position = new (1, 2), Flags = MouseFlags.ReportMousePosition, View = Application.Top.SubViews.ElementAt (1)
+                                Position = new (1, 2), Flags = MouseFlags.ReportMousePosition, View = Application.Current.SubViews.ElementAt (1)
                             }
                            );
         top.Draw ();
@@ -3208,7 +3208,7 @@ Edit
                       menu.NewMouseEvent (
                                           new ()
                                           {
-                                              Position = new (1, 1), Flags = MouseFlags.ReportMousePosition, View = Application.Top.SubViews.ElementAt (1)
+                                              Position = new (1, 1), Flags = MouseFlags.ReportMousePosition, View = Application.Current.SubViews.ElementAt (1)
                                           }
                                          )
                      );
@@ -3227,7 +3227,7 @@ Edit
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         menu.NewMouseEvent (
-                            new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }
+                            new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Current }
                            );
         top.Draw ();
 

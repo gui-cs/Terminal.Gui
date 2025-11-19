@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.App;
 
@@ -45,6 +44,11 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public bool PositionCursor ()
     {
+        if (Driver is null)
+        {
+            return false;
+        }
+
         // Find the most focused view and position the cursor there.
         View? mostFocused = Navigation?.GetFocused ();
 
@@ -66,7 +70,7 @@ public partial class ApplicationImpl
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
 
         Rectangle superViewViewport =
-            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver!.Screen;
+            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
 
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {
@@ -133,7 +137,7 @@ public partial class ApplicationImpl
 
         ScreenChanged?.Invoke (this, new (screen));
 
-        foreach (Toplevel t in TopLevels)
+        foreach (Toplevel t in SessionStack)
         {
             t.OnSizeChanging (new (screen.Size));
             t.SetNeedsLayout ();
@@ -147,7 +151,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. TopLevels];
+        List<View> tops = [.. SessionStack];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
@@ -169,9 +173,12 @@ public partial class ApplicationImpl
             Driver?.ClearContents ();
         }
 
-        View.SetClipToScreen ();
-        View.Draw (tops, neededLayout || forceRedraw);
-        View.SetClipToScreen ();
-        Driver?.Refresh ();
+        if (Driver is { })
+        {
+            Driver.Clip = new (Screen);
+            View.Draw (tops, neededLayout || forceRedraw);
+            Driver.Clip = new (Screen);
+            Driver?.Refresh ();
+        }
     }
 }

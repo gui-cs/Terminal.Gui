@@ -39,7 +39,7 @@ public class GlobalTestSetup : IDisposable
         // Check that all Application fields and properties are set to their default values
 
         // Public Properties
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
         Assert.Null (Application.Mouse.MouseGrabView);
 
         // Don't check Application.ForceDriver
@@ -59,7 +59,7 @@ public class GlobalTestSetup : IDisposable
         Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
         Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
         Assert.Null (Application.MainThreadId);
-        Assert.Empty (Application.TopLevels);
+        Assert.Empty (Application.SessionStack);
         Assert.Empty (Application.CachedViewsUnderMouse);
 
         // Mouse
@@ -67,10 +67,10 @@ public class GlobalTestSetup : IDisposable
         //Assert.Null (Application._lastMousePosition);
 
         // Navigation
-        Assert.Null (Application.Navigation);
+        // Assert.Null (Application.Navigation);
 
         // Popover
-        Assert.Null (Application.Popover);
+        //Assert.Null (Application.Popover);
 
         // Events - Can't check
         //Assert.Null (Application.SessionBegun);

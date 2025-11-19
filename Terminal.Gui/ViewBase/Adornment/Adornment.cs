@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.ViewBase;
 
@@ -83,6 +83,12 @@ public class Adornment : View, IDesignable
     #endregion Thickness
 
     #region View Overrides
+
+    /// <inheritdoc />
+    protected override IApplication? GetApp () => Parent?.App;
+
+    /// <inheritdoc />
+    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver();
 
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
     private Scheme? _scheme;
@@ -176,7 +182,10 @@ public class Adornment : View, IDesignable
         }
 
         // This just draws/clears the thickness, not the insides.
-        Thickness.Draw (ViewportToScreen (Viewport), Diagnostics, ToString ());
+        if (Driver is { })
+        {
+            Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
+        }
 
         NeedsDraw = true;
 

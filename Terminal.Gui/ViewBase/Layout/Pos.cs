@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.ViewBase;
 
@@ -334,18 +333,18 @@ public abstract record Pos
     internal virtual bool ReferencesOtherViews () { return false; }
 
     /// <summary>
-    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Pos object.
+    ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.
     /// </summary>
     /// <param name="pos">A reference to this <see cref="Pos"/> instance.</param>
     /// <returns></returns>
-    public bool Has<T> (out T pos) where T : Pos
+    public bool Has<TPos> (out TPos pos) where TPos : Pos
     {
-        pos = (this as T)!;
+        pos = (this as TPos)!;
 
         return this switch
                {
-                   PosCombine combine => combine.Left.Has<T> (out pos) || combine.Right.Has<T> (out pos),
-                   T => true,
+                   PosCombine combine => combine.Left.Has<TPos> (out pos) || combine.Right.Has<TPos> (out pos),
+                   TPos => true,
                    _ => false
                };
     }

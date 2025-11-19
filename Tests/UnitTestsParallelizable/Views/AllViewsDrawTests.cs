@@ -21,6 +21,7 @@ public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        view.Driver = driver;
         output.WriteLine ($"Testing {viewType}");
 
         if (view is IDesignable designable)

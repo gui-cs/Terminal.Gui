@@ -202,15 +202,15 @@ public class ApplicationMouseTests
 
         var clicked = false;
 
-        Application.Top = new Toplevel ()
+        Application.Current = new Toplevel ()
         {
             Id = "top",
         };
-        Application.Top.X = 0;
-        Application.Top.Y = 0;
-        Application.Top.Width = size.Width * 2;
-        Application.Top.Height = size.Height * 2;
-        Application.Top.BorderStyle = LineStyle.None;
+        Application.Current.X = 0;
+        Application.Current.Y = 0;
+        Application.Current.Width = size.Width * 2;
+        Application.Current.Height = size.Height * 2;
+        Application.Current.BorderStyle = LineStyle.None;
 
         var view = new View { Id = "view", X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
@@ -218,7 +218,7 @@ public class ApplicationMouseTests
         view.BorderStyle = LineStyle.Single;
         view.CanFocus = true;
 
-        Application.Top.Add (view);
+        Application.Current.Add (view);
 
         var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
@@ -231,7 +231,7 @@ public class ApplicationMouseTests
 
         Application.RaiseMouseEvent (mouseEvent);
         Assert.Equal (expectedClicked, clicked);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (ignoreDisposed: true);
 
     }

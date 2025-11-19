@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -16,7 +15,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseHeldDown = new MouseHeldDown (this, Application.TimedEvents,Application.Mouse);
+        MouseHeldDown = new MouseHeldDown (this, App?.TimedEvents, App?.Mouse);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
@@ -54,7 +53,7 @@ public partial class View // Mouse APIs
     #region MouseEnterLeave
 
     /// <summary>
-    ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's
+    ///     INTERNAL Called by <see cref="IMouse.RaiseMouseEvent"/> when the mouse moves over the View's
     ///     <see cref="Frame"/>.
     ///     <see cref="MouseLeave"/> will
     ///     be raised when the mouse is no longer over the <see cref="Frame"/>. If another View occludes this View, the
@@ -151,7 +150,7 @@ public partial class View // Mouse APIs
     public event EventHandler<CancelEventArgs>? MouseEnter;
 
     /// <summary>
-    ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is
+    ///     INTERNAL Called by <see cref="IMouse.RaiseMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is
     ///     occluded
     ///     by another non-SubView.
     /// </summary>
@@ -228,7 +227,7 @@ public partial class View // Mouse APIs
     public bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Processes a new <see cref="MouseEvent"/>. This method is called by <see cref="Application.RaiseMouseEvent"/> when a
+    ///     Processes a new <see cref="MouseEvent"/>. This method is called by <see cref="IMouse.RaiseMouseEvent"/> when a
     ///     mouse
     ///     event occurs.
     /// </summary>
@@ -375,7 +374,7 @@ public partial class View // Mouse APIs
 
         if (mouseEvent.IsReleased)
         {
-            if (Application.Mouse.MouseGrabView == this)
+            if (App?.Mouse.MouseGrabView == this)
             {
                 //Logging.Debug ($"{Id} - {MouseState}");
                 MouseState &= ~MouseState.Pressed;
@@ -407,9 +406,9 @@ public partial class View // Mouse APIs
         if (mouseEvent.IsPressed)
         {
             // The first time we get pressed event, grab the mouse and set focus
-            if (Application.Mouse.MouseGrabView != this)
+            if (App?.Mouse.MouseGrabView != this)
             {
-                Application.Mouse.GrabMouse (this);
+                App?.Mouse.GrabMouse (this);
 
                 if (!HasFocus && CanFocus)
                 {
@@ -541,10 +540,10 @@ public partial class View // Mouse APIs
     {
         mouseEvent.Handled = false;
 
-        if (Application.Mouse.MouseGrabView == this && mouseEvent.IsSingleClicked)
+        if (App?.Mouse.MouseGrabView == this && mouseEvent.IsSingleClicked)
         {
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
 
             // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
             // TODO: There may be perf gains if we don't unset these flags here

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿// 
 // FileDialog.cs: File system dialogs for open and save
 //
@@ -22,7 +23,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         To use, create an instance of <see cref="OpenDialog"/>, and pass it to
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
+///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
 ///         the list of files will be available on the <see cref="FilePaths"/> property.
 ///     </para>
 ///     <para>To select more than one file, users can use the spacebar, or control-t.</para>

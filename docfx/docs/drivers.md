@@ -34,7 +34,7 @@ Application.Init();
 // Method 2: Pass driver name to Init
 Application.Init(driverName: "unix");
 
-// Method 3: Pass a custom IConsoleDriver instance
+// Method 3: Pass a custom IDriver instance
 var customDriver = new MyCustomDriver();
 Application.Init(driver: customDriver);
 ```
@@ -56,7 +56,7 @@ The v2 driver architecture uses the **Component Factory** pattern to create plat
 
 Each driver is composed of specialized components, each with a single responsibility:
 
-#### IConsoleInput&lt;T&gt;
+#### IInput&lt;T&gt;
 Reads raw console input events from the terminal. The generic type `T` represents the platform-specific input type:
 - `ConsoleKeyInfo` for DotNetDriver and FakeDriver
 - `WindowsConsole.InputRecord` for WindowsDriver
@@ -64,7 +64,7 @@ Reads raw console input events from the terminal. The generic type `T` represent
 
 Runs on a dedicated input thread to avoid blocking the UI.
 
-#### IConsoleOutput
+#### IOutput
 Renders the output buffer to the terminal. Handles:
 - Writing text and ANSI escape sequences
 - Setting cursor position
@@ -88,8 +88,8 @@ Manages the screen buffer and drawing operations:
 #### IWindowSizeMonitor
 Detects terminal size changes and raises `SizeChanged` events when the terminal is resized.
 
-#### ConsoleDriverFacade&lt;T&gt;
-A unified facade that implements `IConsoleDriver` and coordinates all the components. This is what gets assigned to `Application.Driver`.
+#### DriverFacade&lt;T&gt;
+A unified facade that implements `IDriver` and coordinates all the components. This is what gets assigned to `Application.Driver`.
 
 ### Threading Model
 
@@ -105,22 +105,22 @@ The driver architecture employs a **multi-threaded design** for optimal responsi
                  ├──────────────────┬───────────────────┐
                  │                  │                   │
         ┌────────▼────────┐ ┌──────▼─────────┐ ┌──────▼──────────┐
-        │  Input Thread   │ │  Main UI Thread│ │ ConsoleDriver   │
+        │  Input Thread   │ │  Main UI Thread│ │ Driver          │
         │                 │ │                 │ │   Facade        │
-        │ IConsoleInput   │ │ ApplicationMain│ │                 │
+        │ IInput   │ │ ApplicationMain│ │                 │
         │ reads console   │ │ Loop processes │ │ Coordinates all │
         │ input async     │ │ events, layout,│ │ components      │
         │ into queue      │ │ and rendering  │ │                 │
         └─────────────────┘ └────────────────┘ └─────────────────┘
 ```
 
-- **Input Thread**: Started by `MainLoopCoordinator`, runs `IConsoleInput.Run()` which continuously reads console input and queues it into a thread-safe `ConcurrentQueue<T>`.
+- **Input Thread**: Started by `MainLoopCoordinator`, runs `IInput.Run()` which continuously reads console input and queues it into a thread-safe `ConcurrentQueue<T>`.
 
 - **Main UI Thread**: Runs `ApplicationMainLoop.Iteration()` which:
   1. Processes input from the queue via `IInputProcessor`
   2. Executes timeout callbacks
   3. Checks for UI changes (layout/drawing)
-  4. Renders updates via `IConsoleOutput`
+  4. Renders updates via `IOutput`
 
 This separation ensures that input is never lost and the UI remains responsive during intensive operations.
 
@@ -131,25 +131,25 @@ When you call `Application.Init()`:
 1. **ApplicationImpl.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
 3. **MainLoopCoordinator.StartAsync()** begins:
-   - Starts the input thread which creates `IConsoleInput<T>`
-   - Initializes the main UI loop which creates `IConsoleOutput`
-   - Creates `ConsoleDriverFacade<T>` and assigns to `Application.Driver`
+   - Starts the input thread which creates `IInput<T>`
+   - Initializes the main UI loop which creates `IOutput`
+   - Creates `DriverFacade<T>` and assigns to `IApplication.Driver`
    - Waits for both threads to be ready
 4. Returns control to the application
 
 ### Shutdown Flow
 
-When `Application.Shutdown()` is called:
+When `IApplication.Shutdown()` is called:
 
 1. Cancellation token is triggered
 2. Input thread exits its read loop
-3. `IConsoleOutput` is disposed
+3. `IOutput` is disposed
 4. Main thread waits for input thread to complete
 5. All resources are cleaned up
 
 ## Component Interfaces
 
-### IConsoleDriver
+### IDriver
 
 The main driver interface that the framework uses internally. Provides:
 
@@ -166,16 +166,6 @@ The main driver interface that the framework uses internally. Provides:
 - Use @Terminal.Gui.ViewBase.View.Move for positioning (with viewport-relative coordinates)
 - Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
 - ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
-
-### IConsoleDriverFacade
-
-Extended interface for v2 drivers that exposes the internal components:
-
-- `IInputProcessor InputProcessor`
-- `IOutputBuffer OutputBuffer`  
-- `IWindowSizeMonitor WindowSizeMonitor`
-
-This interface allows advanced scenarios and testing.
 
 ## Platform-Specific Details
 
@@ -219,79 +209,13 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 - Uses `FakeConsole` for all operations
 - Allows injection of predefined input
 - Captures output for verification
-- Always used when `Application._forceFakeConsole` is true
-
-## Example: Checking Driver Capabilities
-
-```csharp
-Application.Init();
-
-// The driver is internal - access through Application properties
-// Check screen dimensions
-var screenWidth = Application.Screen.Width;
-var screenHeight = Application.Screen.Height;
-
-// Check if 24-bit color is supported
-bool supportsTrueColor = Application.Driver?.SupportsTrueColor ?? false;
-
-// Access advanced components (for framework/infrastructure code only)
-if (Application.Driver is IConsoleDriverFacade facade)
-{
-    // Access individual components for advanced scenarios
-    IInputProcessor inputProcessor = facade.InputProcessor;
-    IOutputBuffer outputBuffer = facade.OutputBuffer;
-    IWindowSizeMonitor sizeMonitor = facade.WindowSizeMonitor;
-    
-    // Use components for advanced scenarios
-    sizeMonitor.SizeChanging += (s, e) => 
-    {
-        Console.WriteLine($"Terminal resized to {e.Size}");
-    };
-}
-```
+- Always used when `IApplication.ForceDriver` is `fake`
 
 **Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
 - `View.Move(col, row)` for positioning
 - `View.AddRune()` and `View.AddStr()` for drawing
-- `Application.Screen` for screen dimensions
+- `View.App.Screen` for screen dimensions
 
-## Custom Drivers
-
-To create a custom driver, implement `IComponentFactory<T>`:
-
-```csharp
-public class MyComponentFactory : ComponentFactory<MyInputType>
-{
-    public override IConsoleInput<MyInputType> CreateInput()
-    {
-        return new MyConsoleInput();
-    }
-    
-    public override IConsoleOutput CreateOutput()
-    {
-        return new MyConsoleOutput();
-    }
-    
-    public override IInputProcessor CreateInputProcessor(
-        ConcurrentQueue<MyInputType> inputBuffer)
-    {
-        return new MyInputProcessor(inputBuffer);
-    }
-}
-```
-
-Then use it:
-
-```csharp
-ApplicationImpl.ChangeComponentFactory(new MyComponentFactory());
-Application.Init();
-```
-
-## Legacy Drivers
-
-Terminal.Gui v1 drivers that implement `IConsoleDriver` but not `IConsoleDriverFacade` are still supported through a legacy compatibility layer. However, they do not benefit from the v2 architecture improvements (multi-threading, component separation, etc.).
-
-**Note**: The legacy `MainLoop` infrastructure (including the `MainLoop` class, `IMainLoopDriver` interface, and `FakeMainLoop`) has been removed in favor of the modern architecture. All drivers now use the `MainLoopCoordinator` and `ApplicationMainLoop` system exclusively.
 
 ## See Also
 

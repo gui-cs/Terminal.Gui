@@ -1142,6 +1142,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void NeedsFormat_Sets ()
     {
+        IDriver driver = CreateFakeDriver ();
         var testText = "test";
         var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
@@ -1151,7 +1152,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
         Assert.Equal (testText, tf.Text);
-        tf.Draw (testBounds, new (), new ());
+        tf.Draw (driver: driver, screen: testBounds, normalColor: new (), hotColor: new ());
         Assert.False (tf.NeedsFormat);
 
         tf.ConstrainToSize = new (1, 1);
@@ -2987,7 +2988,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3016,7 +3017,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3042,7 +3043,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3068,7 +3069,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3100,12 +3101,11 @@ ssb
         tf.ConstrainToSize = new (width, height);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
@@ -3139,12 +3139,11 @@ ssb
         Assert.True (tf.WordWrap);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
@@ -3178,12 +3177,11 @@ ssb
         Assert.False (tf.PreserveTrailingSpaces);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
@@ -3217,12 +3215,11 @@ ssb
         Assert.False (tf.PreserveTrailingSpaces);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();

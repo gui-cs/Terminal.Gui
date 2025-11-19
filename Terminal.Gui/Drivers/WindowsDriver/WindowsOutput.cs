@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
@@ -148,7 +147,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
             }
 
             // Force 16 colors if not in virtual terminal mode.
-            Application.Force16Colors = true;
+            // BUGBUG: This is bad. It does not work if the app was crated without
+            // BUGBUG: Apis.
+            ApplicationImpl.Instance.Force16Colors = true;
 
         }
 
@@ -263,7 +264,10 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public override void Write (IOutputBuffer outputBuffer)
     {
-        _force16Colors = Application.Driver!.Force16Colors;
+        // BUGBUG: This is bad. It does not work if the app was crated without
+        // BUGBUG: Apis.
+        //_force16Colors = ApplicationImpl.Instance.Driver!.Force16Colors;
+        _force16Colors = false;
         _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
@@ -303,6 +307,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 {
                     int err = Marshal.GetLastWin32Error ();
 
+                    if (err == 1)
+                    {
+                        Logging.Logger.LogError ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
+
+                        return;
+                    }
                     if (err != 0)
                     {
                         throw new Win32Exception (err);
@@ -345,7 +355,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        bool force16Colors = Application.Force16Colors;
+        // BUGBUG: This is bad. It does not work if the app was crated without
+        // BUGBUG: Apis.
+        bool force16Colors = ApplicationImpl.Instance.Force16Colors;
 
         if (force16Colors)
         {

@@ -134,4 +134,35 @@ public class TimedEventsTests
 
         Assert.Equal (expected, executeCount);
     }
+
+    [Fact]
+    public void StopAll_Stops_All_Timeouts ()
+    {
+        var timedEvents = new TimedEvents ();
+        var executeCount = 0;
+        var expected = 100;
+
+        for (var i = 0; i < expected; i++)
+        {
+            timedEvents.Add (
+                             TimeSpan.Zero,
+                             () =>
+                             {
+                                 Interlocked.Increment (ref executeCount);
+
+                                 return false;
+                             });
+        }
+
+        Assert.Equal (expected, timedEvents.Timeouts.Count);
+
+        timedEvents.StopAll ();
+
+        Assert.Empty (timedEvents.Timeouts);
+
+        // Run timers once
+        timedEvents.RunTimers ();
+
+        Assert.Equal (0, executeCount);
+    }
 }

@@ -25,20 +25,16 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
-    /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
-        string forceDriver = null,
-        bool verifyShutdown = false
+        string forceDriver = null
     )
     {
-        AutoInit = autoInit;
+        _autoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         _forceDriver = forceDriver;
-        _verifyShutdown = verifyShutdown;
     }
 
-    private readonly bool _verifyShutdown;
     private readonly string _forceDriver;
     private IDisposable _v2Cleanup;
 
@@ -51,15 +47,10 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         _v2Cleanup?.Dispose ();
 
-        if (AutoInit)
+        if (_autoInit)
         {
-            // try
+            try
             {
-                if (!_verifyShutdown)
-                {
-                    Application.ResetState (ignoreDisposed: true);
-                }
-
                 Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
                 if (View.Instances.Count == 0)
@@ -74,14 +65,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
             //catch (Exception e)
             //{
-            //    Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
+            //    Debug.WriteLine ($"Application.Shutdown threw an exception after the test exited: {e}");
             //}
-            //finally
+            finally
             {
 #if DEBUG_IDISPOSABLE
                 View.Instances.Clear ();
                 Application.ResetState (true);
 #endif
+                ApplicationImpl.SetInstance (null);
             }
         }
 
@@ -102,7 +94,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         //Debug.Assert(!CM.IsEnabled, "Some other test left ConfigurationManager enabled.");
 
-        if (AutoInit)
+        if (_autoInit)
         {
 #if DEBUG_IDISPOSABLE
             View.EnableDebugIDisposableAsserts = true;
@@ -117,7 +109,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            if (string.IsNullOrEmpty(_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
+            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
             {
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
@@ -131,7 +123,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         }
     }
 
-    private bool AutoInit { get; }
+    private bool _autoInit { get; }
 
     /// <summary>
     /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)

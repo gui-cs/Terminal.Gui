@@ -121,7 +121,7 @@ public class Menus : Scenario
                         Command.Cancel,
                         ctx =>
                         {
-                            if (Application.Popover?.GetActivePopover () as PopoverMenu is { Visible: true } visiblePopover)
+                            if (App?.Popover?.GetActivePopover () as PopoverMenu is { Visible: true } visiblePopover)
                             {
                                 visiblePopover.Visible = false;
                             }

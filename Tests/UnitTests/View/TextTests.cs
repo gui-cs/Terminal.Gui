@@ -13,6 +13,7 @@ public class TextTests (ITestOutputHelper output)
     public void Setting_With_Height_Horizontal ()
     {
         var top = new View { Width = 25, Height = 25 };
+        top.App = ApplicationImpl.Instance;
 
         var label = new Label { Text = "Hello", /* Width = 10, Height = 2, */ ValidatePosDim = true };
         var viewX = new View { Text = "X", X = Pos.Right (label), Width = 1, Height = 1 };
@@ -39,7 +40,7 @@ Y
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
         top.LayoutSubViews ();
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         expected = @"
@@ -394,7 +395,7 @@ Y
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
-        Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 4, 10), Application.Current.Frame);
 
         var expected = @"
 ┌──┐
@@ -449,6 +450,7 @@ Y
 
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             TextDirection = TextDirection.TopBottom_LeftRight,
             Text = text,
             Width = Dim.Auto (),
@@ -1000,6 +1002,7 @@ w ";
     {
         Application.Driver!.SetScreenSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
+        top.App = ApplicationImpl.Instance;
 
         var text = $"First line{Environment.NewLine}Second line";
         var horizontalView = new View { Width = 20, Height = 1, Text = text };
@@ -1075,7 +1078,7 @@ w ";
         verticalView.Width = 2;
         verticalView.TextFormatter.ConstrainToSize = new (2, 20);
         Assert.True (verticalView.TextFormatter.NeedsFormat);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         Assert.Equal (new (0, 3, 2, 20), verticalView.Frame);
 
@@ -1124,7 +1127,7 @@ w ";
         View view;
         var text = "test";
 
-        view = new Label { Text = text };
+        view = new Label { App = ApplicationImpl.Instance, Text = text };
         view.BeginInit ();
         view.EndInit ();
         view.Draw ();

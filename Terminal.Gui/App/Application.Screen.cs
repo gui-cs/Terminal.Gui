@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.App;
 
@@ -6,6 +5,7 @@ public static partial class Application // Screen related stuff; intended to hid
 {
     /// <inheritdoc cref="IApplication.Screen"/>
 
+    [Obsolete ("The legacy static Application object is going away.")]
     public static Rectangle Screen
     {
         get => ApplicationImpl.Instance.Screen;
@@ -13,6 +13,7 @@ public static partial class Application // Screen related stuff; intended to hid
     }
 
     /// <inheritdoc cref="IApplication.ScreenChanged"/>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<EventArgs<Rectangle>>? ScreenChanged
     {
         add => ApplicationImpl.Instance.ScreenChanged += value;
@@ -21,6 +22,7 @@ public static partial class Application // Screen related stuff; intended to hid
 
     /// <inheritdoc cref="IApplication.ClearScreenNextIteration"/>
 
+    [Obsolete ("The legacy static Application object is going away.")]
     internal static bool ClearScreenNextIteration
     {
         get => ApplicationImpl.Instance.ClearScreenNextIteration;
