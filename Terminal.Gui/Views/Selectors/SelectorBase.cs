@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Immutable;
 
 namespace Terminal.Gui.Views;

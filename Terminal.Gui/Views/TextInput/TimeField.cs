@@ -5,6 +5,7 @@
 //
 // Licensed under the MIT license
 
+#nullable disable
 using System.Globalization;
 
 namespace Terminal.Gui.Views;

@@ -1,7 +1,5 @@
 ﻿namespace Terminal.Gui.App;
 
-#nullable enable
-
 /// <summary>
 ///     Provides helper methods for executing property change workflows in the Cancellable Work Pattern (CWP).
 /// </summary>

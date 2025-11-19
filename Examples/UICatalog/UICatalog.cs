@@ -246,7 +246,7 @@ public class UICatalog
 
     /// <summary>
     ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
-    ///     killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
+    ///     killed and the Scenario is run as though it were Application.Current. When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel ()
@@ -275,7 +275,7 @@ public class UICatalog
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
 
-    private static void StartConfigFileWatcher ()
+    private static void StartConfigWatcher ()
     {
         // Set up a file system watcher for `./.tui/`
         _currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
@@ -323,10 +323,19 @@ public class UICatalog
 
         //_homeDirWatcher.Created += ConfigFileChanged;
         _homeDirWatcher.EnableRaisingEvents = true;
+
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
     }
 
-    private static void StopConfigFileWatcher ()
+    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e)
     {
+        CM.Apply ();
+    }
+
+    private static void StopConfigWatcher ()
+    {
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
+
         _currentDirWatcher.EnableRaisingEvents = false;
         _currentDirWatcher.Changed -= ConfigFileChanged;
         _currentDirWatcher.Created -= ConfigFileChanged;
@@ -338,7 +347,7 @@ public class UICatalog
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
-        if (Application.Top == null)
+        if (Application.Current == null)
         {
             return;
         }
@@ -404,7 +413,7 @@ public class UICatalog
         if (!Options.DontEnableConfigurationManagement)
         {
             ConfigurationManager.Enable (ConfigLocations.All);
-            StartConfigFileWatcher ();
+            StartConfigWatcher ();
         }
 
         while (RunUICatalogTopLevel () is { } scenario)
@@ -450,7 +459,7 @@ public class UICatalog
 #endif
         }
 
-        StopConfigFileWatcher ();
+        StopConfigWatcher ();
         VerifyObjectsWereDisposed ();
     }
 

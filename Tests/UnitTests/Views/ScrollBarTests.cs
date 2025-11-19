@@ -495,6 +495,8 @@ public class ScrollBarTests (ITestOutputHelper output)
     {
         var super = new Window
         {
+            Driver = ApplicationImpl.Instance.Driver,
+
             Id = "super",
             Width = width + 2,
             Height = height + 2,

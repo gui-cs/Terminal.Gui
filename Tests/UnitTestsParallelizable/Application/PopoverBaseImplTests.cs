@@ -27,8 +27,8 @@ public class PopoverBaseImplTests
     {
         var popover = new TestPopover ();
         var top = new Toplevel ();
-        popover.Toplevel = top;
-        Assert.Same (top, popover.Toplevel);
+        popover.Current = top;
+        Assert.Same (top, popover.Current);
     }
 
     [Fact]
@@ -59,11 +59,11 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Show_DoesNotThrow_BasePopoverImpl ()
+    public void Show_Throw_If_Not_Registered ()
     {
         var popover = new TestPopover ();
 
         var popoverManager = new ApplicationPopover ();
-        popoverManager.Show (popover);
+        Assert.Throws<InvalidOperationException> (() => popoverManager.Show (popover));
     }
 }

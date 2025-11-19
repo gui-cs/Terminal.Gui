@@ -15,7 +15,7 @@ public class ApplicationScreenTests
     {
         // Arrange
         Application.ResetState (true);
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         // Act
         Application.ClearScreenNextIteration = true;
@@ -46,35 +46,35 @@ public class ApplicationScreenTests
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Top!.SetNeedsLayout ();
+        Application.Current!.SetNeedsLayout ();
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Top.X = 1;
+        Application.Current.X = 1;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (1, clearedContentsRaised);
 
         // Act
-        Application.Top.Width = 10;
+        Application.Current.Width = 10;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (2, clearedContentsRaised);
 
         // Act
-        Application.Top.Y = 1;
+        Application.Current.Y = 1;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (3, clearedContentsRaised);
 
         // Act
-        Application.Top.Height = 10;
+        Application.Current.Height = 10;
         Application.LayoutAndDraw ();
 
         // Assert

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Represents an option in a <see cref="Slider{T}"/> .</summary>

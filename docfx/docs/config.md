@@ -459,7 +459,7 @@ ThemeManager.ThemeChanged += (sender, e) =>
 {
     // Theme has changed
     // Refresh all views to use new theme
-    Application.Top?.SetNeedsDraw();
+    Application.Current?.SetNeedsDraw();
 };
 ```
 

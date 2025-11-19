@@ -1,4 +1,3 @@
-#nullable enable
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -40,7 +39,10 @@ public partial class Border
         // Add Commands and KeyBindings - Note it's ok these get added each time. KeyBindings are cleared in EndArrange()
         AddArrangeModeKeyBindings ();
 
-        Application.MouseEvent += ApplicationOnMouseEvent;
+        if (App is { })
+        {
+            App.Mouse.MouseEvent += ApplicationOnMouseEvent;
+        }
 
         // Create all necessary arrangement buttons
         CreateArrangementButtons ();
@@ -429,11 +431,14 @@ public partial class Border
 
         MouseState &= ~MouseState.Pressed;
 
-        Application.MouseEvent -= ApplicationOnMouseEvent;
-
-        if (Application.Mouse.MouseGrabView == this && _dragPosition.HasValue)
+        if (App is { })
         {
-            Application.Mouse.UngrabMouse ();
+            App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
+
+            if (App.Mouse.MouseGrabView == this && _dragPosition.HasValue)
+            {
+                App.Mouse.UngrabMouse ();
+            }
         }
 
         // Clean up all arrangement buttons
@@ -498,7 +503,7 @@ public partial class Border
                 // Set the start grab point to the Frame coords
                 _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
-                Application.Mouse.GrabMouse (this);
+                App?.Mouse.GrabMouse (this);
 
                 // Determine the mode based on where the click occurred
                 ViewArrangement arrangeMode = DetermineArrangeModeFromClick ();
@@ -511,7 +516,7 @@ public partial class Border
             return true;
         }
 
-        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && Application.Mouse.MouseGrabView == this)
+        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && App?.Mouse.MouseGrabView == this)
         {
             if (_dragPosition.HasValue)
             {
@@ -523,7 +528,7 @@ public partial class Border
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
         {
             _dragPosition = null;
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
 
             EndArrangeMode ();
 
@@ -652,7 +657,7 @@ public partial class Border
         if (Parent!.SuperView is null)
         {
             // Redraw the entire app window.
-            Application.Top!.SetNeedsDraw ();
+            App?.Current?.SetNeedsDraw ();
         }
         else
         {
@@ -763,7 +768,7 @@ public partial class Border
 
     private void Application_GrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (Application.Mouse.MouseGrabView == this && _dragPosition.HasValue)
+        if (App?.Mouse.MouseGrabView == this && _dragPosition.HasValue)
         {
             e.Cancel = true;
         }
@@ -771,7 +776,7 @@ public partial class Border
 
     private void Application_UnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (Application.Mouse.MouseGrabView == this && _dragPosition.HasValue)
+        if (App?.Mouse.MouseGrabView == this && _dragPosition.HasValue)
         {
             e.Cancel = true;
         }
@@ -784,8 +789,11 @@ public partial class Border
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        Application.Mouse.GrabbingMouse -= Application_GrabbingMouse;
-        Application.Mouse.UnGrabbingMouse -= Application_UnGrabbingMouse;
+        if (App is { })
+        {
+            App.Mouse.GrabbingMouse -= Application_GrabbingMouse;
+            App.Mouse.UnGrabbingMouse -= Application_UnGrabbingMouse;
+        }
 
         _dragPosition = null;
         base.Dispose (disposing);

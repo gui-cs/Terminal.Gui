@@ -3423,7 +3423,7 @@ public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDr
         };
 
         driver.FillRect (new (0, 0, 7, 7), (Rune)'*');
-        tf.Draw (new (0, 0, 7, 7), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, 7, 7), normalColor: Attribute.Default, hotColor: Attribute.Default);
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 }

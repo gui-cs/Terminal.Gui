@@ -1,3 +1,4 @@
+#nullable disable
 ﻿// 
 // FileDialog.cs: File system dialogs for open and save
 //
@@ -17,7 +18,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         To use, create an instance of <see cref="SaveDialog"/>, and pass it to
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
+///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
 ///         the <see cref="FileName"/>property will contain the selected file name or null if the user canceled.
 ///     </para>
 /// </remarks>

@@ -44,7 +44,7 @@ internal class FakeVAxis : VerticalAxis
 
 #endregion
 
-public class GraphViewTests
+public class GraphViewTests : FakeDriverBase
 {
     /// <summary>
     ///     A cell size of 0 would result in mapping all graph space into the same cell of the console.  Since
@@ -74,7 +74,10 @@ public class GraphViewTests
     /// <returns></returns>
     public static GraphView GetGraph ()
     {
-        var gv = new GraphView ();
+        var gv = new GraphView ()
+        {
+            Driver = Application.Driver ?? CreateFakeDriver ()
+        };
         gv.BeginInit ();
         gv.EndInit ();
 
@@ -650,7 +653,7 @@ public class MultiBarSeriesTests
         fakeXAxis.LabelPoints.Clear ();
         gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         Assert.Equal (3, fakeXAxis.LabelPoints.Count);
@@ -677,12 +680,13 @@ public class MultiBarSeriesTests
     }
 }
 
-public class BarSeriesTests
+public class BarSeriesTests : FakeDriverBase
 {
     [Fact]
     public void TestOneLongOneShortHorizontalBars_WithOffset ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+        graph.Driver = CreateFakeDriver ();
         graph.Draw ();
 
         // no bars
@@ -1125,7 +1129,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         // we expect the text annotation to go down one line since
@@ -1222,7 +1226,7 @@ public class TextAnnotationTests
                             new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
                            );
         gv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         var expected =
@@ -1238,7 +1242,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1257,7 +1261,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1385,7 +1389,7 @@ public class PathAnnotationTests
          
          
           ";
-        DriverAssert.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output, gv.Driver);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1410,7 +1414,7 @@ public class PathAnnotationTests
          
          
           ";
-        DriverAssert.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output, gv.Driver);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1528,7 +1532,7 @@ public class PathAnnotationTests
             // change the text and redraw
             view.Text = "ff1234";
             mount.SetNeedsDraw ();
-            View.SetClipToScreen ();
+            top.SetClipToScreen ();
             mount.Draw ();
 
             // should have the new text rendered

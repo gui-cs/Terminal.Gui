@@ -3,7 +3,7 @@
 namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "Output")]
-public class NeedsDrawTests
+public class NeedsDrawTests : FakeDriverBase
 {
     [Fact]
     public void NeedsDraw_False_If_Width_Height_Zero ()
@@ -19,7 +19,7 @@ public class NeedsDrawTests
     [Fact]
     public void NeedsDraw_True_Initially_If_Width_Height_Not_Zero ()
     {
-        View superView = new () { Width = 1, Height = 1 };
+        View superView = new () { Driver = CreateFakeDriver (), Width = 1, Height = 1 };
         View view1 = new () { Width = 1, Height = 1 };
         View view2 = new () { Width = 1, Height = 1 };
 
@@ -55,7 +55,7 @@ public class NeedsDrawTests
         var view = new View { Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
 
-        view = new() { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        view = new () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         Assert.True (view.NeedsDraw);
     }
 
@@ -91,7 +91,7 @@ public class NeedsDrawTests
         view.EndInit ();
         Assert.True (view.NeedsDraw);
 
-        view = new() { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        view = new () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.NeedsDraw = false;
         view.EndInit ();
@@ -101,7 +101,7 @@ public class NeedsDrawTests
     [Fact]
     public void NeedsDraw_After_SetLayoutNeeded_And_Layout ()
     {
-        var view = new View { Width = 2, Height = 2 };
+        var view = new View { Driver = CreateFakeDriver (), Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
 
@@ -121,7 +121,7 @@ public class NeedsDrawTests
     [Fact]
     public void NeedsDraw_False_After_SetRelativeLayout_Absolute_Dims ()
     {
-        var view = new View { Width = 2, Height = 2 };
+        var view = new View { Driver = CreateFakeDriver (), Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
 
         view.Draw ();
@@ -225,7 +225,7 @@ public class NeedsDrawTests
     [Fact]
     public void NeedsDraw_False_After_Draw ()
     {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View { Driver = CreateFakeDriver (), Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         Assert.True (view.NeedsDraw);
 
         view.BeginInit ();

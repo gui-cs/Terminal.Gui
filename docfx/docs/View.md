@@ -32,6 +32,8 @@ See the [Views Overview](views.md) for a catalog of all built-in View subclasses
 - [View.SuperView](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SuperView) - The View's container (null if the View has no container)
 - [View.Id](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Id) - Unique identifier for the View (should be unique among siblings)
 - [View.Data](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Data) - Arbitrary data attached to the View
+- [View.App](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_App) - The application context this View belongs to
+- [View.Driver](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Driver) - The driver used for rendering (derived from App). This is a shortcut to `App.Driver` for convenience.
 
 ---
 
@@ -102,6 +104,8 @@ Views implement [ISupportInitializeNotification](https://docs.microsoft.com/en-u
 2. **[BeginInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_BeginInit)** - Signals initialization is starting
 3. **[EndInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_EndInit)** - Signals initialization is complete; raises [View.Initialized](~/api/Terminal.Gui.ViewBase.View.yml) event
 4. **[IsInitialized](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_IsInitialized)** - Property indicating if initialization is complete
+
+During initialization, [View.App](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_App) is set to reference the application context, enabling views to access application services like the driver and current session.
 
 ### Disposal
 
@@ -678,6 +682,7 @@ view.ShadowStyle = ShadowStyle.Transparent;
 
 ## See Also
 
+- **[Application Deep Dive](application.md)** - Instance-based application architecture
 - **[Views Overview](views.md)** - Complete list of all built-in Views
 - **[Layout Deep Dive](layout.md)** - Detailed layout system documentation
 - **[Drawing Deep Dive](drawing.md)** - Drawing system and color management

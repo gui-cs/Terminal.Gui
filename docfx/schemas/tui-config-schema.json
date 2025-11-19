@@ -220,7 +220,7 @@
   "additionalProperties": true,
   "definitions": {
     "Color": {
-      "description": "One be either one of the W3C standard color names (parsed case-insensitively), a ColorName16 (e.g. 'BrightBlue', parsed case-insensitively), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
+      "description": "One of the standard color names (parsed case-insensitively; (e.g. 'BrightBlue'), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "string",
       "oneOf": [
