@@ -3,12 +3,18 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Moq;
+using Terminal.Gui;
+using UnitTests;
+using Xunit;
+using Xunit.Abstractions;
+
 // ReSharper disable AccessToModifiedClosure
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
-public class ListViewTests
+public class ListViewTests (ITestOutputHelper output)
 {
+    private readonly ITestOutputHelper _output = output;
     [Fact]
     public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
@@ -871,4 +877,489 @@ public class ListViewTests
     }
 
     #endregion
+
+    [Fact]
+    public void Clicking_On_Border_Is_Ignored ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+
+        var selected = "";
+
+        var lv = new ListView
+        {
+            Height = 5,
+            Width = 7,
+            BorderStyle = LineStyle.Single
+        };
+        lv.SetSource (["One", "Two", "Three", "Four"]);
+        lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        //AutoInitShutdownAttribute.RunIteration ();
+
+        Assert.Equal (new (1), lv.Border!.Thickness);
+        Assert.Null (lv.SelectedItem);
+        Assert.Equal ("", lv.Text);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌─────┐
+│One  │
+│Two  │
+│Three│
+└─────┘",
+                                                       _output, app?.Driver);
+
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.Equal ("", selected);
+        Assert.Null (lv.SelectedItem);
+
+        app?.Mouse.RaiseMouseEvent (
+                                    new ()
+                                    {
+                                        ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked
+                                    });
+        Assert.Equal ("One", selected);
+        Assert.Equal (0, lv.SelectedItem);
+
+        app?.Mouse.RaiseMouseEvent (
+                                    new ()
+                                    {
+                                        ScreenPosition = new (1, 2), Flags = MouseFlags.Button1Clicked
+                                    });
+        Assert.Equal ("Two", selected);
+        Assert.Equal (1, lv.SelectedItem);
+
+        app?.Mouse.RaiseMouseEvent (
+                                    new ()
+                                    {
+                                        ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked
+                                    });
+        Assert.Equal ("Three", selected);
+        Assert.Equal (2, lv.SelectedItem);
+
+        app?.Mouse.RaiseMouseEvent (
+                                    new ()
+                                    {
+                                        ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Clicked
+                                    });
+        Assert.Equal ("Three", selected);
+        Assert.Equal (2, lv.SelectedItem);
+        top.Dispose ();
+
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        app.Driver?.SetScreenSize (12, 12);
+
+        ObservableCollection<string> source = [];
+
+        for (var i = 0; i < 20; i++)
+        {
+            source.Add ($"Line{i}");
+        }
+
+        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper<string> (source) };
+        var win = new Window ();
+        win.Add (lv);
+        var top = new Toplevel ();
+        top.Add (win);
+        app.Begin (top);
+
+        Assert.Null (lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.ScrollVertical (10));
+        app.LayoutAndDraw ();
+        Assert.Null (lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.MoveDown ());
+        app.LayoutAndDraw ();
+        Assert.Equal (0, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.MoveEnd ());
+        app.LayoutAndDraw ();
+        Assert.Equal (19, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.ScrollVertical (-20));
+        app.LayoutAndDraw ();
+        Assert.Equal (19, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.MoveDown ());
+        app.LayoutAndDraw ();
+        Assert.Equal (19, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.ScrollVertical (-20));
+        app.LayoutAndDraw ();
+        Assert.Equal (19, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.MoveDown ());
+        app.LayoutAndDraw ();
+        Assert.Equal (19, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
+│Line19    │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.MoveHome ());
+        app.LayoutAndDraw ();
+        Assert.Equal (0, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.ScrollVertical (20));
+        app.LayoutAndDraw ();
+        Assert.Equal (0, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line19    │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+│          │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+
+        Assert.True (lv.MoveUp ());
+        app.LayoutAndDraw ();
+        Assert.Equal (0, lv.SelectedItem);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌──────────┐
+│Line0     │
+│Line1     │
+│Line2     │
+│Line3     │
+│Line4     │
+│Line5     │
+│Line6     │
+│Line7     │
+│Line8     │
+│Line9     │
+└──────────┘",
+                                                       _output, app.Driver
+                                                      );
+        top.Dispose ();
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void EnsureSelectedItemVisible_SelectedItem ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        app.Driver?.SetScreenSize (12, 12);
+
+        ObservableCollection<string> source = [];
+
+        for (var i = 0; i < 10; i++)
+        {
+            source.Add ($"Item {i}");
+        }
+
+        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+Item 0
+Item 1
+Item 2
+Item 3
+Item 4",
+                                                       _output, app.Driver
+                                                      );
+
+        // EnsureSelectedItemVisible is auto enabled on the OnSelectedChanged
+        lv.SelectedItem = 6;
+        app.LayoutAndDraw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+Item 2
+Item 3
+Item 4
+Item 5
+Item 6",
+                                                       _output, app.Driver
+                                                      );
+        top.Dispose ();
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void EnsureSelectedItemVisible_Top ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        IDriver? driver = app.Driver;
+        driver.SetScreenSize (8, 2);
+
+        ObservableCollection<string> source = ["First", "Second"];
+        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 1;
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        Assert.Equal ("Second ", GetContents (0));
+        Assert.Equal (new (' ', 7), GetContents (1));
+
+        lv.MoveUp ();
+        lv.Draw ();
+
+        Assert.Equal ("First  ", GetContents (0));
+        Assert.Equal (new (' ', 7), GetContents (1));
+
+        string GetContents (int line)
+        {
+            var item = "";
+
+            for (var i = 0; i < 7; i++)
+            {
+                item += app.Driver?.Contents [line, i].Rune;
+            }
+
+            return item;
+        }
+
+        top.Dispose ();
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void LeftItem_TopItem_Tests ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        app.Driver?.SetScreenSize (12, 12);
+
+        ObservableCollection<string> source = [];
+
+        for (var i = 0; i < 5; i++)
+        {
+            source.Add ($"Item {i}");
+        }
+
+        var lv = new ListView
+        {
+            X = 1,
+            Source = new ListWrapper<string> (source)
+        };
+        lv.Height = lv.Source.Count;
+        lv.Width = lv.MaxLength;
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ Item 0
+ Item 1
+ Item 2
+ Item 3
+ Item 4",
+                                                       _output, app.Driver);
+
+        lv.LeftItem = 1;
+        lv.TopItem = 1;
+        app.LayoutAndDraw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ tem 1
+ tem 2
+ tem 3
+ tem 4",
+                                                       _output, app.Driver);
+        top.Dispose ();
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void RowRender_Event ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+
+        var rendered = false;
+        ObservableCollection<string> source = ["one", "two", "three"];
+        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
+        lv.RowRender += (s, _) => rendered = true;
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+        Assert.False (rendered);
+
+        lv.SetSource (source);
+        lv.Draw ();
+        Assert.True (rendered);
+        top.Dispose ();
+        app.Shutdown ();
+    }
 }
