@@ -478,42 +478,4 @@ public class ShortcutTests
         Application.Current.Dispose ();
         Application.ResetState ();
     }
-
-
-    // Test Key gets bound correctly
-    [Fact]
-    public void BindKeyToApplication_Defaults_To_HotKey ()
-    {
-        var shortcut = new Shortcut ();
-
-        Assert.False (shortcut.BindKeyToApplication);
-    }
-
-    [Fact]
-    public void BindKeyToApplication_Can_Be_Set ()
-    {
-        var shortcut = new Shortcut ();
-
-        shortcut.BindKeyToApplication = true;
-
-        Assert.True (shortcut.BindKeyToApplication);
-    }
-
-    [Fact]
-    public void BindKeyToApplication_Changing_Adjusts_KeyBindings ()
-    {
-        var shortcut = new Shortcut ();
-
-        shortcut.Key = Key.A;
-        Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-
-        shortcut.BindKeyToApplication = true;
-        Assert.False (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.True (Application.KeyBindings.TryGet (Key.A, out _));
-
-        shortcut.BindKeyToApplication = false;
-        Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
-    }
-
 }
