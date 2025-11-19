@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{B8
 		nuget.config = nuget.config
 		Terminal.sln.DotSettings = Terminal.sln.DotSettings
 		testenvironments.json = testenvironments.json
+		docfx\schemas\tui-config-schema.json = docfx\schemas\tui-config-schema.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"

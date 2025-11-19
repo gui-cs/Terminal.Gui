@@ -86,7 +86,7 @@
             "Menu": {
               "Normal": {
                 "Foreground": "Black",
-                "Background": "WHite"
+                "Background": "White"
               },
               "Focus": {
                 "Foreground": "White",
