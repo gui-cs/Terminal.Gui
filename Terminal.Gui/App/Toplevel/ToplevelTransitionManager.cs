@@ -36,6 +36,6 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
             newTop.SetNeedsDraw ();
         }
 
-        _lastTop = app.Current;
+        _lastTop = app?.Current;
     }
 }

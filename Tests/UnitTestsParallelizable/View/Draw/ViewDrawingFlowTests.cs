@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
-public class ViewDrawingFlowTests (ITestOutputHelper output) : FakeDriverBase
+public class ViewDrawingFlowTests () : FakeDriverBase
 {
     #region NeedsDraw Tests
 

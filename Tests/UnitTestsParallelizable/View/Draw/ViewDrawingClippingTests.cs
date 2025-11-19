@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
-public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBase
+public class ViewDrawingClippingTests () : FakeDriverBase
 {
     #region GetClip / SetClip Tests
 

@@ -40,7 +40,6 @@ public partial class GuiTestContext : IDisposable
     private TestDriver _driverType;
 
     // ===== Application State Preservation (for restoration) =====
-    private IApplication? _originalApplicationInstance;
     private ILogger? _originalLogger;
 
     // ===== Test Configuration =====

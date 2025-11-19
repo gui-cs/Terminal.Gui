@@ -988,7 +988,7 @@ public class ScrollSliderTests (ITestOutputHelper output) : FakeDriverBase
 └──────────┘")]
     public void Draws_Correctly (int superViewportWidth, int superViewportHeight, int sliderSize, int position, Orientation orientation, string expected)
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver driver = CreateFakeDriver ();
         var super = new Window
         {
             Driver = driver,

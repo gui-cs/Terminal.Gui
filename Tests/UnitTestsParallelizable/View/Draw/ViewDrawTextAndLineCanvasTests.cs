@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
-public class ViewDrawTextAndLineCanvasTests (ITestOutputHelper output) : FakeDriverBase
+public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
 {
     #region DrawText Tests
 

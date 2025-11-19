@@ -267,6 +267,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         // BUGBUG: This is bad. It does not work if the app was crated without
         // BUGBUG: Apis.
         //_force16Colors = ApplicationImpl.Instance.Driver!.Force16Colors;
+        _force16Colors = false;
         _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.

@@ -67,7 +67,7 @@ public class ApplicationImplTests
         IApplication? app = NewMockedApplicationImpl ();
         var ex = Assert.Throws<NotInitializedException> (() => app?.Run (new Window ()));
         Assert.Equal ("Run cannot be accessed before Initialization", ex.Message);
-        app.Shutdown ();
+        app?.Shutdown ();
     }
 
     [Fact]

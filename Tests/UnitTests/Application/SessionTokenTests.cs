@@ -45,7 +45,7 @@ public class SessionTokenTests
     [Fact]
     public void Dispose_Cleans_Up_SessionToken ()
     {
-        var rs = new SessionToken (null);
+        var rs = new SessionToken (null!);
         Assert.NotNull (rs);
 
         // Should not throw because Toplevel was null
@@ -60,7 +60,7 @@ public class SessionTokenTests
         // Should throw because Toplevel was not cleaned up
         Assert.Throws<InvalidOperationException> (() => rs.Dispose ());
 
-        rs.Toplevel.Dispose ();
+        rs.Toplevel?.Dispose ();
         rs.Toplevel = null;
         rs.Dispose ();
 #if DEBUG_IDISPOSABLE
@@ -72,7 +72,7 @@ public class SessionTokenTests
     [Fact]
     public void New_Creates_SessionToken ()
     {
-        var rs = new SessionToken (null);
+        var rs = new SessionToken (null!);
         Assert.Null (rs.Toplevel);
 
         var top = new Toplevel ();

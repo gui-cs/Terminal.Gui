@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
-public class ViewClearViewportTests (ITestOutputHelper output) : FakeDriverBase
+public class ViewClearViewportTests () : FakeDriverBase
 {
     [Fact]
     public void ClearViewport_FillsViewportArea ()
