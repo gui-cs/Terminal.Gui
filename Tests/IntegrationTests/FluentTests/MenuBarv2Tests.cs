@@ -153,7 +153,7 @@ public class MenuBarv2Tests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Current!.Add (menuBar);
+                                                app.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItemv2> (top?.App?.Navigation!.GetFocused ())
@@ -172,10 +172,11 @@ public class MenuBarv2Tests
     public void DefaultKey_DeActivates (TestDriver d)
     {
         MenuBarv2? menuBar = null;
-
+        IApplication? app = null;
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then ((app) =>
+                                     .Then ((a) =>
                                             {
+                                                app = a;
                                                 menuBar = new MenuBarv2 ();
                                                 Toplevel top = app.Current!;
 
@@ -190,14 +191,14 @@ public class MenuBarv2Tests
                                                 app.Current!.Add (menuBar);
                                             })
                                      .WaitIteration ()
-                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
+                                     .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
-                                     .AssertEqual ("_New file", Application.Navigation!.GetFocused ()!.Title)
+                                     .AssertEqual ("_New file", app?.Navigation!.GetFocused ()!.Title)
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
-                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ());
+                                     .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ());
     }
 
     [Theory]
@@ -262,13 +263,13 @@ public class MenuBarv2Tests
     public void EnableForDesign_CreatesMenuItems (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d, _out)
-                                     .Then ((_) =>
+                                     .Then ((app) =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Application.Current!.Add (menuBar);
+                                                app.Current!.Add (menuBar);
 
                                                 // Call EnableForDesign
-                                                Toplevel top = Application.Current!;
+                                                Toplevel top = app.Current!;
                                                 bool result = menuBar.EnableForDesign (ref top);
 
                                                 // Should return true
@@ -310,22 +311,22 @@ public class MenuBarv2Tests
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (menuBar?.IsOpen ())
-                                     .AssertEqual ("_New file", Application.Navigation?.GetFocused ()!.Title)
+                                     .AssertEqual ("_New file", app?.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Key.CursorRight)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .ScreenShot ("After right arrow", _out)
-                                     .AssertEqual ("Cu_t", Application.Navigation?.GetFocused ()!.Title)
+                                     .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
                                      .EnqueueKeyEvent (Key.CursorRight)
                                      .ScreenShot ("After second right arrow", _out)
-                                     .AssertEqual ("_Online Help...", Application.Navigation?.GetFocused ()!.Title)
+                                     .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ("After third right arrow", _out)
                                      .EnqueueKeyEvent (Key.CursorRight)
                                      .ScreenShot ("After fourth right arrow", _out)
-                                     .AssertEqual ("_New file", Application.Navigation?.GetFocused ()!.Title)
+                                     .AssertEqual ("_New file", app?.Navigation?.GetFocused ()!.Title)
                                      .EnqueueKeyEvent (Key.CursorLeft)
                                      .ScreenShot ("After left arrow", _out)
-                                     .AssertEqual ("_Online Help...", Application.Navigation?.GetFocused ()!.Title);
+                                     .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title);
     }
 
 
@@ -433,7 +434,7 @@ public class MenuBarv2Tests
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .EnqueueKeyEvent (MenuBarv2.DefaultKey)
                                      .AssertEqual ("_New file", app.Navigation!.GetFocused ()!.Title)
-                                     .AssertTrue (Application.Current!.Running)
+                                     .AssertTrue (app?.Current!.Running)
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
@@ -502,12 +503,12 @@ public class MenuBarv2Tests
                             };
 
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then ((_) =>
+                                     .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Current!;
+                                                Toplevel top = a.Current!;
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Current!.Add (menuBar);
+                                                a.Current!.Add (menuBar);
                                             })
                                      .Add (testView)
                                      .WaitIteration ()
@@ -536,12 +537,12 @@ public class MenuBarv2Tests
                             };
 
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then ((_) =>
+                                     .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Toplevel top = Application.Current!;
+                                                Toplevel top = a.Current!;
                                                 menuBar.EnableForDesign (ref top);
-                                                Application.Current!.Add (menuBar);
+                                                a.Current!.Add (menuBar);
                                             })
                                      .Add (testView)
                                      .WaitIteration ()

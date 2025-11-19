@@ -23,13 +23,13 @@ public class PopoverMenuTests
     public void EnableForDesign_CreatesMenuItems (TestDriver d)
     {
         using GuiTestContext c = With.A<Window> (80, 25, d)
-                                     .Then ((_) =>
+                                     .Then ((app) =>
                                             {
                                                 PopoverMenu popoverMenu = new ();
-                                                Application.Current!.Add (popoverMenu);
+                                                app.Current!.Add (popoverMenu);
 
                                                 // Call EnableForDesign
-                                                Toplevel top = Application.Current;
+                                                Toplevel top = app.Current;
                                                 bool result = popoverMenu.EnableForDesign (ref top);
 
                                                 // Should return true
@@ -217,7 +217,7 @@ public class PopoverMenuTests
                                                     Id = "focusableView",
                                                     Text = "View"
                                                 };
-                                                Application.Current!.Add (view);
+                                                app.Current!.Add (view);
 
                                                 // EnableForDesign sets to true; undo that
                                                 popoverMenu.Visible = false;
@@ -226,7 +226,7 @@ public class PopoverMenuTests
 
                                                 view.SetFocus ();
                                             })
-                                     .AssertIsNotType<MenuItemv2> (Application.Navigation!.GetFocused ())
+                                     .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ())
                                      .ScreenShot ("PopoverMenu initial state", _out)
                                      .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                      .ScreenShot ("PopoverMenu after Show", _out)

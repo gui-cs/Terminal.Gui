@@ -21,7 +21,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
         var v6 = new View { Id = "v6", CanFocus = true };
 
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then ((_) =>
+                                     .Then ((app) =>
                                             {
                                                 var w1 = new Window { Id = "w1" };
                                                 w1.Add (v1, v2);
@@ -29,8 +29,8 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                                 w2.Add (v3, v4);
                                                 var w3 = new Window { Id = "w3" };
                                                 w3.Add (v5, v6);
-                                                Toplevel top = Application.Current!;
-                                                Application.Current!.Add (w1, w2, w3);
+                                                Toplevel top = app?.Current!;
+                                                app?.Current!.Add (w1, w2, w3);
                                             })
                                      .AssertTrue (v5.HasFocus)
                                      .EnqueueKeyEvent (Key.F6)

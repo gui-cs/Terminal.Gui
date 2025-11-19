@@ -35,7 +35,7 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     The IApplication instance that was created.
     /// </summary>
-    public IApplication App => _applicationImpl!;
+    public IApplication? App => _applicationImpl;
 
     private TestDriver _driverType;
 
@@ -125,11 +125,11 @@ public partial class GuiTestContext : IDisposable
 
                                      Toplevel t = topLevelBuilder ();
                                      t.Closed += (s, e) => { Finished = true; };
-                                     _applicationImpl?.Run (t); // This will block, but it's on a background thread now
+                                     App?.Run (t); // This will block, but it's on a background thread now
 
                                      t.Dispose ();
                                      Logging.Trace ("Application.Run completed");
-                                     _applicationImpl?.Shutdown ();
+                                     App?.Shutdown ();
                                      _runCancellationTokenSource.Cancel ();
                                  }
                                  catch (OperationCanceledException)
@@ -167,7 +167,7 @@ public partial class GuiTestContext : IDisposable
 
     private void InitializeApplication ()
     {
-        _applicationImpl?.Init (GetDriverName ());
+        App?.Init (GetDriverName ());
     }
 
 
@@ -323,22 +323,22 @@ public partial class GuiTestContext : IDisposable
         }
         CancellationTokenSource ctsActionCompleted = new ();
 
-        _applicationImpl?.Invoke (app =>
-                                 {
-                                     try
-                                     {
-                                         action (app);
+        App?.Invoke (app =>
+                     {
+                         try
+                         {
+                             action (app);
 
-                                         //Logging.Trace ("Action completed");
-                                         ctsActionCompleted.Cancel ();
-                                     }
-                                     catch (Exception e)
-                                     {
-                                         Logging.Warning ($"Action failed with exception: {e}");
-                                         _backgroundException = e;
-                                         _fakeInput.ExternalCancellationTokenSource?.Cancel ();
-                                     }
-                                 });
+                             //Logging.Trace ("Action completed");
+                             ctsActionCompleted.Cancel ();
+                         }
+                         catch (Exception e)
+                         {
+                             Logging.Warning ($"Action failed with exception: {e}");
+                             _backgroundException = e;
+                             _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+                         }
+                     });
 
         // Blocks until either the token or the hardStopToken is cancelled.
         // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
@@ -426,7 +426,7 @@ public partial class GuiTestContext : IDisposable
             {
                 try
                 {
-                    _applicationImpl?.Shutdown ();
+                    App?.Shutdown ();
                 }
                 catch
                 {
@@ -454,8 +454,8 @@ public partial class GuiTestContext : IDisposable
             // If this doesn't work there will be test failures as the main loop continues to run during next test.
             try
             {
-                _applicationImpl?.RequestStop ();
-                _applicationImpl?.Shutdown ();
+                App?.RequestStop ();
+                App?.Shutdown ();
             }
             catch (Exception ex)
             {
@@ -530,7 +530,7 @@ public partial class GuiTestContext : IDisposable
         Logging.Trace ("CleanupApplication");
         _fakeInput.ExternalCancellationTokenSource = null;
 
-        _applicationImpl?.ResetState (true);
+        App?.ResetState (true);
         Logging.Logger = _originalLogger!;
         Finished = true;
 
