@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Moq;
+// ReSharper disable AccessToModifiedClosure
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
@@ -269,13 +270,13 @@ public class ListViewTests
 
         return;
 
-        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        void OpenSelectedItem (object? sender, ListViewItemEventArgs e)
         {
             opened = true;
-            selectedValue = e.Value.ToString ();
+            selectedValue = e.Value!.ToString ();
         }
 
-        void Accepted (object sender, CommandEventArgs e) { accepted = true; }
+        void Accepted (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -300,13 +301,13 @@ public class ListViewTests
 
         return;
 
-        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        void OpenSelectedItem (object? sender, ListViewItemEventArgs e)
         {
             opened = true;
-            selectedValue = e.Value.ToString ();
+            selectedValue = e.Value!.ToString ();
         }
 
-        void Accepted (object sender, CommandEventArgs e)
+        void Accepted (object? sender, CommandEventArgs e)
         {
             accepted = true;
             e.Handled = true;
@@ -780,7 +781,7 @@ public class ListViewTests
         Assert.Equal (0, otherActions);
         Assert.Empty (source1);
 
-        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        void Lw_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -820,7 +821,7 @@ public class ListViewTests
         Assert.Equal (6, lw.Count);
         Assert.Equal (6, source.Count);
 
-        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        void Lw_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -860,7 +861,7 @@ public class ListViewTests
         Assert.Equal (6, lv.Source.Count);
         Assert.Equal (6, source.Count);
 
-        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        void Lw_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {

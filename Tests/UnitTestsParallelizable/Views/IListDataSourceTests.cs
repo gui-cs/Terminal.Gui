@@ -343,9 +343,6 @@ public class IListDataSourceTests (ITestOutputHelper output)
     public void CustomDataSource_Dispose_CleansUp ()
     {
         var customSource = new TestListDataSource ();
-        var eventRaised = false;
-
-        customSource.CollectionChanged += (s, e) => eventRaised = true;
 
         customSource.Dispose ();
 
@@ -500,9 +497,8 @@ public class IListDataSourceTests (ITestOutputHelper output)
     {
         ObservableCollection<string> source = ["Item1"];
         ListWrapper<string> wrapper = new (source);
-        var eventRaised = false;
 
-        wrapper.CollectionChanged += (s, e) => eventRaised = true;
+        wrapper.CollectionChanged += (s, e) => { };
 
         wrapper.Dispose ();
 
