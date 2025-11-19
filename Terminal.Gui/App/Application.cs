@@ -53,58 +53,6 @@ public static partial class Application
     /// </summary>
     public const ushort DefaultMaximumIterationsPerSecond = 25;
 
-    /// <summary>
-    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
-    /// </summary>
-    /// <returns>A string representation of the Application </returns>
-    public new static string ToString ()
-    {
-        IDriver? driver = Driver;
-
-        if (driver is null)
-        {
-            return string.Empty;
-        }
-
-        return ToString (driver);
-    }
-
-    /// <summary>
-    ///     Gets a string representation of the Application rendered by the provided <see cref="IDriver"/>.
-    /// </summary>
-    /// <param name="driver">The driver to use to render the contents.</param>
-    /// <returns>A string representation of the Application </returns>
-    public static string ToString (IDriver? driver)
-    {
-        if (driver is null)
-        {
-            return string.Empty;
-        }
-
-        var sb = new StringBuilder ();
-
-        Cell [,] contents = driver?.Contents!;
-
-        for (var r = 0; r < driver!.Rows; r++)
-        {
-            for (var c = 0; c < driver.Cols; c++)
-            {
-                string text = contents [r, c].Grapheme;
-
-                sb.Append (text);
-
-                if (text.GetColumns () > 1)
-                {
-                    c++;
-                }
-            }
-
-            sb.AppendLine ();
-        }
-
-        return sb.ToString ();
-    }
-
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
