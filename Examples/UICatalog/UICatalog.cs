@@ -269,7 +269,7 @@ public class UICatalog
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
 
-    private static void StartConfigFileWatcher ()
+    private static void StartConfigWatcher ()
     {
         // Set up a file system watcher for `./.tui/`
         _currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
@@ -317,10 +317,19 @@ public class UICatalog
 
         //_homeDirWatcher.Created += ConfigFileChanged;
         _homeDirWatcher.EnableRaisingEvents = true;
+
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
     }
 
-    private static void StopConfigFileWatcher ()
+    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e)
     {
+        CM.Apply ();
+    }
+
+    private static void StopConfigWatcher ()
+    {
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
+
         _currentDirWatcher.EnableRaisingEvents = false;
         _currentDirWatcher.Changed -= ConfigFileChanged;
         _currentDirWatcher.Created -= ConfigFileChanged;
@@ -398,7 +407,7 @@ public class UICatalog
         if (!Options.DontEnableConfigurationManagement)
         {
             ConfigurationManager.Enable (ConfigLocations.All);
-            StartConfigFileWatcher ();
+            StartConfigWatcher ();
         }
 
         while (RunUICatalogTopLevel () is { } scenario)
@@ -440,7 +449,7 @@ public class UICatalog
 #endif
         }
 
-        StopConfigFileWatcher ();
+        StopConfigWatcher ();
         VerifyObjectsWereDisposed ();
     }
 

@@ -211,6 +211,7 @@ public class UICatalogTop : Toplevel
                                                          return;
                                                      }
                                                      ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
+
                                                  };
 
                 var menuItem = new MenuItemv2

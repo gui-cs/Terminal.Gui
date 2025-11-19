@@ -218,6 +218,33 @@ public class SourcesManagerTests
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
+
+    //[Fact]
+    //public void Update_WithValidJson_UpdatesThemeScope ()
+    //{
+    //    // Arrange
+    //    var sourcesManager = new SourcesManager ();
+    //    var themeScope = new ThemeScope ();
+    //    themeScope.LoadHardCodedDefaults ();
+    //    themeScope ["Button.DefaultShadowStyle"].PropertyValue = ShadowStyle.Opaque;
+
+    //    var json = """
+    //               {
+    //                    "Button.DefaultShadowStyle": "None"
+    //               }
+    //               """;
+    //    var source = "test.json";
+    //    var location = ConfigLocations.HardCoded;
+
+    //    // Act
+    //    bool result = sourcesManager.Load (themeScope, json, source, location);
+
+    //    // Assert
+    //    Assert.True (result);
+    //    Assert.Equal (Key.Z.WithCtrl, themeScope ["Application.QuitKey"].PropertyValue as Key);
+    //    Assert.Contains (source, sourcesManager.Sources.Values);
+    //}
+
     #endregion
 
     #region Load
