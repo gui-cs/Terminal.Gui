@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO.Abstractions;
 
 namespace Terminal.Gui.FileServices;

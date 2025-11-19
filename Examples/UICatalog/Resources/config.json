@@ -86,7 +86,7 @@
             "Menu": {
               "Normal": {
                 "Foreground": "Black",
-                "Background": "WHite"
+                "Background": "White"
               },
               "Focus": {
                 "Foreground": "White",
@@ -136,17 +136,16 @@
     {
       "UI Catalog Theme": {
         "Window.DefaultShadow": "Transparent",
+        "Button.DefaultShadow": "None",
         "CheckBox.DefaultHighlightStates": "In, Pressed, PressedOutside",
         "MessageBox.DefaultButtonAlignment": "Start",
         "StatusBar.DefaultSeparatorLineStyle": "Single",
         "Dialog.DefaultMinimumWidth": 80,
-        "MessageBox.DefaultBorderStyle": "Dotted",
         "NerdFonts.Enable": false,
         "MessageBox.DefaultMinimumWidth": 0,
         "Window.DefaultBorderStyle": "Double",
         "Dialog.DefaultShadow": "Opaque",
         "Dialog.DefaultButtonAlignment": "Start",
-        "Button.DefaultShadow": "Transparent",
         "FrameView.DefaultBorderStyle": "Double",
         "MessageBox.DefaultMinimumHeight": 0,
         "Button.DefaultHighlightStates": "In, Pressed",

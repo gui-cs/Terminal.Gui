@@ -1,5 +1,4 @@
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-#nullable enable
 
 
 namespace Terminal.Gui.Views;
@@ -13,10 +12,10 @@ internal sealed class Menu : View
 {
     public Menu ()
     {
-        if (Application.Top is { })
+        if (Application.Current is { })
         {
-            Application.Top.DrawComplete += Top_DrawComplete;
-            Application.Top.SizeChanging += Current_TerminalResized;
+            Application.Current.DrawComplete += Top_DrawComplete;
+            Application.Current.SizeChanging += Current_TerminalResized;
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
@@ -232,10 +231,10 @@ internal sealed class Menu : View
     {
         RemoveKeyBindingsHotKey (_barItems);
 
-        if (Application.Top is { })
+        if (Application.Current is { })
         {
-            Application.Top.DrawComplete -= Top_DrawComplete;
-            Application.Top.SizeChanging -= Current_TerminalResized;
+            Application.Current.DrawComplete -= Top_DrawComplete;
+            Application.Current.SizeChanging -= Current_TerminalResized;
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;
@@ -968,11 +967,11 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
-                             i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
-                             i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
-                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
-                            );
+                             driver: Driver,
+                             screen: ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
+                             normalColor: i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                             hotColor: i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                             maximum: SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty);
                 }
                 else
                 {

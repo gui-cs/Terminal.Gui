@@ -1,4 +1,5 @@
 
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>

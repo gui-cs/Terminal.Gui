@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 
 // These classes use a key binding system based on the design implemented in Scintilla.Net which is an

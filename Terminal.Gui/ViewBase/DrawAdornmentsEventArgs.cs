@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     Provides data for events that allow cancellation of adornment drawing in the Cancellable Work Pattern (CWP).

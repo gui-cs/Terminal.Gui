@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Describes render stylistic selections of a <see cref="TabView"/></summary>

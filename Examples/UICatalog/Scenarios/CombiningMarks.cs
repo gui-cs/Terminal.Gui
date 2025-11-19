@@ -13,7 +13,7 @@ public class CombiningMarks : Scenario
         top.DrawComplete += (s, e) =>
         {
             // Forces reset _lineColsOffset because we're dealing with direct draw
-            Application.Top!.SetNeedsDraw ();
+            Application.Current!.SetNeedsDraw ();
 
             var i = -1;
             top.Move (0, ++i);
@@ -59,9 +59,9 @@ public class CombiningMarks : Scenario
             top.Move (0, ++i);
             top.AddStr ("From now on we are using TextFormatter");
             TextFormatter tf = new () { Text = "[e\u0301\u0301\u0328]<- \"[e\\u0301\\u0301\\u0328]\" using TextFormatter." };
-            tf.Draw (new (0, ++i, tf.Text.Length, 1), top.GetAttributeForRole (VisualRole.Normal), top.GetAttributeForRole (VisualRole.Normal));
+            tf.Draw (driver: Application.Driver, screen: new (0, ++i, tf.Text.Length, 1), normalColor: top.GetAttributeForRole (VisualRole.Normal), hotColor: top.GetAttributeForRole (VisualRole.Normal));
             tf.Text = "[e\u0328\u0301]<- \"[e\\u0328\\u0301]\" using TextFormatter.";
-            tf.Draw (new (0, ++i, tf.Text.Length, 1), top.GetAttributeForRole (VisualRole.Normal), top.GetAttributeForRole (VisualRole.Normal));
+            tf.Draw (driver: Application.Driver, screen: new (0, ++i, tf.Text.Length, 1), normalColor: top.GetAttributeForRole (VisualRole.Normal), hotColor: top.GetAttributeForRole (VisualRole.Normal));
             i++;
             top.Move (0, ++i);
             top.AddStr ("From now on we are using Surrogate pairs with combining diacritics");

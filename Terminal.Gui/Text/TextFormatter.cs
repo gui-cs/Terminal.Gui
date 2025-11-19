@@ -1,4 +1,3 @@
-#nullable enable
 using System.Buffers;
 using System.Diagnostics;
 
@@ -11,7 +10,7 @@ namespace Terminal.Gui.Text;
 public class TextFormatter
 {
     // Utilized in CRLF related helper methods for faster newline char index search.
-    private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create(['\r', '\n']);
+    private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create (['\r', '\n']);
 
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
@@ -52,29 +51,26 @@ public class TextFormatter
     ///     Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to
     ///     <c>false</c>.
     /// </remarks>
+    /// <param name="driver">The console driver currently used by the application.</param>
     /// <param name="screen">Specifies the screen-relative location and maximum size for drawing the text.</param>
     /// <param name="normalColor">The color to use for all text except the hotkey</param>
     /// <param name="hotColor">The color to use to draw the hotkey</param>
     /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>
-    /// <param name="driver">The console driver currently used by the application.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Draw (
+        IDriver? driver,
         Rectangle screen,
         Attribute normalColor,
         Attribute hotColor,
-        Rectangle maximum = default,
-        IDriver? driver = null
+        Rectangle maximum = default
     )
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         // With this check, we protect against subclasses with overrides of Text (like Button)
         if (string.IsNullOrEmpty (Text))
         {
             return;
-        }
-
-        if (driver is null)
-        {
-            driver = Application.Driver;
         }
 
         driver?.SetAttribute (normalColor);
@@ -1201,8 +1197,8 @@ public class TextFormatter
             return str;
         }
 
-        StringBuilder stringBuilder = new();
-        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        StringBuilder stringBuilder = new ();
+        ReadOnlySpan<char> firstSegment = remaining [..firstNewlineCharIndex];
         stringBuilder.Append (firstSegment);
 
         // The first newline is not yet skipped because the "keepNewLine" condition has not been evaluated.
@@ -1217,7 +1213,7 @@ public class TextFormatter
                 break;
             }
 
-            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            ReadOnlySpan<char> segment = remaining [..newlineCharIndex];
             stringBuilder.Append (segment);
 
             int stride = segment.Length;
@@ -1269,8 +1265,8 @@ public class TextFormatter
             return str;
         }
 
-        StringBuilder stringBuilder = new();
-        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        StringBuilder stringBuilder = new ();
+        ReadOnlySpan<char> firstSegment = remaining [..firstNewlineCharIndex];
         stringBuilder.Append (firstSegment);
 
         // The first newline is not yet skipped because the newline type has not been evaluated.
@@ -1285,7 +1281,7 @@ public class TextFormatter
                 break;
             }
 
-            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            ReadOnlySpan<char> segment = remaining [..newlineCharIndex];
             stringBuilder.Append (segment);
 
             int stride = segment.Length;
@@ -2455,12 +2451,12 @@ public class TextFormatter
         }
 
         const int maxStackallocCharBufferSize = 512; // ~1 kB
-        char[]? rentedBufferArray = null;
+        char []? rentedBufferArray = null;
         try
         {
             Span<char> buffer = text.Length <= maxStackallocCharBufferSize
-                ? stackalloc char[text.Length]
-                : (rentedBufferArray = ArrayPool<char>.Shared.Rent(text.Length));
+                ? stackalloc char [text.Length]
+                : (rentedBufferArray = ArrayPool<char>.Shared.Rent (text.Length));
 
             int i = 0;
             var remainingBuffer = buffer;
@@ -2478,7 +2474,7 @@ public class TextFormatter
 
             ReadOnlySpan<char> newText = buffer [..^remainingBuffer.Length];
             // If the resulting string would be the same as original then just return the original.
-            if (newText.Equals(text, StringComparison.Ordinal))
+            if (newText.Equals (text, StringComparison.Ordinal))
             {
                 return text;
             }

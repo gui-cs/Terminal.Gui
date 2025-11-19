@@ -77,7 +77,7 @@ public class TreeUseCases : Scenario
 
         if (_currentTree != null)
         {
-            Application.Top.Remove (_currentTree);
+            Application.Current.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
@@ -97,7 +97,7 @@ public class TreeUseCases : Scenario
             tree.TreeBuilder = new GameObjectTreeBuilder ();
         }
 
-        Application.Top.Add (tree);
+        Application.Current.Add (tree);
 
         tree.AddObject (army1);
 
@@ -117,13 +117,13 @@ public class TreeUseCases : Scenario
 
         if (_currentTree != null)
         {
-            Application.Top.Remove (_currentTree);
+            Application.Current.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
         var tree = new TreeView { X = 0, Y = 1, Width = Dim.Fill(), Height = Dim.Fill (1) };
 
-        Application.Top.Add (tree);
+        Application.Current.Add (tree);
 
         tree.AddObject (myHouse);
 
@@ -134,13 +134,13 @@ public class TreeUseCases : Scenario
     {
         if (_currentTree != null)
         {
-            Application.Top.Remove (_currentTree);
+            Application.Current.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
         var tree = new TreeView { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        Application.Top.Add (tree);
+        Application.Current.Add (tree);
 
         var root1 = new TreeNode ("Root1");
         root1.Children.Add (new TreeNode ("Child1.1"));

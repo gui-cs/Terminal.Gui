@@ -9,8 +9,12 @@ public class PaddingTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Padding_Uses_Parent_Scheme ()
     {
-        Application.Driver!.SetScreenSize (5, 5);
-        var view = new View { Height = 3, Width = 3 };
+        ApplicationImpl.Instance.Driver!.SetScreenSize (5, 5);
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Height = 3, Width = 3
+        };
         view.Padding!.Thickness = new (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
 

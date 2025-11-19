@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.Drivers;
 
 /// <summary>

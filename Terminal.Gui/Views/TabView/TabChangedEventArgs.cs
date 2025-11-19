@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Describes a change in <see cref="TabView.SelectedTab"/></summary>

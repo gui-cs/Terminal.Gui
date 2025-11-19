@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
+#nullable disable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>

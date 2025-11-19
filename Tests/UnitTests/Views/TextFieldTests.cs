@@ -84,7 +84,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedRender, output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Misérables", output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Theory (Skip = "Broke with ContextMenuv2")]
@@ -124,16 +124,16 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
 
         // but disapear when text is added
         tf.Text = content;
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (content, output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -148,17 +148,17 @@ public class TextFieldTests (ITestOutputHelper output)
         // Caption has no effect when focused
         tf.Title = "Enter txt";
         Assert.True (tf.HasFocus);
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
         Application.RaiseKeyDownEvent ('\t');
 
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         
         // Verify the caption text is rendered
@@ -188,7 +188,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // All characters in "Enter text" should have the caption attribute
         DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         
         // The hotkey character 'F' should be rendered (without the underscore in the actual text)
@@ -222,7 +222,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
         DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         
         // The underscore should not be rendered, 'T' should be underlined
@@ -256,7 +256,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
         DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -1621,7 +1621,11 @@ public class TextFieldTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
-        var tf = new TextField { Width = 30, Text = "Les Misérables" };
+        var tf = new TextField
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 30, Text = "Les Misérables"
+        };
         tf.SetRelativeLayout (new (100, 100));
         tf.Draw ();
 
@@ -1642,7 +1646,7 @@ Les Misérables",
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1687,7 +1691,7 @@ Les Miśerables",
         {
             base.Before (methodUnderTest);
 
-            //Application.Top.Scheme = Colors.Schemes ["Base"];
+            //Application.Current.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
                 //                1         2         3 
@@ -1702,7 +1706,11 @@ Les Miśerables",
     [AutoInitShutdown]
     public void Draw_Esc_Rune ()
     {
-        var tf = new TextField { Width = 5, Text = "\u001b" };
+        var tf = new TextField
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 5, Text = "\u001b"
+        };
         tf.BeginInit ();
         tf.EndInit ();
         tf.Draw ();

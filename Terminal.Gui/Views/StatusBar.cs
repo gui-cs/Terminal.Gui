@@ -1,6 +1,3 @@
-#nullable enable
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -137,12 +134,14 @@ public class StatusBar : Bar, IDesignable
         button1.Accepting += OnButtonClicked;
         Add (button1);
 
-        shortcut.Accepting += (s, e) =>
-                           {
-                               button1.Visible = !button1.Visible;
-                               button1.Enabled = button1.Visible;
-                               e.Handled = false;
-                           };
+#pragma warning disable TGUI001
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  button1.Visible = !button1.Visible;
+                                  button1.Enabled = button1.Visible;
+                                  e.Handled = false;
+                              };
+#pragma warning restore TGUI001
 
         Add (new Label
         {
@@ -155,7 +154,7 @@ public class StatusBar : Bar, IDesignable
         {
             Text = "Or me!",
         };
-        button2.Accepting += (s, e) => Application.RequestStop ();
+        button2.Accepting += (s, e) => App?.RequestStop ();
 
         Add (button2);
 

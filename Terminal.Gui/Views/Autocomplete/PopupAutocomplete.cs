@@ -1,5 +1,4 @@
-using System.Diagnostics;
-
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -125,7 +124,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             {
                 Visible = true;
                 HostControl?.SetNeedsDraw ();
-                Application.Mouse.UngrabMouse ();
+                HostControl?.App?.Mouse.UngrabMouse ();
 
                 return false;
             }
@@ -137,7 +136,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                 _closed = false;
             }
 
-            HostControl?.SetNeedsDraw ();
+            HostControl.SetNeedsDraw ();
 
             return false;
         }
@@ -406,7 +405,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
             string text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
-            Application.Driver?.AddStr (text);
+            _popup.App?.Driver?.AddStr (text);
         }
     }
 
@@ -544,7 +543,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="column"></param>
     protected abstract void SetCursorPosition (int column);
 
-#nullable enable
     private Point? LastPopupPos { get; set; }
 #nullable restore
 

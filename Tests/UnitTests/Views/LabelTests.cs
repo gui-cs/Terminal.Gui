@@ -1,5 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
@@ -112,9 +111,17 @@ public class LabelTests (ITestOutputHelper output)
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+        tf1.Draw (
+                  Application.Driver,
+                  new (new (0, 1), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
-        tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+        tf2.Draw (
+                  Application.Driver,
+                  new (new (0, 2), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -135,10 +142,20 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
-        tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+
+        tf1.Draw (
+                  Application.Driver,
+                  new (new (0, 1), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+
+        tf2.Draw (
+                  Application.Driver,
+                  new (new (0, 2), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -301,7 +318,11 @@ t
     [SetupFakeApplication]
     public void Full_Border ()
     {
-        var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
+        var label = new Label
+        {
+            Driver = Application.Driver,
+            BorderStyle = LineStyle.Single, Text = "Test"
+        };
         label.BeginInit ();
         label.EndInit ();
         label.SetRelativeLayout (Application.Screen.Size);
@@ -699,6 +720,7 @@ t
         var label = new Label
         {
             Text = "This should be the last line.",
+
             //Width = Dim.Fill (),
             X = 0, // keep unit test focused; don't use Center here
             Y = Pos.AnchorEnd (1)
@@ -745,6 +767,7 @@ t
         var label = new Label
         {
             Text = "This should be the last line.",
+
             //Width = Dim.Fill (),
             X = 0,
             Y = Pos.Bottom (win)
@@ -907,7 +930,11 @@ t
         label.Width = Dim.Fill () - text.Length;
         label.Height = 0;
 
-        var win = new View { CanFocus = true, BorderStyle = LineStyle.Single, Width = Dim.Fill (), Height = Dim.Fill () };
+        var win = new View
+        {
+            App = ApplicationImpl.Instance,
+            CanFocus = true, BorderStyle = LineStyle.Single, Width = Dim.Fill (), Height = Dim.Fill ()
+        };
         win.Add (label);
         win.BeginInit ();
         win.EndInit ();
@@ -1071,7 +1098,7 @@ t
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.Current.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1130,7 +1157,7 @@ t
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.Current.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1202,11 +1229,11 @@ t
             Text = "nextView",
             CanFocus = true
         };
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (otherView, label, nextView);
 
-        Application.Top.SetFocus ();
+        Application.Current = new ();
+        Application.Current.Add (otherView, label, nextView);
+
+        Application.Current.SetFocus ();
         Assert.True (otherView.HasFocus);
 
         Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
@@ -1214,7 +1241,7 @@ t
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 
@@ -1224,19 +1251,18 @@ t
         View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
         Label label = new () { X = 0, Y = 1, Text = "_label" };
         View nextView = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true };
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (otherView, label, nextView);
-        Application.Top.Layout ();
+        Application.Current = new ();
+        Application.Current.Add (otherView, label, nextView);
+        Application.Current.Layout ();
 
-        Application.Top.SetFocus ();
+        Application.Current.SetFocus ();
 
         // click on label
         Application.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 
@@ -1254,9 +1280,9 @@ t
             Text = "view",
             CanFocus = true
         };
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (label, view);
+
+        Application.Current = new ();
+        Application.Current.Add (label, view);
 
         view.SetFocus ();
         Assert.True (label.CanFocus);
@@ -1269,15 +1295,13 @@ t
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 
     [Fact]
     public void CanFocus_True_MouseClick_Focuses ()
     {
-        Application.Navigation = new ();
-
         Label label = new ()
         {
             Text = "label",
@@ -1296,14 +1320,14 @@ t
             CanFocus = true
         };
 
-        Application.Top = new ()
+        Application.Current = new ()
         {
             Width = 10,
             Height = 10
         };
-        Application.Top.Add (label, otherView);
-        Application.Top.SetFocus ();
-        Application.Top.Layout ();
+        Application.Current.Add (label, otherView);
+        Application.Current.SetFocus ();
+        Application.Current.Layout ();
 
         Assert.True (label.CanFocus);
         Assert.True (label.HasFocus);
@@ -1323,7 +1347,7 @@ t
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState ();
     }
 

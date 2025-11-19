@@ -60,7 +60,7 @@ internal partial class DriverAssert
                 {
                     case 0:
                         output.WriteLine (
-                                          $"{Application.ToString (driver)}\n"
+                                          $"{driver.ToString ()}\n"
                                           + $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]} was not found.\n"
                                           + $" Expected: {string.Join (",", expectedAttributes.Select (attr => attr))}\n"
                                           + $" But Was: <not found>"
@@ -79,7 +79,7 @@ internal partial class DriverAssert
 
                 if (colorUsed != userExpected)
                 {
-                    output.WriteLine ($"{Application.ToString (driver)}");
+                    output.WriteLine ($"{driver.ToString ()}");
                     output.WriteLine ($"Unexpected Attribute at Contents[{line},{c}] = {contents [line, c]}.");
                     output.WriteLine ($" Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})");
                     output.WriteLine ($"  But Was: {colorUsed} ({val})");
@@ -152,7 +152,9 @@ internal partial class DriverAssert
     )
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
-        var actualLook = Application.ToString (driver ?? Application.Driver);
+        driver ??= Application.Driver!;
+
+        var actualLook = driver.ToString ();
 
         if (string.Equals (expectedLook, actualLook))
         {
@@ -198,7 +200,7 @@ internal partial class DriverAssert
     {
         List<List<string>> lines = [];
         var sb = new StringBuilder ();
-        driver ??= Application.Driver;
+        driver ??= Application.Driver!;
 
         int x = -1;
         int y = -1;

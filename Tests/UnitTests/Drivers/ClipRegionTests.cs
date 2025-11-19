@@ -12,7 +12,7 @@ public class ClipRegionTests (ITestOutputHelper output)
     [Fact]
     public void AddRune_Is_Clipped ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Application.Driver!.Move (0, 0);
         Application.Driver!.AddRune ('x');
@@ -41,7 +41,7 @@ public class ClipRegionTests (ITestOutputHelper output)
     [Fact]
     public void Clip_Set_To_Empty_AllInvalid ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         // Define a clip rectangle
         Application.Driver!.Clip = new (Rectangle.Empty);
@@ -64,7 +64,7 @@ public class ClipRegionTests (ITestOutputHelper output)
     [Fact]
     public void IsValidLocation ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
         Application.Driver!.Rows = 10;
         Application.Driver!.Cols = 10;
 

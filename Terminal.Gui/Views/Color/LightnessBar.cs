@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;

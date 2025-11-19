@@ -48,6 +48,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
         var superView = new Toplevel
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Height = 3,
             Width = 3,
             Text = "012ABC!@#",
@@ -65,7 +66,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.SetScheme (new (Attribute.Default));
 
         superView.Add (view);
-        Application.TopLevels.Push (superView);
+        Application.SessionStack.Push (superView);
         Application.LayoutAndDraw (true);
         DriverAssert.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
         Application.ResetState (true);
@@ -104,6 +105,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
         var superView = new Toplevel
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Width = 4,
             Height = 4,
             Text = "!@#$".Repeat (4)!
@@ -118,7 +120,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         };
         view.ShadowStyle = style;
         superView.Add (view);
-        Application.TopLevels.Push (superView);
+        Application.SessionStack.Push (superView);
         Application.LayoutAndDraw (true);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
@@ -136,7 +138,8 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         var superView = new View
         {
-            Height = 10, Width = 10
+            Height = 10, Width = 10,
+            App = ApplicationImpl.Instance
         };
 
         View view = new ()

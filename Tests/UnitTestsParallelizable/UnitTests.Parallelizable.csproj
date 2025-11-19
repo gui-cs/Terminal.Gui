@@ -69,4 +69,7 @@
         <Using Include="Terminal.Gui" />
         <Using Include="Xunit" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="ViewBase\" />
+    </ItemGroup>
 </Project>

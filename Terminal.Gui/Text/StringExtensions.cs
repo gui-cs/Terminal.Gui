@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Buffers;
+﻿using System.Buffers;
 using System.Globalization;
 
 namespace Terminal.Gui.Text;

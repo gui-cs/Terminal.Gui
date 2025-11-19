@@ -1,5 +1,6 @@
-#nullable enable
 
+
+using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
@@ -113,6 +114,8 @@ public class MenuBarItemv2 : MenuItemv2
 
             if (_popoverMenu is { })
             {
+                _popoverMenu.App = App;
+
                 PopoverMenuOpen = _popoverMenu.Visible;
                 _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
                 _popoverMenu.Accepted += OnPopoverMenuOnAccepted;

@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.Views;
 
@@ -9,7 +9,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         To use as a context menu, register the popover menu with <see cref="Application.Popover"/> and call
+///         To use as a context menu, register the popover menu with <see cref="IApplication.Popover"/> and call
 ///         <see cref="MakeVisible"/>.
 ///     </para>
 /// </remarks>
@@ -176,7 +176,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         UpdateKeyBindings ();
         SetPosition (idealScreenPosition);
-        Application.Popover?.Show (this);
+        App!.Popover?.Show (this);
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
     public void SetPosition (Point? idealScreenPosition = null)
     {
-        idealScreenPosition ??= Application.GetLastMousePosition ();
+        idealScreenPosition ??= App?.Mouse.LastMousePosition;
 
         if (idealScreenPosition is null || Root is null)
         {
@@ -199,6 +199,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (!Root.IsInitialized)
         {
+            Root.App ??= App;
             Root.BeginInit ();
             Root.EndInit ();
             Root.Layout ();
@@ -223,7 +224,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         else
         {
             HideAndRemoveSubMenu (_root);
-            Application.Popover?.Hide (this);
+            App?.Popover?.Hide (this);
         }
     }
 
@@ -246,6 +247,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             _root = value;
 
+            if (_root is { })
+            {
+                _root.App = App;
+            }
+
             // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             // TODO: And it needs to clear the old bindings first
             UpdateKeyBindings ();
@@ -255,6 +261,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             foreach (Menuv2 menu in allMenus)
             {
+                menu.App = App;
                 menu.Visible = false;
                 menu.Accepting += MenuOnAccepting;
                 menu.Accepted += MenuAccepted;
@@ -279,7 +286,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             else
             {
                 // No TargetView implies Application HotKey
-                key = Application.KeyBindings.GetFirstFromCommands (menuItem.Command);
+                key = App?.Keyboard.KeyBindings.GetFirstFromCommands (menuItem.Command);
             }
 
             if (key is not { IsValid: true })
@@ -439,6 +446,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             if (!menu!.IsInitialized)
             {
+                menu.App ??= App;
                 menu.BeginInit ();
                 menu.EndInit ();
             }
@@ -626,27 +634,27 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign<TContext> (ref TContext context) where TContext : notnull
+    public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
 
         Root = new (
                     [
-                        new MenuItemv2 (context as View, Command.Cut),
-                        new MenuItemv2 (context as View, Command.Copy),
-                        new MenuItemv2 (context as View, Command.Paste),
+                        new MenuItemv2 (targetView as View, Command.Cut),
+                        new MenuItemv2 (targetView as View, Command.Copy),
+                        new MenuItemv2 (targetView as View, Command.Paste),
                         new Line (),
-                        new MenuItemv2 (context as View, Command.SelectAll),
+                        new MenuItemv2 (targetView as View, Command.SelectAll),
                         new Line (),
-                        new MenuItemv2 (context as View, Command.Quit)
+                        new MenuItemv2 (targetView as View, Command.Quit)
                     ])
         {
             Title = "Popover Demo Root"
         };
 
         // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
-        // NOTE: without being activated via Application.Popover. But we want it to be visible.
+        // NOTE: without being activated via App?.Popover. But we want it to be visible.
         // NOTE: If you use PopoverView.EnableForDesign for real Popover scenarios, change back to false
         // NOTE: after calling EnableForDesign.
         //Visible = true;

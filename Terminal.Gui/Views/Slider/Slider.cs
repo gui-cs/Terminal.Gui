@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Transactions;
 
 namespace Terminal.Gui.Views;
@@ -1311,7 +1312,7 @@ public class Slider<T> : View, IOrientation
             {
                 _dragPosition = mouseEvent.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
-                Application.Mouse.GrabMouse (this);
+                App?.Mouse.GrabMouse (this);
             }
 
             SetNeedsDraw ();
@@ -1357,7 +1358,7 @@ public class Slider<T> : View, IOrientation
             || mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             // End Drag
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
             _dragPosition = null;
             _moveRenderPosition = null;
 

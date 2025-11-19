@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>Direction of an element (horizontal or vertical)</summary>
