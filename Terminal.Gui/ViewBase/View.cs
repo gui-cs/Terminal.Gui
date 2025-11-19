@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -52,7 +51,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+    public override string ToString () => $"{GetType ().Name}({Id}){Frame}";
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     /// <remarks>
@@ -72,9 +71,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
-            if (Application.Mouse.MouseGrabView == this)
+            if (App?.Mouse.MouseGrabView == this)
             {
-                Application.Mouse.UngrabMouse ();
+                App.Mouse.UngrabMouse ();
             }
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
@@ -109,6 +108,34 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
+    private IApplication? _app;
+
+    /// <summary>
+    ///     Gets the <see cref="IApplication"/> instance this view is running in. If this view is at the top of the view
+    ///     hierarchy, returns <see langword="null"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If not explicitly set on an instance, this property will retrieve the value from the view at the top
+    ///         of the View hierarchy (the top-most SuperView).
+    ///     </para>
+    /// </remarks>
+    public IApplication? App
+    {
+        get => GetApp ();
+        internal set => _app = value;
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
+    ///     <see cref="Adornment"/>.
+    /// </summary>
+    /// <returns>
+    ///     If this view is at the top of the view hierarchy, and <see cref="App"/> was not explicitly set,
+    ///     returns <see langword="null"/>.
+    /// </returns>
+    protected virtual IApplication? GetApp () => _app ?? SuperView?.App ?? null;
+
     private IDriver? _driver;
 
     /// <summary>
@@ -118,19 +145,21 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// </summary>
     internal IDriver? Driver
     {
-        get
-        {
-            if (_driver is { })
-            {
-                return _driver;
-            }
-
-            return Application.Driver;
-        }
+        get => GetDriver ();
         set => _driver = value;
     }
 
-    /// <summary>Gets the screen buffer contents. This is a convenience property for Views that need direct access to the screen buffer.</summary>
+    /// <summary>
+    ///     Gets the <see cref="IDriver"/> instance for this view. Used internally to allow overrides by
+    ///     <see cref="Adornment"/>.
+    /// </summary>
+    /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
+    protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver /*?? ApplicationImpl.Instance.Driver*/;
+
+    /// <summary>
+    ///     Gets the screen buffer contents. This is a convenience property for Views that need direct access to the
+    ///     screen buffer.
+    /// </summary>
     protected Cell [,]? ScreenContents => Driver?.Contents;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
@@ -387,7 +416,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     }
 
     /// <summary>Called when <see cref="Visible"/> is changing. Can be cancelled by returning <see langword="true"/>.</summary>
-    protected virtual bool OnVisibleChanging () { return false; }
+    protected virtual bool OnVisibleChanging () => false;
 
     /// <summary>
     ///     Raised when the <see cref="Visible"/> value is being changed. Can be cancelled by setting Cancel to

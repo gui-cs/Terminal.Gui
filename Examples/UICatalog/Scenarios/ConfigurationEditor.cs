@@ -75,7 +75,7 @@ public class ConfigurationEditor : Scenario
 
         void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
         {
-            Application.Top?.SetNeedsDraw ();
+            Application.Current?.SetNeedsDraw ();
         }
     }
     public void Save ()

@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.App;
 
@@ -74,8 +73,18 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
+    private Toplevel? _current;
+
     /// <inheritdoc/>
-    public Toplevel? Toplevel { get; set; }
+    public Toplevel? Current
+    {
+        get => _current;
+        set
+        {
+            _current = value;
+            App ??= _current?.App;
+        }
+    }
 
     /// <summary>
     ///     Called when the <see cref="View.Visible"/> property is changing.
@@ -100,14 +109,17 @@ public abstract class PopoverBaseImpl : View, IPopover
         {
             // Whenever visible is changing to true, we need to resize;
             // it's our only chance because we don't get laid out until we're visible
-            Layout (Application.Screen.Size);
+            if (App is { })
+            {
+                Layout (App.Screen.Size);
+            }
         }
         else
         {
             // Whenever visible is changing to false, we need to reset the focus
-            if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation?.GetFocused ()))
+            if (ApplicationNavigation.IsInHierarchy (this, App?.Navigation?.GetFocused ()))
             {
-                Application.Navigation?.SetFocused (Application.Top?.MostFocused);
+                App?.Navigation?.SetFocused (App?.Current?.MostFocused);
             }
         }
 

@@ -1,3 +1,4 @@
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>Collection navigator for cycling selections in a <see cref="TableView"/>.</summary>

@@ -16,6 +16,7 @@ public interface IMainLoopCoordinator
     /// <summary>
     ///     Initializes all required subcomponents and starts the input thread.
     /// </summary>
+    /// <param name="app"></param>
     /// <remarks>
     ///     This method:
     ///     <list type="number">
@@ -25,7 +26,7 @@ public interface IMainLoopCoordinator
     ///     </list>
     /// </remarks>
     /// <returns>A task that completes when initialization is done</returns>
-    public Task StartInputTaskAsync ();
+    public Task StartInputTaskAsync (IApplication? app);
 
     /// <summary>
     ///     Stops the input thread and performs cleanup.

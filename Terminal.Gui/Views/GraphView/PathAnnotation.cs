@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Sequence of lines to connect points e.g. of a <see cref="ScatterSeries"/></summary>

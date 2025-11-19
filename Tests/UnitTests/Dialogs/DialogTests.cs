@@ -902,8 +902,8 @@ public class DialogTests (ITestOutputHelper output)
 
 #if DEBUG_IDISPOSABLE
         Assert.False (dlg.WasDisposed);
-        Assert.False (Application.Top!.WasDisposed);
-        Assert.Equal (dlg, Application.Top);
+        Assert.False (Application.Current!.WasDisposed);
+        Assert.Equal (dlg, Application.Current);
 #endif
 
         Assert.True (dlg.Canceled);
@@ -925,8 +925,8 @@ public class DialogTests (ITestOutputHelper output)
         Application.Run (dlg2);
 
         Assert.True (dlg.WasDisposed);
-        Assert.False (Application.Top.WasDisposed);
-        Assert.Equal (dlg2, Application.Top);
+        Assert.False (Application.Current.WasDisposed);
+        Assert.Equal (dlg2, Application.Current);
         Assert.False (dlg2.WasDisposed);
 
         dlg2.Dispose ();
@@ -937,10 +937,10 @@ public class DialogTests (ITestOutputHelper output)
         //Assert.NotNull (exception);
         //Assert.StartsWith ("Cannot access a disposed object.", exception.Message);
 
-        Assert.True (Application.Top.WasDisposed);
+        Assert.True (Application.Current.WasDisposed);
         Application.Shutdown ();
         Assert.True (dlg2.WasDisposed);
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 #endif
 
         return;
@@ -1174,8 +1174,8 @@ public class DialogTests (ITestOutputHelper output)
             switch (iterations)
             {
                 case 0:
-                    Application.Top!.SetNeedsLayout ();
-                    Application.Top.SetNeedsDraw ();
+                    Application.Current!.SetNeedsLayout ();
+                    Application.Current.SetNeedsDraw ();
 
                     break;
 
@@ -1216,7 +1216,7 @@ public class DialogTests (ITestOutputHelper output)
   └───────────────────────┘",
                                                                    output);
 
-                    Assert.False (Application.Top!.NewKeyDownEvent (Key.Enter));
+                    Assert.False (Application.Current!.NewKeyDownEvent (Key.Enter));
 
                     break;
                 case 7:
@@ -1410,9 +1410,9 @@ public class DialogTests (ITestOutputHelper output)
 
 #if DEBUG_IDISPOSABLE
         Assert.False (dlg.WasDisposed);
-        Assert.False (Application.Top!.WasDisposed);
-        Assert.NotEqual (top, Application.Top);
-        Assert.Equal (dlg, Application.Top);
+        Assert.False (Application.Current!.WasDisposed);
+        Assert.NotEqual (top, Application.Current);
+        Assert.Equal (dlg, Application.Current);
 #endif
 
         // dlg wasn't disposed yet and it's possible to access to his properties
@@ -1426,11 +1426,11 @@ public class DialogTests (ITestOutputHelper output)
         top.Dispose ();
 #if DEBUG_IDISPOSABLE
         Assert.True (dlg.WasDisposed);
-        Assert.True (Application.Top.WasDisposed);
-        Assert.NotNull (Application.Top);
+        Assert.True (Application.Current.WasDisposed);
+        Assert.NotNull (Application.Current);
 #endif
         Application.Shutdown ();
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
 
         return;
 

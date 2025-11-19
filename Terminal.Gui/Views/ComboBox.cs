@@ -1,3 +1,4 @@
+#nullable disable
 ﻿//
 // ComboBox.cs: ComboBox control
 //

@@ -1,4 +1,3 @@
-#nullable enable
 using System.IO.Abstractions;
 
 namespace Terminal.Gui.FileServices;

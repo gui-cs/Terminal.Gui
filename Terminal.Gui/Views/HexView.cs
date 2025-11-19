@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 //
 // HexView.cs: A hexadecimal viewer

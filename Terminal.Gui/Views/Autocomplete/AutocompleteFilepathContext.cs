@@ -1,3 +1,4 @@
+#nullable disable
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 

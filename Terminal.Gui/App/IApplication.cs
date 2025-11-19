@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
@@ -41,14 +40,9 @@ public interface IApplication
     #region Initialization and Shutdown
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
-    /// <param name="driver">
-    ///     The <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or
-    ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
-    /// </param>
     /// <param name="driverName">
     ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
-    ///     <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
-    ///     specified the default driver for the platform will be used.
+    ///     <see cref="IDriver"/> to use. If not specified the default driver for the platform will be used.
     /// </param>
     /// <remarks>
     ///     <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
@@ -61,14 +55,14 @@ public interface IApplication
     ///         <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and terminal settings restored.
     ///     </para>
     ///     <para>
-    ///         The <see cref="Run{T}"/> function combines <see cref="Init(IDriver,string)"/> and
+    ///         The <see cref="Run{T}"/> function combines <see cref="Init(string)"/> and
     ///         <see cref="Run(Toplevel, Func{Exception, bool})"/> into a single call. An application can use
-    ///         <see cref="Run{T}"/> without explicitly calling <see cref="Init(IDriver,string)"/>.
+    ///         <see cref="Run{T}"/> without explicitly calling <see cref="Init(string)"/>.
     ///     </para>
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IDriver? driver = null, string? driverName = null);
+    public void Init (string? driverName = null);
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
@@ -137,7 +131,7 @@ public interface IApplication
     ///     stopped, <see cref="End(SessionToken)"/> will be called.
     /// </summary>
     /// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
-    /// <param name="driver">
+    /// <param name="driverName">
     ///     The driver name. If not specified the default driver for the platform will be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
@@ -154,7 +148,7 @@ public interface IApplication
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null);
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null);
 
     /// <summary>
     ///     Runs a new Session creating a <see cref="Toplevel"/>-derived object of type <typeparamref name="TView"/>
@@ -163,7 +157,7 @@ public interface IApplication
     /// </summary>
     /// <typeparam name="TView">The type of <see cref="Toplevel"/> to create and run.</typeparam>
     /// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
-    /// <param name="driver">
+    /// <param name="driverName">
     ///     The driver name. If not specified the default driver for the platform will be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
@@ -206,7 +200,7 @@ public interface IApplication
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
+    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
         where TView : Toplevel, new ();
 
     /// <summary>
@@ -275,6 +269,17 @@ public interface IApplication
     ///         iteration.
     ///     </para>
     /// </remarks>
+    void Invoke (Action<IApplication>? action);
+
+    /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
+    /// <param name="action">The action to be invoked on the main processing thread.</param>
+    /// <remarks>
+    ///     <para>
+    ///         If called from the main thread, the action is executed immediately. Otherwise, it is queued via
+    ///         <see cref="AddTimeout"/> with <see cref="TimeSpan.Zero"/> and will be executed on the next main loop
+    ///         iteration.
+    ///     </para>
+    /// </remarks>
     void Invoke (Action action);
 
     /// <summary>
@@ -296,14 +301,14 @@ public interface IApplication
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="Top"/> as the parameter.
+    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="Current"/> as the parameter.
     ///     </para>
     /// </remarks>
     void RequestStop ();
 
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <param name="top">
-    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running <see cref="Top"/>.
+    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running <see cref="Current"/>.
     /// </param>
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
@@ -351,22 +356,22 @@ public interface IApplication
 
     #region Toplevel Management
 
-    /// <summary>Gets or sets the current Toplevel.</summary>
+    /// <summary>Gets or sets the currently active Toplevel.</summary>
     /// <remarks>
     ///     <para>
     ///         This is set by <see cref="Begin(Toplevel)"/> and cleared by <see cref="End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
-    Toplevel? Top { get; set; }
+    Toplevel? Current { get; set; }
 
-    /// <summary>Gets the stack of all Toplevels.</summary>
+    /// <summary>Gets the stack of all active Toplevel sessions.</summary>
     /// <remarks>
     ///     <para>
     ///         Toplevels are added to this stack by <see cref="Begin(Toplevel)"/> and removed by
     ///         <see cref="End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
-    ConcurrentStack<Toplevel> TopLevels { get; }
+    ConcurrentStack<Toplevel> SessionStack { get; }
 
     /// <summary>
     ///     Caches the Toplevel associated with the current Session.
@@ -428,7 +433,7 @@ public interface IApplication
     /// <remarks>
     ///     <para>
     ///         This is typically set to <see langword="true"/> when a View's <see cref="View.Frame"/> changes and that view
-    ///         has no SuperView (e.g. when <see cref="Top"/> is moved or resized).
+    ///         has no SuperView (e.g. when <see cref="Current"/> is moved or resized).
     ///     </para>
     ///     <para>
     ///         Automatically reset to <see langword="false"/> after <see cref="LayoutAndDraw"/> processes it.
@@ -509,11 +514,14 @@ public interface IApplication
     ///     returns <see langword="false"/>, the timeout will stop and be removed.
     /// </param>
     /// <returns>
-    ///     A token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    ///     Call <see cref="RemoveTimeout(object)"/> with the returned value to stop the timeout.
     /// </returns>
     /// <remarks>
     ///     <para>
     ///         When the time specified passes, the callback will be invoked on the main UI thread.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="IApplication.Shutdown"/> calls StopAll on <see cref="TimedEvents"/> to remove all timeouts.
     ///     </para>
     /// </remarks>
     object AddTimeout (TimeSpan time, Func<bool> callback);
@@ -539,4 +547,10 @@ public interface IApplication
     ITimedEvents? TimedEvents { get; }
 
     #endregion Timeouts
+
+    /// <summary>
+    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
+    /// </summary>
+    /// <returns>A string representation of the Application </returns>
+    public string ToString ();
 }

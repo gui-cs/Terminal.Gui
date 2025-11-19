@@ -41,7 +41,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (testPosition, mouse.LastMousePosition);
-        Assert.Equal (testPosition, mouse.GetLastMousePosition ());
+        Assert.Equal (testPosition, mouse.LastMousePosition);
     }
 
     [Fact]

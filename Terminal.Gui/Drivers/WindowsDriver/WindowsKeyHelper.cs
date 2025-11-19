@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 // ReSharper disable InconsistentNaming
 

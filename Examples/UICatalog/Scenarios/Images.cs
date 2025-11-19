@@ -151,7 +151,7 @@ public class Images : Scenario
         _win.Add (_tabView);
 
         // Start trying to detect sixel support
-        var sixelSupportDetector = new SixelSupportDetector ();
+        var sixelSupportDetector = new SixelSupportDetector (Application.Driver);
         sixelSupportDetector.Detect (UpdateSixelSupportState);
 
         Application.Run (_win);

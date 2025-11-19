@@ -565,7 +565,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -584,7 +584,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -609,7 +609,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -628,7 +628,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -647,7 +647,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
@@ -928,7 +928,7 @@ One
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -944,7 +944,7 @@ Two
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
 
-        View.SetClipToScreen ();
+        cb.SetClipToScreen ();
         cb.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1013,10 +1013,9 @@ Three
     [Fact]
     public void Source_Equal_Null_Or_Count_Equal_Zero_Sets_SelectedItem_Equal_To_Minus_One ()
     {
-        Application.Navigation = new ();
         var cb = new ComboBox ();
         var top = new Toplevel ();
-        Application.Top = top;
+        Application.Current = top;
 
         top.Add (cb);
         top.FocusDeepest (NavigationDirection.Forward, null);
@@ -1055,7 +1054,7 @@ Three
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
 }

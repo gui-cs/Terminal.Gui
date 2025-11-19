@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.ViewBase;
 
@@ -144,9 +144,9 @@ internal class ShadowView : View
     {
         if (SuperView is not Adornment adornment
             || location.X < 0
-            || location.X >= Application.Screen.Width
+            || location.X >= App?.Screen.Width
             || location.Y < 0
-            || location.Y >= Application.Screen.Height)
+            || location.Y >= App?.Screen.Height)
         {
             return Attribute.Default;
         }
@@ -170,7 +170,7 @@ internal class ShadowView : View
         // use the Normal attribute from the View under the shadow.
         if (newAttribute.Background == Color.DarkGray)
         {
-            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
+            List<View?> currentViewsUnderMouse = GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
             View? underView = currentViewsUnderMouse!.LastOrDefault ();
             attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 

@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Terminal.Gui.Drawing;
+﻿namespace Terminal.Gui.Drawing;
 
 using System;
 

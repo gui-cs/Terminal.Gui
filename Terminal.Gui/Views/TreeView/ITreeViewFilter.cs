@@ -1,3 +1,4 @@
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>Provides filtering for a <see cref="TreeView"/>.</summary>

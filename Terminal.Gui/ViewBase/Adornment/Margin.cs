@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 using System.Runtime.InteropServices;
 
@@ -80,10 +80,10 @@ public class Margin : Adornment
             if (view.Margin?.GetCachedClip () != null)
             {
                 view.Margin!.NeedsDraw = true;
-                Region? saved = GetClip ();
-                View.SetClip (view.Margin!.GetCachedClip ());
-                view.Margin!.Draw ();
-                View.SetClip (saved);
+                Region? saved = view.GetClip ();
+                view.SetClip (view.Margin!.GetCachedClip ());
+                view.Margin!.Draw (); 
+                view.SetClip (saved);
                 view.Margin!.ClearCachedClip ();
             }
 
@@ -128,7 +128,7 @@ public class Margin : Adornment
             // This just draws/clears the thickness, not the insides.
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             //SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            Thickness.Draw (screen, Diagnostics, ToString ());
+            Thickness.Draw (Driver, screen, Diagnostics, ToString ());
         }
 
         if (ShadowStyle != ShadowStyle.None)

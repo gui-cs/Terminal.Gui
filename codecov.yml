@@ -11,7 +11,7 @@ coverage:
     # Overall project coverage
     project:
       default:
-        target: 70%         # Minimum target coverage
+        target: 75%         # Minimum target coverage
         threshold: 1%       # Allow 1% decrease without failing
         base: auto          # Compare against base branch (v2_develop)
         if_ci_failed: error # Fail if CI fails
