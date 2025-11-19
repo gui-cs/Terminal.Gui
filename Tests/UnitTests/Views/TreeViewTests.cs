@@ -93,7 +93,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void CursorVisibility_MultiSelect ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("normal");
         var n2 = new TreeNode ("pink");
@@ -698,7 +698,11 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestBottomlessTreeView_MaxDepth_3 ()
     {
-        TreeView<string> tv = new () { Width = 20, Height = 10 };
+        TreeView<string> tv = new ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 20, Height = 10
+        };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
                                                           s => new [] { (int.Parse (s) + 1).ToString () }
@@ -737,7 +741,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestBottomlessTreeView_MaxDepth_5 ()
     {
-        TreeView<string> tv = new () { Width = 20, Height = 10 };
+        TreeView<string> tv = new () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
                                                           s => new [] { (int.Parse (s) + 1).ToString () }
@@ -806,7 +810,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestGetObjectOnRow ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
         tv.BeginInit ();
         tv.EndInit ();
         var n1 = new TreeNode ("normal");
@@ -862,7 +866,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestGetObjectRow ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("normal");
         var n1_1 = new TreeNode ("pink");
@@ -933,7 +937,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
 
@@ -1000,7 +1004,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent_Handled ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         tv.DrawLine += (s, e) =>
                        {
@@ -1046,7 +1050,7 @@ FFFFFFFFFF
     [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent_WithScrolling ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
 
@@ -1109,7 +1113,7 @@ oot two
     [SetupFakeApplication]
     public void TestTreeView_Filter ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("root one");
         var n1_1 = new TreeNode ("leaf 1");
@@ -1197,7 +1201,7 @@ oot two
     [SetupFakeApplication]
     public void TestTreeViewColor ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
         tv.BeginInit ();
         tv.EndInit ();
         var n1 = new TreeNode ("normal");

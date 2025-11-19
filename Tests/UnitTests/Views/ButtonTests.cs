@@ -13,7 +13,10 @@ public class ButtonTests (ITestOutputHelper output)
         // Override CM
         Button.DefaultShadow = ShadowStyle.None;
 
-        var btn = new Button ();
+        var btn = new Button ()
+        {
+            App = ApplicationImpl.Instance
+        };
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
         btn.EndInit ();
@@ -45,7 +48,8 @@ public class ButtonTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
 
-        btn = new () { Text = "_Test", IsDefault = true };
+        btn = new () { App = ApplicationImpl.Instance,
+            Text = "_Test", IsDefault = true };
         btn.Layout ();
         Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
@@ -77,7 +81,8 @@ public class ButtonTests (ITestOutputHelper output)
 
         btn.Dispose ();
 
-        btn = new () { X = 1, Y = 2, Text = "_abc", IsDefault = true };
+        btn = new () { App = ApplicationImpl.Instance,
+            X = 1, Y = 2, Text = "_abc", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);
@@ -92,13 +97,13 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
 
-        Application.Driver?.ClearContents ();
+        ApplicationImpl.Instance.Driver?.ClearContents ();
         btn.Draw ();
 
         expected = @$"
  {Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} abc {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}
 ";
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, ApplicationImpl.Instance.Driver);
 
         Assert.Equal (new (0, 0, 9, 1), btn.Viewport);
         Assert.Equal (new (1, 2, 9, 1), btn.Frame);

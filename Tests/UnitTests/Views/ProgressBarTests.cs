@@ -26,9 +26,13 @@ public class ProgressBarTests
     [AutoInitShutdown]
     public void Fraction_Redraw ()
     {
-        var driver = Application.Driver;
+        var driver = ApplicationImpl.Instance.Driver;
 
-        var pb = new ProgressBar { Width = 5 };
+        var pb = new ProgressBar
+        {
+            Driver = driver,
+            Width = 5
+        };
 
         pb.BeginInit ();
         pb.EndInit ();
@@ -161,10 +165,11 @@ public class ProgressBarTests
     [AutoInitShutdown]
     public void Pulse_Redraw_BidirectionalMarquee_False ()
     {
-        var driver = Application.Driver;
+        var driver = ApplicationImpl.Instance.Driver;
 
         var pb = new ProgressBar
         {
+            Driver = driver,
             Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks, BidirectionalMarquee = false
         };
 
@@ -869,9 +874,13 @@ public class ProgressBarTests
     [AutoInitShutdown]
     public void Pulse_Redraw_BidirectionalMarquee_True_Default ()
     {
-        var driver = Application.Driver;
+        var driver = ApplicationImpl.Instance.Driver;
 
-        var pb = new ProgressBar { Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
+        var pb = new ProgressBar
+        {
+            Driver = driver,
+            Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
+        };
 
         pb.BeginInit ();
         pb.EndInit ();

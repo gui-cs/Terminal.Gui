@@ -9,7 +9,11 @@ public class AdornmentTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Border_Is_Cleared_After_Margin_Thickness_Change ()
     {
-        View view = new () { Text = "View", Width = 6, Height = 3, BorderStyle = LineStyle.Rounded };
+        View view = new ()
+        {
+            App = ApplicationImpl.Instance,
+            Text = "View", Width = 6, Height = 3, BorderStyle = LineStyle.Rounded
+        };
 
         // Remove border bottom thickness
         view.Border!.Thickness = new (1, 1, 1, 0);

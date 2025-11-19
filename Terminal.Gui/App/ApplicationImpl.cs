@@ -21,22 +21,22 @@ public partial class ApplicationImpl : IApplication
 
     #region Singleton
 
-    // Private static readonly Lazy instance of Application
-    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
-
     /// <summary>
-    ///     Change the singleton implementation, should not be called except before application
-    ///     startup. This method lets you provide alternative implementations of core static gateway
-    ///     methods of <see cref="Application"/>.
+    ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
-    /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication? newApplication) { _lazyInstance = new (newApplication!); }
+    /// <param name="app"></param>
+    public static void SetInstance (IApplication? app)
+    {
+        _instance = app;
+    }
+
+    // Private static readonly Lazy instance of Application
+    private static IApplication? _instance;
 
     /// <summary>
     ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
-    ///     Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
     /// </summary>
-    public static IApplication Instance => _lazyInstance.Value;
+    public static IApplication Instance => _instance ??= new ApplicationImpl ();
 
     #endregion Singleton
 

@@ -113,9 +113,6 @@ public partial class ApplicationImpl
 
         // Clear the event to prevent memory leaks
         InitializedChanged = null;
-
-        // Create a new lazy instance for potential future Init
-        _lazyInstance = new (() => new ApplicationImpl ());
     }
 
 #if DEBUG
@@ -154,6 +151,9 @@ public partial class ApplicationImpl
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
+
+        // === 0. Stop all timers ===
+        TimedEvents?.StopAll ();
 
         // === 1. Stop all running toplevels ===
         foreach (Toplevel? t in SessionStack)

@@ -168,8 +168,6 @@ public partial class GuiTestContext : IDisposable
 
     private void InitializeApplication ()
     {
-        ApplicationImpl.ChangeInstance (_applicationImpl);
-
         _applicationImpl?.Init (GetDriverName ());
     }
 
@@ -180,7 +178,6 @@ public partial class GuiTestContext : IDisposable
     private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
     {
         _timeout = timeout ?? TimeSpan.FromSeconds (10);
-        _originalApplicationInstance = ApplicationImpl.Instance;
         _originalLogger = Logging.Logger;
         _logsSb = new ();
         _driverType = driverType;
@@ -535,7 +532,6 @@ public partial class GuiTestContext : IDisposable
         _fakeInput.ExternalCancellationTokenSource = null;
 
         _applicationImpl?.ResetState (true);
-        ApplicationImpl.ChangeInstance (_originalApplicationInstance);
         Logging.Logger = _originalLogger!;
         Finished = true;
 

@@ -48,6 +48,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
         var superView = new Toplevel
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Height = 3,
             Width = 3,
             Text = "012ABC!@#",
@@ -104,6 +105,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
         var superView = new Toplevel
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Width = 4,
             Height = 4,
             Text = "!@#$".Repeat (4)!

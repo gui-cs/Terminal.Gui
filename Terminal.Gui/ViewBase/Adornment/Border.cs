@@ -313,7 +313,8 @@ public partial class Border : Adornment
             }
         }
 
-        if (Parent is { }
+        if (Driver is { }
+            && Parent is { }
             && canDrawBorder
             && Thickness.Top > 0
             && maxTitleWidth > 0

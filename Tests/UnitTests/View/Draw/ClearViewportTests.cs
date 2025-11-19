@@ -101,7 +101,11 @@ public class ClearViewportTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Clear_ClearsEntireViewport ()
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {
@@ -149,7 +153,11 @@ public class ClearViewportTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {

@@ -21,120 +21,41 @@ public class ApplicationTests
 
     private readonly ITestOutputHelper _output;
 
-    private object _timeoutLock;
-
-    [Fact (Skip = "Hangs with SetupFakeApplication")]
-    [SetupFakeApplication]
+    [Fact]
     public void AddTimeout_Fires ()
     {
-        Assert.Null (_timeoutLock);
-        _timeoutLock = new ();
+        IApplication app = Application.Create ();
+        app.Init ("fake");
 
-        uint timeoutTime = 250;
-        var initialized = false;
-        var iteration = 0;
-        var shutdown = false;
-        object timeout = null;
-        var timeoutCount = 0;
+        uint timeoutTime = 100;
+        var timeoutFired = false;
 
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+        // Setup a timeout that will fire
+        app.AddTimeout (
+                        TimeSpan.FromMilliseconds (timeoutTime),
+                        () =>
+                        {
+                            timeoutFired = true;
 
-        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
-        Application.Run<Toplevel> ().Dispose ();
-        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
+                            // Return false so the timer does not repeat
+                            return false;
+                        }
+                       );
 
-        Assert.True (initialized);
-        Assert.False (shutdown);
+        // The timeout has not fired yet
+        Assert.False (timeoutFired);
 
-        Assert.Equal (1, timeoutCount);
-        Application.Shutdown ();
+        // Block the thread to prove the timeout does not fire on a background thread
+        Thread.Sleep ((int)timeoutTime * 2);
+        Assert.False (timeoutFired);
 
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+        app.StopAfterFirstIteration = true;
+        app.Run<Toplevel> ().Dispose ();
 
-        lock (_timeoutLock)
-        {
-            if (timeout is { })
-            {
-                Application.RemoveTimeout (timeout);
-                timeout = null;
-            }
-        }
+        // The timeout should have fired
+        Assert.True (timeoutFired);
 
-        Assert.True (initialized);
-        Assert.True (shutdown);
-
-#if DEBUG_IDISPOSABLE
-        Assert.Empty (View.Instances);
-#endif
-        lock (_timeoutLock)
-        {
-            _timeoutLock = null;
-        }
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
-        {
-            if (a.Value)
-            {
-                Application.Iteration += OnApplicationOnIteration;
-                initialized = true;
-
-                lock (_timeoutLock)
-                {
-                    _output.WriteLine ($"Setting timeout for {timeoutTime}ms");
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime), TimeoutCallback);
-                }
-            }
-            else
-            {
-                Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
-            }
-        }
-
-        bool TimeoutCallback ()
-        {
-            lock (_timeoutLock)
-            {
-                _output.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
-
-                if (timeout is { })
-                {
-                    _output.WriteLine ("  Nulling timeout.");
-                    timeout = null;
-                }
-            }
-
-            // False means "don't re-do timer and remove it"
-            return false;
-        }
-
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
-        {
-            lock (_timeoutLock)
-            {
-                if (timeoutCount > 0)
-                {
-                    _output.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
-                    Application.RequestStop ();
-
-                    return;
-                }
-            }
-
-            iteration++;
-
-            // Simulate a delay
-            Thread.Sleep ((int)timeoutTime / 10);
-
-            // Worst case scenario - something went wrong
-            if (Application.Initialized && iteration > 25)
-            {
-                _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
-                Application.RequestStop ();
-            }
-        }
+        app.Shutdown ();
     }
 
     [Fact]
@@ -356,7 +277,7 @@ public class ApplicationTests
             //Assert.Null (Application._lastMousePosition);
 
             // Navigation
-           // Assert.Null (Application.Navigation);
+            // Assert.Null (Application.Navigation);
 
             // Popover
             //Assert.Null (Application.Popover);
@@ -839,7 +760,7 @@ public class ApplicationTests
 
         //exception = Record.Exception (
         //                              () => Application.Run (
-        //                                                     w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+        //                                                     w)); // Invalid - w has not been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
         //Assert.NotNull (exception);
 
         // TODO: Re-enable this when we are done debug logging of ctx.Source.Title in RaiseSelecting
@@ -924,9 +845,9 @@ public class ApplicationTests
 
         Application.Init ("fake");
 
-        Application.Iteration += OnApplicationOnIteration;
+        Application.Iteration += OnApplication_OnIteration;
         Application.Run (new Toplevel ());
-        Application.Iteration -= OnApplicationOnIteration;
+        Application.Iteration -= OnApplication_OnIteration;
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Current!.WasDisposed);
         Exception exception = Record.Exception (Application.Shutdown);
@@ -944,7 +865,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs e)
+        void OnApplication_OnIteration (object s, IterationEventArgs e)
         {
             Assert.NotNull (Application.Current);
             Application.RequestStop ();

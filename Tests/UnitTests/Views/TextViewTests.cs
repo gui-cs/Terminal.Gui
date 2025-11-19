@@ -6805,7 +6805,10 @@ Line 2.",
                      );
         tv.WordWrap = true;
 
-        var top = new Toplevel ();
+        var top = new Toplevel ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+        };
         top.Add (tv);
         top.Layout ();
         tv.Draw ();
@@ -6891,7 +6894,10 @@ line.
                      );
         tv.WordWrap = true;
 
-        var top = new Toplevel ();
+        var top = new Toplevel ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+        };
         top.Add (tv);
 
         top.Layout ();
@@ -7005,7 +7011,11 @@ line.
     [SetupFakeApplication]
     public void Draw_Esc_Rune ()
     {
-        var tv = new TextView { Width = 5, Height = 1, Text = "\u001b" };
+        var tv = new TextView
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 5, Height = 1, Text = "\u001b"
+        };
         tv.BeginInit ();
         tv.EndInit ();
         tv.Draw ();

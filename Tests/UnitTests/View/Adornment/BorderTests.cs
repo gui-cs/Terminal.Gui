@@ -8,7 +8,11 @@ public class BorderTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
     {
-        var superView = new View { Width = 10, Height = 10, CanFocus = true };
+        var superView = new View
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 10, Height = 10, CanFocus = true
+        };
         var otherView = new View { Width = 0, Height = 0, CanFocus = true };
         superView.Add (otherView);
 
@@ -51,7 +55,11 @@ public class BorderTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Border_Uses_Parent_Scheme ()
     {
-        var view = new View { Title = "A", Height = 2, Width = 5 };
+        var view = new View
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Title = "A", Height = 2, Width = 5
+        };
         view.Border!.Thickness = new (0, 1, 0, 0);
         view.Border!.LineStyle = LineStyle.Single;
 
@@ -839,6 +847,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var superView = new View
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Id = "superView",
             Width = 5,
             Height = 5,
@@ -902,6 +911,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var superView = new View
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Id = "superView",
             Title = "A",
             Width = 11,

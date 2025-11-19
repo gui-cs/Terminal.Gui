@@ -40,7 +40,7 @@ public partial class GuiTestContext
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
         evaluator ??= _ => true;
-        Toplevel? t = Application.Current;
+        Toplevel? t = _applicationImpl?.Current;
 
         HashSet<View> seen = new ();
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#nullable enable
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -9,16 +7,19 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public sealed class AnsiEscapeSequenceRequests : Scenario
 {
-    private GraphView _graphView;
+    private GraphView? _graphView;
 
-    private ScatterSeries _sentSeries;
-    private ScatterSeries _answeredSeries;
+    private ScatterSeries? _sentSeries;
+    private ScatterSeries? _answeredSeries;
 
     private readonly List<DateTime> _sends = new ();
 
     private readonly object _lockAnswers = new object ();
     private readonly Dictionary<DateTime, string> _answers = new ();
-    private Label _lblSummary;
+    private Label? _lblSummary;
+
+    private object? _updateTimeoutToken;
+    private object? _sendDarTimeoutToken;
 
     public override void Main ()
     {
@@ -32,7 +33,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             CanFocus = true
         };
 
-        Tab single = new Tab ();
+        Tab single = new ();
         single.DisplayText = "Single";
         single.View = BuildSingleTab ();
 
@@ -57,6 +58,8 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         single.View.Dispose ();
         appWindow.Dispose ();
 
+        Application.RemoveTimeout (_updateTimeoutToken!);
+        Application.RemoveTimeout (_sendDarTimeoutToken!);
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
@@ -218,21 +221,21 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             Width = Dim.Fill ()
         };
 
-        Application.AddTimeout (
-                                TimeSpan.FromMilliseconds (1000),
-                                () =>
-                                {
-                                    lock (_lockAnswers)
-                                    {
-                                        UpdateGraph ();
+        _updateTimeoutToken = Application.AddTimeout (
+                                                      TimeSpan.FromMilliseconds (1000),
+                                                      () =>
+                                                      {
+                                                          lock (_lockAnswers)
+                                                          {
+                                                              UpdateGraph ();
 
-                                        UpdateResponses ();
-                                    }
+                                                              UpdateResponses ();
+                                                          }
 
 
 
-                                    return true;
-                                });
+                                                          return true;
+                                                      });
 
         var tv = new TextView ()
         {
@@ -266,28 +269,28 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         int lastSendTime = Environment.TickCount;
         object lockObj = new object ();
-        Application.AddTimeout (
-                                TimeSpan.FromMilliseconds (50),
-                                () =>
-                                {
-                                    lock (lockObj)
-                                    {
-                                        if (cbDar.Value > 0)
-                                        {
-                                            int interval = 1000 / cbDar.Value; // Calculate the desired interval in milliseconds
-                                            int currentTime = Environment.TickCount; // Current system time in milliseconds
+        _sendDarTimeoutToken = Application.AddTimeout (
+                                                          TimeSpan.FromMilliseconds (50),
+                                                          () =>
+                                                          {
+                                                              lock (lockObj)
+                                                              {
+                                                                  if (cbDar.Value > 0)
+                                                                  {
+                                                                      int interval = 1000 / cbDar.Value; // Calculate the desired interval in milliseconds
+                                                                      int currentTime = Environment.TickCount; // Current system time in milliseconds
 
-                                            // Check if the time elapsed since the last send is greater than the interval
-                                            if (currentTime - lastSendTime >= interval)
-                                            {
-                                                SendDar (); // Send the request
-                                                lastSendTime = currentTime; // Update the last send time
-                                            }
-                                        }
-                                    }
+                                                                      // Check if the time elapsed since the last send is greater than the interval
+                                                                      if (currentTime - lastSendTime >= interval)
+                                                                      {
+                                                                          SendDar (); // Send the request
+                                                                          lastSendTime = currentTime; // Update the last send time
+                                                                      }
+                                                                  }
+                                                              }
 
-                                    return true;
-                                });
+                                                              return true;
+                                                          });
 
 
         _graphView = new GraphView ()

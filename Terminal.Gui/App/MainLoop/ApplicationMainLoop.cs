@@ -142,8 +142,8 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        ToplevelTransitionManager.RaiseReadyEventIfNeeded ();
-        ToplevelTransitionManager.HandleTopMaybeChanging ();
+        ToplevelTransitionManager.RaiseReadyEventIfNeeded (App);
+        ToplevelTransitionManager.HandleTopMaybeChanging (App);
 
         if (App?.Current != null)
         {

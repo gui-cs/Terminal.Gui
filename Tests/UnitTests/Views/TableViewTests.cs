@@ -57,7 +57,11 @@ public class TableViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void CellEventsBackgroundFill ()
     {
-        var tv = new TableView { Width = 20, Height = 4 };
+        var tv = new TableView
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 20, Height = 4
+        };
 
         var dt = new DataTable ();
         dt.Columns.Add ("C1");
@@ -677,7 +681,10 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void ScrollIndicators ()
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tableView.BeginInit ();
         tableView.EndInit ();
 
@@ -756,7 +763,10 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void ScrollRight_SmoothScrolling ()
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tableView.BeginInit ();
         tableView.EndInit ();
 
@@ -818,7 +828,11 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void ScrollRight_WithoutSmoothScrolling ()
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
+
         tableView.BeginInit ();
         tableView.EndInit ();
         tableView.SchemeName = "TopLevel";
@@ -1563,7 +1577,10 @@ public class TableViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Test_CollectionNavigator ()
     {
-        var tv = new TableView ();
+        var tv = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 7);
 
@@ -2206,8 +2223,11 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        Application.Driver!.SetScreenSize (100, 100);
-        var tv = new TableView ();
+        ApplicationImpl.Instance.Driver!.SetScreenSize (100, 100);
+        var tv = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 6);
 
@@ -2411,7 +2431,10 @@ A B C
     {
         IList list = BuildList (16);
 
-        var tv = new TableView ();
+        var tv = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
 
         //tv.BeginInit (); tv.EndInit ();
         tv.SchemeName = "TopLevel";
@@ -3416,7 +3439,10 @@ A B C
 
     private TableView GetABCDEFTableView (out DataTable dt)
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tableView.BeginInit ();
         tableView.EndInit ();
 
@@ -3445,9 +3471,12 @@ A B C
 
     private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
     {
-        var tv = new TableView ();
-        tv.SchemeName = "TopLevel";
-        tv.Viewport = new (0, 0, 25, 6);
+        var tv = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            SchemeName = "TopLevel",
+            Viewport = new (0, 0, 25, 6)
+        };
 
         List<PickablePet> pets = new ()
         {
@@ -3473,7 +3502,10 @@ A B C
 
     private TableView GetTwoRowSixColumnTable (out DataTable dt)
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tableView.SchemeName = "TopLevel";
 
         // 3 columns are visible
@@ -3503,7 +3535,10 @@ A B C
 
     private TableView SetUpMiniTable (out DataTable dt)
     {
-        var tv = new TableView ();
+        var tv = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver
+        };
         tv.BeginInit ();
         tv.EndInit ();
         tv.Viewport = new (0, 0, 10, 4);

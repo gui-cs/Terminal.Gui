@@ -14,6 +14,7 @@ public class ClipTests (ITestOutputHelper _output)
     {
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
             Width = 3, Height = 3
@@ -36,6 +37,7 @@ public class ClipTests (ITestOutputHelper _output)
     {
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
             Width = 3, Height = 3
@@ -67,7 +69,11 @@ public class ClipTests (ITestOutputHelper _output)
     [SetupFakeApplication]
     public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {
@@ -175,6 +181,7 @@ public class ClipTests (ITestOutputHelper _output)
 
         var top = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "top",
             Width = Dim.Fill (),
             Height = Dim.Fill ()

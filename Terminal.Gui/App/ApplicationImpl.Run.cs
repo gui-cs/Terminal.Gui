@@ -91,7 +91,7 @@ public partial class ApplicationImpl
 
         if (Current is null)
         {
-            toplevel.App = Instance;
+            toplevel.App = this;
             Current = toplevel;
         }
 
@@ -116,7 +116,7 @@ public partial class ApplicationImpl
                 Toplevel previousTop = Current!;
 
                 Current = toplevel;
-                Current.App = Instance;
+                Current.App = this;
                 Current.OnActivate (previousTop);
             }
         }
@@ -136,7 +136,7 @@ public partial class ApplicationImpl
 
         toplevel.OnLoaded ();
 
-        Instance.LayoutAndDraw (true);
+        LayoutAndDraw (true);
 
         if (PositionCursor ())
         {
@@ -253,7 +253,7 @@ public partial class ApplicationImpl
 
         if (SessionStack.TryPeek (out Toplevel? newTop))
         {
-            newTop.App = Instance;
+            newTop.App = this;
             Current = newTop;
             Current?.SetNeedsDraw ();
         }

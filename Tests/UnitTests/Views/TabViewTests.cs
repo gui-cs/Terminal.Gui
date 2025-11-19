@@ -1489,7 +1489,11 @@ public class TabViewTests (ITestOutputHelper output)
 
     private TabView GetTabView (out Tab tab1, out Tab tab2)
     {
-        var tv = new TabView () { Id = "tv " };
+        var tv = new TabView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Id = "tv "
+        };
         tv.BeginInit ();
         tv.EndInit ();
         //tv.Scheme = new ();

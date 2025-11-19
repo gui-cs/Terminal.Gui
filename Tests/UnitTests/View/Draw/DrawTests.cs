@@ -114,7 +114,11 @@ public class DrawTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport ()
     {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 2, Height = 2, BorderStyle = LineStyle.Single
+        };
         Assert.True (view.NeedsLayout);
         Assert.True (view.NeedsDraw);
         view.Layout ();
@@ -139,7 +143,11 @@ public class DrawTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Bottom ()
     {
-        var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 2, Height = 1, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
@@ -157,7 +165,11 @@ public class DrawTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Left ()
     {
-        var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 1, Height = 2, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
@@ -182,7 +194,11 @@ public class DrawTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Right ()
     {
-        var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 1, Height = 2, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
@@ -207,7 +223,11 @@ public class DrawTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Top ()
     {
-        var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 2, Height = 1, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (1, 0, 1, 1);
 
         view.BeginInit ();
@@ -587,7 +607,11 @@ public class DrawTests (ITestOutputHelper output)
     [InlineData ("a𐐀b")]
     public void DrawHotString_NonBmp (string expected)
     {
-        var view = new View { Width = 10, Height = 1 };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 10, Height = 1
+        };
         view.DrawHotString (expected, Attribute.Default, Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);

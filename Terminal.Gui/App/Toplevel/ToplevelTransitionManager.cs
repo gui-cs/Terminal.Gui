@@ -9,10 +9,11 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
 
     private View? _lastTop;
 
+    /// <param name="app"></param>
     /// <inheritdoc/>
-    public void RaiseReadyEventIfNeeded ()
+    public void RaiseReadyEventIfNeeded (IApplication? app)
     {
-        Toplevel? top = ApplicationImpl.Instance.Current;
+        Toplevel? top = app.Current;
 
         if (top != null && !_readiedTopLevels.Contains (top))
         {
@@ -24,16 +25,17 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
         }
     }
 
+    /// <param name="app"></param>
     /// <inheritdoc/>
-    public void HandleTopMaybeChanging ()
+    public void HandleTopMaybeChanging (IApplication? app)
     {
-        Toplevel? newTop = ApplicationImpl.Instance.Current;
+        Toplevel? newTop = app.Current;
 
         if (_lastTop != null && _lastTop != newTop && newTop != null)
         {
             newTop.SetNeedsDraw ();
         }
 
-        _lastTop = ApplicationImpl.Instance.Current;
+        _lastTop = app.Current;
     }
 }

@@ -154,7 +154,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     <see cref="Adornment"/>.
     /// </summary>
     /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
-    protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver ?? ApplicationImpl.Instance.Driver;
+    protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver /*?? ApplicationImpl.Instance.Driver*/;
 
     /// <summary>
     ///     Gets the screen buffer contents. This is a convenience property for Views that need direct access to the

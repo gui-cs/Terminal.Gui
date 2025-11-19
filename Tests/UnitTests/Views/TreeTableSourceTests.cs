@@ -239,7 +239,10 @@ public class TreeTableSourceTests : IDisposable
 
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+        };
         tableView.SchemeName = "TopLevel";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
 

@@ -20,8 +20,6 @@ public class ScenarioTests : TestsAllViews
 
     private readonly ITestOutputHelper _output;
 
-    private object? _timeoutLock;
-
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
     ///     <para>Should find any Scenarios which crash on load or do not respond to <see cref="Application.RequestStop()"/>.</para>
@@ -37,18 +35,14 @@ public class ScenarioTests : TestsAllViews
             return;
         }
 
-        Assert.Null (_timeoutLock);
-        _timeoutLock = new ();
-
-        ConfigurationManager.Disable (true);
-
-        // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         Scenario? scenario = null;
         var scenarioName = string.Empty;
-        object? timeout = null;
+        // Do not use Application.AddTimer for out-of-band watchdogs as
+        // they will be stopped by Shutdown/ResetState.
+        Timer? watchdogTimer = null;
         var timeoutFired = false;
 
         // Increase timeout for macOS - it's consistently slower
@@ -90,14 +84,7 @@ public class ScenarioTests : TestsAllViews
                 iterationHandlerRemoved = true;
             }
 
-            lock (_timeoutLock)
-            {
-                if (timeout is { })
-                {
-                    Application.RemoveTimeout (timeout);
-                    timeout = null;
-                }
-            }
+            watchdogTimer?.Dispose ();
 
             scenario?.Dispose ();
             scenario = null;
@@ -130,10 +117,8 @@ public class ScenarioTests : TestsAllViews
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
 
-                lock (_timeoutLock)
-                {
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-                }
+                // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
+                watchdogTimer = new Timer (_ => ForceCloseCallback (), null, (int)abortTime, System.Threading.Timeout.Infinite);
             }
             else
             {
@@ -144,13 +129,9 @@ public class ScenarioTests : TestsAllViews
         }
 
         // If the scenario doesn't close within abortTime ms, this will force it to quit
-        bool ForceCloseCallback ()
+        void ForceCloseCallback ()
         {
-            lock (_timeoutLock)
-            {
-                timeoutFired = true;
-                timeout = null;
-            }
+            timeoutFired = true;
 
             _output.WriteLine ($"TIMEOUT FIRED for {scenarioName} after {abortTime}ms. Attempting graceful shutdown.");
 
@@ -167,8 +148,6 @@ public class ScenarioTests : TestsAllViews
             {
                 _output.WriteLine ($"Exception during timeout callback: {ex.Message}");
             }
-
-            return false;
         }
 
         void OnApplicationOnIteration (object? s, IterationEventArgs a)

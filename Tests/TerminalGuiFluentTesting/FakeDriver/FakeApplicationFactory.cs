@@ -21,17 +21,14 @@ public class FakeApplicationFactory
         FakeOutput output = new ();
         output.SetSize (80, 25);
 
-        IApplication origApp = ApplicationImpl.Instance;
-
         SizeMonitorImpl sizeMonitor = new (output);
 
         ApplicationImpl impl = new (new FakeComponentFactory (fakeInput, output, sizeMonitor));
-
-        ApplicationImpl.ChangeInstance (impl);
+        ApplicationImpl.SetInstance (impl);
 
         // Initialize with a fake driver
         impl.Init ("fake");
 
-        return new FakeApplicationLifecycle (origApp, hardStopTokenSource);
+        return new FakeApplicationLifecycle (hardStopTokenSource);
     }
 }

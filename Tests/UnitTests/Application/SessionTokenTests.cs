@@ -1,4 +1,5 @@
 
+#nullable enable
 namespace UnitTests.ApplicationTests;
 
 /// <summary>These tests focus on Application.SessionToken and the various ways it can be changed.</summary>
@@ -19,9 +20,11 @@ public class SessionTokenTests
     public void Begin_End_Cleans_Up_SessionToken ()
     {
         // Test null Toplevel
-        Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
+        Assert.Throws<ArgumentNullException> (() => Application.Begin (null!));
 
-        var top = new Toplevel ();
+        Assert.NotNull (Application.Driver);
+
+        Toplevel top = new Toplevel ();
         SessionToken rs = Application.Begin (top);
         Assert.NotNull (rs);
         Application.End (rs);

@@ -450,6 +450,7 @@ Y
 
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             TextDirection = TextDirection.TopBottom_LeftRight,
             Text = text,
             Width = Dim.Auto (),
@@ -1126,7 +1127,7 @@ w ";
         View view;
         var text = "test";
 
-        view = new Label { Text = text };
+        view = new Label { App = ApplicationImpl.Instance, Text = text };
         view.BeginInit ();
         view.EndInit ();
         view.Draw ();

@@ -1620,7 +1620,11 @@ public class TextFieldTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
-        var tf = new TextField { Width = 30, Text = "Les Misérables" };
+        var tf = new TextField
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 30, Text = "Les Misérables"
+        };
         tf.SetRelativeLayout (new (100, 100));
         tf.Draw ();
 
@@ -1701,7 +1705,11 @@ Les Miśerables",
     [AutoInitShutdown]
     public void Draw_Esc_Rune ()
     {
-        var tf = new TextField { Width = 5, Text = "\u001b" };
+        var tf = new TextField
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 5, Text = "\u001b"
+        };
         tf.BeginInit ();
         tf.EndInit ();
         tf.Draw ();

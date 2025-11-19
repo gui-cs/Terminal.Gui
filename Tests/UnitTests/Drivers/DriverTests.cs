@@ -16,8 +16,9 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("unix")]
     public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName = null)
     {
-        Application.Init (driverName);
-        Application.Shutdown ();
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.Shutdown ();
     }
 
     [Theory]
@@ -27,10 +28,11 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("unix")]
     public void All_Drivers_Run_Cross_Platform (string driverName = null)
     {
-        Application.Init (driverName);
-        Application.StopAfterFirstIteration = true;
-        Application.Run ().Dispose ();
-        Application.Shutdown ();
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.StopAfterFirstIteration = true;
+        app.Run ().Dispose ();
+        app.Shutdown ();
     }
 
     [Theory]
@@ -40,13 +42,14 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("unix")]
     public void All_Drivers_LayoutAndDraw_Cross_Platform (string driverName = null)
     {
-        Application.Init (driverName);
-        Application.StopAfterFirstIteration = true;
-        Application.Run<TestTop> ().Dispose ();
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.StopAfterFirstIteration = true;
+        app.Run<TestTop> ().Dispose ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedLook: driverName!, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedLook: driverName!, _output, app.Driver);
 
-        Application.Shutdown ();
+        app.Shutdown ();
 
     }
 }

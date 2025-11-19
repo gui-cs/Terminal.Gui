@@ -144,6 +144,22 @@ public class TimedEvents : ITimedEvents
         return false;
     }
 
+    /// <inheritdoc/>
+    public TimeSpan? GetTimeout (object token)
+    {
+        lock (_timeoutsLockToken)
+        {
+            int idx = _timeouts.IndexOfValue ((token as Timeout)!);
+
+            if (idx == -1)
+            {
+                return null;
+            }
+
+            return _timeouts.Values [idx].Span;
+        }
+    }
+
     private void AddTimeout (TimeSpan time, Timeout timeout)
     {
         lock (_timeoutsLockToken)
@@ -213,6 +229,15 @@ public class TimedEvents : ITimedEvents
                     _timeouts.Add (NudgeToUniqueKey (k), timeout);
                 }
             }
+        }
+    }
+
+    /// <inheritdoc/>
+    public void StopAll ()
+    {
+        lock (_timeoutsLockToken)
+        {
+            _timeouts.Clear ();
         }
     }
 }

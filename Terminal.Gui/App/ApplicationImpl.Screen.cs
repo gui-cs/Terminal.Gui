@@ -44,6 +44,11 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public bool PositionCursor ()
     {
+        if (Driver is null)
+        {
+            return false;
+        }
+
         // Find the most focused view and position the cursor there.
         View? mostFocused = Navigation?.GetFocused ();
 
@@ -65,7 +70,7 @@ public partial class ApplicationImpl
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
 
         Rectangle superViewViewport =
-            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver!.Screen;
+            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
 
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {

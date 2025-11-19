@@ -514,11 +514,14 @@ public interface IApplication
     ///     returns <see langword="false"/>, the timeout will stop and be removed.
     /// </param>
     /// <returns>
-    ///     A token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    ///     Call <see cref="RemoveTimeout(object)"/> with the returned value to stop the timeout.
     /// </returns>
     /// <remarks>
     ///     <para>
     ///         When the time specified passes, the callback will be invoked on the main UI thread.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="IApplication.Shutdown"/> calls StopAll on <see cref="TimedEvents"/> to remove all timeouts.
     ///     </para>
     /// </remarks>
     object AddTimeout (TimeSpan time, Func<bool> callback);
