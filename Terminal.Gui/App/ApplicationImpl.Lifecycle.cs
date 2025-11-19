@@ -33,13 +33,8 @@ public partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        if (string.IsNullOrWhiteSpace (_driverName) && driver is { })
-        {
-            _driverName = driver.GetName ();
-        }
-
-       // Debug.Assert (Navigation is null);
-       // Navigation = new ();
+        // Debug.Assert (Navigation is null);
+        // Navigation = new ();
 
         //Debug.Assert (Popover is null);
         //Popover = new ();

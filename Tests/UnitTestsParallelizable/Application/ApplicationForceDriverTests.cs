@@ -27,7 +27,7 @@ public class ApplicationForceDriverTests : FakeDriverBase
         Assert.Null (Application.Driver);
         Assert.Equal (string.Empty, Application.ForceDriver);
 
-        Application.Init (driver);
+        Application.Init (driverName: "fake");
         Assert.True (Application.Initialized);
         Assert.NotNull (Application.Driver);
         Assert.Equal ("fake", Application.Driver.GetName ());

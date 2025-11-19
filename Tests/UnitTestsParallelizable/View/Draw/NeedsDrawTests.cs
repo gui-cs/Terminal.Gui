@@ -1,4 +1,5 @@
 #nullable enable
+using UnitTests;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
