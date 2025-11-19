@@ -7,14 +7,16 @@
 public interface IToplevelTransitionManager
 {
     /// <summary>
-    ///     Raises the <see cref="Toplevel.Ready"/> event on the current top level
+    ///     Raises the <see cref="Toplevel.Ready"/> event on tahe current top level
     ///     if it has not been raised before now.
     /// </summary>
-    void RaiseReadyEventIfNeeded ();
+    /// <param name="app"></param>
+    void RaiseReadyEventIfNeeded (IApplication? app);
 
     /// <summary>
     ///     Handles any state change needed when the application top changes e.g.
     ///     setting redraw flags
     /// </summary>
-    void HandleTopMaybeChanging ();
+    /// <param name="app"></param>
+    void HandleTopMaybeChanging (IApplication? app);
 }

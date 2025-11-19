@@ -20,7 +20,7 @@ public class Timeout
     ///     rescheduled and invoked again after the same interval.
     ///     If the callback returns <see langword="false"/>, the timeout will be removed and not invoked again.
     /// </value>
-    public Func<bool> Callback { get; set; }
+    public Func<bool>? Callback { get; set; }
 
     /// <summary>
     ///     Gets or sets the time interval to wait before invoking the <see cref="Callback"/>.

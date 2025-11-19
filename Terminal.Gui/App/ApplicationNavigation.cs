@@ -1,4 +1,3 @@
-#nullable enable
 
 using System.Diagnostics;
 
@@ -16,6 +15,11 @@ public class ApplicationNavigation
     {
         // TODO: Move navigation key bindings here from AddApplicationKeyBindings
     }
+
+    /// <summary>
+    ///     The <see cref="IApplication"/> instance used by this instance.
+    /// </summary>
+    public IApplication? App { get; set; }
 
     private View? _focused;
 
@@ -105,10 +109,10 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (Application.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }
-        return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
+        return App?.Current is { } && App.Current.AdvanceFocus (direction, behavior);
     }
 }

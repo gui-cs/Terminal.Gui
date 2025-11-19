@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -384,12 +383,12 @@ public class CharMap : View, IDesignable
                                    try
                                    {
                                        decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
-                                       Application.Invoke (() => waitIndicator.RequestStop ());
+                                       Application.Invoke ((_) => waitIndicator.RequestStop ());
                                    }
                                    catch (HttpRequestException e)
                                    {
                                        getCodePointError = errorLabel.Text = e.Message;
-                                       Application.Invoke (() => waitIndicator.RequestStop ());
+                                       Application.Invoke ((_) => waitIndicator.RequestStop ());
                                    }
                                };
         Application.Run (waitIndicator);
@@ -972,7 +971,7 @@ public class CharMap : View, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        App!.Popover?.Register (contextMenu);
 
         contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 

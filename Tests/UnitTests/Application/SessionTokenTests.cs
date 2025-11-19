@@ -1,4 +1,5 @@
 
+#nullable enable
 namespace UnitTests.ApplicationTests;
 
 /// <summary>These tests focus on Application.SessionToken and the various ways it can be changed.</summary>
@@ -19,14 +20,16 @@ public class SessionTokenTests
     public void Begin_End_Cleans_Up_SessionToken ()
     {
         // Test null Toplevel
-        Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
+        Assert.Throws<ArgumentNullException> (() => Application.Begin (null!));
 
-        var top = new Toplevel ();
+        Assert.NotNull (Application.Driver);
+
+        Toplevel top = new Toplevel ();
         SessionToken rs = Application.Begin (top);
         Assert.NotNull (rs);
         Application.End (rs);
 
-        Assert.NotNull (Application.Top);
+        Assert.NotNull (Application.Current);
 
         // v2 does not use main loop, it uses MainLoop<T> and its internal
         //Assert.NotNull (Application.MainLoop);
@@ -42,7 +45,7 @@ public class SessionTokenTests
     [Fact]
     public void Dispose_Cleans_Up_SessionToken ()
     {
-        var rs = new SessionToken (null);
+        var rs = new SessionToken (null!);
         Assert.NotNull (rs);
 
         // Should not throw because Toplevel was null
@@ -57,7 +60,7 @@ public class SessionTokenTests
         // Should throw because Toplevel was not cleaned up
         Assert.Throws<InvalidOperationException> (() => rs.Dispose ());
 
-        rs.Toplevel.Dispose ();
+        rs.Toplevel?.Dispose ();
         rs.Toplevel = null;
         rs.Dispose ();
 #if DEBUG_IDISPOSABLE
@@ -69,7 +72,7 @@ public class SessionTokenTests
     [Fact]
     public void New_Creates_SessionToken ()
     {
-        var rs = new SessionToken (null);
+        var rs = new SessionToken (null!);
         Assert.Null (rs.Toplevel);
 
         var top = new Toplevel ();

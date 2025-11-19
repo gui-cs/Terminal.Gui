@@ -211,6 +211,7 @@ public class UICatalogTop : Toplevel
                                                          return;
                                                      }
                                                      ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
+
                                                  };
 
                 var menuItem = new MenuItemv2
@@ -695,7 +696,7 @@ public class UICatalogTop : Toplevel
         _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
-        Application.Top?.SetNeedsDraw ();
+        Application.Current?.SetNeedsDraw ();
     }
 
     private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigApplied (); }

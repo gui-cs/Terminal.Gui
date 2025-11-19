@@ -11,7 +11,7 @@ public class PosTests ()
     public void
         Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Toplevel t = new ();
 
@@ -43,7 +43,7 @@ public class PosTests ()
     [TestRespondersDisposed]
     public void PosCombine_WHY_Throws ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Toplevel t = new Toplevel ();
 
@@ -133,7 +133,7 @@ public class PosTests ()
     [TestRespondersDisposed]
     public void Pos_Subtract_Operator ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Toplevel top = new ();
 
@@ -207,7 +207,7 @@ public class PosTests ()
     [Fact]
     public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Toplevel t = new ();
 
@@ -233,7 +233,7 @@ public class PosTests ()
     [Fact]
     public void Validation_Does_Not_Throw_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Toplevel t = new Toplevel ();
 

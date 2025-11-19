@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;

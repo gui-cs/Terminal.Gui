@@ -26,7 +26,7 @@ internal class RuneJsonConverter : JsonConverter<Rune>
         {
             case JsonTokenType.String:
                 {
-                    string value = reader.GetString ();
+                    string? value = reader.GetString ();
                     int first = RuneExtensions.MaxUnicodeCodePoint + 1;
                     int second = RuneExtensions.MaxUnicodeCodePoint + 1;
 

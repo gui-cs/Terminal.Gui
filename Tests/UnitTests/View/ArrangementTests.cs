@@ -5,7 +5,7 @@ namespace UnitTests.ViewTests;
 public class ArrangementTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
-    
+
     [Fact]
     public void MouseGrabHandler_WorksWithMovableView_UsingNewMouseEvent ()
     {
@@ -17,6 +17,7 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = 80,
             Height = 25
         };
+        superView.App = Application.Create ();
 
         var movableView = new View
         {
@@ -45,7 +46,7 @@ public class ArrangementTests (ITestOutputHelper output)
 
         // The border should have grabbed the mouse
         Assert.True (result);
-        Assert.Equal (movableView.Border, Application.Mouse.MouseGrabView);
+        Assert.Equal (movableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate mouse drag
         var dragEvent = new MouseEventArgs
@@ -58,7 +59,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (result);
 
         // Mouse should still be grabbed
-        Assert.Equal (movableView.Border, Application.Mouse.MouseGrabView);
+        Assert.Equal (movableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate mouse release to end dragging
         var releaseEvent = new MouseEventArgs
@@ -71,7 +72,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (result);
 
         // Mouse should be released
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.Null (superView.App.Mouse.MouseGrabView);
     }
 
     [Fact]
@@ -81,6 +82,7 @@ public class ArrangementTests (ITestOutputHelper output)
 
         var superView = new View
         {
+            App = Application.Create (),
             Width = 80,
             Height = 25
         };
@@ -113,7 +115,7 @@ public class ArrangementTests (ITestOutputHelper output)
 
         // The border should have grabbed the mouse for resizing
         Assert.True (result);
-        Assert.Equal (resizableView.Border, Application.Mouse.MouseGrabView);
+        Assert.Equal (resizableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate dragging to resize
         var dragEvent = new MouseEventArgs
@@ -124,7 +126,7 @@ public class ArrangementTests (ITestOutputHelper output)
 
         result = resizableView.Border.NewMouseEvent (dragEvent);
         Assert.True (result);
-        Assert.Equal (resizableView.Border, Application.Mouse.MouseGrabView);
+        Assert.Equal (resizableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate mouse release
         var releaseEvent = new MouseEventArgs
@@ -137,7 +139,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (result);
 
         // Mouse should be released
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.Null (superView.App.Mouse.MouseGrabView);
     }
 
     [Fact]
@@ -146,6 +148,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // This test verifies MouseGrabHandler properly releases when switching between views
 
         var superView = new View { Width = 80, Height = 25 };
+        superView.App = Application.Create ();
 
         var view1 = new View
         {
@@ -168,6 +171,8 @@ public class ArrangementTests (ITestOutputHelper output)
         };
 
         superView.Add (view1, view2);
+        superView.BeginInit ();
+        superView.EndInit ();
 
         // Grab mouse on first view
         var pressEvent1 = new MouseEventArgs
@@ -177,7 +182,7 @@ public class ArrangementTests (ITestOutputHelper output)
         };
 
         view1.Border!.NewMouseEvent (pressEvent1);
-        Assert.Equal (view1.Border, Application.Mouse.MouseGrabView);
+        Assert.Equal (view1.Border, superView.App.Mouse.MouseGrabView);
 
         // Release on first view
         var releaseEvent1 = new MouseEventArgs
@@ -197,7 +202,7 @@ public class ArrangementTests (ITestOutputHelper output)
         };
 
         view2.Border!.NewMouseEvent (pressEvent2);
-        Assert.Equal (view2.Border, Application.Mouse.MouseGrabView);
+        Assert.Equal (view2.Border, superView.App.Mouse.MouseGrabView);
 
         // Release on second view
         var releaseEvent2 = new MouseEventArgs
@@ -207,6 +212,6 @@ public class ArrangementTests (ITestOutputHelper output)
         };
 
         view2.Border.NewMouseEvent (releaseEvent2);
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.Null (superView.App.Mouse.MouseGrabView);
     }
 }

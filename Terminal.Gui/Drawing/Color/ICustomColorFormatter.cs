@@ -1,4 +1,3 @@
-#nullable enable
 namespace Terminal.Gui.Drawing;
 
 /// <summary>An interface to support custom formatting and parsing of <see cref="Color"/> values.</summary>

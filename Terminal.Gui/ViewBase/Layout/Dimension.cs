@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>

@@ -1,4 +1,3 @@
-#nullable enable
 
 using System.Diagnostics.CodeAnalysis;
 
@@ -7,6 +6,7 @@ namespace Terminal.Gui.App;
 public static partial class Application // Driver abstractions
 {
     /// <inheritdoc cref="IApplication.Driver"/>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static IDriver? Driver
     {
         get => ApplicationImpl.Instance.Driver;
@@ -15,6 +15,7 @@ public static partial class Application // Driver abstractions
 
     /// <inheritdoc cref="IApplication.Force16Colors"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    [Obsolete ("The legacy static Application object is going away.")]
     public static bool Force16Colors
     {
         get => ApplicationImpl.Instance.Force16Colors;
@@ -23,6 +24,7 @@ public static partial class Application // Driver abstractions
 
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    [Obsolete ("The legacy static Application object is going away.")]
     public static string ForceDriver
     {
         get => ApplicationImpl.Instance.ForceDriver;
@@ -30,11 +32,13 @@ public static partial class Application // Driver abstractions
     }
 
     /// <inheritdoc cref="IApplication.Sixel"/>
+    [Obsolete ("The legacy static Application object is going away.")] 
     public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Sixel;
 
     /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
+    [Obsolete ("The legacy static Application object is going away.")]
     public static (List<Type?>, List<string?>) GetDriverTypes ()
     {
         // use reflection to get the list of drivers

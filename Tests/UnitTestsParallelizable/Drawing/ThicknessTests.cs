@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Terminal.Gui.Drivers;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -634,7 +635,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
                                       new (0, 0, driver!.Cols, driver!.Rows),
                                       (Rune)' '
                                      );
-        t.Draw (r, ViewDiagnosticFlags.Thickness, "Test", driver);
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -650,7 +651,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
                         new (0, 0, driver!.Cols, driver!.Rows),
                         (Rune)' '
                        );
-        t.Draw (r, ViewDiagnosticFlags.Thickness, "Test", driver);
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -680,7 +681,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
                                       new (0, 0, driver!.Cols, driver!.Rows),
                                       (Rune)' '
                                      );
-        t.Draw (r, ViewDiagnosticFlags.Thickness, "Test", driver);
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -710,7 +711,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
                                       new (0, 0, driver!.Cols, driver!.Rows),
                                       (Rune)' '
                                      );
-        t.Draw (r, ViewDiagnosticFlags.Thickness, "Test", driver);
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -754,7 +755,8 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
         var r = new Rectangle (2, 2, 40, 15);
 
         top.Draw ();
-        t.Draw (r, ViewDiagnosticFlags.Ruler, "Test", driver);
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -786,7 +788,8 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
         r = new (1, 1, 40, 15);
         top.SetNeedsDraw ();
         top.Draw ();
-        t.Draw (r, ViewDiagnosticFlags.Ruler, "Test", driver);
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -818,7 +821,8 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
         r = new (2, 2, 40, 15);
         top.SetNeedsDraw ();
         top.Draw ();
-        t.Draw (r, ViewDiagnosticFlags.Ruler, "Test", driver);
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -850,7 +854,8 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
         r = new (5, 5, 40, 15);
         top.SetNeedsDraw ();
         top.Draw ();
-        t.Draw (r, ViewDiagnosticFlags.Ruler, "Test", driver);
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

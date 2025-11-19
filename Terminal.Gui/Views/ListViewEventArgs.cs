@@ -1,4 +1,3 @@
-﻿#nullable enable
 namespace Terminal.Gui.Views;
 
 /// <summary><see cref="EventArgs"/> for <see cref="ListView"/> events.</summary>

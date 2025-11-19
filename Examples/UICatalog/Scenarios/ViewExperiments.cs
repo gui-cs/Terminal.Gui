@@ -75,15 +75,15 @@ public class ViewExperiments : Scenario
             Y = Pos.Center (),
             Title = $"_Close",
         };
-        //popoverButton.Accepting += (sender, e) => Application.Popover!.Visible = false;
+        //popoverButton.Accepting += (sender, e) => App?.Popover!.Visible = false;
         popoverView.Add (popoverButton);
 
         button.Accepting += ButtonAccepting;
 
         void ButtonAccepting (object sender, CommandEventArgs e)
         {
-            //Application.Popover = popoverView;
-            //Application.Popover!.Visible = true;
+            //App?.Popover = popoverView;
+            //App?.Popover!.Visible = true;
         }
 
         testFrame.MouseClick += TestFrameOnMouseClick;
@@ -94,8 +94,8 @@ public class ViewExperiments : Scenario
             {
                 popoverView.X = e.ScreenPosition.X;
                 popoverView.Y = e.ScreenPosition.Y;
-                //Application.Popover = popoverView;
-                //Application.Popover!.Visible = true;
+                //App?.Popover = popoverView;
+                //App?.Popover!.Visible = true;
             }
         }
 

@@ -15,7 +15,7 @@ namespace Terminal.Gui.Configuration;
 /// </summary>
 internal class ColorJsonConverter : JsonConverter<Color>
 {
-    private static ColorJsonConverter _instance;
+    private static ColorJsonConverter? _instance;
 
     /// <summary>Singleton</summary>
     public static ColorJsonConverter Instance
