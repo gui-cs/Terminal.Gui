@@ -88,7 +88,7 @@ public class CanFocusTests
     [Fact]
     public void CanFocus_Set_True_Get_AdvanceFocus_Works ()
     {
-        IApplication app = new ApplicationImpl ();
+        IApplication app = Application.Create ();
         app.Current = new () { App = app };
 
         Label label = new () { Text = "label" };

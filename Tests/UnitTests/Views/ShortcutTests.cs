@@ -349,7 +349,7 @@ public class ShortcutTests
     [InlineData (KeyCode.F1, 0)]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        Application.Current = new () { App = new ApplicationImpl () };
+        Application.Current = new () { App = Application.Create () };
 
         var shortcut = new Shortcut
         {
@@ -442,7 +442,7 @@ public class ShortcutTests
 
         // Shortcut requires Init for App scoped hotkeys to work
         Application.Current.BeginInit ();
-        Application.Current.EndInit();
+        Application.Current.EndInit ();
 
         Application.Current.SetFocus ();
 

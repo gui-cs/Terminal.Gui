@@ -9,9 +9,9 @@ namespace Terminal.Gui.App;
 public partial class ApplicationImpl : IApplication
 {
     /// <summary>
-    ///     Creates a new instance of the Application backend.
+    ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
-    public ApplicationImpl () { }
+    internal ApplicationImpl () { }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.

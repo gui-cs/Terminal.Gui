@@ -314,7 +314,7 @@ public class ShortcutTests
         shortcut.Key = Key.A;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
 
-        shortcut.App = new ApplicationImpl ();
+        shortcut.App = Application.Create ();
         shortcut.BindKeyToApplication = true;
         shortcut.BeginInit ();
         shortcut.EndInit ();

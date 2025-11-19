@@ -10,6 +10,16 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Lifecycle (Init/Shutdown)
 {
+    /// <summary>
+    ///     Creates a new <see cref="IApplication"/> instance.
+    /// </summary>
+    /// <remarks>
+    ///     The recommended pattern is for developers to call <c>Application.Create()</c> and then use the returned
+    ///     <see cref="IApplication"/> instance for all subsequent application operations.
+    /// </remarks>
+    /// <returns>A new <see cref="IApplication"/> instance.</returns>
+    public static IApplication Create () { return new ApplicationImpl (); }
+
     /// <inheritdoc cref="IApplication.Init"/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]

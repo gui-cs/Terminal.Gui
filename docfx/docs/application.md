@@ -78,7 +78,7 @@ Application.Run();
 Application.Shutdown();
 
 // NEW (v2 instance-based):
-var app = new ApplicationImpl();
+var app = Application.Create ();
 app.Init();
 var top = new Toplevel();
 top.Add(myView);
@@ -305,7 +305,7 @@ public class MyService
 Applications manage sessions through `Begin()` and `End()`:
 
 ```csharp
-var app = new ApplicationImpl();
+var app = Application.Create ();
 app.Init();
 
 var toplevel = new Toplevel();
@@ -330,7 +330,7 @@ if (token != null)
 Multiple sessions can run nested:
 
 ```csharp
-var app = new ApplicationImpl();
+var app = Application.Create ();
 app.Init();
 
 // Session 1
@@ -414,7 +414,7 @@ public void MyView_DisplaysCorrectly()
 [Fact]
 public void MyView_WorksWithRealApplication()
 {
-    var app = new ApplicationImpl();
+    var app = Application.Create ();
     try
     {
         app.Init(new FakeDriver());
@@ -508,13 +508,13 @@ The instance-based architecture enables multiple applications:
 
 ```csharp
 // Application 1
-var app1 = new ApplicationImpl();
+var app1 = Application.Create ();
 app1.Init(new WindowsDriver());
 var top1 = new Toplevel { Title = "App 1" };
 // ... configure top1
 
 // Application 2 (different driver!)
-var app2 = new ApplicationImpl();
+var app2 = Application.Create ();
 app2.Init(new CursesDriver());
 var top2 = new Toplevel { Title = "App 2" };
 // ... configure top2

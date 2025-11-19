@@ -17,7 +17,7 @@ public class ArrangementTests (ITestOutputHelper output)
             Width = 80,
             Height = 25
         };
-        superView.App = new ApplicationImpl ();
+        superView.App = Application.Create ();
 
         var movableView = new View
         {
@@ -82,7 +82,7 @@ public class ArrangementTests (ITestOutputHelper output)
 
         var superView = new View
         {
-            App = new ApplicationImpl(),
+            App = Application.Create (),
             Width = 80,
             Height = 25
         };
@@ -148,7 +148,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // This test verifies MouseGrabHandler properly releases when switching between views
 
         var superView = new View { Width = 80, Height = 25 };
-        superView.App = new ApplicationImpl ();
+        superView.App = Application.Create ();
 
         var view1 = new View
         {
