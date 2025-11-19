@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
+///     <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
 ///     or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
@@ -21,7 +21,7 @@ public class Dialog : Window
     /// <remarks>
     ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
     ///     set
-    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="Application.Current"/>, if
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="IApplication.Current"/>, if
     ///     there is one. Otherwise,
     ///     it will be bound by the screen dimensions.
     /// </remarks>
