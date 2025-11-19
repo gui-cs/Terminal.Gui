@@ -63,10 +63,10 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 }
 #endif
             }
-            catch (Exception e)
-            {
-                Debug.WriteLine ($"Application.Shutdown threw an exception after the test exited: {e}");
-            }
+            //catch (Exception e)
+            //{
+            //    Debug.WriteLine ($"Application.Shutdown threw an exception after the test exited: {e}");
+            //}
             finally
             {
 #if DEBUG_IDISPOSABLE
