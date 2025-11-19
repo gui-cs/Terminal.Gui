@@ -679,7 +679,7 @@ Nice       Work")]
         };
         Assert.Equal (width, text.GetColumns ());
 
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver, new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
     }
