@@ -30,7 +30,7 @@ public class FakeApplicationFactory
         ApplicationImpl.ChangeInstance (impl);
 
         // Initialize with a fake driver
-        impl.Init (null, "fake");
+        impl.Init ("fake");
 
         return new FakeApplicationLifecycle (origApp, hardStopTokenSource);
     }

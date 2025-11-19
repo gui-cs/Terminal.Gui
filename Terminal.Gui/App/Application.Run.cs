@@ -32,14 +32,14 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     [Obsolete ("The legacy static Application object is going away.")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null) => ApplicationImpl.Instance.Run (errorHandler, driver);
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) => ApplicationImpl.Instance.Run (errorHandler, driverName);
 
     /// <inheritdoc cref="IApplication.Run{TView}(Func{Exception, bool}, string)"/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     [Obsolete ("The legacy static Application object is going away.")]
-    public static TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
-        where TView : Toplevel, new() => ApplicationImpl.Instance.Run<TView> (errorHandler, driver);
+    public static TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
+        where TView : Toplevel, new() => ApplicationImpl.Instance.Run<TView> (errorHandler, driverName);
 
     /// <inheritdoc cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>
     [Obsolete ("The legacy static Application object is going away.")]

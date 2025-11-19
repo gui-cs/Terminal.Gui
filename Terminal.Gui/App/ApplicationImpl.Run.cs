@@ -157,18 +157,18 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) { return Run<Toplevel> (errorHandler, driverName); }
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
+    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
         where TView : Toplevel, new ()
     {
         if (!Initialized)
         {
             // Init() has NOT been called. Auto-initialize as per interface contract.
-            Init (null, driver);
+            Init (driverName);
         }
 
         TView top = new ();

@@ -219,7 +219,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = ["Percent", "AnchorEnd", "Center", "Absolute"];
         List<string> dimNames = ["Auto", "Percent", "Fill", "Absolute"];
 
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         var top = new Toplevel ();
 

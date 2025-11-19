@@ -14,7 +14,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IDriver? driver = null, string? driverName = null)
+    public void Init (string? driverName = null)
     {
         if (Initialized)
         {

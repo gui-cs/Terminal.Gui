@@ -16,7 +16,7 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("unix")]
     public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName = null)
     {
-        Application.Init (null, driverName: driverName);
+        Application.Init (driverName);
         Application.Shutdown ();
     }
 
@@ -27,7 +27,7 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("unix")]
     public void All_Drivers_Run_Cross_Platform (string driverName = null)
     {
-        Application.Init (null, driverName: driverName);
+        Application.Init (driverName);
         Application.StopAfterFirstIteration = true;
         Application.Run ().Dispose ();
         Application.Shutdown ();
@@ -40,7 +40,7 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("unix")]
     public void All_Drivers_LayoutAndDraw_Cross_Platform (string driverName = null)
     {
-        Application.Init (null, driverName: driverName);
+        Application.Init (driverName);
         Application.StopAfterFirstIteration = true;
         Application.Run<TestTop> ().Dispose ();
 

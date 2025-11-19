@@ -175,7 +175,7 @@ public interface IApplication
     IDriver? Driver { get; }
     IMainLoopCoordinator? MainLoop { get; }
     
-    void Init(IDriver? driver = null);
+    void Init(string? driverName = null);
     void Shutdown();
     SessionToken? Begin(Toplevel toplevel);
     void End(SessionToken sessionToken);

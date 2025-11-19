@@ -42,7 +42,7 @@ public class ApplicationImplTests
 
         Assert.Empty (Application.KeyBindings.GetBindings ());
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         Assert.NotEmpty (Application.KeyBindings.GetBindings ());
 
@@ -188,7 +188,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         object timeoutToken = v2.AddTimeout (
                                              TimeSpan.FromMilliseconds (150),
@@ -229,7 +229,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         Toplevel top = new Window
         {
@@ -283,7 +283,7 @@ public class ApplicationImplTests
         Assert.Null (Application.Current);
         Assert.Null (Application.Driver);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         Toplevel top = new Window ();
 
@@ -335,7 +335,7 @@ public class ApplicationImplTests
         Assert.Null (Application.Current);
         Assert.Null (Application.Driver);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         Toplevel top = new Window ();
 
@@ -395,7 +395,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         Toplevel top = new Window
         {
@@ -443,7 +443,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         v2.AddTimeout (TimeSpan.Zero, IdleExit);
         Assert.Null (Application.Current);
@@ -468,7 +468,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         var closing = 0;
         var closed = 0;
@@ -556,7 +556,7 @@ public class ApplicationImplTests
         ApplicationImpl v2 = NewMockedApplicationImpl ();
         ApplicationImpl.ChangeInstance (v2);
 
-        v2.Init (null, "fake");
+        v2.Init ("fake");
         var b = new Button ();
 
         var result = false;
@@ -631,7 +631,7 @@ public class ApplicationImplTests
         Assert.Empty (v2.SessionStack);
 
         // Init should populate instance fields
-        v2.Init (null, "fake");
+        v2.Init ("fake");
 
         // After Init, Driver, Navigation, and Popover should be populated
         Assert.NotNull (v2.Driver);

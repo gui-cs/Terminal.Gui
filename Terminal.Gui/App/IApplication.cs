@@ -40,14 +40,9 @@ public interface IApplication
     #region Initialization and Shutdown
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
-    /// <param name="driver">
-    ///     The <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or
-    ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
-    /// </param>
     /// <param name="driverName">
     ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
-    ///     <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
-    ///     specified the default driver for the platform will be used.
+    ///     <see cref="IDriver"/> to use. If not specified the default driver for the platform will be used.
     /// </param>
     /// <remarks>
     ///     <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
@@ -60,14 +55,14 @@ public interface IApplication
     ///         <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and terminal settings restored.
     ///     </para>
     ///     <para>
-    ///         The <see cref="Run{T}"/> function combines <see cref="Init(IDriver,string)"/> and
+    ///         The <see cref="Run{T}"/> function combines <see cref="Init(string)"/> and
     ///         <see cref="Run(Toplevel, Func{Exception, bool})"/> into a single call. An application can use
-    ///         <see cref="Run{T}"/> without explicitly calling <see cref="Init(IDriver,string)"/>.
+    ///         <see cref="Run{T}"/> without explicitly calling <see cref="Init(string)"/>.
     ///     </para>
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (IDriver? driver = null, string? driverName = null);
+    public void Init (string? driverName = null);
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
@@ -136,7 +131,7 @@ public interface IApplication
     ///     stopped, <see cref="End(SessionToken)"/> will be called.
     /// </summary>
     /// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
-    /// <param name="driver">
+    /// <param name="driverName">
     ///     The driver name. If not specified the default driver for the platform will be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
@@ -153,7 +148,7 @@ public interface IApplication
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null);
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null);
 
     /// <summary>
     ///     Runs a new Session creating a <see cref="Toplevel"/>-derived object of type <typeparamref name="TView"/>
@@ -162,7 +157,7 @@ public interface IApplication
     /// </summary>
     /// <typeparam name="TView">The type of <see cref="Toplevel"/> to create and run.</typeparam>
     /// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
-    /// <param name="driver">
+    /// <param name="driverName">
     ///     The driver name. If not specified the default driver for the platform will be used. Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
@@ -205,7 +200,7 @@ public interface IApplication
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
+    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
         where TView : Toplevel, new ();
 
     /// <summary>

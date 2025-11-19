@@ -9,7 +9,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             // Act
             Assert.NotNull (Application.Popover);
@@ -27,7 +27,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             // Act
             Assert.NotNull (Application.Popover);
@@ -50,7 +50,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (null, "fake");
+            Application.Init ("fake");
             Assert.NotNull (Application.Popover);
             Application.StopAfterFirstIteration = true;
 
@@ -78,7 +78,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (null, "fake");
+            Application.Init ("fake");
             Application.StopAfterFirstIteration = true;
 
             top = new ();
@@ -114,7 +114,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             PopoverTestClass? popover = new ();
 
@@ -138,7 +138,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             PopoverTestClass? popover = new ();
 
@@ -167,7 +167,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             PopoverTestClass? popover = new ();
             Application.Popover?.Register (popover);
@@ -196,7 +196,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (null, "fake");
+            Application.Init ("fake");
             Application.Current = new ();
             PopoverTestClass? popover = new ();
 
@@ -218,7 +218,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (null, "fake");
+            Application.Init ("fake");
             Application.Current = new() { Id = "initialTop" };
             PopoverTestClass? popover = new () { };
             var keyDownEvents = 0;
@@ -265,7 +265,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             Application.Current = new ()
             {

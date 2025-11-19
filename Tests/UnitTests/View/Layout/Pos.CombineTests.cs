@@ -76,7 +76,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [Fact]
     public void PosCombine_Refs_SuperView_Throws ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         var top = new Toplevel ();
         var w = new Window { X = Pos.Left (top) + 2, Y = Pos.Top (top) + 2 };

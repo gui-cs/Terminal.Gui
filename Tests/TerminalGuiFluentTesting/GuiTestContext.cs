@@ -170,7 +170,7 @@ public partial class GuiTestContext : IDisposable
     {
         ApplicationImpl.ChangeInstance (_applicationImpl);
 
-        _applicationImpl?.Init (null, GetDriverName ());
+        _applicationImpl?.Init (GetDriverName ());
     }
 
 

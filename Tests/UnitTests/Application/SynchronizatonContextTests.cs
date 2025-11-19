@@ -9,7 +9,7 @@ public class SyncrhonizationContextTests
     [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
-        Application.Init (null, "fake");
+        Application.Init ("fake");
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -31,7 +31,7 @@ public class SyncrhonizationContextTests
     {
         lock (_lockPost)
         {
-            Application.Init (null, driverName: driverName);
+            Application.Init (driverName);
 
             SynchronizationContext context = SynchronizationContext.Current;
 

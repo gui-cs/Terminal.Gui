@@ -240,7 +240,7 @@ public class ApplicationTests
             Application.QuitKey = Key.Q;
             Assert.Equal (Key.Q, Application.QuitKey);
 
-            Application.Init (null, "fake");
+            Application.Init ("fake");
 
             Assert.Equal (Key.Q, Application.QuitKey);
         }
@@ -378,7 +378,7 @@ public class ApplicationTests
         // Verify initial state is per spec
         //Pre_Init_State ();
 
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         // Verify post-Init state is correct
         //Post_Init_State ();
@@ -434,7 +434,7 @@ public class ApplicationTests
     public void Init_Unbalanced_Throws ()
     {
         Assert.Throws<InvalidOperationException> (() =>
-                                                      Application.Init (null, "fake")
+                                                      Application.Init ("fake")
                                                  );
     }
 
@@ -443,7 +443,7 @@ public class ApplicationTests
     public void Init_Unbalanced_Throws2 ()
     {
         // Now try the other way
-        Assert.Throws<InvalidOperationException> (() => Application.Init (null, "fake"));
+        Assert.Throws<InvalidOperationException> (() => Application.Init ("fake"));
     }
 
     [Fact]
@@ -454,7 +454,7 @@ public class ApplicationTests
         // NOTE: Run<T>, when called after Init has been called behaves differently than
         // when called if Init has not been called.
         Toplevel topLevel = new ();
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         SessionToken sessionToken = null;
 
@@ -518,7 +518,7 @@ public class ApplicationTests
     {
         var iteration = 0;
 
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Application.Iteration += Application_Iteration;
         Application.Run<Toplevel> ().Dispose ();
@@ -922,7 +922,7 @@ public class ApplicationTests
 
         Assert.Throws<NotInitializedException> (() => Application.Run (new Toplevel ()));
 
-        Application.Init (null, "fake");
+        Application.Init ("fake");
 
         Application.Iteration += OnApplicationOnIteration;
         Application.Run (new Toplevel ());
@@ -958,7 +958,7 @@ public class ApplicationTests
     public void Run_T_With_V2_Driver_Does_Not_Call_ResetState_After_Init ()
     {
         Assert.False (Application.Initialized);
-        Application.Init (null, "fake");
+        Application.Init ("fake");
         Assert.True (Application.Initialized);
 
         Task.Run (() => { Task.Delay (300).Wait (); })
