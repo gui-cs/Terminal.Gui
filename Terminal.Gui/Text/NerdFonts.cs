@@ -741,8 +741,13 @@ internal class NerdFonts
         { "nf-seti-typescript", '' }
     };
 
-    public char GetNerdIcon (IFileSystemInfo file, bool isOpen)
+    public char GetNerdIcon (IFileSystemInfo? file, bool isOpen)
     {
+        if (file == null)
+        {
+            throw new ArgumentNullException (nameof (file));
+        }
+
         if (FilenameToIcon.ContainsKey (file.Name))
         {
             return Glyphs [FilenameToIcon [file.Name]];

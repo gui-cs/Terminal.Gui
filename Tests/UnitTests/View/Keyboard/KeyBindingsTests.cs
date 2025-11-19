@@ -160,14 +160,14 @@ public class KeyBindingsTests ()
         var hotKeyRaised = false;
         var acceptRaised = false;
         var selectRaised = false;
-        Application.Top = new Toplevel ();
+        Application.Current = new Toplevel ();
         var view = new View
         {
             CanFocus = true,
             HotKeySpecifier = new Rune ('_'),
             Title = "_Test"
         };
-        Application.Top.Add (view);
+        Application.Current.Add (view);
         view.HandlingHotKey += (s, e) => hotKeyRaised = true;
         view.Accepting += (s, e) => acceptRaised = true;
         view.Selecting += (s, e) => selectRaised = true;
@@ -191,7 +191,7 @@ public class KeyBindingsTests ()
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.ResetState (true);
     }
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)

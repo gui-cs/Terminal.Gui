@@ -86,6 +86,43 @@ public class ThemeScopeTests
         Disable (true);
     }
 
+
+    [Fact]
+    public void DeSerialize_Themes_UpdateFrom_Updates ()
+    {
+        Enable (ConfigLocations.HardCoded);
+
+        IDictionary<string, ThemeScope> initial = ThemeManager.Themes!;
+
+        string serialized = """
+                     {
+                       "Default": {
+                         "Button.DefaultShadow": "None"
+                       }
+                     }
+                     """;
+        ConcurrentDictionary<string, ThemeScope>? deserialized =
+            JsonSerializer.Deserialize<ConcurrentDictionary<string, ThemeScope>> (serialized, SerializerContext.Options);
+
+        ShadowStyle initialShadowStyle = (ShadowStyle)(initial! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
+        Assert.Equal (ShadowStyle.Opaque, initialShadowStyle);
+
+        ShadowStyle deserializedShadowStyle = (ShadowStyle)(deserialized! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
+        Assert.Equal (ShadowStyle.None, deserializedShadowStyle);
+
+        initial ["Default"].UpdateFrom (deserialized ["Default"]);
+        initialShadowStyle = (ShadowStyle)(initial! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
+        Assert.Equal (ShadowStyle.None, initialShadowStyle);
+
+        Assert.Equal(ShadowStyle.Opaque, Button.DefaultShadow);
+        initial ["Default"].Apply ();
+        Assert.Equal (ShadowStyle.None, Button.DefaultShadow);
+
+        Disable (true);
+        Assert.Equal (ShadowStyle.Opaque, Button.DefaultShadow);
+
+    }
+
     [Fact]
     public void Serialize_New_RoundTrip ()
     {

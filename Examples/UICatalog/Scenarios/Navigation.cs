@@ -219,7 +219,7 @@ public class Navigation : Scenario
 
             progressBar.Fraction += 0.01f;
 
-            Application.Invoke (() => { });
+            Application.Invoke ((_) => { });
         }
 
         void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)

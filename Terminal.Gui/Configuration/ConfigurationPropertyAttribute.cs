@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Terminal.Gui.Configuration;
+﻿namespace Terminal.Gui.Configuration;
 
 /// <summary>An attribute indicating a property is managed by <see cref="ConfigurationManager"/>.</summary>
 /// <example>

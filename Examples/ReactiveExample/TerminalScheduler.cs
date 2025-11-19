@@ -22,7 +22,7 @@ public class TerminalScheduler : LocalScheduler
             var cancellation = new CancellationDisposable ();
 
             Application.Invoke (
-                                () =>
+                                (_) =>
                                 {
                                     if (!cancellation.Token.IsCancellationRequested)
                                     {

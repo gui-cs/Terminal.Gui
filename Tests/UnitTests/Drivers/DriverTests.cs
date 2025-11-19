@@ -1,5 +1,4 @@
-﻿using System.Text;
-using UnitTests.ViewsTests;
+﻿#nullable enable
 using Xunit.Abstractions;
 
 namespace UnitTests.DriverTests;
@@ -8,16 +7,16 @@ public class DriverTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-
     [Theory]
     [InlineData ("fake")]
     [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
-    public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName = null)
+    public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName)
     {
-        Application.Init (null, driverName: driverName);
-        Application.Shutdown ();
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.Shutdown ();
     }
 
     [Theory]
@@ -25,12 +24,13 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
-    public void All_Drivers_Run_Cross_Platform (string driverName = null)
+    public void All_Drivers_Run_Cross_Platform (string driverName)
     {
-        Application.Init (null, driverName: driverName);
-        Application.StopAfterFirstIteration = true;
-        Application.Run ().Dispose ();
-        Application.Shutdown ();
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.StopAfterFirstIteration = true;
+        app.Run ().Dispose ();
+        app.Shutdown ();
     }
 
     [Theory]
@@ -38,22 +38,22 @@ public class DriverTests (ITestOutputHelper output)
     [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
-    public void All_Drivers_LayoutAndDraw_Cross_Platform (string driverName = null)
+    public void All_Drivers_LayoutAndDraw_Cross_Platform (string driverName)
     {
-        Application.Init (null, driverName: driverName);
-        Application.StopAfterFirstIteration = true;
-        Application.Run<TestTop> ().Dispose ();
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.StopAfterFirstIteration = true;
+        app.Run<TestTop> ().Dispose ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (expectedLook: driverName!, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (driverName!, _output, app.Driver);
 
-        Application.Shutdown ();
-
+        app.Shutdown ();
     }
 }
 
 public class TestTop : Toplevel
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void BeginInit ()
     {
         Text = Driver!.GetName ()!;

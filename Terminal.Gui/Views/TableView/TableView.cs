@@ -1,3 +1,4 @@
+#nullable disable
 using System.Data;
 using System.Globalization;
 

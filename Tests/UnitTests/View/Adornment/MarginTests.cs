@@ -15,27 +15,27 @@ public class MarginTests (ITestOutputHelper output)
         view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new (1);
 
-        Application.Top = new Toplevel ();
-        Application.TopLevels.Push (Application.Top);
+        Application.Current = new Toplevel ();
+        Application.SessionStack.Push (Application.Current);
 
-        Application.Top.SetScheme (new()
+        Application.Current.SetScheme (new()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         });
 
-        Application.Top.Add (view);
+        Application.Current.Add (view);
         Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Red, Application.Top.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, Application.Current.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
 
-        Application.Top.BeginInit ();
-        Application.Top.EndInit ();
+        Application.Current.BeginInit ();
+        Application.Current.EndInit ();
         Application.LayoutAndDraw();
 
         DriverAssert.AssertDriverContentsAre (
                                              @"",
                                              output
                                             );
-        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Top.GetAttributeForRole (VisualRole.Normal));
+        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Current.GetAttributeForRole (VisualRole.Normal));
 
         Application.ResetState (true);
     }
@@ -51,20 +51,20 @@ public class MarginTests (ITestOutputHelper output)
         view.Margin.Thickness = new (1);
         view.Margin.ViewportSettings = ViewportSettingsFlags.None;
 
-        Application.Top = new Toplevel ();
-        Application.TopLevels.Push (Application.Top);
+        Application.Current = new Toplevel ();
+        Application.SessionStack.Push (Application.Current);
 
-        Application.Top.SetScheme (new ()
+        Application.Current.SetScheme (new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         });
 
-        Application.Top.Add (view);
+        Application.Current.Add (view);
         Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Red, Application.Top.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, Application.Current.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
 
-        Application.Top.BeginInit ();
-        Application.Top.EndInit ();
+        Application.Current.BeginInit ();
+        Application.Current.EndInit ();
         Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -74,7 +74,7 @@ M M
 MMM",
                                               output
                                              );
-        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Top.GetAttributeForRole (VisualRole.Normal));
+        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Current.GetAttributeForRole (VisualRole.Normal));
 
         Application.ResetState (true);
     }

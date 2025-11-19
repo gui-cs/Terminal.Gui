@@ -16,7 +16,7 @@ public static class Program
         RxApp.MainThreadScheduler = TerminalScheduler.Default;
         RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
         Application.Run (new LoginView (new LoginViewModel ()));
-        Application.Top.Dispose ();
+        Application.Current.Dispose ();
         Application.Shutdown ();
     }
 }

@@ -1,4 +1,3 @@
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 using System;
