@@ -7,13 +7,19 @@ namespace Terminal.Gui.Views;
 ///     scheme.
 /// </summary>
 /// <remarks>
+///     <para>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
 ///     <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
 ///     or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
+///     </para>
+///     <para>
+///     Dialog implements <see cref="IModalRunnable{TResult}"/> with <c>int?</c> as the result type.
+///     The <see cref="Result"/> property contains the index of the button that was clicked, or null if canceled.
+///     </para>
 /// </remarks>
-public class Dialog : Window
+public class Dialog : Window, IModalRunnable<int?>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
@@ -60,6 +66,24 @@ public class Dialog : Window
 
         _buttons.Add (button);
         Add (button);
+
+        // Subscribe to the button's Accept command to set Result
+        button.Accepting += Button_Accepting;
+    }
+
+    private void Button_Accepting (object? sender, CommandEventArgs e)
+    {
+        // Set Result to the index of the button that was clicked
+        if (sender is Button button)
+        {
+            int index = _buttons.IndexOf (button);
+            if (index >= 0)
+            {
+                Result = index;
+                // For backward compatibility, set Canceled = false
+                Canceled = false;
+            }
+        }
     }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
@@ -85,7 +109,14 @@ public class Dialog : Window
     }
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    /// <remarks>The default value is <see langword="true"/>.</remarks>
+    /// <remarks>
+    /// <para>The default value is <see langword="true"/>.</para>
+    /// <para>
+    /// <b>Obsolete:</b> Use <see cref="Result"/> instead. When <see cref="Result"/> is null, the dialog was canceled.
+    /// This property is maintained for backward compatibility.
+    /// </para>
+    /// </remarks>
+    [Obsolete ("Use Result property instead. Result == null indicates the dialog was canceled.")]
     public bool Canceled
     {
         get { return _canceled; }
@@ -100,6 +131,29 @@ public class Dialog : Window
             _canceled = value;
         }
     }
+
+    /// <summary>
+    /// Gets or sets the result of the modal dialog operation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Contains the zero-based index of the button that was clicked to close the dialog,
+    /// or null if the dialog was canceled (e.g., ESC key pressed).
+    /// </para>
+    /// <para>
+    /// The button index corresponds to the order buttons were added via <see cref="AddButton"/> or
+    /// the <see cref="Buttons"/> initializer.
+    /// </para>
+    /// <para>
+    /// For backward compatibility with the <see cref="Canceled"/> property:
+    /// - <see cref="Result"/> == null means the dialog was canceled (<see cref="Canceled"/> == true)
+    /// - <see cref="Result"/> != null means a button was clicked (<see cref="Canceled"/> == false)
+    /// </para>
+    /// <para>
+    /// This property implements <see cref="IModalRunnable{TResult}.Result"/> where TResult is <c>int?</c>.
+    /// </para>
+    /// </remarks>
+    public int? Result { get; set; }
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via

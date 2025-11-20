@@ -30,7 +30,7 @@ namespace Terminal.Gui.App;
 public interface IModalRunnable<TResult> : IRunnable
 {
     /// <summary>
-    /// Gets the result data from the modal operation, or <c>null</c> if not accepted.
+    /// Gets or sets the result data from the modal operation.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -38,15 +38,16 @@ public interface IModalRunnable<TResult> : IRunnable
     /// file selected). The result should be extracted from the modal's state before views are disposed.
     /// </para>
     /// <para>
-    /// <c>null</c> indicates the modal was stopped without accepting (ESC key, cancel button, close without action).
-    /// Non-<c>null</c> contains the type-safe result data.
+    /// For value types (like <see cref="int"/>), implementations should use a nullable type (e.g., <c>int?</c>)
+    /// where <c>null</c> indicates the modal was stopped without accepting.
+    /// For reference types, <c>null</c> similarly indicates cancellation.
     /// </para>
     /// <para>
-    /// For example:
-    /// - <see cref="Dialog"/>: Returns button index (int) or custom result
-    /// - <see cref="MessageBox"/>: Returns button index (int)
-    /// - <see cref="FileDialog"/>: Returns selected file path (string)
+    /// Examples:
+    /// - <see cref="Dialog"/>: Implement with <c>IModalRunnable&lt;int?&gt;</c>, returns button index or null
+    /// - <see cref="MessageBox"/>: Implement with <c>IModalRunnable&lt;int?&gt;</c>, returns button index or null
+    /// - <see cref="FileDialog"/>: Implement with <c>IModalRunnable&lt;string?&gt;</c>, returns file path or null
     /// </para>
     /// </remarks>
-    TResult? Result { get; set; }
+    TResult Result { get; set; }
 }
