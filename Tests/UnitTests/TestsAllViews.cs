@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Reflection;
-using System.Drawing;
 
 namespace UnitTests;
 

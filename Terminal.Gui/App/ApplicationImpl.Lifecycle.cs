@@ -33,8 +33,8 @@ public partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-       // Debug.Assert (Navigation is null);
-       // Navigation = new ();
+        // Debug.Assert (Navigation is null);
+        // Navigation = new ();
 
         //Debug.Assert (Popover is null);
         //Popover = new ();
@@ -62,7 +62,7 @@ public partial class ApplicationImpl
             _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
         }
 
-        CreateDriver (driverName ?? _driverName);
+        CreateDriver (_driverName);
         Screen = Driver!.Screen;
         Initialized = true;
 
@@ -145,9 +145,13 @@ public partial class ApplicationImpl
     }
 #endif
 
+    private bool _isResetingState;
+
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
     {
+        _isResetingState = true;
+
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
@@ -231,7 +235,14 @@ public partial class ApplicationImpl
         // === 9. Clear graphics ===
         Sixel.Clear ();
 
-        // === 10. Reset synchronization context ===
+        // === 10. Reset ForceDriver ===
+        // Note: ForceDriver and Force16Colors are reset
+        // If they need to persist across Init/Shutdown cycles
+        // then the user of the library should manage that state
+        Force16Colors = false;
+        ForceDriver = string.Empty;
+
+        // === 11. Reset synchronization context ===
         // IMPORTANT: Always reset sync context, even if not initialized
         // This ensures cleanup works correctly even if Shutdown is called without Init
         // Reset synchronization context to allow the user to run async/await,
@@ -240,8 +251,7 @@ public partial class ApplicationImpl
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
 
-        // Note: ForceDriver and Force16Colors are NOT reset; 
-        // they need to persist across Init/Shutdown cycles
+        _isResetingState = false;
     }
 
     /// <summary>

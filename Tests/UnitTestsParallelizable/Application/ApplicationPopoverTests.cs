@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Moq;
 using Terminal.Gui.App;
 

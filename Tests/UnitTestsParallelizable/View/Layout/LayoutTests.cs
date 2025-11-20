@@ -2,7 +2,7 @@
 
 namespace UnitTests_Parallelizable.LayoutTests;
 
-public class LayoutTests : GlobalTestSetup
+public class LayoutTests
 {
     #region Constructor Tests
 

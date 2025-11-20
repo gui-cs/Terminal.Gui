@@ -3,7 +3,7 @@ using UnitTests.Parallelizable;
 
 namespace UnitTests_Parallelizable.ViewLayoutEventTests;
 
-public class ViewLayoutEventTests : GlobalTestSetup
+public class ViewLayoutEventTests
 {
     [Fact]
     public void View_WidthChanging_Event_Fires ()
