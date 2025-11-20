@@ -162,7 +162,7 @@ public partial class ApplicationImpl
         // === 1. Stop all running toplevels ===
         foreach (Toplevel? t in SessionStack)
         {
-            t!.Running = false;
+            t!.IsRunning = false;
         }
 
         // === 2. Close and dispose popover ===

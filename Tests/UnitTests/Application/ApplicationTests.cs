@@ -660,8 +660,8 @@ public class ApplicationTests
 
         void OnApplicationOnIteration (object s, IterationEventArgs a)
         {
-            Assert.True (top.Running);
-            top.Running = false;
+            Assert.True (top.IsRunning);
+            top.IsRunning = false;
         }
     }
 
@@ -681,7 +681,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a) { top.Running = false; }
+        void OnApplicationOnIteration (object s, IterationEventArgs a) { top.IsRunning = false; }
     }
 
     [Fact]
@@ -893,7 +893,7 @@ public class ApplicationTests
         Application.Run<TestToplevel> ();
         Assert.NotNull (Application.Driver);
         Assert.NotNull (Application.Current);
-        Assert.False (Application.Current!.Running);
+        Assert.False (Application.Current!.IsRunning);
         Application.Current!.Dispose ();
         Application.Shutdown ();
     }

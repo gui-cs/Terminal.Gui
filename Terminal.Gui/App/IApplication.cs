@@ -313,7 +313,7 @@ public interface IApplication
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
+    ///         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.IsRunning"/>
     ///         property on the specified <see cref="Toplevel"/> to <see langword="false"/>.
     ///     </para>
     /// </remarks>

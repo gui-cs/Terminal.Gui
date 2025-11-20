@@ -10,7 +10,7 @@ public class ToplevelTests
         Assert.Equal ("Toplevel", top.SchemeName);
         Assert.Equal ("Fill(Absolute(0))", top.Width.ToString ());
         Assert.Equal ("Fill(Absolute(0))", top.Height.ToString ());
-        Assert.False (top.Running);
+        Assert.False (top.IsRunning);
         Assert.False (top.Modal);
         Assert.Null (top.MenuBar);
 

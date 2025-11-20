@@ -385,14 +385,14 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1", Running = true };
-            toplevel2 = new() { Id = "2", Running = true };
+            toplevel1 = new() { Id = "1", IsRunning = true };
+            toplevel2 = new() { Id = "2", IsRunning = true };
 
             app.Begin (toplevel1);
             app.Begin (toplevel2);
 
-            Assert.True (toplevel1.Running);
-            Assert.True (toplevel2.Running);
+            Assert.True (toplevel1.IsRunning);
+            Assert.True (toplevel2.IsRunning);
         }
         finally
         {
@@ -404,8 +404,8 @@ public class ApplicationImplBeginEndTests
             app.Shutdown ();
 
             // Verify toplevels were stopped
-            Assert.False (toplevel1!.Running);
-            Assert.False (toplevel2!.Running);
+            Assert.False (toplevel1!.IsRunning);
+            Assert.False (toplevel2!.IsRunning);
         }
     }
 

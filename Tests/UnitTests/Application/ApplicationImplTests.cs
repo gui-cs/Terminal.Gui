@@ -122,7 +122,7 @@ public class ApplicationImplTests
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.True (top!.Running);
+                                                  Assert.True (top!.IsRunning);
 
                                                   if (app.Current != null)
                                                   {
@@ -135,7 +135,7 @@ public class ApplicationImplTests
                                               }
                                              );
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         // Blocks until the timeout call is hit
         app.Run (top);
@@ -143,7 +143,7 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app.RemoveTimeout (timeoutToken));
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         // BUGBUG: Shutdown sets Top to null, not End.
         //Assert.Null (Application.Current);
@@ -226,7 +226,7 @@ public class ApplicationImplTests
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.True (top!.Running);
+                                                  Assert.True (top!.IsRunning);
 
                                                   if (app.Current != null)
                                                   {
@@ -273,7 +273,7 @@ public class ApplicationImplTests
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.True (top!.Running);
+                                                  Assert.True (top!.IsRunning);
 
                                                   if (app.Current != null)
                                                   {
@@ -284,7 +284,7 @@ public class ApplicationImplTests
                                               }
                                              );
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         // Blocks until the timeout call is hit
         app.Run (top);
@@ -292,7 +292,7 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app.RemoveTimeout (timeoutToken));
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         Assert.NotNull (app.Current);
         top.Dispose ();

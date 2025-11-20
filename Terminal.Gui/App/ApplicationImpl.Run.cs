@@ -198,11 +198,11 @@ public partial class ApplicationImpl
 
         SessionToken rs = Begin (view);
 
-        Current.Running = true;
+        Current.IsRunning = true;
 
         var firstIteration = true;
 
-        while (SessionStack.TryPeek (out Toplevel? found) && found == view && view.Running)
+        while (SessionStack.TryPeek (out Toplevel? found) && found == view && view.IsRunning)
         {
             if (Coordinator is null)
             {
@@ -302,7 +302,7 @@ public partial class ApplicationImpl
             return;
         }
 
-        top.Running = false;
+        top.IsRunning = false;
     }
 
     /// <inheritdoc/>
@@ -327,7 +327,7 @@ public partial class ApplicationImpl
     public void Invoke (Action<IApplication>? action)
     {
         // If we are already on the main UI thread
-        if (Current is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (Current is { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action?.Invoke (this);
 
@@ -350,7 +350,7 @@ public partial class ApplicationImpl
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Current is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (Current is { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action?.Invoke ();
 

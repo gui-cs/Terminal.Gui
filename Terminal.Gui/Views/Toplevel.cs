@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         Toplevel views can run as modal (popup) views, started by calling
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
-///         <see cref="IApplication.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
+///         <see cref="IApplication.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.IsRunning"/>
 ///         property to <c>false</c>).
 ///     </para>
 ///     <para>
@@ -83,7 +83,7 @@ public partial class Toplevel : View
     // TODO: IRunnable: Re-implement as a property on IRunnable
     /// <summary>Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.</summary>
     /// <remarks>Setting this property directly is discouraged. Use <see cref="IApplication.RequestStop()"/> instead.</remarks>
-    public bool Running { get; set; }
+    public bool IsRunning { get; set; }
 
     // TODO: IRunnable: Re-implement in IRunnable
     /// <summary>

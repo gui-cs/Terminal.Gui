@@ -39,7 +39,7 @@ public class SyncrhonizationContextTests
 
             Task.Run (() =>
                       {
-                          while (Application.Current is null || Application.Current is { Running: false })
+                          while (Application.Current is null || Application.Current is { IsRunning: false })
                           {
                               Thread.Sleep (500);
                           }
@@ -56,7 +56,7 @@ public class SyncrhonizationContextTests
                                         null
                                        );
 
-                          if (Application.Current is { Running: true })
+                          if (Application.Current is { IsRunning: true })
                           {
                               Assert.False (success);
                           }

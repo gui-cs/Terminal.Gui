@@ -101,7 +101,7 @@ public class SubViewTests
             v1.Add (sv1);
 
             Application.LayoutAndDraw ();
-            t.Running = false;
+            t.IsRunning = false;
         }
     }
 }
