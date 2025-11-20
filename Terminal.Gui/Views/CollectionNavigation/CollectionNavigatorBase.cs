@@ -28,7 +28,7 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     /// <inheritdoc/>
     public int? GetNextMatchingItem (int? currentIndex, char keyStruck)
     {
-        if (currentIndex < 0)
+        if (currentIndex.HasValue && currentIndex < 0)
         {
             throw new ArgumentOutOfRangeException (nameof (currentIndex), @"Must be non-negative");
         }
@@ -166,7 +166,7 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
 
         int collectionLength = GetCollectionLength ();
 
-        if (currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex.Value)))
+        if (currentIndex.HasValue && currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex.Value)))
         {
             // we are already at a match
             if (minimizeMovement)

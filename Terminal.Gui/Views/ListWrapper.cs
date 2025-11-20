@@ -161,12 +161,9 @@ public class ListWrapper<T> : IListDataSource, IDisposable
                     return i;
                 }
             }
-            else if (t is string s)
+            else if (t is string s && s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase))
             {
-                if (s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return i;
-                }
+                return i;
             }
         }
 
@@ -211,14 +208,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
             int l;
 
-            if (t is string u)
-            {
-                l = u.GetColumns ();
-            }
-            else
-            {
-                l = t.ToString ()!.Length;
-            }
+            l = t is string u ? u.GetColumns () : t.ToString ()!.Length;
 
             if (l > maxLength)
             {
