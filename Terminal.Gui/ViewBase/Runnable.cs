@@ -11,8 +11,7 @@ namespace Terminal.Gui.ViewBase;
 /// </para>
 /// <para>
 /// To customize lifecycle behavior, override the protected virtual methods:
-/// <see cref="OnStopping"/>, <see cref="OnStopped"/>, <see cref="OnActivating"/>,
-/// <see cref="OnActivated"/>, <see cref="OnDeactivating"/>, <see cref="OnDeactivated"/>.
+/// <see cref="OnStarting"/>, <see cref="OnStarted"/>, <see cref="OnStopping"/>, <see cref="OnStopped"/>.
 /// </para>
 /// </remarks>
 public class Runnable : View, IRunnable
@@ -21,6 +20,42 @@ public class Runnable : View, IRunnable
     public bool Running { get; set; }
 
     #region IRunnable Implementation (RaiseXxxEvent Methods)
+
+    /// <inheritdoc/>
+    public virtual bool RaiseStartingEvent ()
+    {
+        // CWP Phase 1: Pre-notification via virtual method (can cancel)
+        if (OnStarting ())
+        {
+            return true; // Starting canceled
+        }
+
+        // CWP Phase 2: Event notification (can cancel)
+        var args = new System.ComponentModel.CancelEventArgs ();
+        Starting?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return true; // Starting canceled
+        }
+
+        // CWP Phase 3: Perform the work (mark as running)
+        Running = true;
+
+        // CWP Phase 4: Post-notification via virtual method
+        OnStarted ();
+
+        // CWP Phase 5: Post-notification event
+        Started?.Invoke (this, EventArgs.Empty);
+
+        return false; // Starting succeeded
+    }
+
+    /// <inheritdoc/>
+    public virtual void RaiseStartedEvent ()
+    {
+        Started?.Invoke (this, EventArgs.Empty);
+    }
 
     /// <inheritdoc/>
     public virtual void RaiseStoppingEvent ()
@@ -50,71 +85,46 @@ public class Runnable : View, IRunnable
         Stopped?.Invoke (this, EventArgs.Empty);
     }
 
-    /// <inheritdoc/>
-    public virtual bool RaiseActivatingEvent (IRunnable? deactivated)
-    {
-        // CWP Phase 1: Pre-notification via virtual method (can cancel)
-        if (OnActivating (deactivated))
-        {
-            return true; // Activation canceled
-        }
-
-        // CWP Phase 2: Event notification (can cancel)
-        var args = new RunnableActivatingEventArgs (this, deactivated);
-        Activating?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return true; // Activation canceled
-        }
-
-        // CWP Phase 3: Work is done by Application (setting Current)
-        // CWP Phase 4 & 5: Call post-notification methods
-        OnActivated (deactivated);
-
-        return false; // Activation succeeded
-    }
-
-    /// <inheritdoc/>
-    public virtual void RaiseActivatedEvent (IRunnable? deactivated)
-    {
-        Activated?.Invoke (this, new RunnableEventArgs (this));
-    }
-
-    /// <inheritdoc/>
-    public virtual bool RaiseDeactivatingEvent (IRunnable? activated)
-    {
-        // CWP Phase 1: Pre-notification via virtual method (can cancel)
-        if (OnDeactivating (activated))
-        {
-            return true; // Deactivation canceled
-        }
-
-        // CWP Phase 2: Event notification (can cancel)
-        var args = new RunnableDeactivatingEventArgs (this, activated);
-        Deactivating?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return true; // Deactivation canceled
-        }
-
-        // CWP Phase 3: Work is done by Application (changing Current)
-        // CWP Phase 4 & 5: Call post-notification methods
-        OnDeactivated (activated);
-
-        return false; // Deactivation succeeded
-    }
-
-    /// <inheritdoc/>
-    public virtual void RaiseDeactivatedEvent (IRunnable? activated)
-    {
-        Deactivated?.Invoke (this, new RunnableEventArgs (this));
-    }
-
     #endregion
 
     #region Protected Virtual Methods (Override Pattern)
+
+    /// <summary>
+    /// Called before <see cref="Starting"/> event. Override to cancel starting.
+    /// </summary>
+    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
+    /// <remarks>
+    /// <para>
+    /// This is the first phase of the Cancellable Work Pattern for starting.
+    /// Default implementation returns <see langword="false"/> (allow starting).
+    /// </para>
+    /// <para>
+    /// Override this method to provide custom logic for determining whether the runnable
+    /// should start (e.g., validating preconditions).
+    /// </para>
+    /// </remarks>
+    protected virtual bool OnStarting ()
+    {
+        return false; // Default: allow starting
+    }
+
+    /// <summary>
+    /// Called after session has started. Override for post-start work.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the fourth phase of the Cancellable Work Pattern for starting.
+    /// At this point, <see cref="Running"/> is <see langword="true"/>.
+    /// Default implementation does nothing.
+    /// </para>
+    /// <para>
+    /// Override this method to perform work that should occur after the session starts.
+    /// </para>
+    /// </remarks>
+    protected virtual void OnStarted ()
+    {
+        // Default: do nothing
+    }
 
     /// <summary>
     /// Called before <see cref="Stopping"/> event. Override to cancel stopping.
@@ -153,86 +163,6 @@ public class Runnable : View, IRunnable
         // Default: do nothing
     }
 
-    /// <summary>
-    /// Called before <see cref="Activating"/> event. Override to cancel activation.
-    /// </summary>
-    /// <param name="deactivated">The previously active runnable being deactivated, or null if none.</param>
-    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
-    /// <remarks>
-    /// <para>
-    /// This is the first phase of the Cancellable Work Pattern for activation.
-    /// Default implementation returns <see langword="false"/> (allow activation).
-    /// </para>
-    /// <para>
-    /// Override this method to provide custom logic for determining whether the runnable
-    /// should become active.
-    /// </para>
-    /// </remarks>
-    protected virtual bool OnActivating (IRunnable? deactivated)
-    {
-        return false; // Default: allow activation
-    }
-
-    /// <summary>
-    /// Called after activation succeeds. Override for post-activation logic.
-    /// </summary>
-    /// <param name="deactivated">The previously active runnable that was deactivated, or null if none.</param>
-    /// <remarks>
-    /// <para>
-    /// This is the fourth phase of the Cancellable Work Pattern for activation.
-    /// Default implementation calls <see cref="RaiseActivatedEvent"/>.
-    /// </para>
-    /// <para>
-    /// Override this method to perform work that should occur after activation
-    /// (e.g., setting focus, updating UI). Overrides must call base to ensure the
-    /// <see cref="Activated"/> event is raised.
-    /// </para>
-    /// </remarks>
-    protected virtual void OnActivated (IRunnable? deactivated)
-    {
-        RaiseActivatedEvent (deactivated);
-    }
-
-    /// <summary>
-    /// Called before <see cref="Deactivating"/> event. Override to cancel deactivation.
-    /// </summary>
-    /// <param name="activated">The newly activated runnable, or null if none.</param>
-    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
-    /// <remarks>
-    /// <para>
-    /// This is the first phase of the Cancellable Work Pattern for deactivation.
-    /// Default implementation returns <see langword="false"/> (allow deactivation).
-    /// </para>
-    /// <para>
-    /// Override this method to provide custom logic for determining whether the runnable
-    /// should be deactivated (e.g., preventing switching away if unsaved changes exist).
-    /// </para>
-    /// </remarks>
-    protected virtual bool OnDeactivating (IRunnable? activated)
-    {
-        return false; // Default: allow deactivation
-    }
-
-    /// <summary>
-    /// Called after deactivation succeeds. Override for post-deactivation logic.
-    /// </summary>
-    /// <param name="activated">The newly activated runnable, or null if none.</param>
-    /// <remarks>
-    /// <para>
-    /// This is the fourth phase of the Cancellable Work Pattern for deactivation.
-    /// Default implementation calls <see cref="RaiseDeactivatedEvent"/>.
-    /// </para>
-    /// <para>
-    /// Override this method to perform work that should occur after deactivation
-    /// (e.g., saving state, releasing resources). Overrides must call base to ensure the
-    /// <see cref="Deactivated"/> event is raised.
-    /// </para>
-    /// </remarks>
-    protected virtual void OnDeactivated (IRunnable? activated)
-    {
-        RaiseDeactivatedEvent (activated);
-    }
-
     #endregion
 
     #region Events
@@ -240,22 +170,16 @@ public class Runnable : View, IRunnable
     // Note: Initializing and Initialized events are inherited from View (ISupportInitialize pattern)
 
     /// <inheritdoc/>
+    public event EventHandler<System.ComponentModel.CancelEventArgs>? Starting;
+
+    /// <inheritdoc/>
+    public event EventHandler? Started;
+
+    /// <inheritdoc/>
     public event EventHandler<System.ComponentModel.CancelEventArgs>? Stopping;
 
     /// <inheritdoc/>
     public event EventHandler? Stopped;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableActivatingEventArgs>? Activating;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableEventArgs>? Activated;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableDeactivatingEventArgs>? Deactivating;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableEventArgs>? Deactivated;
 
     #endregion
 

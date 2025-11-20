@@ -17,12 +17,8 @@ namespace Terminal.Gui.Views;
 ///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
-///     <para>
-///         Toplevel implements <see cref="IRunnable"/> to support the runnable session lifecycle with proper event handling
-///         following the Cancellable Work Pattern (CWP).
-///     </para>
 /// </remarks>
-public partial class Toplevel : View, IRunnable
+public partial class Toplevel : View
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Toplevel"/> class,
@@ -96,60 +92,27 @@ public partial class Toplevel : View, IRunnable
     /// </summary>
     public bool IsLoaded { get; private set; }
 
+    // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Activating/Activate
     /// <summary>Invoked when the Toplevel <see cref="SessionToken"/> active.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> Use <see cref="IRunnable.Activated"/> instead. This event is maintained for backward
-    /// compatibility and will be raised alongside the new <see cref="IRunnable.Activated"/> event.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use IRunnable.Activated instead. This event is maintained for backward compatibility.")]
     public event EventHandler<ToplevelEventArgs>? Activate;
 
+    // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Deactivating/Deactivate?
     /// <summary>Invoked when the Toplevel<see cref="SessionToken"/> ceases to be active.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> Use <see cref="IRunnable.Deactivated"/> instead. This event is maintained for backward
-    /// compatibility and will be raised alongside the new <see cref="IRunnable.Deactivated"/> event.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use IRunnable.Deactivated instead. This event is maintained for backward compatibility.")]
     public event EventHandler<ToplevelEventArgs>? Deactivate;
 
     /// <summary>Invoked when the Toplevel's <see cref="SessionToken"/> is closed by <see cref="IApplication.End(SessionToken)"/>.</summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> This event is maintained for backward compatibility. The IRunnable architecture
-    /// combines this functionality into the <see cref="IRunnable.Stopped"/> event.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use IRunnable.Stopped instead. This event is maintained for backward compatibility.")]
     public event EventHandler<ToplevelEventArgs>? Closed;
 
     /// <summary>
     ///     Invoked when the Toplevel's <see cref="SessionToken"/> is being closed by
     ///     <see cref="IApplication.RequestStop(Toplevel)"/>.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> Use <see cref="IRunnable.Stopping"/> instead. This event is maintained for backward
-    /// compatibility and will be raised alongside the new <see cref="IRunnable.Stopping"/> event.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use IRunnable.Stopping instead. This event is maintained for backward compatibility.")]
     public event EventHandler<ToplevelClosingEventArgs>? Closing;
 
     /// <summary>
     ///     Invoked when the <see cref="Toplevel"/> <see cref="SessionToken"/> has begun to be loaded. A Loaded event handler
     ///     is a good place to finalize initialization before calling Run.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> Use <see cref="View.Initialized"/> instead. The Loaded event conceptually maps to
-    /// the Initialized event from the ISupportInitialize pattern, which is now part of IRunnable.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use View.Initialized instead. The Loaded event maps to the Initialized event from ISupportInitialize.")]
     public event EventHandler? Loaded;
 
     /// <summary>
@@ -181,13 +144,6 @@ public partial class Toplevel : View, IRunnable
     ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> Use <see cref="View.Initialized"/> instead. The Ready event is similar to Initialized
-    /// but was fired later in the lifecycle. The IRunnable architecture consolidates these into Initialized.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use View.Initialized instead. The Ready event is consolidated into the Initialized event.")]
     public event EventHandler? Ready;
 
     /// <summary>
@@ -203,13 +159,6 @@ public partial class Toplevel : View, IRunnable
     ///     Invoked when the Toplevel <see cref="SessionToken"/> has been unloaded. A Unloaded event handler is a good place
     ///     to dispose objects after calling <see cref="IApplication.End(SessionToken)"/>.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Obsolete:</b> Use <see cref="IRunnable.Stopped"/> instead. The Unloaded event is consolidated into
-    /// the Stopped event in the IRunnable architecture.
-    /// </para>
-    /// </remarks>
-    [Obsolete ("Use IRunnable.Stopped instead. The Unloaded event is consolidated into the Stopped event.")]
     public event EventHandler? Unloaded;
 
     internal virtual void OnActivate (Toplevel deactivated) { Activate?.Invoke (this, new (deactivated)); }
@@ -250,226 +199,6 @@ public partial class Toplevel : View, IRunnable
         }
 
         Unloaded?.Invoke (this, EventArgs.Empty);
-    }
-
-    #endregion
-
-    #region IRunnable Implementation
-
-    // Note: Running property is already defined above in the Life Cycle region (line 86)
-    // Note: Initializing and Initialized events are inherited from View (ISupportInitialize pattern)
-
-    /// <inheritdoc/>
-    public event EventHandler<System.ComponentModel.CancelEventArgs>? Stopping;
-
-    /// <inheritdoc/>
-    public event EventHandler? Stopped;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableActivatingEventArgs>? Activating;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableEventArgs>? Activated;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableDeactivatingEventArgs>? Deactivating;
-
-    /// <inheritdoc/>
-    public event EventHandler<RunnableEventArgs>? Deactivated;
-
-    /// <inheritdoc/>
-    public virtual void RaiseStoppingEvent ()
-    {
-        // CWP Phase 1: Pre-notification via virtual method (can cancel)
-        if (OnStopping ())
-        {
-            return; // Stopping canceled
-        }
-
-        // CWP Phase 2: Event notification (can cancel)
-        var args = new System.ComponentModel.CancelEventArgs ();
-        Stopping?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return; // Stopping canceled
-        }
-
-        // CWP Phase 3: Perform the work (stop the session)
-        Running = false;
-
-        // CWP Phase 4: Post-notification via virtual method
-        OnStopped ();
-
-        // CWP Phase 5: Post-notification event
-        Stopped?.Invoke (this, EventArgs.Empty);
-    }
-
-    /// <inheritdoc/>
-    public virtual bool RaiseActivatingEvent (IRunnable? deactivated)
-    {
-        // CWP Phase 1: Pre-notification via virtual method (can cancel)
-        if (OnActivating (deactivated))
-        {
-            return true; // Activation canceled
-        }
-
-        // CWP Phase 2: Event notification (can cancel)
-        var args = new RunnableActivatingEventArgs (this, deactivated);
-        Activating?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return true; // Activation canceled
-        }
-
-        // CWP Phase 3: Work is done by Application (setting Current)
-        // CWP Phase 4 & 5: Call post-notification methods
-        OnActivated (deactivated);
-
-        return false; // Activation succeeded
-    }
-
-    /// <inheritdoc/>
-    public virtual void RaiseActivatedEvent (IRunnable? deactivated)
-    {
-        Activated?.Invoke (this, new RunnableEventArgs (this));
-    }
-
-    /// <inheritdoc/>
-    public virtual bool RaiseDeactivatingEvent (IRunnable? activated)
-    {
-        // CWP Phase 1: Pre-notification via virtual method (can cancel)
-        if (OnDeactivating (activated))
-        {
-            return true; // Deactivation canceled
-        }
-
-        // CWP Phase 2: Event notification (can cancel)
-        var args = new RunnableDeactivatingEventArgs (this, activated);
-        Deactivating?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return true; // Deactivation canceled
-        }
-
-        // CWP Phase 3: Work is done by Application (changing Current)
-        // CWP Phase 4 & 5: Call post-notification methods
-        OnDeactivated (activated);
-
-        return false; // Deactivation succeeded
-    }
-
-    /// <inheritdoc/>
-    public virtual void RaiseDeactivatedEvent (IRunnable? activated)
-    {
-        Deactivated?.Invoke (this, new RunnableEventArgs (this));
-    }
-
-    /// <summary>
-    /// Called before <see cref="Stopping"/> event. Override to cancel stopping.
-    /// </summary>
-    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
-    /// <remarks>
-    /// <para>
-    /// This is the first phase of the Cancellable Work Pattern for stopping.
-    /// Default implementation calls the legacy <see cref="OnClosing"/> method for backward compatibility.
-    /// </para>
-    /// </remarks>
-    protected virtual bool OnStopping ()
-    {
-        // For backward compatibility, delegate to legacy OnClosing method
-        var ev = new ToplevelClosingEventArgs (this);
-        return OnClosing (ev);
-    }
-
-    /// <summary>
-    /// Called after session has stopped. Override for post-stop cleanup.
-    /// </summary>
-    /// <remarks>
-    /// Default implementation does nothing. For backward compatibility, the legacy <see cref="Closed"/>
-    /// event is raised by Application.End().
-    /// </remarks>
-    protected virtual void OnStopped ()
-    {
-        // Default: do nothing
-        // Note: Legacy Closed event is raised by Application.End()
-    }
-
-    /// <summary>
-    /// Called before <see cref="Activating"/> event. Override to cancel activation.
-    /// </summary>
-    /// <param name="deactivated">The previously active runnable being deactivated, or null if none.</param>
-    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
-    /// <remarks>
-    /// Default implementation returns false (allow activation). For backward compatibility,
-    /// the legacy <see cref="OnActivate"/> method is called after activation succeeds.
-    /// </remarks>
-    protected virtual bool OnActivating (IRunnable? deactivated)
-    {
-        return false; // Default: allow activation
-    }
-
-    /// <summary>
-    /// Called after activation succeeds. Override for post-activation logic.
-    /// </summary>
-    /// <param name="deactivated">The previously active runnable that was deactivated, or null if none.</param>
-    /// <remarks>
-    /// Default implementation raises the <see cref="Activated"/> event and calls the legacy
-    /// <see cref="OnActivate"/> method for backward compatibility.
-    /// </remarks>
-    protected virtual void OnActivated (IRunnable? deactivated)
-    {
-        RaiseActivatedEvent (deactivated);
-
-        // For backward compatibility, call legacy OnActivate if deactivated is a Toplevel
-        if (deactivated is Toplevel tl)
-        {
-            OnActivate (tl);
-        }
-        else
-        {
-            // If not a Toplevel, still raise the legacy Activate event with null
-            Activate?.Invoke (this, new ToplevelEventArgs (null));
-        }
-    }
-
-    /// <summary>
-    /// Called before <see cref="Deactivating"/> event. Override to cancel deactivation.
-    /// </summary>
-    /// <param name="activated">The newly activated runnable, or null if none.</param>
-    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
-    /// <remarks>
-    /// Default implementation returns false (allow deactivation).
-    /// </remarks>
-    protected virtual bool OnDeactivating (IRunnable? activated)
-    {
-        return false; // Default: allow deactivation
-    }
-
-    /// <summary>
-    /// Called after deactivation succeeds. Override for post-deactivation logic.
-    /// </summary>
-    /// <param name="activated">The newly activated runnable, or null if none.</param>
-    /// <remarks>
-    /// Default implementation raises the <see cref="Deactivated"/> event and calls the legacy
-    /// <see cref="OnDeactivate"/> method for backward compatibility.
-    /// </remarks>
-    protected virtual void OnDeactivated (IRunnable? activated)
-    {
-        RaiseDeactivatedEvent (activated);
-
-        // For backward compatibility, call legacy OnDeactivate if activated is a Toplevel
-        if (activated is Toplevel tl)
-        {
-            OnDeactivate (tl);
-        }
-        else
-        {
-            // If not a Toplevel, still raise the legacy Deactivate event with null
-            Deactivate?.Invoke (this, new ToplevelEventArgs (null));
-        }
     }
 
     #endregion
