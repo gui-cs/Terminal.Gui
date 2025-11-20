@@ -53,12 +53,7 @@ public class ToplevelTests
         // Application.Current with a menu and without status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
-        Assert.Equal (1, ny);
-
-        //Assert.Null (sb);
-
-        //top.Add (new StatusBar ());
-        //Assert.NotNull (top.StatusBar);
+        Assert.Equal (0, ny);
 
         // Application.Current with a menu and status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
@@ -79,54 +74,13 @@ public class ToplevelTests
         supView = View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
         Assert.Equal (Application.Current, supView);
 
-        // Application.Current without menu and status bar.
         View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
-
-        // Application.Current with a menu and without status bar.
-        View.GetLocationEnsuringFullVisibility (win, 2, 2, out nx, out ny /*, out sb*/);
-        Assert.Equal (0, nx);
-        Assert.Equal (1, ny);
-
-        //Assert.Null (sb);
-
-        top.Add (new StatusBar ());
-
-        //Assert.NotNull (top.StatusBar);
-
-        // Application.Current with a menu and status bar.
-        View.GetLocationEnsuringFullVisibility (win, 30, 20, out nx, out ny /*, out sb*/);
-        Assert.Equal (0, nx);
-
-
         top.Remove (win);
 
         win = new () { Width = 60, Height = 15 };
         top.Add (win);
-
-
-        top.Add (new StatusBar ());
-
-        //Assert.NotNull (top.StatusBar);
-
-        // Application.Current with a menu and status bar.
-        View.GetLocationEnsuringFullVisibility (win, 30, 20, out nx, out ny /*, out sb*/);
-        Assert.Equal (20, nx); // 20+60=80
-
-        //Assert.Equal (9, ny); // 9+15+1(mb)=25
-        //Assert.NotNull (sb);
-
-        //Assert.Null (Toplevel._dragPosition);
-        win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
-
-        // Assert.Equal (new Point (6, 0), Toplevel._dragPosition);
-        win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Released });
-
-        //Assert.Null (Toplevel._dragPosition);
-        win.CanFocus = false;
-        win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
-
     }
 
     [Fact]

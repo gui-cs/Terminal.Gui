@@ -98,7 +98,7 @@ public class UICatalogTop : Toplevel
 
     #region MenuBar
 
-    private readonly MenuBarv2? _menuBar;
+    private readonly MenuBar? _menuBar;
     private CheckBox? _force16ColorsMenuItemCb;
     private OptionSelector? _themesSelector;
     private OptionSelector? _topSchemesSelector;
@@ -106,14 +106,14 @@ public class UICatalogTop : Toplevel
     private FlagSelector<ViewDiagnosticFlags>? _diagnosticFlagsSelector;
     private CheckBox? _disableMouseCb;
 
-    private MenuBarv2 CreateMenuBar ()
+    private MenuBar CreateMenuBar ()
     {
-        MenuBarv2 menuBar = new (
+        MenuBar menuBar = new (
                                  [
                                      new (
                                           "_File",
                                           [
-                                              new MenuItemv2 ()
+                                              new MenuItem ()
                                               {
                                                   Title ="_Quit",
                                                   HelpText = "Quit UI Catalog",
@@ -128,19 +128,19 @@ public class UICatalogTop : Toplevel
                                      new (
                                           "_Help",
                                           [
-                                              new MenuItemv2 (
+                                              new MenuItem (
                                                               "_Documentation",
                                                               "API docs",
                                                               () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
                                                               Key.F1
                                                              ),
-                                              new MenuItemv2 (
+                                              new MenuItem (
                                                               "_README",
                                                               "Project readme",
                                                               () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
                                                               Key.F2
                                                              ),
-                                              new MenuItemv2 (
+                                              new MenuItem (
                                                               "_About...",
                                                               "About UI Catalog",
                                                               () => MessageBox.Query (
@@ -192,7 +192,7 @@ public class UICatalogTop : Toplevel
                                                             };
 
             menuItems.Add (
-                           new MenuItemv2
+                           new MenuItem
                            {
                                CommandView = _force16ColorsMenuItemCb
                            });
@@ -218,7 +218,7 @@ public class UICatalogTop : Toplevel
 
                                                  };
 
-                var menuItem = new MenuItemv2
+                var menuItem = new MenuItem
                 {
                     CommandView = _themesSelector,
                     HelpText = "Cycle Through Themes",
@@ -263,7 +263,7 @@ public class UICatalogTop : Toplevel
             }
             else
             {
-                menuItems.Add (new MenuItemv2 ()
+                menuItems.Add (new MenuItem ()
                 {
                     Title = "Configuration Manager is not Enabled",
                     Enabled = false
@@ -293,7 +293,7 @@ public class UICatalogTop : Toplevel
                                                      };
 
             menuItems.Add (
-                           new MenuItemv2
+                           new MenuItem
                            {
                                CommandView = _diagnosticFlagsSelector,
                                HelpText = "View Diagnostics"
@@ -313,7 +313,7 @@ public class UICatalogTop : Toplevel
             _disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
 
             menuItems.Add (
-                           new MenuItemv2
+                           new MenuItem
                            {
                                CommandView = _disableMouseCb,
                                HelpText = "Disable Mouse"
@@ -345,7 +345,7 @@ public class UICatalogTop : Toplevel
             };
 
             menuItems.Add (
-                           new MenuItemv2
+                           new MenuItem
                            {
                                CommandView = _logLevelSelector,
                                HelpText = "Cycle Through Log Levels",
@@ -356,7 +356,7 @@ public class UICatalogTop : Toplevel
             menuItems.Add (new Line ());
 
             menuItems.Add (
-                           new MenuItemv2 (
+                           new MenuItem (
                                            "_Open Log Folder",
                                            string.Empty,
                                            () => OpenUrl (UICatalog.LOGFILE_LOCATION)

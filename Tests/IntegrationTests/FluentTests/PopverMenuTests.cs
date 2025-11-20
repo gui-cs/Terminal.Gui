@@ -86,7 +86,7 @@ public class PopoverMenuTests
                                                     view.SetFocus ();
                                                 })
                                          .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                         .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ())
+                                         .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
                                          .ScreenShot ("PopoverMenu initial state", _out)
                                          .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                          .ScreenShot ("After Show", _out)
@@ -179,15 +179,15 @@ public class PopoverMenuTests
                                             })
                                      .ScreenShot ("PopoverMenu initial state", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ())
+                                     .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
                                      .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                      .ScreenShot ("After Show", _out)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsType<MenuItemv2> (app?.Navigation!.GetFocused ())
+                                     .AssertIsType<MenuItem> (app?.Navigation!.GetFocused ())
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ());
+                                     .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ());
     }
 
     [Theory]
@@ -226,7 +226,7 @@ public class PopoverMenuTests
 
                                                 view.SetFocus ();
                                             })
-                                     .AssertIsNotType<MenuItemv2> (app?.Navigation!.GetFocused ())
+                                     .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
                                      .ScreenShot ("PopoverMenu initial state", _out)
                                      .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                      .ScreenShot ("PopoverMenu after Show", _out)
@@ -361,7 +361,7 @@ public class PopoverMenuTests
     {
         var clicked = false;
 
-        MenuItemv2 [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
+        MenuItem [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
 
         IApplication? app = null;
         using GuiTestContext c = With.A<Window> (40, 10, d, _out)
@@ -390,7 +390,7 @@ public class PopoverMenuTests
     {
         var clicked = false;
 
-        MenuItemv2 [] menuItems =
+        MenuItem [] menuItems =
         [
             new ("One", "", null),
             new ("Two", "", null),

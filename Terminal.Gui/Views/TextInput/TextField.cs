@@ -1233,7 +1233,7 @@ public class TextField : View, IDesignable
         DisposeContextMenu ();
 
         PopoverMenu menu = new (
-                                new List<MenuItemv2>
+                                new List<MenuItem>
                                 {
                                     new (this, Command.SelectAll, Strings.ctxSelectAll),
                                     new (this, Command.DeleteAll, Strings.ctxDeleteAll),

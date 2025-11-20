@@ -15,4 +15,4 @@ A `Popover` is any View that meets these characteristics:
 - Is Transparent (`ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse`
 - Sets `Visible = false` when it receives `Application.QuitKey`
 
-@Terminal.Gui.Views.PopoverMenu provides a sophisticated implementation that can be used as a context menu and is the basis for @Terminal.Gui.MenuBarv2.
+@Terminal.Gui.Views.PopoverMenu provides a sophisticated implementation that can be used as a context menu and is the basis for @Terminal.Gui.MenuBar.
