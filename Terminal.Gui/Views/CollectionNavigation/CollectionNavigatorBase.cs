@@ -28,7 +28,7 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     /// <inheritdoc/>
     public int? GetNextMatchingItem (int? currentIndex, char keyStruck)
     {
-        if (currentIndex < 0)
+        if (currentIndex.HasValue && currentIndex < 0)
         {
             throw new ArgumentOutOfRangeException (nameof (currentIndex), @"Must be non-negative");
         }
