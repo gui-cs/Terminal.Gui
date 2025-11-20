@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
-public class WindowTests (ITestOutputHelper output)
+public class WindowTests ()
 {
     [Fact]
     public void New_Initializes ()

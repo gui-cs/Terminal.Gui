@@ -54,13 +54,13 @@ public class Localization : Scenario
             BorderStyle = LineStyle.None
         };
 
-        _cultureInfoSource = Application.SupportedCultures.Append (CultureInfo.InvariantCulture).ToArray ();
+        _cultureInfoSource = Application.SupportedCultures!.Append (CultureInfo.InvariantCulture).ToArray ();
 
-        _cultureInfoNameSource = Application.SupportedCultures.Select (c => $"{c.NativeName} ({c.Name})")
+        _cultureInfoNameSource = Application.SupportedCultures!.Select (c => $"{c.NativeName} ({c.Name})")
                                             .Append ("Invariant")
                                             .ToArray ();
 
-        MenuItem [] languageMenus = Application.SupportedCultures
+        MenuItem [] languageMenus = Application.SupportedCultures!
                                                .Select (c => new MenuItem
                                                         {
                                                             Title = $"{c.NativeName} ({c.Name})",
@@ -69,7 +69,7 @@ public class Localization : Scenario
                                                        )
                                                .Concat (
                                                         [
-                                                            new()
+                                                            new ()
                                                             {
                                                                 Title = "Invariant",
                                                                 Action = () => SetCulture (CultureInfo.InvariantCulture)

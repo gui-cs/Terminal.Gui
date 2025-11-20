@@ -446,7 +446,7 @@ public class CsvEditor : Scenario
                     return;
                 }
 
-                object [] arrayItems = currentRow.ItemArray;
+                object?[] arrayItems = currentRow.ItemArray;
                 _currentTable.Rows.Remove (currentRow);
 
                 // Removing and Inserting the same DataRow seems to result in it loosing its values so we have to create a new instance
@@ -545,7 +545,7 @@ public class CsvEditor : Scenario
 
             reader.Read ();
 
-            if (reader.ReadHeader ())
+            if (reader.ReadHeader () && reader.HeaderRecord is { })
             {
                 foreach (string h in reader.HeaderRecord)
                 {
@@ -631,7 +631,7 @@ public class CsvEditor : Scenario
 
         foreach (DataRow row in _currentTable.Rows)
         {
-            foreach (object item in row.ItemArray)
+            foreach (object? item in row.ItemArray)
             {
                 writer.WriteField (item);
             }

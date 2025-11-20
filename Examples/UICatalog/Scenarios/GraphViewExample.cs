@@ -91,7 +91,9 @@ public class GraphViewExample : Scenario
                 CanFocus = false
             }
         };
-        statusBar.Add (diagShortcut).Accepting += DiagShortcut_Accept;
+        
+        statusBar.Add (diagShortcut);
+        diagShortcut.Accepting += DiagShortcut_Accept;
 
         // Menu setup
         _showBorderCheckBox = new ()

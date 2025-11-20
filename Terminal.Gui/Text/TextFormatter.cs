@@ -271,7 +271,7 @@ public class TextFormatter
             int size = isVertical ? screen.Height : screen.Width;
             int current = start + colOffset;
             List<Point?> lastZeroWidthPos = null!;
-            string text = default;
+            string text = default!;
             int zeroLengthCount = isVertical ? strings.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
 
             for (int idx = (isVertical ? start - y : start - x) + colOffset;

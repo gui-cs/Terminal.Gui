@@ -170,7 +170,7 @@ public class CollectionNavigatorTester : Scenario
         Line vsep = new ()
         {
             Orientation = Orientation.Vertical,
-            X = Pos.Right (_listView),
+            X = Pos.Right (_listView!),
             Y = 1,
             Height = Dim.Fill ()
         };

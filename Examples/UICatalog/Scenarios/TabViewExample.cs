@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿#nullable enable
+
+using System.Linq;
+using System.Text;
 
 namespace UICatalog.Scenarios;
 

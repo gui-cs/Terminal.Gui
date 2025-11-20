@@ -643,7 +643,7 @@ public class TreeViewFileSystem : Scenario
                 {
                     Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
                     sb = new ();
-                    sb.AppendLine ($"Path:\n {dir?.FullName}\n");
+                    sb.AppendLine ($"Path:\n {dir.FullName}\n");
                     sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
                     sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
                 }
