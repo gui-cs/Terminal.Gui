@@ -15,7 +15,7 @@ internal abstract class ColorBar : View, IColorBar
     /// </summary>
     protected ColorBar ()
     {
-        Height = 1;
+        Height = Dim.Auto(minimumContentDim: 1);
         Width = Dim.Fill ();
         CanFocus = true;
 
