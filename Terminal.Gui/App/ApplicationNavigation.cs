@@ -113,6 +113,6 @@ public class ApplicationNavigation
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }
-        return App?.Current is { } && App.Current.AdvanceFocus (direction, behavior);
+        return App?.TopRunnable is { } && App.TopRunnable.AdvanceFocus (direction, behavior);
     }
 }

@@ -69,7 +69,7 @@ public class WindowsAndFrameViews : Scenario
         // add it to our list
         listWin.Add (win);
 
-        // create 3 more Windows in a loop, adding them Application.Current
+        // create 3 more Windows in a loop, adding them Application.TopRunnable
         // Each with a
         //	button
         //  sub Window with

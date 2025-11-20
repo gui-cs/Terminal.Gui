@@ -12,7 +12,7 @@ public class SetLayoutTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Screen_Size_Change_Causes_Layout ()
     {
-        Application.Current = new ();
+        Application.TopRunnable = new ();
 
         var view = new View
         {
@@ -22,21 +22,21 @@ public class SetLayoutTests (ITestOutputHelper output)
             Height = 1,
             Text = "0123456789"
         };
-        Application.Current.Add (view);
+        Application.TopRunnable.Add (view);
 
-        var rs = Application.Begin (Application.Current);
+        var rs = Application.Begin (Application.TopRunnable);
         Application.Driver!.SetScreenSize (80, 25);
 
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height));
-        Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Current.Frame);
-        Assert.Equal (new (0, 0, 80, 25), Application.Current.Frame);
+        Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.TopRunnable.Frame);
+        Assert.Equal (new (0, 0, 80, 25), Application.TopRunnable.Frame);
 
         Application.Driver!.SetScreenSize (20, 10);
-        Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Current.Frame);
+        Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.TopRunnable.Frame);
 
-        Assert.Equal (new (0, 0, 20, 10), Application.Current.Frame);
+        Assert.Equal (new (0, 0, 20, 10), Application.TopRunnable.Frame);
 
         Application.End (rs);
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
     }
 }

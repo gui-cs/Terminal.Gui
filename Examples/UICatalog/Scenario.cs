@@ -221,7 +221,7 @@ public class Scenario : IDisposable
 
     private void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
     {
-        SubscribeAllSubViews (Application.Current!);
+        SubscribeAllSubViews (Application.TopRunnable!);
 
         _demoKeys = GetDemoKeyStrokes ();
 
@@ -241,7 +241,7 @@ public class Scenario : IDisposable
 
         return;
 
-        // Get a list of all subviews under Application.Current (and their subviews, etc.)
+        // Get a list of all subviews under Application.TopRunnable (and their subviews, etc.)
         // and subscribe to their DrawComplete event
         void SubscribeAllSubViews (View view)
         {

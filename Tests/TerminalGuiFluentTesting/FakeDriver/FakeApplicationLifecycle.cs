@@ -13,7 +13,7 @@ internal class FakeApplicationLifecycle (CancellationTokenSource hardStop) : IDi
     {
         hardStop.Cancel ();
 
-        Application.Current?.Dispose ();
+        Application.TopRunnable?.Dispose ();
         Application.Shutdown ();
     }
 }

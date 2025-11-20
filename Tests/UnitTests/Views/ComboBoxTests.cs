@@ -1015,7 +1015,7 @@ Three
     {
         var cb = new ComboBox ();
         var top = new Toplevel ();
-        Application.Current = top;
+        Application.TopRunnable = top;
 
         top.Add (cb);
         top.FocusDeepest (NavigationDirection.Forward, null);
@@ -1054,7 +1054,7 @@ Three
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
         Application.ResetState (true);
     }
 }

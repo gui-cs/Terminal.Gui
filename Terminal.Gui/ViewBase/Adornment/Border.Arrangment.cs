@@ -657,7 +657,7 @@ public partial class Border
         if (Parent!.SuperView is null)
         {
             // Redraw the entire app window.
-            App?.Current?.SetNeedsDraw ();
+            App?.TopRunnable?.SetNeedsDraw ();
         }
         else
         {

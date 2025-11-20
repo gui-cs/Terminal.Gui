@@ -192,22 +192,22 @@ public interface IApplication
 
 Terminal.Gui v2 modernized its terminology for clarity:
 
-### Application.Current (formerly "Top")
+### Application.TopRunnable (formerly "Current", and before that "Top")
 
-The `Current` property represents the currently running Toplevel (the active session):
+The `TopRunnable` property represents the Toplevel on the top of the session stack (the active runnable session):
 
 ```csharp
-// Access the current session
-Toplevel? current = app.Current;
+// Access the top runnable session
+Toplevel? topRunnable = app.TopRunnable;
 
 // From within a view
-Toplevel? current = App?.Current;
+Toplevel? topRunnable = App?.TopRunnable;
 ```
 
-**Why "Current" instead of "Top"?**
-- Follows .NET patterns (`Thread.CurrentThread`, `HttpContext.Current`)
-- Self-documenting: immediately clear it's the "current" active view
-- Less confusing than "Top" which could mean "topmost in Z-order"
+**Why "TopRunnable"?**
+- Clearly indicates it's the top of the runnable session stack
+- Aligns with the IRunnable architecture proposal
+- Distinguishes from other concepts like "Current" which could be ambiguous
 
 ### Application.SessionStack (formerly "TopLevels")
 
@@ -256,7 +256,7 @@ public static partial class Application
 // OLD:
 void MyMethod()
 {
-    Application.Current?.SetNeedsDraw();
+    Application.TopRunnable?.SetNeedsDraw();
 }
 
 // NEW:
@@ -467,7 +467,7 @@ public void Refresh()
 ❌ AVOID:
 public void Refresh()
 {
-    Application.Current?.SetNeedsDraw(); // Obsolete!
+    Application.TopRunnable?.SetNeedsDraw(); // Obsolete!
 }
 ```
 
@@ -487,7 +487,7 @@ public class Service
 ❌ AVOID (obsolete pattern):
 public void Refresh()
 {
-    Application.Current?.SetNeedsDraw(); // Obsolete static access
+    Application.TopRunnable?.SetNeedsDraw(); // Obsolete static access
 }
 
 ✅ PREFERRED:
