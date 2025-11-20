@@ -306,8 +306,6 @@ public class ListView : View, IDesignable
         SetNeedsDraw ();
 
         return Source.IsMarked (SelectedItem.Value);
-
-        // BUGBUG: Shouldn't this return Source.IsMarked (SelectedItem)
     }
 
     /// <summary>Gets the widest item in the list.</summary>
@@ -545,7 +543,7 @@ public class ListView : View, IDesignable
 
             if (value.HasValue && (value < 0 || value >= Source.Count))
             {
-                throw new ArgumentException ("value");
+                throw new ArgumentException (@"SelectedItem must be greater than 0 or less than the number of items.");
             }
 
             _selectedItem = value;
