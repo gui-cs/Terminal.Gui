@@ -145,13 +145,9 @@ public partial class ApplicationImpl
     }
 #endif
 
-    private bool _isResetingState;
-
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
     {
-        _isResetingState = true;
-
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
@@ -250,8 +246,6 @@ public partial class ApplicationImpl
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
-
-        _isResetingState = false;
     }
 
     /// <summary>

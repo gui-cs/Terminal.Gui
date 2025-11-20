@@ -1,10 +1,11 @@
-
-
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui.Views;
 
+/// <summary>
+///     A bar representing the Hue component of a <see cref="Color"/> in HSL color space.
+/// </summary>
 internal class HueBar : ColorBar
 {
     /// <inheritdoc/>
