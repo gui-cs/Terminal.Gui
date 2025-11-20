@@ -42,7 +42,7 @@ namespace Terminal.Gui.Views;
 ///     Application.RequestStop();
 /// };
 /// 
-/// Application.Current.Add (wizard);
+/// Application.Running.Add (wizard);
 /// Application.Run ();
 /// Application.Shutdown ();
 /// </code>

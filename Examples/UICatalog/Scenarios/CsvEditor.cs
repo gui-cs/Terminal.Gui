@@ -502,7 +502,7 @@ public class CsvEditor : Scenario
             // Only set the current filename if we successfully loaded the entire file
             _currentFile = filename;
             _selectedCellTextField.SuperView.Enabled = true;
-            Application.Current.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
+            Application.Running.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
         }
         catch (Exception ex)
         {

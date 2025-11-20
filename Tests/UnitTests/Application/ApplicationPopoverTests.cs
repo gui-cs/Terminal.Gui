@@ -197,14 +197,14 @@ public class ApplicationPopoverTests
             // Arrange
 
             Application.Init ("fake");
-            Application.Current = new ();
+            Application.Running = new ();
             PopoverTestClass? popover = new ();
 
             // Act
             Application.Popover?.Register (popover);
 
             // Assert
-            Assert.Equal (Application.Current, popover.Current);
+            Assert.Equal (Application.Running, popover.Toplevel);
         }
         finally
         {
@@ -219,7 +219,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
             Application.Init ("fake");
-            Application.Current = new() { Id = "initialTop" };
+            Application.Running = new() { Id = "initialTop" };
             PopoverTestClass? popover = new () { };
             var keyDownEvents = 0;
 
@@ -234,7 +234,7 @@ public class ApplicationPopoverTests
             // Act
             Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
 
-            Application.Current = new() { Id = "secondaryTop" };
+            Application.Running = new() { Id = "secondaryTop" };
             Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
 
             // Test
@@ -267,7 +267,7 @@ public class ApplicationPopoverTests
             // Arrange
             Application.Init ("fake");
 
-            Application.Current = new ()
+            Application.Running = new ()
             {
                 Frame = new (0, 0, 10, 10),
                 Id = "top"
@@ -282,7 +282,7 @@ public class ApplicationPopoverTests
                 Height = 2
             };
 
-            Application.Current.Add (view);
+            Application.Running.Add (view);
 
             popover = new ()
             {
@@ -316,7 +316,7 @@ public class ApplicationPopoverTests
         finally
         {
             popover?.Dispose ();
-            Application.Current?.Dispose ();
+            Application.Running?.Dispose ();
             Application.ResetState (true);
         }
     }

@@ -69,11 +69,11 @@ public class ToplevelTests
 #endif
 
         Application.Begin (top);
-        Assert.Equal (top, Application.Current);
+        Assert.Equal (top, Application.Running);
 
-        // Application.Current without menu and status bar.
+        // Application.Running without menu and status bar.
         View supView = View.GetLocationEnsuringFullVisibility (top, 2, 2, out int nx, out int ny /*, out StatusBar sb*/);
-        Assert.Equal (Application.Current, supView);
+        Assert.Equal (Application.Running, supView);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
 
@@ -82,7 +82,7 @@ public class ToplevelTests
         top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
-        // Application.Current with a menu and without status bar.
+        // Application.Running with a menu and without status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
         Assert.Equal (1, ny);
@@ -92,11 +92,11 @@ public class ToplevelTests
         //top.Add (new StatusBar ());
         //Assert.NotNull (top.StatusBar);
 
-        // Application.Current with a menu and status bar.
+        // Application.Running with a menu and status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
 
-        // The available height is lower than the Application.Current height minus
+        // The available height is lower than the Application.Running height minus
         // the menu bar and status bar, then the top can go beyond the bottom
         //        Assert.Equal (2, ny);
         //Assert.NotNull (sb);
@@ -106,11 +106,11 @@ public class ToplevelTests
         Assert.Null (top.MenuBar);
         Assert.NotNull (menuBar);
 
-        // Application.Current without a menu and with a status bar.
+        // Application.Running without a menu and with a status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
 
-        // The available height is lower than the Application.Current height minus
+        // The available height is lower than the Application.Running height minus
         // the status bar, then the top can go beyond the bottom
         //        Assert.Equal (2, ny);
         //Assert.NotNull (sb);
@@ -127,11 +127,11 @@ public class ToplevelTests
 
         // The SuperView is always the same regardless of the caller.
         supView = View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
-        Assert.Equal (Application.Current, supView);
+        Assert.Equal (Application.Running, supView);
         supView = View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
-        Assert.Equal (Application.Current, supView);
+        Assert.Equal (Application.Running, supView);
 
-        // Application.Current without menu and status bar.
+        // Application.Running without menu and status bar.
         View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
@@ -141,7 +141,7 @@ public class ToplevelTests
         top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
-        // Application.Current with a menu and without status bar.
+        // Application.Running with a menu and without status bar.
         View.GetLocationEnsuringFullVisibility (win, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
         Assert.Equal (1, ny);
@@ -152,11 +152,11 @@ public class ToplevelTests
 
         //Assert.NotNull (top.StatusBar);
 
-        // Application.Current with a menu and status bar.
+        // Application.Running with a menu and status bar.
         View.GetLocationEnsuringFullVisibility (win, 30, 20, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
 
-        // The available height is lower than the Application.Current height minus
+        // The available height is lower than the Application.Running height minus
         // the menu bar and status bar, then the top can go beyond the bottom
         //Assert.Equal (20, ny);
         //Assert.NotNull (sb);
@@ -177,7 +177,7 @@ public class ToplevelTests
         win = new () { Width = 60, Height = 15 };
         top.Add (win);
 
-        // Application.Current without menu and status bar.
+        // Application.Running without menu and status bar.
         View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
@@ -187,7 +187,7 @@ public class ToplevelTests
         top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
-        // Application.Current with a menu and without status bar.
+        // Application.Running with a menu and without status bar.
         View.GetLocationEnsuringFullVisibility (win, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (2, nx);
         Assert.Equal (2, ny);
@@ -198,7 +198,7 @@ public class ToplevelTests
 
         //Assert.NotNull (top.StatusBar);
 
-        // Application.Current with a menu and status bar.
+        // Application.Running with a menu and status bar.
         View.GetLocationEnsuringFullVisibility (win, 30, 20, out nx, out ny /*, out sb*/);
         Assert.Equal (20, nx); // 20+60=80
 
@@ -307,7 +307,7 @@ public class ToplevelTests
             }
             else if (iterations == 1)
             {
-                Assert.Equal (new (2, 2), Application.Current!.Frame.Location);
+                Assert.Equal (new (2, 2), Application.Running!.Frame.Location);
             }
             else if (iterations == 2)
             {
@@ -316,12 +316,12 @@ public class ToplevelTests
                 // Grab the mouse
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (3, 2), Flags = MouseFlags.Button1Pressed });
 
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (2, 2, 10, 3), Application.Current.Frame);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (2, 2, 10, 3), Application.Running.Frame);
             }
             else if (iterations == 3)
             {
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
 
                 // Drag to left
                 Application.RaiseMouseEvent (
@@ -333,38 +333,38 @@ public class ToplevelTests
                                              });
                 AutoInitShutdownAttribute.RunIteration ();
 
-                Assert.Equal (Application.Current.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 2, 10, 3), Application.Current.Frame);
+                Assert.Equal (Application.Running.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 2, 10, 3), Application.Running.Frame);
             }
             else if (iterations == 4)
             {
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 2), Application.Current.Frame.Location);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 2), Application.Running.Frame.Location);
 
-                Assert.Equal (Application.Current.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.Running.Border, Application.Mouse.MouseGrabView);
             }
             else if (iterations == 5)
             {
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
 
                 // Drag up
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
                 AutoInitShutdownAttribute.RunIteration ();
 
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 1, 10, 3), Application.Current.Frame);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 1, 10, 3), Application.Running.Frame);
             }
             else if (iterations == 6)
             {
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 1), Application.Current.Frame.Location);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 1), Application.Running.Frame.Location);
 
-                Assert.Equal (Application.Current.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 1, 10, 3), Application.Current.Frame);
+                Assert.Equal (Application.Running.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 1, 10, 3), Application.Running.Frame);
             }
             else if (iterations == 7)
             {
-                Assert.Equal (Application.Current!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.Running!.Border, Application.Mouse.MouseGrabView);
 
                 // Ungrab the mouse
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Released });

@@ -28,7 +28,7 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.Current!.Title = GetQuitKeyAndName ();
+        Application.Running!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
@@ -41,7 +41,7 @@ public class Bars : Scenario
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
-        Application.Current.Add (eventLog);
+        Application.Running.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
         {
@@ -51,7 +51,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent(33),
         };
-        Application.Current.Add (menuBarLikeExamples);
+        Application.Running.Add (menuBarLikeExamples);
 
         Label label = new Label ()
         {
@@ -98,7 +98,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent (33),
         };
-        Application.Current.Add (menuLikeExamples);
+        Application.Running.Add (menuLikeExamples);
 
         label = new Label ()
         {
@@ -212,7 +212,7 @@ public class Bars : Scenario
             Width = Dim.Width (menuLikeExamples),
             Height = Dim.Percent (33),
         };
-        Application.Current.Add (statusBarLikeExamples);
+        Application.Running.Add (statusBarLikeExamples);
 
         label = new Label ()
         {
@@ -249,7 +249,7 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (FrameView frameView in Application.Current.SubViews.Where (f => f is FrameView)!)
+        foreach (FrameView frameView in Application.Running.SubViews.Where (f => f is FrameView)!)
         {
             foreach (Bar barView in frameView.SubViews.Where (b => b is Bar)!)
             {
@@ -269,8 +269,8 @@ public class Bars : Scenario
 
     //private void SetupContentMenu ()
     //{
-    //    Application.Current.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
-    //    Application.Current.MouseClick += ShowContextMenu;
+    //    Application.Running.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
+    //    Application.Running.MouseClick += ShowContextMenu;
     //}
 
     //private void ShowContextMenu (object s, MouseEventEventArgs e)

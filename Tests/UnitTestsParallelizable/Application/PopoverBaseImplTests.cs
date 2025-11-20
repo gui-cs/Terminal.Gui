@@ -27,8 +27,8 @@ public class PopoverBaseImplTests
     {
         var popover = new TestPopover ();
         var top = new Toplevel ();
-        popover.Current = top;
-        Assert.Same (top, popover.Current);
+        popover.Toplevel = top;
+        Assert.Same (top, popover.Toplevel);
     }
 
     [Fact]

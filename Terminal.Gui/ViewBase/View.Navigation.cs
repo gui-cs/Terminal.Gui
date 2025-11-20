@@ -395,7 +395,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public event EventHandler<HasFocusEventArgs>? FocusedChanged;
 
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
-    public bool IsCurrentTop => App?.Current == this;
+    public bool IsCurrentTop => App?.Running == this;
 
     /// <summary>
     ///     Returns the most focused SubView down the subview-hierarchy.
@@ -853,18 +853,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 }
             }
 
-            // Application.Current?
-            if (newFocusedView is null && App?.Current is { CanFocus: true, HasFocus: false })
+            // Application.Running?
+            if (newFocusedView is null && App?.Running is { CanFocus: true, HasFocus: false })
             {
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
                 _canFocus = false;
-                bool restoredFocus = App?.Current.RestoreFocus () ?? false;
+                bool restoredFocus = App?.Running.RestoreFocus () ?? false;
                 _canFocus = prevCanFocus;
 
-                if (App?.Current is { CanFocus: true, HasFocus: true })
+                if (App?.Running is { CanFocus: true, HasFocus: true })
                 {
-                    newFocusedView = App?.Current;
+                    newFocusedView = App?.Running;
                 }
                 else if (restoredFocus)
                 {

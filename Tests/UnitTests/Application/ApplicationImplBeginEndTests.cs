@@ -45,12 +45,12 @@ public class ApplicationImplBeginEndTests
         try
         {
             toplevel = new ();
-            Assert.Null (app.Current);
+            Assert.Null (app.Running);
 
             app.Begin (toplevel);
 
-            Assert.NotNull (app.Current);
-            Assert.Same (toplevel, app.Current);
+            Assert.NotNull (app.Running);
+            Assert.Same (toplevel, app.Running);
             Assert.Single (app.SessionStack);
         }
         finally
@@ -74,11 +74,11 @@ public class ApplicationImplBeginEndTests
 
             app.Begin (toplevel1);
             Assert.Single (app.SessionStack);
-            Assert.Same (toplevel1, app.Current);
+            Assert.Same (toplevel1, app.Running);
 
             app.Begin (toplevel2);
             Assert.Equal (2, app.SessionStack.Count);
-            Assert.Same (toplevel2, app.Current);
+            Assert.Same (toplevel2, app.Running);
         }
         finally
         {
@@ -163,7 +163,7 @@ public class ApplicationImplBeginEndTests
             app.End (token2);
 
             Assert.Single (app.SessionStack);
-            Assert.Same (toplevel1, app.Current);
+            Assert.Same (toplevel1, app.Running);
 
             app.End (token1);
 
@@ -228,13 +228,13 @@ public class ApplicationImplBeginEndTests
             SessionToken token2 = app.Begin (toplevel2);
             SessionToken token3 = app.Begin (toplevel3);
 
-            Assert.Same (toplevel3, app.Current);
+            Assert.Same (toplevel3, app.Running);
 
             app.End (token3);
-            Assert.Same (toplevel2, app.Current);
+            Assert.Same (toplevel2, app.Running);
 
             app.End (token2);
-            Assert.Same (toplevel1, app.Current);
+            Assert.Same (toplevel1, app.Running);
 
             app.End (token1);
         }
@@ -265,7 +265,7 @@ public class ApplicationImplBeginEndTests
             }
 
             Assert.Equal (5, app.SessionStack.Count);
-            Assert.Same (toplevels [4], app.Current);
+            Assert.Same (toplevels [4], app.Running);
 
             // End them in reverse order (LIFO)
             for (var i = 4; i >= 0; i--)
@@ -275,7 +275,7 @@ public class ApplicationImplBeginEndTests
                 if (i > 0)
                 {
                     Assert.Equal (i, app.SessionStack.Count);
-                    Assert.Same (toplevels [i - 1], app.Current);
+                    Assert.Same (toplevels [i - 1], app.Running);
                 }
                 else
                 {
@@ -358,7 +358,7 @@ public class ApplicationImplBeginEndTests
             app.Begin (toplevel2);
 
             Assert.Equal (2, app.SessionStack.Count);
-            Assert.NotNull (app.Current);
+            Assert.NotNull (app.Running);
         }
         finally
         {
@@ -371,7 +371,7 @@ public class ApplicationImplBeginEndTests
 
             // Verify cleanup happened
             Assert.Empty (app.SessionStack);
-            Assert.Null (app.Current);
+            Assert.Null (app.Running);
             Assert.Null (app.CachedSessionTokenToplevel);
         }
     }
@@ -432,7 +432,7 @@ public class ApplicationImplBeginEndTests
 
             Assert.True (toplevel1Deactivated);
             Assert.True (toplevel2Activated);
-            Assert.Same (toplevel2, app.Current);
+            Assert.Same (toplevel2, app.Running);
         }
         finally
         {

@@ -13,7 +13,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="IApplication.Init"/>.
-///         The application Toplevel can be accessed via <see cref="IApplication.Current"/>. Additional Toplevels can be created
+///         The application Toplevel can be accessed via <see cref="IApplication.Running"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
@@ -152,7 +152,7 @@ public partial class Toplevel : View
     /// </summary>
     public virtual void RequestStop ()
     {
-        App?.RequestStop (App?.Current);
+        App?.RequestStop (App?.Running);
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ public partial class Toplevel : View
         }
 
         // BUGBUG: The && true is a temp hack
-        if ((superView != top || top?.SuperView is { } || (top != App?.Current && top!.Modal) || (top == App?.Current && top?.SuperView is null))
+        if ((superView != top || top?.SuperView is { } || (top != App?.Running && top!.Modal) || (top == App?.Running && top?.SuperView is null))
             && (top!.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
 
         {

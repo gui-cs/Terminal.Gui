@@ -191,6 +191,6 @@ public class ApplicationPopoverTests
         }
 
         /// <inheritdoc />
-        public Toplevel? Current { get; set; }
+        public Toplevel? Toplevel { get; set; }
     }
 }

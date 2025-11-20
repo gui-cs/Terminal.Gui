@@ -23,7 +23,7 @@ public class TransparentMouseTests
         {
             Id = "top",
         };
-        Application.Current = top;
+        Application.Running = top;
 
         var underlying = new MouseTrackingView { Id = "underlying", X = 0, Y = 0, Width = 10, Height = 10 };
         var overlay = new MouseTrackingView { Id = "overlay", X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
@@ -56,7 +56,7 @@ public class TransparentMouseTests
     {
         // Arrange
         var top = new Toplevel ();
-        Application.Current = top;
+        Application.Running = top;
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10 };
         var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.None };
@@ -90,7 +90,7 @@ public class TransparentMouseTests
     {
         // Arrange
         var top = new Toplevel ();
-        Application.Current = top;
+        Application.Running = top;
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
         var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };

@@ -29,8 +29,8 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                                 w2.Add (v3, v4);
                                                 var w3 = new Window { Id = "w3" };
                                                 w3.Add (v5, v6);
-                                                Toplevel top = app?.Current!;
-                                                app?.Current!.Add (w1, w2, w3);
+                                                Toplevel top = app?.Running!;
+                                                app?.Running!.Add (w1, w2, w3);
                                             })
                                      .AssertTrue (v5.HasFocus)
                                      .EnqueueKeyEvent (Key.F6)

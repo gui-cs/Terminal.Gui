@@ -395,7 +395,7 @@ Y
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
-        Assert.Equal (new (0, 0, 4, 10), Application.Current.Frame);
+        Assert.Equal (new (0, 0, 4, 10), Application.Running.Frame);
 
         var expected = @"
 ┌──┐

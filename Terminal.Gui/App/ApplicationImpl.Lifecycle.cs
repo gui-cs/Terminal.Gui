@@ -182,21 +182,21 @@ public partial class ApplicationImpl
 
 #if DEBUG_IDISPOSABLE
 
-        // Don't dispose the Current. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Current is { })
+        // Don't dispose the Running. It's up to caller dispose it
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Running is { })
         {
-            Debug.Assert (Current.WasDisposed, $"Title = {Current.Title}, Id = {Current.Id}");
+            Debug.Assert (Running.WasDisposed, $"Title = {Running.Title}, Id = {Running.Id}");
 
             // If End wasn't called _CachedSessionTokenToplevel may be null
             if (CachedSessionTokenToplevel is { })
             {
                 Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
-                Debug.Assert (CachedSessionTokenToplevel == Current);
+                Debug.Assert (CachedSessionTokenToplevel == Running);
             }
         }
 #endif
 
-        Current = null;
+        Running = null;
         CachedSessionTokenToplevel = null;
 
         // === 4. Clean up driver ===

@@ -82,7 +82,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
 
-        app.Current = new ()
+        app.Running = new ()
         {
             Id = "top",
             CanFocus = true,
@@ -101,10 +101,10 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        app.Current?.Add (subView1, subView2);
-        Assert.False (app.Current?.HasFocus);
+        app.Running?.Add (subView1, subView2);
+        Assert.False (app.Running?.HasFocus);
 
-        app.Current?.SetFocus ();
+        app.Running?.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, app.Navigation?.GetFocused ());
 
@@ -117,7 +117,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
 
-        app.Current = new ()
+        app.Running = new ()
         {
             Id = "top",
             CanFocus = true,
@@ -130,20 +130,20 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        app!.Current.Add (subView1);
-        Assert.False (app.Current.HasFocus);
+        app!.Running.Add (subView1);
+        Assert.False (app.Running.HasFocus);
 
-        app.Current.SetFocus ();
+        app.Running.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, app.Navigation!.GetFocused ());
 
         subView1.HasFocus = false;
         Assert.False (subView1.HasFocus);
-        Assert.True (app.Current.HasFocus);
-        Assert.Equal (app.Current, app.Navigation.GetFocused ());
+        Assert.True (app.Running.HasFocus);
+        Assert.Equal (app.Running, app.Navigation.GetFocused ());
 
-        app.Current.HasFocus = false;
-        Assert.False (app.Current.HasFocus);
+        app.Running.HasFocus = false;
+        Assert.False (app.Running.HasFocus);
         Assert.Null (app.Navigation.GetFocused ());
 
     }

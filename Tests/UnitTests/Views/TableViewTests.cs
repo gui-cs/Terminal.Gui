@@ -3257,19 +3257,19 @@ A B C
 
         // Pressing left should move us to the first column without changing focus
         Application.RaiseKeyDownEvent (Key.CursorLeft);
-        Assert.Same (tableView, Application.Current!.MostFocused);
+        Assert.Same (tableView, Application.Running!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the leftmost cell a further left press should move focus
         Application.RaiseKeyDownEvent (Key.CursorLeft);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Running.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.Same (tf1, Application.Running.MostFocused);
         Assert.True (tf1.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Running.Dispose ();
     }
 
     [Fact]
@@ -3282,19 +3282,19 @@ A B C
 
         // First press should move us up
         Application.RaiseKeyDownEvent (Key.CursorUp);
-        Assert.Same (tableView, Application.Current!.MostFocused);
+        Assert.Same (tableView, Application.Running!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the top row a further press should move focus
         Application.RaiseKeyDownEvent (Key.CursorUp);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Running.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.Same (tf1, Application.Running.MostFocused);
         Assert.True (tf1.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Running.Dispose ();
     }
 
     [Fact]
@@ -3307,19 +3307,19 @@ A B C
 
         // First press should move us to the rightmost column without changing focus
         Application.RaiseKeyDownEvent (Key.CursorRight);
-        Assert.Same (tableView, Application.Current!.MostFocused);
+        Assert.Same (tableView, Application.Running!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the rightmost cell, a further right press should move focus
         Application.RaiseKeyDownEvent (Key.CursorRight);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Running.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.Same (tf2, Application.Running.MostFocused);
         Assert.True (tf2.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Running.Dispose ();
     }
 
     [Fact]
@@ -3332,19 +3332,19 @@ A B C
 
         // First press should move us to the bottommost row without changing focus
         Application.RaiseKeyDownEvent (Key.CursorDown);
-        Assert.Same (tableView, Application.Current!.MostFocused);
+        Assert.Same (tableView, Application.Running!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the bottommost cell, a further down press should move focus
         Application.RaiseKeyDownEvent (Key.CursorDown);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Running.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.Same (tf2, Application.Running.MostFocused);
         Assert.True (tf2.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Running.Dispose ();
     }
 
     [Fact]
@@ -3357,7 +3357,7 @@ A B C
 
         // Pressing shift-left should give us a multi selection
         Application.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
-        Assert.Same (tableView, Application.Current!.MostFocused);
+        Assert.Same (tableView, Application.Running!.MostFocused);
         Assert.True (tableView.HasFocus);
         Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
 
@@ -3368,19 +3368,19 @@ A B C
 
         // Selection 'clears' just to the single cell and we remain focused
         Assert.Single (tableView.GetAllSelectedCells ());
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Running.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // A further left will switch focus
         Application.RaiseKeyDownEvent (Key.CursorLeft);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Running.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.Same (tf1, Application.Running.MostFocused);
         Assert.True (tf1.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Running.Dispose ();
     }
 
     [Theory]
@@ -3407,7 +3407,7 @@ A B C
     }
 
     /// <summary>
-    ///     Creates 3 views on <see cref="Application.Current"/> with the focus in the
+    ///     Creates 3 views on <see cref="Application.Running"/> with the focus in the
     ///     <see cref="TableView"/>.  This is a helper method to setup tests that want to
     ///     explore moving input focus out of a tableview.
     /// </summary>
@@ -3421,16 +3421,16 @@ A B C
         tableView.EndInit ();
 
 
-        Application.Current = new ();
+        Application.Running = new ();
         tf1 = new ();
         tf2 = new ();
-        Application.Current.Add (tf1);
-        Application.Current.Add (tableView);
-        Application.Current.Add (tf2);
+        Application.Running.Add (tf1);
+        Application.Running.Add (tableView);
+        Application.Running.Add (tf2);
 
         tableView.SetFocus ();
 
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Running.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Set big table
