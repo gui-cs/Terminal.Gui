@@ -120,7 +120,30 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     #region IRunnable Implementation - IsModal (from base interface)
 
     /// <inheritdoc/>
-    public bool IsModal => App?.TopRunnable == this as Toplevel || (App?.TopRunnable is IRunnable r && r == this);
+    public bool IsModal
+    {
+        get
+        {
+            if (App is null)
+            {
+                return false;
+            }
+
+            // Check if this is the TopRunnable
+            // In Phase 1, TopRunnable is still Toplevel?, so we need to check both cases
+            if (this is Toplevel tl && App.TopRunnable == tl)
+            {
+                return true;
+            }
+
+            if (App.TopRunnable is IRunnable r && r == this)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
 
     /// <inheritdoc/>
     public bool RaiseIsModalChanging (bool oldIsModal, bool newIsModal)
