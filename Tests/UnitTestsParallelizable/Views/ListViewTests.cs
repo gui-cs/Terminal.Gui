@@ -1362,4 +1362,223 @@ Item 6",
         top.Dispose ();
         app.Shutdown ();
     }
+
+    [Fact]
+    public void Vertical_ScrollBar_Hides_And_Shows_As_Needed ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+
+        var lv = new ListView
+        {
+            Width = 10,
+            Height = 3
+        };
+        lv.VerticalScrollBar.AutoShow = true;
+        lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        Assert.True (lv.VerticalScrollBar.Visible);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+One      ▲
+Two      █
+Three    ▼",
+                                                       _output, app?.Driver);
+
+        lv.Height = 5;
+        app?.LayoutAndDraw ();
+
+        Assert.False (lv.VerticalScrollBar.Visible);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+One  
+Two  
+Three
+Four 
+Five ",
+                                                       _output, app?.Driver);
+        top.Dispose ();
+        app?.Shutdown ();
+    }
+
+    [Fact]
+    public void Mouse_Wheel_Scrolls ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+
+        var lv = new ListView
+        {
+            Width = 10,
+            Height = 3,
+        };
+        lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        // Initially, we are at the top.
+        Assert.Equal (0, lv.TopItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+One  
+Two  
+Three",
+                                                       _output, app?.Driver);
+
+        // Scroll down
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledDown });
+        app.LayoutAndDraw ();
+        Assert.Equal (1, lv.TopItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+Two  
+Three
+Four ",
+                                                       _output, app?.Driver);
+
+        // Scroll up
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledUp });
+        app.LayoutAndDraw ();
+        Assert.Equal (0, lv.TopItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+One  
+Two  
+Three",
+                                                       _output, app?.Driver);
+
+        top.Dispose ();
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void SelectedItem_With_Source_Null_Does_Nothing ()
+    {
+        var lv = new ListView ();
+        Assert.Null (lv.Source);
+
+        // should not throw
+        lv.SelectedItem = 0;
+
+        Assert.Null (lv.SelectedItem);
+    }
+
+    [Fact]
+    public void Horizontal_Scroll ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+
+        var lv = new ListView
+        {
+            Width = 10,
+            Height = 3,
+        };
+        lv.SetSource (["One", "Two", "Three - long", "Four", "Five"]);
+        var top = new Toplevel ();
+        top.Add (lv);
+        app.Begin (top);
+
+        Assert.Equal (0, lv.LeftItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+One       
+Two       
+Three - lo",
+                                                       _output, app?.Driver);
+
+        lv.ScrollHorizontal (1);
+        app.LayoutAndDraw ();
+        Assert.Equal (1, lv.LeftItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ne        
+wo        
+hree - lon",
+                                                       _output, app?.Driver);
+
+        // Scroll right with mouse
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledRight });
+        app.LayoutAndDraw ();
+        Assert.Equal (2, lv.LeftItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+e         
+o         
+ree - long",
+                                                       _output, app?.Driver);
+
+        // Scroll left with mouse
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledLeft });
+        app.LayoutAndDraw ();
+        Assert.Equal (1, lv.LeftItem);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ne        
+wo        
+hree - lon",
+                                                       _output, app?.Driver);
+
+        top.Dispose ();
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public async Task SetSourceAsync_SetsSource ()
+    {
+        var lv = new ListView ();
+        var source = new ObservableCollection<string> { "One", "Two", "Three" };
+
+        await lv.SetSourceAsync (source);
+
+        Assert.NotNull (lv.Source);
+        Assert.Equal (3, lv.Source.Count);
+    }
+
+    [Fact]
+    public void AllowsMultipleSelection_Set_To_False_Unmarks_All_But_Selected ()
+    {
+        var lv = new ListView { AllowsMarking = true, AllowsMultipleSelection = true };
+        var source = new ListWrapper<string> (["One", "Two", "Three"]);
+        lv.Source = source;
+
+        lv.SelectedItem = 0;
+        source.SetMark (0, true);
+        source.SetMark (1, true);
+        source.SetMark (2, true);
+
+        Assert.True (source.IsMarked (0));
+        Assert.True (source.IsMarked (1));
+        Assert.True (source.IsMarked (2));
+
+        lv.AllowsMultipleSelection = false;
+
+        Assert.True (source.IsMarked (0));
+        Assert.False (source.IsMarked (1));
+        Assert.False (source.IsMarked (2));
+    }
+
+    [Fact]
+    public void Source_CollectionChanged_Remove ()
+    {
+        var source = new ObservableCollection<string> { "One", "Two", "Three" };
+        var lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.SelectedItem = 2;
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Equal (3, lv.Source.Count);
+
+        source.RemoveAt (0);
+
+        Assert.Equal (2, lv.Source.Count);
+        Assert.Equal (1, lv.SelectedItem);
+
+        source.RemoveAt (1);
+        Assert.Equal (1, lv.Source.Count);
+        Assert.Equal (0, lv.SelectedItem);
+    }
 }
