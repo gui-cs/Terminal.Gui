@@ -254,6 +254,7 @@ internal class MouseImpl : IMouse
         // Do not clear LastMousePosition; Popover's require it to stay set with last mouse pos.
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
+        MouseGrabView = null;
     }
 
     // Mouse grab functionality merged from MouseGrabHandler
