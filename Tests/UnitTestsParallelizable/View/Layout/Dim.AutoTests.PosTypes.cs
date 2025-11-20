@@ -1,4 +1,6 @@
-﻿namespace UnitTests_Parallelizable.LayoutTests;
+﻿using UnitTests.Parallelizable;
+
+namespace UnitTests_Parallelizable.LayoutTests;
 
 public partial class DimAutoTests
 {

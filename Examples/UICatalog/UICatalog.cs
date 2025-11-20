@@ -55,7 +55,9 @@ namespace UICatalog;
 /// </remarks>
 public class UICatalog
 {
-    private static string? _forceDriver = null;
+    private static string? _forceDriver;
+    private static string? _uiCatalogDriver;
+    private static string? _scenarioDriver;
 
     public static string LogFilePath { get; set; } = string.Empty;
     public static LoggingLevelSwitch LogLevelSwitch { get; } = new ();
@@ -194,6 +196,8 @@ public class UICatalog
 
         UICatalogMain (Options);
 
+        Debug.Assert (Application.ForceDriver == string.Empty);
+
         return 0;
     }
 
@@ -255,7 +259,9 @@ public class UICatalog
 
         Application.Init (driverName: _forceDriver);
 
-        var top = Application.Run<UICatalogTop> ();
+        _uiCatalogDriver = Application.Driver!.GetName ();
+
+        Toplevel top = Application.Run<UICatalogTop> ();
         top.Dispose ();
         Application.Shutdown ();
         VerifyObjectsWereDisposed ();
@@ -421,6 +427,8 @@ public class UICatalog
             Application.InitializedChanged += ApplicationOnInitializedChanged;
 #endif
 
+            Application.ForceDriver = _forceDriver;
+
             scenario.Main ();
             scenario.Dispose ();
 
@@ -439,6 +447,8 @@ public class UICatalog
                 if (e.Value)
                 {
                     sw.Start ();
+                    _scenarioDriver = Application.Driver!.GetName ();
+                    Debug.Assert (_scenarioDriver == _uiCatalogDriver);
                 }
                 else
                 {

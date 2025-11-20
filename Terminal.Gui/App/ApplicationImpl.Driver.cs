@@ -34,7 +34,7 @@ public partial class ApplicationImpl
         bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
 
         // Then check driverName
-        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsWindows = driverName?.Contains ("windows", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsDotNet = driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
