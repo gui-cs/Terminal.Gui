@@ -1468,7 +1468,7 @@ public class TextFormatter
 
         if (preserveTrailingSpaces)
         {
-            while ((end = start) < graphemes.Count)
+            while (start < graphemes.Count)
             {
                 end = GetNextWhiteSpace (start, width, out bool incomplete);
 

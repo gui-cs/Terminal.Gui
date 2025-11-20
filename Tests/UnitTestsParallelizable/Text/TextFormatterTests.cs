@@ -831,6 +831,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     {
         var text = "Les Mise\u0328\u0301rables";
         Assert.Equal (14, TextFormatter.GetLengthThatFits (text, 14));
+        Assert.Equal ("Les Misę́rables", text);
     }
 
     [Fact]
@@ -838,14 +839,18 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     {
         List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
         Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
+        Assert.Equal ("Les Mis", text [0]);
+        Assert.Equal ("ę́", text [1]);
+        Assert.Equal ("rables", text [^1]);
     }
 
-    //[Fact]
-    //public void GetWidestLineLength_With_Combining_Runes ()
-    //{
-    //    var text = "Les Mise\u0328\u0301rables";
-    //    Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
-    //}
+    [Fact]
+    public void GetWidestLineLength_With_Combining_Runes ()
+    {
+        var text = "Les Mise\u0328\u0301rables";
+        Assert.Equal (14, TextFormatter.GetWidestLineLength (text, 1));
+        Assert.Equal ("Les Misę́rables", text);
+    }
 
     [Fact]
     public void Internal_Tests ()
@@ -2448,6 +2453,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (expected, breakLines);
 
         // Double space Complex example - this is how VS 2022 does it
+        // which I think is not correct.
         //text = "A  sentence      has words.  ";
         //breakLines = "";
         //wrappedLines = TextFormatter.WordWrapText (text, width, preserveTrailingSpaces: true);
