@@ -166,7 +166,7 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
 
         int collectionLength = GetCollectionLength ();
 
-        if (currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex.Value)))
+        if (currentIndex.HasValue && currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex.Value)))
         {
             // we are already at a match
             if (minimizeMovement)
