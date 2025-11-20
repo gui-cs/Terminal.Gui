@@ -181,7 +181,7 @@ return app.Current?.AdvanceFocus (direction, behavior);
 
 This method is called from the `Command` handlers bound to the application-scoped keybindings created during `app.Init()`. It is `public` as a convenience.
 
-**Note:** When accessing from within a View, use `App?.Current` instead of `Application.Current` (which is obsolete).
+**Note:** When accessing from within a View, use `App?.Current` instead of `Application.TopRunnable` (which is obsolete).
 
 This method replaces about a dozen functions in v1 (scattered across `Application` and `Toplevel`).
 
@@ -379,7 +379,7 @@ In v1 `View` had `MostFocused` property that traversed up the view-hierarchy ret
 var focused = Application.Navigation.GetFocused();
 
 // This replaces the v1 pattern:
-// var focused = Application.Current.MostFocused;
+// var focused = Application.TopRunnable.MostFocused;
 ```
 
 ## How Does `View.Add/Remove` Work?

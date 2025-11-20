@@ -193,7 +193,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             }
             else if (iterations == 1)
             {
-                mbFrame = Application.Current!.Frame;
+                mbFrame = Application.TopRunnable!.Frame;
                 Application.RequestStop ();
             }
         }
@@ -378,8 +378,8 @@ public class MessageBoxTests (ITestOutputHelper output)
                                      {
                                          AutoInitShutdownAttribute.RunIteration ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.TopRunnable);
+                                         Assert.Equal (new (height, width), Application.TopRunnable.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -415,8 +415,8 @@ public class MessageBoxTests (ITestOutputHelper output)
                                      {
                                          AutoInitShutdownAttribute.RunIteration ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.TopRunnable);
+                                         Assert.Equal (new (height, width), Application.TopRunnable.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -448,8 +448,8 @@ public class MessageBoxTests (ITestOutputHelper output)
                                      {
                                          AutoInitShutdownAttribute.RunIteration ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.TopRunnable);
+                                         Assert.Equal (new (height, width), Application.TopRunnable.Frame.Size);
 
                                          Application.RequestStop ();
                                      }

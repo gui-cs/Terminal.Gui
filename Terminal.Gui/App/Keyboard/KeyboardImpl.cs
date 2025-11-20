@@ -138,7 +138,7 @@ internal class KeyboardImpl : IKeyboard
             return true;
         }
 
-        if (App?.Current is null)
+        if (App?.TopRunnable is null)
         {
             if (App?.SessionStack is { })
             {
@@ -158,7 +158,7 @@ internal class KeyboardImpl : IKeyboard
         }
         else
         {
-            if (App.Current.NewKeyDownEvent (key))
+            if (App.TopRunnable.NewKeyDownEvent (key))
             {
                 return true;
             }
