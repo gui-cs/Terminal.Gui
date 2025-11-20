@@ -189,10 +189,34 @@ public partial class View : IDisposable, ISupportInitializeNotification
     }
 
     /// <summary>
-    ///     Raised once when the <see cref="View"/> is being initialized for the first time. Allows
-    ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
+    ///     Raised during <see cref="EndInit"/> before initialization completes. Can be canceled by setting
+    ///     <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>. Follows the Cancellable Work Pattern (CWP).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is raised after the virtual method <see cref="OnInitializing"/> is called and before
+    ///         the initialization work is performed. Subscribe to this event to perform pre-initialization work
+    ///         or to cancel initialization.
+    ///     </para>
+    ///     <para>
+    ///         This event follows Terminal.Gui's Cancellable Work Pattern. The pattern is:
+    ///         1. <see cref="OnInitializing"/> (pre-notification, can cancel)
+    ///         2. <see cref="Initializing"/> event (can cancel)
+    ///         3. Initialization work (sets <see cref="IsInitialized"/> = true, layouts, etc.)
+    ///         4. <see cref="OnInitialized"/> (post-notification)
+    ///         5. <see cref="Initialized"/> event
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<CancelEventArgs>? Initializing;
+
+    /// <summary>
+    ///     Raised once when the <see cref="View"/> has been initialized for the first time. Allows
+    ///     configurations and assignments to be performed after the <see cref="View"/> has been laid out.
     ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
     /// </summary>
+    /// <remarks>
+    ///     This is the post-notification event in the Cancellable Work Pattern pair with <see cref="Initializing"/>.
+    /// </remarks>
     public event EventHandler? Initialized;
 
     /// <summary>
@@ -254,7 +278,18 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.</summary>
     /// <remarks>
-    ///     <para>Initializes all SubViews and Invokes the <see cref="Initialized"/> event.</para>
+    ///     <para>
+    ///         Initializes all SubViews and invokes the <see cref="Initialized"/> event. Follows the Cancellable
+    ///         Work Pattern (CWP).
+    ///     </para>
+    ///     <para>
+    ///         The initialization flow is:
+    ///         1. <see cref="OnInitializing"/> (pre-notification, can cancel)
+    ///         2. <see cref="Initializing"/> event (can cancel)
+    ///         3. Initialization work (sets <see cref="IsInitialized"/> = true, layouts, etc.)
+    ///         4. <see cref="OnInitialized"/> (post-notification)
+    ///         5. <see cref="Initialized"/> event
+    ///     </para>
     /// </remarks>
     public virtual void EndInit ()
     {
@@ -263,6 +298,22 @@ public partial class View : IDisposable, ISupportInitializeNotification
             throw new InvalidOperationException ("The view is already initialized.");
         }
 
+        // CWP Phase 1: Pre-notification via virtual method (can cancel)
+        if (OnInitializing ())
+        {
+            return; // Initialization canceled
+        }
+
+        // CWP Phase 2: Event notification (can cancel)
+        var args = new CancelEventArgs ();
+        Initializing?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return; // Initialization canceled
+        }
+
+        // CWP Phase 3: Perform initialization work
         IsInitialized = true;
 
         EndInitAdornments ();
@@ -290,7 +341,45 @@ public partial class View : IDisposable, ISupportInitializeNotification
         // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
         SetNeedsLayout ();
 
+        // CWP Phase 4: Post-notification via virtual method
+        OnInitialized ();
+
+        // CWP Phase 5: Post-notification event
         Initialized?.Invoke (this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    ///     Called before the <see cref="Initializing"/> event and before initialization work is performed.
+    ///     Override to provide custom pre-initialization logic or to cancel initialization.
+    /// </summary>
+    /// <returns><see langword="true"/> to cancel initialization; <see langword="false"/> to proceed.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This is the first phase of the Cancellable Work Pattern (CWP) for view initialization.
+    ///         Default implementation returns <see langword="false"/> (allow initialization to proceed).
+    ///     </para>
+    ///     <para>
+    ///         If this method returns <see langword="true"/>, initialization is canceled, and neither the
+    ///         <see cref="Initializing"/> event nor <see cref="Initialized"/> event will be raised.
+    ///     </para>
+    /// </remarks>
+    protected virtual bool OnInitializing ()
+    {
+        return false; // Default: allow initialization
+    }
+
+    /// <summary>
+    ///     Called after initialization work completes and before the <see cref="Initialized"/> event is raised.
+    ///     Override to provide custom post-initialization logic.
+    /// </summary>
+    /// <remarks>
+    ///     This is the fourth phase of the Cancellable Work Pattern (CWP) for view initialization.
+    ///     At this point, <see cref="IsInitialized"/> is <see langword="true"/>, layout has been performed,
+    ///     and all subviews have been initialized.
+    /// </remarks>
+    protected virtual void OnInitialized ()
+    {
+        // Default: do nothing
     }
 
     #endregion Constructors and Initialization
