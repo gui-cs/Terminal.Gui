@@ -1,9 +1,7 @@
-﻿#if MENU_V1
-using System;
-using System.Collections.Generic;
+﻿#nullable enable
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading;
 
 namespace UICatalog.Scenarios;
 
@@ -19,54 +17,52 @@ public class SingleBackgroundWorker : Scenario
         Application.Shutdown ();
     }
 
-    public class MainApp : Toplevel
+    public class MainApp : Window
     {
         private readonly ListView _listLog;
         private readonly ObservableCollection<string> _log = [];
         private DateTime? _startStaging;
-        private BackgroundWorker _worker;
+        private BackgroundWorker? _worker;
 
         public MainApp ()
         {
-            var menu = new MenuBar
-            {
-                Menus =
-                [
-                    new (
-                         "_Options",
-                         new MenuItem []
-                         {
-                             new (
-                                  "_Run Worker",
-                                  "",
-                                  () => RunWorker (),
-                                  null,
-                                  null,
-                                  KeyCode.CtrlMask | KeyCode.R
-                                 ),
-                             null,
-                             new (
-                                  "_Quit",
-                                  "",
-                                  () => Application.RequestStop (),
-                                  null,
-                                  null,
-                                  Application.QuitKey
-                                 )
-                         }
-                        )
-                ]
-            };
+            BorderStyle = LineStyle.None;
+            // MenuBar
+            MenuBar menu = new ();
 
-            var statusBar = new StatusBar (
-                                           [
-                                               new (Application.QuitKey, "Quit", () => Application.RequestStop ()),
-                                               new (Key.R.WithCtrl, "Run Worker", RunWorker)
-                                           ]);
+            menu.Add (
+                      new MenuBarItem (
+                                       "_Options",
+                                       [
+                                           new MenuItem
+                                           {
+                                               Title = "_Run Worker",
+                                               Key = Key.R.WithCtrl,
+                                               Action = RunWorker
+                                           },
+                                           new MenuItem
+                                           {
+                                               Title = "_Quit",
+                                               Key = Application.QuitKey,
+                                               Action = () => Application.RequestStop ()
+                                           }
+                                       ]
+                                      )
+                     );
 
-            var workerLogTop = new Toplevel
+            // StatusBar
+            StatusBar statusBar = new (
+                                       [
+                                           new (Application.QuitKey, "Quit", () => Application.RequestStop ()),
+                                           new (Key.R.WithCtrl, "Run Worker", RunWorker)
+                                       ]
+                                      );
+
+            Window workerLogTop = new ()
             {
-                Title = "Worker Log Top"
+                Title = "Worker Log Top",
+                Y = Pos.Bottom (menu),
+                Height = Dim.Fill (1)
             };
 
             workerLogTop.Add (
@@ -83,9 +79,6 @@ public class SingleBackgroundWorker : Scenario
             };
             workerLogTop.Add (_listLog);
 
-            workerLogTop.Y = 1;
-            workerLogTop.Height = Dim.Fill (Dim.Func (_ => statusBar.Frame.Height));
-
             Add (menu, workerLogTop, statusBar);
             Title = "MainApp";
         }
@@ -94,11 +87,11 @@ public class SingleBackgroundWorker : Scenario
         {
             _worker = new () { WorkerSupportsCancellation = true };
 
-            var cancel = new Button { Text = "Cancel Worker" };
+            Button cancel = new () { Text = "Cancel Worker" };
 
             cancel.Accepting += (s, e) =>
                                 {
-                                    if (_worker == null)
+                                    if (_worker is null)
                                     {
                                         _log.Add ($"Worker is not running at {DateTime.Now}!");
                                         _listLog.SetNeedsDraw ();
@@ -117,9 +110,10 @@ public class SingleBackgroundWorker : Scenario
             _log.Add ($"Worker is started at {_startStaging}.{_startStaging:fff}");
             _listLog.SetNeedsDraw ();
 
-            var md = new Dialog
+            Dialog md = new ()
             {
-                Title = $"Running Worker started at {_startStaging}.{_startStaging:fff}", Buttons = [cancel]
+                Title = $"Running Worker started at {_startStaging}.{_startStaging:fff}",
+                Buttons = [cancel]
             };
 
             md.Add (
@@ -128,7 +122,7 @@ public class SingleBackgroundWorker : Scenario
 
             _worker.DoWork += (s, e) =>
                               {
-                                  List<string> stageResult = new ();
+                                  List<string> stageResult = [];
 
                                   for (var i = 0; i < 200; i++)
                                   {
@@ -136,7 +130,7 @@ public class SingleBackgroundWorker : Scenario
                                       e.Result = stageResult;
                                       Thread.Sleep (1);
 
-                                      if (_worker.CancellationPending)
+                                      if (_worker?.CancellationPending == true)
                                       {
                                           e.Cancel = true;
 
@@ -153,7 +147,7 @@ public class SingleBackgroundWorker : Scenario
                                                   Application.RequestStop ();
                                               }
 
-                                              if (e.Error != null)
+                                              if (e.Error is { })
                                               {
                                                   // Failed
                                                   _log.Add (
@@ -178,14 +172,22 @@ public class SingleBackgroundWorker : Scenario
                                                   _listLog.SetNeedsDraw ();
                                                   Application.LayoutAndDraw ();
 
-                                                  var builderUI =
-                                                      new StagingUIController (_startStaging, e.Result as ObservableCollection<string>);
-                                                  Toplevel top = Application.TopRunnable;
-                                                  top.Visible = false;
-                                                  Application.TopRunnable.Visible = false;
+                                                  StagingUIController builderUI =
+                                                      new (_startStaging, e.Result as ObservableCollection<string>);
+                                                  Toplevel? top = Application.TopRunnable;
+
+                                                  if (top is { })
+                                                  {
+                                                      top.Visible = false;
+                                                  }
+
                                                   builderUI.Load ();
                                                   builderUI.Dispose ();
-                                                  top.Visible = true;
+
+                                                  if (top is { })
+                                                  {
+                                                      top.Visible = true;
+                                                  }
                                               }
 
                                               _worker = null;
@@ -198,13 +200,16 @@ public class SingleBackgroundWorker : Scenario
 
     public class StagingUIController : Window
     {
-        private Toplevel _top;
+        private Toplevel? _top;
 
-        public StagingUIController (DateTime? start, ObservableCollection<string> list)
+        public StagingUIController (DateTime? start, ObservableCollection<string>? list)
         {
             _top = new ()
             {
-                Title = "_top", Width = Dim.Fill (), Height = Dim.Fill (), Modal = true
+                Title = "_top",
+                Width = Dim.Fill (),
+                Height = Dim.Fill (),
+                Modal = true
             };
 
             _top.KeyDown += (s, e) =>
@@ -231,75 +236,78 @@ public class SingleBackgroundWorker : Scenario
                 return n == 0;
             }
 
-            var menu = new MenuBar
-            {
-                Menus =
-                [
-                    new (
-                         "_Stage",
-                         new MenuItem []
-                         {
-                             new (
-                                  "_Close",
-                                  "",
-                                  () =>
-                                  {
-                                      if (Close ())
-                                      {
-                                          Application.RequestStop ();
-                                      }
-                                  },
-                                  null,
-                                  null,
-                                  KeyCode.CtrlMask | KeyCode.C
-                                 )
-                         }
-                        )
-                ]
-            };
+            // MenuBar
+            MenuBar menu = new ();
+
+            menu.Add (
+                      new MenuBarItem (
+                                       "_Stage",
+                                       [
+                                           new MenuItem
+                                           {
+                                               Title = "_Close",
+                                               Key = Key.C.WithCtrl,
+                                               Action = () =>
+                                                        {
+                                                            if (Close ())
+                                                            {
+                                                                Application.RequestStop ();
+                                                            }
+                                                        }
+                                           }
+                                       ]
+                                      )
+                     );
             _top.Add (menu);
 
-            var statusBar = new StatusBar (
-                                           [
-                                               new (
-                                                    Key.C.WithCtrl,
-                                                    "Close",
-                                                    () =>
+            // StatusBar
+            StatusBar statusBar = new (
+                                       [
+                                           new (
+                                                Key.C.WithCtrl,
+                                                "Close",
+                                                () =>
+                                                {
+                                                    if (Close ())
                                                     {
-                                                        if (Close ())
-                                                        {
-                                                            Application.RequestStop ();
-                                                        }
+                                                        Application.RequestStop ();
                                                     }
-                                                   )
-                                           ]);
+                                                }
+                                               )
+                                       ]
+                                      );
             _top.Add (statusBar);
 
-            Y = 1;
+            Y = Pos.Bottom (menu);
             Height = Dim.Fill (1);
             Title = $"Worker started at {start}.{start:fff}";
             SchemeName = "Base";
 
-            Add (
-                 new ListView
-                 {
-                     X = 0,
-                     Y = 0,
-                     Width = Dim.Fill (),
-                     Height = Dim.Fill (),
-                     Source = new ListWrapper<string> (list)
-                 }
-                );
+            if (list is { })
+            {
+                Add (
+                     new ListView
+                     {
+                         X = 0,
+                         Y = 0,
+                         Width = Dim.Fill (),
+                         Height = Dim.Fill (),
+                         Source = new ListWrapper<string> (list)
+                     }
+                    );
+            }
 
             _top.Add (this);
         }
 
         public void Load ()
         {
-            Application.Run (_top);
-            _top.Dispose ();
-            _top = null;
+            if (_top is { })
+            {
+                Application.Run (_top);
+                _top.Dispose ();
+                _top = null;
+            }
         }
     }
 }
-#endif

@@ -1,7 +1,3 @@
-#if MENU_V1
-using System.Collections.Generic;
-using System.Linq;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Tree View", "Simple tree view examples.")]
@@ -9,76 +5,93 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 public class TreeUseCases : Scenario
 {
-    private View _currentTree;
+    private View? _currentTree;
 
     public override void Main ()
     {
-        // Init
         Application.Init ();
 
-        // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ();
+        Window appWindow = new ();
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) }),
-                new MenuBarItem (
-                                 "_Scenarios",
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "_Simple Nodes",
-                                          "",
-                                          () => LoadSimpleNodes ()
-                                         ),
-                                     new ("_Rooms", "", () => LoadRooms ()),
-                                     new (
-                                          "_Armies With Builder",
-                                          "",
-                                          () => LoadArmies (false)
-                                         ),
-                                     new (
-                                          "_Armies With Delegate",
-                                          "",
-                                          () => LoadArmies (true)
-                                         )
-                                 }
-                                )
-            ]
-        };
+        // MenuBar
+        MenuBar menu = new ();
 
-        appWindow.Add (menu);
+        menu.Add (
+                  new MenuBarItem (
+                                   "_File",
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = "_Quit",
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
 
-        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
+        menu.Add (
+                  new MenuBarItem (
+                                   "_Scenarios",
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = "_Simple Nodes",
+                                           Action = LoadSimpleNodes
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Rooms",
+                                           Action = LoadRooms
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Armies With Builder",
+                                           Action = () => LoadArmies (false)
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Armies With Delegate",
+                                           Action = () => LoadArmies (true)
+                                       }
+                                   ]
+                                  )
+                 );
 
-        appWindow.Add (statusBar);
+        // StatusBar
+        StatusBar statusBar = new (
+                                   [
+                                       new (Application.QuitKey, "Quit", Quit)
+                                   ]
+                                  );
+
+        appWindow.Add (menu, statusBar);
 
         appWindow.Ready += (sender, args) =>
-                                        // Start with the most basic use case
-                                        LoadSimpleNodes ();
+                           {
+                               // Start with the most basic use case
+                               LoadSimpleNodes ();
+                           };
 
-        // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
-
     }
 
     private void LoadArmies (bool useDelegate)
     {
-        var army1 = new Army
+        Army army1 = new ()
         {
             Designation = "3rd Infantry",
-            Units = new List<Unit> { new () { Name = "Orc" }, new () { Name = "Troll" }, new () { Name = "Goblin" } }
+            Units = [new () { Name = "Orc" }, new () { Name = "Troll" }, new () { Name = "Goblin" }]
         };
 
-        if (_currentTree != null)
+        if (_currentTree is { })
         {
-            Application.TopRunnable.Remove (_currentTree);
+            if (Application.TopRunnable is { })
+            {
+                Application.TopRunnable.Remove (_currentTree);
+            }
+
             _currentTree.Dispose ();
         }
 
@@ -86,8 +99,7 @@ public class TreeUseCases : Scenario
 
         if (useDelegate)
         {
-            tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (
-                                                                    o =>
+            tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (o =>
                                                                         o is Army a
                                                                             ? a.Units
                                                                             : Enumerable.Empty<GameObject> ()
@@ -98,7 +110,10 @@ public class TreeUseCases : Scenario
             tree.TreeBuilder = new GameObjectTreeBuilder ();
         }
 
-        Application.TopRunnable.Add (tree);
+        if (Application.TopRunnable is { })
+        {
+            Application.TopRunnable.Add (tree);
+        }
 
         tree.AddObject (army1);
 
@@ -107,24 +122,33 @@ public class TreeUseCases : Scenario
 
     private void LoadRooms ()
     {
-        var myHouse = new House
+        House myHouse = new ()
         {
             Address = "23 Nowhere Street",
-            Rooms = new List<Room>
-            {
-                new () { Name = "Ballroom" }, new () { Name = "Bedroom 1" }, new () { Name = "Bedroom 2" }
-            }
+            Rooms =
+            [
+                new () { Name = "Ballroom" },
+                new () { Name = "Bedroom 1" },
+                new () { Name = "Bedroom 2" }
+            ]
         };
 
-        if (_currentTree != null)
+        if (_currentTree is { })
         {
-            Application.TopRunnable.Remove (_currentTree);
+            if (Application.TopRunnable is { })
+            {
+                Application.TopRunnable.Remove (_currentTree);
+            }
+
             _currentTree.Dispose ();
         }
 
-        var tree = new TreeView { X = 0, Y = 1, Width = Dim.Fill(), Height = Dim.Fill (1) };
+        TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        Application.TopRunnable.Add (tree);
+        if (Application.TopRunnable is { })
+        {
+            Application.TopRunnable.Add (tree);
+        }
 
         tree.AddObject (myHouse);
 
@@ -133,21 +157,28 @@ public class TreeUseCases : Scenario
 
     private void LoadSimpleNodes ()
     {
-        if (_currentTree != null)
+        if (_currentTree is { })
         {
-            Application.TopRunnable.Remove (_currentTree);
+            if (Application.TopRunnable is { })
+            {
+                Application.TopRunnable.Remove (_currentTree);
+            }
+
             _currentTree.Dispose ();
         }
 
-        var tree = new TreeView { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        Application.TopRunnable.Add (tree);
+        if (Application.TopRunnable is { })
+        {
+            Application.TopRunnable.Add (tree);
+        }
 
-        var root1 = new TreeNode ("Root1");
+        TreeNode root1 = new ("Root1");
         root1.Children.Add (new TreeNode ("Child1.1"));
         root1.Children.Add (new TreeNode ("Child1.2"));
 
-        var root2 = new TreeNode ("Root2");
+        TreeNode root2 = new ("Root2");
         root2.Children.Add (new TreeNode ("Child2.1"));
         root2.Children.Add (new TreeNode ("Child2.2"));
 
@@ -161,9 +192,9 @@ public class TreeUseCases : Scenario
 
     private class Army : GameObject
     {
-        public string Designation { get; set; }
-        public List<Unit> Units { get; set; }
-        public override string ToString () { return Designation; }
+        public string? Designation { get; set; }
+        public List<Unit>? Units { get; set; }
+        public override string ToString () => Designation ?? string.Empty;
     }
 
     private abstract class GameObject
@@ -172,11 +203,11 @@ public class TreeUseCases : Scenario
     private class GameObjectTreeBuilder : ITreeBuilder<GameObject>
     {
         public bool SupportsCanExpand => true;
-        public bool CanExpand (GameObject model) { return model is Army; }
+        public bool CanExpand (GameObject model) => model is Army;
 
         public IEnumerable<GameObject> GetChildren (GameObject model)
         {
-            if (model is Army a)
+            if (model is Army a && a.Units is { })
             {
                 return a.Units;
             }
@@ -189,34 +220,33 @@ public class TreeUseCases : Scenario
     private class House : TreeNode
     {
         // Your properties
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         // ITreeNode member:
-        public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode> ().ToList ();
-        public List<Room> Rooms { get; set; }
+        public override IList<ITreeNode> Children => Rooms?.Cast<ITreeNode> ().ToList () ?? [];
+        public List<Room>? Rooms { get; set; }
 
         public override string Text
         {
-            get => Address;
+            get => Address ?? string.Empty;
             set => Address = value;
         }
     }
 
     private class Room : TreeNode
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public override string Text
         {
-            get => Name;
+            get => Name ?? string.Empty;
             set => Name = value;
         }
     }
 
     private class Unit : GameObject
     {
-        public string Name { get; set; }
-        public override string ToString () { return Name; }
+        public string? Name { get; set; }
+        public override string ToString () => Name ?? string.Empty;
     }
 }
-#endif

@@ -1,6 +1,5 @@
-﻿#if MENU_V1
-using System.Collections.ObjectModel;
-using System.IO;
+﻿#nullable enable
+
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -16,82 +15,75 @@ public class UnicodeInMenu : Scenario
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
         var gitString =
-            $"gui.cs 糊 (hú) {
-                Glyphs.IdenticalTo
-            } {
-                Glyphs.DownArrow
-            }18 {
-                Glyphs.UpArrow
-            }10 {
-                Glyphs.VerticalFourDots
-            }1 {
-                Glyphs.HorizontalEllipsis
-            }";
+            $"gui.cs 糊 (hú) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
 
-        // Init
         Application.Init ();
 
-        // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None
         };
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_Файл",
-                     new MenuItem []
-                     {
-                         new (
-                              "_Создать",
-                              "Creates new file",
-                              null
-                             ),
-                         new ("_Открыть", "", null),
-                         new ("Со_хранить", "", null),
-                         new (
-                              "_Выход",
-                              "",
-                              () => Application.RequestStop ()
-                             )
-                     }
-                    ),
-                new (
-                     "_Edit",
-                     new MenuItem []
-                     {
-                         new ("_Copy", "", null), new ("C_ut", "", null),
-                         new ("_糊", "hú (Paste)", null)
-                     }
-                    )
-            ]
-        };
+        // MenuBar
+        MenuBar menu = new ();
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_Файл",
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = "_Создать",
+                                           HelpText = "Creates new file"
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Открыть"
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "Со_хранить"
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Выход",
+                                           Action = () => Application.RequestStop ()
+                                       }
+                                   ]
+                                  )
+                 );
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_Edit",
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = "_Copy"
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "C_ut"
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_糊",
+                                           HelpText = "hú (Paste)"
+                                       }
+                                   ]
+                                  )
+                 );
+
         appWindow.Add (menu);
 
-        var statusBar = new StatusBar (
-                                       [
-                                           new (
-                                                Application.QuitKey,
-                                                "Выход",
-                                                () => Application.RequestStop ()
-                                               ),
-                                           new (Key.F2, "Создать", null),
-                                           new (Key.F3, "Со_хранить", null)
-                                       ]
-                                      );
-        appWindow.Add (statusBar);
-
-        var label = new Label { X = 0, Y = 1, Text = "Label:" };
+        Label label = new () { X = 0, Y = Pos.Bottom (menu), Text = "Label:" };
         appWindow.Add (label);
 
-        var testlabel = new Label
+        Label testlabel = new ()
         {
             X = 20,
             Y = Pos.Y (label),
-
             Width = Dim.Percent (50),
             Text = gitString
         };
@@ -99,7 +91,8 @@ public class UnicodeInMenu : Scenario
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
         appWindow.Add (label);
-        var sb = new StringBuilder ();
+
+        StringBuilder sb = new ();
         sb.Append ('e');
         sb.Append ('\u0301');
         sb.Append ('\u0301');
@@ -108,64 +101,59 @@ public class UnicodeInMenu : Scenario
         {
             X = 20,
             Y = Pos.Y (label),
-
             Width = Dim.Percent (50),
             CanFocus = true,
             HotKeySpecifier = new ('&'),
             Text = $"Should be [e with two accents, but isn't due to #2616]: [{sb}]"
         };
         appWindow.Add (testlabel);
+
         label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
         appWindow.Add (label);
-        var button = new Button { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
+
+        Button button = new () { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
         appWindow.Add (button);
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
         appWindow.Add (label);
 
-        var checkBox = new CheckBox
+        CheckBox checkBox = new ()
         {
             X = 20,
             Y = Pos.Y (label),
-
             Width = Dim.Percent (50),
             Height = 1,
             Text = gitString
         };
+        appWindow.Add (checkBox);
 
-        var checkBoxRight = new CheckBox
+        CheckBox checkBoxRight = new ()
         {
             X = 20,
             Y = Pos.Bottom (checkBox),
-
             Width = Dim.Percent (50),
             Height = 1,
             TextAlignment = Alignment.End,
             Text = $"End - {gitString}"
         };
-        appWindow.Add (checkBox, checkBoxRight);
+        appWindow.Add (checkBoxRight);
 
-        //label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
-        //appWindow.Add (label);
-        //var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
-        //comboBox.SetSource (new ObservableCollection<string> { gitString, "Со_хранить" });
-
-        //appWindow.Add (comboBox);
-        //comboBox.Text = gitString;
-
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 2, Text = "HexView:" };
         appWindow.Add (label);
 
-        var hexView = new HexView (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
+        HexView hexView = new (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
         {
-            X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Height = 5
+            X = 20,
+            Y = Pos.Y (label),
+            Width = Dim.Percent (60),
+            Height = 5
         };
         appWindow.Add (hexView);
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
         appWindow.Add (label);
 
-        var listView = new ListView
+        ListView listView = new ()
         {
             X = 20,
             Y = Pos.Y (label),
@@ -180,28 +168,31 @@ public class UnicodeInMenu : Scenario
         label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "OptionSelector:" };
         appWindow.Add (label);
 
-        var optionSelector = new OptionSelector
+        OptionSelector optionSelector = new ()
         {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
-            Labels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
+            Labels = ["item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ"]
         };
         appWindow.Add (optionSelector);
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (optionSelector) + 1, Text = "TextField:" };
         appWindow.Add (label);
 
-        var textField = new TextField
+        TextField textField = new ()
         {
-            X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Text = gitString + " = Со_хранить"
+            X = 20,
+            Y = Pos.Y (label),
+            Width = Dim.Percent (60),
+            Text = gitString + " = Со_хранить"
         };
         appWindow.Add (textField);
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
         appWindow.Add (label);
 
-        var textView = new TextView
+        TextView textView = new ()
         {
             X = 20,
             Y = Pos.Y (label),
@@ -211,13 +202,22 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (textView);
 
-        // Run - Start the application.
+        // StatusBar
+        StatusBar statusBar = new (
+                                   [
+                                       new (
+                                            Application.QuitKey,
+                                            "Выход",
+                                            () => Application.RequestStop ()
+                                           ),
+                                       new (Key.F2, "Создать", null),
+                                       new (Key.F3, "Со_хранить", null)
+                                   ]
+                                  );
+        appWindow.Add (statusBar);
+
         Application.Run (appWindow);
-
         appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
 }
-#endif

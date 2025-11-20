@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿#nullable enable
+
 using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios;
-#if MENU_V1
 
 [ScenarioMetadata ("TextView Autocomplete Popup", "Shows five TextView Autocomplete Popup effects")]
 [ScenarioCategory ("TextView")]
@@ -11,77 +11,63 @@ namespace UICatalog.Scenarios;
 public class TextViewAutocompletePopup : Scenario
 {
     private int _height = 10;
-    private MenuItem _miMultiline;
-    private MenuItem _miWrap;
-    private Shortcut _siMultiline;
-    private Shortcut _siWrap;
-    private TextView _textViewBottomLeft;
-    private TextView _textViewBottomRight;
-    private TextView _textViewCentered;
-    private TextView _textViewTopLeft;
-    private TextView _textViewTopRight;
+    private CheckBox? _miMultilineCheckBox;
+    private CheckBox? _miWrapCheckBox;
+    private Shortcut? _siMultiline;
+    private Shortcut? _siWrap;
+    private TextView? _textViewBottomLeft;
+    private TextView? _textViewBottomRight;
+    private TextView? _textViewCentered;
+    private TextView? _textViewTopLeft;
+    private TextView? _textViewTopRight;
 
     public override void Main ()
     {
-        // Init
         Application.Init ();
 
-        // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ();
+        Window appWindow = new ()
+        {
+            BorderStyle = LineStyle.None
+        };
 
         var width = 20;
         var text = " jamp jemp jimp jomp jump";
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_File",
-                     new []
-                     {
-                         _miMultiline =
-                             new (
-                                  "_Multiline",
-                                  "",
-                                  () => Multiline ()
-                                 ) { CheckType = MenuItemCheckStyle.Checked },
-                         _miWrap = new (
-                                        "_Word Wrap",
-                                        "",
-                                        () => WordWrap ()
-                                       ) { CheckType = MenuItemCheckStyle.Checked },
-                         new ("_Quit", "", () => Quit ())
-                     }
-                    )
-            ]
-        };
-        appWindow.Add (menu);
+        // MenuBar
+        MenuBar menu = new ();
 
-        _textViewTopLeft = new()
+        _textViewTopLeft = new ()
         {
-            Y = 1,
-            Width = width, Height = _height, Text = text
+            Y = Pos.Bottom (menu),
+            Width = width,
+            Height = _height,
+            Text = text
         };
         _textViewTopLeft.DrawingContent += TextViewTopLeft_DrawContent;
         appWindow.Add (_textViewTopLeft);
 
-        _textViewTopRight = new()
+        _textViewTopRight = new ()
         {
-            X = Pos.AnchorEnd (width), Y = 1,
-            Width = width, Height = _height, Text = text
+            X = Pos.AnchorEnd (width),
+            Y = Pos.Bottom (menu),
+            Width = width,
+            Height = _height,
+            Text = text
         };
         _textViewTopRight.DrawingContent += TextViewTopRight_DrawContent;
         appWindow.Add (_textViewTopRight);
 
-        _textViewBottomLeft = new()
+        _textViewBottomLeft = new ()
         {
-            Y = Pos.AnchorEnd (_height), Width = width, Height = _height, Text = text
+            Y = Pos.AnchorEnd (_height),
+            Width = width,
+            Height = _height,
+            Text = text
         };
         _textViewBottomLeft.DrawingContent += TextViewBottomLeft_DrawContent;
         appWindow.Add (_textViewBottomLeft);
 
-        _textViewBottomRight = new()
+        _textViewBottomRight = new ()
         {
             X = Pos.AnchorEnd (width),
             Y = Pos.AnchorEnd (_height),
@@ -92,7 +78,7 @@ public class TextViewAutocompletePopup : Scenario
         _textViewBottomRight.DrawingContent += TextViewBottomRight_DrawContent;
         appWindow.Add (_textViewBottomRight);
 
-        _textViewCentered = new()
+        _textViewCentered = new ()
         {
             X = Pos.Center (),
             Y = Pos.Center (),
@@ -103,73 +89,170 @@ public class TextViewAutocompletePopup : Scenario
         _textViewCentered.DrawingContent += TextViewCentered_DrawContent;
         appWindow.Add (_textViewCentered);
 
-        _miMultiline.Checked = _textViewTopLeft.Multiline;
-        _miWrap.Checked = _textViewTopLeft.WordWrap;
+        // Setup menu checkboxes
+        _miMultilineCheckBox = new ()
+        {
+            Title = "_Multiline",
+            CheckedState = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked
+        };
+        _miMultilineCheckBox.CheckedStateChanged += (s, e) => Multiline ();
 
-        var statusBar = new StatusBar (
-                                       new []
+        _miWrapCheckBox = new ()
+        {
+            Title = "_Word Wrap",
+            CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked
+        };
+        _miWrapCheckBox.CheckedStateChanged += (s, e) => WordWrap ();
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_File",
+                                   [
+                                       new MenuItem
                                        {
-                                           new (
-                                                Application.QuitKey,
-                                                "Quit",
-                                                () => Quit ()
-                                               ),
-                                           _siMultiline = new (Key.Empty, "", null),
-                                           _siWrap = new (Key.Empty, "", null)
+                                           CommandView = _miMultilineCheckBox
+                                       },
+                                       new MenuItem
+                                       {
+                                           CommandView = _miWrapCheckBox
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Quit",
+                                           Action = Quit
                                        }
-                                      );
-        appWindow.Add (statusBar);
+                                   ]
+                                  )
+                 );
+
+        // StatusBar
+        _siMultiline = new (Key.Empty, "", null);
+        _siWrap = new (Key.Empty, "", null);
+
+        StatusBar statusBar = new (
+                                   [
+                                       new (
+                                            Application.QuitKey,
+                                            "Quit",
+                                            () => Quit ()
+                                           ),
+                                       _siMultiline,
+                                       _siWrap
+                                   ]
+                                  );
+
+        appWindow.Add (menu, statusBar);
 
         appWindow.SubViewLayout += Win_LayoutStarted;
 
-        // Run - Start the application.
         Application.Run (appWindow);
-
         appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
 
     private void Multiline ()
     {
-        _miMultiline.Checked = !_miMultiline.Checked;
+        if (_miMultilineCheckBox is null
+            || _textViewTopLeft is null
+            || _textViewTopRight is null
+            || _textViewBottomLeft is null
+            || _textViewBottomRight is null
+            || _textViewCentered is null)
+        {
+            return;
+        }
+
         SetMultilineStatusText ();
-        _textViewTopLeft.Multiline = (bool)_miMultiline.Checked;
-        _textViewTopRight.Multiline = (bool)_miMultiline.Checked;
-        _textViewBottomLeft.Multiline = (bool)_miMultiline.Checked;
-        _textViewBottomRight.Multiline = (bool)_miMultiline.Checked;
-        _textViewCentered.Multiline = (bool)_miMultiline.Checked;
+        _textViewTopLeft.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
+        _textViewTopRight.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
+        _textViewBottomLeft.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
+        _textViewBottomRight.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
+        _textViewCentered.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
     }
 
     private void Quit () { Application.RequestStop (); }
 
     private void SetAllSuggestions (TextView view)
     {
-        ((SingleWordSuggestionGenerator)view.Autocomplete.SuggestionGenerator).AllSuggestions = Regex
-                                                                                                .Matches (view.Text, "\\w+")
-                                                                                                .Select (s => s.Value)
-                                                                                                .Distinct ()
-                                                                                                .ToList ();
+        if (view.Autocomplete.SuggestionGenerator is SingleWordSuggestionGenerator generator)
+        {
+            generator.AllSuggestions = Regex
+                                       .Matches (view.Text, "\\w+")
+                                       .Select (s => s.Value)
+                                       .Distinct ()
+                                       .ToList ();
+        }
     }
 
-    private void SetMultilineStatusText () { _siMultiline.Title = $"Multiline: {_miMultiline.Checked}"; }
-
-    private void SetWrapStatusText () { _siWrap.Title = $"WordWrap: {_miWrap.Checked}"; }
-    private void TextViewBottomLeft_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomLeft); }
-    private void TextViewBottomRight_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomRight); }
-    private void TextViewCentered_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewCentered); }
-    private void TextViewTopLeft_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewTopLeft); }
-    private void TextViewTopRight_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewTopRight); }
-
-    private void Win_LayoutStarted (object sender, LayoutEventArgs obj)
+    private void SetMultilineStatusText ()
     {
-        _miMultiline.Checked = _textViewTopLeft.Multiline;
-        _miWrap.Checked = _textViewTopLeft.WordWrap;
+        if (_siMultiline is { } && _miMultilineCheckBox is { })
+        {
+            _siMultiline.Title = $"Multiline: {_miMultilineCheckBox.CheckedState == CheckState.Checked}";
+        }
+    }
+
+    private void SetWrapStatusText ()
+    {
+        if (_siWrap is { } && _miWrapCheckBox is { })
+        {
+            _siWrap.Title = $"WordWrap: {_miWrapCheckBox.CheckedState == CheckState.Checked}";
+        }
+    }
+
+    private void TextViewBottomLeft_DrawContent (object? sender, DrawEventArgs e)
+    {
+        if (_textViewBottomLeft is { })
+        {
+            SetAllSuggestions (_textViewBottomLeft);
+        }
+    }
+
+    private void TextViewBottomRight_DrawContent (object? sender, DrawEventArgs e)
+    {
+        if (_textViewBottomRight is { })
+        {
+            SetAllSuggestions (_textViewBottomRight);
+        }
+    }
+
+    private void TextViewCentered_DrawContent (object? sender, DrawEventArgs e)
+    {
+        if (_textViewCentered is { })
+        {
+            SetAllSuggestions (_textViewCentered);
+        }
+    }
+
+    private void TextViewTopLeft_DrawContent (object? sender, DrawEventArgs e)
+    {
+        if (_textViewTopLeft is { })
+        {
+            SetAllSuggestions (_textViewTopLeft);
+        }
+    }
+
+    private void TextViewTopRight_DrawContent (object? sender, DrawEventArgs e)
+    {
+        if (_textViewTopRight is { })
+        {
+            SetAllSuggestions (_textViewTopRight);
+        }
+    }
+
+    private void Win_LayoutStarted (object? sender, LayoutEventArgs obj)
+    {
+        if (_textViewTopLeft is null || _miMultilineCheckBox is null || _miWrapCheckBox is null || _textViewBottomLeft is null || _textViewBottomRight is null)
+        {
+            return;
+        }
+
+        _miMultilineCheckBox.CheckedState = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked;
+        _miWrapCheckBox.CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked;
         SetMultilineStatusText ();
         SetWrapStatusText ();
 
-        if (_miMultiline.Checked == true)
+        if (_miMultilineCheckBox.CheckedState == CheckState.Checked)
         {
             _height = 10;
         }
@@ -183,14 +266,22 @@ public class TextViewAutocompletePopup : Scenario
 
     private void WordWrap ()
     {
-        _miWrap.Checked = !_miWrap.Checked;
-        _textViewTopLeft.WordWrap = (bool)_miWrap.Checked;
-        _textViewTopRight.WordWrap = (bool)_miWrap.Checked;
-        _textViewBottomLeft.WordWrap = (bool)_miWrap.Checked;
-        _textViewBottomRight.WordWrap = (bool)_miWrap.Checked;
-        _textViewCentered.WordWrap = (bool)_miWrap.Checked;
-        _miWrap.Checked = _textViewTopLeft.WordWrap;
+        if (_miWrapCheckBox is null
+            || _textViewTopLeft is null
+            || _textViewTopRight is null
+            || _textViewBottomLeft is null
+            || _textViewBottomRight is null
+            || _textViewCentered is null)
+        {
+            return;
+        }
+
+        _textViewTopLeft.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
+        _textViewTopRight.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
+        _textViewBottomLeft.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
+        _textViewBottomRight.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
+        _textViewCentered.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
+        _miWrapCheckBox.CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked;
         SetWrapStatusText ();
     }
 }
-#endif
