@@ -8,7 +8,7 @@ Terminal.Gui v2 uses an instance-based application architecture that decouples v
 graph TB
     subgraph ViewTree["View Hierarchy (SuperView/SubView)"]
         direction TB
-        Top[app.Current<br/>Window]
+        Top[app.Running<br/>Window]
         Menu[MenuBar]
         Status[StatusBar]
         Content[Content View]
@@ -127,7 +127,7 @@ public class MyView : View
     public override void OnEnter(View view)
     {
         // Use View.App instead of static Application
-        App?.Current?.SetNeedsDraw();
+        App?.Running?.SetNeedsDraw();
         
         // Access SessionStack
         if (App?.SessionStack.Count > 0)
@@ -153,7 +153,7 @@ public class MyView : View
     
     public void DoWork()
     {
-        _app.Current?.SetNeedsDraw();
+        _app.Running?.SetNeedsDraw();
     }
 }
 ```
@@ -192,22 +192,22 @@ public interface IApplication
 
 Terminal.Gui v2 modernized its terminology for clarity:
 
-### Application.Current (formerly "Top")
+### Application.Running (formerly "Current", which was formerly "Top")
 
-The `Current` property represents the currently running Toplevel (the active session):
+The `Running` property represents the currently running Toplevel (the active session):
 
 ```csharp
-// Access the current session
-Toplevel? current = app.Current;
+// Access the running session
+Toplevel? running = app.Running;
 
 // From within a view
-Toplevel? current = App?.Current;
+Toplevel? running = App?.Running;
 ```
 
-**Why "Current" instead of "Top"?**
-- Follows .NET patterns (`Thread.CurrentThread`, `HttpContext.Current`)
-- Self-documenting: immediately clear it's the "current" active view
-- Less confusing than "Top" which could mean "topmost in Z-order"
+**Why "Running" instead of "Current"?**
+- More descriptive: immediately clear it's the "running" toplevel
+- Avoids confusion with `Current` used in other contexts (e.g., `Thread.Current`, `HttpContext.Current`)
+- Consistent with `Toplevel.IsRunning` property
 
 ### Application.SessionStack (formerly "TopLevels")
 
@@ -256,13 +256,13 @@ public static partial class Application
 // OLD:
 void MyMethod()
 {
-    Application.Current?.SetNeedsDraw();
+    Application.Running?.SetNeedsDraw();
 }
 
 // NEW:
 void MyMethod(View view)
 {
-    view.App?.Current?.SetNeedsDraw();
+    view.App?.Running?.SetNeedsDraw();
 }
 ```
 
@@ -302,7 +302,7 @@ public class MyService
     
     public void DoWork()
     {
-        _app.Current?.Title = "Processing...";
+        _app.Running?.Title = "Processing...";
     }
 }
 ```
@@ -323,7 +323,7 @@ var toplevel = new Toplevel();
 SessionToken? token = app.Begin(toplevel);
 
 // Current now points to this toplevel
-Debug.Assert(app.Current == toplevel);
+Debug.Assert(app.Running == toplevel);
 
 // End the session - pops from SessionStack
 if (token != null)
@@ -345,20 +345,20 @@ app.Init();
 // Session 1
 var main = new Toplevel { Title = "Main" };
 var token1 = app.Begin(main);
-// app.Current == main, SessionStack.Count == 1
+// app.Running == main, SessionStack.Count == 1
 
 // Session 2 (nested)
 var dialog = new Dialog { Title = "Dialog" };
 var token2 = app.Begin(dialog);
-// app.Current == dialog, SessionStack.Count == 2
+// app.Running == dialog, SessionStack.Count == 2
 
 // End dialog
 app.End(token2);
-// app.Current == main, SessionStack.Count == 1
+// app.Running == main, SessionStack.Count == 1
 
 // End main
 app.End(token1);
-// app.Current == null, SessionStack.Count == 0
+// app.Running == null, SessionStack.Count == 0
 ```
 
 ## View.Driver Property
@@ -457,7 +457,7 @@ public void MyView_WorksWithRealApplication()
 ✅ GOOD:
 public void Refresh()
 {
-    App?.Current?.SetNeedsDraw();
+    App?.Running?.SetNeedsDraw();
 }
 ```
 
@@ -467,7 +467,7 @@ public void Refresh()
 ❌ AVOID:
 public void Refresh()
 {
-    Application.Current?.SetNeedsDraw(); // Obsolete!
+    Application.Running?.SetNeedsDraw(); // Obsolete!
 }
 ```
 
@@ -487,13 +487,13 @@ public class Service
 ❌ AVOID (obsolete pattern):
 public void Refresh()
 {
-    Application.Current?.SetNeedsDraw(); // Obsolete static access
+    Application.Running?.SetNeedsDraw(); // Obsolete static access
 }
 
 ✅ PREFERRED:
 public void Refresh()
 {
-    App?.Current?.SetNeedsDraw(); // Use View.App property
+    App?.Running?.SetNeedsDraw(); // Use View.App property
 }
 ```
 
