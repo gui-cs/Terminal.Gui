@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Xunit.Sdk;
 
 namespace UnitTests_Parallelizable.DriverTests;
@@ -268,6 +269,10 @@ public class WindowsKeyConverterTests
         ConsoleKey consoleKey,
         KeyCode expectedKeyCode)
     {
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        {
+            return;
+        }
         // Arrange
         WindowsConsole.InputRecord inputRecord = CreateInputRecord (unicodeChar, consoleKey, false, false, false);
 
