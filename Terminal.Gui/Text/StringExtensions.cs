@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Globalization;
 
 namespace Terminal.Gui.Text;
 
@@ -68,19 +67,13 @@ public static class StringExtensions
         foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
         {
             // Get the maximum rune width within this grapheme cluster
-            int clusterWidth = 0;
+            int clusterWidth = grapheme.EnumerateRunes ()
+                                       .Sum (r =>
+                                             {
+                                                 int w = r.GetColumns ();
 
-            foreach (var rune in grapheme.EnumerateRunes ())
-            {
-                int width = rune.GetColumns ();
-
-                if (ignoreLessThanZero && width < 0)
-                {
-                    width = 0;
-                }
-
-                clusterWidth += width;
-            }
+                                                 return ignoreLessThanZero && w < 0 ? 0 : w;
+                                             });
 
             // Clamp to realistic max display width
             if (clusterWidth > 2)
