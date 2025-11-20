@@ -43,7 +43,11 @@ public class UICatalogTop : Toplevel
         Unloaded += UnloadedHandler;
 
         // Restore previous selections
-        _categoryList.SelectedItem = _cachedCategoryIndex ?? 0;
+        if (_categoryList.Source?.Count > 0) {
+            _categoryList.SelectedItem = _cachedCategoryIndex ?? 0;
+        } else {
+            _categoryList.SelectedItem = null;
+        }
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
         SchemeName = CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
