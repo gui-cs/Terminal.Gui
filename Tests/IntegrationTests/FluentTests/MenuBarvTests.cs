@@ -9,11 +9,11 @@ namespace IntegrationTests.FluentTests;
 /// <summary>
 ///     Tests for the MenuBar class
 /// </summary>
-public class MenuBarv2Tests
+public class MenuBarTests
 {
     private readonly TextWriter _out;
 
-    public MenuBarv2Tests (ITestOutputHelper outputHelper)
+    public MenuBarTests (ITestOutputHelper outputHelper)
     {
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
         _out = new TestOutputWriter (outputHelper);
@@ -143,7 +143,7 @@ public class MenuBarv2Tests
                                      .Then ((app) =>
                                             {
                                                 menuBar = new MenuBar ();
-                                                top = app.Current!;
+                                                top = app.TopRunnable!;
 
                                                 top.Add (
                                                          new View ()
@@ -177,7 +177,7 @@ public class MenuBarv2Tests
                                      .Then ((a) =>
                                             {
                                                 app = a;
-                                                menuBar = new MenuBarv ();
+                                                menuBar = new MenuBar ();
                                                 Toplevel top = app.TopRunnable!;
 
                                                 top.Add (
@@ -265,7 +265,7 @@ public class MenuBarv2Tests
         using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((app) =>
                                             {
-                                                var menuBar = new MenuBarv ();
+                                                var menuBar = new MenuBar ();
                                                 app.TopRunnable!.Add (menuBar);
 
                                                 // Call EnableForDesign
@@ -301,7 +301,7 @@ public class MenuBarv2Tests
                                      .Then ((a) =>
                                             {
                                                 app = a;
-                                                menuBar = new MenuBarv ();
+                                                menuBar = new MenuBar ();
                                                 Toplevel top = app.TopRunnable!;
                                                 menuBar.EnableForDesign (ref top);
                                                 app.TopRunnable!.Add (menuBar);
@@ -341,7 +341,7 @@ public class MenuBarv2Tests
                                      .Then ((a) =>
                                             {
                                                 app = a;
-                                                menuBar = new MenuBarv2 ();
+                                                menuBar = new MenuBar ();
                                                 Toplevel top = app.TopRunnable!;
 
                                                 top.Add (
@@ -385,7 +385,7 @@ public class MenuBarv2Tests
                                      .Then ((a) =>
                                             {
                                                 app = a;
-                                                menuBar = new MenuBarv2 ();
+                                                menuBar = new MenuBar ();
                                                 Toplevel? toplevel = app.TopRunnable;
                                                 menuBar.EnableForDesign (ref toplevel!);
                                                 app.TopRunnable!.Add (menuBar);
@@ -416,7 +416,7 @@ public class MenuBarv2Tests
                                      .Then ((a) =>
                                             {
                                                 app = a;
-                                                menuBar = new MenuBarv2 ();
+                                                menuBar = new MenuBar ();
                                                 Toplevel top = app.TopRunnable!;
 
                                                 top.Add (
@@ -435,7 +435,7 @@ public class MenuBarv2Tests
                                      .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .AssertEqual ("_New file", app.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (app?.TopRunnable!.Running)
-                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
+                                     .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (app!.TopRunnable!.Running);
@@ -452,7 +452,7 @@ public class MenuBarv2Tests
                                      .Then ((a) =>
                                             {
                                                 app = a;
-                                                menuBar = new MenuBarv2 ();
+                                                menuBar = new MenuBar ();
                                                 Toplevel top = app.TopRunnable!;
 
                                                 top.Add (
@@ -505,7 +505,7 @@ public class MenuBarv2Tests
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
-                                                var menuBar = new MenuBarv2 ();
+                                                var menuBar = new MenuBar ();
                                                 Toplevel top = a.TopRunnable!;
                                                 menuBar.EnableForDesign (ref top);
                                                 a.TopRunnable!.Add (menuBar);
@@ -539,10 +539,8 @@ public class MenuBarv2Tests
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
-                                                var menuBar = new MenuBarv2 ();
-                                                Toplevel top = a.TopRunnable!;
                                                 var menuBar = new MenuBar ();
-                                                Toplevel top = a.Current!;
+                                                Toplevel top = a.TopRunnable!;
                                                 menuBar.EnableForDesign (ref top);
                                                 a.TopRunnable!.Add (menuBar);
                                             })
