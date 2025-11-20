@@ -1,3 +1,4 @@
+using TerminalGuiFluentTesting;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -6,13 +7,16 @@ namespace UnitTests.ViewsTests;
 public class ButtonTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Constructors_Defaults ()
     {
         // Override CM
         Button.DefaultShadow = ShadowStyle.None;
 
-        var btn = new Button ();
+        var btn = new Button ()
+        {
+            App = ApplicationImpl.Instance
+        };
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
         btn.EndInit ();
@@ -44,7 +48,8 @@ public class ButtonTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
 
-        btn = new () { Text = "_Test", IsDefault = true };
+        btn = new () { App = ApplicationImpl.Instance,
+            Text = "_Test", IsDefault = true };
         btn.Layout ();
         Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
@@ -76,7 +81,8 @@ public class ButtonTests (ITestOutputHelper output)
 
         btn.Dispose ();
 
-        btn = new () { X = 1, Y = 2, Text = "_abc", IsDefault = true };
+        btn = new () { App = ApplicationImpl.Instance,
+            X = 1, Y = 2, Text = "_abc", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);
@@ -91,13 +97,13 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
 
-        Application.Driver?.ClearContents ();
+        ApplicationImpl.Instance.Driver?.ClearContents ();
         btn.Draw ();
 
         expected = @$"
  {Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} abc {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}
 ";
-        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output, ApplicationImpl.Instance.Driver);
 
         Assert.Equal (new (0, 0, 9, 1), btn.Viewport);
         Assert.Equal (new (1, 2, 9, 1), btn.Frame);
@@ -203,7 +209,7 @@ public class ButtonTests (ITestOutputHelper output)
         clicked = false;
 
         // Toplevel does not handle Enter, so it should get passed on to button
-        Assert.False (Application.Top.NewKeyDownEvent (Key.Enter));
+        Assert.False (Application.Current.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
@@ -243,7 +249,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver?.SetScreenSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);

@@ -1,6 +1,11 @@
-﻿namespace UnitTests_Parallelizable.DrawingTests;
+﻿using System.Text;
+using Terminal.Gui.Drivers;
+using UnitTests;
+using Xunit.Abstractions;
 
-public class ThicknessTests
+namespace UnitTests_Parallelizable.DrawingTests;
+
+public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -615,5 +620,268 @@ public class ThicknessTests
         Assert.Equal (expectedTop, result.Top);
         Assert.Equal (expectedRight, result.Right);
         Assert.Equal (expectedBottom, result.Bottom);
+    }
+
+    [Fact]
+    public void DrawTests ()
+    {
+        IDriver driver = CreateFakeDriver ();
+        driver.SetScreenSize (60, 40);
+
+        var t = new Thickness (0, 0, 0, 0);
+        var r = new Rectangle (5, 5, 40, 15);
+
+        driver.FillRect (
+                                      new (0, 0, driver!.Cols, driver!.Rows),
+                                      (Rune)' '
+                                     );
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+       Test (Left=0,Top=0,Right=0,Bottom=0)",
+                                                       output,
+                                                       driver
+                                                      );
+
+        t = new (1, 1, 1, 1);
+        r = new (5, 5, 40, 15);
+
+        driver.FillRect (
+                        new (0, 0, driver!.Cols, driver!.Rows),
+                        (Rune)' '
+                       );
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     T                                      T
+     TTTest (Left=1,Top=1,Right=1,Bottom=1)TT",
+                                                       output,
+                                                       driver
+                                                      );
+
+        t = new (1, 2, 3, 4);
+        r = new (5, 5, 40, 15);
+
+        driver?.FillRect (
+                                      new (0, 0, driver!.Cols, driver!.Rows),
+                                      (Rune)' '
+                                     );
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     T                                    TTT
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+     TTTest (Left=1,Top=2,Right=3,Bottom=4)TT",
+                                                       output,
+                                                       driver
+                                                      );
+
+        t = new (-1, 1, 1, 1);
+        r = new (5, 5, 40, 15);
+
+        driver?.FillRect (
+                                      new (0, 0, driver!.Cols, driver!.Rows),
+                                      (Rune)' '
+                                     );
+        t.Draw (driver, r, ViewDiagnosticFlags.Thickness, "Test");
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+     TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+                                            T
+     TTest (Left=-1,Top=1,Right=1,Bottom=1)TT",
+                                                       output,
+                                                       driver
+                                                      );
+    }
+
+    [Fact]
+    public void DrawTests_Ruler ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        // Add a frame so we can see the ruler
+        var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
+        f.Driver = driver;
+        driver.SetScreenSize (45, 20);
+
+        var top = new Toplevel () { Width = driver.Cols, Height = driver.Rows };
+        top.Driver = driver;
+        top.Add (f);
+
+        top.Layout ();
+
+        var t = new Thickness (0, 0, 0, 0);
+        var r = new Rectangle (2, 2, 40, 15);
+
+        top.Draw ();
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
+
+        DriverAssert.AssertDriverContentsAre (
+                                              @"
+┌───────────────────────────────────────────┐
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘",
+                                              output,
+                                              driver
+                                             );
+
+        t = new (1, 1, 1, 1);
+        r = new (1, 1, 40, 15);
+        top.SetNeedsDraw ();
+        top.Draw ();
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
+
+        DriverAssert.AssertDriverContentsAre (
+                                              @"
+┌───────────────────────────────────────────┐
+│|123456789|123456789|123456789|123456789   │
+│1                                      1   │
+│2                                      2   │
+│3                                      3   │
+│4                                      4   │
+│5                                      5   │
+│6                                      6   │
+│7                                      7   │
+│8                                      8   │
+│9                                      9   │
+│-                                      -   │
+│1                                      1   │
+│2                                      2   │
+│3                                      3   │
+│|123456789|123456789|123456789|123456789   │
+│                                           │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘",
+                                              output,
+                                              driver
+                                             );
+
+        t = new (1, 2, 3, 4);
+        r = new (2, 2, 40, 15);
+        top.SetNeedsDraw ();
+        top.Draw ();
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌───────────────────────────────────────────┐
+│                                           │
+│ |123456789|123456789|123456789|123456789  │
+│ 1                                      1  │
+│ 2                                      2  │
+│ 3                                      3  │
+│ 4                                      4  │
+│ 5                                      5  │
+│ 6                                      6  │
+│ 7                                      7  │
+│ 8                                      8  │
+│ 9                                      9  │
+│ -                                      -  │
+│ 1                                      1  │
+│ 2                                      2  │
+│ 3                                      3  │
+│ |123456789|123456789|123456789|123456789  │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘",
+                                                       output,
+                                                       driver
+                                                      );
+
+        t = new (-1, 1, 1, 1);
+        r = new (5, 5, 40, 15);
+        top.SetNeedsDraw ();
+        top.Draw ();
+        top.SetClipToScreen ();
+        t.Draw (driver, r, ViewDiagnosticFlags.Ruler, "Test");
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+┌───────────────────────────────────────────┐
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│    |123456789|123456789|123456789|123456789
+│                                           1
+│                                           2
+│                                           3
+│                                           4
+│                                           5
+│                                           6
+│                                           7
+│                                           8
+│                                           9
+│                                           -
+│                                           1
+│                                           2
+│                                           3
+└────|123456789|123456789|123456789|123456789",
+                                                       output,
+                                                       driver
+                                                      );
+        top.Dispose ();
     }
 }

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;

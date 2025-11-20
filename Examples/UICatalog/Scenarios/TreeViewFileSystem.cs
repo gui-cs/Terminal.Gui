@@ -414,11 +414,11 @@ public class TreeViewFileSystem : Scenario
 
     private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
     {
-        PopoverMenu? contextMenu = new ([new ("Properties", $"Show {forObject.Name} properties", () => ShowPropertiesOf (forObject))]);
+        PopoverMenu contextMenu = new ([new ("Properties", $"Show {forObject.Name} properties", () => ShowPropertiesOf (forObject))]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        _detailsFrame.App?.Popover?.Register (contextMenu);
 
         Application.Invoke (() => contextMenu?.MakeVisible (screenPoint));
     }

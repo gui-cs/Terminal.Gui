@@ -1,7 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UICatalog;
 using UICatalog.Scenarios;
@@ -27,31 +24,31 @@ public class RegionScenario : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
         };
-        app.Padding!.Thickness = new (1);
+        appWindow.Padding!.Thickness = new (1);
 
         var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
-        tools.CurrentAttribute = app.GetAttributeForRole (VisualRole.HotNormal);
+        tools.CurrentAttribute = appWindow.GetAttributeForRole (VisualRole.HotNormal);
 
         tools.SetStyle += b =>
                           {
-                              _drawStyle = (RegionDrawStyles)b;
-                              app.SetNeedsDraw ();
+                              _drawStyle = b;
+                              appWindow.SetNeedsDraw ();
                           };
 
         tools.RegionOpChanged += (s, e) => { _regionOp = e; };
 
         //tools.AddLayer += () => canvas.AddLayer ();
 
-        app.Add (tools);
+        appWindow.Add (tools);
 
         // Add drag handling to window
-        app.MouseEvent += (s, e) =>
+        appWindow.MouseEvent += (s, e) =>
                           {
                               if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
                               {
@@ -65,7 +62,7 @@ public class RegionScenario : Scenario
                                       // Drag
                                       if (_isDragging && _dragStart.HasValue)
                                       {
-                                          app.SetNeedsDraw ();
+                                          appWindow.SetNeedsDraw ();
                                       }
                                   }
                               }
@@ -80,31 +77,31 @@ public class RegionScenario : Scenario
                                       _dragStart = null;
                                   }
 
-                                  app.SetNeedsDraw ();
+                                  appWindow.SetNeedsDraw ();
                               }
                           };
 
         // Draw the regions
-        app.DrawingContent += (s, e) =>
+        appWindow.DrawingContent += (s, e) =>
                               {
                                   // Draw all regions with single line style
                                   //_region.FillRectangles (_attribute.Value, _fillRune);
                                   switch (_drawStyle)
                                   {
                                       case RegionDrawStyles.FillOnly:
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, _previewFillRune);
+                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, _previewFillRune);
 
                                           break;
 
                                       case RegionDrawStyles.InnerBoundaries:
-                                          _region.DrawBoundaries (app.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                          _region.DrawBoundaries (appWindow.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                           break;
 
                                       case RegionDrawStyles.OuterBoundary:
-                                          _region.DrawOuterBoundary (app.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                          _region.DrawOuterBoundary (appWindow.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                           break;
                                   }
@@ -112,14 +109,14 @@ public class RegionScenario : Scenario
                                   // If currently dragging, draw preview rectangle
                                   if (_isDragging && _dragStart.HasValue)
                                   {
-                                      Point currentMousePos = Application.GetLastMousePosition ()!.Value;
+                                      Point currentMousePos = appWindow.App!.Mouse.LastMousePosition!.Value;
                                       Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
                                       var previewRegion = new Region (previewRect);
 
-                                      previewRegion.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                      previewRegion.FillRectangles (appWindow.App.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                       previewRegion.DrawBoundaries (
-                                                                    app.LineCanvas,
+                                                                    appWindow.LineCanvas,
                                                                     LineStyle.Dashed,
                                                                     new (
                                                                          tools.CurrentAttribute!.Value.Foreground.GetBrighterColor (),
@@ -127,10 +124,10 @@ public class RegionScenario : Scenario
                                   }
                               };
 
-        Application.Run (app);
+        Application.Run (appWindow);
 
         // Clean up
-        app.Dispose ();
+        appWindow.Dispose ();
         Application.Shutdown ();
     }
 
@@ -169,8 +166,8 @@ public class ToolsView : Window
 {
     //private Button _addLayerBtn;
     private readonly AttributeView _attributeView = new ();
-    private RadioGroup? _stylePicker;
-    private RegionOpSelector? _regionOpSelector;
+    private OptionSelector<RegionDrawStyles>? _stylePicker;
+    private OptionSelector<RegionOp>? _regionOpSelector;
 
     public Attribute? CurrentAttribute
     {
@@ -197,22 +194,30 @@ public class ToolsView : Window
         _stylePicker = new ()
         {
             Width = Dim.Fill (),
-            X = 0, Y = Pos.Bottom (_attributeView) + 1, RadioLabels = Enum.GetNames<RegionDrawStyles> ().Select (n => n = "_" + n).ToArray ()
+            X = 0, Y = Pos.Bottom (_attributeView) + 1,
+            AssignHotKeys = true
         };
         _stylePicker.BorderStyle = LineStyle.Single;
         _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
-        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem!); };
-        _stylePicker.SelectedItem = (int)RegionDrawStyles.FillOnly;
+        _stylePicker.ValueChanged += (s, a) => { SetStyle?.Invoke ((RegionDrawStyles)a.Value!); };
+        _stylePicker.Value = RegionDrawStyles.FillOnly;
 
         _regionOpSelector = new ()
         {
             X = 0,
-            Y = Pos.Bottom (_stylePicker) + 1
+            Y = Pos.Bottom (_stylePicker) + 1,
+            AssignHotKeys = true
         };
-        _regionOpSelector.SelectedItemChanged += (s, a) => { RegionOpChanged?.Invoke (this, a); };
-        _regionOpSelector.SelectedItem = RegionOp.MinimalUnion;
+        _regionOpSelector.ValueChanged += (s, a) =>
+                                          {
+                                              if (a.Value is { })
+                                              {
+                                                  RegionOpChanged?.Invoke (this, (RegionOp)a.Value);
+                                              }
+                                          };
+        _regionOpSelector.Value = RegionOp.MinimalUnion;
 
         //_addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
@@ -222,39 +227,7 @@ public class ToolsView : Window
 
     public event EventHandler<Attribute?>? AttributeChanged;
     public event EventHandler<RegionOp>? RegionOpChanged;
-    public event Action<LineStyle>? SetStyle;
-}
-
-public class RegionOpSelector : View
-{
-    private readonly RadioGroup _radioGroup;
-
-    public RegionOpSelector ()
-    {
-        Width = Dim.Auto ();
-        Height = Dim.Auto ();
-
-        BorderStyle = LineStyle.Single;
-        Border!.Thickness = new (0, 1, 0, 0);
-        Title = "RegionOp";
-
-        _radioGroup = new ()
-        {
-            X = 0,
-            Y = 0,
-            RadioLabels = Enum.GetNames<RegionOp> ().Select (n => n = "_" + n).ToArray ()
-        };
-        _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem!); };
-        Add (_radioGroup);
-    }
-
-    public event EventHandler<RegionOp>? SelectedItemChanged;
-
-    public RegionOp SelectedItem
-    {
-        get => (RegionOp)_radioGroup.SelectedItem;
-        set => _radioGroup.SelectedItem = (int)value;
-    }
+    public event Action<RegionDrawStyles>? SetStyle;
 }
 
 public class AttributeView : View

@@ -1,4 +1,3 @@
-#nullable enable
 
 using System.ComponentModel;
 
@@ -136,7 +135,7 @@ public class MenuItemv2 : Shortcut
             {
                 // Is this an Application-bound command?
                 // Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
-                ret = Application.InvokeCommandsBoundToKey (Key);
+                ret = App?.Keyboard.InvokeCommandsBoundToKey (Key);
             }
         }
 
@@ -186,6 +185,7 @@ public class MenuItemv2 : Shortcut
 
             if (_subMenu is { })
             {
+                SubMenu!.App ??= App;
                 SubMenu!.Visible = false;
                 // TODO: This is a temporary hack - add a flag or something instead
                 KeyView.Text = $"{Glyphs.RightArrow}";

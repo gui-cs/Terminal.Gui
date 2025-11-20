@@ -12,7 +12,7 @@ namespace SelfContained;
 
 public static class Program
 {
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IConsoleDriver)")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IDriver)")]
     private static void Main (string [] args)
     {
         ConfigurationManager.Enable (ConfigLocations.All);

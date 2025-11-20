@@ -129,7 +129,7 @@ public class Mazing : Scenario
             return;
         }
 
-        Point newPos = _m.Player;
+        Point newPos = _m!.Player;
 
         Command? command = e.Context?.Command;
 
@@ -171,7 +171,7 @@ public class Mazing : Scenario
                 if (_m.PlayerHp <= 0)
                 {
                     _message = "You died!";
-                    Application.Top!.SetNeedsDraw (); // trigger redraw
+                    Application.Current!.SetNeedsDraw (); // trigger redraw
                     _dead = true;
 
                     return; // Stop further action if dead
@@ -190,7 +190,7 @@ public class Mazing : Scenario
                 _message = string.Empty;
             }
 
-            Application.Top!.SetNeedsDraw (); // trigger redraw
+            Application.Current!.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
@@ -200,7 +200,7 @@ public class Mazing : Scenario
             _m = new (); // Generate a new maze
             _m.PlayerHp = hp;
             GenerateNpcs ();
-            Application.Top!.SetNeedsDraw (); // trigger redraw
+            Application.Current!.SetNeedsDraw (); // trigger redraw
         }
     }
 }

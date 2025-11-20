@@ -28,7 +28,7 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.Top!.Title = GetQuitKeyAndName ();
+        Application.Current!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
@@ -40,8 +40,8 @@ public class Bars : Scenario
             SchemeName = "Toplevel",
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border.Thickness = new (0, 1, 0, 0);
-        Application.Top.Add (eventLog);
+        eventLog.Border!.Thickness = new (0, 1, 0, 0);
+        Application.Current.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
         {
@@ -51,7 +51,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent(33),
         };
-        Application.Top.Add (menuBarLikeExamples);
+        Application.Current.Add (menuBarLikeExamples);
 
         Label label = new Label ()
         {
@@ -98,7 +98,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent (33),
         };
-        Application.Top.Add (menuLikeExamples);
+        Application.Current.Add (menuLikeExamples);
 
         label = new Label ()
         {
@@ -185,9 +185,9 @@ public class Bars : Scenario
 
         menuLikeExamples.Add (popOverMenu);
 
-        menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
+        menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
 
-        void MenuLikeExamplesMouseClick (object sender, MouseEventArgs e)
+        void MenuLikeExamplesMouseEvent (object _, MouseEventArgs e)
         {
             if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
@@ -212,7 +212,7 @@ public class Bars : Scenario
             Width = Dim.Width (menuLikeExamples),
             Height = Dim.Percent (33),
         };
-        Application.Top.Add (statusBarLikeExamples);
+        Application.Current.Add (statusBarLikeExamples);
 
         label = new Label ()
         {
@@ -249,7 +249,7 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (FrameView frameView in Application.Top.SubViews.Where (f => f is FrameView)!)
+        foreach (FrameView frameView in Application.Current.SubViews.Where (f => f is FrameView)!)
         {
             foreach (Bar barView in frameView.SubViews.Where (b => b is Bar)!)
             {
@@ -269,8 +269,8 @@ public class Bars : Scenario
 
     //private void SetupContentMenu ()
     //{
-    //    Application.Top.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
-    //    Application.Top.MouseClick += ShowContextMenu;
+    //    Application.Current.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
+    //    Application.Current.MouseClick += ShowContextMenu;
     //}
 
     //private void ShowContextMenu (object s, MouseEventEventArgs e)

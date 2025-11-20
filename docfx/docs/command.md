@@ -169,7 +169,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
         return commandContext?.Command == Command.HotKey ? cancelled : cancelled is false;
     }
     ```
-  - **RadioGroup**: Selecting a radio button raises `Selecting` to update the selected option.
+  - **OptionSelector**: Selecting an OpitonSelector option raises `Selecting` to update the selected option.
   - **Menuv2** and **MenuBarv2**: Selecting a `MenuItemv2` (e.g., via mouse enter or arrow keys) sets focus, tracked by `SelectedMenuItem` and raising `SelectedMenuItemChanged`:
     ```csharp
     protected override void OnFocusedChanged(View? previousFocused, View? focused)

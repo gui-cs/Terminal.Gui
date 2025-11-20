@@ -1,5 +1,3 @@
-﻿#nullable enable
-using Terminal.Gui.Drivers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -19,15 +17,18 @@ namespace Terminal.Gui.App;
 ///         <item>Throttling iterations to respect <see cref="Application.MaximumIterationsPerSecond"/></item>
 ///     </list>
 /// </remarks>
-/// <typeparam name="T">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
-public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
+/// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
+public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
     private ITimedEvents? _timedEvents;
-    private ConcurrentQueue<T>? _inputBuffer;
+    private ConcurrentQueue<TInputRecord>? _inputQueue;
     private IInputProcessor? _inputProcessor;
-    private IConsoleOutput? _out;
+    private IOutput? _output;
     private AnsiRequestScheduler? _ansiRequestScheduler;
-    private IWindowSizeMonitor? _windowSizeMonitor;
+    private ISizeMonitor? _sizeMonitor;
+
+    /// <inheritdoc/>
+    public IApplication? App { get; private set; }
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -40,13 +41,13 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
 
     /// <summary>
     ///     The input events thread-safe collection. This is populated on separate
-    ///     thread by a <see cref="IConsoleInput{T}"/>. Is drained as part of each
-    ///     <see cref="Iteration"/>
+    ///     thread by a <see cref="IInput{T}"/>. Is drained as part of each
+    ///     <see cref="Iteration"/> on the main loop thread.
     /// </summary>
-    public ConcurrentQueue<T> InputBuffer
+    public ConcurrentQueue<TInputRecord> InputQueue
     {
-        get => _inputBuffer ?? throw new NotInitializedException (nameof (InputBuffer));
-        private set => _inputBuffer = value;
+        get => _inputQueue ?? throw new NotInitializedException (nameof (InputQueue));
+        private set => _inputQueue = value;
     }
 
     /// <inheritdoc/>
@@ -57,13 +58,13 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public IOutputBuffer OutputBuffer { get; } = new OutputBuffer ();
+    public IOutputBuffer OutputBuffer { get; } = new OutputBufferImpl ();
 
     /// <inheritdoc/>
-    public IConsoleOutput Out
+    public IOutput Output
     {
-        get => _out ?? throw new NotInitializedException (nameof (Out));
-        private set => _out = value;
+        get => _output ?? throw new NotInitializedException (nameof (Output));
+        private set => _output = value;
     }
 
     /// <inheritdoc/>
@@ -74,22 +75,16 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     }
 
     /// <inheritdoc/>
-    public IWindowSizeMonitor WindowSizeMonitor
+    public ISizeMonitor SizeMonitor
     {
-        get => _windowSizeMonitor ?? throw new NotInitializedException (nameof (WindowSizeMonitor));
-        private set => _windowSizeMonitor = value;
+        get => _sizeMonitor ?? throw new NotInitializedException (nameof (SizeMonitor));
+        private set => _sizeMonitor = value;
     }
 
     /// <summary>
-    ///     Handles raising events and setting required draw status etc when <see cref="Application.Top"/> changes
+    ///     Handles raising events and setting required draw status etc when <see cref="IApplication.Current"/> changes
     /// </summary>
     public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
-
-    /// <summary>
-    ///     Determines how to get the current system type, adjust
-    ///     in unit tests to simulate specific timings.
-    /// </summary>
-    public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
     /// <summary>
     ///     Initializes the class with the provided subcomponents
@@ -99,36 +94,39 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
     /// <param name="componentFactory"></param>
+    /// <param name="app"></param>
     public void Initialize (
         ITimedEvents timedEvents,
-        ConcurrentQueue<T> inputBuffer,
+        ConcurrentQueue<TInputRecord> inputBuffer,
         IInputProcessor inputProcessor,
-        IConsoleOutput consoleOutput,
-        IComponentFactory<T> componentFactory
+        IOutput consoleOutput,
+        IComponentFactory<TInputRecord> componentFactory,
+        IApplication? app
     )
     {
-        InputBuffer = inputBuffer;
-        Out = consoleOutput;
+        App = app;
+        InputQueue = inputBuffer;
+        Output = consoleOutput;
         InputProcessor = inputProcessor;
 
         TimedEvents = timedEvents;
         AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
-        WindowSizeMonitor = componentFactory.CreateWindowSizeMonitor (Out, OutputBuffer);
+        OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
+        SizeMonitor = componentFactory.CreateSizeMonitor (Output, OutputBuffer);
     }
 
     /// <inheritdoc/>
     public void Iteration ()
     {
+        App?.RaiseIteration ();
 
-        Application.RaiseIteration ();
-
-        DateTime dt = Now ();
-        int timeAllowed = 1000 / Math.Max(1,(int)Application.MaximumIterationsPerSecond);
+        DateTime dt = DateTime.Now;
+        int timeAllowed = 1000 / Math.Max (1, (int)Application.MaximumIterationsPerSecond);
 
         IterationImpl ();
 
-        TimeSpan took = Now () - dt;
+        TimeSpan took = DateTime.Now - dt;
         TimeSpan sleepFor = TimeSpan.FromMilliseconds (timeAllowed) - took;
 
         Logging.TotalIterationMetric.Record (took.Milliseconds);
@@ -141,28 +139,29 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
 
     internal void IterationImpl ()
     {
+        // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        ToplevelTransitionManager.RaiseReadyEventIfNeeded ();
-        ToplevelTransitionManager.HandleTopMaybeChanging ();
+        ToplevelTransitionManager.RaiseReadyEventIfNeeded (App);
+        ToplevelTransitionManager.HandleTopMaybeChanging (App);
 
-        if (Application.Top != null)
+        if (App?.Current != null)
         {
-            bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (Application.Top)
-                                     || (Application.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (Application.Mouse.MouseGrabView));
+            bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
+                                     || AnySubViewsNeedDrawn (App?.Current)
+                                     || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
-            bool sizeChanged = WindowSizeMonitor.Poll ();
+            bool sizeChanged = SizeMonitor.Poll ();
 
             if (needsDrawOrLayout || sizeChanged)
             {
                 Logging.Redraws.Add (1);
 
-                Application.LayoutAndDraw (true);
+                App?.LayoutAndDraw (true);
 
-                Out.Write (OutputBuffer);
+                Output.Write (OutputBuffer);
 
-                Out.SetCursorVisibility (CursorVisibility.Default);
+                Output.SetCursorVisibility (CursorVisibility.Default);
             }
 
             SetCursor ();
@@ -177,7 +176,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
 
     private void SetCursor ()
     {
-        View? mostFocused = Application.Top!.MostFocused;
+        View? mostFocused = App?.Current!.MostFocused;
 
         if (mostFocused == null)
         {
@@ -191,12 +190,12 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
             // Translate to screen coordinates
             to = mostFocused.ViewportToScreen (to.Value);
 
-            Out.SetCursorPosition (to.Value.X, to.Value.Y);
-            Out.SetCursorVisibility (mostFocused.CursorVisibility);
+            Output.SetCursorPosition (to.Value.X, to.Value.Y);
+            Output.SetCursorVisibility (mostFocused.CursorVisibility);
         }
         else
         {
-            Out.SetCursorVisibility (CursorVisibility.Invisible);
+            Output.SetCursorVisibility (CursorVisibility.Invisible);
         }
     }
 
@@ -209,7 +208,7 @@ public class ApplicationMainLoop<T> : IApplicationMainLoop<T>
 
         if (v.NeedsDraw || v.NeedsLayout)
         {
-           // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
+            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 
             return true;
         }

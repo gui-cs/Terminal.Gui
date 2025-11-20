@@ -50,8 +50,8 @@ public class Images : Scenario
     private SixelToRender _fireSixel;
     private int _fireFrameCounter;
     private bool _isDisposed;
-    private RadioGroup _rgPaletteBuilder;
-    private RadioGroup _rgDistanceAlgorithm;
+    private OptionSelector _osPaletteBuilder;
+    private OptionSelector _osDistanceAlgorithm;
     private NumericUpDown _popularityThreshold;
     private SixelToRender _sixelImage;
 
@@ -151,7 +151,7 @@ public class Images : Scenario
         _win.Add (_tabView);
 
         // Start trying to detect sixel support
-        var sixelSupportDetector = new SixelSupportDetector ();
+        var sixelSupportDetector = new SixelSupportDetector (Application.Driver);
         sixelSupportDetector.Detect (UpdateSixelSupportState);
 
         Application.Run (_win);
@@ -408,22 +408,22 @@ public class Images : Scenario
             Y = Pos.Bottom (_pxY) + 1
         };
 
-        _rgPaletteBuilder = new ()
+        _osPaletteBuilder = new ()
         {
-            RadioLabels = new []
-            {
+            Labels =
+            [
                 "Popularity",
                 "Median Cut"
-            },
+            ],
             X = Pos.Right (_sixelView) + 2,
             Y = Pos.Bottom (l1),
-            SelectedItem = 1
+            Value = 1
         };
 
         _popularityThreshold = new ()
         {
-            X = Pos.Right (_rgPaletteBuilder) + 1,
-            Y = Pos.Top (_rgPaletteBuilder),
+            X = Pos.Right (_osPaletteBuilder) + 1,
+            Y = Pos.Top (_osPaletteBuilder),
             Value = 8
         };
 
@@ -439,12 +439,12 @@ public class Images : Scenario
             Text = "Color Distance Algorithm",
             Width = Dim.Auto (),
             X = Pos.Right (_sixelView),
-            Y = Pos.Bottom (_rgPaletteBuilder) + 1
+            Y = Pos.Bottom (_osPaletteBuilder) + 1
         };
 
-        _rgDistanceAlgorithm = new ()
+        _osDistanceAlgorithm = new ()
         {
-            RadioLabels = new []
+            Labels = new []
             {
                 "Euclidian",
                 "CIE76"
@@ -458,10 +458,10 @@ public class Images : Scenario
         _sixelSupported.Add (lblPxY);
         _sixelSupported.Add (_pxY);
         _sixelSupported.Add (l1);
-        _sixelSupported.Add (_rgPaletteBuilder);
+        _sixelSupported.Add (_osPaletteBuilder);
 
         _sixelSupported.Add (l2);
-        _sixelSupported.Add (_rgDistanceAlgorithm);
+        _sixelSupported.Add (_osDistanceAlgorithm);
         _sixelSupported.Add (_popularityThreshold);
         _sixelSupported.Add (lblPopThreshold);
 
@@ -470,7 +470,7 @@ public class Images : Scenario
 
     private IPaletteBuilder GetPaletteBuilder ()
     {
-        switch (_rgPaletteBuilder.SelectedItem)
+        switch (_osPaletteBuilder.Value)
         {
             case 0: return new PopularityPaletteWithThreshold (GetDistanceAlgorithm (), _popularityThreshold.Value);
             case 1: return new MedianCutPaletteBuilder (GetDistanceAlgorithm ());
@@ -480,7 +480,7 @@ public class Images : Scenario
 
     private IColorDistance GetDistanceAlgorithm ()
     {
-        switch (_rgDistanceAlgorithm.SelectedItem)
+        switch (_osDistanceAlgorithm.Value)
         {
             case 0: return new EuclideanColorDistance ();
             case 1: return new CIE76ColorDistance ();

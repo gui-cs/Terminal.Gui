@@ -80,7 +80,7 @@ public class UICatalog
         // Get allowed driver names
         string? [] allowedDrivers = Application.GetDriverTypes ().Item2.ToArray ();
 
-        Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.")
+        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.")
             .FromAmong (allowedDrivers!);
         driverOption.SetDefaultValue (string.Empty);
         driverOption.AddAlias ("-d");
@@ -242,7 +242,7 @@ public class UICatalog
 
     /// <summary>
     ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
-    ///     killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
+    ///     killed and the Scenario is run as though it were Application.Current. When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel ()
@@ -269,7 +269,7 @@ public class UICatalog
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
 
-    private static void StartConfigFileWatcher ()
+    private static void StartConfigWatcher ()
     {
         // Set up a file system watcher for `./.tui/`
         _currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
@@ -317,10 +317,19 @@ public class UICatalog
 
         //_homeDirWatcher.Created += ConfigFileChanged;
         _homeDirWatcher.EnableRaisingEvents = true;
+
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
     }
 
-    private static void StopConfigFileWatcher ()
+    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e)
     {
+        CM.Apply ();
+    }
+
+    private static void StopConfigWatcher ()
+    {
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
+
         _currentDirWatcher.EnableRaisingEvents = false;
         _currentDirWatcher.Changed -= ConfigFileChanged;
         _currentDirWatcher.Created -= ConfigFileChanged;
@@ -332,7 +341,7 @@ public class UICatalog
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
-        if (Application.Top == null)
+        if (Application.Current == null)
         {
             return;
         }
@@ -398,7 +407,7 @@ public class UICatalog
         if (!Options.DontEnableConfigurationManagement)
         {
             ConfigurationManager.Enable (ConfigLocations.All);
-            StartConfigFileWatcher ();
+            StartConfigWatcher ();
         }
 
         while (RunUICatalogTopLevel () is { } scenario)
@@ -440,7 +449,7 @@ public class UICatalog
 #endif
         }
 
-        StopConfigFileWatcher ();
+        StopConfigWatcher ();
         VerifyObjectsWereDisposed ();
     }
 
@@ -451,7 +460,7 @@ public class UICatalog
             scenario.StartBenchmark ();
         }
 
-        Application.Init (driverName: _forceDriver);
+        Application.ForceDriver = _forceDriver!;
 
         scenario.Main ();
 
@@ -517,7 +526,7 @@ public class UICatalog
 
         if (benchmarkWindow.Border is { })
         {
-            benchmarkWindow.Border.Thickness = new (0, 0, 0, 0);
+            benchmarkWindow.Border!.Thickness = new (0, 0, 0, 0);
         }
 
         TableView resultsTableView = new ()
@@ -635,7 +644,7 @@ public class UICatalog
         if (!View.EnableDebugIDisposableAsserts)
         {
             View.Instances.Clear ();
-            RunState.Instances.Clear ();
+            SessionToken.Instances.Clear ();
 
             return;
         }
@@ -650,15 +659,15 @@ public class UICatalog
 
         View.Instances.Clear ();
 
-        // Validate there are no outstanding Application.RunState-based instances 
+        // Validate there are no outstanding Application sessions
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
-        foreach (RunState? inst in RunState.Instances)
+        foreach (SessionToken? inst in SessionToken.Instances)
         {
             Debug.Assert (inst.WasDisposed);
         }
 
-        RunState.Instances.Clear ();
+        SessionToken.Instances.Clear ();
 #endif
     }
 }

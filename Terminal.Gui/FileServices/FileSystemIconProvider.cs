@@ -10,6 +10,43 @@ public class FileSystemIconProvider
     private bool _useUnicodeCharacters;
 
     /// <summary>
+    ///     Returns the character to use to represent <paramref name="fileSystemInfo"/> or an empty space if no icon
+    ///     should be used.
+    /// </summary>
+    /// <param name="fileSystemInfo">The file or directory requiring an icon.</param>
+    /// <returns></returns>
+    public Rune GetIcon (IFileSystemInfo? fileSystemInfo)
+    {
+        if (UseNerdIcons)
+        {
+            return new (
+                        _nerd.GetNerdIcon (
+                                           fileSystemInfo,
+                                           fileSystemInfo is IDirectoryInfo dir && IsOpenGetter (dir)
+                                          )
+                       );
+        }
+
+        if (fileSystemInfo is IDirectoryInfo)
+        {
+            return UseUnicodeCharacters ? Glyphs.Folder : new (Path.DirectorySeparatorChar);
+        }
+
+        return UseUnicodeCharacters ? Glyphs.File : new (' ');
+    }
+
+    /// <summary>
+    ///     Returns <see cref="GetIcon(IFileSystemInfo)"/> with an extra space on the end if icon is likely to overlap
+    ///     adjacent cells.
+    /// </summary>
+    public string GetIconWithOptionalSpace (IFileSystemInfo? fileSystemInfo)
+    {
+        string space = UseNerdIcons ? " " : "";
+
+        return GetIcon (fileSystemInfo!) + space;
+    }
+
+    /// <summary>
     ///     Gets or sets the delegate to be used to determine opened state of directories when resolving
     ///     <see cref="GetIcon(IFileSystemInfo)"/>.  Defaults to always false.
     /// </summary>
@@ -50,42 +87,5 @@ public class FileSystemIconProvider
                 UseNerdIcons = false;
             }
         }
-    }
-
-    /// <summary>
-    ///     Returns the character to use to represent <paramref name="fileSystemInfo"/> or an empty space if no icon
-    ///     should be used.
-    /// </summary>
-    /// <param name="fileSystemInfo">The file or directory requiring an icon.</param>
-    /// <returns></returns>
-    public Rune GetIcon (IFileSystemInfo fileSystemInfo)
-    {
-        if (UseNerdIcons)
-        {
-            return new Rune (
-                             _nerd.GetNerdIcon (
-                                                fileSystemInfo,
-                                                fileSystemInfo is IDirectoryInfo dir ? IsOpenGetter (dir) : false
-                                               )
-                            );
-        }
-
-        if (fileSystemInfo is IDirectoryInfo)
-        {
-            return UseUnicodeCharacters ? Glyphs.Folder : new Rune (Path.DirectorySeparatorChar);
-        }
-
-        return UseUnicodeCharacters ? Glyphs.File : new Rune (' ');
-    }
-
-    /// <summary>
-    ///     Returns <see cref="GetIcon(IFileSystemInfo)"/> with an extra space on the end if icon is likely to overlap
-    ///     adjacent cells.
-    /// </summary>
-    public string GetIconWithOptionalSpace (IFileSystemInfo fileSystemInfo)
-    {
-        string space = UseNerdIcons ? " " : "";
-
-        return GetIcon (fileSystemInfo) + space;
     }
 }

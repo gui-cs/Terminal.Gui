@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-
+#nullable disable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Console input implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
+///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>.
 /// </summary>
-public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
+public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>, IDisposable
 {
-    private readonly NetWinVTConsole _adjustConsole;
-
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
@@ -16,12 +15,7 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
     /// </summary>
     public NetInput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (NetInput)}");
-
-        if (ConsoleDriver.RunningUnitTests)
-        {
-            return;
-        }
+        Logging.Information ($"Creating {nameof (NetInput)}");
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -34,75 +28,110 @@ public class NetInput : ConsoleInput<ConsoleKeyInfo>, INetInput
             catch (ApplicationException ex)
             {
                 // Likely running as a unit test, or in a non-interactive session.
-                Logging.Logger.LogCritical (
-                                            ex,
-                                            "NetWinVTConsole could not be constructed i.e. could not configure terminal modes. May indicate running in non-interactive session e.g. unit testing CI");
+                Logging.Critical ($"NetWinVTConsole could not configure terminal modes. May indicate running in non-interactive session: {ex}");
+
+                return;
             }
         }
 
-        //Enable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-
-        //Set cursor key to application.
-        Console.Out.Write (EscSeqUtils.CSI_HideCursor);
-
-        Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
-        Console.TreatControlCAsInput = true;
-    }
-
-    /// <inheritdoc/>
-    protected override bool Peek ()
-    {
-        if (ConsoleDriver.RunningUnitTests)
+        try
         {
-            return false;
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+            //Set cursor key to application.
+            Console.Out.Write (EscSeqUtils.CSI_HideCursor);
+
+            Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+            Console.TreatControlCAsInput = true;
         }
-
-        return Console.KeyAvailable;
-    }
-
-    /// <inheritdoc/>
-    protected override IEnumerable<ConsoleKeyInfo> Read ()
-    {
-        while (Console.KeyAvailable)
+        catch
         {
-            yield return Console.ReadKey (true);
+            // Swallow any exceptions during initialization for unit tests
         }
     }
 
-    private void FlushConsoleInput ()
-    {
-        if (!ConsoleDriver.RunningUnitTests)
-        {
-            while (Console.KeyAvailable)
-            {
-                Console.ReadKey (intercept: true);
-            }
-        }
-    }
+    private readonly NetWinVTConsole _adjustConsole;
 
     /// <inheritdoc/>
     public override void Dispose ()
     {
         base.Dispose ();
 
-        if (ConsoleDriver.RunningUnitTests)
+        try
         {
-            return;
+            // Disable mouse events first
+            Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+            _adjustConsole?.Cleanup ();
+
+            // Flush any pending input so no stray events appear
+            FlushConsoleInput ();
         }
+        catch
+        {
+            // Swallow any exceptions during Dispose for unit tests
+        }
+    }
 
-        // Disable mouse events first
-        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+    /// <inheritdoc />
+    public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
 
-        //Disable alternative screen buffer.
-        Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+    /// <inheritdoc/>
+    public override bool Peek ()
+    {
+        try
+        {
+            return Console.KeyAvailable;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
-        //Set cursor key to cursor.
-        Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+    /// <inheritdoc/>
+    public override IEnumerable<ConsoleKeyInfo> Read ()
+    {
+        while (true)
+        {
+            ConsoleKeyInfo keyInfo = default;
 
-        _adjustConsole?.Cleanup ();
+            try
+            {
+                if (!Console.KeyAvailable)
+                {
+                    break;
+                }
 
-        // Flush any pending input so no stray events appear
-        FlushConsoleInput ();
+                keyInfo = Console.ReadKey (true);
+            }
+            catch (InvalidOperationException)
+            {
+                // Not connected to a terminal (GitHub Actions, redirected input, etc.)
+                yield break;
+            }
+            catch (IOException)
+            {
+                // I/O error reading from console
+                yield break;
+            }
+
+            yield return keyInfo;
+        }
+    }
+
+    private void FlushConsoleInput ()
+    {
+        while (Console.KeyAvailable)
+        {
+            Console.ReadKey (true);
+        }
     }
 }

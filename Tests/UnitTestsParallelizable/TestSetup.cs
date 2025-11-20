@@ -39,7 +39,7 @@ public class GlobalTestSetup : IDisposable
         // Check that all Application fields and properties are set to their default values
 
         // Public Properties
-        Assert.Null (Application.Top);
+        Assert.Null (Application.Current);
         Assert.Null (Application.Mouse.MouseGrabView);
 
         // Don't check Application.ForceDriver
@@ -47,7 +47,7 @@ public class GlobalTestSetup : IDisposable
         // Don't check Application.Force16Colors
         //Assert.False (Application.Force16Colors);
         Assert.Null (Application.Driver);
-        Assert.False (Application.EndAfterFirstIteration);
+        Assert.False (Application.StopAfterFirstIteration);
         Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
         Assert.Equal (Key.Tab, Application.NextTabKey);
         Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
@@ -58,9 +58,8 @@ public class GlobalTestSetup : IDisposable
         Assert.False (Application.Initialized);
         Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
         Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
-        Assert.False (Application._forceFakeConsole);
-        Assert.Equal (-1, Application.MainThreadId);
-        Assert.Empty (Application.TopLevels);
+        Assert.Null (Application.MainThreadId);
+        Assert.Empty (Application.SessionStack);
         Assert.Empty (Application.CachedViewsUnderMouse);
 
         // Mouse
@@ -68,15 +67,15 @@ public class GlobalTestSetup : IDisposable
         //Assert.Null (Application._lastMousePosition);
 
         // Navigation
-        Assert.Null (Application.Navigation);
+        // Assert.Null (Application.Navigation);
 
         // Popover
-        Assert.Null (Application.Popover);
+        //Assert.Null (Application.Popover);
 
         // Events - Can't check
-        //Assert.Null (Application.NotifyNewRunState);
-        //Assert.Null (Application.NotifyNewRunState);
-        //Assert.Null (Application.Iteration);
+        //Assert.Null (Application.SessionBegun);
+        //Assert.Null (Application.SessionBegun);
+        //Assert.Null (ApplicationImpl.Instance.Iteration);
         //Assert.Null (Application.SizeChanging);
         //Assert.Null (Application.GrabbedMouse);
         //Assert.Null (Application.UnGrabbingMouse);

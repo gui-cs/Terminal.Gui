@@ -1,7 +1,5 @@
 ﻿namespace Terminal.Gui.App;
 
-#nullable enable
-
 /// <summary>
 ///     Provides helper methods for executing property change workflows in the Cancellable Work Pattern (CWP).
 /// </summary>
@@ -22,7 +20,10 @@ public static class CWPPropertyHelper
     ///     The type of the property value, which may be a nullable reference type (e.g., <see cref="string"/>
     ///     ?).
     /// </typeparam>
-    /// <param name="currentValue">The current property value, which may be null for nullable types.</param>
+    /// <param name="currentValue">
+    ///     Reference to the current property value, which may be null for nullable types. If the change is not cancelled, this
+    ///     will be set to <paramref name="finalValue"/>.
+    /// </param>
     /// <param name="newValue">The proposed new property value, which may be null for nullable types.</param>
     /// <param name="onChanging">The virtual method invoked before the change, returning true to cancel.</param>
     /// <param name="changingEvent">The pre-change event raised to allow modification or cancellation.</param>
@@ -52,9 +53,9 @@ public static class CWPPropertyHelper
     ///     </code>
     /// </example>
     public static bool ChangeProperty<T> (
-        T currentValue,
+        ref T currentValue,
         T newValue,
-        Func<ValueChangingEventArgs<T>, bool> onChanging,
+        Func<ValueChangingEventArgs<T>, bool>? onChanging,
         EventHandler<ValueChangingEventArgs<T>>? changingEvent,
         Action<T> doWork,
         Action<ValueChangedEventArgs<T>>? onChanged,
@@ -70,13 +71,17 @@ public static class CWPPropertyHelper
         }
 
         ValueChangingEventArgs<T> args = new (currentValue, newValue);
-        bool cancelled = onChanging (args) || args.Handled;
 
-        if (cancelled)
+        if (onChanging is { })
         {
-            finalValue = currentValue;
+            bool cancelled = onChanging (args) || args.Handled;
 
-            return false;
+            if (cancelled)
+            {
+                finalValue = currentValue;
+
+                return false;
+            }
         }
 
         changingEvent?.Invoke (null, args);
@@ -100,6 +105,7 @@ public static class CWPPropertyHelper
         doWork (finalValue);
         
         ValueChangedEventArgs<T> changedArgs = new (currentValue, finalValue);
+        currentValue = finalValue;
         onChanged?.Invoke (changedArgs);
         changedEvent?.Invoke (null, changedArgs);
 

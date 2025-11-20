@@ -7,7 +7,6 @@ public class ApplicationScreenTests
 {
     public ApplicationScreenTests (ITestOutputHelper output)
     {
-        ConsoleDriver.RunningUnitTests = true;
     }
 
 
@@ -16,7 +15,7 @@ public class ApplicationScreenTests
     {
         // Arrange
         Application.ResetState (true);
-        Application.Init ();
+        Application.Init ("fake");
 
         // Act
         Application.ClearScreenNextIteration = true;
@@ -34,7 +33,7 @@ public class ApplicationScreenTests
     public void ClearContents_Called_When_Top_Frame_Changes ()
     {
         Toplevel top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         // Arrange
         var clearedContentsRaised = 0;
 
@@ -47,39 +46,41 @@ public class ApplicationScreenTests
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Top!.SetNeedsLayout ();
+        Application.Current!.SetNeedsLayout ();
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Top.X = 1;
+        Application.Current.X = 1;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (1, clearedContentsRaised);
 
         // Act
-        Application.Top.Width = 10;
+        Application.Current.Width = 10;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (2, clearedContentsRaised);
 
         // Act
-        Application.Top.Y = 1;
+        Application.Current.Y = 1;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (3, clearedContentsRaised);
 
         // Act
-        Application.Top.Height = 10;
+        Application.Current.Height = 10;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (4, clearedContentsRaised);
+
+        Application.Driver!.ClearedContents -= OnClearedContents;
 
         Application.End (rs);
 
@@ -89,22 +90,15 @@ public class ApplicationScreenTests
     }
 
     [Fact]
-    public void Screen_Changes_OnSizeChanged_Without_Call_Application_Init ()
+    [SetupFakeApplication]
+    public void Screen_Changes_OnScreenChanged_Without_Call_Application_Init ()
     {
-        // Arrange
-        Application.ResetState (true);
-        Assert.Null (Application.Driver);
-        Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
-        Application.SubscribeDriverEvents ();
-        Assert.Equal (new (0, 0, 25, 25), Application.Screen);
+        Assert.Equal (new (0, 0, 80, 25), Application.Screen);
 
         // Act
-        ((FakeDriver)Application.Driver)!.SetBufferSize (120, 30);
+        Application.Driver!.SetScreenSize (120, 30);
 
         // Assert
         Assert.Equal (new (0, 0, 120, 30), Application.Screen);
-
-        // Cleanup
-        Application.ResetState (true);
     }
 }

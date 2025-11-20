@@ -174,11 +174,11 @@ public class DynamicMenuBar : Scenario
 
             var rChkLabels = new [] { "NoCheck", "Checked", "Radio" };
 
-            RbChkStyle = new ()
+            OsChkStyle = new ()
             {
-                X = Pos.Left (lblTitle), Y = Pos.Bottom (CkbSubMenu) + 1, RadioLabels = rChkLabels
+                X = Pos.Left (lblTitle), Y = Pos.Bottom (CkbSubMenu) + 1, Labels = rChkLabels
             };
-            Add (RbChkStyle);
+            Add (OsChkStyle);
 
             var lblShortcut = new Label
             {
@@ -294,7 +294,7 @@ public class DynamicMenuBar : Scenario
         public CheckBox CkbIsTopLevel { get; }
         public CheckBox CkbNullCheck { get; }
         public CheckBox CkbSubMenu { get; }
-        public RadioGroup RbChkStyle { get; }
+        public OptionSelector OsChkStyle { get; }
         public TextView TextAction { get; }
         public TextField TextHelp { get; }
         public TextField TextHotKey { get; }
@@ -361,7 +361,7 @@ public class DynamicMenuBar : Scenario
             CkbNullCheck.CheckedState = menuItem.AllowNullChecked ? CheckState.Checked : CheckState.UnChecked;
             TextHelp.Enabled = CkbSubMenu.CheckedState == CheckState.UnChecked;
             TextAction.Enabled = CkbSubMenu.CheckedState == CheckState.UnChecked;
-            RbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
+            OsChkStyle.Value = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
             TextShortcutKey.Text = menuItem?.ShortcutTag ?? "";
 
             TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.Checked && CkbSubMenu.CheckedState == CheckState.UnChecked
@@ -434,8 +434,8 @@ public class DynamicMenuBar : Scenario
                     HotKey = TextHotKey.Text,
                     IsTopLevel = CkbIsTopLevel?.CheckedState == CheckState.Checked,
                     HasSubMenu = CkbSubMenu?.CheckedState == CheckState.Checked,
-                    CheckStyle = RbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
-                                 RbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
+                    CheckStyle = OsChkStyle.Value == 0 ? MenuItemCheckStyle.NoCheck :
+                                 OsChkStyle.Value == 1 ? MenuItemCheckStyle.Checked :
                                  MenuItemCheckStyle.Radio,
                     ShortcutKey = TextShortcutKey.Text,
                     AllowNullChecked = CkbNullCheck?.CheckedState == CheckState.Checked,
@@ -484,7 +484,7 @@ public class DynamicMenuBar : Scenario
             TextHotKey.Text = "";
             CkbIsTopLevel.CheckedState = CheckState.UnChecked;
             CkbSubMenu.CheckedState = CheckState.UnChecked;
-            RbChkStyle.SelectedItem = (int)MenuItemCheckStyle.NoCheck;
+            OsChkStyle.Value = (int)MenuItemCheckStyle.NoCheck;
             TextShortcutKey.Text = "";
         }
 
@@ -712,7 +712,7 @@ public class DynamicMenuBar : Scenario
 
             btnUp.Accepting += (s, e) =>
                              {
-                                 int i = _lstMenus.SelectedItem;
+                                 int i = _lstMenus.SelectedItem.Value;
                                  MenuItem menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
 
                                  if (menuItem != null)
@@ -734,7 +734,7 @@ public class DynamicMenuBar : Scenario
 
             btnDown.Accepting += (s, e) =>
                                {
-                                   int i = _lstMenus.SelectedItem;
+                                   int i = _lstMenus.SelectedItem.Value;
                                    MenuItem menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
 
                                    if (menuItem != null)
@@ -829,14 +829,14 @@ public class DynamicMenuBar : Scenario
                                          HotKey = frmMenuDetails.TextHotKey.Text,
                                          IsTopLevel = frmMenuDetails.CkbIsTopLevel?.CheckedState == CheckState.Checked,
                                          HasSubMenu = frmMenuDetails.CkbSubMenu?.CheckedState == CheckState.Checked,
-                                         CheckStyle = frmMenuDetails.RbChkStyle.SelectedItem == 0
+                                         CheckStyle = frmMenuDetails.OsChkStyle.Value == 0
                                                           ? MenuItemCheckStyle.NoCheck
-                                                          : frmMenuDetails.RbChkStyle.SelectedItem == 1
+                                                          : frmMenuDetails.OsChkStyle.Value == 1
                                                               ? MenuItemCheckStyle.Checked
                                                               : MenuItemCheckStyle.Radio,
                                          ShortcutKey = frmMenuDetails.TextShortcutKey.Text
                                      };
-                                     UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem);
+                                     UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem.Value);
                                  }
                              };
 
@@ -885,8 +885,8 @@ public class DynamicMenuBar : Scenario
 
             btnRemove.Accepting += (s, e) =>
                                 {
-                                    MenuItem menuItem = (DataContext.Menus.Count > 0 && _lstMenus.SelectedItem > -1
-                                                             ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
+                                    MenuItem menuItem = (DataContext.Menus.Count > 0 && _lstMenus.SelectedItem is {} selectedItem
+                                                             ? DataContext.Menus [selectedItem].MenuItem
                                                              : _currentEditMenuBarItem);
 
                                     if (menuItem != null)
@@ -905,9 +905,9 @@ public class DynamicMenuBar : Scenario
                                             SelectCurrentMenuBarItem ();
                                         }
 
-                                        if (_lstMenus.SelectedItem > -1)
+                                        if (_lstMenus.SelectedItem is {} selected)
                                         {
-                                            DataContext.Menus?.RemoveAt (_lstMenus.SelectedItem);
+                                            DataContext.Menus?.RemoveAt (selected);
                                         }
 
                                         if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1)
@@ -927,7 +927,7 @@ public class DynamicMenuBar : Scenario
 
             _lstMenus.OpenSelectedItem += (s, e) =>
                                           {
-                                              _currentMenuBarItem = DataContext.Menus [e.Item].MenuItem;
+                                              _currentMenuBarItem = DataContext.Menus [e.Item.Value].MenuItem;
 
                                               if (!(_currentMenuBarItem is MenuBarItem))
                                               {
@@ -945,8 +945,8 @@ public class DynamicMenuBar : Scenario
 
             _lstMenus.HasFocusChanging += (s, e) =>
                                {
-                                   MenuItem menuBarItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0
-                                                              ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
+                                   MenuItem menuBarItem = _lstMenus.SelectedItem is {} selectedItem && DataContext.Menus.Count > 0
+                                                              ? DataContext.Menus [selectedItem].MenuItem
                                                               : null;
                                    SetFrameDetails (menuBarItem);
                                };
@@ -1077,8 +1077,8 @@ public class DynamicMenuBar : Scenario
 
                 if (menuBarItem == null)
                 {
-                    menuItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0
-                                   ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
+                    menuItem = _lstMenus.SelectedItem is {} selectedItem && DataContext.Menus.Count > 0
+                                   ? DataContext.Menus [selectedItem].MenuItem
                                    : _currentEditMenuBarItem;
                 }
                 else

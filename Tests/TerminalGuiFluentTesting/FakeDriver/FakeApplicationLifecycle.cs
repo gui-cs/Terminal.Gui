@@ -1,16 +1,19 @@
 ﻿#nullable enable
 namespace Terminal.Gui.Drivers;
 
-#pragma warning disable CS1591
-internal class FakeApplicationLifecycle (IApplication origApp, CancellationTokenSource hardStop) : IDisposable
+/// <summary>
+///     Implements a fake application lifecycle for testing purposes. Cleans up the application on dispose by cancelling
+///     the provided <see cref="CancellationTokenSource"/> and shutting down the application.
+/// </summary>
+/// <param name="hardStop"></param>
+internal class FakeApplicationLifecycle (CancellationTokenSource hardStop) : IDisposable
 {
     /// <inheritdoc/>
     public void Dispose ()
     {
         hardStop.Cancel ();
 
-        Application.Top?.Dispose ();
+        Application.Current?.Dispose ();
         Application.Shutdown ();
-        ApplicationImpl.ChangeInstance (origApp);
     }
 }

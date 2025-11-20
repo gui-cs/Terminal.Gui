@@ -1,55 +1,53 @@
-﻿
+
 namespace Terminal.Gui.Views;
 
-internal class FileDialogTableSource : ITableSource
+internal class FileDialogTableSource (
+    FileDialog? dlg,
+    FileDialogState? state,
+    FileDialogStyle? style,
+    int currentSortColumn,
+    bool currentSortIsAsc)
+    : ITableSource
 {
-    private readonly int currentSortColumn;
-    private readonly bool currentSortIsAsc;
-    private readonly FileDialog dlg;
-    private readonly FileDialogState state;
-    private readonly FileDialogStyle style;
-
-    public FileDialogTableSource (
-        FileDialog dlg,
-        FileDialogState state,
-        FileDialogStyle style,
-        int currentSortColumn,
-        bool currentSortIsAsc
-    )
+    public object this [int row, int col]
     {
-        this.style = style;
-        this.currentSortColumn = currentSortColumn;
-        this.currentSortIsAsc = currentSortIsAsc;
-        this.dlg = dlg;
-        this.state = state;
+        get
+        {
+            if (state is { })
+            {
+                return GetColumnValue (col, state.Children [row]);
+            }
+
+            return string.Empty;
+        }
     }
 
-    public object this [int row, int col] => GetColumnValue (col, state.Children [row]);
-    public int Rows => state.Children.Count ();
+    public int Rows => state is { } ? state.Children.Count () : 0;
+
     public int Columns => 4;
 
-    public string [] ColumnNames => new []
-    {
-        MaybeAddSortArrows (style.FilenameColumnName, 0),
+    public string [] ColumnNames =>
+    [
+        MaybeAddSortArrows (style!.FilenameColumnName, 0),
         MaybeAddSortArrows (style.SizeColumnName, 1),
         MaybeAddSortArrows (style.ModifiedColumnName, 2),
         MaybeAddSortArrows (style.TypeColumnName, 3)
-    };
+    ];
 
-    internal static object GetRawColumnValue (int col, FileSystemInfoStats stats)
+    internal static object GetRawColumnValue (int col, FileSystemInfoStats? stats)
     {
         switch (col)
         {
-            case 0: return stats.FileSystemInfo.Name;
-            case 1: return stats.MachineReadableLength;
-            case 2: return stats.LastWriteTime;
-            case 3: return stats.Type;
+            case 0: return stats!.FileSystemInfo!.Name;
+            case 1: return stats!.MachineReadableLength;
+            case 2: return stats!.LastWriteTime ?? default (DateTime);
+            case 3: return stats!.Type;
         }
 
         throw new ArgumentOutOfRangeException (nameof (col));
     }
 
-    private object GetColumnValue (int col, FileSystemInfoStats stats)
+    private object GetColumnValue (int col, FileSystemInfoStats? stats)
     {
         switch (col)
         {
@@ -60,7 +58,7 @@ internal class FileDialogTableSource : ITableSource
                     return stats.Name;
                 }
 
-                string icon = dlg.Style.IconProvider.GetIconWithOptionalSpace (stats.FileSystemInfo);
+                string icon = dlg!.Style.IconProvider.GetIconWithOptionalSpace (stats!.FileSystemInfo);
 
                 return (icon + (stats?.Name ?? string.Empty)).Trim ();
             case 1:
@@ -71,7 +69,7 @@ internal class FileDialogTableSource : ITableSource
                     return string.Empty;
                 }
 
-                return stats.LastWriteTime.Value.ToString (style.DateFormat);
+                return stats.LastWriteTime.Value.ToString (style!.DateFormat);
             case 3:
                 return stats?.Type ?? string.Empty;
             default:

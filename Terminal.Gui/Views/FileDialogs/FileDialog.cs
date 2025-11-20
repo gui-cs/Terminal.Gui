@@ -1,4 +1,3 @@
-#nullable enable
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 
@@ -148,7 +147,7 @@ public class FileDialog : Dialog, IDesignable
                                      e.Handled = true;
                                  };
 
-        _tbPath = new () { Width = Dim.Fill (),/* CaptionColor = new (Color.Black)*/ };
+        _tbPath = new () { Width = Dim.Fill () };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -248,7 +247,6 @@ public class FileDialog : Dialog, IDesignable
             X = 0,
             Width = Dim.Fill (),
             Y = Pos.AnchorEnd (),
-            HotKey = Key.F.WithAlt,
             Id = "_tbFind",
         };
 
@@ -456,8 +454,8 @@ public class FileDialog : Dialog, IDesignable
         _btnBack.Text = GetBackButtonText ();
         _btnForward.Text = GetForwardButtonText ();
 
-        _tbPath.Caption = Style.PathCaption;
-        _tbFind.Caption = Style.SearchCaption;
+        _tbPath.Title = Style.PathCaption;
+        _tbFind.Title = Style.SearchCaption;
 
         _tbPath.Autocomplete.Scheme = new (_tbPath.GetScheme ())
         {
@@ -602,7 +600,10 @@ public class FileDialog : Dialog, IDesignable
                                                     FileDialogTableSource.GetRawColumnValue (_currentSortColumn, f)
                                                );
 
-        State!.Children = ordered.ToArray ();
+        if (State is { })
+        {
+            State.Children = ordered.ToArray ();
+        }
 
         _tableView.Update ();
     }
@@ -668,7 +669,7 @@ public class FileDialog : Dialog, IDesignable
         // Don't include ".." (IsParent) in multi-selections
         MultiSelected = toMultiAccept
                         .Where (s => !s.IsParent)
-                        .Select (s => s.FileSystemInfo.FullName)
+                        .Select (s => s.FileSystemInfo!.FullName)
                         .ToList ()
                         .AsReadOnly ();
 
@@ -744,7 +745,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.ClearAllSelection ();
         _tbPath.Autocomplete.ClearSuggestions ();
 
-        State!.RefreshChildren ();
+        State?.RefreshChildren ();
         WriteStateToTableView ();
     }
 
@@ -825,7 +826,7 @@ public class FileDialog : Dialog, IDesignable
             return _tableView.GetScheme ();
         }
 
-        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);
+        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? new Color (Color.White);
         var black = new Color (Color.Black);
 
         // TODO: Add some kind of cache for this
@@ -878,7 +879,7 @@ public class FileDialog : Dialog, IDesignable
 
     private string GetBackButtonText () { return Glyphs.LeftArrow + "-"; }
 
-    private IFileSystemInfo []? GetFocusedFiles ()
+    private IFileSystemInfo? []? GetFocusedFiles ()
     {
         if (!_tableView.HasFocus || !_tableView.CanFocus)
         {
@@ -1032,7 +1033,7 @@ public class FileDialog : Dialog, IDesignable
     private void New ()
     {
         {
-            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem, State!.Directory);
+            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem!, State!.Directory);
 
             if (created is { })
             {
@@ -1173,7 +1174,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (toRename?.Length == 1)
         {
-            IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem, toRename.Single ());
+            IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem!, toRename.Single ());
 
             if (newNamed is { })
             {
@@ -1231,7 +1232,7 @@ public class FileDialog : Dialog, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        App!.Popover?.Register (contextMenu);
 
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
@@ -1259,7 +1260,7 @@ public class FileDialog : Dialog, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        App!.Popover?.Register (contextMenu);
 
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
@@ -1347,9 +1348,9 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (obj.NewRow);
+        FileSystemInfoStats? stats = RowToStats (obj.NewRow);
 
-        IFileSystemInfo dest;
+        IFileSystemInfo? dest;
 
         if (stats.IsParent)
         {
@@ -1417,10 +1418,10 @@ public class FileDialog : Dialog, IDesignable
         }
 
         if (fileSystemInfoStatsEnumerable.All (
-                                               m => IsCompatibleWithOpenMode (
-                                                                              m.FileSystemInfo.FullName,
-                                                                              out reason
-                                                                             )
+                                               m => m.FileSystemInfo is { } && IsCompatibleWithOpenMode (
+                                                                                                         m.FileSystemInfo.FullName,
+                                                                                                         out reason
+                                                                                                        )
                                               ))
         {
             Accept (fileSystemInfoStatsEnumerable);
@@ -1567,7 +1568,7 @@ public class FileDialog : Dialog, IDesignable
                     }
                 }
 
-                if (Parent.SearchMatcher.IsMatch (f.FileSystemInfo))
+                if (Parent.SearchMatcher.IsMatch (f.FileSystemInfo!))
                 {
                     lock (_oLockFound)
                     {
@@ -1610,7 +1611,7 @@ public class FileDialog : Dialog, IDesignable
                     UpdateChildrenToFound ();
                 }
 
-                Application.Invoke (() => { Parent._spinnerView.Visible = false; });
+                Application.Invoke ((_) => { Parent._spinnerView.Visible = false; });
             }
         }
 
@@ -1622,7 +1623,7 @@ public class FileDialog : Dialog, IDesignable
             }
 
             Application.Invoke (
-                                () =>
+                                (_) =>
                                 {
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (
                                                                                      new AutocompleteFilepathContext (

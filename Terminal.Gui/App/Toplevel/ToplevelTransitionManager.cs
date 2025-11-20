@@ -1,6 +1,3 @@
-﻿#nullable enable
-using Terminal.Gui.Drivers;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -12,10 +9,11 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
 
     private View? _lastTop;
 
+    /// <param name="app"></param>
     /// <inheritdoc/>
-    public void RaiseReadyEventIfNeeded ()
+    public void RaiseReadyEventIfNeeded (IApplication? app)
     {
-        Toplevel? top = Application.Top;
+        Toplevel? top = app?.Current;
 
         if (top != null && !_readiedTopLevels.Contains (top))
         {
@@ -27,16 +25,17 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
         }
     }
 
+    /// <param name="app"></param>
     /// <inheritdoc/>
-    public void HandleTopMaybeChanging ()
+    public void HandleTopMaybeChanging (IApplication? app)
     {
-        Toplevel? newTop = Application.Top;
+        Toplevel? newTop = app?.Current;
 
         if (_lastTop != null && _lastTop != newTop && newTop != null)
         {
             newTop.SetNeedsDraw ();
         }
 
-        _lastTop = Application.Top;
+        _lastTop = app?.Current;
     }
 }

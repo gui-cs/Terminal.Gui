@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Command APIs
@@ -22,9 +21,9 @@ public partial class View // Command APIs
         // HotKey - SetFocus and raise HandlingHotKey
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    (ctx) =>
                     {
-                        if (RaiseHandlingHotKey () is true)
+                        if (RaiseHandlingHotKey (ctx) is true)
                         {
                             return true;
                         }
@@ -257,15 +256,16 @@ public partial class View // Command APIs
     ///     <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
     ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
+    /// <param name="ctx">The context to pass with the command.</param>
     /// <returns>
     ///     <see langword="null"/> if no event was raised; input processing should continue.
     ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
     ///     continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected bool? RaiseHandlingHotKey ()
+    protected bool? RaiseHandlingHotKey (ICommandContext? ctx)
     {
-        CommandEventArgs args = new () { Context = new CommandContext<KeyBinding> { Command = Command.HotKey } };
+        CommandEventArgs args = new () { Context = ctx };
         //Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.

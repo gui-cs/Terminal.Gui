@@ -46,9 +46,9 @@ public class ViewCommandTests
 
         w.LayoutSubViews ();
 
-        Application.Top = w;
-        Application.TopLevels.Push (w);
-        Assert.Same (Application.Top, w);
+        Application.Current = w;
+        Application.SessionStack.Push (w);
+        Assert.Same (Application.Current, w);
 
         // Click button 2
         Rectangle btn2Frame = btnB.FrameToScreen ();
@@ -81,10 +81,10 @@ public class ViewCommandTests
     }
 
     // See: https://github.com/gui-cs/Terminal.Gui/issues/3905
-    [Fact (Skip = "Failing as part of ##4270. Disabling temporarily.")]
+    [Fact]// (Skip = "Failing as part of ##4270. Disabling temporarily.")]
+    [SetupFakeApplication]
     public void Button_CanFocus_False_Raises_Accepted_Correctly ()
     {
-        Application.Init (new FakeDriver ());
         var wAcceptedCount = 0;
         var wCancelAccepting = false;
 
@@ -121,9 +121,9 @@ public class ViewCommandTests
 
         w.Add (btn);
 
-        Application.Top = w;
-        Application.TopLevels.Push (w);
-        Assert.Same (Application.Top, w);
+        Application.Current = w;
+        Application.SessionStack.Push (w);
+        Assert.Same (Application.Current, w);
 
         w.LayoutSubViews ();
 

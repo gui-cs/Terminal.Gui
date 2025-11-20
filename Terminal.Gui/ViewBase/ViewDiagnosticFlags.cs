@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>Enables diagnostic functions for <see cref="View"/>.</summary>
 [Flags]

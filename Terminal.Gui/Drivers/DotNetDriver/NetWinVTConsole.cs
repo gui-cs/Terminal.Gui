@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
@@ -79,7 +78,7 @@ internal class NetWinVTConsole
     {
         if (!FlushConsoleInputBuffer (_inputHandle))
         {
-            throw new ApplicationException ($"Failed to flush input buffer, error code: {GetLastError ()}.");
+            throw new ApplicationException ($"Failed to flush input queue, error code: {GetLastError ()}.");
         }
 
         if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode))

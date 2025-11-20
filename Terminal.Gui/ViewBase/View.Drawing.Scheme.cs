@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -26,7 +25,7 @@ public partial class View
         set
         {
             CWPPropertyHelper.ChangeProperty (
-                                              _schemeName,
+                                              ref _schemeName,
                                               value,
                                               OnSchemeNameChanging,
                                               SchemeNameChanging,
@@ -209,7 +208,7 @@ public partial class View
     public bool SetScheme (Scheme? scheme)
     {
         return CWPPropertyHelper.ChangeProperty (
-                                                 _scheme,
+                                                 ref _scheme,
                                                  scheme,
                                                  OnSettingScheme,
                                                  SchemeChanging,

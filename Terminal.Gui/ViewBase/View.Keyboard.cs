@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs
@@ -99,7 +98,7 @@ public partial class View // Keyboard APIs
 
     /// <summary>
     ///     Adds key bindings for the specified HotKey. Useful for views that contain multiple items that each have their
-    ///     own HotKey such as <see cref="RadioGroup"/>.
+    ///     own HotKey such as <see cref="OptionSelector"/>.
     /// </summary>
     /// <remarks>
     ///     <para>

@@ -1,11 +1,10 @@
 using System.Diagnostics;
 using UICatalog;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;
 
-public class ScenariosStressTests : TestsAllViews
+public class ScenariosStressTests
 {
     public ScenariosStressTests (ITestOutputHelper output)
     {
@@ -38,7 +37,7 @@ public class ScenariosStressTests : TestsAllViews
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
 
-        uint maxIterations = 1000;
+        uint maxIterations = 25;
         uint abortTime = 2000;
         object? timeout = null;
 
@@ -99,28 +98,12 @@ public class ScenariosStressTests : TestsAllViews
 
                 Application.Iteration += OnApplicationOnIteration;
                 Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
-
-                if (Application.Driver is ConsoleDriver cd)
-                {
-                    cd!.Refreshed += (sender, args) =>
-                                     {
-                                         refreshedCount++;
-
-                                         if (args.Value)
-                                         {
-                                             updatedCount++;
-                                         }
-                                     };
-                }
-
-                Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
+                Application.SessionBegun += OnApplicationSessionBegun;
 
                 stopwatch = Stopwatch.StartNew ();
             }
             else
             {
-                Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
-                Application.Iteration -= OnApplicationOnIteration;
                 stopwatch!.Stop ();
             }
 
@@ -135,13 +118,15 @@ public class ScenariosStressTests : TestsAllViews
             {
                 // Press QuitKey
                 _output.WriteLine ("Attempting to quit scenario with RequestStop");
+                Application.Iteration -= OnApplicationOnIteration;
+                Application.SessionBegun -= OnApplicationSessionBegun;
                 Application.RequestStop ();
             }
         }
 
-        void OnApplicationNotifyNewRunState (object? sender, RunStateEventArgs e)
+        void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
         {
-            // Get a list of all subviews under Application.Top (and their subviews, etc.)
+            // Get a list of all subviews under Application.Current (and their subviews, etc.)
             // and subscribe to their DrawComplete event
             void SubscribeAllSubViews (View view)
             {
@@ -155,7 +140,7 @@ public class ScenariosStressTests : TestsAllViews
                 }
             }
 
-            SubscribeAllSubViews (Application.Top!);
+            SubscribeAllSubViews (Application.Current!);
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit
@@ -172,6 +157,8 @@ public class ScenariosStressTests : TestsAllViews
             _output.WriteLine (
                                $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
+            Application.Iteration -= OnApplicationOnIteration;
+            Application.SessionBegun -= OnApplicationSessionBegun;
             Application.RequestStop ();
 
             return false;

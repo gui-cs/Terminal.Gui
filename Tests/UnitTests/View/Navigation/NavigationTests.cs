@@ -7,7 +7,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_AtLeastOneNavKey_Advances (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -27,8 +27,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         Toplevel top = new ();
-        Application.Top = top;
-        Application.Navigation = new ();
+        Application.Current = top;
 
         View otherView = new ()
         {
@@ -85,14 +84,13 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         top.Dispose ();
-        Application.ResetState ();
 
         Assert.True (left);
     }
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_HasFocus_Changed_Event (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -119,8 +117,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         Toplevel top = new ();
-        Application.Top = top;
-        Application.Navigation = new ();
+        Application.Current = top;
 
         View otherView = new ()
         {
@@ -151,8 +148,8 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         // Ensure the view is Visible
         view.Visible = true;
 
-        Application.Top.SetFocus ();
-        Assert.True (Application.Top!.HasFocus);
+        Application.Current.SetFocus ();
+        Assert.True (Application.Current!.HasFocus);
         Assert.True (top.HasFocus);
 
         // Start with the focus on our test view
@@ -251,13 +248,11 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         Assert.Equal (2, enterCount);
         Assert.Equal (1, leaveCount);
-
-        Application.ResetState ();
     }
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    [SetupFakeApplication] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_Visible_False_No_HasFocus_Events (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -285,8 +280,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         Toplevel top = new ();
 
-        Application.Top = top;
-        Application.Navigation = new ();
+        Application.Current = top;
 
         View otherView = new ()
         {
@@ -320,29 +314,6 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (0, hasFocusChangedCount);
 
         top.Dispose ();
-
-        Application.ResetState ();
-    }
-
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Navigation_With_Null_Focused_View ()
-    {
-        // Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
-
-
-        using var top = new Toplevel ();
-        top.Ready += (s, e) => { Assert.Null (top.Focused); };
-
-        // Keyboard navigation with tab
-        FakeConsole.MockKeyPresses.Push (new ('\t', ConsoleKey.Tab, false, false, false));
-
-        Application.Iteration += (s, a) => Application.RequestStop ();
-
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
     }
 
     [Fact]

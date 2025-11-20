@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -9,15 +7,15 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         Toplevel views can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
-///         <see cref="Application.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
+///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
+///         <see cref="IApplication.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
 ///         property to <c>false</c>).
 ///     </para>
 ///     <para>
-///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
-///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
+///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="IApplication.Init"/>.
+///         The application Toplevel can be accessed via <see cref="IApplication.Current"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
+///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View
@@ -84,41 +82,41 @@ public partial class Toplevel : View
 
     // TODO: IRunnable: Re-implement as a property on IRunnable
     /// <summary>Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.</summary>
-    /// <remarks>Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead.</remarks>
+    /// <remarks>Setting this property directly is discouraged. Use <see cref="IApplication.RequestStop()"/> instead.</remarks>
     public bool Running { get; set; }
 
     // TODO: IRunnable: Re-implement in IRunnable
     /// <summary>
-    ///     <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
+    ///     <see langword="true"/> if was already loaded by the <see cref="IApplication.Begin(Toplevel)"/>
     ///     <see langword="false"/>, otherwise.
     /// </summary>
     public bool IsLoaded { get; private set; }
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Activating/Activate
-    /// <summary>Invoked when the Toplevel <see cref="RunState"/> active.</summary>
+    /// <summary>Invoked when the Toplevel <see cref="SessionToken"/> active.</summary>
     public event EventHandler<ToplevelEventArgs>? Activate;
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Deactivating/Deactivate?
-    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be active.</summary>
+    /// <summary>Invoked when the Toplevel<see cref="SessionToken"/> ceases to be active.</summary>
     public event EventHandler<ToplevelEventArgs>? Deactivate;
 
-    /// <summary>Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.</summary>
+    /// <summary>Invoked when the Toplevel's <see cref="SessionToken"/> is closed by <see cref="IApplication.End(SessionToken)"/>.</summary>
     public event EventHandler<ToplevelEventArgs>? Closed;
 
     /// <summary>
-    ///     Invoked when the Toplevel's <see cref="RunState"/> is being closed by
-    ///     <see cref="Application.RequestStop(Toplevel)"/>.
+    ///     Invoked when the Toplevel's <see cref="SessionToken"/> is being closed by
+    ///     <see cref="IApplication.RequestStop(Toplevel)"/>.
     /// </summary>
     public event EventHandler<ToplevelClosingEventArgs>? Closing;
 
     /// <summary>
-    ///     Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded. A Loaded event handler
-    ///     is a good place to finalize initialization before calling <see cref="Application.RunLoop(RunState)"/>.
+    ///     Invoked when the <see cref="Toplevel"/> <see cref="SessionToken"/> has begun to be loaded. A Loaded event handler
+    ///     is a good place to finalize initialization before calling Run.
     /// </summary>
     public event EventHandler? Loaded;
 
     /// <summary>
-    ///     Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first
+    ///     Called from <see cref="IApplication.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first
     ///     time.
     /// </summary>
     /// <remarks>
@@ -143,23 +141,23 @@ public partial class Toplevel : View
     ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
+    ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
     public event EventHandler? Ready;
 
     /// <summary>
     ///     Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel,
-    ///     <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
+    ///     <see cref="IApplication.RequestStop(Toplevel)"/> will be called, causing the application to exit.
     /// </summary>
     public virtual void RequestStop ()
     {
-        Application.RequestStop (Application.Top);
+        App?.RequestStop (App?.Current);
     }
 
     /// <summary>
-    ///     Invoked when the Toplevel <see cref="RunState"/> has been unloaded. A Unloaded event handler is a good place
-    ///     to dispose objects after calling <see cref="Application.End(RunState)"/>.
+    ///     Invoked when the Toplevel <see cref="SessionToken"/> has been unloaded. A Unloaded event handler is a good place
+    ///     to dispose objects after calling <see cref="IApplication.End(SessionToken)"/>.
     /// </summary>
     public event EventHandler? Unloaded;
 
@@ -177,7 +175,7 @@ public partial class Toplevel : View
     internal virtual void OnDeactivate (Toplevel activated) { Deactivate?.Invoke (this, new (activated)); }
 
     /// <summary>
-    ///     Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the first iteration
+    ///     Called from run loop after the <see cref="Toplevel"/> has entered the first iteration
     ///     of the loop.
     /// </summary>
     internal virtual void OnReady ()
@@ -191,7 +189,7 @@ public partial class Toplevel : View
         Ready?.Invoke (this, EventArgs.Empty);
     }
 
-    /// <summary>Called from <see cref="Application.End(RunState)"/> before the <see cref="Toplevel"/> is disposed.</summary>
+    /// <summary>Called from <see cref="IApplication.End(SessionToken)"/> before the <see cref="Toplevel"/> is disposed.</summary>
     internal virtual void OnUnloaded ()
     {
         foreach (var view in SubViews.Where (v => v is Toplevel))
@@ -246,7 +244,7 @@ public partial class Toplevel : View
         }
 
         // BUGBUG: The && true is a temp hack
-        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top!.Modal) || (top == Application.Top && top?.SuperView is null))
+        if ((superView != top || top?.SuperView is { } || (top != App?.Current && top!.Modal) || (top == App?.Current && top?.SuperView is null))
             && (top!.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
 
         {

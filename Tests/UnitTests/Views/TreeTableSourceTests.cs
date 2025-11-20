@@ -27,10 +27,10 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (100, 100);
+        Application.Driver!.SetScreenSize (100, 100);
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -55,7 +55,7 @@ public class TreeTableSourceTests : IDisposable
         // when pressing right we should expand the top route
         tv.NewKeyDownEvent (Key.CursorRight);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -73,7 +73,7 @@ public class TreeTableSourceTests : IDisposable
         // when pressing left we should collapse the top route again
         tv.NewKeyDownEvent (Key.CursorLeft);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -88,16 +88,16 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (100, 100);
+        Application.Driver!.SetScreenSize (100, 100);
 
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -117,7 +117,7 @@ public class TreeTableSourceTests : IDisposable
 
         Assert.True (tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -142,7 +142,7 @@ public class TreeTableSourceTests : IDisposable
 
         // Clicking on the + again should collapse
         tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -195,7 +195,7 @@ public class TreeTableSourceTests : IDisposable
 
         Application.RaiseKeyDownEvent (Key.CursorRight);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -213,7 +213,7 @@ public class TreeTableSourceTests : IDisposable
 
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.Space);
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -239,7 +239,10 @@ public class TreeTableSourceTests : IDisposable
 
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+        };
         tableView.SchemeName = "TopLevel";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
 

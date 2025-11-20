@@ -9,11 +9,12 @@ namespace UnitTests.ViewTests;
 public class ClipTests (ITestOutputHelper _output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Move_Is_Not_Constrained_To_Viewport ()
     {
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
             Width = 3, Height = 3
@@ -31,11 +32,12 @@ public class ClipTests (ITestOutputHelper _output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void AddRune_Is_Constrained_To_Viewport ()
     {
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
             Width = 3, Height = 3
@@ -64,10 +66,14 @@ public class ClipTests (ITestOutputHelper _output)
     [InlineData (0, 0, 1, 1)]
     [InlineData (0, 0, 2, 2)]
     [InlineData (-1, -1, 2, 2)]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {
@@ -91,7 +97,7 @@ public class ClipTests (ITestOutputHelper _output)
                                                        _output);
 
         Rectangle toFill = new (x, y, width, height);
-        View.SetClipToScreen ();
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -133,7 +139,7 @@ public class ClipTests (ITestOutputHelper _output)
                                                        _output);
         toFill = new (-1, -1, width + 1, height + 1);
 
-        View.SetClipToScreen ();
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -154,7 +160,7 @@ public class ClipTests (ITestOutputHelper _output)
  └─┘",
                                                        _output);
         toFill = new (0, 0, width * 2, height * 2);
-        View.SetClipToScreen ();
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -167,14 +173,15 @@ public class ClipTests (ITestOutputHelper _output)
 
     // TODO: Simplify this test to just use AddRune directly
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Trait ("Category", "Unicode")]
     public void Clipping_Wide_Runes ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (30, 1);
+        Application.Driver!.SetScreenSize (30, 1);
 
         var top = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "top",
             Width = Dim.Fill (),
             Height = Dim.Fill ()
@@ -190,10 +197,10 @@ public class ClipTests (ITestOutputHelper _output)
                    """
         };
         frameView.Border!.LineStyle = LineStyle.Single;
-        frameView.Border.Thickness = new (1, 0, 0, 0);
+        frameView.Border!.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Layout ();
         top.Draw ();
 
@@ -217,7 +224,7 @@ public class ClipTests (ITestOutputHelper _output)
 
         top.Add (view);
         top.Layout ();
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         //                            012345678901234567890123456789012345678
@@ -235,7 +242,7 @@ public class ClipTests (ITestOutputHelper _output)
     // TODO: Add more AddRune tests to cover all the cases where wide runes are clipped
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetClip_ClipVisibleContentOnly_VisibleContentIsClipped ()
     {
         // Screen is 25x25
@@ -252,27 +259,29 @@ public class ClipTests (ITestOutputHelper _output)
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ViewportSettings = ViewportSettingsFlags.ClipContentOnly
+            ViewportSettings = ViewportSettingsFlags.ClipContentOnly,
+            App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
+        Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
 
         // Act
         view.AddViewportToClip ();
 
         // Assert
-        Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
+        Assert.Equal (expectedClip, view.GetClip ()!.GetBounds ());
         view.Dispose ();
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetClip_Default_ClipsToViewport ()
     {
         // Screen is 25x25
+        Application.Driver!.SetScreenSize (25, 25);
         // View is 25x25
         // Viewport is (0, 0, 23, 23)
         // ContentSize is (10, 10)
@@ -285,20 +294,21 @@ public class ClipTests (ITestOutputHelper _output)
         var view = new View
         {
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+            App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
+        Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 
         // Act
         view.AddViewportToClip ();
 
         // Assert
-        Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
+        Assert.Equal (expectedClip, view.GetClip ()!.GetBounds ());
         view.Dispose ();
     }
 }

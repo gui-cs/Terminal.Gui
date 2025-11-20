@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -31,11 +31,11 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    (ctx) =>
                     {
                         // Logging.Debug ($"{Title} - Command.HotKey");
 
-                        if (RaiseHandlingHotKey () is true)
+                        if (RaiseHandlingHotKey (ctx) is true)
                         {
                             return true;
                         }
@@ -321,7 +321,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
         foreach (MenuBarItemv2? mbi in SubViews.Select (s => s as MenuBarItemv2))
         {
-            Application.Popover?.Register (mbi?.PopoverMenu);
+            App?.Popover?.Register (mbi?.PopoverMenu);
         }
     }
 
@@ -396,11 +396,11 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
 
         // If the active Application Popover is part of this MenuBar, hide it.
-        if (Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
+        if (App?.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu.Root?.SuperMenuItem?.SuperView == this)
         {
-            // Logging.Debug ($"{Title} - Calling Application.Popover?.Hide ({popoverMenu.Title})");
-            Application.Popover.Hide (popoverMenu);
+            // Logging.Debug ($"{Title} - Calling App?.Popover?.Hide ({popoverMenu.Title})");
+            App?.Popover.Hide (popoverMenu);
         }
 
         if (menuBarItem is null)
@@ -420,7 +420,11 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
 
         // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
-        menuBarItem.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
+        if (menuBarItem.PopoverMenu is { })
+        {
+            menuBarItem.PopoverMenu.App ??= App;
+            menuBarItem.PopoverMenu.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
+        }
 
         menuBarItem.Accepting += OnMenuItemAccepted;
 
@@ -501,10 +505,15 @@ public class MenuBarv2 : Menuv2, IDesignable
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign<TContext> (ref TContext context) where TContext : notnull
+    public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
+
+        if (targetView is View target)
+        {
+            App ??= target.App;
+        }
 
         Id = "DemoBar";
 
@@ -526,8 +535,8 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
         {
-            Options = ["G_ood", "_Bad", "U_gly"],
-            SelectedItem = 0
+            Labels = ["G_ood", "_Bad", "U_gly"],
+            Value = 0
         };
 
         var menuBgColorCp = new ColorPicker
@@ -552,10 +561,10 @@ public class MenuBarv2 : Menuv2, IDesignable
              new MenuBarItemv2 (
                                 "_File",
                                 [
-                                    new MenuItemv2 (context as View, Command.New),
-                                    new MenuItemv2 (context as View, Command.Open),
-                                    new MenuItemv2 (context as View, Command.Save),
-                                    new MenuItemv2 (context as View, Command.SaveAs),
+                                    new MenuItemv2 (targetView as View, Command.New),
+                                    new MenuItemv2 (targetView as View, Command.Open),
+                                    new MenuItemv2 (targetView as View, Command.Save),
+                                    new MenuItemv2 (targetView as View, Command.SaveAs),
                                     new Line (),
                                     new MenuItemv2
                                     {
@@ -576,7 +585,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                                Key = Key.W.WithCtrl,
                                                                CommandView = enableOverwriteCb,
                                                                Command = Command.EnableOverwrite,
-                                                               TargetView = context as View
+                                                               TargetView = targetView as View
                                                            },
                                                            new ()
                                                            {
@@ -622,7 +631,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                     new Line (),
                                     new MenuItemv2
                                     {
-                                        TargetView = context as View,
+                                        TargetView = targetView as View,
                                         Key = Application.QuitKey,
                                         Command = Command.Quit
                                     }
@@ -634,11 +643,11 @@ public class MenuBarv2 : Menuv2, IDesignable
              new MenuBarItemv2 (
                                 "_Edit",
                                 [
-                                    new MenuItemv2 (context as View, Command.Cut),
-                                    new MenuItemv2 (context as View, Command.Copy),
-                                    new MenuItemv2 (context as View, Command.Paste),
+                                    new MenuItemv2 (targetView as View, Command.Cut),
+                                    new MenuItemv2 (targetView as View, Command.Copy),
+                                    new MenuItemv2 (targetView as View, Command.Paste),
                                     new Line (),
-                                    new MenuItemv2 (context as View, Command.SelectAll),
+                                    new MenuItemv2 (targetView as View, Command.SelectAll),
                                     new Line (),
                                     new MenuItemv2
                                     {

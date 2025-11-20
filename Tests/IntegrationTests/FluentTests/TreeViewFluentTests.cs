@@ -36,14 +36,14 @@ public class TreeViewFluentTests
         tv.AddObject (root);
 
         using GuiTestContext context =
-            With.A<Window> (40, 10, d)
+            With.A<Window> (40, 10, d, _out)
                 .Add (tv)
                 .Focus (tv)
                 .WaitIteration ()
                 .ScreenShot ("Before expanding", _out)
                 .AssertEqual (root, tv.GetObjectOnRow (0))
                 .AssertNull (tv.GetObjectOnRow (1))
-                .Right ()
+                .EnqueueKeyEvent (Key.CursorRight)
                 .ScreenShot ("After expanding", _out)
                 .AssertMultiple (
                                  () =>
@@ -55,7 +55,7 @@ public class TreeViewFluentTests
                                  })
                 .AssertIsAssignableFrom <ITreeNode>(tv.SelectedObject)
                 .Then (
-                       () =>
+                       (_) =>
                        {
                            // Re order
                            root.Children = [bike, car, lorry];
@@ -150,7 +150,7 @@ public class TreeViewFluentTests
                                      Assert.Equal (mrE, tv.GetObjectOnRow (8));
                                  })
                 .Then (
-                       () =>
+                       (_) =>
                        {
                            // Re order
                            root.Children = [bike, car, lorry];

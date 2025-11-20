@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Data;
 
 namespace Terminal.Gui.Views;

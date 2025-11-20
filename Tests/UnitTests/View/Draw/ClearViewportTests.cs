@@ -98,10 +98,14 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_ClearsEntireViewport ()
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {
@@ -133,7 +137,7 @@ public class ClearViewportTests (ITestOutputHelper output)
  └─┘",
                                                        output);
 
-        View.SetClipToScreen ();
+       view.SetClipToScreen ();
 
         view.ClearViewport ();
 
@@ -146,10 +150,14 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {
@@ -172,7 +180,7 @@ public class ClearViewportTests (ITestOutputHelper output)
  │X│
  └─┘",
                                                        output);
-        View.SetClipToScreen ();
+       view.SetClipToScreen ();
         view.ClearViewport ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -203,13 +211,13 @@ public class ClearViewportTests (ITestOutputHelper output)
                                        }
                                    }
 
-                                   View.SetClip (savedClip);
+                                   view.SetClip (savedClip);
                                    e.Cancel = true;
                                };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
+        Application.Driver!.SetScreenSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -268,13 +276,13 @@ public class ClearViewportTests (ITestOutputHelper output)
                                        }
                                    }
 
-                                   View.SetClip (savedClip);
+                                   view.SetClip (savedClip);
                                    e.Cancel = true;
                                };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 10));
+        Application.Driver!.SetScreenSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -337,7 +345,7 @@ public class ClearViewportTests (ITestOutputHelper output)
 
         Toplevel top = new ();
         top.Add (root);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         if (label)
@@ -406,7 +414,7 @@ cccccccccccccccccccc",
                                                    );
         }
 
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
 
         CM.Disable (resetToHardCodedDefaults: true);

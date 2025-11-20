@@ -15,6 +15,47 @@ Terminal.Gui v2 represents a fundamental rethinking of the library's architectur
 
 This architectural shift has resulted in the removal of thousands of lines of redundant or overly complex code from v1, replaced with cleaner, more focused implementations.
 
+## Instance-Based Application Architecture
+
+See the [Application Deep Dive](application.md) for complete details on the new application architecture.
+
+Terminal.Gui v2 introduces an instance-based application architecture that decouples views from global application state, dramatically improving testability and enabling multiple application contexts.
+
+### Key Changes
+
+- **Instance-Based Pattern**: The recommended pattern is to use `Application.Create()` to get an `IApplication` instance, rather than using the static `Application` class (which is marked obsolete but still functional for backward compatibility).
+- **View.App Property**: Every view now has an `App` property that references its `IApplication` context, enabling views to access application services without static dependencies.
+- **Session Management**: Applications manage sessions through `Begin()` and `End()` methods, with a `SessionStack` tracking nested sessions and `Current` representing the active session.
+- **Improved Testability**: Views can be tested in isolation by setting their `App` property to a mock `IApplication`, eliminating the need for `Application.Init()` in unit tests.
+
+### Example Usage
+
+```csharp
+// Recommended v2 pattern (instance-based)
+var app = Application.Create();
+app.Init();
+var top = new Toplevel { Title = "My App" };
+top.Add(myView);
+app.Run(top);
+top.Dispose();
+app.Shutdown();
+
+// Static pattern (obsolete but still works)
+Application.Init();
+var top = new Toplevel { Title = "My App" };
+top.Add(myView);
+Application.Run(top);
+top.Dispose();
+Application.Shutdown();
+```
+
+### Benefits
+
+- **Testability**: Views can be tested without initializing the entire application
+- **Multiple Contexts**: Multiple `IApplication` instances can coexist (useful for testing or complex scenarios)
+- **Clear Ownership**: Views explicitly know their application context via the `App` property
+- **Reduced Global State**: Less reliance on static singletons improves code maintainability
+
 ## Modern Look & Feel - Technical Details
 
 ### TrueColor Support

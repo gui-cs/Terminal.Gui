@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.App;
 
@@ -7,6 +6,7 @@ public static partial class Application // Navigation stuff
     /// <summary>
     ///     Gets the <see cref="ApplicationNavigation"/> instance for the current <see cref="Application"/>.
     /// </summary>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static ApplicationNavigation? Navigation
     {
         get => ApplicationImpl.Instance.Navigation;
@@ -15,18 +15,18 @@ public static partial class Application // Navigation stuff
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabGroupKey
+      [Obsolete ("The legacy static Application object is going away.")]public static Key NextTabGroupKey
     {
-        get => Keyboard.NextTabGroupKey;
-        set => Keyboard.NextTabGroupKey = value;
+        get => ApplicationImpl.Instance.Keyboard.NextTabGroupKey;
+        set => ApplicationImpl.Instance.Keyboard.NextTabGroupKey = value;
     }
 
     /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key NextTabKey
     {
-        get => Keyboard.NextTabKey;
-        set => Keyboard.NextTabKey = value;
+        get => ApplicationImpl.Instance.Keyboard.NextTabKey;
+        set => ApplicationImpl.Instance.Keyboard.NextTabKey = value;
     }
 
     /// <summary>
@@ -41,25 +41,26 @@ public static partial class Application // Navigation stuff
     ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
     ///     <para>Fired after <see cref="KeyDown"/>.</para>
     /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<Key>? KeyUp
     {
-        add => Keyboard.KeyUp += value;
-        remove => Keyboard.KeyUp -= value;
+        add => ApplicationImpl.Instance.Keyboard.KeyUp += value;
+        remove => ApplicationImpl.Instance.Keyboard.KeyUp -= value;
     }
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key PrevTabGroupKey
     {
-        get => Keyboard.PrevTabGroupKey;
-        set => Keyboard.PrevTabGroupKey = value;
+        get => ApplicationImpl.Instance.Keyboard.PrevTabGroupKey;
+        set => ApplicationImpl.Instance.Keyboard.PrevTabGroupKey = value;
     }
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key PrevTabKey
     {
-        get => Keyboard.PrevTabKey;
-        set => Keyboard.PrevTabKey = value;
+        get => ApplicationImpl.Instance.Keyboard.PrevTabKey;
+        set => ApplicationImpl.Instance.Keyboard.PrevTabKey = value;
     }
 }

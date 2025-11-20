@@ -1,3 +1,4 @@
+#nullable disable
 using System.Data;
 using System.Globalization;
 
@@ -1606,11 +1607,11 @@ public class TableView : View, IDesignable
             return false;
         }
 
-        int match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
+        int? match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
 
-        if (match != -1)
+        if (match != null)
         {
-            SelectedRow = match;
+            SelectedRow = match.Value;
             EnsureValidSelection ();
             EnsureSelectedCellIsVisible ();
             SetNeedsDraw ();

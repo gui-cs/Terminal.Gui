@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace Terminal.Gui.Views;
 
@@ -61,7 +60,7 @@ public class NetMaskedTextProvider : ITextValidateProvider
     public bool Fixed => true;
 
     /// <inheritdoc/>
-    public string DisplayText => _provider.ToDisplayString ();
+    public string DisplayText => _provider!.ToDisplayString ();
 
     /// <inheritdoc/>
     public int Cursor (int pos)

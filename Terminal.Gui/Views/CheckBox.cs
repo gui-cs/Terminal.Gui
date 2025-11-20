@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.Views;
 
@@ -26,22 +26,14 @@ public class CheckBox : View
 
         CanFocus = true;
 
-        // Select (Space key and single-click) - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.Select, AdvanceAndSelect);
+        // Activate (Space key and single-click) - Raise Activate event and Advance
+        // - DO NOT raise Accept
+        // - DO NOT SetFocus
+        AddCommand (Command.Select, ActivateAndAdvance);
 
-        // Hotkey - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.HotKey, ctx =>
-                                    {
-                                        if (RaiseHandlingHotKey () is true)
-                                        {
-                                            return true;
-                                        }
-                                        return AdvanceAndSelect (ctx);
-                                    });
-
-        // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, RaiseAccepting);
-
+        // Accept (Enter key and double-click) - Raise Accept event
+        // - DO NOT advance state
+        // The default Accept handler does that.
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
@@ -49,16 +41,31 @@ public class CheckBox : View
         HighlightStates = DefaultHighlightStates;
     }
 
-    private bool? AdvanceAndSelect (ICommandContext? commandContext)
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
-        bool? cancelled = AdvanceCheckState ();
+        // Invoke Activate on ourselves
+        if (InvokeCommand (Command.Select, args.Context) is true)
+        {
+            // Default behavior for View is to set Focus on hotkey. We need to return
+            // true here to indicate Activate was handled. That will prevent the default
+            // behavior from setting focus, so we do it here.
+            SetFocus ();
+            return true;
+        }
+        return base.OnHandlingHotKey (args);
+    }
 
-        if (cancelled is true)
+    private bool? ActivateAndAdvance (ICommandContext? commandContext)
+    {
+        if (RaiseSelecting (commandContext) is true)
         {
             return true;
         }
 
-        if (RaiseSelecting (commandContext) is true)
+        bool? cancelled = AdvanceCheckState ();
+
+        if (cancelled is true)
         {
             return true;
         }
@@ -251,6 +258,13 @@ public class CheckBox : View
         return cancelled;
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        return base.OnClearingViewport ();
+    }
+
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
@@ -292,11 +306,11 @@ public class CheckBox : View
     private Rune GetRadioGlyph ()
     {
         return CheckedState switch
-               {
-                   CheckState.Checked => Glyphs.Selected,
-                   CheckState.UnChecked => Glyphs.UnSelected,
-                   CheckState.None => Glyphs.Dot,
-                   _ => throw new ArgumentOutOfRangeException ()
-               };
+        {
+            CheckState.Checked => Glyphs.Selected,
+            CheckState.UnChecked => Glyphs.UnSelected,
+            CheckState.None => Glyphs.Dot,
+            _ => throw new ArgumentOutOfRangeException ()
+        };
     }
 }

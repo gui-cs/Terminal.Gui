@@ -9,10 +9,11 @@ namespace UnitTests.ViewTests;
 public class TextTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Setting_With_Height_Horizontal ()
     {
         var top = new View { Width = 25, Height = 25 };
+        top.App = ApplicationImpl.Instance;
 
         var label = new Label { Text = "Hello", /* Width = 10, Height = 2, */ ValidatePosDim = true };
         var viewX = new View { Text = "X", X = Pos.Right (label), Width = 1, Height = 1 };
@@ -39,7 +40,7 @@ Y
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
         top.LayoutSubViews ();
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         expected = @"
@@ -65,7 +66,7 @@ Y
 
         var top = new Toplevel ();
         top.Add (label, viewX, viewY);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         label.Text = "Hello";
         AutoInitShutdownAttribute.RunIteration ();
@@ -120,12 +121,12 @@ Y
         var top = new Toplevel ();
         top.Add (win);
 
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(15, 15))   ;
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (15, 15);
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Border.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Margin!.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Border!.Frame);
         Assert.Equal (new (1, 1, 13, 13), win.Padding.Frame);
 
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
@@ -385,8 +386,8 @@ Y
         win.Add (view);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(4, 10));
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (4, 10);
 
         Assert.Equal (5, text.Length);
 
@@ -394,7 +395,7 @@ Y
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
-        Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 4, 10), Application.Current.Frame);
 
         var expected = @"
 ┌──┐
@@ -442,13 +443,14 @@ Y
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void DimAuto_Vertical_TextDirection_Wide_Rune ()
     {
         var text = "界View";
 
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             TextDirection = TextDirection.TopBottom_LeftRight,
             Text = text,
             Width = Dim.Auto (),
@@ -510,8 +512,8 @@ w ";
         win.Add (horizontalView, verticalView);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(20, 20));
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (20, 20);
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -598,8 +600,8 @@ w ";
         win.Add (horizontalView, verticalView);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(22, 22));
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (22, 22);
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -677,7 +679,7 @@ w ";
         var lbl = new Label { Text = "123" };
         var top = new Toplevel ();
         top.Add (lbl);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 3, 1), lbl.Frame);
@@ -783,7 +785,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize (new Size(width + 2, 6));
+        Application.Driver!.SetScreenSize (width + 2, 6);
 
         // frame.Width is width + border wide (20 + 2) and 6 high
 
@@ -913,7 +915,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(9, height + 2));
+        Application.Driver!.SetScreenSize (9, height + 2);
 
         if (autoSize)
         {
@@ -995,11 +997,12 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Narrow_Wide_Runes ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (32, 32);
+        Application.Driver!.SetScreenSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
+        top.App = ApplicationImpl.Instance;
 
         var text = $"First line{Environment.NewLine}Second line";
         var horizontalView = new View { Width = 20, Height = 1, Text = text };
@@ -1075,7 +1078,7 @@ w ";
         verticalView.Width = 2;
         verticalView.TextFormatter.ConstrainToSize = new (2, 20);
         Assert.True (verticalView.TextFormatter.NeedsFormat);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
         Assert.Equal (new (0, 3, 2, 20), verticalView.Frame);
 
@@ -1118,13 +1121,13 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetText_RendersCorrectly ()
     {
         View view;
         var text = "test";
 
-        view = new Label { Text = text };
+        view = new Label { App = ApplicationImpl.Instance, Text = text };
         view.BeginInit ();
         view.EndInit ();
         view.Draw ();

@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.Drawing;
 
 /// <summary>Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...</summary>
@@ -57,11 +56,11 @@ public class Glyphs
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CheckStateNone { get; set; } = (Rune)'□'; // TODO: Verify this works as broadly as possible
 
-    /// <summary>Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).</summary>
+    /// <summary>Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="OptionSelector"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Selected { get; set; } = (Rune)'◉';
 
-    /// <summary>Not Selected indicator (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).</summary>
+    /// <summary>Not Selected indicator (e.g. for <see cref="ListView"/> and <see cref="OptionSelector"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune UnSelected { get; set; } = (Rune)'○';
 

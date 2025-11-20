@@ -8,7 +8,7 @@ public class ScrollBarTests (ITestOutputHelper output)
     #region Draw
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     #region Horizontal
 
@@ -495,6 +495,8 @@ public class ScrollBarTests (ITestOutputHelper output)
     {
         var super = new Window
         {
+            Driver = ApplicationImpl.Instance.Driver,
+
             Id = "super",
             Width = width + 2,
             Height = height + 2,
@@ -549,7 +551,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         };
 
         top.Add (scrollBar);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Scroll to end
         scrollBar.Position = 19;
@@ -598,7 +600,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         };
 
         top.Add (scrollBar);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Scroll to top
         scrollBar.Position = 0;

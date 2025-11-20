@@ -43,7 +43,7 @@ public class WindowsAndFrameViews : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
         win.Padding.Thickness = new (padding);
-        win.Margin.Thickness = new (margin);
+        win.Margin!.Thickness = new (margin);
 
         var paddingButton = new Button
         {
@@ -69,7 +69,7 @@ public class WindowsAndFrameViews : Scenario
         // add it to our list
         listWin.Add (win);
 
-        // create 3 more Windows in a loop, adding them Application.Top
+        // create 3 more Windows in a loop, adding them Application.Current
         // Each with a
         //	button
         //  sub Window with

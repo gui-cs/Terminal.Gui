@@ -8,12 +8,13 @@ namespace UnitTests.ViewTests;
 public class TransparentTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     public void Transparent_Text_Occludes ()
     {
         var super = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "super",
             Width = 20,
             Height = 5,
@@ -52,12 +53,13 @@ public class TransparentTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     public void Transparent_SubView_Occludes ()
     {
         var super = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "super",
             Width = 20,
             Height = 5,
