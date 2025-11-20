@@ -93,6 +93,74 @@ In v1, @Terminal.Gui./Terminal.Gui.Application.Init) automatically created a top
 * Update any code that assumes `Application.Init` automatically created a toplevel view and set `Application.Current`.
 * Update any code that assumes `Application.Init` automatically disposed of the toplevel view when the application exited.
 
+## Instance-Based Application Architecture
+
+See the [Application Deep Dive](application.md) for complete details on the new application architecture.
+
+Terminal.Gui v2 introduces an instance-based application architecture. While the static `Application` class still works (marked obsolete), the recommended pattern is to use `Application.Create()` to get an `IApplication` instance.
+
+### Key Changes
+
+- **Static Application is Obsolete**: The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton) and is marked `[Obsolete]` but remains functional for backward compatibility.
+- **Recommended Pattern**: Use `Application.Create()` to get a new `IApplication` instance for better testability and multiple application contexts.
+- **View.App Property**: Every view has an `App` property that references its `IApplication` context, enabling views to access application services without static dependencies.
+
+### Migration Strategies
+
+**Option 1: Continue Using Static Application (Backward Compatible)**
+
+The static `Application` class still works, so existing v1 code can continue to work with minimal changes:
+
+```csharp
+// v1 code (still works in v2, but obsolete)
+Application.Init();
+var top = new Toplevel();
+top.Add(myView);
+Application.Run(top);
+top.Dispose();
+Application.Shutdown();
+```
+
+**Option 2: Migrate to Instance-Based Pattern (Recommended)**
+
+For new code or when refactoring, use the instance-based pattern:
+
+```csharp
+// v2 recommended pattern
+var app = Application.Create();
+app.Init();
+var top = new Toplevel();
+top.Add(myView);
+app.Run(top);
+top.Dispose();
+app.Shutdown();
+```
+
+**Option 3: Use View.App Property**
+
+When accessing application services from within views, use the `App` property instead of static `Application`:
+
+```csharp
+// OLD (v1 / obsolete static):
+public void Refresh()
+{
+    Application.Current?.SetNeedsDraw();
+}
+
+// NEW (v2 - use View.App):
+public void Refresh()
+{
+    App?.Current?.SetNeedsDraw();
+}
+```
+
+### Benefits of Instance-Based Architecture
+
+- **Testability**: Views can be tested without `Application.Init()` by setting `view.App = mockApp`
+- **Multiple Contexts**: Multiple `IApplication` instances can coexist
+- **Clear Ownership**: Views explicitly know their application context
+- **Reduced Global State**: Less reliance on static singletons
+
 ## @Terminal.Gui.Pos and @Terminal.Gui.Dim types now adhere to standard C# idioms
 
 * In v1, the @Terminal.Gui.Pos and @Terminal.Gui.Dim types (e.g. @Terminal.Gui.Pos.PosView) were nested classes and marked @Terminal.Gui.internal. In v2, they are no longer nested, and have appropriate public APIs. 

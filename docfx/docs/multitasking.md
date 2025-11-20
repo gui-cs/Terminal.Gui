@@ -9,7 +9,7 @@ Terminal.Gui applications run on a single main thread with an event loop that pr
 Terminal.Gui follows the standard UI toolkit pattern where **all UI operations must happen on the main thread**. Attempting to modify views or their properties from background threads will result in undefined behavior and potential crashes.
 
 ### The Golden Rule
-> Always use `Application.Invoke()` to update the UI from background threads.
+> Always use `Application.Invoke()` (static, obsolete) or `app.Invoke()` (instance-based, recommended) to update the UI from background threads. From within a View, use `App?.Invoke()`.
 
 ## Background Operations
 
@@ -47,6 +47,7 @@ private async void LoadDataButton_Clicked()
 
 When working with traditional threading APIs or when async/await isn't suitable:
 
+**From within a View (recommended):**
 ```csharp
 private void StartBackgroundWork()
 {
@@ -58,19 +59,54 @@ private void StartBackgroundWork()
             Thread.Sleep(50); // Simulate work
             
             // Marshal back to main thread for UI updates
-            Application.Invoke(() =>
+            App?.Invoke(() =>
             {
                 progressBar.Fraction = i / 100f;
                 statusLabel.Text = $"Progress: {i}%";
             });
         }
         
-        Application.Invoke(() =>
+        App?.Invoke(() =>
         {
             statusLabel.Text = "Complete!";
         });
     });
 }
+```
+
+**Using IApplication instance (recommended):**
+```csharp
+var app = Application.Create();
+app.Init();
+
+private void StartBackgroundWork(IApplication app)
+{
+    Task.Run(() =>
+    {
+        // This code runs on a background thread
+        for (int i = 0; i <= 100; i++)
+        {
+            Thread.Sleep(50); // Simulate work
+            
+            // Marshal back to main thread for UI updates
+            app.Invoke(() =>
+            {
+                progressBar.Fraction = i / 100f;
+                statusLabel.Text = $"Progress: {i}%";
+            });
+        }
+        
+        app.Invoke(() =>
+        {
+            statusLabel.Text = "Complete!";
+        });
+    });
+}
+```
+
+**Using static Application (obsolete but still works):**
+```csharp
+Application.Invoke(() => { /* ... */ });
 ```
 
 ## Timers
@@ -89,10 +125,11 @@ public class ClockView : View
         Add(timeLabel);
         
         // Update every second
-        timerToken = Application.AddTimeout(
+        // Use App?.AddTimeout() when available, or Application.AddTimeout() (obsolete)
+        timerToken = App?.AddTimeout(
             TimeSpan.FromSeconds(1), 
             UpdateTime
-        );
+        ) ?? Application.AddTimeout(TimeSpan.FromSeconds(1), UpdateTime);
     }
     
     private bool UpdateTime()
@@ -105,7 +142,7 @@ public class ClockView : View
     {
         if (disposing && timerToken != null)
         {
-            Application.RemoveTimeout(timerToken);
+            App?.RemoveTimeout(timerToken) ?? Application.RemoveTimeout(timerToken);
         }
         base.Dispose(disposing);
     }
@@ -220,6 +257,13 @@ Task.Run(() =>
 ### ❌ Don't: Forget to clean up timers
 ```csharp
 // Memory leak - timer keeps running after view is disposed
+// From within a View:
+App?.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
+
+// Or with IApplication instance:
+app.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
+
+// Or static (obsolete but works):
 Application.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
 ```
 

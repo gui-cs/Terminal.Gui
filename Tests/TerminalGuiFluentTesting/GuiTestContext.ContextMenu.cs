@@ -24,7 +24,7 @@ public partial class GuiTestContext
                                    {
                                        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
                                        // and the context menu is disposed when it is closed.
-                                       App.Popover?.Register (contextMenu);
+                                       App?.Popover?.Register (contextMenu);
                                        contextMenu?.MakeVisible (e.ScreenPosition);
                                    }
                                };

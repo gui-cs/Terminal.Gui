@@ -47,9 +47,9 @@ public class ComboBox : View, IDesignable
                               };
         _listview.SelectedItemChanged += (sender, e) =>
                                          {
-                                             if (!HideDropdownListOnClick && _searchSet.Count > 0)
+                                             if (e.Item >= 0 && !HideDropdownListOnClick && _searchSet.Count > 0)
                                              {
-                                                 SetValue (_searchSet [_listview.SelectedItem]);
+                                                 SetValue (_searchSet [e.Item.Value]);
                                              }
                                          };
         Add (_search, _listview);
@@ -114,7 +114,7 @@ public class ComboBox : View, IDesignable
     /// <inheritdoc />
     protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme> args)
     {
-        _listview.SetScheme(args.NewValue);
+        _listview.SetScheme (args.NewValue);
         return base.OnSettingScheme (args);
     }
 
@@ -461,7 +461,10 @@ public class ComboBox : View, IDesignable
 
     private void FocusSelectedItem ()
     {
-        _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+        if (_listview.Source?.Count > 0)
+        {
+            _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+        }
         _listview.TabStop = TabBehavior.TabStop;
         _listview.SetFocus ();
         OnExpanded ();
@@ -517,9 +520,9 @@ public class ComboBox : View, IDesignable
                 _listview.TabStop = TabBehavior.TabStop;
                 _listview.SetFocus ();
 
-                if (_listview.SelectedItem > -1)
+                if (_listview.SelectedItem is { })
                 {
-                    SetValue (_searchSet [_listview.SelectedItem]);
+                    SetValue (_searchSet [_listview.SelectedItem.Value]);
                 }
                 else
                 {
@@ -728,7 +731,7 @@ public class ComboBox : View, IDesignable
         IsShow = false;
         _listview.TabStop = TabBehavior.NoStop;
 
-        if (_listview.Source.Count == 0 || (_searchSet?.Count ?? 0) == 0)
+        if (_listview.Source!.Count == 0 || (_searchSet?.Count ?? 0) == 0)
         {
             _text = "";
             HideList ();
@@ -737,7 +740,7 @@ public class ComboBox : View, IDesignable
             return false;
         }
 
-        SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
+        SetValue (_listview.SelectedItem is { } ? _searchSet [_listview.SelectedItem.Value] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
         ShowHideList (Text);
         OnOpenSelectedItem ();
@@ -977,7 +980,11 @@ public class ComboBox : View, IDesignable
         {
             bool res = base.OnSelectedChanged ();
 
-            _highlighted = SelectedItem;
+            if (SelectedItem is null)
+            {
+                return res;
+            }
+            _highlighted = SelectedItem.Value;
 
             return res;
         }
@@ -997,7 +1004,7 @@ public class ComboBox : View, IDesignable
             _container = container
                          ?? throw new ArgumentNullException (
                                                              nameof (container),
-                                                             "ComboBox container cannot be null."
+                                                             @"ComboBox container cannot be null."
                                                             );
             HideDropdownListOnClick = hideDropdownListOnClick;
             AddCommand (Command.Up, () => _container.MoveUpList ());

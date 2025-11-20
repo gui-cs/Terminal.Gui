@@ -153,7 +153,7 @@ public class SpinnerViewStyles : Scenario
                                           else
                                           {
                                               spinner.Visible = true;
-                                              spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.Item].Value);
+                                              spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.Item.Value].Value);
                                               delayField.Text = spinner.SpinDelay.ToString ();
                                               ckbBounce.CheckedState = spinner.SpinBounce ? CheckState.Checked : CheckState.UnChecked;
                                               ckbNoSpecial.CheckedState = !spinner.HasSpecialCharacters ? CheckState.Checked : CheckState.UnChecked;
