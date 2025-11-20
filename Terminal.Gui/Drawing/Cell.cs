@@ -95,7 +95,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, st
                     }
                     else
                     {
-                        sb.Append (rune.ToString ());
+                        sb.Append (rune);
                     }
                     break;
             }
