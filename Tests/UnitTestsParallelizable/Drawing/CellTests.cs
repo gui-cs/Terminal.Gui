@@ -146,7 +146,7 @@ public class CellTests
             Assert.True (throws);
         }
 
-        Cell c = new () { Grapheme = text };
+        Assert.Null (Record.Exception (() => new Cell { Grapheme = text }));
     }
 
     [Fact]
