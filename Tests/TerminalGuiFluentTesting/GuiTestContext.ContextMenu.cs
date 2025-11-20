@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace TerminalGuiFluentTesting;
@@ -12,13 +14,17 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext WithContextMenu (PopoverMenu? contextMenu)
     {
-        LastView.MouseEvent += (s, e) =>
+        if (contextMenu?.App is null)
+        {
+            Fail (@"PopoverMenu's must have their App property set.");
+        }
+        LastView.MouseEvent += (_, e) =>
                                {
                                    if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
                                    {
                                        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
                                        // and the context menu is disposed when it is closed.
-                                       Application.Popover?.Register (contextMenu);
+                                       App?.Popover?.Register (contextMenu);
                                        contextMenu?.MakeVisible (e.ScreenPosition);
                                    }
                                };

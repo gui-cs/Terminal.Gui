@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 
 namespace Terminal.Gui.Views;
@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. The
 ///     <see cref="SearchString"/> is used to find the next item in the collection that matches the search string when
-///     <see cref="GetNextMatchingItem(int, char)"/> is called.
+///     <see cref="GetNextMatchingItem(int?, char)"/> is called.
 ///     <para>
 ///         If the user types keystrokes that can't be found in the collection, the search string is cleared and the next
 ///         item is found that starts with the last keystroke.
@@ -17,7 +17,7 @@ public interface ICollectionNavigator
 {
     /// <summary>
     ///     Gets or sets the number of milliseconds to delay before clearing the search string. The delay is reset on each
-    ///     call to <see cref="GetNextMatchingItem(int, char)"/>. The default is 500ms.
+    ///     call to <see cref="GetNextMatchingItem(int?, char)"/>. The default is 500ms.
     /// </summary>
     public int TypingDelay { get; set; }
 
@@ -43,8 +43,8 @@ public interface ICollectionNavigator
     /// <param name="currentIndex">The index in the collection to start the search from.</param>
     /// <param name="keyStruck">The character of the key the user pressed.</param>
     /// <returns>
-    ///     The index of the item that matches what the user has typed. Returns <see langword="-1"/> if no item in the
+    ///     The index of the item that matches what the user has typed. Returns <see langword="null"/> if no item in the
     ///     collection matched.
     /// </returns>
-    int GetNextMatchingItem (int currentIndex, char keyStruck);
+    int? GetNextMatchingItem (int? currentIndex, char keyStruck);
 }

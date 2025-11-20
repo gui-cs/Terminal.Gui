@@ -33,6 +33,10 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
         _appDispose?.Dispose ();
         _appDispose = null;
 
+        // TODO: This is troublesome; it seems to cause tests to hang when enabled, but shouldn't have any impact.
+        // TODO: Uncomment after investigation.
+        //ApplicationImpl.SetInstance (null);
+
         base.After (methodUnderTest);
     }
 

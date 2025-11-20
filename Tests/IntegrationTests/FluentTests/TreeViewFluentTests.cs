@@ -55,7 +55,7 @@ public class TreeViewFluentTests
                                  })
                 .AssertIsAssignableFrom <ITreeNode>(tv.SelectedObject)
                 .Then (
-                       () =>
+                       (_) =>
                        {
                            // Re order
                            root.Children = [bike, car, lorry];
@@ -150,7 +150,7 @@ public class TreeViewFluentTests
                                      Assert.Equal (mrE, tv.GetObjectOnRow (8));
                                  })
                 .Then (
-                       () =>
+                       (_) =>
                        {
                            // Re order
                            root.Children = [bike, car, lorry];

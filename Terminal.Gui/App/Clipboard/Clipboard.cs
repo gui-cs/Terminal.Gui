@@ -1,4 +1,3 @@
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 /// <summary>Provides cut, copy, and paste support for the OS clipboard.</summary>
@@ -31,7 +30,7 @@ public static class Clipboard
                 if (IsSupported)
                 {
                     // throw new InvalidOperationException ($"{Application.Driver?.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
-                    string? clipData = Application.Driver?.Clipboard?.GetClipboardData () ?? string.Empty;
+                    string clipData = Application.Driver?.Clipboard?.GetClipboardData () ?? string.Empty;
 
                     _contents = clipData;
                 }

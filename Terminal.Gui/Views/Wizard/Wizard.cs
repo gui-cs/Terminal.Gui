@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -44,7 +42,7 @@ namespace Terminal.Gui.Views;
 ///     Application.RequestStop();
 /// };
 /// 
-/// Application.Top.Add (wizard);
+/// Application.Current.Add (wizard);
 /// Application.Run ();
 /// Application.Shutdown ();
 /// </code>
@@ -123,7 +121,7 @@ public class Wizard : Dialog
     ///         </item>
     ///     </list>
     ///     If a non-Modal Wizard is added to the application after
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> has
+    ///     <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/> has
     ///     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
     ///     <see cref="GetNextStep()"/>:
     ///     <code>
@@ -374,7 +372,7 @@ public class Wizard : Dialog
 
     /// <summary>
     ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-    ///     <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides
+    ///     <see cref="IApplication.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides
     ///     <see cref="OnKeyDownNotHandled"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
     ///     non-modal (see <see cref="Wizard.Modal"/>).
     /// </summary>

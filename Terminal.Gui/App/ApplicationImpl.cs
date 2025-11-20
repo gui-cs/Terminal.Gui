@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;
@@ -10,9 +9,9 @@ namespace Terminal.Gui.App;
 public partial class ApplicationImpl : IApplication
 {
     /// <summary>
-    ///     Creates a new instance of the Application backend.
+    ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
-    public ApplicationImpl () { }
+    internal ApplicationImpl () { }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
@@ -22,22 +21,22 @@ public partial class ApplicationImpl : IApplication
 
     #region Singleton
 
-    // Private static readonly Lazy instance of Application
-    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
-
     /// <summary>
-    ///     Change the singleton implementation, should not be called except before application
-    ///     startup. This method lets you provide alternative implementations of core static gateway
-    ///     methods of <see cref="Application"/>.
+    ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
-    /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication? newApplication) { _lazyInstance = new (newApplication!); }
+    /// <param name="app"></param>
+    public static void SetInstance (IApplication? app)
+    {
+        _instance = app;
+    }
+
+    // Private static readonly Lazy instance of Application
+    private static IApplication? _instance;
 
     /// <summary>
     ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
-    ///     Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
     /// </summary>
-    public static IApplication Instance => _lazyInstance.Value;
+    public static IApplication Instance => _instance ??= new ApplicationImpl ();
 
     #endregion Singleton
 
@@ -57,7 +56,7 @@ public partial class ApplicationImpl : IApplication
         {
             if (_mouse is null)
             {
-                _mouse = new MouseImpl { Application = this };
+                _mouse = new MouseImpl { App = this };
             }
 
             return _mouse;
@@ -66,7 +65,6 @@ public partial class ApplicationImpl : IApplication
     }
 
     private IKeyboard? _keyboard;
-    private bool _stopAfterFirstIteration;
 
     /// <summary>
     ///     Handles keyboard input and key bindings at the Application level
@@ -77,7 +75,7 @@ public partial class ApplicationImpl : IApplication
         {
             if (_keyboard is null)
             {
-                _keyboard = new KeyboardImpl { Application = this };
+                _keyboard = new KeyboardImpl { App = this };
             }
 
             return _keyboard;
@@ -89,22 +87,67 @@ public partial class ApplicationImpl : IApplication
 
     #region View Management
 
-    /// <inheritdoc/>
-    public ApplicationPopover? Popover { get; set; }
+    private ApplicationPopover? _popover;
 
     /// <inheritdoc/>
-    public ApplicationNavigation? Navigation { get; set; }
+    public ApplicationPopover? Popover
+    {
+        get
+        {
+            if (_popover is null)
+            {
+                _popover = new () { App = this };
+            }
+
+            return _popover;
+        }
+        set => _popover = value;
+    }
+
+    private ApplicationNavigation? _navigation;
 
     /// <inheritdoc/>
-    public Toplevel? Top { get; set; }
+    public ApplicationNavigation? Navigation
+    {
+        get
+        {
+            if (_navigation is null)
+            {
+                _navigation = new () { App = this };
+            }
 
-    // BUGBUG: Technically, this is not the full lst of TopLevels. There be dragons here, e.g. see how Toplevel.Id is used. What
+            return _navigation;
+        }
+        set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
+    private Toplevel? _current;
 
     /// <inheritdoc/>
-    public ConcurrentStack<Toplevel> TopLevels { get; } = new ();
+    public Toplevel? Current
+    {
+        get => _current;
+        set
+        {
+            _current = value;
+
+            if (_current is { })
+            {
+                _current.App = this;
+            }
+        }
+    }
+
+    // BUGBUG: Technically, this is not the full lst of sessions. There be dragons here, e.g. see how Toplevel.Id is used. What
+
+    /// <inheritdoc/>
+    public ConcurrentStack<Toplevel> SessionStack { get; } = new ();
 
     /// <inheritdoc/>
     public Toplevel? CachedSessionTokenToplevel { get; set; }
 
     #endregion View Management
+
+    /// <inheritdoc/>
+    public new string ToString () => Driver?.ToString () ?? string.Empty;
 }

@@ -42,7 +42,7 @@ public class CollectionNavigatorTests
 
         // cycling with 'a'
         n = new CollectionNavigator (simpleStrings);
-        Assert.Equal (0, n.GetNextMatchingItem (-1, 'a'));
+        Assert.Equal (0, n.GetNextMatchingItem (null, 'a'));
         Assert.Equal (1, n.GetNextMatchingItem (0, 'a'));
 
         // if 4 (candle) is selected it should loop back to apricot
@@ -53,7 +53,7 @@ public class CollectionNavigatorTests
     public void Delay ()
     {
         var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "apricot" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
 
         // No delay
@@ -96,7 +96,7 @@ public class CollectionNavigatorTests
         var strings = new [] { "apricot", "arm", "ta", "target", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
-        var current = 0;
+        int? current = 0;
         Assert.Equal (strings.IndexOf ("ta"), current = n.GetNextMatchingItem (current, 't'));
 
         // should match "te" in "text"
@@ -137,7 +137,7 @@ public class CollectionNavigatorTests
     public void MinimizeMovement_False_ShouldMoveIfMultipleMatches ()
     {
         var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "apricot", "c", "car", "cart" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$"));
         Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$"));
@@ -166,14 +166,14 @@ public class CollectionNavigatorTests
         Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car"));
         Assert.Equal (strings.IndexOf ("cart"), current = n.GetNextMatchingItem (current, "car"));
 
-        Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x"));
+        Assert.Null (n.GetNextMatchingItem (current, "x"));
     }
 
     [Fact]
     public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
     {
         var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "apricot", "c", "car", "cart" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$", true));
@@ -185,14 +185,14 @@ public class CollectionNavigatorTests
         Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", true));
         Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", true));
 
-        Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x", true));
+        Assert.Null (n.GetNextMatchingItem (current, "x", true));
     }
 
     [Fact]
     public void MutliKeySearchPlusWrongKeyStays ()
     {
         var strings = new [] { "a", "c", "can", "candle", "candy", "yellow", "zebra" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
 
         // https://github.com/gui-cs/Terminal.Gui/pull/2132#issuecomment-1298425573
@@ -240,20 +240,20 @@ public class CollectionNavigatorTests
     }
 
     [Fact]
-    public void ShouldAcceptNegativeOne ()
+    public void ShouldAcceptNull ()
     {
         var n = new CollectionNavigator (simpleStrings);
 
-        // Expect that index of -1 (i.e. no selection) should work correctly
+        // Expect that index of null (i.e. no selection) should work correctly
         // and select the first entry of the letter 'b'
-        Assert.Equal (2, n.GetNextMatchingItem (-1, 'b'));
+        Assert.Equal (2, n.GetNextMatchingItem (null, 'b'));
     }
 
     [Fact]
     public void Symbols ()
     {
         var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "apricot" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("apricot"), current = n.GetNextMatchingItem (current, 'a'));
         Assert.Equal ("a", n.SearchString);
@@ -293,7 +293,7 @@ public class CollectionNavigatorTests
         var strings = new [] { "apricot", "arm", "ta", "丗丙业丞", "丗丙丛", "text", "egg", "candle" };
 
         var n = new CollectionNavigator (strings);
-        var current = 0;
+        int? current = 0;
         Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丗'));
 
         // 丗丙业丞 is as good a match as 丗丙丛
@@ -319,7 +319,7 @@ public class CollectionNavigatorTests
     public void Word ()
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
@@ -344,7 +344,7 @@ public class CollectionNavigatorTests
     public void CustomMatcher_NeverMatches ()
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
-        var current = 0;
+        int? current = 0;
         var n = new CollectionNavigator (strings);
 
         var matchNone = new Mock<ICollectionNavigatorMatcher> ();

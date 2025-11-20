@@ -332,6 +332,7 @@ public class ViewTests
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
         var v = new View { Width = 11, Height = 3 };
+        v.App = ApplicationImpl.Instance;
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };

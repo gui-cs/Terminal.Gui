@@ -1,4 +1,3 @@
-﻿
 namespace Terminal.Gui.Input;
 
 /// <summary>Args GrabMouse related events.</summary>

@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Defines the event arguments for <see cref="TableView.SelectedCellChanged"/></summary>

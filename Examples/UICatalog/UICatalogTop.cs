@@ -43,7 +43,11 @@ public class UICatalogTop : Toplevel
         Unloaded += UnloadedHandler;
 
         // Restore previous selections
-        _categoryList.SelectedItem = _cachedCategoryIndex;
+        if (_categoryList.Source?.Count > 0) {
+            _categoryList.SelectedItem = _cachedCategoryIndex ?? 0;
+        } else {
+            _categoryList.SelectedItem = null;
+        }
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
         SchemeName = CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
@@ -211,6 +215,7 @@ public class UICatalogTop : Toplevel
                                                          return;
                                                      }
                                                      ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
+
                                                  };
 
                 var menuItem = new MenuItemv2
@@ -509,7 +514,7 @@ public class UICatalogTop : Toplevel
     #region Category List
 
     private readonly ListView? _categoryList;
-    private static int _cachedCategoryIndex;
+    private static int? _cachedCategoryIndex;
     public static ObservableCollection<string>? CachedCategories { get; set; }
 
     private ListView CreateCategoryList ()
@@ -539,7 +544,11 @@ public class UICatalogTop : Toplevel
 
     private void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
     {
-        string item = CachedCategories! [e!.Item];
+        if (e is null or { Item: null })
+        {
+            return;
+        }
+        string item = CachedCategories! [e.Item.Value];
         ObservableCollection<Scenario> newScenarioList;
 
         if (e.Item == 0)
@@ -691,7 +700,7 @@ public class UICatalogTop : Toplevel
         _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
-        Application.Top?.SetNeedsDraw ();
+        Application.Current?.SetNeedsDraw ();
     }
 
     private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigApplied (); }

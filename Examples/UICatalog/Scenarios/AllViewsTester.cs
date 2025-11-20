@@ -28,7 +28,7 @@ public class AllViewsTester : Scenario
 
     public override void Main ()
     {
-        // Don't create a sub-win (Scenario.Win); just use Application.Top
+        // Don't create a sub-win (Scenario.Win); just use Application.Current
         Application.Init ();
 
         var app = new Window
@@ -65,7 +65,7 @@ public class AllViewsTester : Scenario
                                                   // Dispose existing current View, if any
                                                   DisposeCurrentView ();
 
-                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem.Value]);
 
                                                   // Force ViewToEdit to be the view and not a subview
                                                   if (_adornmentsEditor is { })

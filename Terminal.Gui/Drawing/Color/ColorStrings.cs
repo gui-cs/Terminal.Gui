@@ -1,4 +1,3 @@
-#nullable enable
 using System.Globalization;
 
 namespace Terminal.Gui.Drawing;

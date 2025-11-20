@@ -112,7 +112,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_int ()
     {
         NumericUpDown<int> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (Application.Screen.Size);
+        numericUpDown.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -122,7 +122,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_float ()
     {
         NumericUpDown<float> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (Application.Screen.Size);
+        numericUpDown.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -132,7 +132,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_double ()
     {
         NumericUpDown<double> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (Application.Screen.Size);
+        numericUpDown.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -142,7 +142,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_long ()
     {
         NumericUpDown<long> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (Application.Screen.Size);
+        numericUpDown.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -152,7 +152,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_decimal ()
     {
         NumericUpDown<decimal> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (Application.Screen.Size);
+        numericUpDown.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);

@@ -176,25 +176,30 @@ The @Terminal.Gui.App.ApplicationNavigation.AdvanceFocus method causes the focus
 The implementation is simple:
 
 ```cs
-return Application.Current?.AdvanceFocus (direction, behavior);
+return app.Current?.AdvanceFocus (direction, behavior);
 ```
 
-This method is called from the `Command` handlers bound to the application-scoped keybindings created during `Application.Init`. It is `public` as a convenience.
+This method is called from the `Command` handlers bound to the application-scoped keybindings created during `app.Init()`. It is `public` as a convenience.
+
+**Note:** When accessing from within a View, use `App?.Current` instead of `Application.Current` (which is obsolete).
 
 This method replaces about a dozen functions in v1 (scattered across `Application` and `Toplevel`).
 
 ### Application Navigation Examples
 
 ```csharp
+var app = Application.Create();
+app.Init();
+
 // Listen for global focus changes
-Application.Navigation.FocusedChanged += (sender, e) => 
+app.Navigation.FocusedChanged += (sender, e) => 
 {
-    var focused = Application.Navigation.GetFocused();
+    var focused = app.Navigation.GetFocused();
     StatusBar.Text = $"Focused: {focused?.GetType().Name ?? "None"}";
 };
 
 // Prevent certain views from getting focus
-Application.Navigation.FocusedChanging += (sender, e) => 
+app.Navigation.FocusedChanging += (sender, e) => 
 {
     if (e.NewView is SomeRestrictedView)
     {
@@ -374,7 +379,7 @@ In v1 `View` had `MostFocused` property that traversed up the view-hierarchy ret
 var focused = Application.Navigation.GetFocused();
 
 // This replaces the v1 pattern:
-// var focused = Application.Top.MostFocused;
+// var focused = Application.Current.MostFocused;
 ```
 
 ## How Does `View.Add/Remove` Work?

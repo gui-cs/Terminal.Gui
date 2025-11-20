@@ -26,9 +26,13 @@ public class ProgressBarTests
     [AutoInitShutdown]
     public void Fraction_Redraw ()
     {
-        var driver = Application.Driver;
+        var driver = ApplicationImpl.Instance.Driver;
 
-        var pb = new ProgressBar { Width = 5 };
+        var pb = new ProgressBar
+        {
+            Driver = driver,
+            Width = 5
+        };
 
         pb.BeginInit ();
         pb.EndInit ();
@@ -37,7 +41,7 @@ public class ProgressBarTests
         for (var i = 0; i <= pb.Frame.Width; i++)
         {
             pb.Fraction += 0.2F;
-            View.SetClipToScreen ();
+            pb.SetClipToScreen ();
             pb.Draw ();
 
             if (i == 0)
@@ -161,10 +165,11 @@ public class ProgressBarTests
     [AutoInitShutdown]
     public void Pulse_Redraw_BidirectionalMarquee_False ()
     {
-        var driver = Application.Driver;
+        var driver = ApplicationImpl.Instance.Driver;
 
         var pb = new ProgressBar
         {
+            Driver = driver,
             Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks, BidirectionalMarquee = false
         };
 
@@ -175,7 +180,7 @@ public class ProgressBarTests
         for (var i = 0; i < 38; i++)
         {
             pb.Pulse ();
-            View.SetClipToScreen ();
+            pb.SetClipToScreen ();
             pb.Draw ();
 
             if (i == 0)
@@ -869,9 +874,13 @@ public class ProgressBarTests
     [AutoInitShutdown]
     public void Pulse_Redraw_BidirectionalMarquee_True_Default ()
     {
-        var driver = Application.Driver;
+        var driver = ApplicationImpl.Instance.Driver;
 
-        var pb = new ProgressBar { Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks };
+        var pb = new ProgressBar
+        {
+            Driver = driver,
+            Width = 15, ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
+        };
 
         pb.BeginInit ();
         pb.EndInit ();
@@ -880,7 +889,7 @@ public class ProgressBarTests
         for (var i = 0; i < 38; i++)
         {
             pb.Pulse ();
-            View.SetClipToScreen ();
+            pb.SetClipToScreen ();
             pb.Draw ();
 
             if (i == 0)

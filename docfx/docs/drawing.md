@@ -8,7 +8,7 @@ Terminal.Gui provides a set of APIs for formatting text, line drawing, and chara
 
 # View Drawing API
 
-Terminal.Gui apps draw using the @Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32) and @Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune) APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the @Terminal.Gui.Drawing.Attribute that was most recently set via @Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute). The @Terminal.Gui.Drivers.ConsoleDriver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
+Terminal.Gui apps draw using the @Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32) and @Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune) APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the @Terminal.Gui.Drawing.Attribute that was most recently set via @Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute). The driver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
 
 ## Coordinate System for Drawing
 
@@ -26,7 +26,7 @@ See [Layout](layout.md) for more details of the Terminal.Gui coordinate system.
 
 1) Adding the text to a @Terminal.Gui.Text.TextFormatter object.
 2) Setting formatting options, such as @Terminal.Gui.Text.TextFormatter.Alignment.
-3) Calling @Terminal.Gui.Text.TextFormatter.Draw(System.Drawing.Rectangle,Terminal.Gui.Drawing.Attribute,Terminal.Gui.Drawing.Attribute,System.Drawing.Rectangle,Terminal.Gui.Drivers.IConsoleDriver).
+3) Calling @Terminal.Gui.Text.TextFormatter.Draw(Terminal.Gui.Drivers.IDriver, System.Drawing.Rectangle,Terminal.Gui.Drawing.Attribute,Terminal.Gui.Drawing.Attribute,System.Drawing.Rectangle).
 
 ## Line drawing
 
@@ -62,18 +62,16 @@ If a View need to redraw because something changed within it's Content Area it c
 
 ## Clipping
 
-Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the @Terminal.Gui.Drivers.ConsoleDriver. Terminal.Gui supports non-rectangular clip regions with @Terminal.Gui.Drawing.Region. @Terminal.Gui.Drivers.ConsoleDriver.Clip is the application managed clip region and is managed by @Terminal.Gui.App.Application. Developers cannot change this directly, but can use @Terminal.Gui.ViewBase.View.SetClipToScreen, @Terminal.Gui.ViewBase.View.SetClip(Terminal.Gui.Drawing.Region), @Terminal.Gui.ViewBase.View.SetClipToFrame, etc...
+Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with @Terminal.Gui.Drawing.Region. The driver.Clip is the application managed clip region and is managed by @Terminal.Gui.App.Application. Developers cannot change this directly, but can use @Terminal.Gui.ViewBase.View.SetClipToScreen, @Terminal.Gui.ViewBase.View.SetClip(Terminal.Gui.Drawing.Region), @Terminal.Gui.ViewBase.View.SetClipToFrame, etc...
 
 
 ## Cell
 
 The @Terminal.Gui.Drawing.Cell class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type @Terminal.Gui.Drawing.Attribute.
 
-`Cell` is not exposed directly to the developer. Instead, the @Terminal.Gui.Drivers.ConsoleDriver classes manage the `Cell` array that represents the screen.
+`Cell` is not exposed directly to the developer. Instead, the driver classes manage the `Cell` array that represents the screen.
 
 To draw a `Cell` to the screen, use @Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32) to specify the row and column coordinates and then use the @Terminal.Gui.ViewBase.View.AddRune(System.Int32,System.Int32,System.Text.Rune) method to draw a single glyph.  
-
-// ... existing code ...
 
 ## Attribute 
 
@@ -99,8 +97,6 @@ SetScheme (new Scheme (Scheme)
 SetAttributeForRole (VisualRole.Focus);
 AddStr ("Red on Black Underlined.");
 ```
-
-// ... existing code ...
 
 ## VisualRole
 
@@ -141,4 +137,30 @@ See [View Deep Dive](View.md) for details.
 
 ## Diagnostics
 
-The @Terminal.Gui.ViewBase.ViewDiagnosticFlags.DrawIndicator flag can be set on @Terminal.Gui.ViewBase.View.Diagnostics to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either @Terminal.Gui.ViewBase.View.NeedsDraw or @Terminal.Gui.ViewBase.View.SubViewNeedsDraw is set. 
+The @Terminal.Gui.ViewBase.ViewDiagnosticFlags.DrawIndicator flag can be set on @Terminal.Gui.ViewBase.View.Diagnostics to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either @Terminal.Gui.ViewBase.View.NeedsDraw or @Terminal.Gui.ViewBase.View.SubViewNeedsDraw is set.
+
+## Accessing Application Drawing Context
+
+Views can access application-level drawing functionality through `View.App`:
+
+```csharp
+public class CustomView : View
+{
+    protected override bool OnDrawingContent()
+    {
+        // Access driver capabilities through View.App
+        if (App?.Driver?.SupportsTrueColor == true)
+        {
+            // Use true color features
+            SetAttribute(new Attribute(Color.FromRgb(255, 0, 0), Color.FromRgb(0, 0, 255)));
+        }
+        else
+        {
+            // Fallback to 16-color mode
+            SetAttributeForRole(VisualRole.Normal);
+        }
+        
+        AddStr("Custom drawing with application context");
+        return true;
+    }
+}

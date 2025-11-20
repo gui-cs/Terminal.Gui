@@ -32,7 +32,7 @@ public class MouseTests (ITestOutputHelper output)
 
         // Act
         mouse.LastMousePosition = expectedPosition;
-        Point? actualPosition = mouse.GetLastMousePosition ();
+        Point? actualPosition = mouse.LastMousePosition;
 
         // Assert
         Assert.Equal (expectedPosition, actualPosition);

@@ -92,7 +92,7 @@ public class AnimationScenario : Scenario
                       {
                           // When updating from a Thread/Task always use Invoke
                           Application.Invoke (
-                                              () =>
+                                              (_) =>
                                               {
                                                   _imageView.NextFrame ();
                                                   _imageView.SetNeedsDraw ();
