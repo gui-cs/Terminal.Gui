@@ -39,14 +39,9 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, st
 
             try
             {
-                if (!string.IsNullOrEmpty (value) && !value.IsNormalized (NormalizationForm.FormC))
-                {
-                    _grapheme = value.Normalize (NormalizationForm.FormC);
-                }
-                else
-                {
-                    _grapheme = value;
-                }
+                _grapheme = !string.IsNullOrEmpty (value) && !value.IsNormalized (NormalizationForm.FormC)
+                                ? value.Normalize (NormalizationForm.FormC)
+                                : value;
             }
             catch (ArgumentException)
             {
