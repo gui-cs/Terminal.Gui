@@ -1,5 +1,4 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary><see cref="EventArgs"/> for <see cref="ListView"/> events.</summary>
 public class ListViewItemEventArgs : EventArgs
@@ -7,17 +6,17 @@ public class ListViewItemEventArgs : EventArgs
     /// <summary>Initializes a new instance of <see cref="ListViewItemEventArgs"/></summary>
     /// <param name="item">The index of the <see cref="ListView"/> item.</param>
     /// <param name="value">The <see cref="ListView"/> item</param>
-    public ListViewItemEventArgs (int item, object value)
+    public ListViewItemEventArgs (int? item, object? value)
     {
         Item = item;
         Value = value;
     }
 
     /// <summary>The index of the <see cref="ListView"/> item.</summary>
-    public int Item { get; }
+    public int? Item { get; }
 
     /// <summary>The <see cref="ListView"/> item.</summary>
-    public object Value { get; }
+    public object? Value { get; }
 }
 
 /// <summary><see cref="EventArgs"/> used by the <see cref="ListView.RowRender"/> event.</summary>

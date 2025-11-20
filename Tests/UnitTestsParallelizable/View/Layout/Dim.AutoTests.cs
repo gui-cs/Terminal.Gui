@@ -304,10 +304,10 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         lastSize = view.Frame.Size;
         view.HotKeySpecifier = (Rune)'*';
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.NotEqual (lastSize, view.Frame.Size);
 
         view = new ()
@@ -316,10 +316,10 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         lastSize = view.Frame.Size;
         view.Text = "*ABCD";
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.NotEqual (lastSize, view.Frame.Size);
     }
 
@@ -703,7 +703,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
         view.Text = text;
 
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
@@ -812,7 +812,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
         view.Text = text;
 
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
@@ -831,7 +831,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
         view.Text = text;
 
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }

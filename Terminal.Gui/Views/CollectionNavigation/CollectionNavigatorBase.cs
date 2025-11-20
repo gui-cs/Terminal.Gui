@@ -1,6 +1,5 @@
 
 
-
 namespace Terminal.Gui.Views;
 
 /// <inheritdoc/>
@@ -27,8 +26,13 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     public int TypingDelay { get; set; } = 500;
 
     /// <inheritdoc/>
-    public int GetNextMatchingItem (int currentIndex, char keyStruck)
+    public int? GetNextMatchingItem (int? currentIndex, char keyStruck)
     {
+        if (currentIndex.HasValue && currentIndex < 0)
+        {
+            throw new ArgumentOutOfRangeException (nameof (currentIndex), @"Must be non-negative");
+        }
+
         if (!char.IsControl (keyStruck))
         {
             // maybe user pressed 'd' and now presses 'd' again.
@@ -36,7 +40,7 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
             // but if we find none then we must fallback on cycling
             // d instead and discard the candidate state
             var candidateState = "";
-            var elapsedTime = DateTime.Now - _lastKeystroke;
+            TimeSpan elapsedTime = DateTime.Now - _lastKeystroke;
 
             Logging.Debug ($"CollectionNavigator began processing '{keyStruck}', it has been {elapsedTime} since last keystroke");
 
@@ -51,26 +55,28 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
             {
                 // its a fresh keystroke after some time
                 // or its first ever key press
-                SearchString = new string (keyStruck, 1);
-                Logging.Debug ($"It has been too long since last key press so beginning new search");
+                SearchString = new (keyStruck, 1);
+                Logging.Debug ("It has been too long since last key press so beginning new search");
             }
 
-            int idxCandidate = GetNextMatchingItem (
-                                                    currentIndex,
-                                                    candidateState,
+            int? idxCandidate = GetNextMatchingItem (
+                                                     currentIndex,
+                                                     candidateState,
 
-                                                    // prefer not to move if there are multiple characters e.g. "ca" + 'r' should stay on "car" and not jump to "cart"
-                                                    candidateState.Length > 1
-                                                   );
+                                                     // prefer not to move if there are multiple characters e.g. "ca" + 'r' should stay on "car" and not jump to "cart"
+                                                     candidateState.Length > 1
+                                                    );
 
             Logging.Debug ($"CollectionNavigator searching (preferring minimum movement) matched:{idxCandidate}");
-            if (idxCandidate != -1)
+
+            if (idxCandidate is { })
             {
                 // found "dd" so candidate search string is accepted
                 _lastKeystroke = DateTime.Now;
                 SearchString = candidateState;
 
                 Logging.Debug ($"Found collection item that matched search:{idxCandidate}");
+
                 return idxCandidate;
             }
 
@@ -83,16 +89,17 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
 
             // if a match wasn't found, the user typed a 'wrong' key in their search ("can" + 'z'
             // instead of "can" + 'd').
-            if (SearchString.Length > 1 && idxCandidate == -1)
+            if (SearchString.Length > 1 && idxCandidate is null)
             {
                 Logging.Debug ("CollectionNavigator ignored key and returned existing index");
+
                 // ignore it since we're still within the typing delay
                 // don't add it to SearchString either
                 return currentIndex;
             }
 
             // if no changes to current state manifested
-            if (idxCandidate == currentIndex || idxCandidate == -1)
+            if (idxCandidate == currentIndex || idxCandidate is null)
             {
                 Logging.Debug ("CollectionNavigator found no changes to current index, so clearing search");
 
@@ -100,36 +107,28 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
                 ClearSearchString ();
 
                 // match on the fresh letter alone
-                SearchString = new string (keyStruck, 1);
+                SearchString = new (keyStruck, 1);
                 idxCandidate = GetNextMatchingItem (currentIndex, SearchString);
 
                 Logging.Debug ($"CollectionNavigator new SearchString {SearchString} matched index:{idxCandidate}");
 
-                return idxCandidate == -1 ? currentIndex : idxCandidate;
+                return idxCandidate ?? currentIndex;
             }
 
             Logging.Debug ($"CollectionNavigator final answer was:{idxCandidate}");
+
             // Found another "d" or just leave index as it was
             return idxCandidate;
         }
 
-        Logging.Debug ("CollectionNavigator found key press was not actionable so clearing search and returning -1");
+        Logging.Debug ("CollectionNavigator found key press was not actionable so clearing search and returning null");
 
         // clear state because keypress was a control char
         ClearSearchString ();
 
         // control char indicates no selection
-        return -1;
+        return null;
     }
-
-
-
-    /// <summary>
-    ///     Raised when the <see cref="SearchString"/> is changed. Useful for debugging. Raises the
-    ///     <see cref="SearchStringChanged"/> event.
-    /// </summary>
-    /// <param name="e"></param>
-    protected virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e) { SearchStringChanged?.Invoke (this, e); }
 
     /// <summary>This event is raised when <see cref="SearchString"/> is changed. Useful for debugging.</summary>
     public event EventHandler<KeystrokeNavigatorEventArgs>? SearchStringChanged;
@@ -141,6 +140,13 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     /// <summary>Return the number of elements in the collection</summary>
     protected abstract int GetCollectionLength ();
 
+    /// <summary>
+    ///     Raised when the <see cref="SearchString"/> is changed. Useful for debugging. Raises the
+    ///     <see cref="SearchStringChanged"/> event.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e) { SearchStringChanged?.Invoke (this, e); }
+
     /// <summary>Gets the index of the next item in the collection that matches <paramref name="search"/>.</summary>
     /// <param name="currentIndex">The index in the collection to start the search from.</param>
     /// <param name="search">The search string to use.</param>
@@ -150,17 +156,17 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     ///     <see langword="false"/> (the default), the next matching item will be returned, even if it is above in the
     ///     collection.
     /// </param>
-    /// <returns>The index of the next matching item or <see langword="-1"/> if no match was found.</returns>
-    internal int GetNextMatchingItem (int currentIndex, string search, bool minimizeMovement = false)
+    /// <returns>The index of the next matching item or <see langword="null"/> if no match was found.</returns>
+    internal int? GetNextMatchingItem (int? currentIndex, string search, bool minimizeMovement = false)
     {
         if (string.IsNullOrEmpty (search))
         {
-            return -1;
+            return null;
         }
 
         int collectionLength = GetCollectionLength ();
 
-        if (currentIndex != -1 && currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex)))
+        if (currentIndex.HasValue && currentIndex < collectionLength && Matcher.IsMatch (search, ElementAt (currentIndex.Value)))
         {
             // we are already at a match
             if (minimizeMovement)
@@ -172,9 +178,9 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
             for (var i = 1; i < collectionLength; i++)
             {
                 //circular
-                int idxCandidate = (i + currentIndex) % collectionLength;
+                int? idxCandidate = (i + currentIndex) % collectionLength;
 
-                if (Matcher.IsMatch (search, ElementAt (idxCandidate)))
+                if (Matcher.IsMatch (search, ElementAt (idxCandidate!.Value)))
                 {
                     return idxCandidate;
                 }
@@ -194,7 +200,7 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
         }
 
         // Nothing matches
-        return -1;
+        return null;
     }
 
     private void ClearSearchString ()
