@@ -175,6 +175,7 @@ public partial class ApplicationImpl
 
         // === 3. Clean up toplevels ===
         SessionStack.Clear ();
+        RunnableSessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE
 

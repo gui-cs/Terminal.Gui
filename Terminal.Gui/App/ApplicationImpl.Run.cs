@@ -214,7 +214,7 @@ public partial class ApplicationImpl
             if (StopAfterFirstIteration && firstIteration)
             {
                 Logging.Information ("Run - Stopping after first iteration as requested");
-                view.RequestStop ();
+                RequestStop ((Toplevel?)view);
             }
 
             firstIteration = false;
@@ -280,7 +280,7 @@ public partial class ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public void RequestStop () { RequestStop (null); }
+    public void RequestStop () { RequestStop ((Toplevel?)null); }
 
     /// <inheritdoc/>
     public void RequestStop (Toplevel? top)
@@ -369,4 +369,291 @@ public partial class ApplicationImpl
     }
 
     #endregion Timeouts and Invoke
+
+    #region IRunnable Support
+
+    /// <inheritdoc/>
+    public RunnableSessionToken Begin (IRunnable runnable)
+    {
+        ArgumentNullException.ThrowIfNull (runnable);
+
+        // Ensure the mouse is ungrabbed
+        if (Mouse.MouseGrabView is { })
+        {
+            Mouse.UngrabMouse ();
+        }
+
+        // Create session token
+        RunnableSessionToken token = new (runnable);
+
+        // Get old IsRunning value (should be false before starting)
+        bool oldIsRunning = runnable.IsRunning;
+
+        // Raise IsRunningChanging (false -> true) - can be canceled
+        if (runnable.RaiseIsRunningChanging (oldIsRunning, true))
+        {
+            // Starting was canceled
+            return token;
+        }
+
+        // Push token onto RunnableSessionStack (IsRunning becomes true)
+        RunnableSessionStack?.Push (token);
+
+        // Update TopRunnable to the new top of stack
+        IRunnable? previousTop = null;
+
+        // In Phase 1, Toplevel doesn't implement IRunnable yet
+        // In Phase 2, it will, and this will work properly
+        if (TopRunnable is IRunnable r)
+        {
+            previousTop = r;
+        }
+
+        // Set TopRunnable (handles both Toplevel and IRunnable)
+        if (runnable is Toplevel tl)
+        {
+            TopRunnable = tl;
+        }
+        else if (runnable is View v)
+        {
+            // For now, we can't set a non-Toplevel View as TopRunnable
+            // This is a limitation of the current architecture
+            // In Phase 2, we'll make TopRunnable an IRunnable property
+        }
+
+        // Raise IsRunningChanged (now true)
+        runnable.RaiseIsRunningChangedEvent (true);
+
+        // If there was a previous top, it's no longer modal
+        if (previousTop != null)
+        {
+            // Get old IsModal value (should be true before becoming non-modal)
+            bool oldIsModal = previousTop.IsModal;
+
+            // Raise IsModalChanging (true -> false)
+            previousTop.RaiseIsModalChanging (oldIsModal, false);
+
+            // IsModal is now false (derived property)
+            previousTop.RaiseIsModalChangedEvent (false);
+        }
+
+        // New runnable becomes modal
+        // Get old IsModal value (should be false before becoming modal)
+        bool oldIsModalValue = runnable.IsModal;
+
+        // Raise IsModalChanging (false -> true)
+        runnable.RaiseIsModalChanging (oldIsModalValue, true);
+
+        // IsModal is now true (derived property)
+        runnable.RaiseIsModalChangedEvent (true);
+
+        // Initialize if needed
+        if (runnable is View view && !view.IsInitialized)
+        {
+            view.BeginInit ();
+            view.EndInit ();
+
+            // Initialized event is raised by View.EndInit()
+        }
+
+        // Initial Layout and draw
+        LayoutAndDraw (true);
+
+        // Set focus
+        if (runnable is View viewToFocus && !viewToFocus.HasFocus)
+        {
+            viewToFocus.SetFocus ();
+        }
+
+        if (PositionCursor ())
+        {
+            Driver?.UpdateCursor ();
+        }
+
+        return token;
+    }
+
+    /// <inheritdoc/>
+    public void Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null)
+    {
+        ArgumentNullException.ThrowIfNull (runnable);
+
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Run));
+        }
+
+        // Begin the session (adds to stack, raises IsRunningChanging/IsRunningChanged)
+        RunnableSessionToken token = Begin (runnable);
+
+        try
+        {
+            // All runnables block until RequestStop() is called
+            RunLoop (runnable, errorHandler);
+        }
+        finally
+        {
+            // End the session (raises IsRunningChanging/IsRunningChanged, pops from stack)
+            End (token);
+        }
+    }
+
+    /// <inheritdoc/>
+    public TRunnable Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ()
+    {
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Run));
+        }
+
+        TRunnable runnable = new ();
+        Run (runnable, errorHandler);
+
+        return runnable;
+    }
+
+    private void RunLoop (IRunnable runnable, Func<Exception, bool>? errorHandler)
+    {
+        // Main loop - blocks until RequestStop() is called
+        // Note: IsRunning is a derived property (stack.Contains), so we check it each iteration
+        var firstIteration = true;
+
+        while (runnable.IsRunning)
+        {
+            if (Coordinator is null)
+            {
+                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
+            }
+
+            try
+            {
+                // Process one iteration of the event loop
+                Coordinator.RunIteration ();
+            }
+            catch (Exception ex)
+            {
+                if (errorHandler is null || !errorHandler (ex))
+                {
+                    throw;
+                }
+            }
+
+            if (StopAfterFirstIteration && firstIteration)
+            {
+                Logging.Information ("Run - Stopping after first iteration as requested");
+                RequestStop (runnable);
+            }
+
+            firstIteration = false;
+        }
+    }
+
+    /// <inheritdoc/>
+    public void End (RunnableSessionToken token)
+    {
+        ArgumentNullException.ThrowIfNull (token);
+
+        if (token.Runnable is null)
+        {
+            return; // Already ended
+        }
+
+        IRunnable runnable = token.Runnable;
+
+        // Get old IsRunning value (should be true before stopping)
+        bool oldIsRunning = runnable.IsRunning;
+
+        // Raise IsRunningChanging (true -> false) - can be canceled
+        // This is where Result should be extracted!
+        if (runnable.RaiseIsRunningChanging (oldIsRunning, false))
+        {
+            // Stopping was canceled
+            return;
+        }
+
+        // Current runnable is no longer modal
+        // Get old IsModal value (should be true before becoming non-modal)
+        bool oldIsModal = runnable.IsModal;
+
+        // Raise IsModalChanging (true -> false)
+        runnable.RaiseIsModalChanging (oldIsModal, false);
+
+        // IsModal is now false (will be false after pop)
+        runnable.RaiseIsModalChangedEvent (false);
+
+        // Pop token from RunnableSessionStack (IsRunning becomes false)
+        if (RunnableSessionStack?.TryPop (out RunnableSessionToken? popped) == true && popped == token)
+        {
+            // Restore previous top runnable
+            if (RunnableSessionStack?.TryPeek (out RunnableSessionToken? previousToken) == true && previousToken?.Runnable is { })
+            {
+                IRunnable? previousRunnable = previousToken.Runnable;
+
+                // Update TopRunnable if it's a Toplevel
+                if (previousRunnable is Toplevel tl)
+                {
+                    TopRunnable = tl;
+                }
+
+                // Previous runnable becomes modal again
+                // Get old IsModal value (should be false before becoming modal again)
+                bool oldIsModalValue = previousRunnable.IsModal;
+
+                // Raise IsModalChanging (false -> true)
+                previousRunnable.RaiseIsModalChanging (oldIsModalValue, true);
+
+                // IsModal is now true (derived property)
+                previousRunnable.RaiseIsModalChangedEvent (true);
+            }
+            else
+            {
+                // No more runnables, clear TopRunnable
+                if (TopRunnable is IRunnable)
+                {
+                    TopRunnable = null;
+                }
+            }
+        }
+
+        // Raise IsRunningChanged (now false)
+        runnable.RaiseIsRunningChangedEvent (false);
+
+        // Set focus to new TopRunnable if exists
+        if (TopRunnable is View viewToFocus && !viewToFocus.HasFocus)
+        {
+            viewToFocus.SetFocus ();
+        }
+
+        // Clear the token
+        token.Runnable = null;
+    }
+
+    /// <inheritdoc/>
+    public void RequestStop (IRunnable? runnable)
+    {
+        // Get the runnable to stop
+        if (runnable is null)
+        {
+            // Try to get from TopRunnable
+            if (TopRunnable is IRunnable r)
+            {
+                runnable = r;
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        // For Toplevel, use the existing mechanism
+        if (runnable is Toplevel toplevel)
+        {
+            RequestStop (toplevel);
+        }
+
+        // Note: The End() method will be called from the finally block in Run()
+        // and that's where IsRunningChanging/IsRunningChanged will be raised
+    }
+
+    #endregion IRunnable Support
 }

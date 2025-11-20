@@ -384,6 +384,138 @@ public interface IApplication
 
     #endregion Toplevel Management
 
+    #region IRunnable Management
+
+    /// <summary>
+    ///     Gets the stack of all active runnable session tokens.
+    ///     Sessions execute serially - the top of stack is the currently modal session.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Session tokens are pushed onto the stack when <see cref="Run(IRunnable, Func{Exception, bool})"/> is called and popped when
+    ///         <see cref="RequestStop(IRunnable)"/> completes. The stack grows during nested modal calls and
+    ///         shrinks as they complete.
+    ///     </para>
+    ///     <para>
+    ///         Only the top session (<see cref="TopRunnable"/>) has exclusive keyboard/mouse input (<see cref="IRunnable.IsModal"/> = true).
+    ///         All other sessions on the stack continue to be laid out, drawn, and receive iteration events (<see cref="IRunnable.IsRunning"/> = true),
+    ///         but they don't receive user input.
+    ///     </para>
+    ///     <example>
+    ///         Stack during nested modals:
+    ///         <code>
+    /// RunnableSessionStack (top to bottom):
+    /// - MessageBox (TopRunnable, IsModal=true, IsRunning=true, has input)
+    /// - FileDialog (IsModal=false, IsRunning=true, continues to update/draw)
+    /// - MainWindow (IsModal=false, IsRunning=true, continues to update/draw)
+    /// </code>
+    ///     </example>
+    /// </remarks>
+    ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
+
+    /// <summary>
+    ///     Building block API: Creates a <see cref="RunnableSessionToken"/> and prepares the provided <see cref="IRunnable"/> for
+    ///     execution. Not usually called directly by applications. Use <see cref="Run(IRunnable, Func{Exception, bool})"/>
+    ///     instead.
+    /// </summary>
+    /// <param name="runnable">The <see cref="IRunnable"/> to prepare execution for.</param>
+    /// <returns>
+    ///     The <see cref="RunnableSessionToken"/> that needs to be passed to the <see cref="End(RunnableSessionToken)"/> method upon
+    ///     completion.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method prepares the provided <see cref="IRunnable"/> for running. It adds this to the
+    ///         <see cref="RunnableSessionStack"/>, lays out the SubViews, focuses the first element, and draws the
+    ///         runnable on the screen. This is usually followed by starting the main loop, and then the
+    ///         <see cref="End(RunnableSessionToken)"/> method upon termination which will undo these changes.
+    ///     </para>
+    ///     <para>
+    ///         Raises the <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
+    ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    RunnableSessionToken Begin (IRunnable runnable);
+
+    /// <summary>
+    ///     Runs a new Session with the provided runnable view.
+    /// </summary>
+    /// <param name="runnable">The runnable to execute.</param>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is used to start processing events for the main application, but it is also used to run other
+    ///         modal views such as dialogs.
+    ///     </para>
+    ///     <para>
+    ///         To make <see cref="Run(IRunnable, Func{Exception, bool})"/> stop execution, call
+    ///         <see cref="RequestStop()"/> or <see cref="RequestStop(IRunnable)"/>.
+    ///     </para>
+    ///     <para>
+    ///         Calling <see cref="Run(IRunnable, Func{Exception, bool})"/> is equivalent to calling
+    ///         <see cref="Begin(IRunnable)"/>, followed by starting the main loop, and then calling
+    ///         <see cref="End(RunnableSessionToken)"/>.
+    ///     </para>
+    ///     <para>
+    ///         In RELEASE builds: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
+    ///         rethrown. Otherwise, <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
+    ///         returns <see langword="true"/> the main loop will resume; otherwise this method will exit.
+    ///     </para>
+    /// </remarks>
+    void Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
+
+    /// <summary>
+    ///     Creates and runs a new session with a runnable of the specified type.
+    /// </summary>
+    /// <typeparam name="TRunnable">The type of runnable to create and run. Must have a parameterless constructor.</typeparam>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <returns>The runnable instance that was created and run.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience method that creates an instance of <typeparamref name="TRunnable"/> and runs it.
+    ///         Equivalent to: <c>TRunnable r = new(); Run(r); return r;</c>
+    ///     </para>
+    ///     <para>
+    ///         The caller is responsible for disposing the returned object.
+    ///     </para>
+    /// </remarks>
+    TRunnable Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ();
+
+    /// <summary>
+    ///     Requests that the specified runnable session stop.
+    /// </summary>
+    /// <param name="runnable">The runnable to stop. If <see langword="null"/>, stops the current <see cref="TopRunnable"/>.</param>
+    /// <remarks>
+    ///     <para>
+    ///         This will cause <see cref="Run(IRunnable, Func{Exception, bool})"/> to return.
+    ///     </para>
+    ///     <para>
+    ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
+    ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    void RequestStop (IRunnable? runnable);
+
+    /// <summary>
+    ///     Building block API: Ends the session associated with the token and completes the execution of an <see cref="IRunnable"/>.
+    ///     Not usually called directly by applications. <see cref="Run(IRunnable, Func{Exception, bool})"/>
+    ///     will automatically call this method when the session is stopped.
+    /// </summary>
+    /// <param name="sessionToken">The <see cref="RunnableSessionToken"/> returned by the <see cref="Begin(IRunnable)"/> method.</param>
+    /// <remarks>
+    ///     <para>
+    ///         This method removes the <see cref="IRunnable"/> from the <see cref="RunnableSessionStack"/>,
+    ///         raises the lifecycle events, and disposes the <paramref name="sessionToken"/>.
+    ///     </para>
+    ///     <para>
+    ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
+    ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    void End (RunnableSessionToken sessionToken);
+
+    #endregion IRunnable Management
+
     #region Screen and Driver
 
     /// <summary>Gets or sets the console driver being used.</summary>

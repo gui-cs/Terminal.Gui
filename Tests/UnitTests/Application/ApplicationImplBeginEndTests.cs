@@ -28,7 +28,7 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
+            Assert.Throws<ArgumentNullException> (() => app.Begin ((Toplevel)null!));
         }
         finally
         {
@@ -135,7 +135,7 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            Assert.Throws<ArgumentNullException> (() => app.End (null!));
+            Assert.Throws<ArgumentNullException> (() => app.End ((SessionToken)null!));
         }
         finally
         {

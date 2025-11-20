@@ -146,6 +146,9 @@ public partial class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public Toplevel? CachedSessionTokenToplevel { get; set; }
 
+    /// <inheritdoc/>
+    public ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; } = new ();
+
     #endregion View Management
 
     /// <inheritdoc/>
