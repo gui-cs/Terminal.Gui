@@ -49,17 +49,17 @@ public class ClipTests (ITestOutputHelper _output)
         view.Draw ();
 
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
+        Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
         // When we exit Draw, the view is excluded from the clip. So drawing at 0,0, is not valid and is clipped.
         view.AddRune (0, 0, Rune.ReplacementChar);
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
+        Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
         view.AddRune (-1, -1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'P', Application.Driver?.Contents! [1, 1].Rune);
+        Assert.Equal ("P", Application.Driver?.Contents! [1, 1].Grapheme);
 
         view.AddRune (1, 1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'P', Application.Driver?.Contents! [3, 3].Rune);
+        Assert.Equal ("P", Application.Driver?.Contents! [3, 3].Grapheme);
     }
 
     [Theory]
@@ -233,7 +233,7 @@ public class ClipTests (ITestOutputHelper _output)
         //                            01 2345678901234 56 78 90 12 34 56 
         //                            │� |0123456989│� ン  ラ イ ン で  す 。
         expectedOutput = """
-                         │�│0123456789│�ンラインです。
+                         │�│0123456789│ ンラインです。
                          """;
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);

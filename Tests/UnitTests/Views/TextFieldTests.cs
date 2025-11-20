@@ -95,6 +95,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.Equal (11, caption.Length);
         Assert.Equal (10, caption.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (10, caption.GetColumns ());
 
         TextField tf = GetTextFieldsInView ();
 

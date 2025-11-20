@@ -65,7 +65,9 @@ public class OutputBufferImpl : IOutputBuffer
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Indicates which lines have been modified and need to be redrawn.
+    /// </summary>
     public bool [] DirtyLines { get; set; } = [];
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
@@ -112,178 +114,8 @@ public class OutputBufferImpl : IOutputBuffer
     ///         will be added instead.
     ///     </para>
     /// </remarks>
-    /// <param name="rune">Rune to add.</param>
-    public void AddRune (Rune rune)
-    {
-        int runeWidth = -1;
-        bool validLocation = IsValidLocation (rune, Col, Row);
-
-        if (Contents is null)
-        {
-            return;
-        }
-
-        Clip ??= new (Screen);
-
-        Rectangle clipRect = Clip!.GetBounds ();
-
-        if (validLocation)
-        {
-            rune = rune.MakePrintable ();
-            runeWidth = rune.GetColumns ();
-
-            lock (Contents)
-            {
-                if (runeWidth == 0 && rune.IsCombiningMark ())
-                {
-                    // AtlasEngine does not support NON-NORMALIZED combining marks in a way
-                    // compatible with the driver architecture. Any CMs (except in the first col)
-                    // are correctly combined with the base char, but are ALSO treated as 1 column
-                    // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-                    // 
-                    // Until this is addressed (see Issue #), we do our best by 
-                    // a) Attempting to normalize any CM with the base char to it's left
-                    // b) Ignoring any CMs that don't normalize
-                    if (Col > 0)
-                    {
-                        if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
-                        {
-                            // Just add this mark to the list
-                            Contents [Row, Col - 1].AddCombiningMark (rune);
-
-                            // Ignore. Don't move to next column (let the driver figure out what to do).
-                        }
-                        else
-                        {
-                            // Attempt to normalize the cell to our left combined with this mark
-                            string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
-
-                            // Normalize to Form C (Canonical Composition)
-                            string normalized = combined.Normalize (NormalizationForm.FormC);
-
-                            if (normalized.Length == 1)
-                            {
-                                // It normalized! We can just set the Cell to the left with the
-                                // normalized codepoint 
-                                Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-
-                                // Ignore. Don't move to next column because we're already there
-                            }
-                            else
-                            {
-                                // It didn't normalize. Add it to the Cell to left's CM list
-                                Contents [Row, Col - 1].AddCombiningMark (rune);
-
-                                // Ignore. Don't move to next column (let the driver figure out what to do).
-                            }
-                        }
-
-                        Contents [Row, Col - 1].Attribute = CurrentAttribute;
-                        Contents [Row, Col - 1].IsDirty = true;
-                    }
-                    else
-                    {
-                        // Most drivers will render a combining mark at col 0 as the mark
-                        Contents [Row, Col].Rune = rune;
-                        Contents [Row, Col].Attribute = CurrentAttribute;
-                        Contents [Row, Col].IsDirty = true;
-                        Col++;
-                    }
-                }
-                else
-                {
-                    Contents [Row, Col].Attribute = CurrentAttribute;
-                    Contents [Row, Col].IsDirty = true;
-
-                    if (Col > 0)
-                    {
-                        // Check if cell to left has a wide glyph
-                        if (Contents [Row, Col - 1].Rune.GetColumns () > 1)
-                        {
-                            // Invalidate cell to left
-                            Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
-                            Contents [Row, Col - 1].IsDirty = true;
-                        }
-                    }
-
-                    if (runeWidth < 1)
-                    {
-                        Contents [Row, Col].Rune = Rune.ReplacementChar;
-                    }
-                    else if (runeWidth == 1)
-                    {
-                        Contents [Row, Col].Rune = rune;
-
-                        if (Col < clipRect.Right - 1)
-                        {
-                            Contents [Row, Col + 1].IsDirty = true;
-                        }
-                    }
-                    else if (runeWidth == 2)
-                    {
-                        if (!Clip.Contains (Col + 1, Row))
-                        {
-                            // We're at the right edge of the clip, so we can't display a wide character.
-                            // TODO: Figure out if it is better to show a replacement character or ' '
-                            Contents [Row, Col].Rune = Rune.ReplacementChar;
-                        }
-                        else if (!Clip.Contains (Col, Row))
-                        {
-                            // Our 1st column is outside the clip, so we can't display a wide character.
-                            Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
-                        }
-                        else
-                        {
-                            Contents [Row, Col].Rune = rune;
-
-                            if (Col < clipRect.Right - 1)
-                            {
-                                // Invalidate cell to right so that it doesn't get drawn
-                                // TODO: Figure out if it is better to show a replacement character or ' '
-                                Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
-                                Contents [Row, Col + 1].IsDirty = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // This is a non-spacing character, so we don't need to do anything
-                        Contents [Row, Col].Rune = (Rune)' ';
-                        Contents [Row, Col].IsDirty = false;
-                    }
-
-                    DirtyLines [Row] = true;
-                }
-            }
-        }
-
-        if (runeWidth is < 0 or > 0)
-        {
-            Col++;
-        }
-
-        if (runeWidth > 1)
-        {
-            Debug.Assert (runeWidth <= 2);
-
-            if (validLocation && Col < clipRect.Right)
-            {
-                lock (Contents!)
-                {
-                    // This is a double-width character, and we are not at the end of the line.
-                    // Col now points to the second column of the character. Ensure it doesn't
-                    // Get rendered.
-                    Contents [Row, Col].IsDirty = false;
-                    Contents [Row, Col].Attribute = CurrentAttribute;
-
-                    // TODO: Determine if we should wipe this out (for now now)
-                    //Contents [Row, Col].Rune = (Rune)' ';
-                }
-            }
-
-            Col++;
-        }
-    }
+    /// <param name="rune">Text to add.</param>
+    public void AddRune (Rune rune) { AddStr (rune.ToString ()); }
 
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
@@ -296,7 +128,7 @@ public class OutputBufferImpl : IOutputBuffer
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="Clip"/> or screen
+    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="Clip"/> or screen
     ///         dimensions defined by <see cref="Cols"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
@@ -304,11 +136,112 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="str">String.</param>
     public void AddStr (string str)
     {
-        List<Rune> runes = str.EnumerateRunes ().ToList ();
-
-        for (var i = 0; i < runes.Count; i++)
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
         {
-            AddRune (runes [i]);
+            string text = grapheme;
+
+            int textWidth = -1;
+            bool validLocation = IsValidLocation (text, Col, Row);
+
+            if (Contents is null)
+            {
+                return;
+            }
+
+            Clip ??= new (Screen);
+
+            Rectangle clipRect = Clip!.GetBounds ();
+
+            if (validLocation)
+            {
+                text = text.MakePrintable ();
+                textWidth = text.GetColumns ();
+
+                lock (Contents)
+                {
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    Contents [Row, Col].IsDirty = true;
+
+                    if (Col > 0)
+                    {
+                        // Check if cell to left has a wide glyph
+                        if (Contents [Row, Col - 1].Grapheme.GetColumns () > 1)
+                        {
+                            // Invalidate cell to left
+                            Contents [Row, Col - 1].Grapheme = Rune.ReplacementChar.ToString ();
+                            Contents [Row, Col - 1].IsDirty = true;
+                        }
+                    }
+
+                    if (textWidth is 0 or 1)
+                    {
+                        Contents [Row, Col].Grapheme = text;
+
+                        if (Col < clipRect.Right - 1)
+                        {
+                            Contents [Row, Col + 1].IsDirty = true;
+                        }
+                    }
+                    else if (textWidth == 2)
+                    {
+                        if (!Clip.Contains (Col + 1, Row))
+                        {
+                            // We're at the right edge of the clip, so we can't display a wide character.
+                            // TODO: Figure out if it is better to show a replacement character or ' '
+                            Contents [Row, Col].Grapheme = Rune.ReplacementChar.ToString ();
+                        }
+                        else if (!Clip.Contains (Col, Row))
+                        {
+                            // Our 1st column is outside the clip, so we can't display a wide character.
+                            Contents [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
+                        }
+                        else
+                        {
+                            Contents [Row, Col].Grapheme = text;
+
+                            if (Col < clipRect.Right - 1)
+                            {
+                                // Invalidate cell to right so that it doesn't get drawn
+                                // TODO: Figure out if it is better to show a replacement character or ' '
+                                Contents [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
+                                Contents [Row, Col + 1].IsDirty = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // This is a non-spacing character, so we don't need to do anything
+                        Contents [Row, Col].Grapheme = " ";
+                        Contents [Row, Col].IsDirty = false;
+                    }
+
+                    DirtyLines [Row] = true;
+                }
+            }
+
+            Col++;
+
+            if (textWidth > 1)
+            {
+                Debug.Assert (textWidth <= 2);
+
+                if (validLocation && Col < clipRect.Right)
+                {
+                    lock (Contents!)
+                    {
+                        // This is a double-width character, and we are not at the end of the line.
+                        // Col now points to the second column of the character. Ensure it doesn't
+                        // Get rendered.
+                        Contents [Row, Col].IsDirty = false;
+                        Contents [Row, Col].Attribute = CurrentAttribute;
+
+                        // TODO: Determine if we should wipe this out (for now now)
+                        //Contents [Row, Col].Text = (Text)' ';
+                    }
+                }
+
+                Col++;
+            }
         }
     }
 
@@ -331,7 +264,7 @@ public class OutputBufferImpl : IOutputBuffer
                 {
                     Contents [row, c] = new ()
                     {
-                        Rune = (Rune)' ',
+                        Grapheme = " ",
                         Attribute = new Attribute (Color.White, Color.Black),
                         IsDirty = true
                     };
@@ -345,22 +278,19 @@ public class OutputBufferImpl : IOutputBuffer
         //ClearedContents?.Invoke (this, EventArgs.Empty);
     }
 
-    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
+    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
     ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (Rune rune, int col, int row)
+    public bool IsValidLocation (string text, int col, int row)
     {
-        if (rune.GetColumns () < 2)
-        {
-            return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip!.Contains (col, row);
-        }
+        int textWidth = text.GetColumns ();
 
-        return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
+        return col >= 0 && row >= 0 && col + textWidth <= Cols && row < Rows && Clip!.Contains (col, row);
     }
 
     /// <inheritdoc/>
@@ -383,14 +313,14 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 for (int c = rect.X; c < rect.X + rect.Width; c++)
                 {
-                    if (!IsValidLocation (rune, c, r))
+                    if (!IsValidLocation (rune.ToString (), c, r))
                     {
                         continue;
                     }
 
                     Contents [r, c] = new ()
                     {
-                        Rune = rune != default (Rune) ? rune : (Rune)' ',
+                        Grapheme = rune != default (Rune) ? rune.ToString () : " ",
                         Attribute = CurrentAttribute, IsDirty = true
                     };
                 }

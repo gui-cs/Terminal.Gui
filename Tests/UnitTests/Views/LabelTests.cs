@@ -171,7 +171,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
     [AutoInitShutdown]
     public void Label_Draw_Horizontal_Simple_Runes ()
     {
-        var label = new Label { Text = "Demo Simple Rune" };
+        var label = new Label { Text = "Demo Simple Text" };
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -180,7 +180,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
         Assert.Equal (new (0, 0, 16, 1), label.Frame);
 
         var expected = @"
-Demo Simple Rune
+Demo Simple Text
 ";
 
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
@@ -190,9 +190,9 @@ Demo Simple Rune
 
     [Fact]
     [AutoInitShutdown]
-    public void Label_Draw_Vertical_Simple_Runes ()
+    public void Label_Draw_Vertical_Simple_Text ()
     {
-        var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Rune" };
+        var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Text" };
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -213,10 +213,10 @@ p
 l
 e
  
-R
-u
-n
+T
 e
+x
+t
 ";
 
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);

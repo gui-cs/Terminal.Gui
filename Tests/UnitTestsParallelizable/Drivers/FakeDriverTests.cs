@@ -155,7 +155,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
         {
             for (int col = rect.X; col < rect.X + rect.Width; col++)
             {
-                Assert.Equal ((Rune)'X', driver.Contents [row, col].Rune);
+                Assert.Equal ("X", driver.Contents [row, col].Grapheme);
             }
         }
     }
