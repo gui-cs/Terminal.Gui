@@ -161,12 +161,9 @@ public class ListWrapper<T> : IListDataSource, IDisposable
                     return i;
                 }
             }
-            else if (t is string s)
+            else if (t is string s && s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase))
             {
-                if (s.StartsWith (search, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return i;
-                }
+                return i;
             }
         }
 
