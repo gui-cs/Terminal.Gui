@@ -82,7 +82,7 @@ public partial class Toplevel : View
 
     // TODO: IRunnable: Re-implement as a property on IRunnable
     /// <summary>Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.</summary>
-    /// <remarks>Setting this property directly is discouraged. Use <see cref="IApplication.RequestStop"/> instead.</remarks>
+    /// <remarks>Setting this property directly is discouraged. Use <see cref="IApplication.RequestStop()"/> instead.</remarks>
     public bool Running { get; set; }
 
     // TODO: IRunnable: Re-implement in IRunnable

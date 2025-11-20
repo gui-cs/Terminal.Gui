@@ -317,7 +317,7 @@ public class ScenarioTests : TestsAllViews
                                                      hostPane.FillRect (hostPane.Viewport);
                                                  }
 
-                                                 curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem]);
+                                                 curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
                                              };
 
         xOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
@@ -404,7 +404,7 @@ public class ScenarioTests : TestsAllViews
                 {
                     Assert.Equal (
                                   curView.GetType ().Name,
-                                  viewClasses.Values.ToArray () [classListView.SelectedItem].Name);
+                                  viewClasses.Values.ToArray () [classListView.SelectedItem!.Value].Name);
                 }
             }
             else

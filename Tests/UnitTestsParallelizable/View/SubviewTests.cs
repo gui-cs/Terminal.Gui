@@ -14,11 +14,11 @@ public class SubViewTests
 
         super.SuperViewChanged += (s, e) =>
                               {
-                                    superRaisedCount++;
+                                  superRaisedCount++;
                               };
         sub.SuperViewChanged += (s, e) =>
                                 {
-                                    if (e.SuperView is {})
+                                    if (e.SuperView is { })
                                     {
                                         subRaisedCount++;
                                     }
@@ -266,14 +266,14 @@ public class SubViewTests
         superView.Add (subview1, subview2, subview3);
 
         superView.MoveSubViewTowardsEnd (subview2);
-        Assert.Equal (subview2, superView.SubViews.ToArray() [^1]);
+        Assert.Equal (subview2, superView.SubViews.ToArray () [^1]);
 
         superView.MoveSubViewTowardsEnd (subview1);
-        Assert.Equal (subview1, superView.SubViews.ToArray() [1]);
+        Assert.Equal (subview1, superView.SubViews.ToArray () [1]);
 
         // Already at end, what happens?
         superView.MoveSubViewTowardsEnd (subview2);
-        Assert.Equal (subview2, superView.SubViews.ToArray() [^1]);
+        Assert.Equal (subview2, superView.SubViews.ToArray () [^1]);
     }
 
     [Fact]
@@ -517,7 +517,7 @@ public class SubViewTests
             Assert.False (v2AddedToWin.CanFocus);
             Assert.False (svAddedTov1.CanFocus);
 
-            Application.LayoutAndDraw ();
+            top.Layout ();
         };
 
         winAddedToTop.Initialized += (s, e) =>
