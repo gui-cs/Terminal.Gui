@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Text;
 using Moq;
 using Terminal.Gui;
 using UnitTests;
@@ -1278,14 +1279,14 @@ Item 6",
 
         string GetContents (int line)
         {
-            var item = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 7; i++)
             {
-                item += app.Driver?.Contents [line, i].Grapheme;
+                sb.Append ((app.Driver?.Contents!) [line, i].Grapheme);
             }
 
-            return item;
+            return sb.ToString ();
         }
 
         top.Dispose ();

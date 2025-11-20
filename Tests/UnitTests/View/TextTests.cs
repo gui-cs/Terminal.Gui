@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿using System.Text;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests.ViewTests;
@@ -699,14 +700,14 @@ w ";
 
         string GetContents ()
         {
-            var text = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 4; i++)
             {
-                text += Application.Driver?.Contents [0, i].Grapheme;
+                sb.Append (Application.Driver?.Contents! [0, i].Grapheme);
             }
 
-            return text;
+            return sb.ToString ();
         }
 
         Application.End (rs);
