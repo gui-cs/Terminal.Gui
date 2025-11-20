@@ -1,5 +1,10 @@
 namespace Terminal.Gui.App;
 
+// TODO: This whole concept is bogus and over-engineered.
+// TODO: Remove it and just let subscribers use the IApplication.Iteration
+// TODO: If the requirement is they know if it's the first iteration, they can
+// TODO: count invocations.
+
 /// <summary>
 ///     Handles bespoke behaviours that occur when application top level changes.
 /// </summary>

@@ -1,4 +1,5 @@
-﻿#nullable enable
+﻿#if MENU_V1
+#nullable enable
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Notepad", "Multi-tab text editor using the TabView control.")]
@@ -389,3 +390,4 @@ public class Notepad : Scenario
         }
     }
 }
+#endif

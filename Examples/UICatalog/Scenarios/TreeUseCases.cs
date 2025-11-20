@@ -1,3 +1,4 @@
+#if MENU_V1
 using System.Collections.Generic;
 using System.Linq;
 
@@ -218,3 +219,4 @@ public class TreeUseCases : Scenario
         public override string ToString () { return Name; }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MENU_V1
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -234,3 +235,4 @@ public class Localization : Scenario
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MENU_V1
+using System;
 using System.Data;
 using System.Text;
 
@@ -215,3 +216,4 @@ public class MultiColouredTable : Scenario
         }
     }
 }
+#endif

@@ -6,6 +6,7 @@ using System.Text;
 using Application = Terminal.Gui.App.Application;
 
 namespace UICatalog.Scenarios;
+#if MENU_V1
 
 [ScenarioMetadata ("Graph View", "Demos the GraphView control.")]
 [ScenarioCategory ("Controls")]
@@ -1033,3 +1034,4 @@ public class GraphViewExample : Scenario
         }
     }
 }
+#endif

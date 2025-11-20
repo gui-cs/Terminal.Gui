@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MENU_V1
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -209,3 +210,4 @@ public class CollectionNavigatorTester : Scenario
 
     private void Quit () { Application.RequestStop (); }
 }
+#endif

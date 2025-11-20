@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MENU_V1
+using System;
 
 namespace UICatalog.Scenarios;
 
@@ -176,3 +177,4 @@ public class RuneWidthGreaterThanOne : Scenario
         Application.LayoutAndDraw ();
     }
 }
+#endif

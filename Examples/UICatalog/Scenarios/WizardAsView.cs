@@ -1,5 +1,6 @@
 ﻿
 namespace UICatalog.Scenarios;
+#if MENU_V1
 
 [ScenarioMetadata ("WizardAsView", "Shows using the Wizard class in an non-modal way")]
 [ScenarioCategory ("Wizards")]
@@ -153,3 +154,4 @@ public class WizardAsView : Scenario
         Application.Shutdown ();
     }
 }
+#endif

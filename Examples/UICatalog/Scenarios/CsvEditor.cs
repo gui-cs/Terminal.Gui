@@ -8,6 +8,8 @@ using CsvHelper;
 
 namespace UICatalog.Scenarios;
 
+#if MENU_V1
+
 [ScenarioMetadata ("Csv Editor", "Open and edit simple CSV files using the TableView class.")]
 [ScenarioCategory ("TableView")]
 [ScenarioCategory ("TextView")]
@@ -697,3 +699,4 @@ public class CsvEditor : Scenario
         }
     }
 }
+#endif

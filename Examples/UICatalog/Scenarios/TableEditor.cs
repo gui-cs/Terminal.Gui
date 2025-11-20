@@ -5,6 +5,8 @@ using System.Text;
 
 namespace UICatalog.Scenarios;
 
+#if MENU_V1
+
 [ScenarioMetadata ("TableEditor", "Implements data table editor using the TableView control.")]
 [ScenarioCategory ("TableView")]
 [ScenarioCategory ("Controls")]
@@ -1669,3 +1671,5 @@ public class TableEditor : Scenario
         public readonly uint Start = start;
     }
 }
+
+#endif

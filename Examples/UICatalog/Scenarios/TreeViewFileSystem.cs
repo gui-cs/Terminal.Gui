@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using System.Text;
 
 namespace UICatalog.Scenarios;
+#if MENU_V1
 
 [ScenarioMetadata ("File System Explorer", "Hierarchical file system explorer demonstrating TreeView.")]
 [ScenarioCategory ("Controls")]
@@ -562,3 +563,4 @@ public class TreeViewFileSystem : Scenario
         }
     }
 }
+#endif

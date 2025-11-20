@@ -142,6 +142,11 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
+
+        // TODO: This whole ToplevelTransitionManager is bogus and over-engineered.
+        // TODO: Remove it and just let subscribers use the IApplication.Iteration
+        // TODO: If the requirement is they know if it's the first iteration, they can
+        // TODO: count invocations.
         ToplevelTransitionManager.RaiseReadyEventIfNeeded (App);
         ToplevelTransitionManager.HandleTopMaybeChanging (App);
 

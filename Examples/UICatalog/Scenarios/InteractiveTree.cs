@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if MENU_V1
+using System.Linq;
 
 namespace UICatalog.Scenarios;
 
@@ -163,3 +164,4 @@ public class InteractiveTree : Scenario
         }
     }
 }
+#endif

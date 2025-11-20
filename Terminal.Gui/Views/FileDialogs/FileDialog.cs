@@ -42,9 +42,11 @@ public class FileDialog : Dialog, IDesignable
     private readonly TextField _tbFind;
     private readonly TextField _tbPath;
     private readonly TreeView<IFileSystemInfo> _treeView;
+#if MENU_V1
     private MenuBarItem? _allowedTypeMenu;
     private MenuBar? _allowedTypeMenuBar;
     private MenuItem []? _allowedTypeMenuItems;
+#endif 
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
     private bool _disposed;
@@ -466,6 +468,7 @@ public class FileDialog : Dialog, IDesignable
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
 
         _treeView.AddObjects (_treeRoots.Keys);
+#if MENU_V1
 
         // if filtering on file type is configured then create the ComboBox and establish
         // initial filtering by extension(s)
@@ -510,6 +513,7 @@ public class FileDialog : Dialog, IDesignable
 
             Add (_allowedTypeMenuBar);
         }
+#endif
 
         // if no path has been provided
         if (_tbPath.Text.Length <= 0)
@@ -728,6 +732,7 @@ public class FileDialog : Dialog, IDesignable
             Accept (false);
         }
     }
+#if MENU_V1
 
     private void AllowedTypeMenuClicked (int idx)
     {
@@ -748,6 +753,7 @@ public class FileDialog : Dialog, IDesignable
         State?.RefreshChildren ();
         WriteStateToTableView ();
     }
+#endif
 
     private string AspectGetter (object o)
     {

@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios;
+#if MENU_V1
 
 [ScenarioMetadata ("TextView Autocomplete Popup", "Shows five TextView Autocomplete Popup effects")]
 [ScenarioCategory ("TextView")]
@@ -192,3 +193,4 @@ public class TextViewAutocompletePopup : Scenario
         SetWrapStatusText ();
     }
 }
+#endif

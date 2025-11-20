@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+#if MENU_V1
+
 using static UICatalog.Scenarios.DynamicMenuBar;
 
 namespace UICatalog.Scenarios;
@@ -1281,3 +1283,4 @@ public class Editor : Scenario
         _textToReplace = string.IsNullOrEmpty (_textToReplace) ? "" : _textToReplace;
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿#if MENU_V1
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 
@@ -219,3 +220,4 @@ public class UnicodeInMenu : Scenario
         Application.Shutdown ();
     }
 }
+#endif

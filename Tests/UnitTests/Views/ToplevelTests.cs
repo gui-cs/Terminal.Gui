@@ -12,7 +12,6 @@ public class ToplevelTests
         Assert.Equal ("Fill(Absolute(0))", top.Height.ToString ());
         Assert.False (top.Running);
         Assert.False (top.Modal);
-        Assert.Null (top.MenuBar);
 
         //Assert.Null (top.StatusBar);
     }
@@ -42,32 +41,6 @@ public class ToplevelTests
         top.OnUnloaded ();
         Assert.Equal ("Unloaded", eventInvoked);
 
-        top.Add (new MenuBar ());
-        Assert.NotNull (top.MenuBar);
-
-        //top.Add (new StatusBar ());
-        //Assert.NotNull (top.StatusBar);
-        MenuBar menuBar = top.MenuBar;
-        top.Remove (top.MenuBar);
-        Assert.Null (top.MenuBar);
-        Assert.NotNull (menuBar);
-
-        //var statusBar = top.StatusBar;
-        //top.Remove (top.StatusBar);
-        //Assert.Null (top.StatusBar);
-        //Assert.NotNull (statusBar);
-#if DEBUG_IDISPOSABLE
-        Assert.False (menuBar.WasDisposed);
-
-        //Assert.False (statusBar.WasDisposed);
-        menuBar.Dispose ();
-
-        //statusBar.Dispose ();
-        Assert.True (menuBar.WasDisposed);
-
-        //Assert.True (statusBar.WasDisposed);
-#endif
-
         Application.Begin (top);
         Assert.Equal (top, Application.Current);
 
@@ -76,11 +49,6 @@ public class ToplevelTests
         Assert.Equal (Application.Current, supView);
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
-
-        //Assert.Null (sb);
-
-        top.Add (new MenuBar ());
-        Assert.NotNull (top.MenuBar);
 
         // Application.Current with a menu and without status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
@@ -96,30 +64,10 @@ public class ToplevelTests
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
 
-        // The available height is lower than the Application.Current height minus
-        // the menu bar and status bar, then the top can go beyond the bottom
-        //        Assert.Equal (2, ny);
-        //Assert.NotNull (sb);
-
-        menuBar = top.MenuBar;
-        top.Remove (top.MenuBar);
-        Assert.Null (top.MenuBar);
-        Assert.NotNull (menuBar);
-
+        // The available height is lower tha
         // Application.Current without a menu and with a status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
-
-        // The available height is lower than the Application.Current height minus
-        // the status bar, then the top can go beyond the bottom
-        //        Assert.Equal (2, ny);
-        //Assert.NotNull (sb);
-
-        //statusBar = top.StatusBar;
-        //top.Remove (top.StatusBar);
-        //Assert.Null (top.StatusBar);
-        //Assert.NotNull (statusBar);
-        Assert.Null (top.MenuBar);
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         top.Add (win);
@@ -136,11 +84,6 @@ public class ToplevelTests
         Assert.Equal (0, nx);
         Assert.Equal (0, ny);
 
-        //Assert.Null (sb);
-
-        top.Add (new MenuBar ());
-        Assert.NotNull (top.MenuBar);
-
         // Application.Current with a menu and without status bar.
         View.GetLocationEnsuringFullVisibility (win, 2, 2, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
@@ -156,43 +99,12 @@ public class ToplevelTests
         View.GetLocationEnsuringFullVisibility (win, 30, 20, out nx, out ny /*, out sb*/);
         Assert.Equal (0, nx);
 
-        // The available height is lower than the Application.Current height minus
-        // the menu bar and status bar, then the top can go beyond the bottom
-        //Assert.Equal (20, ny);
-        //Assert.NotNull (sb);
-
-        menuBar = top.MenuBar;
-
-        //statusBar = top.StatusBar;
-        top.Remove (top.MenuBar);
-        Assert.Null (top.MenuBar);
-        Assert.NotNull (menuBar);
-
-        //top.Remove (top.StatusBar);
-        //Assert.Null (top.StatusBar);
-        //Assert.NotNull (statusBar);
 
         top.Remove (win);
 
         win = new () { Width = 60, Height = 15 };
         top.Add (win);
 
-        // Application.Current without menu and status bar.
-        View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
-        Assert.Equal (0, nx);
-        Assert.Equal (0, ny);
-
-        //Assert.Null (sb);
-
-        top.Add (new MenuBar ());
-        Assert.NotNull (top.MenuBar);
-
-        // Application.Current with a menu and without status bar.
-        View.GetLocationEnsuringFullVisibility (win, 2, 2, out nx, out ny /*, out sb*/);
-        Assert.Equal (2, nx);
-        Assert.Equal (2, ny);
-
-        //Assert.Null (sb);
 
         top.Add (new StatusBar ());
 
@@ -215,28 +127,6 @@ public class ToplevelTests
         win.CanFocus = false;
         win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
 
-        //Assert.Null (Toplevel._dragPosition);
-#if DEBUG_IDISPOSABLE
-
-        Assert.False (top.MenuBar.WasDisposed);
-
-        //Assert.False (top.StatusBar.WasDisposed);
-#endif
-        menuBar = top.MenuBar;
-
-        //statusBar = top.StatusBar;
-        top.Dispose ();
-        Assert.Null (top.MenuBar);
-
-        //Assert.Null (top.StatusBar);
-        Assert.NotNull (menuBar);
-
-        //Assert.NotNull (statusBar);
-#if DEBUG_IDISPOSABLE
-        Assert.True (menuBar.WasDisposed);
-
-        //Assert.True (statusBar.WasDisposed);
-#endif
     }
 
     [Fact]
@@ -715,28 +605,6 @@ public class ToplevelTests
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new ("Child", new MenuItem [] { new ("_Create Child", "", null) })
-            ]
-        };
-        var topChild = new Toplevel ();
-        topChild.Add (menu);
-        var top = new Toplevel ();
-        top.Add (topChild);
-        Application.Begin (top);
-
-        Exception exception = Record.Exception (() => topChild.NewKeyDownEvent (KeyCode.AltMask));
-        Assert.Null (exception);
-        top.Dispose ();
-    }
-
-    [Fact]
     public void Multi_Thread_Toplevels ()
     {
         Application.Init ("fake");
@@ -869,34 +737,5 @@ public class ToplevelTests
         Application.Run (t);
         t.Dispose ();
         Application.Shutdown ();
-    }
-
-    [Fact]
-    public void Remove_Do_Not_Dispose_MenuBar_Or_StatusBar ()
-    {
-        var mb = new MenuBar ();
-        var sb = new StatusBar ();
-        var tl = new Toplevel ();
-
-#if DEBUG
-        Assert.False (mb.WasDisposed);
-        Assert.False (sb.WasDisposed);
-#endif
-        tl.Add (mb, sb);
-        Assert.NotNull (tl.MenuBar);
-
-        //Assert.NotNull (tl.StatusBar);
-#if DEBUG
-        Assert.False (mb.WasDisposed);
-        Assert.False (sb.WasDisposed);
-#endif
-        tl.RemoveAll ();
-        Assert.Null (tl.MenuBar);
-
-        //Assert.Null (tl.StatusBar);
-#if DEBUG
-        Assert.False (mb.WasDisposed);
-        Assert.False (sb.WasDisposed);
-#endif
     }
 }

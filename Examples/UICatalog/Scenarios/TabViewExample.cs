@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace UICatalog.Scenarios;
+#if MENU_V1
 
 [ScenarioMetadata ("Tab View", "Demos TabView control with limited screen space in Absolute layout.")]
 [ScenarioCategory ("Controls")]
@@ -274,3 +275,4 @@ public class TabViewExample : Scenario
         _tabView.ApplyStyleChanges ();
     }
 }
+#endif

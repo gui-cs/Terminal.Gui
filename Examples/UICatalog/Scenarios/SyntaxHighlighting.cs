@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios;
 
+#if MENU_V1
+
 [ScenarioMetadata ("Syntax Highlighting", "Text editor with keyword highlighting using the TextView control.")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Controls")]
@@ -502,3 +504,4 @@ public static class EventExtensions
         }
     }
 }
+#endif

@@ -6,6 +6,8 @@ using System.Text;
 
 namespace UICatalog.Scenarios;
 
+#if MENU_V1
+
 [ScenarioMetadata ("Class Explorer", "Tree view explorer for classes by namespace based on TreeView.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("TreeView")]
@@ -324,3 +326,4 @@ public class ClassExplorer : Scenario
         public override string ToString () { return ToShow.ToString (); }
     }
 }
+#endif 

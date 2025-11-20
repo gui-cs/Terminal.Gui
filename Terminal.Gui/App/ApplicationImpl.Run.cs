@@ -16,9 +16,11 @@ public partial class ApplicationImpl
 
     #region Begin->Run->Stop->End
 
+    // TODO: This API is not used anywhere; it can be deleted
     /// <inheritdoc/>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
+    // TODO: This API is not used anywhere; it can be deleted
     /// <inheritdoc/>
     public event EventHandler<ToplevelEventArgs>? SessionEnded;
 
@@ -152,6 +154,12 @@ public partial class ApplicationImpl
     public bool StopAfterFirstIteration { get; set; }
 
     /// <inheritdoc/>
+    public void RaiseIteration ()
+    {
+        Iteration?.Invoke (null, new ());
+    }
+
+    /// <inheritdoc/>
     public event EventHandler<IterationEventArgs>? Iteration;
 
     /// <inheritdoc/>
@@ -276,6 +284,9 @@ public partial class ApplicationImpl
         // BUGBUG: Why layout and draw here? This causes the screen to be cleared!
         //LayoutAndDraw (true);
 
+        // TODO: This API is not used (correctly) anywhere; it can be deleted
+        // TODO: Instead, callers should use the new equivalent of Toplevel.Ready 
+        // TODO: which will be IsRunningChanged with newIsRunning == true
         SessionEnded?.Invoke (this, new (CachedSessionTokenToplevel));
     }
 
@@ -304,9 +315,6 @@ public partial class ApplicationImpl
 
         top.Running = false;
     }
-
-    /// <inheritdoc/>
-    public void RaiseIteration () { Iteration?.Invoke (null, new ()); }
 
     #endregion Begin->Run->Stop->End
 
