@@ -46,35 +46,35 @@ public class ApplicationScreenTests
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Current!.SetNeedsLayout ();
+        Application.TopRunnable!.SetNeedsLayout ();
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (0, clearedContentsRaised);
 
         // Act
-        Application.Current.X = 1;
+        Application.TopRunnable.X = 1;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (1, clearedContentsRaised);
 
         // Act
-        Application.Current.Width = 10;
+        Application.TopRunnable.Width = 10;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (2, clearedContentsRaised);
 
         // Act
-        Application.Current.Y = 1;
+        Application.TopRunnable.Y = 1;
         Application.LayoutAndDraw ();
 
         // Assert
         Assert.Equal (3, clearedContentsRaised);
 
         // Act
-        Application.Current.Height = 10;
+        Application.TopRunnable.Height = 10;
         Application.LayoutAndDraw ();
 
         // Assert

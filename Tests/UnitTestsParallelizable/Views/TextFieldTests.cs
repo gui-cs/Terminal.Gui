@@ -622,14 +622,14 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         string GetContents ()
         {
-            var item = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 16; i++)
             {
-                item += driver.Contents [0, i]!.Rune;
+                sb.Append (driver.Contents! [0, i]!.Grapheme);
             }
 
-            return item;
+            return sb.ToString ();
         }
     }
 }

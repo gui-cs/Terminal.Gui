@@ -40,7 +40,7 @@ public class SpinnerViewTests (ITestOutputHelper output)
         // Dispose clears timeout
         view.Dispose ();
         Assert.Empty (Application.TimedEvents.Timeouts);
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class SpinnerViewTests (ITestOutputHelper output)
 
         expected = "/";
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class SpinnerViewTests (ITestOutputHelper output)
 
         //expected = "|";
         //DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
     }
 
     private SpinnerView GetSpinnerView ()

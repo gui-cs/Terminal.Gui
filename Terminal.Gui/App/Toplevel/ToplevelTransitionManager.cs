@@ -18,7 +18,7 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
     /// <inheritdoc/>
     public void RaiseReadyEventIfNeeded (IApplication? app)
     {
-        Toplevel? top = app?.Current;
+        Toplevel? top = app?.TopRunnable;
 
         if (top != null && !_readiedTopLevels.Contains (top))
         {
@@ -34,13 +34,13 @@ public class ToplevelTransitionManager : IToplevelTransitionManager
     /// <inheritdoc/>
     public void HandleTopMaybeChanging (IApplication? app)
     {
-        Toplevel? newTop = app?.Current;
+        Toplevel? newTop = app?.TopRunnable;
 
         if (_lastTop != null && _lastTop != newTop && newTop != null)
         {
             newTop.SetNeedsDraw ();
         }
 
-        _lastTop = app?.Current;
+        _lastTop = app?.TopRunnable;
     }
 }

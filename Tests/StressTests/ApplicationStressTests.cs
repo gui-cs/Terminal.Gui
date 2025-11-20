@@ -71,8 +71,8 @@ public class ApplicationStressTests
                 {
                     int tbNow = _tbCounter;
 
-                    // Wait for Application.Current to be running to ensure timed events can be processed
-                    while (Application.Current is null || Application.Current is { Running: false })
+                    // Wait for Application.TopRunnable to be running to ensure timed events can be processed
+                    while (Application.TopRunnable is null || Application.TopRunnable is { Running: false })
                     {
                         Thread.Sleep (1);
                     }

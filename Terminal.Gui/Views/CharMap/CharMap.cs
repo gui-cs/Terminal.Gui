@@ -147,10 +147,7 @@ public class CharMap : View, IDesignable
                     break;
                 }
 
-                var rune = new Rune (cp);
-                Span<char> utf16 = new char [2];
-                rune.EncodeToUtf16 (utf16);
-                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
+                UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (cp);
                 if (cat == ShowUnicodeCategory.Value)
                 {
                     anyVisible = true;
@@ -684,7 +681,7 @@ public class CharMap : View, IDesignable
                 // Don't render out-of-range scalars
                 if (scalar > MAX_CODE_POINT)
                 {
-                    AddRune (' ');
+                    AddStr (" ");
                     if (visibleRow == selectedRowIndex && col == selectedCol)
                     {
                         SetAttributeForRole (VisualRole.Normal);
@@ -692,22 +689,20 @@ public class CharMap : View, IDesignable
                     continue;
                 }
 
-                var rune = (Rune)'?';
+                string grapheme = "?";
 
                 if (Rune.IsValid (scalar))
                 {
-                    rune = new (scalar);
+                    grapheme = new Rune (scalar).ToString ();
                 }
 
-                int width = rune.GetColumns ();
+                int width = grapheme.GetColumns ();
 
                 // Compute visibility based on ShowUnicodeCategory
                 bool isVisible = Rune.IsValid (scalar);
                 if (isVisible && ShowUnicodeCategory.HasValue)
                 {
-                    Span<char> filterUtf16 = new char [2];
-                    rune.EncodeToUtf16 (filterUtf16);
-                    UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (filterUtf16 [0]);
+                    UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (scalar);
                     isVisible = cat == ShowUnicodeCategory.Value;
                 }
 
@@ -716,11 +711,11 @@ public class CharMap : View, IDesignable
                     // Glyph row
                     if (isVisible)
                     {
-                        RenderRune (rune, width);
+                        RenderGrapheme (grapheme, width, scalar);
                     }
                     else
                     {
-                        AddRune (' ');
+                        AddStr (" ");
                     }
                 }
                 else
@@ -735,7 +730,7 @@ public class CharMap : View, IDesignable
                     }
                     else
                     {
-                        AddRune (' ');
+                        AddStr (" ");
                     }
                 }
 
@@ -749,21 +744,18 @@ public class CharMap : View, IDesignable
 
         return true;
 
-        void RenderRune (Rune rune, int width)
+        void RenderGrapheme (string grapheme, int width, int scalar)
         {
             // Get the UnicodeCategory
-            Span<char> utf16 = new char [2];
-            int charCount = rune.EncodeToUtf16 (utf16);
-
             // Get the bidi class for the first code unit
             // For most bidi characters, the first code unit is sufficient
-            UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
+            UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory (scalar);
 
             switch (category)
             {
                 case UnicodeCategory.OtherNotAssigned:
                     SetAttributeForRole (VisualRole.Highlight);
-                    AddRune (Rune.ReplacementChar);
+                    AddStr (Rune.ReplacementChar.ToString ());
                     SetAttributeForRole (VisualRole.Normal);
 
                     break;
@@ -772,7 +764,7 @@ public class CharMap : View, IDesignable
                 // These report width of 0 and don't render on their own.
                 case UnicodeCategory.Format:
                     SetAttributeForRole (VisualRole.Highlight);
-                    AddRune ('F');
+                    AddStr ("F");
                     SetAttributeForRole (VisualRole.Normal);
 
                     break;
@@ -785,36 +777,7 @@ public class CharMap : View, IDesignable
                 case UnicodeCategory.EnclosingMark:
                     if (width > 0)
                     {
-                        AddRune (rune);
-                    }
-                    else
-                    {
-                        if (rune.IsCombiningMark ())
-                        {
-                            // This is a hack to work around the fact that combining marks
-                            // a) can't be rendered on their own
-                            // b) that don't normalize are not properly supported in 
-                            //    any known terminal (esp Windows/AtlasEngine). 
-                            // See Issue #2616
-                            var sb = new StringBuilder ();
-                            sb.Append ('a');
-                            sb.Append (rune);
-
-                            // Try normalizing after combining with 'a'. If it normalizes, at least 
-                            // it'll show on the 'a'. If not, just show the replacement char.
-                            string normal = sb.ToString ().Normalize (NormalizationForm.FormC);
-
-                            if (normal.Length == 1)
-                            {
-                                AddRune ((Rune)normal [0]);
-                            }
-                            else
-                            {
-                                SetAttributeForRole (VisualRole.Highlight);
-                                AddRune ('M');
-                                SetAttributeForRole (VisualRole.Normal);
-                            }
-                        }
+                        AddStr (grapheme);
                     }
 
                     break;
@@ -824,20 +787,28 @@ public class CharMap : View, IDesignable
                 case UnicodeCategory.LineSeparator:
                 case UnicodeCategory.ParagraphSeparator:
                 case UnicodeCategory.Surrogate:
-                    AddRune (rune);
+                    AddStr (grapheme);
 
                     break;
+                case UnicodeCategory.OtherLetter:
+                    AddStr (grapheme);
 
+                    if (width == 0)
+                    {
+                        AddStr (" ");
+                    }
+
+                    break;
                 default:
 
                     // Draw the rune
                     if (width > 0)
                     {
-                        AddRune (rune);
+                        AddStr (grapheme);
                     }
                     else
                     {
-                        throw new InvalidOperationException ($"The Rune \"{rune}\" (U+{rune.Value:x6}) has zero width and no special-case UnicodeCategory logic applies.");
+                        throw new InvalidOperationException ($"The Rune \"{grapheme}\" (U+{Rune.GetRuneAt (grapheme, 0).Value:x6}) has zero width and no special-case UnicodeCategory logic applies.");
                     }
 
                     break;

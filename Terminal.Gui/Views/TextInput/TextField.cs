@@ -17,7 +17,7 @@ public class TextField : View, IDesignable
     private int _selectedStart; // -1 represents there is no text selection.
     private string _selectedText;
     private int _start;
-    private List<Rune> _text;
+    private List<string> _text;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class.
@@ -541,7 +541,7 @@ public class TextField : View, IDesignable
             ClearAllSelection ();
 
             // Note we use NewValue here; TextChanging subscribers may have changed it
-            _text = args.Result.EnumerateRunes ().ToList ();
+            _text = args.Result.ToStringList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -629,7 +629,7 @@ public class TextField : View, IDesignable
         }
 
         Clipboard.Contents = SelectedText;
-        List<Rune> newText = DeleteSelectedText ();
+        List<string> newText = DeleteSelectedText ();
         Text = StringExtensions.ToString (newText);
         Adjust ();
     }
@@ -700,7 +700,7 @@ public class TextField : View, IDesignable
         }
         else
         {
-            List<Rune> newText = DeleteSelectedText ();
+            List<string> newText = DeleteSelectedText ();
             Text = StringExtensions.ToString (newText);
             Adjust ();
         }
@@ -734,7 +734,7 @@ public class TextField : View, IDesignable
         }
         else
         {
-            List<Rune> newText = DeleteSelectedText ();
+            List<string> newText = DeleteSelectedText ();
             Text = StringExtensions.ToString (newText);
             Adjust ();
         }
@@ -943,8 +943,8 @@ public class TextField : View, IDesignable
 
         for (int idx = p; idx < tcount; idx++)
         {
-            Rune rune = _text [idx];
-            int cols = rune.GetColumns ();
+            string text = _text [idx];
+            int cols = text.GetColumns ();
 
             if (!Enabled)
             {
@@ -980,7 +980,7 @@ public class TextField : View, IDesignable
 
             if (col + cols <= width)
             {
-                AddRune (Secret ? Glyphs.Dot : rune);
+                AddStr (Secret ? Glyphs.Dot.ToString () : text);
             }
 
             if (!TextModel.SetCol (ref col, width, cols))
@@ -1254,7 +1254,7 @@ public class TextField : View, IDesignable
 
     private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
 
-    private List<Rune> DeleteSelectedText ()
+    private List<string> DeleteSelectedText ()
     {
         SetSelectedStartSelectedLength ();
         int selStart = SelectedStart > -1 ? _start : _cursorPosition;
@@ -1270,7 +1270,7 @@ public class TextField : View, IDesignable
         ClearAllSelection ();
         _cursorPosition = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 
-        return newText.ToRuneList ();
+        return newText.ToStringList ();
     }
 
     private void GenerateSuggestions ()
@@ -1318,7 +1318,7 @@ public class TextField : View, IDesignable
                           new (_cursorPosition, 0)
                          );
 
-        List<Rune> newText = _text;
+        List<string> newText = _text;
 
         if (SelectedLength > 0)
         {
@@ -1339,7 +1339,7 @@ public class TextField : View, IDesignable
 
             if (_cursorPosition == newText.Count + 1)
             {
-                SetText (newText.Concat (kbstr).ToList ());
+                SetText (newText.Concat (kbstr.Select (r => r.ToString ())).ToList ());
             }
             else
             {
@@ -1350,7 +1350,7 @@ public class TextField : View, IDesignable
 
                 SetText (
                          newText.GetRange (0, _preTextChangedCursorPos)
-                                .Concat (kbstr)
+                                .Concat (kbstr.Select (r => r.ToString ()))
                                 .Concat (
                                          newText.GetRange (
                                                            _preTextChangedCursorPos,
@@ -1367,7 +1367,7 @@ public class TextField : View, IDesignable
         {
             SetText (
                      newText.GetRange (0, _preTextChangedCursorPos)
-                            .Concat (kbstr)
+                            .Concat (kbstr.Select (r => r.ToString ()))
                             .Concat (
                                      newText.GetRange (
                                                        Math.Min (_preTextChangedCursorPos + 1, newText.Count),
@@ -1729,7 +1729,7 @@ public class TextField : View, IDesignable
         TitleTextFormatter.Draw (driver: Driver, screen: ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), normalColor: captionAttribute, hotColor: hotKeyAttribute);
     }
 
-    private void SetClipboard (IEnumerable<Rune> text)
+    private void SetClipboard (IEnumerable<string> text)
     {
         if (!Secret)
         {
@@ -1755,8 +1755,8 @@ public class TextField : View, IDesignable
         }
     }
 
-    private void SetText (List<Rune> newText) { Text = StringExtensions.ToString (newText); }
-    private void SetText (IEnumerable<Rune> newText) { SetText (newText.ToList ()); }
+    private void SetText (List<string> newText) { Text = StringExtensions.ToString (newText); }
+    private void SetText (IEnumerable<string> newText) { SetText (newText.ToList ()); }
 
     private void ShowContextMenu (bool keyboard)
     {

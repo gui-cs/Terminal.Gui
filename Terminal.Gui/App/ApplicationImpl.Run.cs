@@ -38,28 +38,28 @@ public partial class ApplicationImpl
         var rs = new SessionToken (toplevel);
 
 #if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts && Current is { } && toplevel != Current && !SessionStack.Contains (Current))
+        if (View.EnableDebugIDisposableAsserts && TopRunnable is { } && toplevel != TopRunnable && !SessionStack.Contains (TopRunnable))
         {
-            // This assertion confirm if the Current was already disposed
-            Debug.Assert (Current.WasDisposed);
-            Debug.Assert (Current == CachedSessionTokenToplevel);
+            // This assertion confirm if the TopRunnable was already disposed
+            Debug.Assert (TopRunnable.WasDisposed);
+            Debug.Assert (TopRunnable == CachedSessionTokenToplevel);
         }
 #endif
 
         lock (SessionStack)
         {
-            if (Current is { } && toplevel != Current && !SessionStack.Contains (Current))
+            if (TopRunnable is { } && toplevel != TopRunnable && !SessionStack.Contains (TopRunnable))
             {
-                // If Current was already disposed and isn't on the Toplevels Stack,
+                // If TopRunnable was already disposed and isn't on the Toplevels Stack,
                 // clean it up here if is the same as _CachedSessionTokenToplevel
-                if (Current == CachedSessionTokenToplevel)
+                if (TopRunnable == CachedSessionTokenToplevel)
                 {
-                    Current = null;
+                    TopRunnable = null;
                 }
                 else
                 {
                     // Probably this will never hit
-                    throw new ObjectDisposedException (Current.GetType ().FullName);
+                    throw new ObjectDisposedException (TopRunnable.GetType ().FullName);
                 }
             }
 
@@ -91,35 +91,35 @@ public partial class ApplicationImpl
             }
         }
 
-        if (Current is null)
+        if (TopRunnable is null)
         {
             toplevel.App = this;
-            Current = toplevel;
+            TopRunnable = toplevel;
         }
 
-        if ((Current?.Modal == false && toplevel.Modal)
-            || (Current?.Modal == false && !toplevel.Modal)
-            || (Current?.Modal == true && toplevel.Modal))
+        if ((TopRunnable?.Modal == false && toplevel.Modal)
+            || (TopRunnable?.Modal == false && !toplevel.Modal)
+            || (TopRunnable?.Modal == true && toplevel.Modal))
         {
             if (toplevel.Visible)
             {
-                if (Current is { HasFocus: true })
+                if (TopRunnable is { HasFocus: true })
                 {
-                    Current.HasFocus = false;
+                    TopRunnable.HasFocus = false;
                 }
 
-                // Force leave events for any entered views in the old Current
+                // Force leave events for any entered views in the old TopRunnable
                 if (Mouse.LastMousePosition is { })
                 {
                     Mouse.RaiseMouseEnterLeaveEvents (Mouse.LastMousePosition!.Value, new ());
                 }
 
-                Current?.OnDeactivate (toplevel);
-                Toplevel previousTop = Current!;
+                TopRunnable?.OnDeactivate (toplevel);
+                Toplevel previousTop = TopRunnable!;
 
-                Current = toplevel;
-                Current.App = this;
-                Current.OnActivate (previousTop);
+                TopRunnable = toplevel;
+                TopRunnable.App = this;
+                TopRunnable.OnActivate (previousTop);
             }
         }
 
@@ -202,11 +202,11 @@ public partial class ApplicationImpl
             throw new InvalidOperationException ("Driver was inexplicably null when trying to Run view");
         }
 
-        Current = view;
+        TopRunnable = view;
 
         SessionToken rs = Begin (view);
 
-        Current.Running = true;
+        TopRunnable.Running = true;
 
         var firstIteration = true;
 
@@ -262,8 +262,8 @@ public partial class ApplicationImpl
         if (SessionStack.TryPeek (out Toplevel? newTop))
         {
             newTop.App = this;
-            Current = newTop;
-            Current?.SetNeedsDraw ();
+            TopRunnable = newTop;
+            TopRunnable?.SetNeedsDraw ();
         }
 
         if (sessionToken.Toplevel is { HasFocus: true })
@@ -271,9 +271,9 @@ public partial class ApplicationImpl
             sessionToken.Toplevel.HasFocus = false;
         }
 
-        if (Current is { HasFocus: false })
+        if (TopRunnable is { HasFocus: false })
         {
-            Current.SetFocus ();
+            TopRunnable.SetFocus ();
         }
 
         CachedSessionTokenToplevel = sessionToken.Toplevel;
@@ -296,9 +296,9 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void RequestStop (Toplevel? top)
     {
-        Logging.Trace ($"Current: '{(top is { } ? top : "null")}'");
+        Logging.Trace ($"TopRunnable: '{(top is { } ? top : "null")}'");
 
-        top ??= Current;
+        top ??= TopRunnable;
 
         if (top == null)
         {
@@ -335,7 +335,7 @@ public partial class ApplicationImpl
     public void Invoke (Action<IApplication>? action)
     {
         // If we are already on the main UI thread
-        if (Current is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (TopRunnable is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action?.Invoke (this);
 
@@ -358,7 +358,7 @@ public partial class ApplicationImpl
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (Current is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (TopRunnable is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action?.Invoke ();
 

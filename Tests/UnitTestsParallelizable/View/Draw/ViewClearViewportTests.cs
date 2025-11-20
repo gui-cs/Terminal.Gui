@@ -36,7 +36,7 @@ public class ViewClearViewportTests () : FakeDriverBase
         {
             for (int x = viewportScreen.X; x < viewportScreen.X + viewportScreen.Width; x++)
             {
-                Assert.Equal (new Rune (' '), driver.Contents [y, x].Rune);
+                Assert.Equal (" ", driver.Contents [y, x].Grapheme);
             }
         }
     }
@@ -75,7 +75,7 @@ public class ViewClearViewportTests () : FakeDriverBase
         {
             for (int x = toClear.X; x < toClear.X + toClear.Width; x++)
             {
-                Assert.Equal (new Rune (' '), driver.Contents [y, x].Rune);
+                Assert.Equal (" ", driver.Contents [y, x].Grapheme);
             }
         }
     }
@@ -154,7 +154,7 @@ public class ViewClearViewportTests () : FakeDriverBase
         {
             for (int x = viewportScreen.X; x < viewportScreen.X + viewportScreen.Width; x++)
             {
-                Assert.Equal (new Rune ('X'), driver.Contents [y, x].Rune);
+                Assert.Equal ("X", driver.Contents [y, x].Grapheme);
             }
         }
     }
@@ -309,7 +309,7 @@ public class ViewClearViewportTests () : FakeDriverBase
         {
             for (int x = viewportScreen.X; x < viewportScreen.X + viewportScreen.Width; x++)
             {
-                Assert.Equal (new Rune (' '), driver.Contents [y, x].Rune);
+                Assert.Equal (" ", driver.Contents [y, x].Grapheme);
             }
         }
     }
@@ -353,7 +353,7 @@ public class ViewClearViewportTests () : FakeDriverBase
             {
                 for (int x = toClear.X; x < toClear.X + toClear.Width; x++)
                 {
-                    Assert.Equal (new Rune (' '), driver.Contents [y, x].Rune);
+                    Assert.Equal (" ", driver.Contents[y, x].Grapheme);
                 }
             }
         }

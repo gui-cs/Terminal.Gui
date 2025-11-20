@@ -154,12 +154,12 @@ public class SyntaxHighlighting : Scenario
                              ),
                          null,
                          new (
-                              "_Load Rune Cells",
+                              "_Load Text Cells",
                               "",
                               () => ApplyLoadCells ()
                              ),
                          new (
-                              "_Save Rune Cells",
+                              "_Save Text Cells",
                               "",
                               () => SaveCells ()
                              ),
@@ -242,12 +242,9 @@ public class SyntaxHighlighting : Scenario
         {
             string csName = color.Key;
 
-            foreach (Rune rune in csName.EnumerateRunes ())
-            {
-                cells.Add (new () { Rune = rune, Attribute = color.Value.Normal });
-            }
+            cells.AddRange (Cell.ToCellList (csName, color.Value.Normal));
 
-            cells.Add (new () { Rune = (Rune)'\n', Attribute = color.Value.Focus });
+            cells.Add (new () { Grapheme = "\n", Attribute = color.Value.Focus });
         }
 
         if (File.Exists (_path))

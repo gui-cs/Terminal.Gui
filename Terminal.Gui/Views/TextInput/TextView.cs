@@ -1481,7 +1481,7 @@ public class TextView : View, IDesignable
     }
 
     /// <summary>Loads the contents of the <see cref="Cell"/> list into the <see cref="TextView"/>.</summary>
-    /// <param name="cells">Rune cells list to load the contents from.</param>
+    /// <param name="cells">Text cells list to load the contents from.</param>
     public void Load (List<Cell> cells)
     {
         SetWrapModel ();
@@ -1801,8 +1801,8 @@ public class TextView : View, IDesignable
 
             for (int idxCol = _leftColumn; idxCol < lineRuneCount; idxCol++)
             {
-                Rune rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol].Rune;
-                int cols = rune.GetColumns ();
+                string text = idxCol >= lineRuneCount ? " " : line [idxCol].Grapheme;
+                int cols = text.GetColumns (false);
 
                 if (idxCol < line.Count && IsSelecting && PointInSelection (idxCol, idxRow))
                 {
@@ -1821,7 +1821,7 @@ public class TextView : View, IDesignable
                     OnDrawNormalColor (line, idxCol, idxRow);
                 }
 
-                if (rune.Value == '\t')
+                if (text == "\t")
                 {
                     cols += TabWidth + 1;
 
@@ -1840,7 +1840,7 @@ public class TextView : View, IDesignable
                 }
                 else
                 {
-                    AddRune (col, row, rune);
+                    AddStr (col, row, text);
 
                     // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
                     cols = Math.Max (cols, 1);
@@ -1851,7 +1851,7 @@ public class TextView : View, IDesignable
                     break;
                 }
 
-                if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Rune.GetColumns () > right)
+                if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Grapheme.GetColumns () > right)
                 {
                     break;
                 }
@@ -2047,9 +2047,9 @@ public class TextView : View, IDesignable
                     break;
                 }
 
-                int cols = line [idx].Rune.GetColumns ();
+                int cols = line [idx].Grapheme.GetColumns ();
 
-                if (line [idx].Rune.Value == '\t')
+                if (line [idx].Grapheme == "\t")
                 {
                     cols += TabWidth + 1;
                 }
@@ -2806,12 +2806,12 @@ public class TextView : View, IDesignable
             cells = line.GetRange (startCol, endCol - startCol);
             cellsList.Add (cells);
 
-            return StringFromRunes (cells);
+            return StringFromCells (cells);
         }
 
         cells = line.GetRange (startCol, line.Count - startCol);
         cellsList.Add (cells);
-        string res = StringFromRunes (cells);
+        string res = StringFromCells (cells);
 
         for (int row = startRow + 1; row < maxRow; row++)
         {
@@ -2821,14 +2821,14 @@ public class TextView : View, IDesignable
 
             res = res
                   + Environment.NewLine
-                  + StringFromRunes (cells);
+                  + StringFromCells (cells);
         }
 
         line = model is null ? _model.GetLine (maxRow) : model.GetLine (maxRow);
         cellsList.AddRange ([]);
         cells = line.GetRange (0, endCol);
         cellsList.Add (cells);
-        res = res + Environment.NewLine + StringFromRunes (cells);
+        res = res + Environment.NewLine + StringFromCells (cells);
 
         return res;
     }
@@ -3108,7 +3108,7 @@ public class TextView : View, IDesignable
         {
             if (Used)
             {
-                Insert (new () { Rune = a.AsRune, Attribute = attribute });
+                Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
 
                 if (CurrentColumn >= _leftColumn + Viewport.Width)
@@ -3119,7 +3119,7 @@ public class TextView : View, IDesignable
             }
             else
             {
-                Insert (new () { Rune = a.AsRune, Attribute = attribute });
+                Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
             }
         }
@@ -3207,7 +3207,7 @@ public class TextView : View, IDesignable
             int restCount = currentLine.Count - CurrentColumn;
             List<Cell> rest = currentLine.GetRange (CurrentColumn, restCount);
             var val = string.Empty;
-            val += StringFromRunes (rest);
+            val += StringFromCells (rest);
 
             if (_lastWasKill)
             {
@@ -3313,7 +3313,7 @@ public class TextView : View, IDesignable
             int restCount = CurrentColumn;
             List<Cell> rest = currentLine.GetRange (0, restCount);
             var val = string.Empty;
-            val += StringFromRunes (rest);
+            val += StringFromCells (rest);
 
             if (_lastWasKill)
             {
@@ -3842,7 +3842,7 @@ public class TextView : View, IDesignable
 
             List<Cell> currentLine = GetCurrentLine ();
 
-            if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Rune.Value == '\t')
+            if (currentLine.Count > 0 && currentLine[CurrentColumn - 1].Grapheme == "\t")
             {
                 _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
@@ -4601,29 +4601,28 @@ public class TextView : View, IDesignable
         _isButtonShift = false;
     }
 
-    private string StringFromRunes (List<Cell> cells)
+    private string StringFromCells (List<Cell> cells)
     {
-        if (cells is null)
-        {
-            throw new ArgumentNullException (nameof (cells));
-        }
+        ArgumentNullException.ThrowIfNull (cells);
 
         var size = 0;
-
         foreach (Cell cell in cells)
         {
-            size += cell.Rune.GetEncodingLength ();
+            string t = cell.Grapheme;
+            size += Encoding.Unicode.GetByteCount (t);
         }
 
-        var encoded = new byte [size];
+        byte [] encoded = new byte [size];
         var offset = 0;
-
         foreach (Cell cell in cells)
         {
-            offset += cell.Rune.Encode (encoded, offset);
+            string t = cell.Grapheme;
+            int bytesWritten = Encoding.Unicode.GetBytes (t, 0, t.Length, encoded, offset);
+            offset += bytesWritten;
         }
 
-        return StringExtensions.ToString (encoded);
+        // decode using the same encoding and the bytes actually written
+        return Encoding.Unicode.GetString (encoded, 0, offset);
     }
 
     private void TextView_SuperViewChanged (object sender, SuperViewChangedEventArgs e)

@@ -109,7 +109,7 @@ public class TextViewTests
                 Assert.Equal (leftCol, _textView.LeftColumn);
             }
 
-            Application.Current.Remove (_textView);
+            Application.TopRunnable.Remove (_textView);
             Application.RequestStop ();
         }
     }
@@ -6922,7 +6922,7 @@ line.
     {
         string [] lines = _textView.Text.Split (Environment.NewLine);
 
-        if (lines == null || lines.Length == 0)
+        if (lines is { Length: 0 })
         {
             return 0;
         }
@@ -7034,11 +7034,11 @@ line.
         List<List<Cell>> text =
         [
             Cell.ToCells (
-                          "This is the first line.".ToRunes ()
+                          "This is the first line.".ToStringList ()
                          ),
 
             Cell.ToCells (
-                          "This is the second line.".ToRunes ()
+                          "This is the second line.".ToStringList ()
                          )
         ];
         TextView tv = CreateTextView ();
@@ -7101,12 +7101,9 @@ line.  ",
         {
             string csName = color.Key;
 
-            foreach (Rune rune in csName.EnumerateRunes ())
-            {
-                cells.Add (new () { Rune = rune, Attribute = color.Value.Normal });
-            }
+            cells.AddRange (Cell.ToCellList (csName, color.Value.Normal));
 
-            cells.Add (new () { Rune = (Rune)'\n', Attribute = color.Value.Focus });
+            cells.Add (new () { Grapheme = "\n", Attribute = color.Value.Focus });
         }
 
         TextView tv = CreateTextView ();

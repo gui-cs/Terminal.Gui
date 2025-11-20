@@ -40,7 +40,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void PosCombine_DimCombine_View_With_SubViews ()
     {
-        Application.Current = new Toplevel () { Width = 80, Height = 25 };
+        Application.TopRunnable = new Toplevel () { Width = 80, Height = 25 };
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
         var view1 = new View
         {
@@ -59,18 +59,18 @@ public class PosCombineTests (ITestOutputHelper output)
         view2.Add (view3);
         win2.Add (view2);
         win1.Add (view1, win2);
-        Application.Current.Add (win1);
-        Application.Current.Layout ();
+        Application.TopRunnable.Add (win1);
+        Application.TopRunnable.Layout ();
 
-        Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Current.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), Application.TopRunnable.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 1), view1.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 10), win1.Frame);
         Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
-        var foundView = Application.Current.GetViewsUnderLocation (new Point(9, 4), ViewportSettingsFlags.None).LastOrDefault ();
+        var foundView = Application.TopRunnable.GetViewsUnderLocation (new Point(9, 4), ViewportSettingsFlags.None).LastOrDefault ();
         Assert.Equal (foundView, view2);
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
     }
 
     [Fact]
@@ -89,13 +89,13 @@ public class PosCombineTests (ITestOutputHelper output)
         top.Add (w);
         Application.Begin (top);
 
-        f.X = Pos.X (Application.Current) + Pos.X (v2) - Pos.X (v1);
-        f.Y = Pos.Y (Application.Current) + Pos.Y (v2) - Pos.Y (v1);
+        f.X = Pos.X (Application.TopRunnable) + Pos.X (v2) - Pos.X (v1);
+        f.Y = Pos.Y (Application.TopRunnable) + Pos.Y (v2) - Pos.Y (v1);
 
-        Application.Current.SubViewsLaidOut += (s, e) =>
+        Application.TopRunnable.SubViewsLaidOut += (s, e) =>
         {
-            Assert.Equal (0, Application.Current.Frame.X);
-            Assert.Equal (0, Application.Current.Frame.Y);
+            Assert.Equal (0, Application.TopRunnable.Frame.X);
+            Assert.Equal (0, Application.TopRunnable.Frame.Y);
             Assert.Equal (2, w.Frame.X);
             Assert.Equal (2, w.Frame.Y);
             Assert.Equal (2, f.Frame.X);
@@ -109,7 +109,7 @@ public class PosCombineTests (ITestOutputHelper output)
         Application.StopAfterFirstIteration = true;
 
         Assert.Throws<LayoutException> (() => Application.Run ());
-        Application.Current.Dispose ();
+        Application.TopRunnable.Dispose ();
         top.Dispose ();
         Application.Shutdown ();
     }

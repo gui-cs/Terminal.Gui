@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿using System.Text;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests.ViewTests;
@@ -395,7 +396,7 @@ Y
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
-        Assert.Equal (new (0, 0, 4, 10), Application.Current.Frame);
+        Assert.Equal (new (0, 0, 4, 10), Application.TopRunnable.Frame);
 
         var expected = @"
 ┌──┐
@@ -699,14 +700,14 @@ w ";
 
         string GetContents ()
         {
-            var text = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 4; i++)
             {
-                text += Application.Driver?.Contents [0, i].Rune;
+                sb.Append (Application.Driver?.Contents! [0, i].Grapheme);
             }
 
-            return text;
+            return sb.ToString ();
         }
 
         Application.End (rs);

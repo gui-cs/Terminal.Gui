@@ -28,7 +28,7 @@ public class AllViewsTester : Scenario
 
     public override void Main ()
     {
-        // Don't create a sub-win (Scenario.Win); just use Application.Current
+        // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
         Application.Init ();
 
         var app = new Window

@@ -39,7 +39,7 @@ public class GlobalTestSetup : IDisposable
         // Check that all Application fields and properties are set to their default values
 
         // Public Properties
-        Assert.Null (Application.Current);
+        Assert.Null (Application.TopRunnable);
         Assert.Null (Application.Mouse.MouseGrabView);
 
         // Don't check Application.ForceDriver

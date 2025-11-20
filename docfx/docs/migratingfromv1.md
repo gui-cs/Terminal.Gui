@@ -85,12 +85,12 @@ When measuring the screen space taken up by a `string` you can use the extension
 
 In v1, @Terminal.Gui.View was derived from `Responder` which supported `IDisposable`. In v2, `Responder` has been removed and @Terminal.Gui.View is the base-class supporting `IDisposable`. 
 
-In v1, @Terminal.Gui./Terminal.Gui.Application.Init) automatically created a toplevel view and set [Application.Current](~/api/Terminal.Gui.Application.Current. In v2, @Terminal.Gui.App.Application.Init no longer automatically creates a toplevel or sets @Terminal.Gui.App.Application.Current; app developers must explicitly create the toplevel view and pass it to @Terminal.Gui.App.Application.Run (or use `Application.Run<myTopLevel>`). Developers are responsible for calling `Dispose` on any toplevel they create before exiting. 
+In v1, @Terminal.Gui./Terminal.Gui.Application.Init) automatically created a toplevel view and set [Application.TopRunnable](~/api/Terminal.Gui.Application.TopRunnable. In v2, @Terminal.Gui.App.Application.Init no longer automatically creates a toplevel or sets @Terminal.Gui.App.Application.TopRunnable; app developers must explicitly create the toplevel view and pass it to @Terminal.Gui.App.Application.Run (or use `Application.Run<myTopLevel>`). Developers are responsible for calling `Dispose` on any toplevel they create before exiting. 
 
 ### How to Fix
 
 * Replace `Responder` with @Terminal.Gui.View
-* Update any code that assumes `Application.Init` automatically created a toplevel view and set `Application.Current`.
+* Update any code that assumes `Application.Init` automatically created a toplevel view and set `Application.TopRunnable`.
 * Update any code that assumes `Application.Init` automatically disposed of the toplevel view when the application exited.
 
 ## Instance-Based Application Architecture
@@ -144,7 +144,7 @@ When accessing application services from within views, use the `App` property in
 // OLD (v1 / obsolete static):
 public void Refresh()
 {
-    Application.Current?.SetNeedsDraw();
+    Application.TopRunnable?.SetNeedsDraw();
 }
 
 // NEW (v2 - use View.App):
@@ -591,6 +591,6 @@ new (
 
 * To simplify programming, any `View` added as a SubView another `View` will have it's lifecycle owned by the Superview; when a `View` is disposed, it will call `Dispose` on all the items in the `SubViews` property. Note this behavior is the same as it was in v1, just clarified.
 
-* In v1, `Application.End` called `Dispose ()` on @Terminal.Gui.App.Application.Current (via `Runstate.Toplevel`). This was incorrect as it meant that after `Application.Run` returned, `Application.Current` had been disposed, and any code that wanted to interrogate the results of `Run` by accessing `Application.Current` only worked by accident. This is because GC had not actually happened; if it had the application would have crashed. In v2 `Application.End` does NOT call `Dispose`, and it is the caller to `Application.Run` who is responsible for disposing the `Toplevel` that was either passed to `Application.Run (View)` or created by `Application.Run<T> ()`.
+* In v1, `Application.End` called `Dispose ()` on @Terminal.Gui.App.Application.TopRunnable (via `Runstate.Toplevel`). This was incorrect as it meant that after `Application.Run` returned, `Application.TopRunnable` had been disposed, and any code that wanted to interrogate the results of `Run` by accessing `Application.TopRunnable` only worked by accident. This is because GC had not actually happened; if it had the application would have crashed. In v2 `Application.End` does NOT call `Dispose`, and it is the caller to `Application.Run` who is responsible for disposing the `Toplevel` that was either passed to `Application.Run (View)` or created by `Application.Run<T> ()`.
 
 * Any code that creates a `Toplevel`, either by using `top = new()` or by calling either `top = Application.Run ()` or `top = ApplicationRun<T>()` must call `top.Dispose` when complete. The exception to this is if `top` is passed to `myView.Add(top)` making it a subview of `myView`. This is because the semantics of `Add` are that the `myView` takes over responsibility for the subviews lifetimes. Of course, if someone calls `myView.Remove(top)` to remove said subview, they then re-take responsbility for `top`'s lifetime and they must call `top.Dispose`.

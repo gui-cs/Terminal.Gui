@@ -80,10 +80,10 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         // Text should appear at the content location
         Point screenPos = view.ContentToScreen (Point.Empty);
 
-        Assert.Equal ('T', (char)driver.Contents [screenPos.Y, screenPos.X].Rune.Value);
-        Assert.Equal ('e', (char)driver.Contents [screenPos.Y, screenPos.X + 1].Rune.Value);
-        Assert.Equal ('s', (char)driver.Contents [screenPos.Y, screenPos.X + 2].Rune.Value);
-        Assert.Equal ('t', (char)driver.Contents [screenPos.Y, screenPos.X + 3].Rune.Value);
+        Assert.Equal ("T", driver.Contents [screenPos.Y, screenPos.X].Grapheme);
+        Assert.Equal ("e", driver.Contents [screenPos.Y, screenPos.X + 1].Grapheme);
+        Assert.Equal ("s", driver.Contents [screenPos.Y, screenPos.X + 2].Grapheme);
+        Assert.Equal ("t", driver.Contents [screenPos.Y, screenPos.X + 3].Grapheme);
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         // Verify the line was drawn (check for horizontal line character)
         for (int i = 0; i < 5; i++)
         {
-            Assert.NotEqual (new Rune (' '), driver.Contents [screenPos.Y, screenPos.X + i].Rune);
+            Assert.NotEqual (" ", driver.Contents [screenPos.Y, screenPos.X + i].Grapheme);
         }
     }
 
@@ -409,7 +409,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         bool lineRendered = true;
         for (int i = 0; i < 5; i++)
         {
-            if (driver.Contents [screenPos.Y, screenPos.X + i].Rune.Value == ' ')
+            if (driver.Contents [screenPos.Y, screenPos.X + i].Grapheme == " ")
             {
                 lineRendered = false;
                 break;
