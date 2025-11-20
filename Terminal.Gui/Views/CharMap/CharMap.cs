@@ -147,7 +147,6 @@ public class CharMap : View, IDesignable
                     break;
                 }
 
-                string grapheme = new Rune (cp).ToString ();
                 UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (cp);
                 if (cat == ShowUnicodeCategory.Value)
                 {
