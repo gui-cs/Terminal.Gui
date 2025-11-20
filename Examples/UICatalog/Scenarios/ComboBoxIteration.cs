@@ -42,8 +42,8 @@ public class ComboBoxIteration : Scenario
 
         listview.SelectedItemChanged += (s, e) =>
                                         {
-                                            lbListView.Text = items [e.Item];
-                                            comboBox.SelectedItem = e.Item;
+                                            lbListView.Text = items [e.Item!.Value];
+                                            comboBox.SelectedItem = e.Item.Value;
                                         };
 
         comboBox.SelectedItemChanged += (sender, text) =>

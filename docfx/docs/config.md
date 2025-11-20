@@ -459,7 +459,8 @@ ThemeManager.ThemeChanged += (sender, e) =>
 {
     // Theme has changed
     // Refresh all views to use new theme
-    Application.Current?.SetNeedsDraw();
+    // From within a View, use: App?.Current?.SetNeedsDraw();
+    // Or access via IApplication instance: app.Current?.SetNeedsDraw();
 };
 ```
 

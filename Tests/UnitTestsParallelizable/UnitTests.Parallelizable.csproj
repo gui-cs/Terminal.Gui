@@ -27,6 +27,11 @@
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <Optimize>true</Optimize>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="ViewBase\**" />
+      <EmbeddedResource Remove="ViewBase\**" />
+      <None Remove="ViewBase\**" />
+    </ItemGroup>
 
     <ItemGroup>
         <Compile Include="..\UnitTests\DriverAssert.cs" Link="DriverAssert.cs" />
@@ -68,8 +73,5 @@
         <Using Include="System.Drawing" />
         <Using Include="Terminal.Gui" />
         <Using Include="Xunit" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="ViewBase\" />
     </ItemGroup>
 </Project>

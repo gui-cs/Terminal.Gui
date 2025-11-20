@@ -50,7 +50,7 @@ public class ListsAndCombos : Scenario
             Width = Dim.Percent (40),
             Source = new ListWrapper<string> (items)
         };
-        listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
+        listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem.Value];
         win.Add (lbListView, listview);
 
         //var scrollBar = new ScrollBarView (listview, true);

@@ -8,7 +8,7 @@ Terminal.Gui v2 uses an instance-based application architecture that decouples v
 graph TB
     subgraph ViewTree["View Hierarchy (SuperView/SubView)"]
         direction TB
-        Top[Application.Current<br/>Window]
+        Top[app.Current<br/>Window]
         Menu[MenuBar]
         Status[StatusBar]
         Content[Content View]
@@ -22,7 +22,7 @@ graph TB
         Content --> Button2
     end
     
-    subgraph Stack["Application.SessionStack"]
+    subgraph Stack["app.SessionStack"]
         direction TB
         S1[Window<br/>Currently Active]
         S2[Previous Toplevel<br/>Waiting]
@@ -41,7 +41,7 @@ graph TB
 
 ```mermaid
 sequenceDiagram
-    participant App as Application
+    participant App as IApplication
     participant Main as Main Window
     participant Dialog as Dialog
     
@@ -68,23 +68,28 @@ sequenceDiagram
 
 ### Instance-Based vs Static
 
-**Terminal.Gui v2** has transitioned from a static singleton pattern to an instance-based architecture:
+**Terminal.Gui v2** supports both static and instance-based patterns. The static `Application` class is marked obsolete but still functional for backward compatibility. The recommended pattern is to use `Application.Create()` to get an `IApplication` instance:
 
 ```csharp
-// OLD (v1 / early v2 - now obsolete):
+// OLD (v1 / early v2 - still works but obsolete):
 Application.Init();
-Application.Top.Add(myView);
-Application.Run();
+var top = new Toplevel();
+top.Add(myView);
+Application.Run(top);
+top.Dispose();
 Application.Shutdown();
 
-// NEW (v2 instance-based):
-var app = Application.Create ();
+// NEW (v2 recommended - instance-based):
+var app = Application.Create();
 app.Init();
 var top = new Toplevel();
 top.Add(myView);
 app.Run(top);
+top.Dispose();
 app.Shutdown();
 ```
+
+**Note:** The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton). `Application.Create()` creates a **new** `ApplicationImpl` instance, enabling multiple application contexts and better testability.
 
 ### View.App Property
 
@@ -226,18 +231,22 @@ int sessionCount = App?.SessionStack.Count ?? 0;
 
 ## Migration from Static Application
 
-The static `Application` class now delegates to `ApplicationImpl.Instance` and is marked obsolete:
+The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton) and is marked obsolete. All static methods and properties are marked with `[Obsolete]` but remain functional for backward compatibility:
 
 ```csharp
-public static class Application
+public static partial class Application
 {
-    [Obsolete("Use ApplicationImpl.Instance.Current or view.App?.Current")]
-    public static Toplevel? Current => Instance?.Current;
+    [Obsolete("The legacy static Application object is going away.")]
+    public static Toplevel? Current => ApplicationImpl.Instance.Current;
     
-    [Obsolete("Use ApplicationImpl.Instance.SessionStack or view.App?.SessionStack")]
-    public static ConcurrentStack<Toplevel> SessionStack => Instance?.SessionStack ?? new();
+    [Obsolete("The legacy static Application object is going away.")]
+    public static ConcurrentStack<Toplevel> SessionStack => ApplicationImpl.Instance.SessionStack;
+    
+    // ... other obsolete static members
 }
 ```
+
+**Important:** The static `Application` class uses a singleton (`ApplicationImpl.Instance`), while `Application.Create()` creates new instances. For new code, prefer the instance-based pattern using `Application.Create()`.
 
 ### Migration Strategies
 
@@ -472,16 +481,19 @@ public class Service
 }
 ```
 
-### DON'T: Assume Application.Instance Exists
+### DON'T: Use Static Application in New Code
 
 ```csharp
-❌ AVOID:
-public class Service
+❌ AVOID (obsolete pattern):
+public void Refresh()
 {
-    public void DoWork()
-    {
-        var app = Application.Instance; // Might be null!
-    }
+    Application.Current?.SetNeedsDraw(); // Obsolete static access
+}
+
+✅ PREFERRED:
+public void Refresh()
+{
+    App?.Current?.SetNeedsDraw(); // Use View.App property
 }
 ```
 
