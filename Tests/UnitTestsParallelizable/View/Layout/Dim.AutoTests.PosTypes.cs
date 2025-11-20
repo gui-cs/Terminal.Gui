@@ -599,7 +599,7 @@ public partial class DimAutoTests
 
         // Without a subview, width should be 10
         // Without a subview, height should be 1
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.SetRelativeLayout (new (100, 100));
         Assert.Equal (10, view.Frame.Width);
         Assert.Equal (1, view.Frame.Height);
 
