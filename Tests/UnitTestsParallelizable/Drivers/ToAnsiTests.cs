@@ -63,19 +63,34 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Contains ("Blue", ansi);
     }
 
-    [Fact]
-    public void ToAnsi_With_Background_Colors ()
+    [Theory]
+    [InlineData (false, "\u001b[48;2;")]
+    [InlineData (true, "\u001b[41m")]
+    public void ToAnsi_With_Background_Colors (bool force16Colors, string expected)
     {
         IDriver driver = CreateFakeDriver (10, 2);
+        Application.Force16Colors = force16Colors;
 
         // Set background color
-        driver.CurrentAttribute = new Attribute (Color.White, Color.Red);
+        driver.CurrentAttribute = new (Color.White, Color.Red);
         driver.AddStr ("WhiteOnRed");
 
         string ansi = driver.ToAnsi ();
 
+        /*
+         The ANSI escape sequence for red background (8-color) is ESC[41m — where ESC is \x1b (or \u001b).
+           Examples:
+           •	C# string: "\u001b[41m" or "\x1b[41m"
+           •	Reset (clear attributes): "\u001b[0m"
+           Notes:
+           •	Bright/red background (16-color bright variant) uses ESC[101m ("\u001b[101m").
+           •	For 24-bit RGB background use ESC[48;2;<r>;<g>;<b>m, e.g. "\u001b[48;2;255;0;0m" for pure red.
+         */
+
+        Assert.True (driver.Force16Colors == force16Colors);
+
         // Should contain ANSI background color code
-        Assert.Contains ("\u001b[41m", ansi); // Red background
+        Assert.Contains (expected, ansi); // Red background
         Assert.Contains ("WhiteOnRed", ansi);
     }
 
