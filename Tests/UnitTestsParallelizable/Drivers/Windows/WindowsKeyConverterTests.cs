@@ -2,8 +2,8 @@ using Xunit.Sdk;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-[Collection("Global Test Setup")]
-[Trait("Platform", "Windows")]
+[Collection ("Global Test Setup")]
+[Trait ("Platform", "Windows")]
 public class WindowsKeyConverterTests
 {
     private readonly WindowsKeyConverter _converter = new ();
@@ -152,12 +152,12 @@ public class WindowsKeyConverterTests
     #region ToKey Tests - VK_PACKET (Unicode/IME)
 
     [Theory]
-    [InlineData ('?')] // Chinese character
-    [InlineData ('?')] // Japanese character
-    [InlineData ('?')] // Korean character
-    [InlineData ('Θ')] // Accented character
-    [InlineData ('Ç')] // Euro symbol
-    [InlineData ('?')] // Greek character
+    [InlineData ('中')] // Chinese character
+    [InlineData ('日')] // Japanese character
+    [InlineData ('한')] // Korean character
+    [InlineData ('é')] // Accented character
+    [InlineData ('€')] // Euro symbol
+    [InlineData ('Ω')] // Greek character
     public void ToKey_VKPacket_Unicode_ReturnsExpectedCharacter (char unicodeChar)
     {
         // Arrange
@@ -186,7 +186,7 @@ public class WindowsKeyConverterTests
     [Fact]
     public void ToKey_VKPacket_SurrogatePair_DocumentsCurrentLimitation ()
     {
-        // Emoji '??' (U+1F600) requires a surrogate pair: High=U+D83D, Low=U+DE00
+        // Emoji '😀' (U+1F600) requires a surrogate pair: High=U+D83D, Low=U+DE00
         // Windows sends this as TWO consecutive VK_PACKET events (one for each char)
         // because KeyEventRecord.UnicodeChar is a single 16-bit char field.
         // 
@@ -199,8 +199,8 @@ public class WindowsKeyConverterTests
         // complete Unicode codepoint.
         // See: https://docs.microsoft.com/en-us/windows/console/key-event-record
         
-        char highSurrogate = '\uD83D'; // High surrogate for ??
-        char lowSurrogate = '\uDE00';  // Low surrogate for ??
+        char highSurrogate = '\uD83D'; // High surrogate for 😀
+        char lowSurrogate = '\uDE00';  // Low surrogate for 😀
 
         // First event with high surrogate
         WindowsConsole.InputRecord highRecord = CreateVKPacketInputRecord (highSurrogate);
@@ -217,7 +217,7 @@ public class WindowsKeyConverterTests
 
         // What SHOULD happen (future fix):
         // The InputProcessor should detect the surrogate pair and combine them:
-        // var expectedRune = new Rune(0x1F600); // ??
+        // var expectedRune = new Rune(0x1F600); // 😀
         // Assert.Equal((KeyCode)expectedRune.Value, combinedResult.KeyCode);
     }
 
