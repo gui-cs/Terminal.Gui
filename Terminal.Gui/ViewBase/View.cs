@@ -190,7 +190,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>
     ///     Raised during <see cref="EndInit"/> before initialization completes. Can be canceled by setting
-    ///     <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>. Follows the Cancellable Work Pattern (CWP).
+    ///     <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/>. Follows the Cancellable Work Pattern (CWP).
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -207,7 +207,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///         5. <see cref="Initialized"/> event
     ///     </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs>? Initializing;
+    public event EventHandler<System.ComponentModel.CancelEventArgs>? Initializing;
 
     /// <summary>
     ///     Raised once when the <see cref="View"/> has been initialized for the first time. Allows
@@ -305,7 +305,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         }
 
         // CWP Phase 2: Event notification (can cancel)
-        var args = new CancelEventArgs ();
+        var args = new System.ComponentModel.CancelEventArgs ();
         Initializing?.Invoke (this, args);
 
         if (args.Cancel)
