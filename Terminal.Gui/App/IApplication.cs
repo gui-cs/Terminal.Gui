@@ -301,14 +301,14 @@ public interface IApplication
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="Current"/> as the parameter.
+    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="TopRunnable"/> as the parameter.
     ///     </para>
     /// </remarks>
     void RequestStop ();
 
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <param name="top">
-    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running <see cref="Current"/>.
+    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running <see cref="TopRunnable"/>.
     /// </param>
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
@@ -356,13 +356,14 @@ public interface IApplication
 
     #region Toplevel Management
 
-    /// <summary>Gets or sets the currently active Toplevel.</summary>
+    /// <summary>Gets or sets the Toplevel that is on the top of the <see cref="SessionStack"/>.</summary>
     /// <remarks>
     ///     <para>
+    ///         The top runnable in the session stack captures all mouse and keyboard input.
     ///         This is set by <see cref="Begin(Toplevel)"/> and cleared by <see cref="End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
-    Toplevel? Current { get; set; }
+    Toplevel? TopRunnable { get; set; }
 
     /// <summary>Gets the stack of all active Toplevel sessions.</summary>
     /// <remarks>
@@ -433,7 +434,7 @@ public interface IApplication
     /// <remarks>
     ///     <para>
     ///         This is typically set to <see langword="true"/> when a View's <see cref="View.Frame"/> changes and that view
-    ///         has no SuperView (e.g. when <see cref="Current"/> is moved or resized).
+    ///         has no SuperView (e.g. when <see cref="TopRunnable"/> is moved or resized).
     ///     </para>
     ///     <para>
     ///         Automatically reset to <see langword="false"/> after <see cref="LayoutAndDraw"/> processes it.

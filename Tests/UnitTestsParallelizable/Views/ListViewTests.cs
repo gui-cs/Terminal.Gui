@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Text;
 using Moq;
 using Terminal.Gui;
 using UnitTests;
@@ -893,7 +894,7 @@ public class ListViewTests (ITestOutputHelper output)
             BorderStyle = LineStyle.Single
         };
         lv.SetSource (["One", "Two", "Three", "Four"]);
-        lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
+        lv.SelectedItemChanged += (s, e) => selected = e.Value!.ToString ();
         var top = new Toplevel ();
         top.Add (lv);
         app.Begin (top);
@@ -950,7 +951,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Equal (2, lv.SelectedItem);
         top.Dispose ();
 
-        app.Shutdown ();
+        app?.Shutdown ();
     }
 
     [Fact]
@@ -1258,7 +1259,7 @@ Item 6",
         IApplication? app = Application.Create ();
         app.Init ("fake");
         IDriver? driver = app.Driver;
-        driver.SetScreenSize (8, 2);
+        driver?.SetScreenSize (8, 2);
 
         ObservableCollection<string> source = ["First", "Second"];
         var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
@@ -1278,14 +1279,14 @@ Item 6",
 
         string GetContents (int line)
         {
-            var item = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 7; i++)
             {
-                item += app.Driver?.Contents [line, i].Rune;
+                sb.Append ((app?.Driver?.Contents!) [line, i].Grapheme);
             }
 
-            return item;
+            return sb.ToString ();
         }
 
         top.Dispose ();
@@ -1430,8 +1431,8 @@ Three",
                                                        _output, app?.Driver);
 
         // Scroll down
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledDown });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledDown });
+        app?.LayoutAndDraw ();
         Assert.Equal (1, lv.TopItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1441,8 +1442,8 @@ Four ",
                                                        _output, app?.Driver);
 
         // Scroll up
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledUp });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledUp });
+        app?.LayoutAndDraw ();
         Assert.Equal (0, lv.TopItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1452,7 +1453,7 @@ Three",
                                                        _output, app?.Driver);
 
         top.Dispose ();
-        app.Shutdown ();
+        app?.Shutdown ();
     }
 
     [Fact]
@@ -1492,7 +1493,7 @@ Three - lo",
                                                        _output, app?.Driver);
 
         lv.ScrollHorizontal (1);
-        app.LayoutAndDraw ();
+        app?.LayoutAndDraw ();
         Assert.Equal (1, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1502,8 +1503,8 @@ hree - lon",
                                                        _output, app?.Driver);
 
         // Scroll right with mouse
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledRight });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledRight });
+        app?.LayoutAndDraw ();
         Assert.Equal (2, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1513,8 +1514,8 @@ ree - long",
                                                        _output, app?.Driver);
 
         // Scroll left with mouse
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledLeft });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledLeft });
+        app?.LayoutAndDraw ();
         Assert.Equal (1, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1524,7 +1525,7 @@ hree - lon",
                                                        _output, app?.Driver);
 
         top.Dispose ();
-        app.Shutdown ();
+        app?.Shutdown ();
     }
 
     [Fact]

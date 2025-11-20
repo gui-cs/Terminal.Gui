@@ -129,7 +129,7 @@ public sealed class Themes : Scenario
                                           {
                                               if (_view is { })
                                               {
-                                                  Application.Current!.SchemeName = args.NewValue;
+                                                  Application.TopRunnable!.SchemeName = args.NewValue;
 
                                                   if (_view.HasScheme)
                                                   {

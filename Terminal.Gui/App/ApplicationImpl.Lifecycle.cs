@@ -145,13 +145,9 @@ public partial class ApplicationImpl
     }
 #endif
 
-    private bool _isResetingState;
-
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
     {
-        _isResetingState = true;
-
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
@@ -182,21 +178,21 @@ public partial class ApplicationImpl
 
 #if DEBUG_IDISPOSABLE
 
-        // Don't dispose the Current. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && Current is { })
+        // Don't dispose the TopRunnable. It's up to caller dispose it
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnable is { })
         {
-            Debug.Assert (Current.WasDisposed, $"Title = {Current.Title}, Id = {Current.Id}");
+            Debug.Assert (TopRunnable.WasDisposed, $"Title = {TopRunnable.Title}, Id = {TopRunnable.Id}");
 
             // If End wasn't called _CachedSessionTokenToplevel may be null
             if (CachedSessionTokenToplevel is { })
             {
                 Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
-                Debug.Assert (CachedSessionTokenToplevel == Current);
+                Debug.Assert (CachedSessionTokenToplevel == TopRunnable);
             }
         }
 #endif
 
-        Current = null;
+        TopRunnable = null;
         CachedSessionTokenToplevel = null;
 
         // === 4. Clean up driver ===
@@ -250,8 +246,6 @@ public partial class ApplicationImpl
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
-
-        _isResetingState = false;
     }
 
     /// <summary>

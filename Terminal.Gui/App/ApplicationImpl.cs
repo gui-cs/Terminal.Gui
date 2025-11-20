@@ -121,19 +121,19 @@ public partial class ApplicationImpl : IApplication
         set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    private Toplevel? _current;
+    private Toplevel? _topRunnable;
 
     /// <inheritdoc/>
-    public Toplevel? Current
+    public Toplevel? TopRunnable
     {
-        get => _current;
+        get => _topRunnable;
         set
         {
-            _current = value;
+            _topRunnable = value;
 
-            if (_current is { })
+            if (_topRunnable is { })
             {
-                _current.App = this;
+                _topRunnable.App = this;
             }
         }
     }

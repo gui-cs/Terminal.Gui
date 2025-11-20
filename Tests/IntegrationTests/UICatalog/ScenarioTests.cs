@@ -35,7 +35,9 @@ public class ScenarioTests : TestsAllViews
             return;
         }
 
-        Application.ResetState (true);
+        // Force a complete reset
+        ApplicationImpl.SetInstance (null);
+        CM.Disable (true);
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         Scenario? scenario = null;

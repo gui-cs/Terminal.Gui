@@ -124,8 +124,8 @@ public interface IDriver
     /// </returns>
     bool IsRuneSupported (Rune rune);
 
-    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
+    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
@@ -133,7 +133,7 @@ public interface IDriver
     ///     <see cref="IDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    bool IsValidLocation (Rune rune, int col, int row);
+    bool IsValidLocation (string text, int col, int row);
 
     /// <summary>
     ///     Updates <see cref="IDriver.Col"/> and <see cref="IDriver.Row"/> to the specified column and row in

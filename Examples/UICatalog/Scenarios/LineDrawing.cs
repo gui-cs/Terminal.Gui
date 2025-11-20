@@ -284,7 +284,7 @@ public class DrawingArea : View
                     SetCurrentAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
+                    AddStr (c.Key.X, c.Key.Y, c.Value.Value.Grapheme);
                 }
             }
         }

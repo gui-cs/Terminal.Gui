@@ -253,8 +253,16 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
 
-    /// <inheritdoc/>
-    public bool IsValidLocation (Rune rune, int col, int row) => OutputBuffer.IsValidLocation (rune, col, row);
+    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
+    ///     <see cref="IDriver.Clip"/>.
+    ///     <see langword="true"/> otherwise.
+    /// </returns>
+    public bool IsValidLocation (string text, int col, int row) { return OutputBuffer.IsValidLocation (text, col, row); }
 
     /// <inheritdoc/>
     public void Move (int col, int row) { OutputBuffer.Move (col, row); }
@@ -379,26 +387,14 @@ internal class DriverImpl : IDriver
         {
             for (var c = 0; c < Cols; c++)
             {
-                Rune rune = contents [r, c].Rune;
+                string text = contents [r, c].Grapheme;
 
-                if (rune.DecodeSurrogatePair (out char []? sp))
-                {
-                    sb.Append (sp);
-                }
-                else
-                {
-                    sb.Append ((char)rune.Value);
-                }
+                sb.Append (text);
 
-                if (rune.GetColumns () > 1)
+                if (text.GetColumns () > 1)
                 {
                     c++;
                 }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	sb.Append ((char)combMark.Value);
-                //}
             }
 
             sb.AppendLine ();

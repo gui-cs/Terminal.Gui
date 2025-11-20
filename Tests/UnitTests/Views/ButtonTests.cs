@@ -209,7 +209,7 @@ public class ButtonTests (ITestOutputHelper output)
         clicked = false;
 
         // Toplevel does not handle Enter, so it should get passed on to button
-        Assert.False (Application.Current.NewKeyDownEvent (Key.Enter));
+        Assert.False (Application.TopRunnable.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
