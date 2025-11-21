@@ -399,6 +399,12 @@ public partial class ApplicationImpl
         // Push token onto RunnableSessionStack (IsRunning becomes true)
         RunnableSessionStack?.Push (token);
 
+        // Set the App property if the runnable is a View
+        if (runnable is View runnableView)
+        {
+            runnableView.App = this;
+        }
+
         // Update TopRunnable to the new top of stack
         IRunnable? previousTop = null;
 
