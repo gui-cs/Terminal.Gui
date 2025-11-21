@@ -415,18 +415,15 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         IApplication app = GetApp ();
         app.StopAfterFirstIteration = true;
 
-        // Act
-        var runnable = app.Run<TestRunnable> ();
+        // Act - With fluent API, Run<T>() returns IApplication for chaining
+        IApplication result = app.Run<TestRunnable> ();
 
         // Assert
-        Assert.NotNull (runnable);
-        Assert.IsType<TestRunnable> (runnable);
+        Assert.NotNull (result);
+        Assert.Same (app, result); // Fluent API returns this
 
         // Note: Run blocks until stopped, but StopAfterFirstIteration makes it return immediately
-        // The runnable should have been begun and ended
-
-        // Cleanup
-        runnable.Dispose ();
+        // The runnable is automatically disposed by Shutdown()
     }
 
     [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]

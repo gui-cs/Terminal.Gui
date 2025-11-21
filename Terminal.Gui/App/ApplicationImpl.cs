@@ -133,6 +133,9 @@ public partial class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; } = new ();
 
+    /// <inheritdoc/>
+    public IRunnable? FrameworkOwnedRunnable { get; set; }
+
     #endregion View Management
 
     /// <inheritdoc/>

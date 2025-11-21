@@ -509,7 +509,7 @@ public partial class ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public TRunnable Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ()
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ()
     {
         if (!Initialized)
         {
@@ -517,9 +517,13 @@ public partial class ApplicationImpl
         }
 
         TRunnable runnable = new ();
+        
+        // Store the runnable for automatic disposal by Shutdown
+        FrameworkOwnedRunnable = runnable;
+        
         Run (runnable, errorHandler);
 
-        return runnable;
+        return this;
     }
 
     private void RunLoop (IRunnable runnable, Func<Exception, bool>? errorHandler)

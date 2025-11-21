@@ -44,6 +44,7 @@ public interface IApplication
     ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
     ///     <see cref="IDriver"/> to use. If not specified the default driver for the platform will be used.
     /// </param>
+    /// <returns>This instance for fluent API chaining.</returns>
     /// <remarks>
     ///     <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     ///     <para>
@@ -59,10 +60,13 @@ public interface IApplication
     ///         <see cref="Run(Toplevel, Func{Exception, bool})"/> into a single call. An application can use
     ///         <see cref="Run{T}(Func{Exception, bool})"/> without explicitly calling <see cref="Init(string)"/>.
     ///     </para>
+    ///     <para>
+    ///         Supports fluent API: <c>Application.Create().Init().Run&lt;MyView&gt;().Shutdown()</c>
+    ///     </para>
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (string? driverName = null);
+    public IApplication Init (string? driverName = null);
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
@@ -76,12 +80,25 @@ public interface IApplication
     bool Initialized { get; set; }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
+    /// <returns>
+    ///     The result from the last <see cref="Run{T}(Func{Exception, bool})"/> call, or <see langword="null"/> if none.
+    ///     Automatically disposes any runnable created by <see cref="Run{T}(Func{Exception, bool})"/>.
+    /// </returns>
     /// <remarks>
-    ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
-    ///     up (Disposed) and terminal settings are restored.
+    ///     <para>
+    ///         Shutdown must be called for every call to <see cref="Init"/> or
+    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
+    ///         up (Disposed) and terminal settings are restored.
+    ///     </para>
+    ///     <para>
+    ///         When used in a fluent chain with <see cref="Run{T}(Func{Exception, bool})"/>, this method automatically
+    ///         disposes the runnable instance and extracts its result for return.
+    ///     </para>
+    ///     <para>
+    ///         Supports fluent API: <c>var result = Application.Create().Init().Run&lt;MyView&gt;().Shutdown() as MyResultType</c>
+    ///     </para>
     /// </remarks>
-    public void Shutdown ();
+    public object? Shutdown ();
 
     /// <summary>
     ///     Resets the state of this instance.
@@ -421,6 +438,21 @@ public interface IApplication
     ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
 
     /// <summary>
+    ///     Gets or sets the runnable that was created by <see cref="Run{T}(Func{Exception, bool})"/> for automatic disposal.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When <see cref="Run{T}(Func{Exception, bool})"/> creates a runnable instance, it stores it here so
+    ///         <see cref="Shutdown"/> can automatically dispose it and extract its result.
+    ///     </para>
+    ///     <para>
+    ///         This property is <see langword="null"/> if <see cref="Run(IRunnable, Func{Exception, bool})"/> was used
+    ///         with an externally-created runnable.
+    ///     </para>
+    /// </remarks>
+    IRunnable? FrameworkOwnedRunnable { get; set; }
+
+    /// <summary>
     ///     Building block API: Creates a <see cref="RunnableSessionToken"/> and prepares the provided <see cref="IRunnable"/>
     ///     for
     ///     execution. Not usually called directly by applications. Use <see cref="Run(IRunnable, Func{Exception, bool})"/>
@@ -478,17 +510,20 @@ public interface IApplication
     /// </summary>
     /// <typeparam name="TRunnable">The type of runnable to create and run. Must have a parameterless constructor.</typeparam>
     /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
-    /// <returns>The runnable instance that was created and run.</returns>
+    /// <returns>This instance for fluent API chaining. The created runnable is stored internally for disposal.</returns>
     /// <remarks>
     ///     <para>
     ///         This is a convenience method that creates an instance of <typeparamref name="TRunnable"/> and runs it.
-    ///         Equivalent to: <c>TRunnable r = new(); Run(r); return r;</c>
+    ///         The framework owns the created instance and will automatically dispose it when <see cref="Shutdown"/> is called.
     ///     </para>
     ///     <para>
-    ///         The caller is responsible for disposing the returned object.
+    ///         To access the result, use <see cref="Shutdown"/> which returns the result from <see cref="IRunnable{TResult}.Result"/>.
+    ///     </para>
+    ///     <para>
+    ///         Supports fluent API: <c>var result = Application.Create().Init().Run&lt;MyView&gt;().Shutdown() as MyResultType</c>
     ///     </para>
     /// </remarks>
-    TRunnable Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ();
+    IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ();
 
     /// <summary>
     ///     Requests that the specified runnable session stop.
