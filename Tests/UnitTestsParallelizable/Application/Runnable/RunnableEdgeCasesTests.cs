@@ -1,10 +1,9 @@
-using Xunit;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
 
 /// <summary>
-/// Tests for edge cases and error conditions in IRunnable implementation.
+///     Tests for edge cases and error conditions in IRunnable implementation.
 /// </summary>
 public class RunnableEdgeCasesTests (ITestOutputHelper output)
 {
@@ -18,7 +17,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         RunnableSessionToken token = new (runnable);
 
         // Act & Assert
-        InvalidOperationException ex = Assert.Throws<InvalidOperationException> (() => token.Dispose ());
+        var ex = Assert.Throws<InvalidOperationException> (() => token.Dispose ());
         Assert.Contains ("Runnable must be null", ex.Message);
     }
 
@@ -65,11 +64,12 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         var subscriber2Called = false;
 
         runnable.IsRunningChanging += (s, e) => subscriber1Called = true;
+
         runnable.IsRunningChanging += (s, e) =>
-        {
-            subscriber2Called = true;
-            e.Cancel = true; // Second subscriber cancels
-        };
+                                      {
+                                          subscriber2Called = true;
+                                          e.Cancel = true; // Second subscriber cancels
+                                      };
 
         // Act
         bool canceled = runnable.RaiseIsRunningChanging (false, true);
@@ -158,6 +158,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
+
         // Don't set App property
 
         // Act & Assert
@@ -169,6 +170,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
+
         // Don't set App property
 
         // Act & Assert
@@ -199,6 +201,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
+
         // Don't set App property
 
         // Act & Assert - Should not throw
@@ -210,7 +213,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         // This is implicitly tested by the constructor signature,
         // but let's verify it creates with non-null runnable
-        
+
         // Arrange
         Runnable<int> runnable = new ();
 
@@ -230,10 +233,10 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         bool? capturedNewValue = null;
 
         runnable.IsRunningChanging += (s, e) =>
-        {
-            capturedOldValue = e.CurrentValue;
-            capturedNewValue = e.NewValue;
-        };
+                                      {
+                                          capturedOldValue = e.CurrentValue;
+                                          capturedNewValue = e.NewValue;
+                                      };
 
         // Act
         runnable.RaiseIsRunningChanging (false, true);
@@ -252,10 +255,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         Runnable<int> runnable = new ();
         bool? capturedValue = null;
 
-        runnable.IsModalChanged += (s, e) =>
-        {
-            capturedValue = e.Value;
-        };
+        runnable.IsModalChanged += (s, e) => { capturedValue = e.Value; };
 
         // Act
         runnable.RaiseIsModalChangedEvent (true);
@@ -280,7 +280,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Complex result type for testing.
+    ///     Complex result type for testing.
     /// </summary>
     private class ComplexResult
     {
@@ -289,7 +289,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Runnable that tracks virtual method calls.
+    ///     Runnable that tracks virtual method calls.
     /// </summary>
     private class OverriddenRunnable : Runnable<int>
     {
@@ -301,6 +301,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
         {
             OnIsRunningChangingCalled = true;
+
             return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
         }
 
@@ -313,6 +314,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         protected override bool OnIsModalChanging (bool oldIsModal, bool newIsModal)
         {
             OnIsModalChangingCalled = true;
+
             return base.OnIsModalChanging (oldIsModal, newIsModal);
         }
 

@@ -1,11 +1,10 @@
-using Xunit;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
 
 /// <summary>
-/// Integration tests for IApplication's IRunnable support.
-/// Tests the full lifecycle of IRunnable instances through Application methods.
+///     Integration tests for IApplication's IRunnable support.
+///     Tests the full lifecycle of IRunnable instances through Application methods.
 /// </summary>
 public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : IDisposable
 {
@@ -35,7 +34,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        var stackCountBefore = app.RunnableSessionStack?.Count ?? 0;
+        int stackCountBefore = app.RunnableSessionStack?.Count ?? 0;
 
         // Act
         RunnableSessionToken token = app.Begin (runnable);
@@ -66,16 +65,16 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        bool isRunningChangingRaised = false;
+        var isRunningChangingRaised = false;
         bool? oldValue = null;
         bool? newValue = null;
 
         runnable.IsRunningChanging += (s, e) =>
-        {
-            isRunningChangingRaised = true;
-            oldValue = e.CurrentValue;
-            newValue = e.NewValue;
-        };
+                                      {
+                                          isRunningChangingRaised = true;
+                                          oldValue = e.CurrentValue;
+                                          newValue = e.NewValue;
+                                      };
 
         // Act
         RunnableSessionToken token = app.Begin (runnable);
@@ -95,14 +94,14 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        bool isRunningChangedRaised = false;
+        var isRunningChangedRaised = false;
         bool? receivedValue = null;
 
         runnable.IsRunningChanged += (s, e) =>
-        {
-            isRunningChangedRaised = true;
-            receivedValue = e.Value;
-        };
+                                     {
+                                         isRunningChangedRaised = true;
+                                         receivedValue = e.Value;
+                                     };
 
         // Act
         RunnableSessionToken token = app.Begin (runnable);
@@ -121,16 +120,16 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        bool isModalChangingRaised = false;
+        var isModalChangingRaised = false;
         bool? oldValue = null;
         bool? newValue = null;
 
         runnable.IsModalChanging += (s, e) =>
-        {
-            isModalChangingRaised = true;
-            oldValue = e.CurrentValue;
-            newValue = e.NewValue;
-        };
+                                    {
+                                        isModalChangingRaised = true;
+                                        oldValue = e.CurrentValue;
+                                        newValue = e.NewValue;
+                                    };
 
         // Act
         RunnableSessionToken token = app.Begin (runnable);
@@ -150,14 +149,14 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        bool isModalChangedRaised = false;
+        var isModalChangedRaised = false;
         bool? receivedValue = null;
 
         runnable.IsModalChanged += (s, e) =>
-        {
-            isModalChangedRaised = true;
-            receivedValue = e.Value;
-        };
+                                   {
+                                       isModalChangedRaised = true;
+                                       receivedValue = e.Value;
+                                   };
 
         // Act
         RunnableSessionToken token = app.Begin (runnable);
@@ -211,7 +210,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
         RunnableSessionToken token = app.Begin (runnable);
-        var stackCountBefore = app.RunnableSessionStack?.Count ?? 0;
+        int stackCountBefore = app.RunnableSessionStack?.Count ?? 0;
 
         // Act
         app.End (token);
@@ -237,16 +236,16 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
         RunnableSessionToken token = app.Begin (runnable);
-        bool isRunningChangingRaised = false;
+        var isRunningChangingRaised = false;
         bool? oldValue = null;
         bool? newValue = null;
 
         runnable.IsRunningChanging += (s, e) =>
-        {
-            isRunningChangingRaised = true;
-            oldValue = e.CurrentValue;
-            newValue = e.NewValue;
-        };
+                                      {
+                                          isRunningChangingRaised = true;
+                                          oldValue = e.CurrentValue;
+                                          newValue = e.NewValue;
+                                      };
 
         // Act
         app.End (token);
@@ -264,14 +263,14 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
         RunnableSessionToken token = app.Begin (runnable);
-        bool isRunningChangedRaised = false;
+        var isRunningChangedRaised = false;
         bool? receivedValue = null;
 
         runnable.IsRunningChanged += (s, e) =>
-        {
-            isRunningChangedRaised = true;
-            receivedValue = e.Value;
-        };
+                                     {
+                                         isRunningChangedRaised = true;
+                                         receivedValue = e.Value;
+                                     };
 
         // Act
         app.End (token);
@@ -417,7 +416,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         app.StopAfterFirstIteration = true;
 
         // Act
-        TestRunnable runnable = app.Run<TestRunnable> ();
+        var runnable = app.Run<TestRunnable> ();
 
         // Assert
         Assert.NotNull (runnable);
@@ -435,6 +434,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     {
         // Arrange
         IApplication app = Application.Create ();
+
         // Don't call Init
 
         // Act & Assert
@@ -499,7 +499,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     }
 
     /// <summary>
-    /// Test runnable that can be stopped.
+    ///     Test runnable that can be stopped.
     /// </summary>
     private class StoppableRunnable : Runnable<int>
     {
@@ -513,18 +513,15 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     }
 
     /// <summary>
-    /// Test runnable for generic Run tests.
+    ///     Test runnable for generic Run tests.
     /// </summary>
     private class TestRunnable : Runnable<int>
     {
-        public TestRunnable ()
-        {
-            Id = "TestRunnable";
-        }
+        public TestRunnable () { Id = "TestRunnable"; }
     }
 
     /// <summary>
-    /// Test runnable that can cancel lifecycle changes.
+    ///     Test runnable that can cancel lifecycle changes.
     /// </summary>
     private class CancelableRunnable : Runnable<int>
     {

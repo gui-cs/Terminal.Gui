@@ -157,7 +157,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) { return Run<Toplevel> (errorHandler, driverName); }
+    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) => Run<Toplevel> (errorHandler, driverName);
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
@@ -176,7 +176,6 @@ public partial class ApplicationImpl
 
         return top;
     }
-
 
     /// <inheritdoc/>
     public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
@@ -318,10 +317,10 @@ public partial class ApplicationImpl
     public ITimedEvents? TimedEvents => _timedEvents;
 
     /// <inheritdoc/>
-    public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
+    public object AddTimeout (TimeSpan time, Func<bool> callback) => _timedEvents.Add (time, callback);
 
     /// <inheritdoc/>
-    public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
+    public bool RemoveTimeout (object token) => _timedEvents.Remove (token);
 
     /// <inheritdoc/>
     public void Invoke (Action<IApplication>? action)
@@ -344,7 +343,6 @@ public partial class ApplicationImpl
                           }
                          );
     }
-
 
     /// <inheritdoc/>
     public void Invoke (Action action)

@@ -25,10 +25,7 @@ public partial class ApplicationImpl : IApplication
     ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
     /// <param name="app"></param>
-    public static void SetInstance (IApplication? app)
-    {
-        _instance = app;
-    }
+    public static void SetInstance (IApplication? app) { _instance = app; }
 
     // Private static readonly Lazy instance of Application
     private static IApplication? _instance;
@@ -42,7 +39,6 @@ public partial class ApplicationImpl : IApplication
 
     private string? _driverName;
 
-
     #region Input
 
     private IMouse? _mouse;
@@ -54,10 +50,7 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
-            if (_mouse is null)
-            {
-                _mouse = new MouseImpl { App = this };
-            }
+            _mouse ??= new MouseImpl { App = this };
 
             return _mouse;
         }
@@ -73,10 +66,7 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
-            if (_keyboard is null)
-            {
-                _keyboard = new KeyboardImpl { App = this };
-            }
+            _keyboard ??= new KeyboardImpl { App = this };
 
             return _keyboard;
         }
@@ -94,10 +84,7 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
-            if (_popover is null)
-            {
-                _popover = new () { App = this };
-            }
+            _popover ??= new () { App = this };
 
             return _popover;
         }
@@ -111,10 +98,7 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
-            if (_navigation is null)
-            {
-                _navigation = new () { App = this };
-            }
+            _navigation ??= new () { App = this };
 
             return _navigation;
         }

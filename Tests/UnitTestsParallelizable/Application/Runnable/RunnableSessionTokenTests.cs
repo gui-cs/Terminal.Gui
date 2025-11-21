@@ -1,10 +1,9 @@
-using Xunit;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
 
 /// <summary>
-/// Tests for RunnableSessionToken class.
+///     Tests for RunnableSessionToken class.
 /// </summary>
 public class RunnableSessionTokenTests (ITestOutputHelper output)
 {

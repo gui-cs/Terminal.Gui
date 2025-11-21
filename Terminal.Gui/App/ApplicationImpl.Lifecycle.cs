@@ -156,9 +156,9 @@ public partial class ApplicationImpl
         TimedEvents?.StopAll ();
 
         // === 1. Stop all running toplevels ===
-        foreach (Toplevel? t in SessionStack)
+        foreach (Toplevel t in SessionStack)
         {
-            t!.Running = false;
+            t.Running = false;
         }
 
         // === 2. Close and dispose popover ===
@@ -223,6 +223,7 @@ public partial class ApplicationImpl
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
+
         //Navigation = null;
 
         // === 8. Reset initialization state ===

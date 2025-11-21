@@ -219,8 +219,8 @@ public class ApplicationPopoverTests
         {
             // Arrange
             Application.Init ("fake");
-            Application.TopRunnable = new() { Id = "initialTop" };
-            PopoverTestClass? popover = new () { };
+            Application.TopRunnable = new () { Id = "initialTop" };
+            PopoverTestClass? popover = new ();
             var keyDownEvents = 0;
 
             popover.KeyDown += (s, e) =>
@@ -234,7 +234,7 @@ public class ApplicationPopoverTests
             // Act
             Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
 
-            Application.TopRunnable = new() { Id = "secondaryTop" };
+            Application.TopRunnable = new () { Id = "secondaryTop" };
             Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
 
             // Test

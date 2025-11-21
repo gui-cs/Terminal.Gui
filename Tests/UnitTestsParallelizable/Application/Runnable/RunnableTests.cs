@@ -1,10 +1,9 @@
-using Xunit;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
 
 /// <summary>
-/// Tests for IRunnable interface and Runnable base class.
+///     Tests for IRunnable interface and Runnable base class.
 /// </summary>
 public class RunnableTests (ITestOutputHelper output)
 {
@@ -115,13 +114,13 @@ public class RunnableTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
-        bool eventRaised = false;
+        var eventRaised = false;
 
         runnable.IsRunningChanging += (s, e) =>
-        {
-            eventRaised = true;
-            e.Cancel = true;
-        };
+                                      {
+                                          eventRaised = true;
+                                          e.Cancel = true;
+                                      };
 
         // Act
         bool canceled = runnable.RaiseIsRunningChanging (false, true);
@@ -136,14 +135,14 @@ public class RunnableTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
-        bool eventRaised = false;
+        var eventRaised = false;
         bool? receivedValue = null;
 
         runnable.IsRunningChanged += (s, e) =>
-        {
-            eventRaised = true;
-            receivedValue = e.Value;
-        };
+                                     {
+                                         eventRaised = true;
+                                         receivedValue = e.Value;
+                                     };
 
         // Act
         runnable.RaiseIsRunningChangedEvent (true);
@@ -171,13 +170,13 @@ public class RunnableTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
-        bool eventRaised = false;
+        var eventRaised = false;
 
         runnable.IsModalChanging += (s, e) =>
-        {
-            eventRaised = true;
-            e.Cancel = true;
-        };
+                                    {
+                                        eventRaised = true;
+                                        e.Cancel = true;
+                                    };
 
         // Act
         bool canceled = runnable.RaiseIsModalChanging (false, true);
@@ -192,14 +191,14 @@ public class RunnableTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
-        bool eventRaised = false;
+        var eventRaised = false;
         bool? receivedValue = null;
 
         runnable.IsModalChanged += (s, e) =>
-        {
-            eventRaised = true;
-            receivedValue = e.Value;
-        };
+                                   {
+                                       eventRaised = true;
+                                       receivedValue = e.Value;
+                                   };
 
         // Act
         runnable.RaiseIsModalChangedEvent (true);
@@ -210,20 +209,14 @@ public class RunnableTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Test runnable that can cancel lifecycle changes.
+    ///     Test runnable that can cancel lifecycle changes.
     /// </summary>
     private class CancelableRunnable : Runnable<int>
     {
         public bool CancelModalChange { get; set; }
 
-        protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
-        {
-            return true; // Always cancel
-        }
+        protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning) => true; // Always cancel
 
-        protected override bool OnIsModalChanging (bool oldIsModal, bool newIsModal)
-        {
-            return CancelModalChange;
-        }
+        protected override bool OnIsModalChanging (bool oldIsModal, bool newIsModal) => CancelModalChange;
     }
 }

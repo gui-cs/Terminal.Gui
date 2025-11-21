@@ -1,10 +1,9 @@
-using Xunit;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
 
 /// <summary>
-/// Tests for IRunnable lifecycle behavior.
+///     Tests for IRunnable lifecycle behavior.
 /// </summary>
 public class RunnableLifecycleTests (ITestOutputHelper output)
 {
@@ -94,7 +93,7 @@ public class RunnableLifecycleTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Test runnable that extracts result in OnIsRunningChanging.
+    ///     Test runnable that extracts result in OnIsRunningChanging.
     /// </summary>
     private class ResultExtractingRunnable : Runnable<string>
     {
@@ -113,7 +112,7 @@ public class RunnableLifecycleTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Test runnable that can prevent stopping with unsaved changes.
+    ///     Test runnable that can prevent stopping with unsaved changes.
     /// </summary>
     private class UnsavedChangesRunnable : Runnable<int>
     {
@@ -131,7 +130,7 @@ public class RunnableLifecycleTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Test runnable that tracks lifecycle method calls.
+    ///     Test runnable that tracks lifecycle method calls.
     /// </summary>
     private class TrackedRunnable : Runnable<int>
     {

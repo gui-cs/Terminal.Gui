@@ -1,17 +1,17 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-/// Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.
+///     Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.
 /// </summary>
 /// <typeparam name="TResult">The type of result data returned when the session completes.</typeparam>
 /// <remarks>
-/// <para>
-/// Views can derive from this class or implement <see cref="IRunnable{TResult}"/> directly.
-/// </para>
-/// <para>
-/// This class provides default implementations of the <see cref="IRunnable{TResult}"/> interface
-/// following the Terminal.Gui Cancellable Work Pattern (CWP).
-/// </para>
+///     <para>
+///         Views can derive from this class or implement <see cref="IRunnable{TResult}"/> directly.
+///     </para>
+///     <para>
+///         This class provides default implementations of the <see cref="IRunnable{TResult}"/> interface
+///         following the Terminal.Gui Cancellable Work Pattern (CWP).
+///     </para>
 /// </remarks>
 public class Runnable<TResult> : View, IRunnable<TResult>
 {
@@ -29,7 +29,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         // Clear previous result when starting
         if (newIsRunning)
         {
-            Result = default;
+            Result = default (TResult);
         }
 
         // CWP Phase 1: Virtual method (pre-notification)
@@ -63,30 +63,32 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     public event EventHandler<EventArgs<bool>>? IsRunningChanged;
 
     /// <summary>
-    /// Called before <see cref="IsRunningChanging"/> event. Override to cancel state change or extract <see cref="Result"/>.
+    ///     Called before <see cref="IsRunningChanging"/> event. Override to cancel state change or extract
+    ///     <see cref="Result"/>.
     /// </summary>
     /// <param name="oldIsRunning">The current value of <see cref="IsRunning"/>.</param>
     /// <param name="newIsRunning">The new value of <see cref="IsRunning"/> (true = starting, false = stopping).</param>
     /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
     /// <remarks>
-    /// <para>
-    /// Default implementation returns <see langword="false"/> (allow change).
-    /// </para>
-    /// <para>
-    /// <b>IMPORTANT</b>: When <paramref name="newIsRunning"/> is <see langword="false"/> (stopping), this is the ideal place
-    /// to extract <see cref="Result"/> from views before the runnable is removed from the stack.
-    /// At this point, all views are still alive and accessible, and subscribers can inspect the result
-    /// and optionally cancel the stop.
-    /// </para>
-    /// <example>
-    /// <code>
+    ///     <para>
+    ///         Default implementation returns <see langword="false"/> (allow change).
+    ///     </para>
+    ///     <para>
+    ///         <b>IMPORTANT</b>: When <paramref name="newIsRunning"/> is <see langword="false"/> (stopping), this is the ideal
+    ///         place
+    ///         to extract <see cref="Result"/> from views before the runnable is removed from the stack.
+    ///         At this point, all views are still alive and accessible, and subscribers can inspect the result
+    ///         and optionally cancel the stop.
+    ///     </para>
+    ///     <example>
+    ///         <code>
     /// protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     /// {
     ///     if (!newIsRunning)  // Stopping
     ///     {
     ///         // Extract result before removal from stack
     ///         Result = _textField.Text;
-    ///
+    /// 
     ///         // Or check if user wants to save first
     ///         if (HasUnsavedChanges ())
     ///         {
@@ -95,20 +97,20 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     ///             if (result == 0) Save ();
     ///         }
     ///     }
-    ///
+    /// 
     ///     return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
     /// }
     /// </code>
-    /// </example>
+    ///     </example>
     /// </remarks>
     protected virtual bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning) => false;
 
     /// <summary>
-    /// Called after <see cref="IsRunning"/> has changed. Override for post-state-change logic.
+    ///     Called after <see cref="IsRunning"/> has changed. Override for post-state-change logic.
     /// </summary>
     /// <param name="newIsRunning">The new value of <see cref="IsRunning"/> (true = started, false = stopped).</param>
     /// <remarks>
-    /// Default implementation does nothing. Overrides should call base to ensure extensibility.
+    ///     Default implementation does nothing. Overrides should call base to ensure extensibility.
     /// </remarks>
     protected virtual void OnIsRunningChanged (bool newIsRunning)
     {
@@ -181,27 +183,27 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     public event EventHandler<EventArgs<bool>>? IsModalChanged;
 
     /// <summary>
-    /// Called before <see cref="IsModalChanging"/> event. Override to cancel activation/deactivation.
+    ///     Called before <see cref="IsModalChanging"/> event. Override to cancel activation/deactivation.
     /// </summary>
     /// <param name="oldIsModal">The current value of <see cref="IsModal"/>.</param>
     /// <param name="newIsModal">The new value of <see cref="IsModal"/> (true = becoming modal/top, false = no longer modal).</param>
     /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
     /// <remarks>
-    /// Default implementation returns <see langword="false"/> (allow change).
+    ///     Default implementation returns <see langword="false"/> (allow change).
     /// </remarks>
     protected virtual bool OnIsModalChanging (bool oldIsModal, bool newIsModal) => false;
 
     /// <summary>
-    /// Called after <see cref="IsModal"/> has changed. Override for post-activation logic.
+    ///     Called after <see cref="IsModal"/> has changed. Override for post-activation logic.
     /// </summary>
     /// <param name="newIsModal">The new value of <see cref="IsModal"/> (true = became modal, false = no longer modal).</param>
     /// <remarks>
-    /// <para>
-    /// Default implementation does nothing. Overrides should call base to ensure extensibility.
-    /// </para>
-    /// <para>
-    /// Common uses: setting focus when becoming modal, updating UI state.
-    /// </para>
+    ///     <para>
+    ///         Default implementation does nothing. Overrides should call base to ensure extensibility.
+    ///     </para>
+    ///     <para>
+    ///         Common uses: setting focus when becoming modal, updating UI state.
+    ///     </para>
     /// </remarks>
     protected virtual void OnIsModalChanged (bool newIsModal)
     {
@@ -211,7 +213,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     #endregion
 
     /// <summary>
-    /// Requests that this runnable session stop.
+    ///     Requests that this runnable session stop.
     /// </summary>
     public virtual void RequestStop ()
     {
