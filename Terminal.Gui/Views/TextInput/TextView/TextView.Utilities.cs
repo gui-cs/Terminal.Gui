@@ -3,6 +3,11 @@ namespace Terminal.Gui.Views;
 /// <summary>Utility and helper methods for TextView</summary>
 public partial class TextView
 {
+    /// <summary>
+    ///     INTERNAL: Adjusts the scroll position and cursor to ensure the cursor is visible in the viewport.
+    ///     This method handles both horizontal and vertical scrolling, word wrap considerations, and syncs
+    ///     the internal scroll fields with the Viewport property.
+    /// </summary>
     private void Adjust ()
     {
         (int width, int height) offB = OffSetBackground ();
@@ -80,6 +85,11 @@ public partial class TextView
         OnUnwrappedCursorPosition ();
     }
 
+    /// <summary>
+    ///     INTERNAL: Determines if a redraw is needed based on selection state, word wrap needs, and Used flag.
+    ///     If a redraw is needed, calls <see cref="Adjust"/>; otherwise positions the cursor and updates
+    ///     the unwrapped cursor position.
+    /// </summary>
     private void DoNeededAction ()
     {
         if (!NeedsDraw && (IsSelecting || _wrapNeeded || !Used))
@@ -98,6 +108,12 @@ public partial class TextView
         }
     }
 
+    /// <summary>
+    ///     INTERNAL: Calculates the offset from the viewport edges caused by the background extending
+    ///     beyond the SuperView's boundaries. Returns negative width and height offsets if the viewport
+    ///     extends beyond the SuperView.
+    /// </summary>
+    /// <returns>A tuple containing the width and height offsets.</returns>
     private (int width, int height) OffSetBackground ()
     {
         var w = 0;
@@ -117,7 +133,10 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     Updates the content size based on the text model dimensions.
+    ///     INTERNAL: Updates the content size based on the text model dimensions.
+    ///     When word wrap is enabled, content width equals viewport width.
+    ///     Otherwise, calculates the maximum line width from the entire text model.
+    ///     Content height is always the number of lines in the model.
     /// </summary>
     private void UpdateContentSize ()
     {
@@ -142,34 +161,26 @@ public partial class TextView
         SetContentSize (new Size (contentWidth, contentHeight));
     }
 
+    /// <summary>
+    ///     INTERNAL: Resets the cursor position and scroll offsets to the beginning of the document (0,0)
+    ///     and stops any active text selection.
+    /// </summary>
     private void ResetPosition ()
     {
         _topRow = _leftColumn = CurrentRow = CurrentColumn = 0;
         StopSelecting ();
     }
 
-    private void ResetAllTrack ()
-    {
-        // Handle some state here - whether the last command was a kill
-        // operation and the column tracking (up/down)
-        _lastWasKill = false;
-        _columnTrack = -1;
-        _continuousFind = false;
-    }
-
+    /// <summary>
+    ///     INTERNAL: Resets the column tracking state and last kill operation flag.
+    ///     Column tracking is used to maintain the desired cursor column position when moving up/down
+    ///     through lines of different lengths.
+    /// </summary>
     private void ResetColumnTrack ()
     {
         // Handle some state here - whether the last command was a kill
         // operation and the column tracking (up/down)
         _lastWasKill = false;
         _columnTrack = -1;
-    }
-
-    private void ToggleSelecting ()
-    {
-        ResetColumnTrack ();
-        IsSelecting = !IsSelecting;
-        _selectionStartColumn = CurrentColumn;
-        _selectionStartRow = CurrentRow;
     }
 }
