@@ -1019,11 +1019,10 @@ public class TextView : View, IDesignable
                 _model = _wrapManager.Model;
             }
 
-            // Update horizontal scrollbar visibility based on WordWrap
+            // Update horizontal scrollbar AutoShow based on WordWrap
             if (IsInitialized)
             {
                 HorizontalScrollBar.AutoShow = !_wordWrap;
-                HorizontalScrollBar.Visible = !_wordWrap && HorizontalScrollBar.AutoShow;
                 UpdateContentSize ();
             }
 
@@ -4708,18 +4707,14 @@ public class TextView : View, IDesignable
     /// </summary>
     private void ConfigureScrollBars ()
     {
-        // Vertical ScrollBar: AutoShow enabled by default
-        VerticalScrollBar.AutoShow = true;
-        
-        // Horizontal ScrollBar: Initially hidden, visibility tracks WordWrap
-        HorizontalScrollBar.Visible = false;
-        HorizontalScrollBar.AutoShow = !WordWrap;
-        
         // Subscribe to ViewportChanged to sync internal scroll fields
         ViewportChanged += TextView_ViewportChanged;
         
-        // Update content size based on current model
-        UpdateContentSize ();
+        // Vertical ScrollBar: AutoShow enabled by default as per requirements
+        VerticalScrollBar.AutoShow = true;
+        
+        // Horizontal ScrollBar: AutoShow tracks WordWrap as per requirements
+        HorizontalScrollBar.AutoShow = !WordWrap;
     }
     
     private void TextView_ViewportChanged (object? sender, DrawEventArgs e)
@@ -4734,8 +4729,14 @@ public class TextView : View, IDesignable
     /// </summary>
     private void UpdateContentSize ()
     {
-        int contentHeight = _model.Count;
-        int contentWidth = _wordWrap ? Viewport.Width : _model.GetMaxVisibleLine (0, _model.Count, TabWidth);
+        // Only update content size when we have an actual viewport size
+        if (Viewport.Width == 0 || Viewport.Height == 0)
+        {
+            return;
+        }
+        
+        int contentHeight = Math.Max (_model.Count, 1);
+        int contentWidth = _wordWrap ? Viewport.Width : Math.Max (_model.GetMaxVisibleLine (0, _model.Count, TabWidth), 1);
         
         SetContentSize (new Size (contentWidth, contentHeight));
     }
