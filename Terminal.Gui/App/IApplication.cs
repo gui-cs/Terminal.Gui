@@ -330,6 +330,7 @@ public interface IApplication
     /// </remarks>
     bool StopAfterFirstIteration { get; set; }
 
+    // TODO: This API is not used anywhere; it can be deleted
     /// <summary>
     ///     Raised when <see cref="Begin(Toplevel)"/> has been called and has created a new <see cref="SessionToken"/>.
     /// </summary>
@@ -340,6 +341,7 @@ public interface IApplication
     /// </remarks>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
+    // TODO: This API is not used anywhere; it can be deleted
     /// <summary>
     ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
     ///     reference to the <see cref="Toplevel"/>

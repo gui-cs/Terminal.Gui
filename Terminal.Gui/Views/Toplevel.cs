@@ -68,13 +68,9 @@ public partial class Toplevel : View
 
     #region SubViews
 
-    // TODO: Deprecate - Any view can host a menubar in v2
-    /// <summary>Gets the latest <see cref="MenuBar"/> added into this Toplevel.</summary>
-    public MenuBar? MenuBar => (MenuBar?)SubViews?.LastOrDefault (s => s is MenuBar);
-
-    //// TODO: Deprecate - Any view can host a statusbar in v2
-    ///// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
-    //public StatusBar? StatusBar => (StatusBar?)SubViews?.LastOrDefault (s => s is StatusBar);
+    //// TODO: Deprecate - Any view can host a menubar in v2
+    ///// <summary>Gets the latest <see cref="MenuBar"/> added into this Toplevel.</summary>
+    //public MenuBar? MenuBar => (MenuBar?)SubViews?.LastOrDefault (s => s is MenuBar);
 
     #endregion
 
@@ -85,7 +81,7 @@ public partial class Toplevel : View
     /// <remarks>Setting this property directly is discouraged. Use <see cref="IApplication.RequestStop()"/> instead.</remarks>
     public bool Running { get; set; }
 
-    // TODO: IRunnable: Re-implement in IRunnable
+    // TODO: Deprecate. Other than a few tests, this is not used anywhere.
     /// <summary>
     ///     <see langword="true"/> if was already loaded by the <see cref="IApplication.Begin(Toplevel)"/>
     ///     <see langword="false"/>, otherwise.

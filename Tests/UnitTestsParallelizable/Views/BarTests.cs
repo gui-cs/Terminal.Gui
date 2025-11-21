@@ -107,7 +107,7 @@ public class BarTests
     public void GetAttributeForRole_DoesNotDeferToSuperView_WhenSchemeNameIsSet ()
     {
         // This test would fail before the fix that checks SchemeName in GetAttributeForRole
-        // StatusBar and MenuBarv2 set SchemeName = "Menu", and should use Menu scheme
+        // StatusBar and MenuBar set SchemeName = "Menu", and should use Menu scheme
         // instead of deferring to parent's customized attributes
         
         var parentView = new View { SchemeName = "Base" };

@@ -14,7 +14,7 @@ public class HexEditor : Scenario
 {
     private string? _fileName;
     private HexView? _hexView;
-    private MenuItemv2? _miReadOnly;
+    private MenuItem? _miReadOnly;
     private bool _saved = true;
     private Shortcut? _scAddress;
     private Shortcut? _scInfo;
@@ -49,13 +49,13 @@ public class HexEditor : Scenario
 
         app.Add (_hexView);
 
-        var menu = new MenuBarv2
+        var menu = new MenuBar
         {
             Menus =
             [
                 new (
                      "_File",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          new ("_New", "", New),
                          new ("_Open", "", Open),
@@ -66,7 +66,7 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Edit",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          new ("_Copy", "", Copy),
                          new ("C_ut", "", Cut),
@@ -75,7 +75,7 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Options",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          _miReadOnly = new (
                                               "_Read Only",

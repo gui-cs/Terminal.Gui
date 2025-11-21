@@ -748,7 +748,7 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "Single",
+        "Menu.DefaultBorderStyle": "Single",
         "Schemes": [
           {
             "TopLevel": {
@@ -885,7 +885,7 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "Single",
+        "Menu.DefaultBorderStyle": "Single",
         "Schemes": [
           {
             "TopLevel": {
@@ -1022,7 +1022,7 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "None",
+        "Menu.DefaultBorderStyle": "None",
         "Glyphs.LeftBracket": "[",
         "Glyphs.RightBracket": "]",
         "Glyphs.CheckStateChecked": "X",

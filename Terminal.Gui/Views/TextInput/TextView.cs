@@ -2370,13 +2370,13 @@ public class TextView : View, IDesignable
         PopoverMenu menu = new (
                                 new List<View>
                                 {
-                                    new MenuItemv2 (this, Command.SelectAll, Strings.ctxSelectAll),
-                                    new MenuItemv2 (this, Command.DeleteAll, Strings.ctxDeleteAll),
-                                    new MenuItemv2 (this, Command.Copy, Strings.ctxCopy),
-                                    new MenuItemv2 (this, Command.Cut, Strings.ctxCut),
-                                    new MenuItemv2 (this, Command.Paste, Strings.ctxPaste),
-                                    new MenuItemv2 (this, Command.Undo, Strings.ctxUndo),
-                                    new MenuItemv2 (this, Command.Redo, Strings.ctxRedo)
+                                    new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
+                                    new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
+                                    new MenuItem (this, Command.Copy, Strings.ctxCopy),
+                                    new MenuItem (this, Command.Cut, Strings.ctxCut),
+                                    new MenuItem (this, Command.Paste, Strings.ctxPaste),
+                                    new MenuItem (this, Command.Undo, Strings.ctxUndo),
+                                    new MenuItem (this, Command.Redo, Strings.ctxRedo)
                                 });
 
         menu.KeyChanged += ContextMenu_KeyChanged;
