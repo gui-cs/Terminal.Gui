@@ -770,7 +770,13 @@ public class TextView : View, IDesignable
                 return;
             }
 
-            _leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+            int clampedValue = Math.Max (Math.Min (value, Maxlength - 1), 0);
+            _leftColumn = clampedValue;
+            
+            if (IsInitialized && Viewport.X != _leftColumn)
+            {
+                Viewport = Viewport with { X = _leftColumn };
+            }
         }
     }
 
@@ -966,7 +972,16 @@ public class TextView : View, IDesignable
     public int TopRow
     {
         get => _topRow;
-        set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0);
+        set
+        {
+            int clampedValue = Math.Max (Math.Min (value, Lines - 1), 0);
+            _topRow = clampedValue;
+            
+            if (IsInitialized && Viewport.Y != _topRow)
+            {
+                Viewport = Viewport with { Y = _topRow };
+            }
+        }
     }
 
     /// <summary>
@@ -1002,6 +1017,14 @@ public class TextView : View, IDesignable
             else if (!_wordWrap && _wrapManager is { })
             {
                 _model = _wrapManager.Model;
+            }
+
+            // Update horizontal scrollbar visibility based on WordWrap
+            if (IsInitialized)
+            {
+                HorizontalScrollBar.AutoShow = !_wordWrap;
+                HorizontalScrollBar.Visible = !_wordWrap && HorizontalScrollBar.AutoShow;
+                UpdateContentSize ();
             }
 
             SetNeedsDraw ();
@@ -1777,6 +1800,12 @@ public class TextView : View, IDesignable
 
         ProcessInheritsPreviousScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
+        
+        // Update content size when content changes
+        if (IsInitialized)
+        {
+            UpdateContentSize ();
+        }
     }
 
     /// <inheritdoc/>
@@ -2139,12 +2168,22 @@ public class TextView : View, IDesignable
         if (isRow)
         {
             _topRow = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0);
+            
+            if (IsInitialized && Viewport.Y != _topRow)
+            {
+                Viewport = Viewport with { Y = _topRow };
+            }
         }
         else if (!_wordWrap)
         {
             int maxlength =
                 _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
             _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+            
+            if (IsInitialized && Viewport.X != _leftColumn)
+            {
+                Viewport = Viewport with { X = _leftColumn };
+            }
         }
 
         SetNeedsDraw ();
@@ -2340,6 +2379,12 @@ public class TextView : View, IDesignable
         {
             _topRow = Math.Max (_topRow - 1, 0);
             need = true;
+        }
+
+        // Sync Viewport with the internal scroll position
+        if (IsInitialized && (_leftColumn != Viewport.X || _topRow != Viewport.Y))
+        {
+            Viewport = new Rectangle (_leftColumn, _topRow, Viewport.Width, Viewport.Height);
         }
 
         if (need)
@@ -4652,12 +4697,53 @@ public class TextView : View, IDesignable
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
 
+        // Configure ScrollBars to use modern View scrolling infrastructure
+        ConfigureScrollBars ();
+
         OnContentsChanged ();
+    }
+    
+    /// <summary>
+    ///     Configures the ScrollBars to work with the modern View scrolling system.
+    /// </summary>
+    private void ConfigureScrollBars ()
+    {
+        // Vertical ScrollBar: AutoShow enabled by default
+        VerticalScrollBar.AutoShow = true;
+        
+        // Horizontal ScrollBar: Initially hidden, visibility tracks WordWrap
+        HorizontalScrollBar.Visible = false;
+        HorizontalScrollBar.AutoShow = !WordWrap;
+        
+        // Subscribe to ViewportChanged to sync internal scroll fields
+        ViewportChanged += TextView_ViewportChanged;
+        
+        // Update content size based on current model
+        UpdateContentSize ();
+    }
+    
+    private void TextView_ViewportChanged (object? sender, DrawEventArgs e)
+    {
+        // Sync internal scroll position fields with Viewport
+        _topRow = Viewport.Y;
+        _leftColumn = Viewport.X;
+    }
+    
+    /// <summary>
+    ///     Updates the content size based on the text model dimensions.
+    /// </summary>
+    private void UpdateContentSize ()
+    {
+        int contentHeight = _model.Count;
+        int contentWidth = _wordWrap ? Viewport.Width : _model.GetMaxVisibleLine (0, _model.Count, TabWidth);
+        
+        SetContentSize (new Size (contentWidth, contentHeight));
     }
 
     private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
     {
         WrapTextModel ();
+        UpdateContentSize ();
         Adjust ();
     }
 
