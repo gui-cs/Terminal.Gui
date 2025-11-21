@@ -4,19 +4,19 @@ using System.ComponentModel;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
-///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
+///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menu"/>. Has title, an
+///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menu"/>. Has title, an
 ///     associated help text, and an action to execute on activation.
 /// </summary>
-public class MenuItemv2 : Shortcut
+public class MenuItem : Shortcut
 {
     /// <summary>
-    ///     Creates a new instance of <see cref="MenuItemv2"/>.
+    ///     Creates a new instance of <see cref="MenuItem"/>.
     /// </summary>
-    public MenuItemv2 () : base (Key.Empty, null, null) { }
+    public MenuItem () : base (Key.Empty, null, null) { }
 
     /// <summary>
-    ///     Creates a new instance of <see cref="MenuItemv2"/>, binding it to <paramref name="targetView"/> and
+    ///     Creates a new instance of <see cref="MenuItem"/>, binding it to <paramref name="targetView"/> and
     ///     <paramref name="command"/>. The Key <paramref name="targetView"/>
     ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>.
     /// </summary>
@@ -34,7 +34,7 @@ public class MenuItemv2 : Shortcut
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
     /// <param name="subMenu">The submenu to display when the user selects this menu item.</param>
-    public MenuItemv2 (View? targetView, Command command, string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
+    public MenuItem (View? targetView, Command command, string? commandText = null, string? helpText = null, Menu? subMenu = null)
         : base (
                 targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
                 string.IsNullOrEmpty (commandText) ? GlobalResources.GetString ($"cmd.{command}") : commandText,
@@ -48,17 +48,17 @@ public class MenuItemv2 : Shortcut
     }
 
     /// <inheritdoc/>
-    public MenuItemv2 (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null)
+    public MenuItem (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null)
         : base (key ?? Key.Empty, commandText, action, helpText)
     { }
 
     /// <inheritdoc/>
-    public MenuItemv2 (string commandText, Key key, Action? action = null)
+    public MenuItem (string commandText, Key key, Action? action = null)
         : base (key ?? Key.Empty, commandText, action, null)
     { }
 
     /// <inheritdoc/>
-    public MenuItemv2 (string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
+    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null)
         : base (Key.Empty, commandText, null, helpText)
     {
         SubMenu = subMenu;
@@ -171,12 +171,12 @@ public class MenuItemv2 : Shortcut
     //    return ret is true;
     //}
 
-    private Menuv2? _subMenu;
+    private Menu? _subMenu;
 
     /// <summary>
     ///     The submenu to display when the user selects this menu item.
     /// </summary>
-    public Menuv2? SubMenu
+    public Menu? SubMenu
     {
         get => _subMenu;
         set

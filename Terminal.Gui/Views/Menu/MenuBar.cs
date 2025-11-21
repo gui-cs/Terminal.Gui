@@ -5,20 +5,20 @@ using System.Diagnostics;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A horizontal list of <see cref="MenuBarItemv2"/>s. Each <see cref="MenuBarItemv2"/> can have a
-///     <see cref="PopoverMenu"/> that is shown when the <see cref="MenuBarItemv2"/> is selected.
+///     A horizontal list of <see cref="MenuBarItem"/>s. Each <see cref="MenuBarItem"/> can have a
+///     <see cref="PopoverMenu"/> that is shown when the <see cref="MenuBarItem"/> is selected.
 /// </summary>
 /// <remarks>
 ///     MenuBars may be hosted by any View and will, by default, be positioned the full width across the top of the View's
 ///     Viewport.
 /// </remarks>
-public class MenuBarv2 : Menuv2, IDesignable
+public class MenuBar : Menu, IDesignable
 {
     /// <inheritdoc/>
-    public MenuBarv2 () : this ([]) { }
+    public MenuBar () : this ([]) { }
 
     /// <inheritdoc/>
-    public MenuBarv2 (IEnumerable<MenuBarItemv2> menuBarItems) : base (menuBarItems)
+    public MenuBar (IEnumerable<MenuBarItem> menuBarItems) : base (menuBarItems)
     {
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
@@ -45,7 +45,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                             return true;
                         }
 
-                        if (SubViews.OfType<MenuBarItemv2> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
+                        if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
                         {
                             Active = true;
                             ShowItem (first);
@@ -152,7 +152,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     ///         This is a convenience property to help porting from the v1 MenuBar.
     ///     </para>
     /// </remarks>
-    public MenuBarItemv2 []? Menus
+    public MenuBarItem []? Menus
     {
         set
         {
@@ -163,7 +163,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 return;
             }
 
-            foreach (MenuBarItemv2 mbi in value)
+            foreach (MenuBarItem mbi in value)
             {
                 Add (mbi);
             }
@@ -175,7 +175,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         base.OnSubViewAdded (view);
 
-        if (view is MenuBarItemv2 mbi)
+        if (view is MenuBarItem mbi)
         {
             mbi.Accepted += OnMenuBarItemAccepted;
             mbi.PopoverMenuOpenChanged += OnMenuBarItemPopoverMenuOpenChanged;
@@ -187,7 +187,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         base.OnSubViewRemoved (view);
 
-        if (view is MenuBarItemv2 mbi)
+        if (view is MenuBarItem mbi)
         {
             mbi.Accepted -= OnMenuBarItemAccepted;
             mbi.PopoverMenuOpenChanged -= OnMenuBarItemPopoverMenuOpenChanged;
@@ -196,7 +196,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
     private void OnMenuBarItemPopoverMenuOpenChanged (object? sender, EventArgs<bool> e)
     {
-        if (sender is MenuBarItemv2 mbi)
+        if (sender is MenuBarItem mbi)
         {
             if (e.Value)
             {
@@ -223,7 +223,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public bool IsOpen () { return SubViews.OfType<MenuBarItemv2> ().Count (sv => sv is { PopoverMenuOpen: true }) > 0; }
+    public bool IsOpen () { return SubViews.OfType<MenuBarItem> ().Count (sv => sv is { PopoverMenuOpen: true }) > 0; }
 
     private bool _active;
 
@@ -297,11 +297,11 @@ public class MenuBarv2 : Menuv2, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnSelectedMenuItemChanged (MenuItemv2? selected)
+    protected override void OnSelectedMenuItemChanged (MenuItem? selected)
     {
         // Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
 
-        if (IsOpen () && selected is MenuBarItemv2 { PopoverMenuOpen: false } selectedMenuBarItem)
+        if (IsOpen () && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
         {
             ShowItem (selectedMenuBarItem);
         }
@@ -319,7 +319,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
 
         // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
-        foreach (MenuBarItemv2? mbi in SubViews.Select (s => s as MenuBarItemv2))
+        foreach (MenuBarItem? mbi in SubViews.Select (s => s as MenuBarItem))
         {
             App?.Popover?.Register (mbi?.PopoverMenu);
         }
@@ -331,7 +331,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // TODO: Ensure sourceMenuBar is actually one of our bar items
-        if (Visible && Enabled && args.Context?.Source is MenuBarItemv2 { PopoverMenuOpen: false } sourceMenuBarItem)
+        if (Visible && Enabled && args.Context?.Source is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
         {
             if (!CanFocus)
             {
@@ -365,7 +365,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
         base.OnAccepted (args);
 
-        if (SubViews.OfType<MenuBarItemv2> ().Contains (args.Context?.Source))
+        if (SubViews.OfType<MenuBarItem> ().Contains (args.Context?.Source))
         {
             return;
         }
@@ -377,7 +377,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     ///     Shows the specified popover, but only if the menu bar is active.
     /// </summary>
     /// <param name="menuBarItem"></param>
-    private void ShowItem (MenuBarItemv2? menuBarItem)
+    private void ShowItem (MenuBarItem? menuBarItem)
     {
         // Logging.Debug ($"{Title} - {menuBarItem?.Id}");
 
@@ -446,7 +446,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
-    private MenuBarItemv2? GetActiveItem () { return SubViews.OfType<MenuBarItemv2> ().FirstOrDefault (sv => sv is { PopoverMenu: { Visible: true } }); }
+    private MenuBarItem? GetActiveItem () { return SubViews.OfType<MenuBarItem> ().FirstOrDefault (sv => sv is { PopoverMenu: { Visible: true } }); }
 
     /// <summary>
     ///     Hides the popover menu associated with the active menu bar item and updates the focus state.
@@ -459,7 +459,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// </summary>
     /// <param name="activeItem"></param>
     /// <returns><see langword="true"/> if the popover was hidden</returns>
-    public bool HideItem (MenuBarItemv2? activeItem)
+    public bool HideItem (MenuBarItem? activeItem)
     {
         // Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
@@ -484,16 +484,16 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// </summary>
     /// <param name="title"></param>
     /// <returns></returns>
-    public IEnumerable<MenuItemv2> GetMenuItemsWithTitle (string title)
+    public IEnumerable<MenuItem> GetMenuItemsWithTitle (string title)
     {
-        List<MenuItemv2> menuItems = new ();
+        List<MenuItem> menuItems = new ();
 
         if (string.IsNullOrEmpty (title))
         {
             return menuItems;
         }
 
-        foreach (MenuBarItemv2 mbi in SubViews.OfType<MenuBarItemv2> ())
+        foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
         {
             if (mbi.PopoverMenu is { })
             {
@@ -558,15 +558,15 @@ public class MenuBarv2 : Menuv2, IDesignable
                                       };
 
         Add (
-             new MenuBarItemv2 (
+             new MenuBarItem (
                                 "_File",
                                 [
-                                    new MenuItemv2 (targetView as View, Command.New),
-                                    new MenuItemv2 (targetView as View, Command.Open),
-                                    new MenuItemv2 (targetView as View, Command.Save),
-                                    new MenuItemv2 (targetView as View, Command.SaveAs),
+                                    new MenuItem (targetView as View, Command.New),
+                                    new MenuItem (targetView as View, Command.Open),
+                                    new MenuItem (targetView as View, Command.Save),
+                                    new MenuItem (targetView as View, Command.SaveAs),
                                     new Line (),
-                                    new MenuItemv2
+                                    new MenuItem
                                     {
                                         Title = "_File Options",
                                         SubMenu = new (
@@ -601,25 +601,25 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                       )
                                     },
                                     new Line (),
-                                    new MenuItemv2
+                                    new MenuItem
                                     {
                                         Title = "_Preferences",
                                         SubMenu = new (
                                                        [
-                                                           new MenuItemv2
+                                                           new MenuItem
                                                            {
                                                                CommandView = bordersCb,
                                                                HelpText = "Toggle Menu Borders",
                                                                Action = ToggleMenuBorders
                                                            },
-                                                           new MenuItemv2
+                                                           new MenuItem
                                                            {
                                                                HelpText = "3 Mutually Exclusive Options",
                                                                CommandView = mutuallyExclusiveOptionsSelector,
                                                                Key = Key.F7
                                                            },
                                                            new Line (),
-                                                           new MenuItemv2
+                                                           new MenuItem
                                                            {
                                                                HelpText = "MenuBar BG Color",
                                                                CommandView = menuBgColorCp,
@@ -629,7 +629,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                       )
                                     },
                                     new Line (),
-                                    new MenuItemv2
+                                    new MenuItem
                                     {
                                         TargetView = targetView as View,
                                         Key = Application.QuitKey,
@@ -640,16 +640,16 @@ public class MenuBarv2 : Menuv2, IDesignable
             );
 
         Add (
-             new MenuBarItemv2 (
+             new MenuBarItem (
                                 "_Edit",
                                 [
-                                    new MenuItemv2 (targetView as View, Command.Cut),
-                                    new MenuItemv2 (targetView as View, Command.Copy),
-                                    new MenuItemv2 (targetView as View, Command.Paste),
+                                    new MenuItem (targetView as View, Command.Cut),
+                                    new MenuItem (targetView as View, Command.Copy),
+                                    new MenuItem (targetView as View, Command.Paste),
                                     new Line (),
-                                    new MenuItemv2 (targetView as View, Command.SelectAll),
+                                    new MenuItem (targetView as View, Command.SelectAll),
                                     new Line (),
-                                    new MenuItemv2
+                                    new MenuItem
                                     {
                                         Title = "_Details",
                                         SubMenu = new (ConfigureDetailsSubMenu ())
@@ -659,15 +659,15 @@ public class MenuBarv2 : Menuv2, IDesignable
             );
 
         Add (
-             new MenuBarItemv2 (
+             new MenuBarItem (
                                 "_Help",
                                 [
-                                    new MenuItemv2
+                                    new MenuItem
                                     {
                                         Title = "_Online Help...",
                                         Action = () => MessageBox.Query ("Online Help", "https://gui-cs.github.io/Terminal.Gui", "Ok")
                                     },
-                                    new MenuItemv2
+                                    new MenuItem
                                     {
                                         Title = "About...",
                                         Action = () => MessageBox.Query ("About", "Something About Mary.", "Ok")
@@ -680,14 +680,14 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         void ToggleMenuBorders ()
         {
-            foreach (MenuBarItemv2 mbi in SubViews.OfType<MenuBarItemv2> ())
+            foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
             {
                 if (mbi is not { PopoverMenu: { } })
                 {
                     continue;
                 }
 
-                foreach (Menuv2? subMenu in mbi.PopoverMenu.GetAllSubMenus ())
+                foreach (Menu? subMenu in mbi.PopoverMenu.GetAllSubMenus ())
                 {
                     if (bordersCb.CheckedState == CheckState.Checked)
                     {
@@ -701,21 +701,21 @@ public class MenuBarv2 : Menuv2, IDesignable
             }
         }
 
-        MenuItemv2 [] ConfigureDetailsSubMenu ()
+        MenuItem [] ConfigureDetailsSubMenu ()
         {
-            var detail = new MenuItemv2
+            var detail = new MenuItem
             {
                 Title = "_Detail 1",
                 Text = "Some detail #1"
             };
 
-            var nestedSubMenu = new MenuItemv2
+            var nestedSubMenu = new MenuItem
             {
                 Title = "_Moar Details",
                 SubMenu = new (ConfigureMoreDetailsSubMenu ())
             };
 
-            var editMode = new MenuItemv2
+            var editMode = new MenuItem
             {
                 Text = "App Binding to Command.Edit",
                 Id = "EditMode",
@@ -730,14 +730,14 @@ public class MenuBarv2 : Menuv2, IDesignable
 
             View [] ConfigureMoreDetailsSubMenu ()
             {
-                var deeperDetail = new MenuItemv2
+                var deeperDetail = new MenuItem
                 {
                     Title = "_Deeper Detail",
                     Text = "Deeper Detail",
                     Action = () => { MessageBox.Query ("Deeper Detail", "Lots of details", "_Ok"); }
                 };
 
-                var belowLineDetail = new MenuItemv2
+                var belowLineDetail = new MenuItem
                 {
                     Title = "_Even more detail",
                     Text = "Below the line"
