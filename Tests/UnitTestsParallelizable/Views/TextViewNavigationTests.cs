@@ -198,9 +198,16 @@ public class TextViewNavigationTests : FakeDriverBase
         string txt = textView.Text;
         var col = txt.Length;
         
-        while (col - 1 > 0 && txt [col - 1] != '\t')
+        // Find the last tab position
+        while (col > 1 && txt [col - 1] != '\t')
         {
             col--;
+            
+            // Safety check to prevent infinite loop
+            if (col == 0)
+            {
+                break;
+            }
         }
         
         // Set cursor to that position
