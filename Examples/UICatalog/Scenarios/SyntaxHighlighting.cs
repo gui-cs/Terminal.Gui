@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios;
-
-#if MENU_V1
 
 [ScenarioMetadata ("Syntax Highlighting", "Text editor with keyword highlighting using the TextView control.")]
 [ScenarioCategory ("Text and Formatting")]
@@ -90,7 +84,6 @@ public class SyntaxHighlighting : Scenario
     private Attribute _blue;
     private Attribute _green;
     private Attribute _magenta;
-    private MenuItem _miWrap;
     private TextView _textView;
     private Attribute _white;
 
@@ -101,7 +94,7 @@ public class SyntaxHighlighting : Scenario
     /// <typeparam name="T">The type of object to read from the file.</typeparam>
     /// <param name="filePath">The file path to read the object instance from.</param>
     /// <returns>Returns a new instance of the object read from the Json file.</returns>
-    public static T ReadFromJsonFile<T> (string filePath) where T : new()
+    public static T ReadFromJsonFile<T> (string filePath) where T : new ()
     {
         TextReader reader = null;
 
@@ -129,46 +122,26 @@ public class SyntaxHighlighting : Scenario
         // Setup - Create a top-level application window and configure it.
         Toplevel appWindow = new ();
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_TextView",
-                     new []
-                     {
-                         _miWrap = new (
-                                        "_Word Wrap",
-                                        "",
-                                        () => WordWrap ()
-                                       )
-                         {
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
-                         },
-                         null,
-                         new (
-                              "_Syntax Highlighting",
-                              "",
-                              () => ApplySyntaxHighlighting ()
-                             ),
-                         null,
-                         new (
-                              "_Load Text Cells",
-                              "",
-                              () => ApplyLoadCells ()
-                             ),
-                         new (
-                              "_Save Text Cells",
-                              "",
-                              () => SaveCells ()
-                             ),
-                         null,
-                         new ("_Quit", "", () => Quit ())
-                     }
-                    )
-            ]
-        };
+        var menu = new MenuBar ();
+
+        MenuItem wrapMenuItem = CreateWordWrapMenuItem ();
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_TextView",
+                                   [
+                                       wrapMenuItem,
+                                       new Line (),
+                                       new MenuItem { Title = "_Syntax Highlighting", Action = ApplySyntaxHighlighting },
+                                       new Line (),
+                                       new MenuItem { Title = "_Load Text Cells", Action = ApplyLoadCells },
+                                       new MenuItem { Title = "_Save Text Cells", Action = SaveCells },
+                                       new Line (),
+                                       new MenuItem { Title = "_Quit", Action = Quit }
+                                   ]
+                                  )
+                 );
+
         appWindow.Add (menu);
 
         _textView = new ()
@@ -194,6 +167,33 @@ public class SyntaxHighlighting : Scenario
         Application.Shutdown ();
     }
 
+    private MenuItem CreateWordWrapMenuItem ()
+    {
+        CheckBox checkBox = new ()
+        {
+            Title = "_Word Wrap",
+            CheckedState = _textView?.WordWrap == true ? CheckState.Checked : CheckState.UnChecked
+        };
+
+        checkBox.CheckedStateChanged += (s, e) =>
+                                        {
+                                            if (_textView is { })
+                                            {
+                                                _textView.WordWrap = checkBox.CheckedState == CheckState.Checked;
+                                            }
+                                        };
+
+        MenuItem item = new () { CommandView = checkBox };
+
+        item.Accepting += (s, e) =>
+                          {
+                              checkBox.AdvanceCheckState ();
+                              e.Handled = true;
+                          };
+
+        return item;
+    }
+
     /// <summary>
     ///     Writes the given object instance to a Json file.
     ///     <para>Object type must have a parameterless constructor.</para>
@@ -213,7 +213,7 @@ public class SyntaxHighlighting : Scenario
     ///     If false the file will be overwritten if it already exists. If true the contents will be appended
     ///     to the file.
     /// </param>
-    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new()
+    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new ()
     {
         TextWriter writer = null;
 
@@ -265,10 +265,10 @@ public class SyntaxHighlighting : Scenario
     {
         ClearAllEvents ();
 
-        _green = new Attribute (Color.Green, Color.Black);
-        _blue = new Attribute (Color.Blue, Color.Black);
-        _magenta = new Attribute (Color.Magenta, Color.Black);
-        _white = new Attribute (Color.White, Color.Black);
+        _green = new (Color.Green, Color.Black);
+        _blue = new (Color.Blue, Color.Black);
+        _magenta = new (Color.Magenta, Color.Black);
+        _white = new (Color.White, Color.Black);
         _textView.SetScheme (new () { Focus = _white });
 
         _textView.Text =
@@ -289,7 +289,7 @@ public class SyntaxHighlighting : Scenario
         _textView.InheritsPreviousAttribute = false;
     }
 
-    private bool ContainsPosition (Match m, int pos) { return pos >= m.Index && pos < m.Index + m.Length; }
+    private bool ContainsPosition (Match m, int pos) => pos >= m.Index && pos < m.Index + m.Length;
 
     private void HighlightTextBasedOnKeywords ()
     {
@@ -386,12 +386,6 @@ public class SyntaxHighlighting : Scenario
         //Writing to file  
         List<List<Cell>> cells = _textView.GetAllLines ();
         WriteToJsonFile (_path, cells);
-    }
-
-    private void WordWrap ()
-    {
-        _miWrap.Checked = !_miWrap.Checked;
-        _textView.WordWrap = (bool)_miWrap.Checked;
     }
 }
 
@@ -501,4 +495,3 @@ public static class EventExtensions
         }
     }
 }
-#endif
