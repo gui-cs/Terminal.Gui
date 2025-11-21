@@ -129,14 +129,16 @@ public class Runnable<TResult> : View, IRunnable<TResult>
                 return false;
             }
 
-            // Check if this is the TopRunnable
-            // In Phase 1, TopRunnable is still Toplevel?, so we need to check both cases
-            if (this is Toplevel tl && App.TopRunnable == tl)
+            // Check if this runnable is at the top of the RunnableSessionStack
+            // The top of the stack is the modal runnable
+            if (App.RunnableSessionStack is { } && App.RunnableSessionStack.TryPeek (out RunnableSessionToken? topToken))
             {
-                return true;
+                return topToken?.Runnable == this;
             }
 
-            if (App.TopRunnable is IRunnable r && r == this)
+            // Fallback: Check if this is the TopRunnable (for Toplevel compatibility)
+            // In Phase 1, TopRunnable is still Toplevel?, so we need to check both cases
+            if (this is Toplevel tl && App.TopRunnable == tl)
             {
                 return true;
             }

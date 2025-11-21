@@ -17,7 +17,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         if (_app is null)
         {
             _app = Application.Create ();
-            _app.Init ();
+            _app.Init ("fake");
         }
 
         return _app;
@@ -409,7 +409,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         app.End (token);
     }
 
-    [Fact]
+    [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
     public void RunGeneric_CreatesAndReturnsRunnable ()
     {
         // Arrange
@@ -430,7 +430,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         runnable.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
     public void RunGeneric_ThrowsIfNotInitialized ()
     {
         // Arrange

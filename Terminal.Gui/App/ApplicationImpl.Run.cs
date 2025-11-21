@@ -386,8 +386,15 @@ public partial class ApplicationImpl
         // Create session token
         RunnableSessionToken token = new (runnable);
 
-        // Get old IsRunning value (should be false before starting)
+        // Set the App property if the runnable is a View (needed for IsRunning/IsModal checks)
+        if (runnable is View runnableView)
+        {
+            runnableView.App = this;
+        }
+
+        // Get old IsRunning and IsModal values BEFORE any stack changes
         bool oldIsRunning = runnable.IsRunning;
+        bool oldIsModalValue = runnable.IsModal;
 
         // Raise IsRunningChanging (false -> true) - can be canceled
         if (runnable.RaiseIsRunningChanging (oldIsRunning, true))
@@ -398,12 +405,6 @@ public partial class ApplicationImpl
 
         // Push token onto RunnableSessionStack (IsRunning becomes true)
         RunnableSessionStack?.Push (token);
-
-        // Set the App property if the runnable is a View
-        if (runnable is View runnableView)
-        {
-            runnableView.App = this;
-        }
 
         // Update TopRunnable to the new top of stack
         IRunnable? previousTop = null;
@@ -444,10 +445,7 @@ public partial class ApplicationImpl
         }
 
         // New runnable becomes modal
-        // Get old IsModal value (should be false before becoming modal)
-        bool oldIsModalValue = runnable.IsModal;
-
-        // Raise IsModalChanging (false -> true)
+        // Raise IsModalChanging (false -> true) using the old value we captured earlier
         runnable.RaiseIsModalChanging (oldIsModalValue, true);
 
         // IsModal is now true (derived property)
