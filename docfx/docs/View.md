@@ -558,11 +558,134 @@ view.AddCommand(Command.ScrollDown, () => { view.ScrollVertical(1); return true;
 
 ---
 
-## Modal Views
+## Runnable Views (IRunnable)
 
-Views can run modally (exclusively capturing all input until closed). See [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) for details.
+Views can implement [IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) to run as independent, blocking sessions with typed results. This decouples runnability from inheritance, allowing any View to participate in session management.
 
-### Running a View Modally
+### IRunnable Architecture
+
+The **IRunnable** pattern provides:
+
+- **Interface-Based**: Implement `IRunnable<TResult>` instead of inheriting from `Toplevel`
+- **Type-Safe Results**: Generic `TResult` parameter for compile-time type safety
+- **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for concise code
+- **Automatic Disposal**: Framework manages lifecycle of created runnables
+- **CWP Lifecycle Events**: `IsRunningChanging/Changed`, `IsModalChanging/Changed`
+
+### Creating a Runnable View
+
+Derive from [Runnable<TResult>](~/api/Terminal.Gui.ViewBase.Runnable-1.yml) or implement [IRunnable<TResult>](~/api/Terminal.Gui.App.IRunnable-1.yml):
+
+```csharp
+public class ColorPickerDialog : Runnable<Color?>
+{
+    private ColorPicker16 _colorPicker;
+    
+    public ColorPickerDialog()
+    {
+        Title = "Select a Color";
+        
+        _colorPicker = new ColorPicker16 { X = Pos.Center(), Y = 2 };
+        
+        var okButton = new Button { Text = "OK", IsDefault = true };
+        okButton.Accepting += (s, e) => {
+            Result = _colorPicker.SelectedColor;
+            Application.RequestStop();
+        };
+        
+        Add(_colorPicker, okButton);
+    }
+}
+```
+
+### Running with Fluent API
+
+The fluent API enables elegant, concise code with automatic disposal:
+
+```csharp
+// Framework creates, runs, and disposes the runnable automatically
+Color? result = Application.Create()
+                           .Init()
+                           .Run<ColorPickerDialog>()
+                           .Shutdown() as Color?;
+
+if (result is { })
+{
+    Console.WriteLine($"Selected: {result}");
+}
+```
+
+### Running with Explicit Control
+
+For more control over the lifecycle:
+
+```csharp
+var app = Application.Create();
+app.Init();
+
+var dialog = new ColorPickerDialog();
+app.Run(dialog);
+
+// Extract result after Run returns
+Color? result = dialog.Result;
+
+// Caller is responsible for disposal
+dialog.Dispose();
+
+app.Shutdown();
+```
+
+### Disposal Semantics
+
+**"Whoever creates it, owns it":**
+
+- `Run<TRunnable>()`: Framework creates → Framework disposes (in `Shutdown()`)
+- `Run(IRunnable)`: Caller creates → Caller disposes
+
+### Result Extraction
+
+Extract the result in `OnIsRunningChanging` when stopping:
+
+```csharp
+protected override bool OnIsRunningChanging(bool oldIsRunning, bool newIsRunning)
+{
+    if (!newIsRunning)  // Stopping - extract result before disposal
+    {
+        Result = _colorPicker.SelectedColor;
+        
+        // Optionally cancel stop (e.g., prompt to save)
+        if (HasUnsavedChanges())
+        {
+            return true;  // Cancel stop
+        }
+    }
+    
+    return base.OnIsRunningChanging(oldIsRunning, newIsRunning);
+}
+```
+
+### Lifecycle Properties
+
+- **`IsRunning`** - True when on the `RunnableSessionStack`
+- **`IsModal`** - True when at the top of the stack (receiving all input)
+- **`Result`** - The typed result value (set before stopping)
+
+### Lifecycle Events (CWP-Compliant)
+
+- **`IsRunningChanging`** - Cancellable event before added/removed from stack
+- **`IsRunningChanged`** - Non-cancellable event after stack change
+- **`IsModalChanging`** - Cancellable event before becoming/leaving top of stack
+- **`IsModalChanged`** - Non-cancellable event after modal state change
+
+---
+
+## Modal Views (Legacy)
+
+Views can run modally (exclusively capturing all input until closed). See [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) for the legacy pattern.
+
+**Note:** New code should use `IRunnable<TResult>` pattern (see above) for better type safety and lifecycle management.
+
+### Running a View Modally (Legacy)
 
 ```csharp
 var dialog = new Dialog
@@ -580,16 +703,17 @@ dialog.Add(label);
 Application.Run(dialog);
 
 // Dialog has been closed
+dialog.Dispose();
 ```
 
-### Modal View Types
+### Modal View Types (Legacy)
 
 - **[Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml)** - Base class for modal views, can fill entire screen
 - **[Window](~/api/Terminal.Gui.Views.Window.yml)** - Overlapped container with border and title
 - **[Dialog](~/api/Terminal.Gui.Views.Dialog.yml)** - Modal Window, centered with button support
 - **[Wizard](~/api/Terminal.Gui.Views.Wizard.yml)** - Multi-step modal dialog
 
-### Dialog Example
+### Dialog Example (Legacy)
 
 [Dialogs](~/api/Terminal.Gui.Views.Dialog.yml) are Modal [Windows](~/api/Terminal.Gui.Views.Window.yml) centered on screen:
 

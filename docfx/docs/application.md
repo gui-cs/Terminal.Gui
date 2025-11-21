@@ -1,6 +1,15 @@
 # Application Architecture
 
-Terminal.Gui v2 uses an instance-based application architecture that decouples views from the global application state, improving testability and enabling multiple application contexts.
+Terminal.Gui v2 uses an instance-based application architecture with the **IRunnable** interface pattern that decouples views from the global application state, improving testability, enabling multiple application contexts, and providing type-safe result handling.
+
+## Key Features
+
+- **Instance-Based**: Use `Application.Create()` to get an `IApplication` instance instead of static methods
+- **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Toplevel`
+- **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for elegant, concise code
+- **Automatic Disposal**: Framework-created runnables are automatically disposed
+- **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
+- **CWP Compliance**: All lifecycle events follow the Cancellable Work Pattern
 
 ## View Hierarchy and Run Stack
 
@@ -87,6 +96,12 @@ top.Add(myView);
 app.Run(top);
 top.Dispose();
 app.Shutdown();
+
+// NEWEST (v2 with IRunnable and Fluent API):
+Color? result = Application.Create()
+                           .Init()
+                           .Run<ColorPickerDialog>()
+                           .Shutdown() as Color?;
 ```
 
 **Note:** The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton). `Application.Create()` creates a **new** `ApplicationImpl` instance, enabling multiple application contexts and better testability.
@@ -158,32 +173,199 @@ public class MyView : View
 }
 ```
 
-## IApplication Interface
+## IRunnable Architecture
 
-The `IApplication` interface defines the application contract:
+Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Toplevel` class hierarchy. Views can implement `IRunnable<TResult>` to participate in session management without inheritance constraints.
+
+### Key Benefits
+
+- **Interface-Based**: No forced inheritance from `Toplevel`
+- **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
+- **Fluent API**: Method chaining for elegant, concise code
+- **Automatic Disposal**: Framework manages lifecycle of created runnables
+- **CWP Compliance**: All lifecycle events follow the Cancellable Work Pattern
+
+### Fluent API Pattern
+
+The fluent API enables elegant method chaining with automatic resource management:
+
+```csharp
+// All-in-one: Create, initialize, run, shutdown, and extract result
+Color? result = Application.Create()
+                           .Init()
+                           .Run<ColorPickerDialog>()
+                           .Shutdown() as Color?;
+
+if (result is { })
+{
+    ApplyColor(result);
+}
+```
+
+**Key Methods:**
+
+- `Init()` - Returns `IApplication` for chaining
+- `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
+- `Shutdown()` - Disposes framework-owned runnables, returns `object?` result
+
+### Disposal Semantics
+
+**"Whoever creates it, owns it":**
+
+| Method | Creator | Owner | Disposal |
+|--------|---------|-------|----------|
+| `Run<TRunnable>()` | Framework | Framework | Automatic in `Shutdown()` |
+| `Run(IRunnable)` | Caller | Caller | Manual by caller |
+
+```csharp
+// Framework ownership - automatic disposal
+var result = app.Run<MyDialog>().Shutdown();
+
+// Caller ownership - manual disposal
+var dialog = new MyDialog();
+app.Run(dialog);
+var result = dialog.Result;
+dialog.Dispose();  // Caller must dispose
+```
+
+### Creating Runnable Views
+
+Derive from `Runnable<TResult>` or implement `IRunnable<TResult>`:
+
+```csharp
+public class FileDialog : Runnable<string?>
+{
+    private TextField _pathField;
+    
+    public FileDialog()
+    {
+        Title = "Select File";
+        
+        _pathField = new TextField { X = 1, Y = 1, Width = Dim.Fill(1) };
+        
+        var okButton = new Button { Text = "OK", IsDefault = true };
+        okButton.Accepting += (s, e) => {
+            Result = _pathField.Text;
+            Application.RequestStop();
+        };
+        
+        Add(_pathField, okButton);
+    }
+    
+    protected override bool OnIsRunningChanging(bool oldValue, bool newValue)
+    {
+        if (!newValue)  // Stopping - extract result before disposal
+        {
+            Result = _pathField?.Text;
+        }
+        return base.OnIsRunningChanging(oldValue, newValue);
+    }
+}
+```
+
+### Lifecycle Properties
+
+- **`IsRunning`** - True when runnable is on `RunnableSessionStack`
+- **`IsModal`** - True when runnable is at top of stack (capturing all input)
+- **`Result`** - Typed result value set before stopping
+
+### Lifecycle Events (CWP-Compliant)
+
+All events follow Terminal.Gui's Cancellable Work Pattern:
+
+| Event | Cancellable | When | Use Case |
+|-------|-------------|------|----------|
+| `IsRunningChanging` | ✓ | Before add/remove from stack | Extract result, prevent close |
+| `IsRunningChanged` | ✗ | After stack change | Post-start/stop cleanup |
+| `IsModalChanging` | ✓ | Before becoming/leaving top | Prevent activation |
+| `IsModalChanged` | ✗ | After modal state change | Update UI after focus change |
+
+**Example - Result Extraction:**
+
+```csharp
+protected override bool OnIsRunningChanging(bool oldValue, bool newValue)
+{
+    if (!newValue)  // Stopping
+    {
+        // Extract result before views are disposed
+        Result = _colorPicker.SelectedColor;
+        
+        // Optionally cancel stop (e.g., unsaved changes)
+        if (HasUnsavedChanges())
+        {
+            int response = MessageBox.Query("Save?", "Save changes?", "Yes", "No", "Cancel");
+            if (response == 2) return true;  // Cancel stop
+            if (response == 0) Save();
+        }
+    }
+    
+    return base.OnIsRunningChanging(oldValue, newValue);
+}
+```
+
+### RunnableSessionStack
+
+The `RunnableSessionStack` manages all running `IRunnable` sessions:
 
 ```csharp
 public interface IApplication
 {
     /// <summary>
-    /// Gets the currently running Toplevel (the "current session").
-    /// Renamed from "Top" for clarity.
+    /// Stack of running IRunnable sessions.
+    /// Each entry is a RunnableSessionToken wrapping an IRunnable.
     /// </summary>
-    Toplevel? Current { get; }
+    ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
     
     /// <summary>
-    /// Gets the stack of running sessions.
-    /// Renamed from "TopLevels" to align with SessionToken terminology.
+    /// The IRunnable at the top of RunnableSessionStack (currently modal).
     /// </summary>
+    IRunnable? TopRunnable { get; }
+}
+```
+
+**Stack Behavior:**
+
+- Push: `Begin(IRunnable)` adds to top of stack
+- Pop: `End(RunnableSessionToken)` removes from stack
+- Peek: `TopRunnable` returns current modal runnable
+- All: `RunnableSessionStack` enumerates all running sessions
+
+## IApplication Interface
+
+The `IApplication` interface defines the application contract with support for both legacy `Toplevel` and modern `IRunnable` patterns:
+
+```csharp
+public interface IApplication
+{
+    // Legacy Toplevel support
+    Toplevel? Current { get; }
     ConcurrentStack<Toplevel> SessionStack { get; }
     
+    // IRunnable support
+    IRunnable? TopRunnable { get; }
+    ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
+    IRunnable? FrameworkOwnedRunnable { get; set; }
+    
+    // Driver and lifecycle
     IDriver? Driver { get; }
     IMainLoopCoordinator? MainLoop { get; }
     
-    void Init(string? driverName = null);
-    void Shutdown();
+    // Fluent API methods
+    IApplication Init(string? driverName = null);
+    object? Shutdown();
+    
+    // Runnable methods
+    RunnableSessionToken Begin(IRunnable runnable);
+    void Run(IRunnable runnable, Func<Exception, bool>? errorHandler = null);
+    IApplication Run<TRunnable>(Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new();
+    void RequestStop(IRunnable? runnable);
+    void End(RunnableSessionToken sessionToken);
+    
+    // Legacy Toplevel methods
     SessionToken? Begin(Toplevel toplevel);
+    void Run(Toplevel view, Func<Exception, bool>? errorHandler = null);
     void End(SessionToken sessionToken);
+    
     // ... other members
 }
 ```
