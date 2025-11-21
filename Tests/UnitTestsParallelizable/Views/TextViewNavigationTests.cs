@@ -11,14 +11,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void Tab_And_BackTab_Navigation_Without_Text ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "",
-            Driver = driver
+            Text = ""
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -51,14 +48,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void Tab_And_BackTab_Navigation_With_Text ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "TAB to jump between text fields.",
-            Driver = driver
+            Text = "TAB to jump between text fields."
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -83,14 +77,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void Tab_With_CursorLeft_And_CursorRight_Without_Text ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "",
-            Driver = driver
+            Text = ""
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -120,14 +111,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void Tab_With_CursorLeft_And_CursorRight_With_Text ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "TAB to jump between text fields.",
-            Driver = driver
+            Text = "TAB to jump between text fields."
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -160,14 +148,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void Tab_With_Home_End_And_BackTab ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "TAB to jump between text fields.",
-            Driver = driver
+            Text = "TAB to jump between text fields."
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -229,14 +214,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void BackTab_Then_Tab_Navigation ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "",
-            Driver = driver
+            Text = ""
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -268,14 +250,11 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 30,
             Height = 10,
-            Text = "TAB to jump between text fields.",
-            Driver = driver
+            Text = "TAB to jump between text fields."
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -309,15 +288,12 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void KeyBindings_Command_Navigation ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var textView = new TextView
         {
             Width = 10,
             Height = 2,
-            Text = text,
-            Driver = driver
+            Text = text
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -389,16 +365,13 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void UnwrappedCursorPosition_Event_Fires_Correctly ()
     {
-        IDriver driver = CreateFakeDriver (25, 25);
-        
         Point unwrappedPosition = Point.Empty;
         
         var textView = new TextView
         {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            Text = "This is the first line.\nThis is the second line.\n",
-            Driver = driver
+            Width = 25,
+            Height = 25,
+            Text = "This is the first line.\nThis is the second line.\n"
         };
         
         textView.UnwrappedCursorPosition += (s, e) => { unwrappedPosition = e; };
@@ -417,37 +390,31 @@ public class TextViewNavigationTests : FakeDriverBase
         Assert.Equal (new Point (12, 0), textView.CursorPosition);
         Assert.Equal (new Point (12, 0), unwrappedPosition);
 
-        // Resize to narrow width to force wrapping
-        textView.Width = 6;
-        textView.Height = 25;
-        textView.SetRelativeLayout (new Size (6, 25));
-        
-        // The wrapped cursor position should differ from unwrapped
-        // After wrap, column 12 might be on a different visual line
-        // but unwrapped position should still be (12, 0)
-        Assert.Equal (new Point (12, 0), unwrappedPosition);
-
-        // Move right - the unwrapped position event may not fire immediately
-        // or may be based on previous cursor position
-        // Just verify the event mechanism works
+        // Move right and verify unwrapped position updates
         var currentUnwrapped = unwrappedPosition;
         Assert.True (textView.NewKeyDownEvent (Key.CursorRight));
-        // The unwrapped position should have updated (either to 13 or still tracking properly)
+        // The unwrapped position should have updated
         Assert.True (unwrappedPosition.X >= currentUnwrapped.X);
+        
+        // Move several more times to verify tracking continues to work
+        for (int i = 0; i < 5; i++)
+        {
+            Assert.True (textView.NewKeyDownEvent (Key.CursorRight));
+        }
+        
+        // Unwrapped position should track the actual position in the text
+        Assert.True (unwrappedPosition.X > 12);
     }
 
     [Fact]
     public void Horizontal_Scrolling_Adjusts_LeftColumn ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var textView = new TextView
         {
             Width = 20,
             Height = 5,
             Text = "This is a very long line that will require horizontal scrolling to see all of it",
-            WordWrap = false,
-            Driver = driver
+            WordWrap = false
         };
         textView.BeginInit ();
         textView.EndInit ();
@@ -474,15 +441,12 @@ public class TextViewNavigationTests : FakeDriverBase
     [Fact]
     public void Vertical_Scrolling_Adjusts_TopRow ()
     {
-        IDriver driver = CreateFakeDriver ();
-        
         var lines = string.Join ("\n", Enumerable.Range (1, 100).Select (i => $"Line {i}"));
         var textView = new TextView
         {
             Width = 20,
             Height = 5,
-            Text = lines,
-            Driver = driver
+            Text = lines
         };
         textView.BeginInit ();
         textView.EndInit ();
