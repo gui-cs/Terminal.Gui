@@ -1,10 +1,12 @@
 # IRunnable Architecture Proposal
 
-**Status**: Proposal  
+**Status**: Phase 1 Complete ✅ - Phase 2 In Progress
 
-**Version**: 1.7 - Approved - Implementing
+**Version**: 1.8 - Phase 1 Implemented
 
-**Date**: 2025-01-20
+**Date**: 2025-01-21
+
+**Phase 1 Completion**: Issue #4400 closed with full implementation including fluent API and automatic disposal
 
 ## Summary
 
@@ -1648,20 +1650,55 @@ fileDialog.Dispose ();
 - Rename `IApplication.Current` → `IApplication.TopRunnable`
 - Update `View.IsCurrentTop` → `View.IsTopRunnable`
 
-### Phase 1: Add IRunnable Support
+### Phase 1: Add IRunnable Support ✅ COMPLETE
 
-- Issue #4400
+- Issue #4400 - **COMPLETED**
 
-1. Add `IRunnable` (non-generic) interface alongside existing `Toplevel`
-2. Add `IRunnable<TResult>` (generic) interface
-3. Add `Runnable<TResult>` base class
-4. Add `RunnableSessionToken` class
-5. Update `IApplication.RunnableSessionStack` to hold `RunnableSessionToken` instead of `Toplevel`
-6. Update `IApplication` to support both `Toplevel` and `IRunnable`
-7. Implement CWP-based `IsRunningChanging`/`IsRunningChanged` events
-8. Implement CWP-based `IsModalChanging`/`IsModalChanged` events
-9. Update `Begin()`, `End()`, `RequestStop()` to raise these events
-10. Add three `Run()` overloads: `Run(IRunnable)`, `Run<T>()`, `Run()`
+**Implemented:**
+
+1. ✅ Add `IRunnable` (non-generic) interface alongside existing `Toplevel`
+2. ✅ Add `IRunnable<TResult>` (generic) interface
+3. ✅ Add `Runnable<TResult>` base class
+4. ✅ Add `RunnableSessionToken` class
+5. ✅ Update `IApplication.RunnableSessionStack` to hold `RunnableSessionToken`
+6. ✅ Update `IApplication` to support both `Toplevel` and `IRunnable`
+7. ✅ Implement CWP-based `IsRunningChanging`/`IsRunningChanged` events
+8. ✅ Implement CWP-based `IsModalChanging`/`IsModalChanged` events
+9. ✅ Update `Begin()`, `End()`, `RequestStop()` to raise these events
+10. ✅ Add `Run()` overloads: `Run(IRunnable)`, `Run<T>()`
+
+**Bonus Features Added:**
+
+11. ✅ Fluent API - `Init()`, `Run<T>()` return `IApplication` for method chaining
+12. ✅ Automatic Disposal - `Shutdown()` returns result and disposes framework-owned runnables
+13. ✅ Clear Ownership Semantics - "Whoever creates it, owns it"
+14. ✅ 62 Parallelizable Unit Tests - Comprehensive test coverage
+15. ✅ Example Application - `Examples/FluentExample` demonstrating the pattern
+16. ✅ Complete API Documentation - XML docs for all new types
+
+**Key Design Decisions:**
+
+- Fluent API with `Init()` → `Run<T>()` → `Shutdown()` chaining
+- `Run<TRunnable>()` returns `IApplication` (breaking change from returning `TRunnable`)
+- `Shutdown()` returns `object?` (result from last run runnable)
+- Framework automatically disposes runnables created by `Run<T>()`
+- Caller disposes runnables passed to `Run(IRunnable)`
+
+**Migration Example:**
+
+```csharp
+// Before (manual disposal):
+var dialog = new MyDialog();
+app.Run(dialog);
+var result = dialog.Result;
+dialog.Dispose();
+
+// After (fluent with automatic disposal):
+var result = Application.Create()
+                        .Init()
+                        .Run<MyDialog>()
+                        .Shutdown() as MyResultType;
+```
 
 ### Phase 2: Migrate Existing Views
 
