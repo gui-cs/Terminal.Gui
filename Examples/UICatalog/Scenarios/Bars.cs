@@ -80,7 +80,7 @@ public class Bars : Scenario
         };
         menuBarLikeExamples.Add (label);
 
-        //bar = new MenuBarv2
+        //bar = new MenuBar
         //{
         //    Id = "menuBar",
         //    X = Pos.Right (label),
@@ -128,7 +128,7 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        bar = new Menuv2
+        bar = new Menu
         {
             Id = "menu",
             X = Pos.Left (label),
@@ -147,7 +147,7 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        Menuv2 popOverMenu  = new Menuv2
+        Menu popOverMenu  = new Menu
         {
             Id = "popupMenu",
             X = Pos.Left (label),

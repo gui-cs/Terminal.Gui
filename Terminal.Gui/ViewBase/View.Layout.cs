@@ -1187,36 +1187,10 @@ public partial class View // Layout APIs
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-        var menuVisible = false;
-        var statusVisible = false;
+        //var menuVisible = false;
+        //var statusVisible = false;
 
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnable || viewToMove?.SuperView == app?.TopRunnable)
-        {
-            menuVisible = app?.TopRunnable?.MenuBar?.Visible == true;
-        }
-        else
-        {
-            View? t = viewToMove!.SuperView;
-
-            while (t is { } and not Toplevel)
-            {
-                t = t.SuperView;
-            }
-
-            if (t is Toplevel topLevel)
-            {
-                menuVisible = topLevel.MenuBar?.Visible == true;
-            }
-        }
-
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnable || viewToMove?.SuperView == app?.TopRunnable)
-        {
-            maxDimension = menuVisible ? 1 : 0;
-        }
-        else
-        {
-            maxDimension = 0;
-        }
+        maxDimension = 0;
 
         ny = Math.Max (targetY, maxDimension);
 
@@ -1224,7 +1198,7 @@ public partial class View // Layout APIs
         {
             if (app is { })
             {
-                maxDimension = statusVisible ? app.Screen.Height - 1 : app.Screen.Height;
+                maxDimension = app.Screen.Height;
             }
             else
             {
@@ -1233,7 +1207,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            maxDimension = statusVisible ? viewToMove!.SuperView.Viewport.Height - 1 : viewToMove!.SuperView.Viewport.Height;
+            maxDimension = viewToMove!.SuperView.Viewport.Height;
         }
 
         if (superView?.Margin is { } && superView == viewToMove?.SuperView)
@@ -1246,13 +1220,8 @@ public partial class View // Layout APIs
         if (viewToMove?.Frame.Height <= maxDimension)
         {
             ny = ny + viewToMove.Frame.Height > maxDimension
-                     ? Math.Max (maxDimension - viewToMove.Frame.Height, menuVisible ? 1 : 0)
+                     ? Math.Max (maxDimension - viewToMove.Frame.Height, 0)
                      : ny;
-
-            //if (ny > viewToMove.Frame.Y + viewToMove.Frame.Height)
-            //{
-            //    ny = Math.Max (viewToMove.Frame.Bottom, 0);
-            //}
         }
         else
         {

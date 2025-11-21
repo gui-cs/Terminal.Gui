@@ -173,14 +173,14 @@ See the [Views Overview](views.md) for a complete catalog of all built-in views.
 
 v2 introduces many new View subclasses that were not present in v1:
 
-- **Bar**: A foundational view for horizontal or vertical layouts of `Shortcut` or other items, used in `StatusBar`, `MenuBarv2`, and `PopoverMenu`.
+- **Bar**: A foundational view for horizontal or vertical layouts of `Shortcut` or other items, used in `StatusBar`, `MenuBar`, and `PopoverMenu`.
 - **CharMap**: A scrollable, searchable Unicode character map with support for the Unicode Character Database (UCD) API, enabling users to browse and select from all Unicode codepoints with detailed character information. See [Character Map Deep Dive](CharacterMap.md).
 - **ColorPicker**: Leverages TrueColor for a comprehensive color selection experience, supporting multiple color models (HSV, RGB, HSL, Grayscale) with interactive color bars.
 - **DatePicker**: Provides a calendar-based date selection UI with month/year navigation, leveraging v2's improved drawing and navigation systems.
 - **FlagSelector**: Enables selection of non-mutually-exclusive flags with checkbox-based UI, supporting both dictionary-based and enum-based flag definitions.
 - **GraphView**: Displays graphs (bar charts, scatter plots, line graphs) with flexible axes, labels, scaling, scrolling, and annotations - bringing data visualization to the terminal.
 - **Line**: Draws single horizontal or vertical lines using the `LineCanvas` system with automatic intersection handling and multiple line styles (Single, Double, Heavy, Rounded, Dashed, Dotted).
-- **Menuv2 System** (MenuBarv2, PopoverMenu): A completely redesigned menu system built on the `Bar` infrastructure, providing a more flexible and visually appealing menu experience.
+- **Menu System** (MenuBar, PopoverMenu): A completely redesigned menu system built on the `Bar` infrastructure, providing a more flexible and visually appealing menu experience.
 - **NumericUpDown<T>**: Type-safe numeric input with increment/decrement buttons, supporting `int`, `long`, `float`, `double`, and `decimal` types.
 - **OptionSelector**: Displays a list of mutually-exclusive options with checkbox-style UI (radio button equivalent), supporting both horizontal and vertical orientations.
 - **Shortcut**: An opinionated view for displaying commands with key bindings, simplifying status bar and toolbar creation with consistent visual presentation.

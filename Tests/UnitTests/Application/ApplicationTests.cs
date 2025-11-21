@@ -661,7 +661,7 @@ public class ApplicationTests
         void OnApplicationOnIteration (object s, IterationEventArgs a)
         {
             Assert.True (top.Running);
-            top.Running = false;
+            top.RequestStop ();
         }
     }
 

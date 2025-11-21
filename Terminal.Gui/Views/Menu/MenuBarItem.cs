@@ -5,18 +5,18 @@ using System.Diagnostics;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBarv2"/>.
+///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBar"/>.
 ///     MenuBarItems hold a <see cref="PopoverMenu"/> instead of a <see cref="SubMenu"/>.
 /// </summary>
-public class MenuBarItemv2 : MenuItemv2
+public class MenuBarItem : MenuItem
 {
     /// <summary>
-    ///     Creates a new instance of <see cref="MenuBarItemv2"/>.
+    ///     Creates a new instance of <see cref="MenuBarItem"/>.
     /// </summary>
-    public MenuBarItemv2 () : base (null, Command.NotBound) { }
+    public MenuBarItem () : base (null, Command.NotBound) { }
 
     /// <summary>
-    ///     Creates a new instance of <see cref="MenuBarItemv2"/>. Each MenuBarItem typically has a <see cref="PopoverMenu"/>
+    ///     Creates a new instance of <see cref="MenuBarItem"/>. Each MenuBarItem typically has a <see cref="PopoverMenu"/>
     ///     that is
     ///     shown when the item is selected.
     /// </summary>
@@ -32,7 +32,7 @@ public class MenuBarItemv2 : MenuItemv2
     /// </param>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
-    public MenuBarItemv2 (View? targetView, Command command, string? commandText, PopoverMenu? popoverMenu = null)
+    public MenuBarItem (View? targetView, Command command, string? commandText, PopoverMenu? popoverMenu = null)
         : base (
                 targetView,
                 command,
@@ -44,14 +44,14 @@ public class MenuBarItemv2 : MenuItemv2
     }
 
     /// <summary>
-    ///     Creates a new instance of <see cref="MenuBarItemv2"/> with the specified <paramref name="popoverMenu"/>. This is a
+    ///     Creates a new instance of <see cref="MenuBarItem"/> with the specified <paramref name="popoverMenu"/>. This is a
     ///     helper for the most common MenuBar use-cases.
     /// </summary>
     /// <remarks>
     /// </remarks>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
-    public MenuBarItemv2 (string commandText, PopoverMenu? popoverMenu = null)
+    public MenuBarItem (string commandText, PopoverMenu? popoverMenu = null)
         : this (
                 null,
                 Command.NotBound,
@@ -60,7 +60,7 @@ public class MenuBarItemv2 : MenuItemv2
     { }
 
     /// <summary>
-    ///     Creates a new instance of <see cref="MenuBarItemv2"/> with the <paramref name="menuItems"/> automatcialy added to a
+    ///     Creates a new instance of <see cref="MenuBarItem"/> with the <paramref name="menuItems"/> automatcialy added to a
     ///     <see cref="PopoverMenu"/>.
     ///     This is a helper for the most common MenuBar use-cases.
     /// </summary>
@@ -71,7 +71,7 @@ public class MenuBarItemv2 : MenuItemv2
     ///     The menu items that will be added to the Popover Menu that will be displayed when this item is
     ///     selected.
     /// </param>
-    public MenuBarItemv2 (string commandText, IEnumerable<View> menuItems)
+    public MenuBarItem (string commandText, IEnumerable<View> menuItems)
         : this (
                 null,
                 Command.NotBound,
@@ -83,7 +83,7 @@ public class MenuBarItemv2 : MenuItemv2
     ///     Do not use this property. MenuBarItem does not support SubMenu. Use <see cref="PopoverMenu"/> instead.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-    public new Menuv2? SubMenu
+    public new Menu? SubMenu
     {
         get => null;
         set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead.");
@@ -185,7 +185,7 @@ public class MenuBarItemv2 : MenuItemv2
         {
             // If the user presses the hotkey for a menu item that is already open,
             // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
-            if (SuperView is MenuBarv2 { } menuBar)
+            if (SuperView is MenuBar { } menuBar)
             {
                 menuBar.HideActiveItem ();
             }

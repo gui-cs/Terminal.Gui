@@ -572,7 +572,7 @@
           ],
           "description": "Default shadow style for Button controls, often used for 3D effect."
         },
-        "Menuv2.DefaultBorderStyle": {
+        "Menu.DefaultBorderStyle": {
           "type": "string",
           "enum": [
             "None",
@@ -581,9 +581,9 @@
             "Heavy",
             "Rounded"
           ],
-          "description": "Default border style for the newer Menuv2 control and its sub-menus."
+          "description": "Default border style for the newer Menu control and its sub-menus."
         },
-        "MenuBarv2.DefaultBorderStyle": {
+        "MenuBar.DefaultBorderStyle": {
           "type": "string",
           "enum": [
             "None",
@@ -592,7 +592,7 @@
             "Heavy",
             "Rounded"
           ],
-          "description": "Default border style for the MenuBarv2 control."
+          "description": "Default border style for the MenuBar control."
         },
         "StatusBar.DefaultSeparatorLineStyle": {
           "type": "string",

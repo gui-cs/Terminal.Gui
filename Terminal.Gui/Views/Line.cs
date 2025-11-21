@@ -161,10 +161,7 @@ public class Line : View, IOrientation
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 #pragma warning restore CS0067 // The event is never used
 
-    /// <summary>
-    ///     Called when <see cref="Orientation"/> has changed.
-    /// </summary>
-    /// <param name="newOrientation">The new orientation value.</param>
+    /// <inheritdoc/>
     public void OnOrientationChanged (Orientation newOrientation)
     {
         // Set dimensions based on new orientation:

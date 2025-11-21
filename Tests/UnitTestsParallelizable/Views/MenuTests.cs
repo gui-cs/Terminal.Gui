@@ -9,7 +9,7 @@ public class MenuTests ()
     [Fact]
     public void Constructors_Defaults ()
     {
-        var menu = new Menuv2 { };
+        var menu = new Menu { };
         Assert.Empty (menu.Title);
         Assert.Empty (menu.Text);
     }

@@ -3,18 +3,18 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a <see cref="MenuItemv2"/>.
+///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a <see cref="MenuItem"/>.
 /// </summary>
-public class Menuv2 : Bar
+public class Menu : Bar
 {
     /// <inheritdoc/>
-    public Menuv2 () : this ([]) { }
+    public Menu () : this ([]) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<MenuItemv2>? menuItems) : this (menuItems?.Cast<View> ()) { }
+    public Menu (IEnumerable<MenuItem>? menuItems) : this (menuItems?.Cast<View> ()) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
+    public Menu (IEnumerable<View>? shortcuts) : base (shortcuts)
     {
         // Do this to support debugging traces where Title gets set
         base.HotKeySpecifier = (Rune)'\xffff';
@@ -51,14 +51,14 @@ public class Menuv2 : Bar
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>
-    public MenuItemv2? SuperMenuItem { get; set; }
+    public MenuItem? SuperMenuItem { get; set; }
 
     /// <inheritdoc />
     protected override void OnVisibleChanged ()
     {
         if (Visible)
         {
-            SelectedMenuItem = SubViews.Where (mi => mi is MenuItemv2).ElementAtOrDefault (0) as MenuItemv2;
+            SelectedMenuItem = SubViews.Where (mi => mi is MenuItem).ElementAtOrDefault (0) as MenuItem;
         }
     }
 
@@ -69,7 +69,7 @@ public class Menuv2 : Bar
 
         switch (view)
         {
-            case MenuItemv2 menuItem:
+            case MenuItem menuItem:
                 {
                     menuItem.CanFocus = true;
 
@@ -176,7 +176,7 @@ public class Menuv2 : Bar
     {
         base.OnFocusedChanged (previousFocused, focused);
 
-        SelectedMenuItem = focused as MenuItemv2;
+        SelectedMenuItem = focused as MenuItem;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }
 
@@ -184,9 +184,9 @@ public class Menuv2 : Bar
     ///     Gets or set the currently selected menu item. This is a helper that
     ///     tracks <see cref="View.Focused"/>.
     /// </summary>
-    public MenuItemv2? SelectedMenuItem
+    public MenuItem? SelectedMenuItem
     {
-        get => Focused as MenuItemv2;
+        get => Focused as MenuItem;
         set
         {
             if (value == Focused)
@@ -198,7 +198,7 @@ public class Menuv2 : Bar
         }
     }
 
-    internal void RaiseSelectedMenuItemChanged (MenuItemv2? selected)
+    internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
         // Logging.Debug ($"{Title} ({selected?.Title})");
 
@@ -210,14 +210,14 @@ public class Menuv2 : Bar
     ///     Called when the selected menu item has changed.
     /// </summary>
     /// <param name="selected"></param>
-    protected virtual void OnSelectedMenuItemChanged (MenuItemv2? selected)
+    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected)
     {
     }
 
     /// <summary>
     ///     Raised when the selected menu item has changed.
     /// </summary>
-    public event EventHandler<MenuItemv2?>? SelectedMenuItemChanged;
+    public event EventHandler<MenuItem?>? SelectedMenuItemChanged;
 
     /// <inheritdoc />
     protected override void Dispose (bool disposing)
