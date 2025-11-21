@@ -20,7 +20,7 @@ namespace Terminal.Gui.ViewBase;
 ///         <code>
 /// // Wrap a TextField to make it runnable with string result
 /// var textField = new TextField { Width = 40 };
-/// var runnable = new RunnableWrapper&lt;TextField, string&gt;(textField);
+/// var runnable = new RunnableWrapper&lt;TextField, string&gt; { WrappedView = textField };
 /// 
 /// // Extract result when stopping
 /// runnable.IsRunningChanging += (s, e) =&gt;
@@ -40,28 +40,51 @@ namespace Terminal.Gui.ViewBase;
 public class RunnableWrapper<TView, TResult> : Runnable<TResult> where TView : View
 {
     /// <summary>
-    ///     Initializes a new instance of <see cref="RunnableWrapper{TView, TResult}"/> that wraps the specified view.
+    ///     Initializes a new instance of <see cref="RunnableWrapper{TView, TResult}"/>.
     /// </summary>
-    /// <param name="view">The view to wrap and make runnable. Cannot be null.</param>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="view"/> is null.</exception>
-    public RunnableWrapper (TView view)
+    public RunnableWrapper ()
     {
-        WrappedView = view ?? throw new ArgumentNullException (nameof (view));
-
         // Make the wrapper automatically size to fit the wrapped view
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-
-        // Add the wrapped view as a subview
-        Add (view);
     }
 
+    private TView? _wrappedView;
+
     /// <summary>
-    ///     Gets the wrapped view that is being made runnable.
+    ///     Gets or sets the wrapped view that is being made runnable.
     /// </summary>
     /// <remarks>
-    ///     Access this property to interact with the original view, extract its state,
-    ///     or configure result extraction logic.
+    ///     <para>
+    ///         This property must be set before the wrapper is initialized.
+    ///         Access this property to interact with the original view, extract its state,
+    ///         or configure result extraction logic.
+    ///     </para>
     /// </remarks>
-    public TView WrappedView { get; }
+    /// <exception cref="InvalidOperationException">Thrown if the property is set after initialization.</exception>
+    public required TView WrappedView
+    {
+        get => _wrappedView ?? throw new InvalidOperationException ("WrappedView must be set before use.");
+        init
+        {
+            if (IsInitialized)
+            {
+                throw new InvalidOperationException ("WrappedView cannot be changed after initialization.");
+            }
+
+            _wrappedView = value;
+        }
+    }
+
+    /// <inheritdoc/>
+    public override void EndInit ()
+    {
+        base.EndInit ();
+
+        // Add the wrapped view as a subview after initialization
+        if (_wrappedView is { })
+        {
+            Add (_wrappedView);
+        }
+    }
 }

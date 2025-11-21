@@ -20,10 +20,7 @@ public static class ViewRunnableExtensions
     ///     Called automatically when the runnable session ends.
     /// </param>
     /// <returns>A <see cref="RunnableWrapper{TView, TResult}"/> that wraps the view.</returns>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown if <paramref name="view"/> or <paramref name="resultExtractor"/> is
-    ///     null.
-    /// </exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="view"/> or <paramref name="resultExtractor"/> is null.</exception>
     /// <remarks>
     ///     <para>
     ///         This method wraps the view in a <see cref="RunnableWrapper{TView, TResult}"/> and automatically
@@ -62,8 +59,7 @@ public static class ViewRunnableExtensions
     /// </example>
     public static RunnableWrapper<TView, TResult> AsRunnable<TView, TResult> (
         this TView view,
-        Func<TView, TResult?> resultExtractor
-    )
+        Func<TView, TResult?> resultExtractor)
         where TView : View
     {
         if (view is null)
@@ -76,16 +72,16 @@ public static class ViewRunnableExtensions
             throw new ArgumentNullException (nameof (resultExtractor));
         }
 
-        RunnableWrapper<TView, TResult> wrapper = new (view);
+        var wrapper = new RunnableWrapper<TView, TResult> { WrappedView = view };
 
         // Subscribe to IsRunningChanging to extract result when stopping
         wrapper.IsRunningChanging += (s, e) =>
-                                     {
-                                         if (!e.NewValue) // Stopping
-                                         {
-                                             wrapper.Result = resultExtractor (view);
-                                         }
-                                     };
+        {
+            if (!e.NewValue) // Stopping
+            {
+                wrapper.Result = resultExtractor (view);
+            }
+        };
 
         return wrapper;
     }
@@ -125,6 +121,6 @@ public static class ViewRunnableExtensions
             throw new ArgumentNullException (nameof (view));
         }
 
-        return new (view);
+        return new RunnableWrapper<TView, object> { WrappedView = view };
     }
 }

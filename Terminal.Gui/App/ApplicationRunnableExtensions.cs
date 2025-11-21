@@ -65,8 +65,7 @@ public static class ApplicationRunnableExtensions
         this IApplication app,
         TView view,
         Func<TView, TResult?> resultExtractor,
-        Func<Exception, bool>? errorHandler = null
-    )
+        Func<Exception, bool>? errorHandler = null)
         where TView : View
     {
         if (app is null)
@@ -84,16 +83,16 @@ public static class ApplicationRunnableExtensions
             throw new ArgumentNullException (nameof (resultExtractor));
         }
 
-        RunnableWrapper<TView, TResult> wrapper = new (view);
+        var wrapper = new RunnableWrapper<TView, TResult> { WrappedView = view };
 
         // Subscribe to IsRunningChanging to extract result when stopping
         wrapper.IsRunningChanging += (s, e) =>
-                                     {
-                                         if (!e.NewValue) // Stopping
-                                         {
-                                             wrapper.Result = resultExtractor (view);
-                                         }
-                                     };
+        {
+            if (!e.NewValue) // Stopping
+            {
+                wrapper.Result = resultExtractor (view);
+            }
+        };
 
         app.Run (wrapper, errorHandler);
 
@@ -137,8 +136,7 @@ public static class ApplicationRunnableExtensions
     public static TView RunView<TView> (
         this IApplication app,
         TView view,
-        Func<Exception, bool>? errorHandler = null
-    )
+        Func<Exception, bool>? errorHandler = null)
         where TView : View
     {
         if (app is null)
@@ -151,7 +149,7 @@ public static class ApplicationRunnableExtensions
             throw new ArgumentNullException (nameof (view));
         }
 
-        RunnableWrapper<TView, object> wrapper = new (view);
+        var wrapper = new RunnableWrapper<TView, object> { WrappedView = view };
 
         app.Run (wrapper, errorHandler);
 
