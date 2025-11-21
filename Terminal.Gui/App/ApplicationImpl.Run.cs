@@ -432,6 +432,7 @@ public partial class ApplicationImpl
             // For now, we can't set a non-Toplevel View as TopRunnable
             // This is a limitation of the current architecture
             // In Phase 2, we'll make TopRunnable an IRunnable property
+            Logging.Warning ($"WIP on Issue #4148 - Runnable '{runnable}' is a View but not a Toplevel; cannot set as TopRunnable");
         }
 
         // Raise IsRunningChanged (now true)

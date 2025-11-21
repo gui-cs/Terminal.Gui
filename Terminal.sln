@@ -122,6 +122,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A3C
 		Tests\UnitTests\runsettings.xml = Tests\UnitTests\runsettings.xml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentExample", "Examples\FluentExample\FluentExample.csproj", "{8C05292F-86C9-C29A-635B-A4DFC5955D1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,10 @@ Global
 		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

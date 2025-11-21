@@ -1,96 +1,132 @@
 // Fluent API example demonstrating IRunnable with automatic disposal and result extraction
 
-using Terminal.Gui;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+#if POST_4148
 // Run the application with fluent API - automatically creates, runs, and disposes the runnable
-Color? result = Application.Create ()
-                           .Init ()
-                           .Run<ColorPickerView> ()
-                           .Shutdown () as Color?;
 
 // Display the result
-if (result is { })
+if (Application.Create ()
+               .Init ()
+               .Run<ColorPickerView> ()
+               .Shutdown () is Color { } result)
 {
-    Console.WriteLine ($"Selected Color: {result}");
+    Console.WriteLine (@$"Selected Color: {(Color?)result}");
 }
 else
 {
-    Console.WriteLine ("No color selected");
+    Console.WriteLine (@"No color selected");
+}
+#else
+
+// Run using traditional approach
+IApplication app = Application.Create ();
+app.Init ();
+var colorPicker = new ColorPickerView ();
+app.Run (colorPicker);
+
+Color? resultColor = colorPicker.Result;
+
+colorPicker.Dispose ();
+app.Shutdown ();
+
+if (resultColor is { } result)
+{
+    Console.WriteLine (@$"Selected Color: {(Color?)result}");
+}
+else
+{
+    Console.WriteLine (@"No color selected");
 }
 
+#endif
+
+#if POST_4148
 /// <summary>
-/// A runnable view that allows the user to select a color.
-/// Demonstrates IRunnable<TResult> pattern with automatic disposal.
+///     A runnable view that allows the user to select a color.
+///     Demonstrates IRunnable<TResult> pattern with automatic disposal.
 /// </summary>
 public class ColorPickerView : Runnable<Color?>
 {
-    private readonly ColorPicker16 _colorPicker;
-    private readonly Button _okButton;
-    private readonly Button _cancelButton;
 
+#else
+/// <summary>
+///     A runnable view that allows the user to select a color.
+///     Uses the traditional approach without automatic disposal/Fluent API.
+/// </summary>
+public class ColorPickerView : Toplevel
+{
+    public Color? Result { get; set; }
+
+#endif
     public ColorPickerView ()
     {
         Title = "Select a Color (Esc to quit)";
         BorderStyle = LineStyle.Single;
-
-        // Create color picker
-        _colorPicker = new ColorPicker16
-        {
-            X = Pos.Center (),
-            Y = 2,
-            BoxHeight = 2,
-            BoxWidth = 4
-        };
-
-        // Create OK button
-        _okButton = new Button
-        {
-            Text = "OK",
-            X = Pos.Center () - 8,
-            Y = Pos.AnchorEnd (1),
-            IsDefault = true
-        };
-
-        _okButton.Accepting += (s, e) =>
-        {
-            // Extract result before stopping
-            Result = _colorPicker.SelectedColor;
-            Application.RequestStop ();
-            e.Handled = true;
-        };
-
-        // Create Cancel button
-        _cancelButton = new Button
-        {
-            Text = "Cancel",
-            X = Pos.Center () + 2,
-            Y = Pos.AnchorEnd (1)
-        };
-
-        _cancelButton.Accepting += (s, e) =>
-        {
-            // Don't set result - leave as null
-            Application.RequestStop ();
-            e.Handled = true;
-        };
-
-        // Add views
-        Add (_colorPicker, _okButton, _cancelButton);
+        Height = Dim.Auto ();
+        Width = Dim.Auto ();
 
         // Add instructions
-        var label = new Label
+        var instructions = new Label
         {
             Text = "Use arrow keys to select a color, Enter to accept",
             X = Pos.Center (),
             Y = 0
         };
-        Add (label);
+
+        // Create color picker
+        ColorPicker colorPicker = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (instructions),
+            Style = new ColorPickerStyle ()
+            {
+                ShowColorName = true,
+                ShowTextFields = true
+            }
+        };
+        colorPicker.ApplyStyleChanges ();
+
+        // Create OK button
+        Button okButton = new ()
+        {
+            Title = "_OK",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (),
+            IsDefault = true
+        };
+
+        okButton.Accepting += (s, e) =>
+                              {
+                                  // Extract result before stopping
+                                  Result = colorPicker.SelectedColor;
+                                  RequestStop ();
+                                  e.Handled = true;
+                              };
+
+        // Create Cancel button
+        Button cancelButton = new ()
+        {
+            Title = "_Cancel",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd ()
+        };
+
+        cancelButton.Accepting += (s, e) =>
+                                  {
+                                      // Don't set result - leave as null
+                                      RequestStop ();
+                                      e.Handled = true;
+                                  };
+
+        // Add views
+        Add (instructions, colorPicker, okButton, cancelButton);
     }
 
+#if POST_4148
     protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
         // Alternative place to extract result before stopping
@@ -103,4 +139,5 @@ public class ColorPickerView : Runnable<Color?>
 
         return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
     }
+#endif
 }
