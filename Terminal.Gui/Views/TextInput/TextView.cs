@@ -4720,8 +4720,16 @@ public class TextView : View, IDesignable
     private void TextView_ViewportChanged (object? sender, DrawEventArgs e)
     {
         // Sync internal scroll position fields with Viewport
-        _topRow = Viewport.Y;
-        _leftColumn = Viewport.X;
+        // Only update if values actually changed to prevent infinite loops
+        if (_topRow != Viewport.Y)
+        {
+            _topRow = Viewport.Y;
+        }
+        
+        if (_leftColumn != Viewport.X)
+        {
+            _leftColumn = Viewport.X;
+        }
     }
     
     /// <summary>
@@ -4729,14 +4737,23 @@ public class TextView : View, IDesignable
     /// </summary>
     private void UpdateContentSize ()
     {
-        // Only update content size when we have an actual viewport size
-        if (Viewport.Width == 0 || Viewport.Height == 0)
-        {
-            return;
-        }
-        
         int contentHeight = Math.Max (_model.Count, 1);
-        int contentWidth = _wordWrap ? Viewport.Width : Math.Max (_model.GetMaxVisibleLine (0, _model.Count, TabWidth), 1);
+        
+        // For horizontal size: if word wrap is enabled, content width equals viewport width
+        // Otherwise, calculate the maximum line width (but only if we have a reasonable viewport)
+        int contentWidth;
+        
+        if (_wordWrap)
+        {
+            // Word wrap: content width follows viewport width
+            contentWidth = Math.Max (Viewport.Width, 1);
+        }
+        else
+        {
+            // No word wrap: calculate max line width
+            // Cache the current value to avoid recalculating on every call
+            contentWidth = Math.Max (_model.GetMaxVisibleLine (0, _model.Count, TabWidth), 1);
+        }
         
         SetContentSize (new Size (contentWidth, contentHeight));
     }
