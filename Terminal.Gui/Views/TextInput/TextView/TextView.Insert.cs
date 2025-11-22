@@ -28,7 +28,7 @@ public partial class TextView
 
             if (NeedsDraw)
             {
-                Adjust ();
+                AdjustScrollPosition ();
             }
             else
             {
@@ -170,7 +170,7 @@ public partial class TextView
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
-        Adjust ();
+        AdjustScrollPosition ();
 
         _historyText.Add (
                           [new (line)],
@@ -301,7 +301,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        Adjust ();
+        AdjustScrollPosition ();
         OnContentsChanged ();
     }
 

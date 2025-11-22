@@ -638,4 +638,17 @@ public partial class TextView
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
     }
+
+    /// <summary>
+    ///     INTERNAL: Resets the column tracking state and last kill operation flag.
+    ///     Column tracking is used to maintain the desired cursor column position when moving up/down
+    ///     through lines of different lengths.
+    /// </summary>
+    private void ResetColumnTrack ()
+    {
+        // Handle some state here - whether the last command was a kill
+        // operation and the column tracking (up/down)
+        _lastWasKill = false;
+        _columnTrack = -1;
+    }
 }

@@ -178,7 +178,7 @@ public partial class TextView : View, IDesignable
             CurrentRow = value.Y < 0 ? 0 :
                          value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustScrollPosition ();
         }
     }
 
@@ -292,7 +292,7 @@ public partial class TextView : View, IDesignable
 
                 SetNeedsDraw ();
                 WrapTextModel ();
-                Adjust ();
+                AdjustScrollPosition ();
             }
         }
     }
@@ -499,7 +499,7 @@ public partial class TextView : View, IDesignable
         {
             UpdateWrapModel ();
             SetNeedsDraw ();
-            Adjust ();
+            AdjustScrollPosition ();
         }
 
         UpdateWrapModel ();

@@ -150,7 +150,7 @@ public partial class TextView
 
             if (!_isReadOnly && replace)
             {
-                Adjust ();
+                AdjustScrollPosition ();
                 ClearSelectedRegion ();
                 InsertAllText (textToReplace!);
                 StartSelecting ();
@@ -160,7 +160,7 @@ public partial class TextView
             {
                 UpdateWrapModel ();
                 SetNeedsDraw ();
-                Adjust ();
+                AdjustScrollPosition ();
             }
 
             _continuousFind = true;

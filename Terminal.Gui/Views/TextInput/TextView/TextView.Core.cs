@@ -56,6 +56,7 @@ public partial class TextView
         base.HotKeySpecifier = new ('\xffff');
 
         _model.LinesLoaded += Model_LinesLoaded!;
+
         _historyText.ChangeText += HistoryText_ChangeText!;
 
         Initialized += TextView_Initialized!;
@@ -572,20 +573,6 @@ public partial class TextView
 
     #region Initialization and Configuration
 
-    /// <summary>
-    ///     Configures the ScrollBars to work with the modern View scrolling system.
-    /// </summary>
-    private void ConfigureScrollBars ()
-    {
-        // Subscribe to ViewportChanged to sync internal scroll fields
-        ViewportChanged += TextView_ViewportChanged;
-
-        // Vertical ScrollBar: AutoShow enabled by default as per requirements
-        VerticalScrollBar.AutoShow = true;
-
-        // Horizontal ScrollBar: AutoShow tracks WordWrap as per requirements
-        HorizontalScrollBar.AutoShow = !WordWrap;
-    }
 
     private void TextView_Initialized (object sender, EventArgs e)
     {
@@ -599,7 +586,7 @@ public partial class TextView
         KeyBindings.Add (ContextMenu.Key, Command.Context);
 
         // Configure ScrollBars to use modern View scrolling infrastructure
-        ConfigureScrollBars ();
+        ConfigureLayout ();
 
         OnContentsChanged ();
     }
@@ -619,28 +606,6 @@ public partial class TextView
         }
     }
 
-    private void TextView_ViewportChanged (object? sender, DrawEventArgs e)
-    {
-        // Sync internal scroll position fields with Viewport
-        // Only update if values actually changed to prevent infinite loops
-        if (_topRow != Viewport.Y)
-        {
-            _topRow = Viewport.Y;
-        }
-
-        if (_leftColumn != Viewport.X)
-        {
-            _leftColumn = Viewport.X;
-        }
-    }
-
-    private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
-    {
-        WrapTextModel ();
-        UpdateContentSize ();
-        Adjust ();
-    }
-
     private void Model_LinesLoaded (object sender, EventArgs e)
     {
         // This call is not needed. Model_LinesLoaded gets invoked when
@@ -658,4 +623,27 @@ public partial class TextView
     }
 
     #endregion
+
+    /// <summary>
+    ///     INTERNAL: Determines if a redraw is needed based on selection state, word wrap needs, and Used flag.
+    ///     If a redraw is needed, calls <see cref="AdjustScrollPosition"/>; otherwise positions the cursor and updates
+    ///     the unwrapped cursor position.
+    /// </summary>
+    private void DoNeededAction ()
+    {
+        if (!NeedsDraw && (IsSelecting || _wrapNeeded || !Used))
+        {
+            SetNeedsDraw ();
+        }
+
+        if (NeedsDraw)
+        {
+            AdjustScrollPosition ();
+        }
+        else
+        {
+            PositionCursor ();
+            OnUnwrappedCursorPosition ();
+        }
+    }
 }

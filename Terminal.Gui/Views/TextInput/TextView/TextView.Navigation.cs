@@ -111,7 +111,7 @@ public partial class TextView
         }
         else if (CurrentRow > Viewport.Height)
         {
-            Adjust ();
+            AdjustScrollPosition ();
         }
         else
         {
@@ -592,8 +592,28 @@ public partial class TextView
             CurrentColumn = line.Count;
         }
 
-        Adjust ();
+        AdjustScrollPosition ();
     }
 
     #endregion
+
+
+    private void ResetAllTrack ()
+    {
+        // Handle some state here - whether the last command was a kill
+        // operation and the column tracking (up/down)
+        _lastWasKill = false;
+        _columnTrack = -1;
+        _continuousFind = false;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Resets the cursor position and scroll offsets to the beginning of the document (0,0)
+    ///     and stops any active text selection.
+    /// </summary>
+    private void ResetPosition ()
+    {
+        _topRow = _leftColumn = CurrentRow = CurrentColumn = 0;
+        StopSelecting ();
+    }
 }

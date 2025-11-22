@@ -23,7 +23,7 @@ public partial class TextView
                                  value > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value;
             IsSelecting = true;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustScrollPosition ();
         }
     }
 
@@ -39,7 +39,7 @@ public partial class TextView
                                     value > line.Count ? line.Count : value;
             IsSelecting = true;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustScrollPosition ();
         }
     }
 
@@ -395,5 +395,13 @@ public partial class TextView
         long q = ((long)(uint)row << 32) | (uint)col;
 
         return q >= start && q <= end - 1;
+    }
+
+    private void ToggleSelecting ()
+    {
+        ResetColumnTrack ();
+        IsSelecting = !IsSelecting;
+        _selectionStartColumn = CurrentColumn;
+        _selectionStartRow = CurrentRow;
     }
 }

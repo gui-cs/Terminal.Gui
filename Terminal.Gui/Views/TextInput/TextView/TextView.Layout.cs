@@ -1,8 +1,48 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Utility and helper methods for TextView</summary>
+/// <summary>Viewport, scrolling, and content area management methods for TextView</summary>
 public partial class TextView
 {
+
+    /// <summary>
+    ///     Configures the ScrollBars to work with the modern View scrolling system.
+    /// </summary>
+    private void ConfigureLayout ()
+    {
+        // Subscribe to ViewportChanged to sync internal scroll fields
+        ViewportChanged += TextView_ViewportChanged;
+
+        // Vertical ScrollBar: AutoShow enabled by default as per requirements
+        VerticalScrollBar.AutoShow = true;
+
+        // Horizontal ScrollBar: AutoShow tracks WordWrap as per requirements
+        HorizontalScrollBar.AutoShow = !WordWrap;
+    }
+
+    private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
+    {
+        WrapTextModel ();
+        UpdateContentSize ();
+        AdjustScrollPosition ();
+    }
+
+
+    private void TextView_ViewportChanged (object? sender, DrawEventArgs e)
+    {
+        // Sync internal scroll position fields with Viewport
+        // Only update if values actually changed to prevent infinite loops
+        if (_topRow != Viewport.Y)
+        {
+            _topRow = Viewport.Y;
+        }
+
+        if (_leftColumn != Viewport.X)
+        {
+            _leftColumn = Viewport.X;
+        }
+    }
+
+
     /// <summary>
     ///     INTERNAL: Adjusts the scroll position and cursor to ensure the cursor is visible in the viewport.
     ///     This method handles both horizontal and vertical scrolling, word wrap considerations, and syncs
@@ -86,29 +126,6 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     INTERNAL: Determines if a redraw is needed based on selection state, word wrap needs, and Used flag.
-    ///     If a redraw is needed, calls <see cref="AdjustScrollPosition"/>; otherwise positions the cursor and updates
-    ///     the unwrapped cursor position.
-    /// </summary>
-    private void DoNeededAction ()
-    {
-        if (!NeedsDraw && (IsSelecting || _wrapNeeded || !Used))
-        {
-            SetNeedsDraw ();
-        }
-
-        if (NeedsDraw)
-        {
-            AdjustScrollPosition ();
-        }
-        else
-        {
-            PositionCursor ();
-            OnUnwrappedCursorPosition ();
-        }
-    }
-
-    /// <summary>
     ///     INTERNAL: Calculates the viewport clipping caused by the view extending beyond the SuperView's boundaries.
     ///     Returns negative width and height offsets when the viewport extends beyond the SuperView, representing
     ///     how much of the viewport is clipped.
@@ -143,7 +160,7 @@ public partial class TextView
         int contentHeight = Math.Max (_model.Count, 1);
 
         // For horizontal size: if word wrap is enabled, content width equals viewport width
-        // Otherwise, calculate the maximum line width (but only if we have a reasonable viewport)
+        // Otherwise, calculate the maximum line width from the entire text model
         int contentWidth;
 
         if (_wordWrap)
@@ -159,28 +176,5 @@ public partial class TextView
         }
 
         SetContentSize (new Size (contentWidth, contentHeight));
-    }
-
-    /// <summary>
-    ///     INTERNAL: Resets the cursor position and scroll offsets to the beginning of the document (0,0)
-    ///     and stops any active text selection.
-    /// </summary>
-    private void ResetPosition ()
-    {
-        _topRow = _leftColumn = CurrentRow = CurrentColumn = 0;
-        StopSelecting ();
-    }
-
-    /// <summary>
-    ///     INTERNAL: Resets the column tracking state and last kill operation flag.
-    ///     Column tracking is used to maintain the desired cursor column position when moving up/down
-    ///     through lines of different lengths.
-    /// </summary>
-    private void ResetColumnTrack ()
-    {
-        // Handle some state here - whether the last command was a kill
-        // operation and the column tracking (up/down)
-        _lastWasKill = false;
-        _columnTrack = -1;
     }
 }
