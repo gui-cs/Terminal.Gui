@@ -193,7 +193,7 @@ public class Editor : Scenario
 
         Debug.Assert (_textView.IsDirty);
 
-        int r = MessageBox.ErrorQuery (
+        int? r = MessageBox.ErrorQuery (
                                        "Save File",
                                        $"Do you want save changes in {_appWindow.Title}?",
                                        "Yes",

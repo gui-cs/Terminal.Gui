@@ -224,7 +224,7 @@ public class SingleBackgroundWorker : Scenario
 
             bool Close ()
             {
-                int n = MessageBox.Query (
+                int? n = MessageBox.Query (
                                           50,
                                           7,
                                           "Close Window.",

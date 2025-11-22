@@ -18,7 +18,7 @@ public class DefaultFileOperations : IFileOperations
         IFileSystemInfo d = toDelete.Single ();
         string adjective = d.Name;
 
-        int result = MessageBox.Query (
+        int? result = MessageBox.Query (
                                        string.Format (Strings.fdDeleteTitle, adjective),
                                        string.Format (Strings.fdDeleteBody, adjective),
                                        Strings.btnYes,

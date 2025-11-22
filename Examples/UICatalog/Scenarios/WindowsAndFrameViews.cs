@@ -16,7 +16,7 @@ public class WindowsAndFrameViews : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        static int About ()
+        static int? About ()
         {
             return MessageBox.Query (
                                      "About UI Catalog",

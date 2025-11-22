@@ -11,7 +11,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void KeyBindings_Enter_Causes_Focused_Button_Click_No_Accept ()
     {
-        int result = -1;
+        int? result = null;
 
         var iteration = 0;
 
@@ -63,7 +63,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void KeyBindings_Esc_Closes ()
     {
-        var result = 999;
+        int? result = 999;
 
         var iteration = 0;
 
@@ -71,7 +71,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         Application.Run ().Dispose ();
         Application.Iteration -= OnApplicationOnIteration;
 
-        Assert.Equal (-1, result);
+        Assert.Null (result);
 
         return;
 
@@ -104,7 +104,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void KeyBindings_Space_Causes_Focused_Button_Click_No_Accept ()
     {
-        int result = -1;
+        int? result = null;
 
         var iteration = 0;
 
@@ -526,7 +526,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
         Application.Iteration += OnApplicationOnIteration;
-        int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
+        int? res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
         Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, res);

@@ -193,7 +193,7 @@ public class Notepad : Scenario
 
         if (tab.UnsavedChanges)
         {
-            int result = MessageBox.Query (
+            int? result = MessageBox.Query (
                                            "Save Changes",
                                            $"Save changes to {tab.Text.TrimEnd ('*')}",
                                            "Yes",
@@ -201,7 +201,7 @@ public class Notepad : Scenario
                                            "Cancel"
                                           );
 
-            if (result == -1 || result == 2)
+            if (result is null || result == 2)
             {
                 // user cancelled
                 return;

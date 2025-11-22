@@ -86,7 +86,7 @@ public class WizardAsView : Scenario
 
         wizard.Cancelled += (s, args) =>
                             {
-                                int btn = MessageBox.Query ("Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
+                                int? btn = MessageBox.Query ("Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
                                 args.Cancel = btn == 1;
 
                                 if (btn == 0)

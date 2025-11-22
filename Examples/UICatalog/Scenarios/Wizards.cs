@@ -238,7 +238,7 @@ public class Wizards : Scenario
                                                                       {
                                                                           args.Cancel = true;
 
-                                                                          int btn = MessageBox.ErrorQuery (
+                                                                          int? btn = MessageBox.ErrorQuery (
                                                                                "Second Step",
                                                                                "You must enter a First Name to continue",
                                                                                "Ok"

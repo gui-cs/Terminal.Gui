@@ -215,7 +215,7 @@ public class CsvEditor : Scenario
                                       _tableView.Table.Columns
                                      );
 
-            int result = MessageBox.Query (
+            int? result = MessageBox.Query (
                                            "Column Type",
                                            "Pick a data type for the column",
                                            "Date",
@@ -225,7 +225,7 @@ public class CsvEditor : Scenario
                                            "Cancel"
                                           );
 
-            if (result <= -1 || result >= 4)
+            if (result is null || result >= 4)
             {
                 return;
             }

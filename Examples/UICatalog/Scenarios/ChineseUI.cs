@@ -32,7 +32,7 @@ public class ChineseUI : Scenario
 
         btn.Accepting += (s, e) =>
                       {
-                          int result = MessageBox.Query (
+                          int? result = MessageBox.Query (
                                                          "Confirm",
                                                          "Are you sure you want to quit ui?",
                                                          0,
