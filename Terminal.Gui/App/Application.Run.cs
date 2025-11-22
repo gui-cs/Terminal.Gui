@@ -20,7 +20,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         set => ApplicationImpl.Instance.Keyboard.ArrangeKey = value;
     }
 
-    /// <inheritdoc cref="IApplication.Begin"/>
+    /// <inheritdoc cref="IApplication.Begin(IRunnable)"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static SessionToken Begin (Toplevel toplevel) => ApplicationImpl.Instance.Begin (toplevel);
 
@@ -82,7 +82,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("The legacy static Application object is going away.")]
     public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
 
-    /// <inheritdoc cref="IApplication.End"/>
+    /// <inheritdoc cref="IApplication.End(RunnableSessionToken)"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static void End (SessionToken sessionToken) => ApplicationImpl.Instance.End (sessionToken);
 

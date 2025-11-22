@@ -14,7 +14,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public void Init (string? driverName = null)
+    public IApplication Init (string? driverName = null)
     {
         if (Initialized)
         {
@@ -71,11 +71,24 @@ public partial class ApplicationImpl
 
         SynchronizationContext.SetSynchronizationContext (new ());
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
+        return this;
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    public void Shutdown ()
+    public object? Shutdown ()
     {
+        // Extract result from framework-owned runnable before disposal
+        object? result = null;
+        IRunnable? runnableToDispose = FrameworkOwnedRunnable;
+
+        if (runnableToDispose is { })
+        {
+            // Extract the result using reflection to get the Result property value
+            var resultProperty = runnableToDispose.GetType().GetProperty("Result");
+            result = resultProperty?.GetValue(runnableToDispose);
+        }
+
         // Stop the coordinator if running
         Coordinator?.Stop ();
 
@@ -97,6 +110,16 @@ public partial class ApplicationImpl
         }
 #endif
 
+        // Dispose the framework-owned runnable if it exists
+        if (runnableToDispose is { })
+        {
+            if (runnableToDispose is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+            FrameworkOwnedRunnable = null;
+        }
+
         // Clean up all application state (including sync context)
         // ResetState handles the case where Initialized is false
         ResetState ();
@@ -113,6 +136,8 @@ public partial class ApplicationImpl
 
         // Clear the event to prevent memory leaks
         InitializedChanged = null;
+
+        return result;
     }
 
 #if DEBUG
@@ -156,9 +181,9 @@ public partial class ApplicationImpl
         TimedEvents?.StopAll ();
 
         // === 1. Stop all running toplevels ===
-        foreach (Toplevel? t in SessionStack)
+        foreach (Toplevel t in SessionStack)
         {
-            t!.Running = false;
+            t.Running = false;
         }
 
         // === 2. Close and dispose popover ===
@@ -175,6 +200,7 @@ public partial class ApplicationImpl
 
         // === 3. Clean up toplevels ===
         SessionStack.Clear ();
+        RunnableSessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE
 
@@ -222,6 +248,7 @@ public partial class ApplicationImpl
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
+
         //Navigation = null;
 
         // === 8. Reset initialization state ===

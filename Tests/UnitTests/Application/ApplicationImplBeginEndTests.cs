@@ -8,11 +8,9 @@ namespace UnitTests.ApplicationTests;
 ///     These tests ensure the fragile state management logic is robust and catches regressions.
 ///     Tests work directly with ApplicationImpl instances to avoid global Application state issues.
 /// </summary>
-public class ApplicationImplBeginEndTests
+public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ApplicationImplBeginEndTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     private IApplication NewApplicationImpl ()
     {
@@ -28,7 +26,7 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
+            Assert.Throws<ArgumentNullException> (() => app.Begin ((Toplevel)null!));
         }
         finally
         {
@@ -69,8 +67,8 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1" };
-            toplevel2 = new() { Id = "2" };
+            toplevel1 = new () { Id = "1" };
+            toplevel2 = new () { Id = "2" };
 
             app.Begin (toplevel1);
             Assert.Single (app.SessionStack);
@@ -135,7 +133,7 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            Assert.Throws<ArgumentNullException> (() => app.End (null!));
+            Assert.Throws<ArgumentNullException> (() => app.End ((SessionToken)null!));
         }
         finally
         {
@@ -152,8 +150,8 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1" };
-            toplevel2 = new() { Id = "2" };
+            toplevel1 = new () { Id = "1" };
+            toplevel2 = new () { Id = "2" };
 
             SessionToken token1 = app.Begin (toplevel1);
             SessionToken token2 = app.Begin (toplevel2);
@@ -186,8 +184,8 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1" };
-            toplevel2 = new() { Id = "2" };
+            toplevel1 = new () { Id = "1" };
+            toplevel2 = new () { Id = "2" };
 
             SessionToken token1 = app.Begin (toplevel1);
             SessionToken token2 = app.Begin (toplevel2);
@@ -220,9 +218,9 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1" };
-            toplevel2 = new() { Id = "2" };
-            toplevel3 = new() { Id = "3" };
+            toplevel1 = new () { Id = "1" };
+            toplevel2 = new () { Id = "2" };
+            toplevel3 = new () { Id = "3" };
 
             SessionToken token1 = app.Begin (toplevel1);
             SessionToken token2 = app.Begin (toplevel2);
@@ -351,8 +349,8 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1" };
-            toplevel2 = new() { Id = "2" };
+            toplevel1 = new () { Id = "1" };
+            toplevel2 = new () { Id = "2" };
 
             app.Begin (toplevel1);
             app.Begin (toplevel2);
@@ -385,8 +383,8 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1", Running = true };
-            toplevel2 = new() { Id = "2", Running = true };
+            toplevel1 = new () { Id = "1", Running = true };
+            toplevel2 = new () { Id = "2", Running = true };
 
             app.Begin (toplevel1);
             app.Begin (toplevel2);
@@ -418,8 +416,8 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel1 = new() { Id = "1" };
-            toplevel2 = new() { Id = "2" };
+            toplevel1 = new () { Id = "1" };
+            toplevel2 = new () { Id = "2" };
 
             var toplevel1Deactivated = false;
             var toplevel2Activated = false;
@@ -450,7 +448,7 @@ public class ApplicationImplBeginEndTests
 
         try
         {
-            toplevel = new() { Id = "test-id" };
+            toplevel = new () { Id = "test-id" };
 
             app.Begin (toplevel);
             Assert.Single (app.SessionStack);
