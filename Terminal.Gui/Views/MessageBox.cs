@@ -357,15 +357,28 @@ public static class MessageBox
 
             foreach (string s in buttons)
             {
+                int buttonIndex = count; // Capture index for closure
                 var b = new Button
                 {
                     Text = s,
-                    IsDefault = count == defaultButton
+                    IsDefault = count == defaultButton,
+                    Data = buttonIndex
                 };
 
-                // Button handlers just need to call RequestStop - Dialog will extract the result automatically
+                // Set up Accepting handler to store result in Dialog before RequestStop
                 b.Accepting += (_, e) =>
                                {
+                                   // Store the button index in the dialog before stopping
+                                   // This ensures Dialog.Result is set correctly
+                                   if (e?.Context?.Source is Button button && button.Data is int index)
+                                   {
+                                       if (button.SuperView is Dialog dialog)
+                                       {
+                                           dialog.Result = index;
+                                           dialog.Canceled = false;
+                                       }
+                                   }
+
                                    if (e is { })
                                    {
                                        e.Handled = true;
