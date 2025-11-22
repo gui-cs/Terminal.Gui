@@ -7,9 +7,17 @@ namespace Terminal.Gui.Views;
 ///     navigate forward and backward through the Wizard.
 /// </summary>
 /// <remarks>
-///     The Wizard can be displayed either as a modal (pop-up) <see cref="Window"/> (like <see cref="Dialog"/>) or as
-///     an embedded <see cref="View"/>. By default, <see cref="Wizard.Modal"/> is <c>true</c>. In this case launch the
-///     Wizard with <c>Application.Run(wizard)</c>. See <see cref="Wizard.Modal"/> for more details.
+///     <para>
+///         The Wizard can be displayed either as a modal (pop-up) <see cref="Window"/> (like <see cref="Dialog"/>) or as
+///         an embedded <see cref="View"/>. By default, <see cref="Wizard.Modal"/> is <c>true</c>. In this case launch the
+///         Wizard with <c>Application.Run(wizard)</c>. See <see cref="Wizard.Modal"/> for more details.
+///     </para>
+///     <para>
+///         <b>Phase 2:</b> Since <see cref="Wizard"/> inherits from <see cref="Dialog"/>, which implements
+///         <see cref="IRunnable{TResult}"/> with <c>int?</c> result type, the wizard automatically provides result
+///         tracking through <see cref="Dialog.Result"/>. Use the <see cref="WasFinished"/> property to check if the
+///         wizard was completed or canceled.
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
@@ -99,6 +107,23 @@ public class Wizard : Dialog
     /// </summary>
     /// <remarks>Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.</remarks>
     public Button BackButton { get; }
+
+    /// <summary>
+    ///     Gets whether the wizard was completed (the Finish button was pressed and <see cref="Finished"/> event fired).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience property that checks if <see cref="Dialog.Result"/> indicates the wizard was
+    ///         finished rather than canceled. Since <see cref="Wizard"/> inherits from <see cref="Dialog"/> which
+    ///         implements <see cref="IRunnable{TResult}"/> with <c>int?</c> result type, the <see cref="Dialog.Result"/>
+    ///         property contains the button index. The Finish button is added as the last button.
+    ///     </para>
+    ///     <para>
+    ///         Returns <see langword="true"/> if <see cref="Dialog.Result"/> is not <see langword="null"/> and equals
+    ///         the index of the Next/Finish button, <see langword="false"/> otherwise (canceled or Back button pressed).
+    ///     </para>
+    /// </remarks>
+    public bool WasFinished => Result is { } && _finishedPressed;
 
     /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
     public WizardStep? CurrentStep
