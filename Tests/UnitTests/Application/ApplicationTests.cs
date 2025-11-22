@@ -49,8 +49,11 @@ public class ApplicationTests
         Thread.Sleep ((int)timeoutTime * 2);
         Assert.False (timeoutFired);
 
+        // Phase 2: Ambiguous method call after Toplevel implements IRunnable - use non-generic Run()
         app.StopAfterFirstIteration = true;
-        app.Run<Toplevel> ().Dispose ();
+        Toplevel top = new ();
+        app.Run (top);
+        top.Dispose ();
 
         // The timeout should have fired
         Assert.True (timeoutFired);
