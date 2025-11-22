@@ -18,7 +18,15 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     ///     <see cref="IApplication"/> instance for all subsequent application operations.
     /// </remarks>
     /// <returns>A new <see cref="IApplication"/> instance.</returns>
-    public static IApplication Create () { return new ApplicationImpl (); }
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if the legacy static Application model has already been used in this process.
+    /// </exception>
+    public static IApplication Create ()
+    {
+        ApplicationImpl.MarkInstanceBasedModelUsed ();
+
+        return new ApplicationImpl ();
+    }
 
     /// <inheritdoc cref="IApplication.Init"/>
     [RequiresUnreferencedCode ("AOT")]
@@ -65,5 +73,12 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
     [Obsolete ("The legacy static Application object is going away.")]
-    internal static void ResetState (bool ignoreDisposed = false) => ApplicationImpl.Instance?.ResetState (ignoreDisposed);
+    internal static void ResetState (bool ignoreDisposed = false)
+    {
+        // Reset the model usage tracking first to allow access to Instance if needed
+        ApplicationImpl.ResetModelUsageTracking ();
+
+        // Now safe to access Instance for cleanup
+        ApplicationImpl.Instance?.ResetState (ignoreDisposed);
+    }
 }

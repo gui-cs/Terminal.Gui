@@ -22,6 +22,11 @@ public partial class ApplicationImpl : IApplication
     #region Singleton
 
     /// <summary>
+    ///     Tracks which application model has been used in this process.
+    /// </summary>
+    private static ApplicationModelUsage _modelUsage = ApplicationModelUsage.None;
+
+    /// <summary>
     ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
     /// <param name="app"></param>
@@ -33,9 +38,71 @@ public partial class ApplicationImpl : IApplication
     /// <summary>
     ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
     /// </summary>
-    public static IApplication Instance => _instance ??= new ApplicationImpl ();
+    public static IApplication Instance
+    {
+        get
+        {
+            // If an instance already exists, return it without fence checking
+            // This allows for cleanup/reset operations
+            if (_instance is { })
+            {
+                return _instance;
+            }
+
+            // Only check the fence when creating a new instance
+            if (_modelUsage == ApplicationModelUsage.InstanceBased)
+            {
+                throw new InvalidOperationException (
+                    "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
+                    "Use only one model per process.");
+            }
+
+            _modelUsage = ApplicationModelUsage.LegacyStatic;
+
+            return _instance = new ApplicationImpl ();
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Marks that the instance-based model has been used. Called by Application.Create().
+    /// </summary>
+    internal static void MarkInstanceBasedModelUsed ()
+    {
+        if (_modelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            throw new InvalidOperationException (
+                "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
+                "Use only one model per process.");
+        }
+
+        _modelUsage = ApplicationModelUsage.InstanceBased;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Resets the model usage tracking. Only for testing purposes.
+    /// </summary>
+    internal static void ResetModelUsageTracking ()
+    {
+        _modelUsage = ApplicationModelUsage.None;
+        _instance = null;
+    }
 
     #endregion Singleton
+
+    /// <summary>
+    ///     Defines the different application usage models.
+    /// </summary>
+    private enum ApplicationModelUsage
+    {
+        /// <summary>No model has been used yet.</summary>
+        None,
+
+        /// <summary>Legacy static model (Application.Init/ApplicationImpl.Instance).</summary>
+        LegacyStatic,
+
+        /// <summary>Modern instance-based model (Application.Create).</summary>
+        InstanceBased
+    }
 
     private string? _driverName;
 

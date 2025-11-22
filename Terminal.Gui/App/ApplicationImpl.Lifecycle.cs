@@ -273,6 +273,10 @@ public partial class ApplicationImpl
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
+
+        // === 12. Reset application model usage tracking ===
+        // Reset the model usage tracking to allow the process to use either model after shutdown
+        ResetModelUsageTracking ();
     }
 
     /// <summary>
