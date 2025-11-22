@@ -9,9 +9,6 @@ public partial class TextView
     /// </summary>
     private void ConfigureLayout ()
     {
-        // Subscribe to ViewportChanged to sync internal scroll fields
-        ViewportChanged += TextView_ViewportChanged;
-
         // Vertical ScrollBar: AutoShow enabled by default as per requirements
         VerticalScrollBar.AutoShow = true;
 
@@ -21,27 +18,12 @@ public partial class TextView
 
     private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
     {
+        _topRow = Viewport.Y;
+        _leftColumn = Viewport.X;
         WrapTextModel ();
         UpdateContentSize ();
         AdjustScrollPosition ();
     }
-
-
-    private void TextView_ViewportChanged (object? sender, DrawEventArgs e)
-    {
-        // Sync internal scroll position fields with Viewport
-        // Only update if values actually changed to prevent infinite loops
-        if (_topRow != Viewport.Y)
-        {
-            _topRow = Viewport.Y;
-        }
-
-        if (_leftColumn != Viewport.X)
-        {
-            _leftColumn = Viewport.X;
-        }
-    }
-
 
     /// <summary>
     ///     INTERNAL: Adjusts the scroll position and cursor to ensure the cursor is visible in the viewport.
