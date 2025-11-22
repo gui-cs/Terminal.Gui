@@ -8,9 +8,9 @@ public partial class TextView
     ///     This method handles both horizontal and vertical scrolling, word wrap considerations, and syncs
     ///     the internal scroll fields with the Viewport property.
     /// </summary>
-    private void Adjust ()
+    private void AdjustScrollPosition ()
     {
-        (int width, int height) offB = OffSetBackground ();
+        (int width, int height) offB = GetViewportClipping ();
         List<Cell> line = GetCurrentLine ();
         bool need = NeedsDraw || _wrapNeeded || !Used;
         (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
@@ -87,7 +87,7 @@ public partial class TextView
 
     /// <summary>
     ///     INTERNAL: Determines if a redraw is needed based on selection state, word wrap needs, and Used flag.
-    ///     If a redraw is needed, calls <see cref="Adjust"/>; otherwise positions the cursor and updates
+    ///     If a redraw is needed, calls <see cref="AdjustScrollPosition"/>; otherwise positions the cursor and updates
     ///     the unwrapped cursor position.
     /// </summary>
     private void DoNeededAction ()
@@ -99,7 +99,7 @@ public partial class TextView
 
         if (NeedsDraw)
         {
-            Adjust ();
+            AdjustScrollPosition ();
         }
         else
         {
@@ -109,12 +109,12 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     INTERNAL: Calculates the offset from the viewport edges caused by the background extending
-    ///     beyond the SuperView's boundaries. Returns negative width and height offsets if the viewport
-    ///     extends beyond the SuperView.
+    ///     INTERNAL: Calculates the viewport clipping caused by the view extending beyond the SuperView's boundaries.
+    ///     Returns negative width and height offsets when the viewport extends beyond the SuperView, representing
+    ///     how much of the viewport is clipped.
     /// </summary>
-    /// <returns>A tuple containing the width and height offsets.</returns>
-    private (int width, int height) OffSetBackground ()
+    /// <returns>A tuple containing the width and height clipping offsets (negative when clipped).</returns>
+    private (int width, int height) GetViewportClipping ()
     {
         var w = 0;
         var h = 0;

@@ -95,7 +95,7 @@ public partial class TextView
 
         SetAttributeForRole (Enabled ? VisualRole.Editable : VisualRole.Disabled);
 
-        (int width, int height) offB = OffSetBackground ();
+        (int width, int height) offB = GetViewportClipping ();
         int right = Viewport.Width + offB.width;
         int bottom = Viewport.Height + offB.height;
         var row = 0;
