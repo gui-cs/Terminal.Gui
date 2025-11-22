@@ -75,10 +75,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     [Obsolete ("The legacy static Application object is going away.")]
     internal static void ResetState (bool ignoreDisposed = false)
     {
-        // Reset the model usage tracking first to allow access to Instance if needed
-        ApplicationImpl.ResetModelUsageTracking ();
-
-        // Now safe to access Instance for cleanup
-        ApplicationImpl.Instance?.ResetState (ignoreDisposed);
+        // Use the static reset method to bypass the fence check
+        ApplicationImpl.ResetStateStatic (ignoreDisposed);
     }
 }

@@ -49,7 +49,7 @@ public partial class ApplicationImpl : IApplication
                 return _instance;
             }
 
-            // Only check the fence when creating a new instance
+            // Check if the instance-based model has already been used
             if (_modelUsage == ApplicationModelUsage.InstanceBased)
             {
                 throw new InvalidOperationException (
@@ -57,6 +57,7 @@ public partial class ApplicationImpl : IApplication
                     "Use only one model per process.");
             }
 
+            // Mark the usage and create the instance
             _modelUsage = ApplicationModelUsage.LegacyStatic;
 
             return _instance = new ApplicationImpl ();
@@ -68,7 +69,8 @@ public partial class ApplicationImpl : IApplication
     /// </summary>
     internal static void MarkInstanceBasedModelUsed ()
     {
-        if (_modelUsage == ApplicationModelUsage.LegacyStatic)
+        // Check if the legacy static model has already been initialized
+        if (_modelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
         {
             throw new InvalidOperationException (
                 "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
@@ -85,6 +87,19 @@ public partial class ApplicationImpl : IApplication
     {
         _modelUsage = ApplicationModelUsage.None;
         _instance = null;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Resets state without going through the fence-checked Instance property.
+    ///     Used by Application.ResetState() to allow cleanup regardless of which model was used.
+    /// </summary>
+    internal static void ResetStateStatic (bool ignoreDisposed = false)
+    {
+        // If an instance exists, reset it
+        _instance?.ResetState (ignoreDisposed);
+
+        // Always reset the model tracking to allow tests to use either model after reset
+        ResetModelUsageTracking ();
     }
 
     #endregion Singleton

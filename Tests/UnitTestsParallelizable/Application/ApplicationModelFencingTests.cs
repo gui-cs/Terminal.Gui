@@ -18,11 +18,12 @@ public class ApplicationModelFencingTests
     {
         // Create a modern instance-based application
         IApplication app = Application.Create ();
+        app.Init ("fake");
 
-        // Attempting to access the legacy static instance should throw
+        // Attempting to initialize using the legacy static model should throw
         InvalidOperationException ex = Assert.Throws<InvalidOperationException> (() =>
         {
-            IApplication _ = ApplicationImpl.Instance;
+            ApplicationImpl.Instance.Init ("fake");
         });
 
         Assert.Contains ("Cannot use legacy static Application model", ex.Message);
@@ -35,13 +36,15 @@ public class ApplicationModelFencingTests
     [Fact]
     public void InstanceAccess_ThenCreate_ThrowsInvalidOperationException ()
     {
-        // Access the legacy static instance
+        // Initialize using the legacy static model
         IApplication staticInstance = ApplicationImpl.Instance;
+        staticInstance.Init ("fake");
 
-        // Attempting to create a modern instance-based application should throw
+        // Attempting to create and initialize with modern instance-based model should throw
         InvalidOperationException ex = Assert.Throws<InvalidOperationException> (() =>
         {
-            IApplication _ = Application.Create ();
+            IApplication app = Application.Create ();
+            app.Init ("fake");
         });
 
         Assert.Contains ("Cannot use modern instance-based model", ex.Message);
@@ -78,11 +81,10 @@ public class ApplicationModelFencingTests
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        // Attempting to access the legacy static instance should throw
-        // (Init calls ApplicationImpl.Instance internally)
+        // Attempting to initialize using the legacy static model should throw
         InvalidOperationException ex = Assert.Throws<InvalidOperationException> (() =>
         {
-            IApplication _ = ApplicationImpl.Instance;
+            ApplicationImpl.Instance.Init ("fake");
         });
 
         Assert.Contains ("Cannot use legacy static Application model", ex.Message);

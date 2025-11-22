@@ -23,6 +23,23 @@ public partial class ApplicationImpl
             throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
 
+        // Check the fence: ensure we're not mixing application models
+        // If this is a legacy static instance and instance-based model was used, throw
+        if (this == _instance && _modelUsage == ApplicationModelUsage.InstanceBased)
+        {
+            throw new InvalidOperationException (
+                "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
+                "Use only one model per process.");
+        }
+
+        // If this is an instance-based instance and legacy static model was used, throw
+        if (this != _instance && _modelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            throw new InvalidOperationException (
+                "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
+                "Use only one model per process.");
+        }
+
         if (!string.IsNullOrWhiteSpace (driverName))
         {
             _driverName = driverName;
@@ -273,10 +290,6 @@ public partial class ApplicationImpl
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
-
-        // === 12. Reset application model usage tracking ===
-        // Reset the model usage tracking to allow the process to use either model after shutdown
-        ResetModelUsageTracking ();
     }
 
     /// <summary>
