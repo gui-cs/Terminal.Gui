@@ -17,8 +17,15 @@ namespace Terminal.Gui.Views;
 ///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
+///     <para>
+///         <b>Phase 2:</b> <see cref="Toplevel"/> now implements <see cref="IRunnable"/> as an adapter pattern for
+///         backward compatibility. The lifecycle events (<see cref="Activate"/>, <see cref="Deactivate"/>, 
+///         <see cref="Closing"/>, <see cref="Closed"/>) are bridged to the new IRunnable events 
+///         (<see cref="IRunnable.IsModalChanging"/>, <see cref="IRunnable.IsModalChanged"/>, 
+///         <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>).
+///     </para>
 /// </remarks>
-public partial class Toplevel : View
+public partial class Toplevel : View, IRunnable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Toplevel"/> class,
@@ -195,6 +202,118 @@ public partial class Toplevel : View
         }
 
         Unloaded?.Invoke (this, EventArgs.Empty);
+    }
+
+    #endregion
+
+    #region IRunnable Implementation - Adapter Pattern for Backward Compatibility
+
+    /// <inheritdoc/>
+    bool IRunnable.IsRunning => App?.RunnableSessionStack?.Any (token => token.Runnable == this) ?? false;
+
+    /// <inheritdoc/>
+    bool IRunnable.RaiseIsRunningChanging (bool oldIsRunning, bool newIsRunning)
+    {
+        // Bridge to legacy Closing event when stopping
+        if (!newIsRunning && oldIsRunning)
+        {
+            ToplevelClosingEventArgs args = new (this);
+            
+            if (OnClosing (args))
+            {
+                return true; // Canceled
+            }
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    event EventHandler<CancelEventArgs<bool>>? IRunnable.IsRunningChanging
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc/>
+    void IRunnable.RaiseIsRunningChangedEvent (bool newIsRunning)
+    {
+        // Update Running property to maintain backward compatibility
+        Running = newIsRunning;
+
+        // Bridge to legacy events
+        if (newIsRunning)
+        {
+            OnLoaded ();
+        }
+        else
+        {
+            OnClosed (this);
+            OnUnloaded ();
+        }
+    }
+
+    /// <inheritdoc/>
+    event EventHandler<EventArgs<bool>>? IRunnable.IsRunningChanged
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc/>
+    bool IRunnable.IsModal
+    {
+        get
+        {
+            if (App is null)
+            {
+                return false;
+            }
+
+            // Check if this toplevel is at the top of the RunnableSessionStack
+            if (App.RunnableSessionStack is { } && App.RunnableSessionStack.TryPeek (out RunnableSessionToken? topToken))
+            {
+                return topToken?.Runnable == this;
+            }
+
+            // Fallback: Check if this is the TopRunnable
+            return App.TopRunnable == this;
+        }
+    }
+
+    /// <inheritdoc/>
+    bool IRunnable.RaiseIsModalChanging (bool oldIsModal, bool newIsModal)
+    {
+        // No cancellation for modal changes in legacy Toplevel
+        return false;
+    }
+
+    /// <inheritdoc/>
+    event EventHandler<CancelEventArgs<bool>>? IRunnable.IsModalChanging
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc/>
+    void IRunnable.RaiseIsModalChangedEvent (bool newIsModal)
+    {
+        // Bridge to legacy Activate/Deactivate events
+        if (newIsModal)
+        {
+            OnActivate (App?.TopRunnable as Toplevel ?? this);
+        }
+        else
+        {
+            OnDeactivate (App?.TopRunnable as Toplevel ?? this);
+        }
+    }
+
+    /// <inheritdoc/>
+    event EventHandler<EventArgs<bool>>? IRunnable.IsModalChanged
+    {
+        add { }
+        remove { }
     }
 
     #endregion
