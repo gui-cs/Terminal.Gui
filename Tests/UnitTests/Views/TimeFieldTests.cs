@@ -43,25 +43,34 @@ public class TimeFieldTests
     }
 
     [Fact]
-    [SetupFakeApplication]
     public void Copy_Paste ()
     {
-        var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
-        var tf2 = new TimeField { Time = TimeSpan.Parse ("12:59:01") };
+        IApplication app = Application.Create();
+        app.Init("fake");
 
-        // Select all text
-        Assert.True (tf2.NewKeyDownEvent (Key.End.WithShift));
-        Assert.Equal (1, tf2.SelectedStart);
-        Assert.Equal (8, tf2.SelectedLength);
-        Assert.Equal (9, tf2.CursorPosition);
+        try
+        {
+            var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19"), App = app };
+            var tf2 = new TimeField { Time = TimeSpan.Parse ("12:59:01"), App = app };
 
-        // Copy from tf2
-        Assert.True (tf2.NewKeyDownEvent (Key.C.WithCtrl));
+            // Select all text
+            Assert.True (tf2.NewKeyDownEvent (Key.End.WithShift));
+            Assert.Equal (1, tf2.SelectedStart);
+            Assert.Equal (8, tf2.SelectedLength);
+            Assert.Equal (9, tf2.CursorPosition);
 
-        // Paste into tf1
-        Assert.True (tf1.NewKeyDownEvent (Key.V.WithCtrl));
-        Assert.Equal (" 12:59:01", tf1.Text);
-        Assert.Equal (9, tf1.CursorPosition);
+            // Copy from tf2
+            Assert.True (tf2.NewKeyDownEvent (Key.C.WithCtrl));
+
+            // Paste into tf1
+            Assert.True (tf1.NewKeyDownEvent (Key.V.WithCtrl));
+            Assert.Equal (" 12:59:01", tf1.Text);
+            Assert.Equal (9, tf1.CursorPosition);
+        }
+        finally
+        {
+            app.Shutdown();
+        }
     }
 
     [Fact]

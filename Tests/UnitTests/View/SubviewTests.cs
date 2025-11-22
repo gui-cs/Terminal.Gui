@@ -83,7 +83,7 @@ public class SubViewTests
 
     //    return;
 
-    //    void OnApplicationOnIteration (object s, IterationEventArgs a)
+    //    void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
     //    {
     //        var sv1 = new View { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
 

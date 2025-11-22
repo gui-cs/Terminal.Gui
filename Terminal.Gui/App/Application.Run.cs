@@ -88,7 +88,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.Iteration"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static event EventHandler<IterationEventArgs>? Iteration
+    public static event EventHandler<EventArgs<IApplication?>>? Iteration
     {
         add => ApplicationImpl.Instance.Iteration += value;
         remove => ApplicationImpl.Instance.Iteration -= value;

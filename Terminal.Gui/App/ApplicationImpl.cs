@@ -75,6 +75,13 @@ public partial class ApplicationImpl : IApplication
 
     #endregion Input
 
+    #region Clipboard
+
+    /// <inheritdoc/>
+    public IClipboard? Clipboard => Driver?.Clipboard;
+
+    #endregion Clipboard
+
     #region View Management
 
     private ApplicationPopover? _popover;

@@ -71,7 +71,7 @@ public class TextViewTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -1050,7 +1050,7 @@ This is the second line.
     public void HistoryText_Undo_Redo_Copy_Without_Selection_Multi_Line_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView { App = ApplicationImpl.Instance, Text = text };
 
         tv.CursorPosition = new (23, 0);
 
@@ -1100,7 +1100,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Cut_Multi_Line_Another_Selected_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new (17, 0);
@@ -1172,7 +1176,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Cut_Multi_Line_Selected_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new (17, 0);
@@ -1217,7 +1225,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Cut_Simple_Paste_Starting ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new (18, 1);
@@ -1261,7 +1273,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Empty_Copy_Without_Selection_Multi_Line_Selected_Paste ()
     {
         var text = "\nThis is the first line.\nThis is the second line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
@@ -1308,7 +1324,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_KillToEndOfLine ()
     {
         var text = "First line.\nSecond line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         Assert.True (tv.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
@@ -1369,7 +1389,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_KillToLeftStart ()
     {
         var text = "First line.\nSecond line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
@@ -1910,7 +1934,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Multi_Line_Selected_Copy_Simple_Paste_Starting_On_Letter ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new (18, 1);
@@ -1963,7 +1991,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Multi_Line_Selected_Copy_Simple_Paste_Starting_On_Space ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new (18, 1);
@@ -2951,7 +2983,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Setting_Clipboard_Multi_Line_Selected_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         Clipboard.Contents = "Inserted\nNewLine";
 
@@ -2991,7 +3027,11 @@ This is the second line.
     public void HistoryText_Undo_Redo_Simple_Copy_Multi_Line_Selected_Paste ()
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
-        var tv = new TextView { Text = text };
+        var tv = new TextView
+        {
+            App = ApplicationImpl.Instance,
+            Text = text
+        };
 
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new (17, 0);
@@ -4916,7 +4956,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -4964,7 +5004,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5012,7 +5052,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5069,7 +5109,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5128,7 +5168,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -6796,7 +6836,12 @@ Line 2.",
     {
         //          0123456789
         var text = "This is the first line.\nThis is the second line.\n";
-        var tv = new TextView { Width = 11, Height = 9 };
+        var tv = new TextView
+        {
+            Width = 11,
+            Height = 9,
+            App = ApplicationImpl.Instance
+        };
         tv.Text = text;
 
         Assert.Equal (
@@ -7002,7 +7047,11 @@ line.
             //         01234567890123456789012345678901=32 (Length)
             byte [] buff = Encoding.Unicode.GetBytes (Txt);
             byte [] ms = new MemoryStream (buff).ToArray ();
-            _textView = new () { Width = 30, Height = 10, SchemeName = "Base" };
+            _textView = new ()
+            {
+                App = ApplicationImpl.Instance,
+                Width = 30, Height = 10, SchemeName = "Base"
+            };
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }

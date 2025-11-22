@@ -156,11 +156,11 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void RaiseIteration ()
     {
-        Iteration?.Invoke (null, new ());
+        Iteration?.Invoke (null, new (this));
     }
 
     /// <inheritdoc/>
-    public event EventHandler<IterationEventArgs>? Iteration;
+    public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]

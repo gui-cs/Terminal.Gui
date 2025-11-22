@@ -59,7 +59,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
-        button.Accepting += (sender, args) => MessageBox.Query ("hi", button.Title, "_Ok");
+        button.Accepting += (sender, args) => MessageBox.Query (ApplicationImpl.Instance, "hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -210,7 +210,7 @@ public class Navigation : Scenario
 
         return;
 
-        void OnApplicationIteration (object sender, IterationEventArgs args)
+        void OnApplicationIteration (object sender, EventArgs<IApplication?> args)
         {
             if (progressBar.Fraction == 1.0)
             {

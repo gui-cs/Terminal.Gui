@@ -69,7 +69,7 @@ public class PosViewTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             while (count > 0)
             {

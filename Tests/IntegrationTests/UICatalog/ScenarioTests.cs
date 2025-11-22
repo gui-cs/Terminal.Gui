@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Terminal.Gui.App;
 using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;
@@ -152,7 +153,7 @@ public class ScenarioTests : TestsAllViews
             }
         }
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterationCount++;
 
@@ -394,7 +395,7 @@ public class ScenarioTests : TestsAllViews
 
         return;
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterations++;
 
@@ -411,7 +412,7 @@ public class ScenarioTests : TestsAllViews
             }
             else
             {
-                Application.RequestStop ();
+                a.Value?.RequestStop ();
             }
         }
 
@@ -498,7 +499,7 @@ public class ScenarioTests : TestsAllViews
             }
             catch (Exception e)
             {
-                MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+                MessageBox.ErrorQuery (ApplicationImpl.Instance, "Exception", e.Message, "Ok");
             }
 
             UpdateTitle (view);
@@ -602,7 +603,7 @@ public class ScenarioTests : TestsAllViews
                 }
                 catch (TargetInvocationException e)
                 {
-                    MessageBox.ErrorQuery ("Exception", e.InnerException!.Message, "Ok");
+                    MessageBox.ErrorQuery (ApplicationImpl.Instance, "Exception", e.InnerException!.Message, "Ok");
                     view = null;
                 }
             }

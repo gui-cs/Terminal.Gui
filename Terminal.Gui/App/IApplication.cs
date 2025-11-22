@@ -218,7 +218,7 @@ public interface IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TView : Toplevel, new ();
+        where TView : Toplevel, new();
 
     /// <summary>
     ///     Runs a new Session using the provided <see cref="Toplevel"/> view and calling
@@ -273,9 +273,11 @@ public interface IApplication
     ///     <para>
     ///         This event is raised before input processing, timeout callbacks, and rendering occur each iteration.
     ///     </para>
-    ///     <para>See also <see cref="AddTimeout"/> and <see cref="TimedEvents"/>.</para>
+    ///     <para>The event args contain the current application instance.</para>
     /// </remarks>
-    public event EventHandler<IterationEventArgs>? Iteration;
+    /// <seealso cref="AddTimeout"/>
+    /// <seealso cref="TimedEvents"/>.
+    public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
     /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
     /// <param name="action">The action to be invoked on the main processing thread.</param>
@@ -523,7 +525,7 @@ public interface IApplication
     ///         Supports fluent API: <c>var result = Application.Create().Init().Run&lt;MyView&gt;().Shutdown() as MyResultType</c>
     ///     </para>
     /// </remarks>
-    IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ();
+    IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new();
 
     /// <summary>
     ///     Requests that the specified runnable session stop.
@@ -573,6 +575,17 @@ public interface IApplication
     ///     </para>
     /// </remarks>
     IDriver? Driver { get; set; }
+
+    /// <summary>
+    ///     Gets the clipboard for this application instance.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Provides access to the OS clipboard through the driver. Returns <see langword="null"/> if
+    ///         <see cref="Driver"/> is not initialized.
+    ///     </para>
+    /// </remarks>
+    IClipboard? Clipboard { get; }
 
     /// <summary>
     ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in

@@ -79,7 +79,7 @@ public class DynamicStatusBar : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery ("Binding Error", $"Binding failed: {ex}.", "Ok");
+                MessageBox.ErrorQuery (ApplicationImpl.Instance, "Binding Error", $"Binding failed: {ex}.", "Ok");
             }
         }
     }
@@ -140,7 +140,7 @@ public class DynamicStatusBar : Scenario
         public TextView TextAction { get; }
         public TextField TextShortcut { get; }
         public TextField TextTitle { get; }
-        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (item.Title, item.Action, "Ok"); }
+        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (ApplicationImpl.Instance, item.Title, item.Action, "Ok"); }
 
         public void EditStatusItem (Shortcut statusItem)
         {
@@ -184,7 +184,7 @@ public class DynamicStatusBar : Scenario
                               {
                                   if (string.IsNullOrEmpty (TextTitle.Text))
                                   {
-                                      MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
+                                      MessageBox.ErrorQuery (App, "Invalid title", "Must enter a valid title!.", "Ok");
                                   }
                                   else
                                   {
@@ -382,7 +382,7 @@ public class DynamicStatusBar : Scenario
                               {
                                   if (string.IsNullOrEmpty (frmStatusBarDetails.TextTitle.Text) && _currentEditStatusItem != null)
                                   {
-                                      MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
+                                      MessageBox.ErrorQuery (App, "Invalid title", "Must enter a valid title!.", "Ok");
                                   }
                                   else if (_currentEditStatusItem != null)
                                   {

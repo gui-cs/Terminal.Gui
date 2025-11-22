@@ -21,6 +21,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "_Restart Configuration...",
                                            Action = () => MessageBox.Query (
+                                                                            ApplicationImpl.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to reset the Wizard and start over?",
                                                                             "Ok",
@@ -31,6 +32,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "Re_boot Server...",
                                            Action = () => MessageBox.Query (
+                                                                            ApplicationImpl.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to reboot the server start over?",
                                                                             "Ok",
@@ -41,6 +43,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "_Shutdown Server...",
                                            Action = () => MessageBox.Query (
+                                                                            ApplicationImpl.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to cancel setup and shutdown?",
                                                                             "Ok",
@@ -80,13 +83,13 @@ public class WizardAsView : Scenario
         wizard.Finished += (s, args) =>
                            {
                                //args.Cancel = true;
-                               MessageBox.Query ("Setup Wizard", "Finished", "Ok");
+                               MessageBox.Query ((s as View)?.App, "Setup Wizard", "Finished", "Ok");
                                Application.RequestStop ();
                            };
 
         wizard.Cancelled += (s, args) =>
                             {
-                                int? btn = MessageBox.Query ("Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
+                                int? btn = MessageBox.Query ((s as View)?.App, "Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
                                 args.Cancel = btn == 1;
 
                                 if (btn == 0)
@@ -123,7 +126,7 @@ public class WizardAsView : Scenario
                             {
                                 secondStep.Title = "2nd Step";
 
-                                MessageBox.Query (
+                                MessageBox.Query ((s as View)?.App,
                                                   "Wizard Scenario",
                                                   "This Wizard Step's title was changed to '2nd Step'",
                                                   "Ok"

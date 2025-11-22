@@ -1,29 +1,22 @@
-#nullable disable
-﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     MessageBox displays a modal message to the user, with a title, a message and a series of options that the user
-///     can choose from.
+///     Displays a modal message box with a title, message, and buttons. Supports both standard and error color schemes.
 /// </summary>
-/// <para>
-///     The difference between the <see cref="Query(string, string, string[])"/> and
-///     <see cref="ErrorQuery(string, string, string[])"/> method is the default set of colors used for the message box.
-/// </para>
-/// <para>
-///     The following example pops up a <see cref="MessageBox"/> with the specified title and text, plus two
-///     <see cref="Button"/>s. The value <see langword="null"/> is returned when the user cancels the <see cref="MessageBox"/> by pressing the
-///     ESC key.
-/// </para>
-/// <example>
-///     <code lang="c#">
-/// int? n = MessageBox.Query ("Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
-/// if (n == 0)
-///    quit = true;
-/// else
-///    quit = false;
-/// </code>
-/// </example>
+/// <remarks>
+///     <para>
+///         <see cref="Query(IApplication?, string, string, string[])"/> uses the default Dialog color scheme.
+///         <see cref="ErrorQuery(IApplication?, string, string, string[])"/> uses the Error color scheme.
+///     </para>
+///     <para>
+///         Example:
+///         <code>
+///     int? result = MessageBox.Query(app, "Quit Demo", "Are you sure you want to quit?", "Yes", "No");
+///     if (result == 0)
+///         quit = true;
+///     </code>
+///     </para>
+/// </remarks>
 public static class MessageBox
 {
     /// <summary>
@@ -51,248 +44,172 @@ public static class MessageBox
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 0;
+
     /// <summary>
-    ///     The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox. This is useful for web
-    ///     based console where there is no SynchronizationContext or TaskScheduler.
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/>.
     /// </summary>
     /// <remarks>
-    ///     Warning: This is a global variable and should be used with caution. It is not thread safe.
+    ///     This global variable is useful for web-based consoles without a SynchronizationContext or TaskScheduler.
+    ///     Warning: Not thread-safe.
     /// </remarks>
     public static int? Clicked { get; private set; }
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons.
+    ///     Displays an error <see cref="MessageBox"/> with fixed dimensions.
     /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
+    ///     Consider using <see cref="ErrorQuery(IApplication?, string, string, string[])"/> which automatically sizes the
+    ///     MessageBox.
     /// </remarks>
-    public static int? ErrorQuery (int width, int height, string title, string message, params string [] buttons)
-    {
-        return QueryFull (true, width, height, title, message, 0, true, buttons);
-    }
+    public static int? ErrorQuery (
+        IApplication? app,
+        int width,
+        int height,
+        string title,
+        string message,
+        params string [] buttons
+    ) =>
+        QueryFull (
+                   app,
+                   true,
+                   width,
+                   height,
+                   title,
+                   message,
+                   0,
+                   true,
+                   buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Displays an auto-sized error <see cref="MessageBox"/>.
     /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="title">Title for the query.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? ErrorQuery (string title, string message, params string [] buttons) { return QueryFull (true, 0, 0, title, message, 0, true, buttons); }
+    public static int? ErrorQuery (IApplication? app, string title, string message, params string [] buttons) =>
+        QueryFull (
+                   app,
+                   true,
+                   0,
+                   0,
+                   title,
+                   message,
+                   0,
+                   true,
+                   buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons.
+    ///     Displays an error <see cref="MessageBox"/> with fixed dimensions and a default button.
     /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
+    ///     Consider using <see cref="ErrorQuery(IApplication?, string, string, int, string[])"/> which automatically sizes the
+    ///     MessageBox.
     /// </remarks>
     public static int? ErrorQuery (
+        IApplication? app,
         int width,
         int height,
         string title,
         string message,
         int defaultButton = 0,
         params string [] buttons
-    )
-    {
-        return QueryFull (true, width, height, title, message, defaultButton, true, buttons);
-    }
+    ) =>
+        QueryFull (
+                   app,
+                   true,
+                   width,
+                   height,
+                   title,
+                   message,
+                   defaultButton,
+                   true,
+                   buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button.
     /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? ErrorQuery (string title, string message, int defaultButton = 0, params string [] buttons)
-    {
-        return QueryFull (true, 0, 0, title, message, defaultButton, true, buttons);
-    }
+    public static int? ErrorQuery (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons) =>
+        QueryFull (
+                   app,
+                   true,
+                   0,
+                   0,
+                   title,
+                   message,
+                   defaultButton,
+                   true,
+                   buttons);
 
     /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Displays an error <see cref="MessageBox"/> with fixed dimensions, a default button, and word-wrap control.
     /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="width">Width for the window.</param>
-    /// <param name="height">Height for the window.</param>
-    /// <param name="title">Title for the query.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="wrapMessage">If wrap the message or not.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    /// <remarks>
-    ///     Use <see cref="ErrorQuery(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
-    /// </remarks>
-    public static int? ErrorQuery (
-        int width,
-        int height,
-        string title,
-        string message,
-        int defaultButton = 0,
-        bool wrapMessage = true,
-        params string [] buttons
-    )
-    {
-        return QueryFull (true, width, height, title, message, defaultButton, wrapMessage, buttons);
-    }
-
-    /// <summary>
-    ///     Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
-    /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="title">Title for the query.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="wrapMessage">If wrap the message or not. The default is <see langword="true"/></param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
-    /// </remarks>
-    public static int? ErrorQuery (
-        string title,
-        string message,
-        int defaultButton = 0,
-        bool wrapMessage = true,
-        params string [] buttons
-    )
-    {
-        return QueryFull (true, 0, 0, title, message, defaultButton, wrapMessage, buttons);
-    }
-
-    /// <summary>
-    ///     Presents a <see cref="MessageBox"/> with the specified title and message and a list of buttons.
-    /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
+    /// <param name="message">Message to display. May contain multiple lines.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="wrapMessage">
+    ///     If <see langword="true"/>, word-wraps the message; otherwise displays as-is with multi-line
+    ///     support.
+    /// </param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Use <see cref="Query(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
+    ///     Consider using <see cref="ErrorQuery(IApplication?, string, string, int, bool, string[])"/> which automatically
+    ///     sizes the MessageBox.
     /// </remarks>
-    public static int? Query (int width, int height, string title, string message, params string [] buttons)
-    {
-        return QueryFull (false, width, height, title, message, 0, true, buttons);
-    }
-
-    /// <summary>
-    ///     Presents a <see cref="MessageBox"/> with the specified title and message and a list of buttons.
-    /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    /// <remarks>
-    /// <para>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
-    /// </para>
-    /// <para>
-    ///     Use <see cref="Query(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
-    /// </para>
-    /// </remarks>
-    public static int? Query (string title, string message, params string [] buttons) { return QueryFull (false, 0, 0, title, message, 0, true, buttons); }
-
-    /// <summary>
-    ///     Presents a <see cref="MessageBox"/> with the specified title and message and a list of buttons.
-    /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="width">Width for the window.</param>
-    /// <param name="height">Height for the window.</param>
-    /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    /// <remarks>
-    /// <para>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the title, message. and buttons.
-    /// </para>
-    /// <para>
-    ///     Use <see cref="Query(string, string, string[])"/> instead; it automatically sizes the MessageBox based on
-    ///     the contents.
-    /// </para>
-    /// </remarks>
-    public static int? Query (
-        int width,
-        int height,
-        string title,
-        string message,
-        int defaultButton = 0,
-        params string [] buttons
-    )
-    {
-        return QueryFull (false, width, height, title, message, defaultButton, true, buttons);
-    }
-
-    /// <summary>
-    ///     Presents a <see cref="MessageBox"/> with the specified title and message and a list of buttons.
-    /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display; might contain multiple lines. The message will be word=wrapped by default.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    /// <remarks>
-    ///     The message box will be vertically and horizontally centered in the container and the size will be
-    ///     automatically determined from the size of the message and buttons.
-    /// </remarks>
-    public static int? Query (string title, string message, int defaultButton = 0, params string [] buttons)
-    {
-        return QueryFull (false, 0, 0, title, message, defaultButton, true, buttons);
-    }
-
-    /// <summary>
-    ///     Presents a <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
-    /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="width">Width for the window.</param>
-    /// <param name="height">Height for the window.</param>
-    /// <param name="title">Title for the query.</param>
-    /// <param name="message">Message to display, might contain multiple lines.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="wrapMessage">If wrap the message or not.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    /// <remarks>
-    ///     Use <see cref="Query(string, string, string[])"/> instead; it automatically sizes the MessageBox based on the
-    ///     contents.
-    /// </remarks>
-    public static int? Query (
+    public static int? ErrorQuery (
+        IApplication? app,
         int width,
         int height,
         string title,
@@ -300,33 +217,266 @@ public static class MessageBox
         int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
-    )
-    {
-        return QueryFull (false, width, height, title, message, defaultButton, wrapMessage, buttons);
-    }
+    ) =>
+        QueryFull (
+                   app,
+                   true,
+                   width,
+                   height,
+                   title,
+                   message,
+                   defaultButton,
+                   wrapMessage,
+                   buttons);
 
     /// <summary>
-    ///     Presents a <see cref="MessageBox"/> with the specified title and message and a list of buttons to show
-    ///     to the user.
+    ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button and word-wrap control.
     /// </summary>
-    /// <returns>The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox.</returns>
-    /// <param name="title">Title for the query.</param>
-    /// <param name="message">Message to display, might contain multiple lines.</param>
-    /// <param name="defaultButton">Index of the default button.</param>
-    /// <param name="wrapMessage">If wrap the message or not.</param>
-    /// <param name="buttons">Array of buttons to add.</param>
-    public static int? Query (
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="wrapMessage">
+    ///     If <see langword="true"/>, word-wraps the message; otherwise displays as-is with multi-line
+    ///     support.
+    /// </param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    /// </remarks>
+    public static int? ErrorQuery (
+        IApplication? app,
         string title,
         string message,
         int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
-    )
-    {
-        return QueryFull (false, 0, 0, title, message, defaultButton, wrapMessage, buttons);
-    }
+    ) =>
+        QueryFull (
+                   app,
+                   true,
+                   0,
+                   0,
+                   title,
+                   message,
+                   defaultButton,
+                   wrapMessage,
+                   buttons);
+
+    /// <summary>
+    ///     Displays a <see cref="MessageBox"/> with fixed dimensions.
+    /// </summary>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="width">Width for the MessageBox.</param>
+    /// <param name="height">Height for the MessageBox.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     Consider using <see cref="Query(IApplication?, string, string, string[])"/> which automatically sizes the
+    ///     MessageBox.
+    /// </remarks>
+    public static int? Query (IApplication? app, int width, int height, string title, string message, params string [] buttons) =>
+        QueryFull (
+                   app,
+                   false,
+                   width,
+                   height,
+                   title,
+                   message,
+                   0,
+                   true,
+                   buttons);
+
+    /// <summary>
+    ///     Displays an auto-sized <see cref="MessageBox"/>.
+    /// </summary>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    /// </remarks>
+    public static int? Query (IApplication? app, string title, string message, params string [] buttons) =>
+        QueryFull (
+                   app,
+                   false,
+                   0,
+                   0,
+                   title,
+                   message,
+                   0,
+                   true,
+                   buttons);
+
+    /// <summary>
+    ///     Displays a <see cref="MessageBox"/> with fixed dimensions and a default button.
+    /// </summary>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="width">Width for the MessageBox.</param>
+    /// <param name="height">Height for the MessageBox.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     Consider using <see cref="Query(IApplication?, string, string, int, string[])"/> which automatically sizes the
+    ///     MessageBox.
+    /// </remarks>
+    public static int? Query (
+        IApplication? app,
+        int width,
+        int height,
+        string title,
+        string message,
+        int defaultButton = 0,
+        params string [] buttons
+    ) =>
+        QueryFull (
+                   app,
+                   false,
+                   width,
+                   height,
+                   title,
+                   message,
+                   defaultButton,
+                   true,
+                   buttons);
+
+    /// <summary>
+    ///     Displays an auto-sized <see cref="MessageBox"/> with a default button.
+    /// </summary>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    /// </remarks>
+    public static int? Query (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons) =>
+        QueryFull (
+                   app,
+                   false,
+                   0,
+                   0,
+                   title,
+                   message,
+                   defaultButton,
+                   true,
+                   buttons);
+
+    /// <summary>
+    ///     Displays a <see cref="MessageBox"/> with fixed dimensions, a default button, and word-wrap control.
+    /// </summary>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="width">Width for the MessageBox.</param>
+    /// <param name="height">Height for the MessageBox.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="wrapMessage">
+    ///     If <see langword="true"/>, word-wraps the message; otherwise displays as-is with multi-line
+    ///     support.
+    /// </param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     Consider using <see cref="Query(IApplication?, string, string, int, bool, string[])"/> which automatically sizes
+    ///     the MessageBox.
+    /// </remarks>
+    public static int? Query (
+        IApplication? app,
+        int width,
+        int height,
+        string title,
+        string message,
+        int defaultButton = 0,
+        bool wrapMessage = true,
+        params string [] buttons
+    ) =>
+        QueryFull (
+                   app,
+                   false,
+                   width,
+                   height,
+                   title,
+                   message,
+                   defaultButton,
+                   wrapMessage,
+                   buttons);
+
+    /// <summary>
+    ///     Displays an auto-sized <see cref="MessageBox"/> with a default button and word-wrap control.
+    /// </summary>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="Application.Top"/>.</param>
+    /// <param name="title">Title for the MessageBox.</param>
+    /// <param name="message">Message to display. May contain multiple lines.</param>
+    /// <param name="defaultButton">Index of the default button (0-based).</param>
+    /// <param name="wrapMessage">
+    ///     If <see langword="true"/>, word-wraps the message; otherwise displays as-is with multi-line
+    ///     support.
+    /// </param>
+    /// <param name="buttons">Array of button labels.</param>
+    /// <returns>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed
+    ///     <see cref="Application.QuitKey"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    /// </remarks>
+    public static int? Query (
+        IApplication? app,
+        string title,
+        string message,
+        int defaultButton = 0,
+        bool wrapMessage = true,
+        params string [] buttons
+    ) =>
+        QueryFull (
+                   app,
+                   false,
+                   0,
+                   0,
+                   title,
+                   message,
+                   defaultButton,
+                   wrapMessage,
+                   buttons);
 
     private static int? QueryFull (
+        IApplication? app,
         bool useErrorColors,
         int width,
         int height,
@@ -337,6 +487,8 @@ public static class MessageBox
         params string [] buttons
     )
     {
+        ArgumentNullException.ThrowIfNull (app);
+
         // Create button array for Dialog
         var count = 0;
         List<Button> buttonList = new ();
@@ -354,12 +506,13 @@ public static class MessageBox
                 var b = new Button
                 {
                     Text = s,
-                    Data = count,
+                    Data = count
                 };
 
                 if (count == defaultButton)
                 {
                     b.IsDefault = true;
+
                     b.Accepting += (_, e) =>
                                    {
                                        if (e?.Context?.Source is Button button)
@@ -376,7 +529,7 @@ public static class MessageBox
                                            e.Handled = true;
                                        }
 
-                                       Application.RequestStop ();
+                                       app?.RequestStop ();
                                    };
                 }
 
@@ -388,20 +541,21 @@ public static class MessageBox
         var d = new Dialog
         {
             Title = title,
-            ButtonAlignment = MessageBox.DefaultButtonAlignment,
+            ButtonAlignment = DefaultButtonAlignment,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
-            BorderStyle = MessageBox.DefaultBorderStyle,
-            Buttons = buttonList.ToArray (),
+            BorderStyle = DefaultBorderStyle,
+            Buttons = buttonList.ToArray ()
         };
 
-        d.Width = Dim.Auto (DimAutoStyle.Auto,
-                            minimumContentDim: Dim.Func (_ => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
-                            maximumContentDim: Dim.Func (_ => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
+        d.Width = Dim.Auto (
+                            DimAutoStyle.Auto,
+                            Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
+                            Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
 
-        d.Height = Dim.Auto (DimAutoStyle.Auto,
-                             minimumContentDim: Dim.Func (_ => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
-                             maximumContentDim: Dim.Func (_ => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
-
+        d.Height = Dim.Auto (
+                             DimAutoStyle.Auto,
+                             Dim.Func (_ => (int)((app.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
+                             Dim.Func (_ => (int)((app.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
 
         if (width != 0)
         {
@@ -415,7 +569,7 @@ public static class MessageBox
 
         d.SchemeName = useErrorColors ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
-        d.HotKeySpecifier = new Rune ('\xFFFF');
+        d.HotKeySpecifier = new ('\xFFFF');
         d.Text = message;
         d.TextAlignment = Alignment.Center;
         d.VerticalTextAlignment = Alignment.Start;
@@ -423,10 +577,9 @@ public static class MessageBox
         d.TextFormatter.MultiLine = !wrapMessage;
 
         // Run the modal; do not shut down the mainloop driver when done
-        Application.Run (d);
+        app.Run (d);
         d.Dispose ();
 
         return Clicked;
-
     }
 }

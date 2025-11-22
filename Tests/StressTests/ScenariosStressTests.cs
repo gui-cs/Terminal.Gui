@@ -110,7 +110,7 @@ public class ScenariosStressTests
             _output.WriteLine ($"Initialized == {a.Value}");
         }
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterationCount++;
 

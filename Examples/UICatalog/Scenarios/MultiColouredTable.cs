@@ -99,7 +99,7 @@ public class MultiColouredTable : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (ApplicationImpl.Instance, 60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();

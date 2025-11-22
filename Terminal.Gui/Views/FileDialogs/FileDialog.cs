@@ -849,7 +849,7 @@ public class FileDialog : Dialog, IDesignable
     {
         IFileSystemInfo [] toDelete = GetFocusedFiles ()!;
 
-        if (FileOperationsHandler.Delete (toDelete))
+        if (FileOperationsHandler.Delete (App, toDelete))
         {
             RefreshState ();
         }
@@ -1039,7 +1039,7 @@ public class FileDialog : Dialog, IDesignable
     private void New ()
     {
         {
-            IFileSystemInfo created = FileOperationsHandler.New (_fileSystem!, State!.Directory);
+            IFileSystemInfo created = FileOperationsHandler.New (App, _fileSystem!, State!.Directory);
 
             if (created is { })
             {
@@ -1174,13 +1174,13 @@ public class FileDialog : Dialog, IDesignable
         PushState (State, false, false, false);
     }
 
-    private void Rename ()
+    private void Rename (IApplication? app)
     {
         IFileSystemInfo [] toRename = GetFocusedFiles ()!;
 
         if (toRename?.Length == 1)
         {
-            IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem!, toRename.Single ());
+            IFileSystemInfo newNamed = FileOperationsHandler.Rename (app, _fileSystem!, toRename.Single ());
 
             if (newNamed is { })
             {
@@ -1230,7 +1230,7 @@ public class FileDialog : Dialog, IDesignable
         PopoverMenu? contextMenu = new (
                                         [
                                             new (Strings.fdCtxNew, string.Empty, New),
-                                            new (Strings.fdCtxRename, string.Empty, Rename),
+                                            new (Strings.fdCtxRename, string.Empty, () => Rename (App)),
                                             new (Strings.fdCtxDelete, string.Empty, Delete)
                                         ]);
 
@@ -1327,7 +1327,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.R))
         {
-            Rename ();
+            Rename (App);
 
             return true;
         }

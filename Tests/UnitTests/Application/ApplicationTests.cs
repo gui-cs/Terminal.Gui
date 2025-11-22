@@ -450,7 +450,7 @@ public class ApplicationTests
 
         return;
 
-        void Application_Iteration (object sender, IterationEventArgs e)
+        void Application_Iteration (object sender, EventArgs<IApplication?> e)
         {
             if (iteration > 0)
             {
@@ -558,7 +558,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             Assert.NotEqual (initTop, Application.TopRunnable);
 #if DEBUG_IDISPOSABLE
@@ -639,7 +639,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a) { Application.RequestStop (); }
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a) { Application.RequestStop (); }
     }
 
     [Fact]
@@ -658,7 +658,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             Assert.True (top.Running);
             top.RequestStop ();
@@ -681,7 +681,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a) { top.Running = false; }
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a) { top.Running = false; }
     }
 
     [Fact]
@@ -801,7 +801,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs e) { Assert.NotNull (Application.TopRunnable); }
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> e) { Assert.NotNull (Application.TopRunnable); }
     }
 
     [Fact]
@@ -865,7 +865,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplication_OnIteration (object s, IterationEventArgs e)
+        void OnApplication_OnIteration (object s, EventArgs<IApplication?> e)
         {
             Assert.NotNull (Application.TopRunnable);
             Application.RequestStop ();

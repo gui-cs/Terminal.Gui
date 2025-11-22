@@ -63,12 +63,12 @@ public class RunTExample : Scenario
                                {
                                    if (_usernameText.Text == "admin" && passwordText.Text == "password")
                                    {
-                                       MessageBox.Query ("Login Successful", $"Username: {_usernameText.Text}", "Ok");
-                                       Application.RequestStop ();
+                                       MessageBox.Query (App, "Login Successful", $"Username: {_usernameText.Text}", "Ok");
+                                       App?.RequestStop ();
                                    }
                                    else
                                    {
-                                       MessageBox.ErrorQuery (
+                                       MessageBox.ErrorQuery (App,
                                                               "Error Logging In",
                                                               "Incorrect username or password (hint: admin/password)",
                                                               "Ok"

@@ -156,7 +156,7 @@ public class Editor : Scenario
                                        new (Key.F2, "Open", Open),
                                        new (Key.F3, "Save", () => Save ()),
                                        new (Key.F4, "Save As", () => SaveAs ()),
-                                       new (Key.Empty, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null),
+                                       new (Key.Empty, $"OS Clipboard IsSupported : {Application.Clipboard!.IsSupported}", null),
                                        siCursorPosition
                                    ]
                                   )
@@ -194,6 +194,7 @@ public class Editor : Scenario
         Debug.Assert (_textView.IsDirty);
 
         int? r = MessageBox.ErrorQuery (
+                                       ApplicationImpl.Instance,
                                        "Save File",
                                        $"Do you want save changes in {_appWindow.Title}?",
                                        "Yes",
@@ -228,7 +229,7 @@ public class Editor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery ("Error", ex.Message, "Ok");
+            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Error", ex.Message, "Ok");
         }
     }
 
@@ -307,11 +308,11 @@ public class Editor : Scenario
 
         if (!found)
         {
-            MessageBox.Query ("Find", $"The following specified text was not found: '{_textToFind}'", "Ok");
+            MessageBox.Query (ApplicationImpl.Instance, "Find", $"The following specified text was not found: '{_textToFind}'", "Ok");
         }
         else if (gaveFullTurn)
         {
-            MessageBox.Query (
+            MessageBox.Query (ApplicationImpl.Instance,
                               "Find",
                               $"No more occurrences were found for the following specified text: '{_textToFind}'",
                               "Ok"
@@ -887,7 +888,7 @@ public class Editor : Scenario
 
         if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace))
         {
-            MessageBox.Query (
+            MessageBox.Query (ApplicationImpl.Instance,
                               "Replace All",
                               $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
                               "Ok"
@@ -895,7 +896,7 @@ public class Editor : Scenario
         }
         else
         {
-            MessageBox.Query (
+            MessageBox.Query (ApplicationImpl.Instance,
                               "Replace All",
                               $"None of the following specified text was found: '{_textToFind}'",
                               "Ok"
@@ -1147,7 +1148,7 @@ public class Editor : Scenario
         {
             if (File.Exists (path))
             {
-                if (MessageBox.Query (
+                if (MessageBox.Query (ApplicationImpl.Instance,
                                       "Save File",
                                       "File already exists. Overwrite any way?",
                                       "No",
@@ -1186,11 +1187,11 @@ public class Editor : Scenario
             _originalText = Encoding.Unicode.GetBytes (_textView.Text);
             _saved = true;
             _textView.ClearHistoryChanges ();
-            MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
+            MessageBox.Query (ApplicationImpl.Instance, "Save File", "File was successfully saved.", "Ok");
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery ("Error", ex.Message, "Ok");
+            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Error", ex.Message, "Ok");
 
             return false;
         }

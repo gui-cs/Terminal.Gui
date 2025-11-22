@@ -521,7 +521,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
-        var tf = new TextField { Width = 20, Text = "This is a test." };
+        var tf = new TextField { Width = 20, Text = "This is a test.", App = ApplicationImpl.Instance };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -1697,7 +1697,8 @@ Les Miśerables",
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)
                 Text = "TAB to jump between text fields.",
-                Width = 32
+                Width = 32,
+                App = ApplicationImpl.Instance
             };
         }
     }

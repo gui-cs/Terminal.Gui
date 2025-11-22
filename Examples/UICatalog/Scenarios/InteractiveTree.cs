@@ -173,7 +173,7 @@ public class InteractiveTree : Scenario
 
                 if (parent is null)
                 {
-                    MessageBox.ErrorQuery (
+                    MessageBox.ErrorQuery (ApplicationImpl.Instance,
                                            "Could not delete",
                                            $"Parent of '{toDelete}' was unexpectedly null",
                                            "Ok"

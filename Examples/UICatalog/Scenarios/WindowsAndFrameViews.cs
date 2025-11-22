@@ -18,7 +18,7 @@ public class WindowsAndFrameViews : Scenario
 
         static int? About ()
         {
-            return MessageBox.Query (
+            return MessageBox.Query (ApplicationImpl.Instance,
                                      "About UI Catalog",
                                      "UI Catalog is a comprehensive sample library for Terminal.Gui",
                                      "Ok"
@@ -99,7 +99,7 @@ public class WindowsAndFrameViews : Scenario
             };
 
             pressMeButton.Accepting += (s, e) =>
-                                        MessageBox.ErrorQuery (loopWin.Title, "Neat?", "Yes", "No");
+                                        MessageBox.ErrorQuery ((s as View)?.App, loopWin.Title, "Neat?", "Yes", "No");
             loopWin.Add (pressMeButton);
 
             var subWin = new Window

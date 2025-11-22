@@ -160,7 +160,7 @@ public class PosEditor : EditorBase
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+            MessageBox.ErrorQuery (App, "Exception", e.Message, "Ok");
         }
     }
 }

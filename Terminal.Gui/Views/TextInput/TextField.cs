@@ -617,7 +617,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        Clipboard.Contents = SelectedText;
+        App?.Clipboard?.SetClipboardData (SelectedText);
     }
 
     /// <summary>Cut the selected text to the clipboard.</summary>
@@ -628,7 +628,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        Clipboard.Contents = SelectedText;
+        App?.Clipboard?.SetClipboardData (SelectedText);
         List<string> newText = DeleteSelectedText ();
         Text = StringExtensions.ToString (newText);
         Adjust ();
@@ -1079,7 +1079,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
+        string? cbTxt = App?.Clipboard?.GetClipboardData ()?.Split ("\n") [0];
 
         if (string.IsNullOrEmpty (cbTxt))
         {
@@ -1731,9 +1731,9 @@ public class TextField : View, IDesignable
 
     private void SetClipboard (IEnumerable<string> text)
     {
-        if (!Secret)
+        if (!Secret && App?.Clipboard is { })
         {
-            Clipboard.Contents = StringExtensions.ToString (text.ToList ());
+            App.Clipboard.SetClipboardData (StringExtensions.ToString (text.ToList ()));
         }
     }
 

@@ -116,7 +116,7 @@ public class PosTests ()
 
         return;
 
-        void OnInstanceOnIteration (object s, IterationEventArgs a)
+        void OnInstanceOnIteration (object s, EventArgs<IApplication?> a)
         {
             while (count < 20)
             {
@@ -191,7 +191,7 @@ public class PosTests ()
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
         {
             while (count > 0)
             {
