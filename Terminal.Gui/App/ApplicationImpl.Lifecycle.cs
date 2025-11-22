@@ -27,17 +27,13 @@ public partial class ApplicationImpl
         // If this is a legacy static instance and instance-based model was used, throw
         if (this == _instance && _modelUsage == ApplicationModelUsage.InstanceBased)
         {
-            throw new InvalidOperationException (
-                "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
-                "Use only one model per process.");
+            throw new InvalidOperationException (ErrorLegacyAfterModern);
         }
 
         // If this is an instance-based instance and legacy static model was used, throw
         if (this != _instance && _modelUsage == ApplicationModelUsage.LegacyStatic)
         {
-            throw new InvalidOperationException (
-                "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
-                "Use only one model per process.");
+            throw new InvalidOperationException (ErrorModernAfterLegacy);
         }
 
         if (!string.IsNullOrWhiteSpace (driverName))

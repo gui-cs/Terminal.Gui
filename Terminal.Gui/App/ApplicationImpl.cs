@@ -27,6 +27,20 @@ public partial class ApplicationImpl : IApplication
     private static ApplicationModelUsage _modelUsage = ApplicationModelUsage.None;
 
     /// <summary>
+    ///     Error message for when trying to use modern model after legacy static model.
+    /// </summary>
+    private const string ErrorModernAfterLegacy =
+        "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
+        "Use only one model per process.";
+
+    /// <summary>
+    ///     Error message for when trying to use legacy static model after modern model.
+    /// </summary>
+    private const string ErrorLegacyAfterModern =
+        "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
+        "Use only one model per process.";
+
+    /// <summary>
     ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
     /// <param name="app"></param>
@@ -52,9 +66,7 @@ public partial class ApplicationImpl : IApplication
             // Check if the instance-based model has already been used
             if (_modelUsage == ApplicationModelUsage.InstanceBased)
             {
-                throw new InvalidOperationException (
-                    "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
-                    "Use only one model per process.");
+                throw new InvalidOperationException (ErrorLegacyAfterModern);
             }
 
             // Mark the usage and create the instance
@@ -72,9 +84,7 @@ public partial class ApplicationImpl : IApplication
         // Check if the legacy static model has already been initialized
         if (_modelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
         {
-            throw new InvalidOperationException (
-                "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
-                "Use only one model per process.");
+            throw new InvalidOperationException (ErrorModernAfterLegacy);
         }
 
         _modelUsage = ApplicationModelUsage.InstanceBased;
