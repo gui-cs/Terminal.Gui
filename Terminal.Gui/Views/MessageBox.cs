@@ -56,7 +56,14 @@ public static class MessageBox
     ///     based console where there is no SynchronizationContext or TaskScheduler.
     /// </summary>
     /// <remarks>
-    ///     Warning: This is a global variable and should be used with caution. It is not thread safe.
+    ///     <para>
+    ///         Warning: This is a global variable and should be used with caution. It is not thread safe.
+    ///     </para>
+    ///     <para>
+    ///         <b>Deprecated:</b> This property is maintained for backward compatibility. The MessageBox methods
+    ///         now return the button index directly, and <see cref="Dialog.Result"/> provides a cleaner,
+    ///         non-global alternative for custom dialog implementations.
+    ///     </para>
     /// </remarks>
     public static int Clicked { get; private set; } = -1;
 
@@ -340,7 +347,6 @@ public static class MessageBox
         // Create button array for Dialog
         var count = 0;
         List<Button> buttonList = new ();
-        Clicked = -1;
 
         if (buttons is { })
         {
@@ -354,31 +360,19 @@ public static class MessageBox
                 var b = new Button
                 {
                     Text = s,
-                    Data = count,
+                    IsDefault = count == defaultButton
                 };
 
-                if (count == defaultButton)
-                {
-                    b.IsDefault = true;
-                    b.Accepting += (_, e) =>
+                // Button handlers just need to call RequestStop - Dialog will extract the result automatically
+                b.Accepting += (_, e) =>
+                               {
+                                   if (e is { })
                                    {
-                                       if (e?.Context?.Source is Button button)
-                                       {
-                                           Clicked = (int)button.Data!;
-                                       }
-                                       else
-                                       {
-                                           Clicked = defaultButton;
-                                       }
+                                       e.Handled = true;
+                                   }
 
-                                       if (e is { })
-                                       {
-                                           e.Handled = true;
-                                       }
-
-                                       Application.RequestStop ();
-                                   };
-                }
+                                   Application.RequestStop ();
+                               };
 
                 buttonList.Add (b);
                 count++;
@@ -424,9 +418,17 @@ public static class MessageBox
 
         // Run the modal; do not shut down the mainloop driver when done
         Application.Run (d);
+        
+        // Use Dialog.Result instead of manually tracking with Clicked
+        // Dialog automatically extracts which button was clicked in OnIsRunningChanging
+        int result = d.Result ?? -1;
+        
+        // Update legacy Clicked property for backward compatibility
+        Clicked = result;
+        
         d.Dispose ();
 
-        return Clicked;
+        return result;
 
     }
 }
