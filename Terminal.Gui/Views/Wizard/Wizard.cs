@@ -113,14 +113,18 @@ public class Wizard : Dialog
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is a convenience property that checks if <see cref="Dialog.Result"/> indicates the wizard was
-    ///         finished rather than canceled. Since <see cref="Wizard"/> inherits from <see cref="Dialog"/> which
-    ///         implements <see cref="IRunnable{TResult}"/> with <c>int?</c> result type, the <see cref="Dialog.Result"/>
-    ///         property contains the button index. The Finish button is added as the last button.
+    ///         This is a convenience property that checks if the wizard was successfully completed.
+    ///         Since <see cref="Wizard"/> inherits from <see cref="Dialog"/> which implements 
+    ///         <see cref="IRunnable{TResult}"/> with <c>int?</c> result type, the <see cref="Dialog.Result"/>
+    ///         property contains the button index when a button is clicked.
     ///     </para>
     ///     <para>
-    ///         Returns <see langword="true"/> if <see cref="Dialog.Result"/> is not <see langword="null"/> and equals
-    ///         the index of the Next/Finish button, <see langword="false"/> otherwise (canceled or Back button pressed).
+    ///         Returns <see langword="true"/> if both:
+    ///         <list type="bullet">
+    ///             <item><description><see cref="Dialog.Result"/> is not <see langword="null"/> (a button was clicked)</description></item>
+    ///             <item><description>The internal <c>_finishedPressed</c> flag is set (the Finish button was clicked and <see cref="Finished"/> event completed without cancellation)</description></item>
+    ///         </list>
+    ///         Returns <see langword="false"/> if the wizard was canceled (ESC pressed), the Back button was clicked, or the <see cref="Finished"/> event was canceled.
     ///     </para>
     /// </remarks>
     public bool WasFinished => Result is { } && _finishedPressed;
