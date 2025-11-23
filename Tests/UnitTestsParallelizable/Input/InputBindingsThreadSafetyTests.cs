@@ -11,16 +11,16 @@ public class InputBindingsThreadSafetyTests
     {
         // Arrange
         var bindings = new TestInputBindings ();
-        const int numThreads = 10;
-        const int itemsPerThread = 100;
+        const int NUM_THREADS = 10;
+        const int ITEMS_PER_THREAD = 100;
 
         // Act
         Parallel.For (
                       0,
-                      numThreads,
+                      NUM_THREADS,
                       i =>
                       {
-                          for (var j = 0; j < itemsPerThread; j++)
+                          for (var j = 0; j < ITEMS_PER_THREAD; j++)
                           {
                               var key = $"key_{i}_{j}";
 
@@ -38,7 +38,7 @@ public class InputBindingsThreadSafetyTests
         // Assert
         IEnumerable<KeyValuePair<string, KeyBinding>> allBindings = bindings.GetBindings ();
         Assert.NotEmpty (allBindings);
-        Assert.True (allBindings.Count () <= numThreads * itemsPerThread);
+        Assert.True (allBindings.Count () <= NUM_THREADS * ITEMS_PER_THREAD);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class InputBindingsThreadSafetyTests
     {
         // Arrange
         var bindings = new TestInputBindings ();
-        const int numThreads = 10;
+        const int NUM_THREADS = 10;
 
         // Populate initial data
         for (var i = 0; i < 100; i++)
@@ -57,7 +57,7 @@ public class InputBindingsThreadSafetyTests
         // Act - Multiple threads clearing simultaneously
         Parallel.For (
                       0,
-                      numThreads,
+                      NUM_THREADS,
                       i =>
                       {
                           try
@@ -81,7 +81,7 @@ public class InputBindingsThreadSafetyTests
         var bindings = new TestInputBindings ();
         var continueRunning = true;
         List<Exception> exceptions = new ();
-        const int maxAdditions = 200; // Limit total additions to prevent infinite loop
+        const int MAX_ADDITIONS = 200; // Limit total additions to prevent infinite loop
 
         // Populate initial data
         for (var i = 0; i < 50; i++)
@@ -94,7 +94,7 @@ public class InputBindingsThreadSafetyTests
                                       {
                                           var counter = 50;
 
-                                          while (continueRunning && counter < maxAdditions)
+                                          while (continueRunning && counter < MAX_ADDITIONS)
                                           {
                                               try
                                               {
@@ -151,7 +151,7 @@ public class InputBindingsThreadSafetyTests
         var bindings = new TestInputBindings ();
         var continueRunning = true;
         List<Exception> exceptions = new ();
-        const int maxModifications = 200; // Limit total modifications
+        const int MAX_MODIFICATIONS = 200; // Limit total modifications
 
         // Populate some initial data
         for (var i = 0; i < 50; i++)
@@ -164,7 +164,7 @@ public class InputBindingsThreadSafetyTests
                                       {
                                           var counter = 0;
 
-                                          while (continueRunning && counter < maxModifications)
+                                          while (continueRunning && counter < MAX_MODIFICATIONS)
                                           {
                                               try
                                               {
@@ -237,20 +237,20 @@ public class InputBindingsThreadSafetyTests
         var view = new View ();
         KeyBindings keyBindings = view.KeyBindings;
         List<Exception> exceptions = new ();
-        const int numThreads = 10;
-        const int operationsPerThread = 50;
+        const int NUM_THREADS = 10;
+        const int OPERATIONS_PER_THREAD = 50;
 
         // Act
         List<Task> tasks = new ();
 
-        for (var i = 0; i < numThreads; i++)
+        for (var i = 0; i < NUM_THREADS; i++)
         {
             int threadId = i;
 
             tasks.Add (
                        Task.Run (() =>
                                  {
-                                     for (var j = 0; j < operationsPerThread; j++)
+                                     for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
                                          try
                                          {
@@ -291,7 +291,7 @@ public class InputBindingsThreadSafetyTests
         // Arrange
         var bindings = new TestInputBindings ();
         List<Exception> exceptions = new ();
-        const int operationsPerThread = 100;
+        const int OPERATIONS_PER_THREAD = 100;
 
         // Act - Multiple threads doing various operations
         List<Task> tasks = new ();
@@ -304,7 +304,7 @@ public class InputBindingsThreadSafetyTests
             tasks.Add (
                        Task.Run (() =>
                                  {
-                                     for (var j = 0; j < operationsPerThread; j++)
+                                     for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
                                          try
                                          {
@@ -328,7 +328,7 @@ public class InputBindingsThreadSafetyTests
             tasks.Add (
                        Task.Run (() =>
                                  {
-                                     for (var j = 0; j < operationsPerThread; j++)
+                                     for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
                                          try
                                          {
@@ -352,7 +352,7 @@ public class InputBindingsThreadSafetyTests
             tasks.Add (
                        Task.Run (() =>
                                  {
-                                     for (var j = 0; j < operationsPerThread; j++)
+                                     for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
                                          try
                                          {
@@ -381,20 +381,20 @@ public class InputBindingsThreadSafetyTests
         var view = new View ();
         MouseBindings mouseBindings = view.MouseBindings;
         List<Exception> exceptions = new ();
-        const int numThreads = 10;
-        const int operationsPerThread = 50;
+        const int NUM_THREADS = 10;
+        const int OPERATIONS_PER_THREAD = 50;
 
         // Act
         List<Task> tasks = new ();
 
-        for (var i = 0; i < numThreads; i++)
+        for (var i = 0; i < NUM_THREADS; i++)
         {
             int threadId = i;
 
             tasks.Add (
                        Task.Run (() =>
                                  {
-                                     for (var j = 0; j < operationsPerThread; j++)
+                                     for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
                                          try
                                          {
@@ -432,10 +432,10 @@ public class InputBindingsThreadSafetyTests
     {
         // Arrange
         var bindings = new TestInputBindings ();
-        const int numItems = 100;
+        const int NUM_ITEMS = 100;
 
         // Populate data
-        for (var i = 0; i < numItems; i++)
+        for (var i = 0; i < NUM_ITEMS; i++)
         {
             bindings.Add ($"key_{i}", Command.Accept);
         }
@@ -443,7 +443,7 @@ public class InputBindingsThreadSafetyTests
         // Act - Multiple threads removing items
         Parallel.For (
                       0,
-                      numItems,
+                      NUM_ITEMS,
                       i =>
                       {
                           try
@@ -465,10 +465,10 @@ public class InputBindingsThreadSafetyTests
     {
         // Arrange
         var bindings = new TestInputBindings ();
-        const string oldKey = "old_key";
-        const string newKey = "new_key";
+        const string OLD_KEY = "old_key";
+        const string NEW_KEY = "new_key";
 
-        bindings.Add (oldKey, Command.Accept);
+        bindings.Add (OLD_KEY, Command.Accept);
 
         // Act - Multiple threads trying to replace
         List<Exception> exceptions = new ();
@@ -480,7 +480,7 @@ public class InputBindingsThreadSafetyTests
                       {
                           try
                           {
-                              bindings.Replace (oldKey, $"{newKey}_{i}");
+                              bindings.Replace (OLD_KEY, $"{NEW_KEY}_{i}");
                           }
                           catch (InvalidOperationException)
                           {
@@ -501,9 +501,9 @@ public class InputBindingsThreadSafetyTests
     {
         // Arrange
         var bindings = new TestInputBindings ();
-        const string testKey = "test_key";
+        const string TEST_KEY = "test_key";
 
-        bindings.Add (testKey, Command.Accept);
+        bindings.Add (TEST_KEY, Command.Accept);
 
         // Act
         var results = new bool [100];
@@ -511,7 +511,7 @@ public class InputBindingsThreadSafetyTests
         Parallel.For (
                       0,
                       100,
-                      i => { results [i] = bindings.TryGet (testKey, out _); });
+                      i => { results [i] = bindings.TryGet (TEST_KEY, out _); });
 
         // Assert - All threads should consistently find the binding
         Assert.All (results, result => Assert.True (result));
@@ -520,17 +520,14 @@ public class InputBindingsThreadSafetyTests
     /// <summary>
     ///     Test implementation of InputBindings for testing purposes.
     /// </summary>
-    private class TestInputBindings : InputBindings<string, KeyBinding>
+    private class TestInputBindings () : InputBindings<string, KeyBinding> (
+                                                                            (commands, evt) => new ()
+                                                                            {
+                                                                                Commands = commands,
+                                                                                Key = Key.Empty
+                                                                            },
+                                                                            StringComparer.OrdinalIgnoreCase)
     {
-        public TestInputBindings () : base (
-                                            (commands, evt) => new ()
-                                            {
-                                                Commands = commands,
-                                                Key = Key.Empty
-                                            },
-                                            StringComparer.OrdinalIgnoreCase)
-        { }
-
         public override bool IsValid (string eventArgs) { return !string.IsNullOrEmpty (eventArgs); }
     }
 }

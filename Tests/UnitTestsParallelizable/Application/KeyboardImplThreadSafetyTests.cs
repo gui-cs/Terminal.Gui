@@ -1,4 +1,5 @@
 // ReSharper disable AccessToDisposedClosure
+
 #nullable enable
 namespace UnitTests_Parallelizable.ApplicationTests;
 
@@ -12,7 +13,7 @@ public class KeyboardImplThreadSafetyTests
     {
         // Arrange
         var keyboard = new KeyboardImpl ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 50;
 
@@ -60,7 +61,7 @@ public class KeyboardImplThreadSafetyTests
         app.Init ("fake");
         var keyboard = new KeyboardImpl { App = app };
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         var continueRunning = true;
 
         // Act
@@ -112,7 +113,7 @@ public class KeyboardImplThreadSafetyTests
         app.Init ("fake");
         var keyboard = new KeyboardImpl { App = app };
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 50;
 
@@ -157,7 +158,7 @@ public class KeyboardImplThreadSafetyTests
         app.Init ("fake");
         var keyboard = new KeyboardImpl { App = app };
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 50;
 
@@ -200,7 +201,7 @@ public class KeyboardImplThreadSafetyTests
         var keyboard = new KeyboardImpl ();
 
         // Don't call AddKeyBindings here to avoid conflicts
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 50;
 
@@ -253,7 +254,7 @@ public class KeyboardImplThreadSafetyTests
         // Arrange
         var keyboard = new KeyboardImpl ();
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 20;
         var keyDownCount = 0;
@@ -305,7 +306,7 @@ public class KeyboardImplThreadSafetyTests
 
         // Initialize once before concurrent access
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 20;
 
@@ -377,7 +378,7 @@ public class KeyboardImplThreadSafetyTests
         app.Init ("fake");
         var keyboard = new KeyboardImpl { App = app };
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int OPERATIONS_PER_THREAD = 30;
 
         // Act
@@ -481,7 +482,7 @@ public class KeyboardImplThreadSafetyTests
         app.Init ("fake");
         var keyboard = new KeyboardImpl { App = app };
         keyboard.AddKeyBindings ();
-        List<Exception> exceptions = new ();
+        List<Exception> exceptions = [];
         const int NUM_THREADS = 5;
         const int OPERATIONS_PER_THREAD = 20;
 

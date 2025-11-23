@@ -20,15 +20,21 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     /// </summary>
     public KeyboardImpl ()
     {
-        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
-        _quitKey = Application.QuitKey;
-        _arrangeKey = Application.ArrangeKey;
-        _nextTabGroupKey = Application.NextTabGroupKey;
-        _nextTabKey = Application.NextTabKey;
-        _prevTabGroupKey = Application.PrevTabGroupKey;
-        _prevTabKey = Application.PrevTabKey;
+        // DON'T access Application static properties here - they trigger ApplicationImpl.Instance
+        // which sets ModelUsage to LegacyStatic, breaking parallel tests.
+        // These will be initialized from Application static properties in Init() or when accessed.
+
+        // Initialize to reasonable defaults that match Application defaults
+        // These will be updated by property change events if Application properties change
+        _quitKey = Key.Esc;
+        _arrangeKey = Key.F5.WithCtrl;
+        _nextTabGroupKey = Key.F6;
+        _nextTabKey = Key.Tab;
+        _prevTabGroupKey = Key.F6.WithShift;
+        _prevTabKey = Key.Tab.WithShift;
 
         // Subscribe to Application static property change events
+        // so we get updated if they change
         Application.QuitKeyChanged += OnQuitKeyChanged;
         Application.ArrangeKeyChanged += OnArrangeKeyChanged;
         Application.NextTabGroupKeyChanged += OnNextTabGroupKeyChanged;

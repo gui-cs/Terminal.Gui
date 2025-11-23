@@ -8,7 +8,7 @@ namespace Terminal.Gui.Input;
 /// </summary>
 /// <typeparam name="TEvent">The type of the event (e.g. <see cref="Key"/> or <see cref="MouseFlags"/>).</typeparam>
 /// <typeparam name="TBinding">The binding type (e.g. <see cref="KeyBinding"/>).</typeparam>
-public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBinding, new () where TEvent : notnull
+public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBinding, new() where TEvent : notnull
 {
     /// <summary>
     ///     Initializes a new instance.
@@ -38,8 +38,8 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (eventArgs));
         }
 
-        // IMPORTANT: Add a COPY of the eventArgs. This is needed because ConfigurationManager.Apply uses DeepMemberWiseCopy 
-        // IMPORTANT: update the memory referenced by the key, and Dictionary uses caching for performance, and thus 
+        // IMPORTANT: Add a COPY of the eventArgs. This is needed because ConfigurationManager.Apply uses DeepMemberWiseCopy
+        // IMPORTANT: update the memory referenced by the key, and Dictionary uses caching for performance, and thus
         // IMPORTANT: Apply will update the Dictionary with the new eventArgs, but the old eventArgs will still be in the dictionary.
         // IMPORTANT: See the ConfigurationManager.Illustrate_DeepMemberWiseCopy_Breaks_Dictionary test for details.
         if (!_bindings.TryAdd (eventArgs, binding))
