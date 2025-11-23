@@ -42,7 +42,7 @@ internal partial class DriverAssert
         }
 
         expectedLook = expectedLook.Trim ();
-        driver ??= Application.Driver;
+        //driver ??= Application.Driver;
 
         Cell [,] contents = driver!.Contents!;
 
@@ -152,7 +152,7 @@ internal partial class DriverAssert
     )
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
-        driver ??= Application.Driver!;
+        //driver ??= Application.Driver!;
 
         var actualLook = driver.ToString ();
 
@@ -200,7 +200,7 @@ internal partial class DriverAssert
     {
         List<List<string>> lines = [];
         var sb = new StringBuilder ();
-        driver ??= Application.Driver!;
+        //driver ??= Application.Driver!;
 
         int x = -1;
         int y = -1;
@@ -338,7 +338,7 @@ internal partial class DriverAssert
     /// <param name="expectedColors"></param>
     internal static void AssertDriverUsedColors (IDriver? driver = null, params Attribute [] expectedColors)
     {
-        driver ??= Application.Driver;
+        //driver ??= Application.Driver;
         Cell [,] contents = driver?.Contents!;
 
         List<Attribute> toFind = expectedColors.ToList ();
