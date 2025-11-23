@@ -9,15 +9,27 @@ namespace Terminal.Gui.App;
 public partial class ApplicationImpl : IApplication
 {
     /// <summary>
-    ///     INTERNAL: Creates a new instance of the Application backend.
+    ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property events.
     /// </summary>
-    internal ApplicationImpl () { }
+    internal ApplicationImpl ()
+    {
+        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
+        Force16Colors = Application.Force16Colors;
+        ForceDriver = Application.ForceDriver;
+
+        // Subscribe to Application static property change events
+        Application.Force16ColorsChanged += OnForce16ColorsChanged;
+        Application.ForceDriverChanged += OnForceDriverChanged;
+    }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) { _componentFactory = componentFactory; }
+    internal ApplicationImpl (IComponentFactory componentFactory) : this ()
+    {
+        _componentFactory = componentFactory;
+    }
 
     #region Singleton
 
