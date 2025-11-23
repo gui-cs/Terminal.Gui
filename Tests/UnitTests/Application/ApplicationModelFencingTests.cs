@@ -17,7 +17,7 @@ public class ApplicationModelFencingTests
     public void Create_ThenInstanceAccess_ThrowsInvalidOperationException ()
     {
         // Create a modern instance-based application
-        IApplication app = ApplicationImpl.Instance; // Force legacy
+        IApplication app = Application.Create ();
         app.Init ("fake");
 
         // Attempting to initialize using the legacy static model should throw
@@ -31,6 +31,8 @@ public class ApplicationModelFencingTests
 
         // Clean up
         app.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
+
     }
 
     [Fact]
@@ -43,7 +45,7 @@ public class ApplicationModelFencingTests
         // Attempting to create and initialize with modern instance-based model should throw
         InvalidOperationException ex = Assert.Throws<InvalidOperationException> (() =>
         {
-            IApplication app = ApplicationImpl.Instance; // Force legacy
+            IApplication app = Application.Create ();
             app.Init ("fake");
         });
 
@@ -52,6 +54,7 @@ public class ApplicationModelFencingTests
 
         // Clean up
         staticInstance.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
     }
 
     [Fact]
@@ -72,13 +75,14 @@ public class ApplicationModelFencingTests
 
         // Clean up
         staticInstance.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
     }
 
     [Fact]
     public void Create_ThenInit_ThrowsInvalidOperationException ()
     {
         // Create a modern instance-based application
-        IApplication app = ApplicationImpl.Instance; // Force legacy
+        IApplication app = Application.Create ();
         app.Init ("fake");
 
         // Attempting to initialize using the legacy static model should throw
@@ -92,6 +96,7 @@ public class ApplicationModelFencingTests
 
         // Clean up
         app.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
     }
 
     [Fact]
@@ -110,6 +115,7 @@ public class ApplicationModelFencingTests
         app1.Shutdown ();
         app2.Shutdown ();
         app3.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
     }
 
     [Fact]
@@ -126,6 +132,7 @@ public class ApplicationModelFencingTests
 
         // Clean up
         instance1.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
     }
 
     [Fact]
@@ -150,5 +157,6 @@ public class ApplicationModelFencingTests
         IApplication app2 = Application.Create ();
         Assert.NotNull (app2);
         app2.Shutdown ();
+        ApplicationImpl.ResetModelUsageTracking ();
     }
 }

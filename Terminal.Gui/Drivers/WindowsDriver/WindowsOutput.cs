@@ -357,7 +357,8 @@ internal partial class WindowsOutput : OutputBase, IOutput
     {
         // BUGBUG: This is bad. It does not work if the app was crated without
         // BUGBUG: Apis.
-        bool force16Colors = ApplicationImpl.Instance.Force16Colors;
+        // bool force16Colors = ApplicationImpl.Instance.Force16Colors;
+        bool force16Colors = false;
 
         if (force16Colors)
         {
