@@ -208,7 +208,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.TopRunnable = null;
+            Application.TopRunnable?.Dispose ();
             Application.Shutdown ();
         }
     }
