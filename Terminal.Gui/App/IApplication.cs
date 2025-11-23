@@ -39,6 +39,16 @@ public interface IApplication
 
     #region Initialization and Shutdown
 
+    /// <summary>
+    ///     Gets or sets the managed thread ID of the application's main UI thread, which is set during
+    ///     <see cref="Init"/> and used to determine if code is executing on the main thread.
+    /// </summary>
+    /// <value>
+    ///     The managed thread ID of the main UI thread, or <see langword="null"/> if the application is not initialized.
+    /// </value>
+    public int? MainThreadId { get; internal set; }
+
+
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <param name="driverName">
     ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the

@@ -9,7 +9,7 @@ public class GraphView : View, IDesignable
     public GraphView ()
     {
         // BUGBUG: This needs to be upgraded to not access the static.
-        App = ApplicationImpl.Instance;
+        //App = ApplicationImpl.Instance;
         CanFocus = true;
 
         AxisX = new ();

@@ -5,6 +5,9 @@ namespace Terminal.Gui.App;
 
 public partial class ApplicationImpl
 {
+    /// <inheritdoc />
+    public int? MainThreadId { get; set; }
+
     /// <inheritdoc/>
     public bool Initialized { get; set; }
 

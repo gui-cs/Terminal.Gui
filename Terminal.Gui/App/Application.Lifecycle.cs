@@ -43,8 +43,8 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     [Obsolete ("The legacy static Application object is going away.")]
     public static int? MainThreadId
     {
-        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
-        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+        get => ApplicationImpl.Instance.MainThreadId;
+        internal set => ApplicationImpl.Instance.MainThreadId = value;
     }
 
     /// <inheritdoc cref="IApplication.Shutdown"/>

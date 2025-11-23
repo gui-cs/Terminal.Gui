@@ -32,14 +32,16 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Act - Simulate a complete click: press → release → click
         processor.EnqueueMouseEvent (
-                                     new()
+                                     null,
+                                     new ()
                                      {
                                          Position = new (10, 5),
                                          Flags = MouseFlags.Button1Pressed
                                      });
 
         processor.EnqueueMouseEvent (
-                                     new()
+                                     null,
+                                     new ()
                                      {
                                          Position = new (10, 5),
                                          Flags = MouseFlags.Button1Released
@@ -89,7 +91,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                    for (var i = 0; i < eventsPerThread; i++)
                                    {
                                        processor.EnqueueMouseEvent (
-                                                                    new()
+                                                                    null,
+                                                                    new ()
                                                                     {
                                                                         Position = new (threadId, i),
                                                                         Flags = MouseFlags.Button1Clicked
@@ -160,7 +163,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         };
 
         // Act
-        processor.EnqueueMouseEvent (mouseEvent);
+        processor.EnqueueMouseEvent (null, mouseEvent);
 
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
@@ -196,7 +199,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act
         foreach (MouseEventArgs mouseEvent in events)
         {
-            processor.EnqueueMouseEvent (mouseEvent);
+            processor.EnqueueMouseEvent (null, mouseEvent);
         }
 
         SimulateInputThread (fakeInput, queue);
@@ -216,9 +219,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Assert.Contains (receivedEvents, e => e.Flags == MouseFlags.Button1Pressed && e.Position == new Point (10, 5));
         Assert.Contains (receivedEvents, e => e.Flags == MouseFlags.Button1Released && e.Position == new Point (10, 5));
         Assert.Contains (receivedEvents, e => e.Flags == MouseFlags.ReportMousePosition && e.Position == new Point (15, 8));
-        
+
         // There should be two clicked events: one generated, one original
-        var clickedEvents = receivedEvents.Where (e => e.Flags == MouseFlags.Button1Clicked).ToList ();
+        List<MouseEventArgs> clickedEvents = receivedEvents.Where (e => e.Flags == MouseFlags.Button1Clicked).ToList ();
         Assert.Equal (2, clickedEvents.Count);
         Assert.Contains (clickedEvents, e => e.Position == new Point (10, 5)); // Generated from press+release
         Assert.Contains (clickedEvents, e => e.Position == new Point (20, 10)); // Original
@@ -251,7 +254,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.MouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (mouseEvent);
+        processor.EnqueueMouseEvent (null, mouseEvent);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -285,7 +288,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.MouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (mouseEvent);
+        processor.EnqueueMouseEvent (null, mouseEvent);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -323,7 +326,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.MouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (mouseEvent);
+        processor.EnqueueMouseEvent (null, mouseEvent);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -372,7 +375,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.MouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (mouseEvent);
+        processor.EnqueueMouseEvent (null, mouseEvent);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -405,7 +408,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act
         foreach (MouseEventArgs mouseEvent in events)
         {
-            processor.EnqueueMouseEvent (mouseEvent);
+            processor.EnqueueMouseEvent (null, mouseEvent);
         }
 
         SimulateInputThread (fakeInput, queue);
@@ -435,7 +438,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Exception? exception = Record.Exception (() =>
                                                  {
                                                      processor.EnqueueMouseEvent (
-                                                                                  new()
+                                                                                  null,
+                                                                                  new ()
                                                                                   {
                                                                                       Position = new (10, 5),
                                                                                       Flags = MouseFlags.Button1Clicked
@@ -462,9 +466,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.MouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Enqueue multiple events before processing
-        processor.EnqueueMouseEvent (new() { Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
-        processor.EnqueueMouseEvent (new() { Position = new (2, 2), Flags = MouseFlags.ReportMousePosition });
-        processor.EnqueueMouseEvent (new() { Position = new (3, 3), Flags = MouseFlags.Button1Released });
+        processor.EnqueueMouseEvent (null, new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
+        processor.EnqueueMouseEvent (null, new () { Position = new (2, 2), Flags = MouseFlags.ReportMousePosition });
+        processor.EnqueueMouseEvent (null, new () { Position = new (3, 3), Flags = MouseFlags.Button1Released });
 
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
@@ -492,7 +496,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act & Assert - Empty/default mouse event should not throw
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     processor.EnqueueMouseEvent (new ());
+                                                     processor.EnqueueMouseEvent (null, new ());
                                                      SimulateInputThread (fakeInput, queue);
                                                      processor.ProcessQueue ();
                                                  });
@@ -515,7 +519,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Exception? exception = Record.Exception (() =>
                                                  {
                                                      processor.EnqueueMouseEvent (
-                                                                                  new()
+                                                                                  null,
+                                                                                  new ()
                                                                                   {
                                                                                       Position = new (-10, -5),
                                                                                       Flags = MouseFlags.Button1Clicked

@@ -64,7 +64,7 @@ public partial class GuiTestContext
             {
                 mouseEvent.Position = mouseEvent.ScreenPosition;
 
-                app.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+                app.Driver.InputProcessor.EnqueueMouseEvent (app, mouseEvent);
             }
             else
             {
