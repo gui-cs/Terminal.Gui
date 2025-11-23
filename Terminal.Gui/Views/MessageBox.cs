@@ -1,24 +1,69 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Displays a modal message box with a title, message, and buttons. Supports both standard and error color schemes.
+///     Displays a modal message box with a title, message, and buttons. Returns the index of the selected button,
+///     or <see langword="null"/> if the user cancels with <see cref="Application.QuitKey"/>.
 /// </summary>
 /// <remarks>
+///     <para>
+///         MessageBox provides static methods for displaying modal dialogs with customizable buttons and messages.
+///         All methods return <see langword="int?"/> where the value is the 0-based index of the button pressed,
+///         or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> (typically Esc).
+///     </para>
 ///     <para>
 ///         <see cref="Query(IApplication?, string, string, string[])"/> uses the default Dialog color scheme.
 ///         <see cref="ErrorQuery(IApplication?, string, string, string[])"/> uses the Error color scheme.
 ///     </para>
 ///     <para>
-///         Example:
+///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
+///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
+///         application instance (from <see cref="Application.Create()"/>) or use the legacy
+///         <see cref="ApplicationImpl.Instance"/> if using the static Application pattern.
+///     </para>
+///     <para>
+///         Example using instance-based pattern:
 ///         <code>
+///     IApplication app = Application.Create();
+///     app.Init();
+///     
 ///     int? result = MessageBox.Query(app, "Quit Demo", "Are you sure you want to quit?", "Yes", "No");
-///     if (result == 0)
-///         quit = true;
+///     if (result == 0) // User clicked "Yes"
+///         app.RequestStop();
+///     else if (result == null) // User pressed Esc
+///         // Handle cancellation
+///         
+///     app.Shutdown();
 ///     </code>
+///     </para>
+///     <para>
+///         Example using legacy static pattern:
+///         <code>
+///     Application.Init();
+///     
+///     int? result = MessageBox.Query(ApplicationImpl.Instance, "Quit Demo", "Are you sure?", "Yes", "No");
+///     if (result == 0) // User clicked "Yes"
+///         Application.RequestStop();
+///     
+///     Application.Shutdown();
+///     </code>
+///     </para>
+///     <para>
+///         The <see cref="Clicked"/> property provides a global variable alternative for web-based consoles
+///         without SynchronizationContext. However, using the return value is preferred as it's more thread-safe
+///         and follows modern async patterns.
 ///     </para>
 /// </remarks>
 public static class MessageBox
 {
+    /// <summary>
+    ///     The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This global variable is useful for web-based consoles without a SynchronizationContext or TaskScheduler.
+    ///     Warning: Not thread-safe.
+    /// </remarks>
+    public static int? Clicked { get; private set; }
+
     /// <summary>
     ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
@@ -32,13 +77,6 @@ public static class MessageBox
     public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center;
 
     /// <summary>
-    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 0;
-
-    /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
@@ -46,13 +84,11 @@ public static class MessageBox
     public static int DefaultMinimumHeight { get; set; } = 0;
 
     /// <summary>
-    ///     The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/>.
+    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    /// <remarks>
-    ///     This global variable is useful for web-based consoles without a SynchronizationContext or TaskScheduler.
-    ///     Warning: Not thread-safe.
-    /// </remarks>
-    public static int? Clicked { get; private set; }
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth { get; set; } = 0;
 
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions.
@@ -79,17 +115,19 @@ public static class MessageBox
         string title,
         string message,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   true,
-                   width,
-                   height,
-                   title,
-                   message,
-                   0,
-                   true,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          true,
+                          width,
+                          height,
+                          title,
+                          message,
+                          0,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/>.
@@ -106,17 +144,19 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? ErrorQuery (IApplication? app, string title, string message, params string [] buttons) =>
-        QueryFull (
-                   app,
-                   true,
-                   0,
-                   0,
-                   title,
-                   message,
-                   0,
-                   true,
-                   buttons);
+    public static int? ErrorQuery (IApplication? app, string title, string message, params string [] buttons)
+    {
+        return QueryFull (
+                          app,
+                          true,
+                          0,
+                          0,
+                          title,
+                          message,
+                          0,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions and a default button.
@@ -145,17 +185,19 @@ public static class MessageBox
         string message,
         int defaultButton = 0,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   true,
-                   width,
-                   height,
-                   title,
-                   message,
-                   defaultButton,
-                   true,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          true,
+                          width,
+                          height,
+                          title,
+                          message,
+                          defaultButton,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button.
@@ -173,17 +215,19 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? ErrorQuery (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons) =>
-        QueryFull (
-                   app,
-                   true,
-                   0,
-                   0,
-                   title,
-                   message,
-                   defaultButton,
-                   true,
-                   buttons);
+    public static int? ErrorQuery (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons)
+    {
+        return QueryFull (
+                          app,
+                          true,
+                          0,
+                          0,
+                          title,
+                          message,
+                          defaultButton,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions, a default button, and word-wrap control.
@@ -217,17 +261,19 @@ public static class MessageBox
         int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   true,
-                   width,
-                   height,
-                   title,
-                   message,
-                   defaultButton,
-                   wrapMessage,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          true,
+                          width,
+                          height,
+                          title,
+                          message,
+                          defaultButton,
+                          wrapMessage,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button and word-wrap control.
@@ -256,17 +302,19 @@ public static class MessageBox
         int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   true,
-                   0,
-                   0,
-                   title,
-                   message,
-                   defaultButton,
-                   wrapMessage,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          true,
+                          0,
+                          0,
+                          title,
+                          message,
+                          defaultButton,
+                          wrapMessage,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays a <see cref="MessageBox"/> with fixed dimensions.
@@ -286,17 +334,19 @@ public static class MessageBox
     ///     Consider using <see cref="Query(IApplication?, string, string, string[])"/> which automatically sizes the
     ///     MessageBox.
     /// </remarks>
-    public static int? Query (IApplication? app, int width, int height, string title, string message, params string [] buttons) =>
-        QueryFull (
-                   app,
-                   false,
-                   width,
-                   height,
-                   title,
-                   message,
-                   0,
-                   true,
-                   buttons);
+    public static int? Query (IApplication? app, int width, int height, string title, string message, params string [] buttons)
+    {
+        return QueryFull (
+                          app,
+                          false,
+                          width,
+                          height,
+                          title,
+                          message,
+                          0,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an auto-sized <see cref="MessageBox"/>.
@@ -313,17 +363,19 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? Query (IApplication? app, string title, string message, params string [] buttons) =>
-        QueryFull (
-                   app,
-                   false,
-                   0,
-                   0,
-                   title,
-                   message,
-                   0,
-                   true,
-                   buttons);
+    public static int? Query (IApplication? app, string title, string message, params string [] buttons)
+    {
+        return QueryFull (
+                          app,
+                          false,
+                          0,
+                          0,
+                          title,
+                          message,
+                          0,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays a <see cref="MessageBox"/> with fixed dimensions and a default button.
@@ -352,17 +404,19 @@ public static class MessageBox
         string message,
         int defaultButton = 0,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   false,
-                   width,
-                   height,
-                   title,
-                   message,
-                   defaultButton,
-                   true,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          false,
+                          width,
+                          height,
+                          title,
+                          message,
+                          defaultButton,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an auto-sized <see cref="MessageBox"/> with a default button.
@@ -380,17 +434,19 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? Query (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons) =>
-        QueryFull (
-                   app,
-                   false,
-                   0,
-                   0,
-                   title,
-                   message,
-                   defaultButton,
-                   true,
-                   buttons);
+    public static int? Query (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons)
+    {
+        return QueryFull (
+                          app,
+                          false,
+                          0,
+                          0,
+                          title,
+                          message,
+                          defaultButton,
+                          true,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays a <see cref="MessageBox"/> with fixed dimensions, a default button, and word-wrap control.
@@ -424,17 +480,19 @@ public static class MessageBox
         int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   false,
-                   width,
-                   height,
-                   title,
-                   message,
-                   defaultButton,
-                   wrapMessage,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          false,
+                          width,
+                          height,
+                          title,
+                          message,
+                          defaultButton,
+                          wrapMessage,
+                          buttons);
+    }
 
     /// <summary>
     ///     Displays an auto-sized <see cref="MessageBox"/> with a default button and word-wrap control.
@@ -463,17 +521,19 @@ public static class MessageBox
         int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
-    ) =>
-        QueryFull (
-                   app,
-                   false,
-                   0,
-                   0,
-                   title,
-                   message,
-                   defaultButton,
-                   wrapMessage,
-                   buttons);
+    )
+    {
+        return QueryFull (
+                          app,
+                          false,
+                          0,
+                          0,
+                          title,
+                          message,
+                          defaultButton,
+                          wrapMessage,
+                          buttons);
+    }
 
     private static int? QueryFull (
         IApplication? app,
@@ -512,6 +572,7 @@ public static class MessageBox
                 if (count == defaultButton)
                 {
                     b.IsDefault = true;
+
                     b.Accepting += (s, e) =>
                                    {
                                        if (e?.Context?.Source is Button button)

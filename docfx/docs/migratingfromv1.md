@@ -4,6 +4,14 @@ This document provides an overview of the changes between Terminal.Gui v1 and v2
 
 For detailed breaking change documentation check out this Discussion: https://github.com/gui-cs/Terminal.Gui/discussions/2448
 
+## Quick Links to Major Changes
+
+- **[MessageBox and Clipboard Changes](messagebox-clipboard-changes-v2.md)** - Comprehensive guide to MessageBox nullable returns, Clipboard refactoring, and model usage fencing
+- **[Application Architecture](application.md)** - Complete details on the new instance-based application architecture
+- **[Navigation](navigation.md)** - Updated navigation system with focus management
+- **[Keyboard](keyboard.md)** - New keyboard API and key bindings
+- **[Layout](layout.md)** - Improved layout system with Viewport, Adornments, and built-in scrolling
+
 ## View Constructors -> Initializers
 
 In v1, @Terminal.Gui.View and most sub-classes had multiple constructors that took a variety of parameters. In v2, the constructors have been replaced with initializers. This change was made to simplify the API and make it easier to use. In addition, the v1 constructors drove a false (and needlessly complex) distinction between "Absolute" and "Computed" layout. In v2, the layout system is much simpler and more intuitive.
