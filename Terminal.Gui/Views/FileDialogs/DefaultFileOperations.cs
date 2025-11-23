@@ -138,7 +138,7 @@ public class DefaultFileOperations : IFileOperations
         btnOk.Accepting += (s, e) =>
                          {
                              confirm = true;
-                             Application.RequestStop ();
+                             (s as View)?.App?.RequestStop ();
                              // When Accepting is handled, set e.Handled to true to prevent further processing.
                              e.Handled = true;
                          };
@@ -147,7 +147,7 @@ public class DefaultFileOperations : IFileOperations
         btnCancel.Accepting += (s, e) =>
                              {
                                  confirm = false;
-                                 Application.RequestStop ();
+                                 (s as View)?.App?.RequestStop ();
                                  // When Accepting is handled, set e.Handled to true to prevent further processing.
                                  e.Handled = true;
                              };
