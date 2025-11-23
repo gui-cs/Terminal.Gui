@@ -1,6 +1,4 @@
-using UnitTests;
-
-namespace UnitTests.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class TimeFieldTests
 {

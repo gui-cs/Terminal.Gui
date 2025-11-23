@@ -8,8 +8,6 @@ public class GraphView : View, IDesignable
     /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
     public GraphView ()
     {
-        // BUGBUG: This needs to be upgraded to not access the static.
-        App = ApplicationImpl.Instance;
         CanFocus = true;
 
         AxisX = new ();

@@ -421,7 +421,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
                                  if (iterations == 0)
                                  {
-                                     MessageBox.Query (app, height, width, string.Empty, message, null);
+                                     MessageBox.Query (app, height, width, string.Empty, message);
                                      app.RequestStop ();
                                  }
                                  else if (iterations == 1)
@@ -499,7 +499,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
                                  if (iterations == 0)
                                  {
-                                     MessageBox.Query (app, height, width, string.Empty, string.Empty, null);
+                                     MessageBox.Query (app, height, width, string.Empty, string.Empty);
                                      app.RequestStop ();
                                  }
                                  else if (iterations == 1)

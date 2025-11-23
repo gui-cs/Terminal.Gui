@@ -1,6 +1,7 @@
+#nullable enable
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 /// <summary>
 ///     Integration tests for IApplication's IRunnable support.
