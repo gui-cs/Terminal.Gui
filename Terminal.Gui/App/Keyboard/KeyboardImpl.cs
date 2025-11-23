@@ -12,12 +12,12 @@ namespace Terminal.Gui.App;
 /// </summary>
 internal class KeyboardImpl : IKeyboard, IDisposable
 {
-    private Key _quitKey = Key.Esc; // Resources/config.json overrides
-    private Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
-    private Key _nextTabGroupKey = Key.F6; // Resources/config.json overrides
-    private Key _nextTabKey = Key.Tab; // Resources/config.json overrides
-    private Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrides
-    private Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrides
+    private Key _quitKey;
+    private Key _arrangeKey;
+    private Key _nextTabGroupKey;
+    private Key _nextTabKey;
+    private Key _prevTabGroupKey;
+    private Key _prevTabKey;
 
     /// <summary>
     ///     Commands for Application.
@@ -367,19 +367,21 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                         return false;
                     });
 
-        //SetKeysToHardCodedDefaults ();
-
         // Need to clear after setting the above to ensure actually clear
-        // because set_QuitKey etc.. may call Add
-        KeyBindings.Clear ();
+        // because set_QuitKey etc. may call Add
+        //KeyBindings.Clear ();
 
-        KeyBindings.Add (QuitKey, Command.Quit);
-        KeyBindings.Add (NextTabKey, Command.NextTabStop);
-        KeyBindings.Add (PrevTabKey, Command.PreviousTabStop);
-        KeyBindings.Add (NextTabGroupKey, Command.NextTabGroup);
-        KeyBindings.Add (PrevTabGroupKey, Command.PreviousTabGroup);
-        KeyBindings.Add (ArrangeKey, Command.Arrange);
+        // Use ReplaceCommands instead of Add, because it's possible that
+        // during construction the Application static properties changed, and
+        // we added those keys already.
+        KeyBindings.ReplaceCommands (QuitKey, Command.Quit);
+        KeyBindings.ReplaceCommands (NextTabKey, Command.NextTabStop);
+        KeyBindings.ReplaceCommands (PrevTabKey, Command.PreviousTabStop);
+        KeyBindings.ReplaceCommands (NextTabGroupKey, Command.NextTabGroup);
+        KeyBindings.ReplaceCommands (PrevTabGroupKey, Command.PreviousTabGroup);
+        KeyBindings.ReplaceCommands (ArrangeKey, Command.Arrange);
 
+        // TODO: Should these be configurable?
         KeyBindings.Add (Key.CursorRight, Command.NextTabStop);
         KeyBindings.Add (Key.CursorDown, Command.NextTabStop);
         KeyBindings.Add (Key.CursorLeft, Command.PreviousTabStop);

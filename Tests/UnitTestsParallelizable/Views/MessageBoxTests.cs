@@ -1,9 +1,10 @@
 ﻿#nullable enable
 using System.Text;
 using UICatalog;
+using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.DialogTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class MessageBoxTests (ITestOutputHelper output)
 {
