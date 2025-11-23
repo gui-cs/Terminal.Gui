@@ -13,10 +13,6 @@ public partial class ApplicationImpl : IApplication
     /// </summary>
     internal ApplicationImpl ()
     {
-        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
-        Force16Colors = Application.Force16Colors;
-        ForceDriver = Application.ForceDriver;
-
         // Subscribe to Application static property change events
         Application.Force16ColorsChanged += OnForce16ColorsChanged;
         Application.ForceDriverChanged += OnForceDriverChanged;
