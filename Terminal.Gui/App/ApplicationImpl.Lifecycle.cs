@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Terminal.Gui.App;
 
@@ -23,17 +24,27 @@ public partial class ApplicationImpl
             throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
 
-        // Check the fence: ensure we're not mixing application models
-        // If this is a legacy static instance and instance-based model was used, throw
-        if (this == _instance && ModelUsage == ApplicationModelUsage.InstanceBased)
+        // Thread-safe fence check: Ensure we're not mixing application models
+        // Use lock to make check-and-set atomic
+        lock (_modelUsageLock)
         {
-            throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
-        }
+            // If this is a legacy static instance and instance-based model was used, throw
+            if (this == _instance && ModelUsage == ApplicationModelUsage.InstanceBased)
+            {
+                throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
+            }
 
-        // If this is an instance-based instance and legacy static model was used, throw
-        if (this != _instance && ModelUsage == ApplicationModelUsage.LegacyStatic)
-        {
-            throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
+            // If this is an instance-based instance and legacy static model was used, throw
+            if (this != _instance && ModelUsage == ApplicationModelUsage.LegacyStatic)
+            {
+                throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
+            }
+
+            // If no model has been set yet, set it now based on which instance this is
+            if (ModelUsage == ApplicationModelUsage.None)
+            {
+                ModelUsage = this == _instance ? ApplicationModelUsage.LegacyStatic : ApplicationModelUsage.InstanceBased;
+            }
         }
 
         if (!string.IsNullOrWhiteSpace (driverName))
@@ -96,7 +107,7 @@ public partial class ApplicationImpl
         if (runnableToDispose is { })
         {
             // Extract the result using reflection to get the Result property value
-            var resultProperty = runnableToDispose.GetType ().GetProperty ("Result");
+            PropertyInfo? resultProperty = runnableToDispose.GetType ().GetProperty ("Result");
             result = resultProperty?.GetValue (runnableToDispose);
         }
 
@@ -128,6 +139,7 @@ public partial class ApplicationImpl
             {
                 disposable.Dispose ();
             }
+
             FrameworkOwnedRunnable = null;
         }
 
@@ -150,36 +162,6 @@ public partial class ApplicationImpl
 
         return result;
     }
-
-#if DEBUG
-    /// <summary>
-    ///     DEBUG ONLY: Asserts that an event has no remaining subscribers.
-    /// </summary>
-    /// <param name="eventName">The name of the event for diagnostic purposes.</param>
-    /// <param name="eventDelegate">The event delegate to check.</param>
-    private static void AssertNoEventSubscribers (string eventName, Delegate? eventDelegate)
-    {
-        if (eventDelegate is null)
-        {
-            return;
-        }
-
-        Delegate [] subscribers = eventDelegate.GetInvocationList ();
-
-        if (subscribers.Length > 0)
-        {
-            string subscriberInfo = string.Join (
-                                                 ", ",
-                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
-                                                                    )
-                                                );
-
-            Debug.Fail (
-                        $"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}"
-                       );
-        }
-    }
-#endif
 
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
@@ -305,16 +287,40 @@ public partial class ApplicationImpl
     /// </summary>
     internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
 
-    // Event handlers for Application static property changes
-    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e)
+#if DEBUG
+    /// <summary>
+    ///     DEBUG ONLY: Asserts that an event has no remaining subscribers.
+    /// </summary>
+    /// <param name="eventName">The name of the event for diagnostic purposes.</param>
+    /// <param name="eventDelegate">The event delegate to check.</param>
+    private static void AssertNoEventSubscribers (string eventName, Delegate? eventDelegate)
     {
-        Force16Colors = e.NewValue;
-    }
+        if (eventDelegate is null)
+        {
+            return;
+        }
 
-    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e)
-    {
-        ForceDriver = e.NewValue;
+        Delegate [] subscribers = eventDelegate.GetInvocationList ();
+
+        if (subscribers.Length > 0)
+        {
+            string subscriberInfo = string.Join (
+                                                 ", ",
+                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
+                                                                    )
+                                                );
+
+            Debug.Fail (
+                        $"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}"
+                       );
+        }
     }
+#endif
+
+    // Event handlers for Application static property changes
+    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
+
+    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
 
     /// <summary>
     ///     Unsubscribes from Application static property change events.

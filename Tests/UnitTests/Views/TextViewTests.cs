@@ -71,7 +71,7 @@ public class TextViewTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -4956,7 +4956,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5004,7 +5004,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5052,7 +5052,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5109,7 +5109,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);
@@ -5168,7 +5168,7 @@ This is the second line.
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             int width = _textView.Viewport.Width - 1;
             Assert.Equal (30, width + 1);

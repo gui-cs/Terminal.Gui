@@ -1,7 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-using static Terminal.Gui.ViewBase.Dim;
-using static Terminal.Gui.ViewBase.Pos;
+﻿#nullable enable
 
 namespace UnitTests.LayoutTests;
 
@@ -116,7 +113,7 @@ public class PosTests ()
 
         return;
 
-        void OnInstanceOnIteration (object s, EventArgs<IApplication?> a)
+        void OnInstanceOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count < 20)
             {
@@ -191,7 +188,7 @@ public class PosTests ()
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count > 0)
             {

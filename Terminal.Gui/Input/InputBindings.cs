@@ -194,17 +194,28 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (newEventArgs));
         }
 
-        // Thread-safe: Get the old binding (or create a default one if it doesn't exist)
-        TBinding binding = _bindings.GetOrAdd (oldEventArgs, _ => new ());
-
-        // Thread-safe: Remove the old key only if it's different from the new key
-        if (!EqualityComparer<TEvent>.Default.Equals (oldEventArgs, newEventArgs))
+        // Thread-safe: Handle the case where oldEventArgs == newEventArgs
+        if (EqualityComparer<TEvent>.Default.Equals (oldEventArgs, newEventArgs))
         {
-            _bindings.TryRemove (oldEventArgs, out _);
+            // Same key - nothing to do, binding stays as-is
+            return;
         }
 
-        // Thread-safe: Add or update the new key atomically
-        _bindings.AddOrUpdate (newEventArgs, binding, (key, existingBinding) => binding);
+        // Thread-safe: Get the binding from oldEventArgs, or create default if it doesn't exist
+        // This is atomic - either gets existing or adds new
+        TBinding binding = _bindings.GetOrAdd (oldEventArgs, _ => new TBinding ());
+
+        // Thread-safe: Atomically add/update newEventArgs with the binding from oldEventArgs
+        // The updateValueFactory is only called if the key already exists, ensuring we don't
+        // accidentally overwrite a binding that was added by another thread
+        _bindings.AddOrUpdate (
+            newEventArgs,
+            binding, // Add this binding if newEventArgs doesn't exist
+            (_, _) => binding);
+
+        // Thread-safe: Remove oldEventArgs only after newEventArgs has been set
+        // This ensures we don't lose the binding if another thread is reading it
+        _bindings.TryRemove (oldEventArgs, out _);
     }
 
     /// <summary>Replaces the commands already bound to a combination of <typeparamref name="TEvent"/>.</summary>
@@ -220,7 +231,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
         TBinding newBinding = _constructBinding (newCommands, eventArgs);
 
         // Thread-safe: Add or update atomically
-        _bindings.AddOrUpdate (eventArgs, newBinding, (key, existingBinding) => newBinding);
+        _bindings.AddOrUpdate (eventArgs, newBinding, (_, _) => newBinding);
     }
 
     /// <summary>Gets the commands bound with the specified <typeparamref name="TEvent"/>.</summary>

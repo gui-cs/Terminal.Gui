@@ -128,7 +128,7 @@ public class ToplevelTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             iterations++;
 
@@ -249,7 +249,7 @@ public class ToplevelTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             iterations++;
 

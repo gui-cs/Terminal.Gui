@@ -64,7 +64,7 @@ public class ApplicationTests
     public void Begin_Null_Toplevel_Throws ()
     {
         // Test null Toplevel
-        Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
+        Assert.Throws<ArgumentNullException> (() => Application.Begin (null!));
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class ApplicationTests
         var stopwatch = new Stopwatch ();
         stopwatch.Start ();
 
-        SessionToken sessionToken = null;
+        SessionToken? sessionToken = null;
 
         EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
                                                                 {
@@ -338,7 +338,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
             if (a.Value)
             {
@@ -378,7 +378,7 @@ public class ApplicationTests
         Toplevel topLevel = new ();
         Application.Init ("fake");
 
-        SessionToken sessionToken = null;
+        SessionToken? sessionToken = null;
 
         EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
                                                                 {
@@ -451,7 +451,7 @@ public class ApplicationTests
 
         return;
 
-        void Application_Iteration (object sender, EventArgs<IApplication?> e)
+        void Application_Iteration (object? sender, EventArgs<IApplication?> e)
         {
             if (iteration > 0)
             {
@@ -467,7 +467,7 @@ public class ApplicationTests
     [SetupFakeApplication]
     public void Screen_Size_Changes ()
     {
-        IDriver driver = Application.Driver;
+        IDriver? driver = Application.Driver;
 
         Application.Driver!.SetScreenSize (80, 25);
 
@@ -559,7 +559,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             Assert.NotEqual (initTop, Application.TopRunnable);
 #if DEBUG_IDISPOSABLE
@@ -640,7 +640,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a) { Application.RequestStop (); }
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a) { Application.RequestStop (); }
     }
 
     [Fact]
@@ -659,7 +659,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             Assert.True (top.Running);
             top.RequestStop ();
@@ -682,7 +682,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a) { top.Running = false; }
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a) { top.Running = false; }
     }
 
     [Fact]
@@ -802,7 +802,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> e) { Assert.NotNull (Application.TopRunnable); }
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> e) { Assert.NotNull (Application.TopRunnable); }
     }
 
     [Fact]
@@ -866,7 +866,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplication_OnIteration (object s, EventArgs<IApplication?> e)
+        void OnApplication_OnIteration (object? s, EventArgs<IApplication?> e)
         {
             Assert.NotNull (Application.TopRunnable);
             Application.RequestStop ();
