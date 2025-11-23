@@ -34,7 +34,7 @@ public class FakeInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
         // If Application.Invoke is available (running in Application context), defer to next iteration
         // to ensure proper timing - the event is raised after views are laid out.
         // Otherwise (unit tests), raise immediately so tests can verify synchronously.
-        if (Application.MainThreadId is { })
+        if (ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic && Application.MainThreadId is { })
         {
             // Application is running - use Invoke to defer to next iteration
             ApplicationImpl.Instance.Invoke ((_) => RaiseMouseEvent (mouseEvent));

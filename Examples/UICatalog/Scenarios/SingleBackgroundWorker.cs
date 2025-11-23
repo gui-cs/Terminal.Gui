@@ -270,7 +270,7 @@ public class SingleBackgroundWorker : Scenario
                                                 {
                                                     if (Close ())
                                                     {
-                                                        App.RequestStop ();
+                                                        App?.RequestStop ();
                                                     }
                                                 }
                                                )

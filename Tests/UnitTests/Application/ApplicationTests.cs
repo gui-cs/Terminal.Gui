@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#nullable enable
+using System.Diagnostics;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
@@ -24,7 +25,7 @@ public class ApplicationTests
     [Fact]
     public void AddTimeout_Fires ()
     {
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
         app.Init ("fake");
 
         uint timeoutTime = 100;

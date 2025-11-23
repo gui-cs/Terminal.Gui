@@ -108,7 +108,7 @@ public class FileDialog : Dialog, IDesignable
 
                                     if (Modal)
                                     {
-                                        Application.RequestStop ();
+                                        (s as View)?.App?.RequestStop ();
                                     }
                                 };
 
@@ -468,7 +468,6 @@ public class FileDialog : Dialog, IDesignable
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
 
         _treeView.AddObjects (_treeRoots.Keys);
-#if MENU_V1
 
         // if filtering on file type is configured then create the ComboBox and establish
         // initial filtering by extension(s)
@@ -479,6 +478,7 @@ public class FileDialog : Dialog, IDesignable
             // Fiddle factor
             int width = AllowedTypes.Max (a => a.ToString ()!.Length) + 6;
 
+#if MENU_V1
             _allowedTypeMenu = new (
                                     "<placeholder>",
                                     _allowedTypeMenuItems = AllowedTypes.Select (
@@ -512,8 +512,8 @@ public class FileDialog : Dialog, IDesignable
                                                   };
 
             Add (_allowedTypeMenuBar);
-        }
 #endif
+        }
 
         // if no path has been provided
         if (_tbPath.Text.Length <= 0)
@@ -879,7 +879,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (Modal)
         {
-            Application.RequestStop ();
+            App?.RequestStop ();
         }
     }
 

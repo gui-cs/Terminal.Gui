@@ -27,7 +27,9 @@ public class ApplicationImplTests
         m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
         m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
-        return new ApplicationImpl (m.Object);
+        // TODO: Move these tests to Parallelizable tests 
+        ApplicationImpl.SetInstance(new ApplicationImpl (m.Object));
+        return ApplicationImpl.Instance;
     }
 
     [Fact]

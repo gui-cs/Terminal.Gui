@@ -10,14 +10,14 @@ namespace Terminal.Gui.App;
 ///         See <see cref="IKeyboard"/> for usage details.
 ///     </para>
 /// </summary>
-internal class KeyboardImpl : IKeyboard
+internal class KeyboardImpl : IKeyboard, IDisposable
 {
-    private Key _quitKey = Key.Esc; // Resources/config.json overrides
-    private Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
-    private Key _nextTabGroupKey = Key.F6; // Resources/config.json overrides
-    private Key _nextTabKey = Key.Tab; // Resources/config.json overrides
-    private Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrides
-    private Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrides
+    private Key _quitKey;
+    private Key _arrangeKey;
+    private Key _nextTabGroupKey;
+    private Key _nextTabKey;
+    private Key _prevTabGroupKey;
+    private Key _prevTabKey;
 
     /// <summary>
     ///     Commands for Application.
@@ -103,10 +103,26 @@ internal class KeyboardImpl : IKeyboard
     public event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Initializes keyboard bindings.
+    ///     Initializes keyboard bindings and subscribes to Application configuration property events.
     /// </summary>
     public KeyboardImpl ()
     {
+        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
+        _quitKey = Application.QuitKey;
+        _arrangeKey = Application.ArrangeKey;
+        _nextTabGroupKey = Application.NextTabGroupKey;
+        _nextTabKey = Application.NextTabKey;
+        _prevTabGroupKey = Application.PrevTabGroupKey;
+        _prevTabKey = Application.PrevTabKey;
+
+        // Subscribe to Application static property change events
+        Application.QuitKeyChanged += OnQuitKeyChanged;
+        Application.ArrangeKeyChanged += OnArrangeKeyChanged;
+        Application.NextTabGroupKeyChanged += OnNextTabGroupKeyChanged;
+        Application.NextTabKeyChanged += OnNextTabKeyChanged;
+        Application.PrevTabGroupKeyChanged += OnPrevTabGroupKeyChanged;
+        Application.PrevTabKeyChanged += OnPrevTabKeyChanged;
+
         AddKeyBindings ();
     }
 
@@ -351,19 +367,21 @@ internal class KeyboardImpl : IKeyboard
                         return false;
                     });
 
-        //SetKeysToHardCodedDefaults ();
-
         // Need to clear after setting the above to ensure actually clear
-        // because set_QuitKey etc.. may call Add
-        KeyBindings.Clear ();
+        // because set_QuitKey etc. may call Add
+        //KeyBindings.Clear ();
 
-        KeyBindings.Add (QuitKey, Command.Quit);
-        KeyBindings.Add (NextTabKey, Command.NextTabStop);
-        KeyBindings.Add (PrevTabKey, Command.PreviousTabStop);
-        KeyBindings.Add (NextTabGroupKey, Command.NextTabGroup);
-        KeyBindings.Add (PrevTabGroupKey, Command.PreviousTabGroup);
-        KeyBindings.Add (ArrangeKey, Command.Arrange);
+        // Use ReplaceCommands instead of Add, because it's possible that
+        // during construction the Application static properties changed, and
+        // we added those keys already.
+        KeyBindings.ReplaceCommands (QuitKey, Command.Quit);
+        KeyBindings.ReplaceCommands (NextTabKey, Command.NextTabStop);
+        KeyBindings.ReplaceCommands (PrevTabKey, Command.PreviousTabStop);
+        KeyBindings.ReplaceCommands (NextTabGroupKey, Command.NextTabGroup);
+        KeyBindings.ReplaceCommands (PrevTabGroupKey, Command.PreviousTabGroup);
+        KeyBindings.ReplaceCommands (ArrangeKey, Command.Arrange);
 
+        // TODO: Should these be configurable?
         KeyBindings.Add (Key.CursorRight, Command.NextTabStop);
         KeyBindings.Add (Key.CursorDown, Command.NextTabStop);
         KeyBindings.Add (Key.CursorLeft, Command.PreviousTabStop);
@@ -377,5 +395,48 @@ internal class KeyboardImpl : IKeyboard
         {
             KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         }
+    }
+
+    // Event handlers for Application static property changes
+    private void OnQuitKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        QuitKey = e.NewValue;
+    }
+
+    private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        ArrangeKey = e.NewValue;
+    }
+
+    private void OnNextTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        NextTabGroupKey = e.NewValue;
+    }
+
+    private void OnNextTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        NextTabKey = e.NewValue;
+    }
+
+    private void OnPrevTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        PrevTabGroupKey = e.NewValue;
+    }
+
+    private void OnPrevTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        PrevTabKey = e.NewValue;
+    }
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        // Unsubscribe from Application static property change events
+        Application.QuitKeyChanged -= OnQuitKeyChanged;
+        Application.ArrangeKeyChanged -= OnArrangeKeyChanged;
+        Application.NextTabGroupKeyChanged -= OnNextTabGroupKeyChanged;
+        Application.NextTabKeyChanged -= OnNextTabKeyChanged;
+        Application.PrevTabGroupKeyChanged -= OnPrevTabGroupKeyChanged;
+        Application.PrevTabKeyChanged -= OnPrevTabKeyChanged;
     }
 }

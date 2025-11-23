@@ -23,6 +23,19 @@ public partial class ApplicationImpl
             throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
 
+        // Check the fence: ensure we're not mixing application models
+        // If this is a legacy static instance and instance-based model was used, throw
+        if (this == _instance && ModelUsage == ApplicationModelUsage.InstanceBased)
+        {
+            throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
+        }
+
+        // If this is an instance-based instance and legacy static model was used, throw
+        if (this != _instance && ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
+        }
+
         if (!string.IsNullOrWhiteSpace (driverName))
         {
             _driverName = driverName;
@@ -241,6 +254,17 @@ public partial class ApplicationImpl
         ClearScreenNextIteration = false;
 
         // === 6. Reset input systems ===
+        // Dispose keyboard and mouse to unsubscribe from events
+        if (_keyboard is IDisposable keyboardDisposable)
+        {
+            keyboardDisposable.Dispose ();
+        }
+
+        if (_mouse is IDisposable mouseDisposable)
+        {
+            mouseDisposable.Dispose ();
+        }
+
         // Mouse and Keyboard will be lazy-initialized on next access
         _mouse = null;
         _keyboard = null;
@@ -273,10 +297,33 @@ public partial class ApplicationImpl
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
+
+        // === 12. Unsubscribe from Application static property change events ===
+        UnsubscribeApplicationEvents ();
     }
 
     /// <summary>
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
     internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
+
+    // Event handlers for Application static property changes
+    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e)
+    {
+        Force16Colors = e.NewValue;
+    }
+
+    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e)
+    {
+        ForceDriver = e.NewValue;
+    }
+
+    /// <summary>
+    ///     Unsubscribes from Application static property change events.
+    /// </summary>
+    private void UnsubscribeApplicationEvents ()
+    {
+        Application.Force16ColorsChanged -= OnForce16ColorsChanged;
+        Application.ForceDriverChanged -= OnForceDriverChanged;
+    }
 }
