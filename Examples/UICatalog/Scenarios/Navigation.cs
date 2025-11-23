@@ -210,7 +210,7 @@ public class Navigation : Scenario
 
         return;
 
-        void OnApplicationIteration (object sender, EventArgs<IApplication?> args)
+        void OnApplicationIteration (object sender, EventArgs<IApplication> args)
         {
             if (progressBar.Fraction == 1.0)
             {

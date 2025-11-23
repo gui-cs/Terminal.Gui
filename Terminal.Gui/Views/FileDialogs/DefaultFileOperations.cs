@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 public class DefaultFileOperations : IFileOperations
 {
     /// <inheritdoc/>
-    public bool Delete (IApplication? app, IEnumerable<IFileSystemInfo> toDelete)
+    public bool Delete (IApplication app, IEnumerable<IFileSystemInfo> toDelete)
     {
         // Default implementation does not allow deleting multiple files
         if (toDelete.Count () != 1)
@@ -50,7 +50,7 @@ public class DefaultFileOperations : IFileOperations
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo Rename (IApplication? app, IFileSystem fileSystem, IFileSystemInfo toRename)
+    public IFileSystemInfo Rename (IApplication app, IFileSystem fileSystem, IFileSystemInfo toRename)
     {
         // Don't allow renaming C: or D: or / (on linux) etc
         if (toRename is IDirectoryInfo dir && dir.Parent is null)
@@ -104,7 +104,7 @@ public class DefaultFileOperations : IFileOperations
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo New (IApplication? app, IFileSystem fileSystem, IDirectoryInfo inDirectory)
+    public IFileSystemInfo New (IApplication app, IFileSystem fileSystem, IDirectoryInfo inDirectory)
     {
         if (Prompt (Strings.fdNewTitle, "", out string named))
         {

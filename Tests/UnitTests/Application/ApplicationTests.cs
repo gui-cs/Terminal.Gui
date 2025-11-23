@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#nullable enable
+using System.Diagnostics;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
