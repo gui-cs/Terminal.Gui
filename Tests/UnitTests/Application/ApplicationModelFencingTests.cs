@@ -17,7 +17,7 @@ public class ApplicationModelFencingTests
     public void Create_ThenInstanceAccess_ThrowsInvalidOperationException ()
     {
         // Create a modern instance-based application
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
         app.Init ("fake");
 
         // Attempting to initialize using the legacy static model should throw
@@ -43,7 +43,7 @@ public class ApplicationModelFencingTests
         // Attempting to create and initialize with modern instance-based model should throw
         InvalidOperationException ex = Assert.Throws<InvalidOperationException> (() =>
         {
-            IApplication app = Application.Create ();
+            IApplication app = ApplicationImpl.Instance; // Force legacy
             app.Init ("fake");
         });
 
@@ -78,7 +78,7 @@ public class ApplicationModelFencingTests
     public void Create_ThenInit_ThrowsInvalidOperationException ()
     {
         // Create a modern instance-based application
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
         app.Init ("fake");
 
         // Attempting to initialize using the legacy static model should throw

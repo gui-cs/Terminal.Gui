@@ -14,7 +14,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
     private IApplication NewApplicationImpl ()
     {
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
 
         return app;
     }

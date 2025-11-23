@@ -17,7 +17,6 @@ public static partial class Application // Navigation stuff
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    [Obsolete ("The legacy static Application object is going away.")]
     public static Key NextTabGroupKey
     {
         get => _nextTabGroupKey;

@@ -24,7 +24,7 @@ public class ApplicationTests
     [Fact]
     public void AddTimeout_Fires ()
     {
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
         app.Init ("fake");
 
         uint timeoutTime = 100;

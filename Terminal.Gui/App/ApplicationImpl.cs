@@ -36,19 +36,19 @@ public partial class ApplicationImpl : IApplication
     /// <summary>
     ///     Tracks which application model has been used in this process.
     /// </summary>
-    private static ApplicationModelUsage _modelUsage = ApplicationModelUsage.None;
+    public static ApplicationModelUsage ModelUsage { get; private set; } = ApplicationModelUsage.None;
 
     /// <summary>
     ///     Error message for when trying to use modern model after legacy static model.
     /// </summary>
-    private const string ErrorModernAfterLegacy =
+    internal const string ERROR_MODERN_AFTER_LEGACY =
         "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
         "Use only one model per process.";
 
     /// <summary>
     ///     Error message for when trying to use legacy static model after modern model.
     /// </summary>
-    private const string ErrorLegacyAfterModern =
+    internal const string ERROR_LEGACY_AFTER_MODERN =
         "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
         "Use only one model per process.";
 
@@ -56,7 +56,11 @@ public partial class ApplicationImpl : IApplication
     ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
     /// <param name="app"></param>
-    public static void SetInstance (IApplication? app) { _instance = app; }
+    public static void SetInstance (IApplication? app)
+    {
+        ModelUsage = ApplicationModelUsage.LegacyStatic;
+        _instance = app;
+    }
 
     // Private static readonly Lazy instance of Application
     private static IApplication? _instance;
@@ -76,13 +80,13 @@ public partial class ApplicationImpl : IApplication
             }
 
             // Check if the instance-based model has already been used
-            if (_modelUsage == ApplicationModelUsage.InstanceBased)
+            if (ModelUsage == ApplicationModelUsage.InstanceBased)
             {
-                throw new InvalidOperationException (ErrorLegacyAfterModern);
+                throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
             }
 
             // Mark the usage and create the instance
-            _modelUsage = ApplicationModelUsage.LegacyStatic;
+            ModelUsage = ApplicationModelUsage.LegacyStatic;
 
             return _instance = new ApplicationImpl ();
         }
@@ -94,12 +98,12 @@ public partial class ApplicationImpl : IApplication
     internal static void MarkInstanceBasedModelUsed ()
     {
         // Check if the legacy static model has already been initialized
-        if (_modelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
+        if (ModelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
         {
-            throw new InvalidOperationException (ErrorModernAfterLegacy);
+            throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
         }
 
-        _modelUsage = ApplicationModelUsage.InstanceBased;
+        ModelUsage = ApplicationModelUsage.InstanceBased;
     }
 
     /// <summary>
@@ -107,7 +111,7 @@ public partial class ApplicationImpl : IApplication
     /// </summary>
     internal static void ResetModelUsageTracking ()
     {
-        _modelUsage = ApplicationModelUsage.None;
+        ModelUsage = ApplicationModelUsage.None;
         _instance = null;
     }
 
@@ -138,20 +142,6 @@ public partial class ApplicationImpl : IApplication
 
     #endregion Singleton
 
-    /// <summary>
-    ///     Defines the different application usage models.
-    /// </summary>
-    private enum ApplicationModelUsage
-    {
-        /// <summary>No model has been used yet.</summary>
-        None,
-
-        /// <summary>Legacy static model (Application.Init/ApplicationImpl.Instance).</summary>
-        LegacyStatic,
-
-        /// <summary>Modern instance-based model (Application.Create).</summary>
-        InstanceBased
-    }
 
     private string? _driverName;
 

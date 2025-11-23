@@ -25,15 +25,15 @@ public partial class ApplicationImpl
 
         // Check the fence: ensure we're not mixing application models
         // If this is a legacy static instance and instance-based model was used, throw
-        if (this == _instance && _modelUsage == ApplicationModelUsage.InstanceBased)
+        if (this == _instance && ModelUsage == ApplicationModelUsage.InstanceBased)
         {
-            throw new InvalidOperationException (ErrorLegacyAfterModern);
+            throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
         }
 
         // If this is an instance-based instance and legacy static model was used, throw
-        if (this != _instance && _modelUsage == ApplicationModelUsage.LegacyStatic)
+        if (this != _instance && ModelUsage == ApplicationModelUsage.LegacyStatic)
         {
-            throw new InvalidOperationException (ErrorModernAfterLegacy);
+            throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
         }
 
         if (!string.IsNullOrWhiteSpace (driverName))
