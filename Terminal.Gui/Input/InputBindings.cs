@@ -194,15 +194,17 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (newEventArgs));
         }
 
-        if (TryGet (oldEventArgs, out TBinding? binding))
+        // Thread-safe: Get the old binding (or create a default one if it doesn't exist)
+        TBinding binding = _bindings.GetOrAdd (oldEventArgs, _ => new ());
+
+        // Thread-safe: Remove the old key only if it's different from the new key
+        if (!EqualityComparer<TEvent>.Default.Equals (oldEventArgs, newEventArgs))
         {
-            Remove (oldEventArgs);
-            Add (newEventArgs, binding!);
+            _bindings.TryRemove (oldEventArgs, out _);
         }
-        else
-        {
-            Add (newEventArgs, binding!);
-        }
+
+        // Thread-safe: Add or update the new key atomically
+        _bindings.AddOrUpdate (newEventArgs, binding, (key, existingBinding) => binding);
     }
 
     /// <summary>Replaces the commands already bound to a combination of <typeparamref name="TEvent"/>.</summary>
@@ -215,12 +217,10 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// <param name="newCommands">The set of commands to replace the old ones with.</param>
     public void ReplaceCommands (TEvent eventArgs, params Command [] newCommands)
     {
-        if (_bindings.ContainsKey (eventArgs))
-        {
-            Remove (eventArgs);
-        }
+        TBinding newBinding = _constructBinding (newCommands, eventArgs);
 
-        Add (eventArgs, newCommands);
+        // Thread-safe: Add or update atomically
+        _bindings.AddOrUpdate (eventArgs, newBinding, (key, existingBinding) => newBinding);
     }
 
     /// <summary>Gets the commands bound with the specified <typeparamref name="TEvent"/>.</summary>
