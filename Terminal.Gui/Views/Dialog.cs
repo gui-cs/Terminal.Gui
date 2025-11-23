@@ -11,7 +11,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
 ///     or when one of the views or buttons added to the dialog calls
-///     <see cref="Application.RequestStop"/>.
+///     <see cref="IApplication.RequestStop()"/>.
 /// </remarks>
 public class Dialog : Window
 {

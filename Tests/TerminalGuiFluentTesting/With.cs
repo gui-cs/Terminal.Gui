@@ -29,10 +29,11 @@ public static class With
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <param name="testDriver"></param>
+    /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, TestDriver testDriver)
+    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, TestDriver testDriver, TextWriter? logWriter = null)
     {
-        return new (toplevelFactory, width, height, testDriver, null, Timeout);
+        return new (toplevelFactory, width, height, testDriver, logWriter, Timeout);
     }
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.

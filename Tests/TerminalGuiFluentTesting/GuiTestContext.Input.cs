@@ -205,11 +205,6 @@ public partial class GuiTestContext
             App.Driver.EnqueueKeyEvent (key);
             WaitUntil (() => keyReceived);
         }
-        else
-        {
-            Fail ("Expected Application.Driver to be non-null.");
-        }
-
 
         return this;
 

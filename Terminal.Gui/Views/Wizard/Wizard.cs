@@ -458,7 +458,7 @@ public class Wizard : Dialog
 
                 if (IsCurrentTop)
                 {
-                    Application.RequestStop (this);
+                    (sender as View)?.App?.RequestStop (this);
                     e.Handled = true;
                 }
 

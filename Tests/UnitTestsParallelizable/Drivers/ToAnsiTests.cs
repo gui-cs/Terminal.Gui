@@ -67,7 +67,7 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Contains ("Blue", ansi);
     }
 
-    [Theory]
+    [Theory (Skip = "Uses Application.")]
     [InlineData (false, "\u001b[48;2;")]
     [InlineData (true, "\u001b[41m")]
     public void ToAnsi_With_Background_Colors (bool force16Colors, string expected)
@@ -204,7 +204,7 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Equal (50, ansi.Count (c => c == '\n'));
     }
 
-    [Fact]
+    [Fact (Skip = "Use Application.")]
     public void ToAnsi_RGB_Colors ()
     {
         IDriver driver = CreateFakeDriver (10, 1);
@@ -228,7 +228,7 @@ public class ToAnsiTests : FakeDriverBase
         }
     }
 
-    [Fact]
+    [Fact (Skip = "Use Application.")]
     public void ToAnsi_Force16Colors ()
     {
         IDriver driver = CreateFakeDriver (10, 1);

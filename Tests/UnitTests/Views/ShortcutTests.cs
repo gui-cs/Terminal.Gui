@@ -349,7 +349,7 @@ public class ShortcutTests
     [InlineData (KeyCode.F1, 0)]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        Application.TopRunnable = new () { App = Application.Create () };
+        Application.TopRunnable = new () { App = ApplicationImpl.Instance };
 
         var shortcut = new Shortcut
         {

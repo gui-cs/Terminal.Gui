@@ -9,23 +9,58 @@ namespace Terminal.Gui.App;
 public partial class ApplicationImpl : IApplication
 {
     /// <summary>
-    ///     INTERNAL: Creates a new instance of the Application backend.
+    ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property events.
     /// </summary>
-    internal ApplicationImpl () { }
+    internal ApplicationImpl ()
+    {
+        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
+        Force16Colors = Application.Force16Colors;
+        ForceDriver = Application.ForceDriver;
+
+        // Subscribe to Application static property change events
+        Application.Force16ColorsChanged += OnForce16ColorsChanged;
+        Application.ForceDriverChanged += OnForceDriverChanged;
+    }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) { _componentFactory = componentFactory; }
+    internal ApplicationImpl (IComponentFactory componentFactory) : this ()
+    {
+        _componentFactory = componentFactory;
+    }
 
     #region Singleton
+
+    /// <summary>
+    ///     Tracks which application model has been used in this process.
+    /// </summary>
+    public static ApplicationModelUsage ModelUsage { get; private set; } = ApplicationModelUsage.None;
+
+    /// <summary>
+    ///     Error message for when trying to use modern model after legacy static model.
+    /// </summary>
+    internal const string ERROR_MODERN_AFTER_LEGACY =
+        "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
+        "Use only one model per process.";
+
+    /// <summary>
+    ///     Error message for when trying to use legacy static model after modern model.
+    /// </summary>
+    internal const string ERROR_LEGACY_AFTER_MODERN =
+        "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
+        "Use only one model per process.";
 
     /// <summary>
     ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
     /// </summary>
     /// <param name="app"></param>
-    public static void SetInstance (IApplication? app) { _instance = app; }
+    public static void SetInstance (IApplication? app)
+    {
+        ModelUsage = ApplicationModelUsage.LegacyStatic;
+        _instance = app;
+    }
 
     // Private static readonly Lazy instance of Application
     private static IApplication? _instance;
@@ -33,9 +68,80 @@ public partial class ApplicationImpl : IApplication
     /// <summary>
     ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
     /// </summary>
-    public static IApplication Instance => _instance ??= new ApplicationImpl ();
+    public static IApplication Instance
+    {
+        get
+        {
+            // If an instance already exists, return it without fence checking
+            // This allows for cleanup/reset operations
+            if (_instance is { })
+            {
+                return _instance;
+            }
+
+            // Check if the instance-based model has already been used
+            if (ModelUsage == ApplicationModelUsage.InstanceBased)
+            {
+                throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
+            }
+
+            // Mark the usage and create the instance
+            ModelUsage = ApplicationModelUsage.LegacyStatic;
+
+            return _instance = new ApplicationImpl ();
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Marks that the instance-based model has been used. Called by Application.Create().
+    /// </summary>
+    internal static void MarkInstanceBasedModelUsed ()
+    {
+        // Check if the legacy static model has already been initialized
+        if (ModelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
+        {
+            throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
+        }
+
+        ModelUsage = ApplicationModelUsage.InstanceBased;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Resets the model usage tracking. Only for testing purposes.
+    /// </summary>
+    internal static void ResetModelUsageTracking ()
+    {
+        ModelUsage = ApplicationModelUsage.None;
+        _instance = null;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Resets state without going through the fence-checked Instance property.
+    ///     Used by Application.ResetState() to allow cleanup regardless of which model was used.
+    /// </summary>
+    internal static void ResetStateStatic (bool ignoreDisposed = false)
+    {
+        // If an instance exists, reset it
+        _instance?.ResetState (ignoreDisposed);
+
+        // Reset Application static properties to their defaults
+        // This ensures tests start with clean state
+        Application.ForceDriver = string.Empty;
+        Application.Force16Colors = false;
+        Application.IsMouseDisabled = false;
+        Application.QuitKey = Key.Esc;
+        Application.ArrangeKey = Key.F5.WithCtrl;
+        Application.NextTabGroupKey = Key.F6;
+        Application.NextTabKey = Key.Tab;
+        Application.PrevTabGroupKey = Key.F6.WithShift;
+        Application.PrevTabKey = Key.Tab.WithShift;
+
+        // Always reset the model tracking to allow tests to use either model after reset
+        ResetModelUsageTracking ();
+    }
 
     #endregion Singleton
+
 
     private string? _driverName;
 

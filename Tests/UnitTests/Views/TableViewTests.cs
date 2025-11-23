@@ -59,7 +59,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tv = new TableView
         {
-            Driver = ApplicationImpl.Instance.Driver,
+            App = ApplicationImpl.Instance,
             Width = 20, Height = 4
         };
 
@@ -683,7 +683,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tableView = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -765,7 +765,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tableView = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -830,7 +830,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tableView = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
 
         tableView.BeginInit ();
@@ -1579,7 +1579,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tv = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 7);
@@ -2226,7 +2226,7 @@ public class TableViewTests (ITestOutputHelper output)
         ApplicationImpl.Instance.Driver!.SetScreenSize (100, 100);
         var tv = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 6);
@@ -2433,7 +2433,7 @@ A B C
 
         var tv = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
 
         //tv.BeginInit (); tv.EndInit ();
@@ -3441,7 +3441,7 @@ A B C
     {
         var tableView = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -3473,7 +3473,7 @@ A B C
     {
         var tv = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver,
+            App = ApplicationImpl.Instance,
             SchemeName = "TopLevel",
             Viewport = new (0, 0, 25, 6)
         };
@@ -3504,7 +3504,7 @@ A B C
     {
         var tableView = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tableView.SchemeName = "TopLevel";
 
@@ -3537,7 +3537,7 @@ A B C
     {
         var tv = new TableView ()
         {
-            Driver = ApplicationImpl.Instance.Driver
+            App = ApplicationImpl.Instance
         };
         tv.BeginInit ();
         tv.EndInit ();

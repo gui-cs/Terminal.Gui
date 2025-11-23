@@ -10,7 +10,7 @@ namespace Terminal.Gui.App;
 ///         See <see cref="IKeyboard"/> for usage details.
 ///     </para>
 /// </summary>
-internal class KeyboardImpl : IKeyboard
+internal class KeyboardImpl : IKeyboard, IDisposable
 {
     private Key _quitKey = Key.Esc; // Resources/config.json overrides
     private Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
@@ -103,10 +103,26 @@ internal class KeyboardImpl : IKeyboard
     public event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Initializes keyboard bindings.
+    ///     Initializes keyboard bindings and subscribes to Application configuration property events.
     /// </summary>
     public KeyboardImpl ()
     {
+        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
+        _quitKey = Application.QuitKey;
+        _arrangeKey = Application.ArrangeKey;
+        _nextTabGroupKey = Application.NextTabGroupKey;
+        _nextTabKey = Application.NextTabKey;
+        _prevTabGroupKey = Application.PrevTabGroupKey;
+        _prevTabKey = Application.PrevTabKey;
+
+        // Subscribe to Application static property change events
+        Application.QuitKeyChanged += OnQuitKeyChanged;
+        Application.ArrangeKeyChanged += OnArrangeKeyChanged;
+        Application.NextTabGroupKeyChanged += OnNextTabGroupKeyChanged;
+        Application.NextTabKeyChanged += OnNextTabKeyChanged;
+        Application.PrevTabGroupKeyChanged += OnPrevTabGroupKeyChanged;
+        Application.PrevTabKeyChanged += OnPrevTabKeyChanged;
+
         AddKeyBindings ();
     }
 
@@ -377,5 +393,48 @@ internal class KeyboardImpl : IKeyboard
         {
             KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         }
+    }
+
+    // Event handlers for Application static property changes
+    private void OnQuitKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        QuitKey = e.NewValue;
+    }
+
+    private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        ArrangeKey = e.NewValue;
+    }
+
+    private void OnNextTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        NextTabGroupKey = e.NewValue;
+    }
+
+    private void OnNextTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        NextTabKey = e.NewValue;
+    }
+
+    private void OnPrevTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        PrevTabGroupKey = e.NewValue;
+    }
+
+    private void OnPrevTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e)
+    {
+        PrevTabKey = e.NewValue;
+    }
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        // Unsubscribe from Application static property change events
+        Application.QuitKeyChanged -= OnQuitKeyChanged;
+        Application.ArrangeKeyChanged -= OnArrangeKeyChanged;
+        Application.NextTabGroupKeyChanged -= OnNextTabGroupKeyChanged;
+        Application.NextTabKeyChanged -= OnNextTabKeyChanged;
+        Application.PrevTabGroupKeyChanged -= OnPrevTabGroupKeyChanged;
+        Application.PrevTabKeyChanged -= OnPrevTabKeyChanged;
     }
 }

@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DriverTests;
 
-public class DriverTests : FakeDriverBase
+public class DriverTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Theory]
     [InlineData (null, true)]
@@ -48,5 +48,59 @@ public class DriverTests : FakeDriverBase
         Assert.False (driver.IsValidLocation (text, driver.Cols, driver.Rows));
 
         driver.End ();
+    }
+
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName)
+    {
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.Shutdown ();
+    }
+
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void All_Drivers_Run_Cross_Platform (string driverName)
+    {
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.StopAfterFirstIteration = true;
+        app.Run ().Dispose ();
+        app.Shutdown ();
+    }
+
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void All_Drivers_LayoutAndDraw_Cross_Platform (string driverName)
+    {
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        app.StopAfterFirstIteration = true;
+        app.Run<TestTop> ().Dispose ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (driverName!, output, app.Driver);
+
+        app.Shutdown ();
+    }
+}
+
+public class TestTop : Toplevel
+{
+    /// <inheritdoc/>
+    public override void BeginInit ()
+    {
+        Text = Driver!.GetName ()!;
+        BorderStyle = LineStyle.None;
+        base.BeginInit ();
     }
 }

@@ -512,8 +512,7 @@ public static class MessageBox
                 if (count == defaultButton)
                 {
                     b.IsDefault = true;
-
-                    b.Accepting += (_, e) =>
+                    b.Accepting += (s, e) =>
                                    {
                                        if (e?.Context?.Source is Button button)
                                        {
@@ -529,7 +528,7 @@ public static class MessageBox
                                            e.Handled = true;
                                        }
 
-                                       app?.RequestStop ();
+                                       (s as View)?.App?.RequestStop ();
                                    };
                 }
 
