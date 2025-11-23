@@ -66,7 +66,7 @@ public interface IRunnable
     /// <summary>
     ///     Raised when <see cref="IsRunning"/> is changing (e.g., when <see cref="IApplication.Begin(IRunnable)"/> or
     ///     <see cref="IApplication.End(RunnableSessionToken)"/> is called).
-    ///     Can be canceled by setting <see cref="CancelEventArgs{T}.Cancel"/> to <see langword="true"/>.
+    ///     Can be canceled by setting `args.Cancel` to <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -140,7 +140,7 @@ public interface IRunnable
 
     /// <summary>
     ///     Raised when this runnable is about to become modal (top of stack) or cease being modal.
-    ///     Can be canceled by setting <see cref="CancelEventArgs{T}.Cancel"/> to <see langword="true"/>.
+    ///     Can be canceled by setting `args.Cancel` to <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///     <para>

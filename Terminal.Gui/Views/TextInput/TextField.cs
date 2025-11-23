@@ -1079,7 +1079,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        string? cbTxt = App?.Clipboard?.GetClipboardData ()?.Split ("\n") [0];
+        string cbTxt = App?.Clipboard?.GetClipboardData ()?.Split ("\n") [0];
 
         if (string.IsNullOrEmpty (cbTxt))
         {

@@ -164,7 +164,7 @@ public class ConfigurationEditor : Scenario
             switch (result)
             {
                 case 0:
-                    editor.Save ();
+                    editor?.Save ();
 
                     break;
 
