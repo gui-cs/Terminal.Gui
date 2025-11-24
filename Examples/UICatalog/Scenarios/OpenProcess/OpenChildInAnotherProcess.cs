@@ -12,9 +12,8 @@ public sealed class OpenChildInAnotherProcess : Scenario
 {
     public override void Main ()
     {
-        IApplication app = Application.Create ();
-
-        app.Init ();
+        // Only work with legacy
+        Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
@@ -43,10 +42,10 @@ public sealed class OpenChildInAnotherProcess : Scenario
 
         appWindow.Add (button, label);
 
-        app.Run (appWindow);
+        Application.Run (appWindow);
         appWindow.Dispose ();
 
-        app.Shutdown ();
+        Application.Shutdown ();
     }
 
     public async Task<T> OpenNewTerminalWindowAsync<T> (string action)

@@ -12,11 +12,11 @@ public sealed class RunChildProcess : Scenario
     /// <inheritdoc />
     public override void Main ()
     {
-        IApplication app = Application.Create ();
-        app.Init ();
-        app.Run ();
-        app.TopRunnable?.Dispose ();
-        app.Shutdown ();
+        // Only work with legacy
+        Application.Init ();
+        Application.Run ();
+        Application.TopRunnable?.Dispose ();
+        Application.Shutdown ();
     }
 
     public static async Task RunChildAsync (string pipeName, string action)
