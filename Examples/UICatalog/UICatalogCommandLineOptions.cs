@@ -16,5 +16,9 @@ public struct UICatalogCommandLineOptions
     public string ResultsFile { get; set; }
 
     public string DebugLogLevel { get; set; }
+
+    public bool IsChild { get; set; }
+
+    public string Action { get; set; }
     /* etc. */
 }

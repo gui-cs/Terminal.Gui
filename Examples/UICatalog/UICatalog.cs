@@ -25,6 +25,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using UICatalog.Scenarios;
 using Command = Terminal.Gui.Input.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -141,9 +142,18 @@ public class UICatalog
                                                                                           .ToArray ()
                                                                              );
 
+        Option<bool> childOption = new ("--child", "Run in child mode");
+
+        Option<string> actionOption = new (
+                                            name: "--action",
+                                            description: "Optional action for child window",
+                                            getDefaultValue: () => string.Empty
+                                           );
+
         var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
         {
-            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption, disableConfigManagement
+            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption, disableConfigManagement,
+            childOption, actionOption
         };
 
         rootCommand.SetHandler (
@@ -157,7 +167,9 @@ public class UICatalog
                                         Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
                                         BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
-                                        DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning"
+                                        DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning",
+                                        IsChild = context.ParseResult.GetValueForOption (childOption),
+                                        Action = context.ParseResult.GetValueForOption (actionOption) ?? string.Empty
                                         /* etc. */
                                     };
 
@@ -379,6 +391,13 @@ public class UICatalog
                                                                         .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
                                                                   )!);
             UICatalogTop.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogTop.CachedScenarios [item].GetType ())!;
+
+            if (options.IsChild)
+            {
+                Task.Run (async () => await RunChildProcess.RunChildAsync (UICatalogTop.CachedSelectedScenario.GetName (), options.Action)).Wait ();
+
+                return;
+            }
 
             BenchmarkResults? results = RunScenario (UICatalogTop.CachedSelectedScenario, options.Benchmark);
 
