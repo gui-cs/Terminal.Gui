@@ -187,10 +187,6 @@ jobs:
 
     - name: Run UnitTestsParallelizable
       shell: bash
-      env:
-        # xUnit respects these environment variables for test parallelization
-        xunit.parallelizeTestCollections: true
-        xunit.maxParallelThreads: ${{ env.XUNIT_MAX_PARALLEL_THREADS }}
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
           # Run with coverage on Linux only (but only on run 1 to avoid redundant coverage data)
@@ -206,7 +202,7 @@ jobs:
               --blame-hang \
               --blame-hang-timeout 60s \
               --blame-crash-collect-always \
-              -- xUnit.MaxParallelThreads=$XUNIT_MAX_PARALLEL_THREADS
+              -- xUnit.MaxParallelThreads=${XUNIT_MAX_PARALLEL_THREADS}
           else
             dotnet test Tests/UnitTestsParallelizable \
               --no-build \
@@ -218,7 +214,7 @@ jobs:
               --blame-hang \
               --blame-hang-timeout 60s \
               --blame-crash-collect-always \
-              -- xUnit.MaxParallelThreads=$XUNIT_MAX_PARALLEL_THREADS
+              -- xUnit.MaxParallelThreads=${XUNIT_MAX_PARALLEL_THREADS}
           fi
         else
           # Run without coverage on Windows/macOS for speed
@@ -232,7 +228,7 @@ jobs:
             --blame-hang \
             --blame-hang-timeout 60s \
             --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=$XUNIT_MAX_PARALLEL_THREADS
+            -- xUnit.MaxParallelThreads=${XUNIT_MAX_PARALLEL_THREADS}
         fi
 
     - name: Upload UnitTestsParallelizable Logs
