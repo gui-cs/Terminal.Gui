@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Reflection;
 using System.Text.Json;
 
 namespace UICatalog.Scenarios;
@@ -57,9 +58,27 @@ public sealed class OpenChildInAnotherProcess : Scenario
 
         // Launch external console process running UICatalog app again
         var p = new Process ();
-        p.StartInfo.FileName = Environment.ProcessPath!;
-        p.StartInfo.Arguments = $"{pipeName} --child --action \"{action}\"";
-        p.StartInfo.UseShellExecute = true;     // Needed so it opens a new terminal window
+
+        if (OperatingSystem.IsWindows ())
+        {
+            p.StartInfo.FileName = Environment.ProcessPath!;
+            p.StartInfo.Arguments = $"{pipeName} --child --action \"{action}\"";
+            p.StartInfo.UseShellExecute = true;     // Needed so it opens a new terminal window
+        }
+        else
+        {
+            p.StartInfo.FileName = "gnome-terminal";
+            // Use -- <command> <args> to avoid TTY reuse
+            p.StartInfo.ArgumentList.Add ("--");
+            p.StartInfo.ArgumentList.Add ("bash");
+            p.StartInfo.ArgumentList.Add ("-c");
+            p.StartInfo.ArgumentList.Add ($"dotnet {Assembly.GetExecutingAssembly ().Location} {pipeName} --child --action \"{action}\"");
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardInput = false;
+            p.StartInfo.RedirectStandardOutput = false;
+            p.StartInfo.RedirectStandardError = false;
+        }
+
         p.Start ();
 
         // Wait for connection from child
