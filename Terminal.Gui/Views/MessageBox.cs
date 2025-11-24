@@ -55,6 +55,53 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public static class MessageBox
 {
+    private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
+    private static Alignment _defaultButtonAlignment = Alignment.Center; // Resources/config.json overrides
+    private static int _defaultMinimumWidth = 0; // Resources/config.json overrides
+    private static int _defaultMinimumHeight = 0; // Resources/config.json overrides
+
+    /// <summary>
+    ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment
+    {
+        get => _defaultButtonAlignment;
+        set => _defaultButtonAlignment = value;
+    }
+
+    /// <summary>
+    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth
+    {
+        get => _defaultMinimumWidth;
+        set => _defaultMinimumWidth = value;
+    }
+
+    /// <summary>
+    ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumHeight
+    {
+        get => _defaultMinimumHeight;
+        set => _defaultMinimumHeight = value;
+    }
+
     /// <summary>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/>.
     /// </summary>
@@ -63,32 +110,6 @@ public static class MessageBox
     ///     Warning: Not thread-safe.
     /// </remarks>
     public static int? Clicked { get; private set; }
-
-    /// <summary>
-    ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
-
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center;
-
-    /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 0;
-
-    /// <summary>
-    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 0;
 
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions.
