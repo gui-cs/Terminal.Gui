@@ -9,14 +9,11 @@ namespace Terminal.Gui.App;
 public partial class ApplicationImpl : IApplication
 {
     /// <summary>
-    ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property events.
+    ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
+    ///     events.
     /// </summary>
     internal ApplicationImpl ()
     {
-        // Initialize from Application static properties (ConfigurationManager may have set these before we were created)
-        Force16Colors = Application.Force16Colors;
-        ForceDriver = Application.ForceDriver;
-
         // Subscribe to Application static property change events
         Application.Force16ColorsChanged += OnForce16ColorsChanged;
         Application.ForceDriverChanged += OnForceDriverChanged;
@@ -26,12 +23,26 @@ public partial class ApplicationImpl : IApplication
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) : this ()
-    {
-        _componentFactory = componentFactory;
-    }
+    internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
+
+    private string? _driverName;
+
+    #region Clipboard
+
+    /// <inheritdoc/>
+    public IClipboard? Clipboard => Driver?.Clipboard;
+
+    #endregion Clipboard
+
+    /// <inheritdoc/>
+    public new string ToString () { return Driver?.ToString () ?? string.Empty; }
 
     #region Singleton
+
+    /// <summary>
+    ///     Lock object for synchronizing access to ModelUsage and _instance.
+    /// </summary>
+    private static readonly object _modelUsageLock = new ();
 
     /// <summary>
     ///     Tracks which application model has been used in this process.
@@ -42,15 +53,15 @@ public partial class ApplicationImpl : IApplication
     ///     Error message for when trying to use modern model after legacy static model.
     /// </summary>
     internal const string ERROR_MODERN_AFTER_LEGACY =
-        "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). " +
-        "Use only one model per process.";
+        "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). "
+        + "Use only one model per process.";
 
     /// <summary>
     ///     Error message for when trying to use legacy static model after modern model.
     /// </summary>
     internal const string ERROR_LEGACY_AFTER_MODERN =
-        "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). " +
-        "Use only one model per process.";
+        "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). "
+        + "Use only one model per process.";
 
     /// <summary>
     ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
@@ -58,8 +69,11 @@ public partial class ApplicationImpl : IApplication
     /// <param name="app"></param>
     public static void SetInstance (IApplication? app)
     {
-        ModelUsage = ApplicationModelUsage.LegacyStatic;
-        _instance = app;
+        lock (_modelUsageLock)
+        {
+            ModelUsage = ApplicationModelUsage.LegacyStatic;
+            _instance = app;
+        }
     }
 
     // Private static readonly Lazy instance of Application
@@ -72,23 +86,27 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
-            // If an instance already exists, return it without fence checking
-            // This allows for cleanup/reset operations
-            if (_instance is { })
+            // Thread-safe: Use lock to make check-and-create atomic
+            lock (_modelUsageLock)
             {
-                return _instance;
+                // If an instance already exists, return it without fence checking
+                // This allows for cleanup/reset operations
+                if (_instance is { })
+                {
+                    return _instance;
+                }
+
+                // Check if the instance-based model has already been used
+                if (ModelUsage == ApplicationModelUsage.InstanceBased)
+                {
+                    throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
+                }
+
+                // Mark the usage and create the instance
+                ModelUsage = ApplicationModelUsage.LegacyStatic;
+
+                return _instance = new ApplicationImpl ();
             }
-
-            // Check if the instance-based model has already been used
-            if (ModelUsage == ApplicationModelUsage.InstanceBased)
-            {
-                throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
-            }
-
-            // Mark the usage and create the instance
-            ModelUsage = ApplicationModelUsage.LegacyStatic;
-
-            return _instance = new ApplicationImpl ();
         }
     }
 
@@ -97,13 +115,16 @@ public partial class ApplicationImpl : IApplication
     /// </summary>
     internal static void MarkInstanceBasedModelUsed ()
     {
-        // Check if the legacy static model has already been initialized
-        if (ModelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
+        lock (_modelUsageLock)
         {
-            throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
-        }
+            // Check if the legacy static model has already been initialized
+            if (ModelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
+            {
+                throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
+            }
 
-        ModelUsage = ApplicationModelUsage.InstanceBased;
+            ModelUsage = ApplicationModelUsage.InstanceBased;
+        }
     }
 
     /// <summary>
@@ -111,8 +132,11 @@ public partial class ApplicationImpl : IApplication
     /// </summary>
     internal static void ResetModelUsageTracking ()
     {
-        ModelUsage = ApplicationModelUsage.None;
-        _instance = null;
+        lock (_modelUsageLock)
+        {
+            ModelUsage = ApplicationModelUsage.None;
+            _instance = null;
+        }
     }
 
     /// <summary>
@@ -141,9 +165,6 @@ public partial class ApplicationImpl : IApplication
     }
 
     #endregion Singleton
-
-
-    private string? _driverName;
 
     #region Input
 
@@ -180,13 +201,6 @@ public partial class ApplicationImpl : IApplication
     }
 
     #endregion Input
-
-    #region Clipboard
-
-    /// <inheritdoc/>
-    public IClipboard? Clipboard => Driver?.Clipboard;
-
-    #endregion Clipboard
 
     #region View Management
 
@@ -250,7 +264,4 @@ public partial class ApplicationImpl : IApplication
     public IRunnable? FrameworkOwnedRunnable { get; set; }
 
     #endregion View Management
-
-    /// <inheritdoc/>
-    public new string ToString () => Driver?.ToString () ?? string.Empty;
 }

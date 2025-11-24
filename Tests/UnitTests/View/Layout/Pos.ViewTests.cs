@@ -1,6 +1,6 @@
-﻿using UnitTests;
+﻿#nullable enable
+using JetBrains.Annotations;
 using Xunit.Abstractions;
-using static Terminal.Gui.ViewBase.Pos;
 
 namespace UnitTests.LayoutTests;
 
@@ -69,7 +69,7 @@ public class PosViewTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication?> a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count > 0)
             {

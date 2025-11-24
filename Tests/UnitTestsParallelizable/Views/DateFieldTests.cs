@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace UnitTests.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class DateFieldTests
 {

@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿#nullable enable
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.DriverTests;
@@ -6,7 +7,6 @@ namespace UnitTests_Parallelizable.DriverTests;
 public class DriverTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Theory]
-    [InlineData (null, true)]
     [InlineData ("", true)]
     [InlineData ("a", true)]
     [InlineData ("👩‍❤️‍💋‍👨", false)]

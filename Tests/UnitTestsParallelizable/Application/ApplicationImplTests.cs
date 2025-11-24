@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using Moq;
 
-namespace UnitTests.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 public class ApplicationImplTests
 {
@@ -27,25 +27,7 @@ public class ApplicationImplTests
         m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
         m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
-        // TODO: Move these tests to Parallelizable tests 
-        ApplicationImpl.SetInstance(new ApplicationImpl (m.Object));
-        return ApplicationImpl.Instance;
-    }
-
-    [Fact]
-    public void Init_CreatesKeybindings ()
-    {
-        IApplication? app = NewMockedApplicationImpl ();
-
-        app?.Keyboard.KeyBindings.Clear ();
-
-        Assert.Empty (app?.Keyboard?.KeyBindings.GetBindings ()!);
-
-        app?.Init ("fake");
-
-        Assert.NotEmpty (app?.Keyboard?.KeyBindings.GetBindings ()!);
-
-        app?.Shutdown ();
+        return new ApplicationImpl (m.Object);
     }
 
     private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
@@ -61,6 +43,23 @@ public class ApplicationImplTests
                                                   }
                                               })
                 .Verifiable (Times.Once);
+    }
+
+
+    [Fact]
+    public void Init_CreatesKeybindings ()
+    {
+        IApplication? app = NewMockedApplicationImpl ();
+
+        app?.Keyboard.KeyBindings.Clear ();
+
+        Assert.Empty (app?.Keyboard?.KeyBindings.GetBindings ()!);
+
+        app?.Init ("fake");
+
+        Assert.NotEmpty (app?.Keyboard?.KeyBindings.GetBindings ()!);
+
+        app?.Shutdown ();
     }
 
     [Fact]

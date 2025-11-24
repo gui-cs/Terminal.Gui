@@ -1,12 +1,12 @@
+#nullable enable
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Terminal.Gui.App;
 using UICatalog;
-using UnitTests;
 using Xunit.Abstractions;
+using Timeout = System.Threading.Timeout;
 
-namespace IntegrationTests.UICatalog;
+namespace UnitTests.UICatalog;
 
 public class ScenarioTests : TestsAllViews
 {
@@ -33,6 +33,7 @@ public class ScenarioTests : TestsAllViews
         if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
         {
             _output.WriteLine ($"Skipping Scenario '{scenarioType}' on macOS due to random timeout failures.");
+
             return;
         }
 
@@ -43,6 +44,7 @@ public class ScenarioTests : TestsAllViews
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         Scenario? scenario = null;
         var scenarioName = string.Empty;
+
         // Do not use Application.AddTimer for out-of-band watchdogs as
         // they will be stopped by Shutdown/ResetState.
         Timer? watchdogTimer = null;
@@ -121,7 +123,7 @@ public class ScenarioTests : TestsAllViews
                 initialized = true;
 
                 // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
-                watchdogTimer = new Timer (_ => ForceCloseCallback (), null, (int)abortTime, System.Threading.Timeout.Infinite);
+                watchdogTimer = new (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
             }
             else
             {

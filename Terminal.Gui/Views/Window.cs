@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -18,6 +16,9 @@ namespace Terminal.Gui.Views;
 /// <seealso cref="FrameView"/>
 public class Window : Toplevel
 {
+    private static ShadowStyle _defaultShadow = ShadowStyle.None; // Resources/config.json overrides
+    private static LineStyle _defaultBorderStyle = LineStyle.Single; // Resources/config.json overrides
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
@@ -35,7 +36,11 @@ public class Window : Toplevel
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    public static ShadowStyle DefaultShadow
+    {
+        get => _defaultShadow;
+        set => _defaultShadow = value;
+    }
 
     // TODO: enable this
     ///// <summary>
@@ -56,5 +61,9 @@ public class Window : Toplevel
     ///     s.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
 }

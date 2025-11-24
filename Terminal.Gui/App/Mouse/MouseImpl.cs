@@ -16,15 +16,18 @@ internal class MouseImpl : IMouse, IDisposable
     /// </summary>
     public MouseImpl ()
     {
-        // Initialize from Application static property (ConfigurationManager may have set this before we were created)
-        IsMouseDisabled = Application.IsMouseDisabled;
-
         // Subscribe to Application static property change events
         Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
     }
 
+    private IApplication? _app;
+
     /// <inheritdoc/>
-    public IApplication? App { get; set; }
+    public IApplication? App
+    {
+        get => _app;
+        set => _app = value;
+    }
 
     /// <inheritdoc/>
     public Point? LastMousePosition { get; set; }

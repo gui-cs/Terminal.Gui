@@ -1,8 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿namespace UnitTests_Parallelizable.InputTests;
 
-namespace UnitTests_Parallelizable.InputTests;
-
-public class KeyBindingsTests ()
+public class KeyBindingsTests
 {
     [Fact]
     public void Add_Adds ()
@@ -28,7 +26,7 @@ public class KeyBindingsTests ()
     [Fact]
     public void Add_Invalid_Key_Throws ()
     {
-        var keyBindings = new KeyBindings (new View ());
+        var keyBindings = new KeyBindings (new ());
         List<Command> commands = new ();
         Assert.Throws<ArgumentException> (() => keyBindings.Add (Key.Empty, Command.Accept));
     }
@@ -71,40 +69,39 @@ public class KeyBindingsTests ()
         Assert.Contains (Command.HotKey, resultCommands);
     }
 
-
     // Add should not allow duplicates
     [Fact]
     public void Add_Throws_If_Exists ()
     {
-        var keyBindings = new KeyBindings (new View ());
+        var keyBindings = new KeyBindings (new ());
         keyBindings.Add (Key.A, Command.HotKey);
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, Command.Accept));
 
         Command [] resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings = new (new View ());
+        keyBindings = new (new ());
         keyBindings.Add (Key.A, Command.HotKey);
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, Command.Accept));
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings = new (new View ());
+        keyBindings = new (new ());
         keyBindings.Add (Key.A, Command.HotKey);
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, Command.Accept));
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings = new (new View ());
+        keyBindings = new (new ());
         keyBindings.Add (Key.A, Command.Accept);
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, Command.ScrollDown));
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.Accept, resultCommands);
 
-        keyBindings = new (new View ());
+        keyBindings = new (new ());
         keyBindings.Add (Key.A, new KeyBinding ([Command.HotKey]));
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, new KeyBinding (new [] { Command.Accept })));
 
@@ -140,6 +137,23 @@ public class KeyBindingsTests ()
         var keyBindings = new KeyBindings (new ());
         Assert.Throws<InvalidOperationException> (() => keyBindings.Get (Key.A));
         Assert.Throws<InvalidOperationException> (() => keyBindings.Get (Key.B));
+    }
+
+    [Fact]
+    public void Get_Gets ()
+    {
+        var keyBindings = new KeyBindings (new ());
+        Command [] commands = [Command.Right, Command.Left];
+
+        var key = new Key (Key.A);
+        keyBindings.Add (key, commands);
+        KeyBinding binding = keyBindings.Get (key);
+        Assert.Contains (Command.Right, binding.Commands);
+        Assert.Contains (Command.Left, binding.Commands);
+
+        binding = keyBindings.Get (key);
+        Assert.Contains (Command.Right, binding.Commands);
+        Assert.Contains (Command.Left, binding.Commands);
     }
 
     // GetCommands
@@ -231,6 +245,27 @@ public class KeyBindingsTests ()
     }
 
     [Fact]
+    public void ReplaceCommands_Replaces ()
+    {
+        var keyBindings = new KeyBindings (new ());
+        keyBindings.Add (Key.A, Command.Accept);
+
+        keyBindings.ReplaceCommands (Key.A, Command.Refresh);
+
+        bool result = keyBindings.TryGet (Key.A, out KeyBinding bindings);
+        Assert.True (result);
+        Assert.Contains (Command.Refresh, bindings.Commands);
+    }
+
+    [Fact]
+    public void ReplaceKey_Adds_If_DoesNotContain_Old ()
+    {
+        var keyBindings = new KeyBindings (new ());
+        keyBindings.Replace (Key.A, Key.B);
+        Assert.True (keyBindings.TryGet (Key.B, out _));
+    }
+
+    [Fact]
     public void ReplaceKey_Replaces ()
     {
         var keyBindings = new KeyBindings (new ());
@@ -269,36 +304,11 @@ public class KeyBindingsTests ()
     }
 
     [Fact]
-    public void ReplaceKey_Adds_If_DoesNotContain_Old ()
-    {
-        var keyBindings = new KeyBindings (new ());
-        keyBindings.Replace (Key.A, Key.B);
-        Assert.True (keyBindings.TryGet (Key.B, out _));
-    }
-
-    [Fact]
     public void ReplaceKey_Throws_If_New_Is_Empty ()
     {
         var keyBindings = new KeyBindings (new ());
         keyBindings.Add (Key.A, Command.HotKey);
         Assert.Throws<ArgumentException> (() => keyBindings.Replace (Key.A, Key.Empty));
-    }
-
-    [Fact]
-    public void Get_Gets ()
-    {
-        var keyBindings = new KeyBindings (new ());
-        Command [] commands = [Command.Right, Command.Left];
-
-        var key = new Key (Key.A);
-        keyBindings.Add (key, commands);
-        KeyBinding binding = keyBindings.Get (key);
-        Assert.Contains (Command.Right, binding.Commands);
-        Assert.Contains (Command.Left, binding.Commands);
-
-        binding = keyBindings.Get (key);
-        Assert.Contains (Command.Right, binding.Commands);
-        Assert.Contains (Command.Left, binding.Commands);
     }
 
     // TryGet
@@ -309,7 +319,8 @@ public class KeyBindingsTests ()
         keyBindings.Add (Key.Q.WithCtrl, Command.HotKey);
         var key = new Key (Key.Q.WithCtrl);
         bool result = keyBindings.TryGet (key, out KeyBinding _);
-        Assert.True (result); ;
+        Assert.True (result);
+        ;
     }
 
     [Fact]
@@ -328,19 +339,5 @@ public class KeyBindingsTests ()
         bool result = keyBindings.TryGet (Key.A, out KeyBinding bindings);
         Assert.True (result);
         Assert.Contains (Command.HotKey, bindings.Commands);
-    }
-
-    [Fact]
-    public void ReplaceCommands_Replaces ()
-    {
-        var keyBindings = new KeyBindings (new ());
-        keyBindings.Add (Key.A, Command.Accept);
-
-        keyBindings.ReplaceCommands (Key.A, Command.Refresh);
-
-        bool result = keyBindings.TryGet (Key.A, out KeyBinding bindings);
-        Assert.True (result);
-        Assert.Contains (Command.Refresh, bindings.Commands);
-
     }
 }
