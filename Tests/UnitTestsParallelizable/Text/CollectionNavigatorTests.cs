@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using Moq;
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.TextTests;
@@ -41,7 +43,7 @@ public class CollectionNavigatorTests
         Assert.Equal (2, n.GetNextMatchingItem (4, 'b'));
 
         // cycling with 'a'
-        n = new CollectionNavigator (simpleStrings);
+        n = new (simpleStrings);
         Assert.Equal (0, n.GetNextMatchingItem (null, 'a'));
         Assert.Equal (1, n.GetNextMatchingItem (0, 'a'));
 
@@ -340,6 +342,7 @@ public class CollectionNavigatorTests
                       current = n.GetNextMatchingItem (current, ' ')
                      ); // match bates hotel
     }
+
     [Fact]
     public void CustomMatcher_NeverMatches ()
     {
@@ -347,7 +350,7 @@ public class CollectionNavigatorTests
         int? current = 0;
         var n = new CollectionNavigator (strings);
 
-        var matchNone = new Mock<ICollectionNavigatorMatcher> ();
+        Mock<ICollectionNavigatorMatcher> matchNone = new ();
 
         matchNone.Setup (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()))
                  .Returns (false);
@@ -366,27 +369,30 @@ public class CollectionNavigatorTests
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "candle" };
         var navigator = new CollectionNavigator (strings);
-        int numTasks = 20;
-        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception> ();
+        var numTasks = 20;
+        ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (0, numTasks, i =>
-        {
-            try
-            {
-                // Read SearchString concurrently
-                string searchString = navigator.SearchString;
-                
-                // Perform navigation operations concurrently
-                int? result = navigator.GetNextMatchingItem (0, 'a');
-                
-                // Read SearchString again
-                searchString = navigator.SearchString;
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add (ex);
-            }
-        });
+        Parallel.For (
+                      0,
+                      numTasks,
+                      i =>
+                      {
+                          try
+                          {
+                              // Read SearchString concurrently
+                              string searchString = navigator.SearchString;
+
+                              // Perform navigation operations concurrently
+                              int? result = navigator.GetNextMatchingItem (0, 'a');
+
+                              // Read SearchString again
+                              searchString = navigator.SearchString;
+                          }
+                          catch (Exception ex)
+                          {
+                              exceptions.Add (ex);
+                          }
+                      });
 
         Assert.Empty (exceptions);
     }
@@ -396,24 +402,27 @@ public class CollectionNavigatorTests
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "candle" };
         var navigator = new CollectionNavigator (strings);
-        int numTasks = 20;
-        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception> ();
+        var numTasks = 20;
+        ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (0, numTasks, i =>
-        {
-            try
-            {
-                // Access Collection property concurrently
-                System.Collections.IList collection = navigator.Collection;
-                
-                // Perform navigation
-                int? result = navigator.GetNextMatchingItem (0, (char)('a' + (i % 3)));
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add (ex);
-            }
-        });
+        Parallel.For (
+                      0,
+                      numTasks,
+                      i =>
+                      {
+                          try
+                          {
+                              // Access Collection property concurrently
+                              IList collection = navigator.Collection;
+
+                              // Perform navigation
+                              int? result = navigator.GetNextMatchingItem (0, (char)('a' + i % 3));
+                          }
+                          catch (Exception ex)
+                          {
+                              exceptions.Add (ex);
+                          }
+                      });
 
         Assert.Empty (exceptions);
     }
@@ -423,23 +432,26 @@ public class CollectionNavigatorTests
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "candle", "cat", "dog", "elephant" };
         var navigator = new CollectionNavigator (strings);
-        int numTasks = 50;
-        var results = new System.Collections.Concurrent.ConcurrentBag<int?> ();
-        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception> ();
+        var numTasks = 50;
+        ConcurrentBag<int?> results = new ();
+        ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (0, numTasks, i =>
-        {
-            try
-            {
-                char searchChar = (char)('a' + (i % 5));
-                int? result = navigator.GetNextMatchingItem (i % strings.Length, searchChar);
-                results.Add (result);
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add (ex);
-            }
-        });
+        Parallel.For (
+                      0,
+                      numTasks,
+                      i =>
+                      {
+                          try
+                          {
+                              var searchChar = (char)('a' + i % 5);
+                              int? result = navigator.GetNextMatchingItem (i % strings.Length, searchChar);
+                              results.Add (result);
+                          }
+                          catch (Exception ex)
+                          {
+                              exceptions.Add (ex);
+                          }
+                      });
 
         Assert.Empty (exceptions);
         Assert.Equal (numTasks, results.Count);
@@ -450,51 +462,54 @@ public class CollectionNavigatorTests
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "candle" };
         var navigator = new CollectionNavigator (strings);
-        int numReaders = 10;
-        int numWriters = 5;
-        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception> ();
-        var tasks = new List<Task> ();
+        var numReaders = 10;
+        var numWriters = 5;
+        ConcurrentBag<Exception> exceptions = new ();
+        List<Task> tasks = new ();
 
         // Reader tasks
-        for (int i = 0; i < numReaders; i++)
+        for (var i = 0; i < numReaders; i++)
         {
-            tasks.Add (Task.Run (() =>
-            {
-                try
-                {
-                    for (int j = 0; j < 100; j++)
-                    {
-                        int? result = navigator.GetNextMatchingItem (0, 'a');
-                        string searchString = navigator.SearchString;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add (ex);
-                }
-            }));
+            tasks.Add (
+                       Task.Run (() =>
+                                 {
+                                     try
+                                     {
+                                         for (var j = 0; j < 100; j++)
+                                         {
+                                             int? result = navigator.GetNextMatchingItem (0, 'a');
+                                             string searchString = navigator.SearchString;
+                                         }
+                                     }
+                                     catch (Exception ex)
+                                     {
+                                         exceptions.Add (ex);
+                                     }
+                                 }));
         }
 
         // Writer tasks (change Collection reference)
-        for (int i = 0; i < numWriters; i++)
+        for (var i = 0; i < numWriters; i++)
         {
             int writerIndex = i;
-            tasks.Add (Task.Run (() =>
-            {
-                try
-                {
-                    for (int j = 0; j < 50; j++)
-                    {
-                        var newStrings = new [] { $"item{writerIndex}_{j}_1", $"item{writerIndex}_{j}_2" };
-                        navigator.Collection = newStrings;
-                        Thread.Sleep (1); // Small delay to increase contention
-                    }
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add (ex);
-                }
-            }));
+
+            tasks.Add (
+                       Task.Run (() =>
+                                 {
+                                     try
+                                     {
+                                         for (var j = 0; j < 50; j++)
+                                         {
+                                             var newStrings = new [] { $"item{writerIndex}_{j}_1", $"item{writerIndex}_{j}_2" };
+                                             navigator.Collection = newStrings;
+                                             Thread.Sleep (1); // Small delay to increase contention
+                                         }
+                                     }
+                                     catch (Exception ex)
+                                     {
+                                         exceptions.Add (ex);
+                                     }
+                                 }));
         }
 
 #pragma warning disable xUnit1031
@@ -511,27 +526,31 @@ public class CollectionNavigatorTests
     {
         var strings = new [] { "apricot", "arm", "bat", "batman", "candle", "cat", "dog", "elephant", "fox", "goat" };
         var navigator = new CollectionNavigator (strings);
-        int numTasks = 30;
-        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception> ();
-        var searchStrings = new System.Collections.Concurrent.ConcurrentBag<string> ();
+        var numTasks = 30;
+        ConcurrentBag<Exception> exceptions = new ();
+        ConcurrentBag<string> searchStrings = new ();
 
-        Parallel.For (0, numTasks, i =>
-        {
-            try
-            {
-                // Each task performs multiple searches rapidly
-                char [] chars = { 'a', 'b', 'c', 'd', 'e', 'f' };
-                foreach (char c in chars)
-                {
-                    navigator.GetNextMatchingItem (0, c);
-                    searchStrings.Add (navigator.SearchString);
-                }
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add (ex);
-            }
-        });
+        Parallel.For (
+                      0,
+                      numTasks,
+                      i =>
+                      {
+                          try
+                          {
+                              // Each task performs multiple searches rapidly
+                              char [] chars = { 'a', 'b', 'c', 'd', 'e', 'f' };
+
+                              foreach (char c in chars)
+                              {
+                                  navigator.GetNextMatchingItem (0, c);
+                                  searchStrings.Add (navigator.SearchString);
+                              }
+                          }
+                          catch (Exception ex)
+                          {
+                              exceptions.Add (ex);
+                          }
+                      });
 
         Assert.Empty (exceptions);
         Assert.NotEmpty (searchStrings);
@@ -541,39 +560,44 @@ public class CollectionNavigatorTests
     public void ThreadSafety_StressTest_RapidOperations ()
     {
         var strings = new string [100];
-        for (int i = 0; i < 100; i++)
+
+        for (var i = 0; i < 100; i++)
         {
             strings [i] = $"item_{i:D3}";
         }
 
         var navigator = new CollectionNavigator (strings);
-        int numTasks = 100;
-        int operationsPerTask = 1000;
-        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception> ();
+        var numTasks = 100;
+        var operationsPerTask = 1000;
+        ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (0, numTasks, i =>
-        {
-            try
-            {
-                var random = new Random (i);
-                for (int j = 0; j < operationsPerTask; j++)
-                {
-                    int? currentIndex = random.Next (0, strings.Length);
-                    char searchChar = (char)('a' + random.Next (0, 26));
-                    
-                    navigator.GetNextMatchingItem (currentIndex, searchChar);
-                    
-                    if (j % 100 == 0)
-                    {
-                        string searchString = navigator.SearchString;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add (ex);
-            }
-        });
+        Parallel.For (
+                      0,
+                      numTasks,
+                      i =>
+                      {
+                          try
+                          {
+                              var random = new Random (i);
+
+                              for (var j = 0; j < operationsPerTask; j++)
+                              {
+                                  int? currentIndex = random.Next (0, strings.Length);
+                                  var searchChar = (char)('a' + random.Next (0, 26));
+
+                                  navigator.GetNextMatchingItem (currentIndex, searchChar);
+
+                                  if (j % 100 == 0)
+                                  {
+                                      string searchString = navigator.SearchString;
+                                  }
+                              }
+                          }
+                          catch (Exception ex)
+                          {
+                              exceptions.Add (ex);
+                          }
+                      });
 
         Assert.Empty (exceptions);
     }
