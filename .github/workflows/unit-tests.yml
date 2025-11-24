@@ -156,45 +156,48 @@ jobs:
       run: echo "VSTEST_DUMP_PATH=logs/UnitTestsParallelizable/${{ runner.os }}-run${{ matrix.run }}/" >> $GITHUB_ENV
 
     # Add randomization to test execution order and parallelism settings
-    - name: Set Randomization Seed
+    - name: Set Randomization Seed and xUnit Config
       shell: bash
       run: |
         # Use a combination of run number and timestamp to create different execution patterns
         SEED=$((1000 + ${{ matrix.run }} + $(date +%s) % 1000))
         echo "TEST_SEED=$SEED" >> $GITHUB_ENV
         echo "Using randomization seed: $SEED"
-
-    - name: Run UnitTestsParallelizable
-      shell: bash
-      run: |
-        # Vary the number of parallel processes based on run number to expose race conditions
-        # Runs 1-3: Default parallelization
-        # Runs 4-6: Max parallelization
-        # Runs 7-9: Single threaded
-        # Run 10: Random
+        
+        # Vary the xUnit parallelization based on run number to expose race conditions
+        # Runs 1-3: Default parallelization (2x CPU cores)
+        # Runs 4-6: Max parallelization (unlimited)
+        # Runs 7-9: Single threaded (1)
+        # Run 10: Random (1-4 threads)
         if [ ${{ matrix.run }} -le 3 ]; then
-          PARALLEL_SETTING=""
-          echo "Run ${{ matrix.run }}: Using default parallelization"
+          echo "Run ${{ matrix.run }}: Using default parallelization (2x)"
+          echo "XUNIT_MAX_PARALLEL_THREADS=2x" >> $GITHUB_ENV
         elif [ ${{ matrix.run }} -le 6 ]; then
-          PARALLEL_SETTING="--parallel"
-          echo "Run ${{ matrix.run }}: Using maximum parallelization"
+          echo "Run ${{ matrix.run }}: Using maximum parallelization (unlimited)"
+          echo "XUNIT_MAX_PARALLEL_THREADS=unlimited" >> $GITHUB_ENV
         elif [ ${{ matrix.run }} -le 9 ]; then
-          PARALLEL_SETTING="--parallel count=1"
           echo "Run ${{ matrix.run }}: Using single-threaded execution"
+          echo "XUNIT_MAX_PARALLEL_THREADS=1" >> $GITHUB_ENV
         else
           # Random parallelization based on seed
           PROC_COUNT=$(( ($TEST_SEED % 4) + 1 ))
-          PARALLEL_SETTING="--parallel count=$PROC_COUNT"
-          echo "Run ${{ matrix.run }}: Using random parallelization with $PROC_COUNT processes"
+          echo "Run ${{ matrix.run }}: Using random parallelization with $PROC_COUNT threads"
+          echo "XUNIT_MAX_PARALLEL_THREADS=$PROC_COUNT" >> $GITHUB_ENV
         fi
 
+    - name: Run UnitTestsParallelizable
+      shell: bash
+      env:
+        # xUnit respects these environment variables for test parallelization
+        xunit.parallelizeTestCollections: true
+        xunit.maxParallelThreads: ${{ env.XUNIT_MAX_PARALLEL_THREADS }}
+      run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
           # Run with coverage on Linux only (but only on run 1 to avoid redundant coverage data)
           if [ ${{ matrix.run }} -eq 1 ]; then
             dotnet test Tests/UnitTestsParallelizable \
               --no-build \
               --verbosity normal \
-              $PARALLEL_SETTING \
               --collect:"XPlat Code Coverage" \
               --settings Tests/UnitTests/runsettings.coverage.xml \
               --diag:logs/UnitTestsParallelizable/${{ runner.os }}-run${{ matrix.run }}/logs.txt \
@@ -202,33 +205,34 @@ jobs:
               --blame-crash \
               --blame-hang \
               --blame-hang-timeout 60s \
-              --blame-crash-collect-always
+              --blame-crash-collect-always \
+              -- xUnit.MaxParallelThreads=$XUNIT_MAX_PARALLEL_THREADS
           else
             dotnet test Tests/UnitTestsParallelizable \
               --no-build \
               --verbosity normal \
-              $PARALLEL_SETTING \
               --settings Tests/UnitTestsParallelizable/runsettings.xml \
               --diag:logs/UnitTestsParallelizable/${{ runner.os }}-run${{ matrix.run }}/logs.txt \
               --blame \
               --blame-crash \
               --blame-hang \
               --blame-hang-timeout 60s \
-              --blame-crash-collect-always
+              --blame-crash-collect-always \
+              -- xUnit.MaxParallelThreads=$XUNIT_MAX_PARALLEL_THREADS
           fi
         else
           # Run without coverage on Windows/macOS for speed
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
             --verbosity normal \
-            $PARALLEL_SETTING \
             --settings Tests/UnitTestsParallelizable/runsettings.xml \
             --diag:logs/UnitTestsParallelizable/${{ runner.os }}-run${{ matrix.run }}/logs.txt \
             --blame \
             --blame-crash \
             --blame-hang \
             --blame-hang-timeout 60s \
-            --blame-crash-collect-always
+            --blame-crash-collect-always \
+            -- xUnit.MaxParallelThreads=$XUNIT_MAX_PARALLEL_THREADS
         fi
 
     - name: Upload UnitTestsParallelizable Logs
