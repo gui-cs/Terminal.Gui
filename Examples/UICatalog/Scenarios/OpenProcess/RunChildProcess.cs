@@ -9,6 +9,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Application")]
 public sealed class RunChildProcess : Scenario
 {
+    /// <inheritdoc />
+    public override void Main ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ();
+        app.Run ();
+        app.TopRunnable?.Dispose ();
+        app.Shutdown ();
+    }
+
     public static async Task RunChildAsync (string pipeName, string action)
     {
         // Run your Terminal.Gui UI
