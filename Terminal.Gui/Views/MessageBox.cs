@@ -598,11 +598,11 @@ public static class MessageBox
                 };
 
                 // Set up Accepting handler to store result in Dialog before RequestStop
-                b.Accepting += (_, e) =>
+                b.Accepting += (s, e) =>
                                {
                                    // Store the button index in the dialog before stopping
                                    // This ensures Dialog.Result is set correctly
-                                   if (e?.Context?.Source is Button button && button.Data is int index)
+                                   if (e?.Context?.Source is Button { Data: int index } button)
                                    {
                                        if (button.SuperView is Dialog dialog)
                                        {
@@ -613,13 +613,10 @@ public static class MessageBox
 
                                    if (e is { })
                                    {
+                                       (s as View)?.App?.RequestStop ();
                                        e.Handled = true;
                                    }
-
-                                       (s as View)?.App?.RequestStop ();
-                                   };
-                }
-
+                               };
                 buttonList.Add (b);
                 count++;
             }
@@ -637,7 +634,7 @@ public static class MessageBox
         d.Width = Dim.Auto (
                             DimAutoStyle.Auto,
                             Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
-                            Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
+                                Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
 
         d.Height = Dim.Auto (
                              DimAutoStyle.Auto,
@@ -669,10 +666,10 @@ public static class MessageBox
         // Use Dialog.Result instead of manually tracking with Clicked
         // Dialog automatically extracts which button was clicked in OnIsRunningChanging
         int result = d.Result ?? -1;
-        
+
         // Update legacy Clicked property for backward compatibility
         Clicked = result;
-        
+
         d.Dispose ();
 
         return result;
