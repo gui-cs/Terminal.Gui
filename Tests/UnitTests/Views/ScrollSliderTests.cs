@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace Terminal.Gui.ViewsTests;
 
 public class ScrollSliderTests (ITestOutputHelper output) : FakeDriverBase
 {
