@@ -2,7 +2,7 @@
 using System.Reflection;
 using Xunit.Sdk;
 
-namespace UnitTests;
+namespace UnitTests_Parallelizable;
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestDateAttribute : BeforeAfterTestAttribute

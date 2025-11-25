@@ -18,7 +18,15 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     ///     <see cref="IApplication"/> instance for all subsequent application operations.
     /// </remarks>
     /// <returns>A new <see cref="IApplication"/> instance.</returns>
-    public static IApplication Create () { return new ApplicationImpl (); }
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if the legacy static Application model has already been used in this process.
+    /// </exception>
+    public static IApplication Create ()
+    {
+        ApplicationImpl.MarkInstanceBasedModelUsed ();
+
+        return new ApplicationImpl ();
+    }
 
     /// <inheritdoc cref="IApplication.Init"/>
     [RequiresUnreferencedCode ("AOT")]
@@ -26,6 +34,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     [Obsolete ("The legacy static Application object is going away.")]
     public static void Init (string? driverName = null)
     {
+        //Debug.Fail ("Application.Init() called - parallelizable tests should not use legacy static Application model");
         ApplicationImpl.Instance.Init (driverName ?? ForceDriver);
     }
 
@@ -35,8 +44,8 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     [Obsolete ("The legacy static Application object is going away.")]
     public static int? MainThreadId
     {
-        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
-        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+        get => ApplicationImpl.Instance.MainThreadId;
+        internal set => ApplicationImpl.Instance.MainThreadId = value;
     }
 
     /// <inheritdoc cref="IApplication.Shutdown"/>
@@ -65,5 +74,9 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
     [Obsolete ("The legacy static Application object is going away.")]
-    internal static void ResetState (bool ignoreDisposed = false) => ApplicationImpl.Instance?.ResetState (ignoreDisposed);
+    internal static void ResetState (bool ignoreDisposed = false)
+    {
+        // Use the static reset method to bypass the fence check
+        ApplicationImpl.ResetStateStatic (ignoreDisposed);
+    }
 }

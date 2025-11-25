@@ -18,7 +18,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     {
         using var context = new GuiTestContext (d, _out, TimeSpan.FromSeconds (10));
 
-        Assert.NotEqual (Rectangle.Empty, Application.Screen);
+        Assert.NotEqual (Rectangle.Empty, context.App?.Screen);
     }
 
     [Theory]

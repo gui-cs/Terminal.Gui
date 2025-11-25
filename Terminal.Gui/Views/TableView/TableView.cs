@@ -1534,7 +1534,7 @@ public class TableView : View, IDesignable
     /// <param name="width"></param>
     private void ClearLine (int row, int width)
     {
-        if (Application.Screen.Height == 0)
+        if (App?.Screen.Height == 0)
         {
             return;
         }
@@ -1810,7 +1810,7 @@ public class TableView : View, IDesignable
                 }
             }
 
-            if (Application.Screen.Height > 0)
+            if (App?.Screen.Height > 0)
             {
                 AddRuneAt (c, row, rune);
             }

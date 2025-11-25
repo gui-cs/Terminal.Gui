@@ -224,7 +224,7 @@ public class SingleBackgroundWorker : Scenario
 
             bool Close ()
             {
-                int n = MessageBox.Query (
+                int? n = MessageBox.Query (App,
                                           50,
                                           7,
                                           "Close Window.",
@@ -251,7 +251,7 @@ public class SingleBackgroundWorker : Scenario
                                                         {
                                                             if (Close ())
                                                             {
-                                                                Application.RequestStop ();
+                                                                App?.RequestStop ();
                                                             }
                                                         }
                                            }
@@ -270,7 +270,7 @@ public class SingleBackgroundWorker : Scenario
                                                 {
                                                     if (Close ())
                                                     {
-                                                        Application.RequestStop ();
+                                                        App?.RequestStop ();
                                                     }
                                                 }
                                                )
@@ -304,7 +304,7 @@ public class SingleBackgroundWorker : Scenario
         {
             if (_top is { })
             {
-                Application.Run (_top);
+                App?.Run (_top);
                 _top.Dispose ();
                 _top = null;
             }

@@ -149,7 +149,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
             // Force 16 colors if not in virtual terminal mode.
             // BUGBUG: This is bad. It does not work if the app was crated without
             // BUGBUG: Apis.
-            ApplicationImpl.Instance.Force16Colors = true;
+            //ApplicationImpl.Instance.Force16Colors = true;
 
         }
 
@@ -357,7 +357,8 @@ internal partial class WindowsOutput : OutputBase, IOutput
     {
         // BUGBUG: This is bad. It does not work if the app was crated without
         // BUGBUG: Apis.
-        bool force16Colors = ApplicationImpl.Instance.Force16Colors;
+        // bool force16Colors = ApplicationImpl.Instance.Force16Colors;
+        bool force16Colors = false;
 
         if (force16Colors)
         {

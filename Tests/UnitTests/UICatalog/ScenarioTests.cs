@@ -1,11 +1,12 @@
+#nullable enable
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UICatalog;
-using UnitTests;
 using Xunit.Abstractions;
+using Timeout = System.Threading.Timeout;
 
-namespace IntegrationTests.UICatalog;
+namespace UnitTests.UICatalog;
 
 public class ScenarioTests : TestsAllViews
 {
@@ -32,6 +33,7 @@ public class ScenarioTests : TestsAllViews
         if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
         {
             _output.WriteLine ($"Skipping Scenario '{scenarioType}' on macOS due to random timeout failures.");
+
             return;
         }
 
@@ -42,6 +44,7 @@ public class ScenarioTests : TestsAllViews
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         Scenario? scenario = null;
         var scenarioName = string.Empty;
+
         // Do not use Application.AddTimer for out-of-band watchdogs as
         // they will be stopped by Shutdown/ResetState.
         Timer? watchdogTimer = null;
@@ -120,7 +123,7 @@ public class ScenarioTests : TestsAllViews
                 initialized = true;
 
                 // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
-                watchdogTimer = new Timer (_ => ForceCloseCallback (), null, (int)abortTime, System.Threading.Timeout.Infinite);
+                watchdogTimer = new (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
             }
             else
             {
@@ -152,7 +155,7 @@ public class ScenarioTests : TestsAllViews
             }
         }
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterationCount++;
 
@@ -394,7 +397,7 @@ public class ScenarioTests : TestsAllViews
 
         return;
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterations++;
 
@@ -411,7 +414,7 @@ public class ScenarioTests : TestsAllViews
             }
             else
             {
-                Application.RequestStop ();
+                a.Value?.RequestStop ();
             }
         }
 
@@ -498,7 +501,7 @@ public class ScenarioTests : TestsAllViews
             }
             catch (Exception e)
             {
-                MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+                MessageBox.ErrorQuery (ApplicationImpl.Instance, "Exception", e.Message, "Ok");
             }
 
             UpdateTitle (view);
@@ -602,7 +605,7 @@ public class ScenarioTests : TestsAllViews
                 }
                 catch (TargetInvocationException e)
                 {
-                    MessageBox.ErrorQuery ("Exception", e.InnerException!.Message, "Ok");
+                    MessageBox.ErrorQuery (ApplicationImpl.Instance, "Exception", e.InnerException!.Message, "Ok");
                     view = null;
                 }
             }

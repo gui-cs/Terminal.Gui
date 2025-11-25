@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using Moq;
 
-namespace UnitTests.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 public class ApplicationImplTests
 {
@@ -30,6 +30,22 @@ public class ApplicationImplTests
         return new ApplicationImpl (m.Object);
     }
 
+    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
+    {
+        netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
+                .Callback<CancellationToken> (token =>
+                                              {
+                                                  // Simulate an infinite loop that checks for cancellation
+                                                  while (!token.IsCancellationRequested)
+                                                  {
+                                                      // Perform the action that should repeat in the loop
+                                                      // This could be some mock behavior or just an empty loop depending on the context
+                                                  }
+                                              })
+                .Verifiable (Times.Once);
+    }
+
+
     [Fact]
     public void Init_CreatesKeybindings ()
     {
@@ -44,21 +60,6 @@ public class ApplicationImplTests
         Assert.NotEmpty (app?.Keyboard?.KeyBindings.GetBindings ()!);
 
         app?.Shutdown ();
-    }
-
-    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
-    {
-        netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
-                .Callback<CancellationToken> (token =>
-                                              {
-                                                  // Simulate an infinite loop that checks for cancellation
-                                                  while (!token.IsCancellationRequested)
-                                                  {
-                                                      // Perform the action that should repeat in the loop
-                                                      // This could be some mock behavior or just an empty loop depending on the context
-                                                  }
-                                              })
-                .Verifiable (Times.Once);
     }
 
     [Fact]

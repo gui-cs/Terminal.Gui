@@ -88,7 +88,7 @@ public class CanFocusTests
     [Fact]
     public void CanFocus_Set_True_Get_AdvanceFocus_Works ()
     {
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
         app.TopRunnable = new () { App = app };
 
         Label label = new () { Text = "label" };

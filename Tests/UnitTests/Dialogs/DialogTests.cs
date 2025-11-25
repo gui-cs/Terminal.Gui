@@ -998,7 +998,7 @@ public class DialogTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             if (++iterations > 2)
             {
@@ -1085,7 +1085,7 @@ public class DialogTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterations++;
 
@@ -1167,7 +1167,7 @@ public class DialogTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterations++;
 
@@ -1348,7 +1348,7 @@ public class DialogTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             if (++iterations > 2)
             {
