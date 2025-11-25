@@ -48,18 +48,12 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("The legacy static Application object is going away.")]
     public static bool PositionCursor () => ApplicationImpl.Instance.PositionCursor ();
 
-    /// <inheritdoc cref="IApplication.Run(Func{Exception, bool}, string)"/>
+    /// <inheritdoc cref="IApplication.Run{TRunnable}(Func{Exception, bool}, string)"/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     [Obsolete ("The legacy static Application object is going away.")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) => ApplicationImpl.Instance.Run (errorHandler, driverName);
-
-    /// <inheritdoc cref="IApplication.Run{TView}(Func{Exception, bool}, string)"/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    [Obsolete ("The legacy static Application object is going away.")]
-    public static TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TView : Toplevel, new() => ApplicationImpl.Instance.Run<TView> (errorHandler, driverName);
+    public static IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
+        where TRunnable : Toplevel, new() => ApplicationImpl.Instance.Run<TRunnable> (errorHandler, driverName);
 
     /// <inheritdoc cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>
     [Obsolete ("The legacy static Application object is going away.")]
@@ -76,7 +70,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     /// <inheritdoc cref="IApplication.TimedEvents"/>
     /// 
     [Obsolete ("The legacy static Application object is going away.")]
-    public static ITimedEvents? TimedEvents => ApplicationImpl.Instance?.TimedEvents;
+    public static ITimedEvents? TimedEvents => ApplicationImpl.Instance.TimedEvents;
 
     /// <inheritdoc cref="IApplication.Invoke(Action{IApplication})"/>
     [Obsolete ("The legacy static Application object is going away.")]

@@ -1159,7 +1159,7 @@ public class DialogTests (ITestOutputHelper output)
 
         Application.Iteration += OnApplicationOnIteration;
 
-        Application.Run ().Dispose ();
+        Application.Run<Toplevel> ();
         Application.Iteration -= OnApplicationOnIteration;
         Application.Shutdown ();
 

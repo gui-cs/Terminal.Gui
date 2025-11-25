@@ -72,7 +72,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run ().Dispose ();
+        app.Run<Toplevel> ();
         app.Shutdown ();
     }
 
@@ -86,7 +86,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run<TestTop> ().Dispose ();
+        app.Run<TestTop> ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (driverName!, output, app.Driver);
 

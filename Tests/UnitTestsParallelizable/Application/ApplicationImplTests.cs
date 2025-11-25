@@ -430,7 +430,7 @@ public class ApplicationImplTests
         app.Run (w);
 
         Assert.NotNull (app.TopRunnable);
-        app.TopRunnable?.Dispose ();
+        w?.Dispose ();
         app.Shutdown ();
         Assert.Null (app.TopRunnable);
 

@@ -156,13 +156,13 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) => Run<Toplevel> (errorHandler, driverName);
+    public IApplication Run (Func<Exception, bool>? errorHandler = null, string? driverName = null) => Run<Toplevel> (errorHandler, driverName);
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TView : Toplevel, new ()
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
+        where TRunnable : IRunnable, new()
     {
         if (!Initialized)
         {
@@ -170,10 +170,10 @@ public partial class ApplicationImpl
             Init (driverName);
         }
 
-        TView top = new ();
+        TRunnable top = new ();
         Run (top, errorHandler);
 
-        return top;
+        return this;
     }
 
     /// <inheritdoc/>
@@ -498,24 +498,6 @@ public partial class ApplicationImpl
             // End the session (raises IsRunningChanging/IsRunningChanged, pops from stack)
             End (token);
         }
-    }
-
-    /// <inheritdoc/>
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new ()
-    {
-        if (!Initialized)
-        {
-            throw new NotInitializedException (nameof (Run));
-        }
-
-        TRunnable runnable = new ();
-        
-        // Store the runnable for automatic disposal by Shutdown
-        FrameworkOwnedRunnable = runnable;
-        
-        Run (runnable, errorHandler);
-
-        return this;
     }
 
     private void RunLoop (IRunnable runnable, Func<Exception, bool>? errorHandler)

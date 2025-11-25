@@ -13,7 +13,7 @@ public class SingleBackgroundWorker : Scenario
 {
     public override void Main ()
     {
-        Application.Run<MainApp> ().Dispose ();
+        Application.Run<MainApp> ();
         Application.Shutdown ();
     }
 

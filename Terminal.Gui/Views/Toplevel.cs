@@ -18,7 +18,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
-public partial class Toplevel : View
+public partial class Toplevel : Runnable<int?>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Toplevel"/> class,

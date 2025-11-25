@@ -100,7 +100,7 @@ public class StatusBarTests
         var iteration = 0;
 
         Application.Iteration += OnApplicationOnIteration;
-        Application.Run ().Dispose ();
+        Application.Run<Toplevel> ();
         Application.Iteration -= OnApplicationOnIteration;
 
         return;

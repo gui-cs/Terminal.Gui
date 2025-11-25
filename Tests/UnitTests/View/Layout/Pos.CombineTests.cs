@@ -108,7 +108,7 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Application.StopAfterFirstIteration = true;
 
-        Assert.Throws<LayoutException> (() => Application.Run ());
+        Assert.Throws<LayoutException> (() => Application.Run<Toplevel> ());
         Application.TopRunnable.Dispose ();
         top.Dispose ();
         Application.Shutdown ();

@@ -261,8 +261,7 @@ public class UICatalog
 
         _uiCatalogDriver = Application.Driver!.GetName ();
 
-        Toplevel top = Application.Run<UICatalogTop> ();
-        top.Dispose ();
+        Application.Run<UICatalogTop> ();
         Application.Shutdown ();
         VerifyObjectsWereDisposed ();
 

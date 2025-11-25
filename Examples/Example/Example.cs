@@ -14,9 +14,7 @@ using Attribute = Terminal.Gui.Drawing.Attribute;
 //ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
 ConfigurationManager.Enable(ConfigLocations.All);
 
-
-
-Application.Run<ExampleWindow> ().Dispose ();
+Application.Run<ExampleWindow> ();
 
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();

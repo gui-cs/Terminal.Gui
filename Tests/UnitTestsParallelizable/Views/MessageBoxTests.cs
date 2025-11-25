@@ -21,7 +21,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var btnAcceptCount = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Toplevel> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, result);
@@ -76,7 +76,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var iteration = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Toplevel> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Null (result);
@@ -124,7 +124,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var btnAcceptCount = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Toplevel> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, result);
@@ -193,7 +193,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var mbFrame = Rectangle.Empty;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Toplevel> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (new (expectedX, expectedY, expectedW, expectedH), mbFrame);
