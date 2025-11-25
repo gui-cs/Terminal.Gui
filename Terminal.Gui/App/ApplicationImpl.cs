@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
@@ -86,6 +87,8 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
+            Debug.Fail ("ApplicationImpl.Instance accessed - parallelizable tests should not use legacy static Application model");
+            
             // Thread-safe: Use lock to make check-and-create atomic
             lock (_modelUsageLock)
             {
