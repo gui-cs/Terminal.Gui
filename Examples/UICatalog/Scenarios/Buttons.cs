@@ -59,7 +59,7 @@ public class Buttons : Scenario
 
                                     if (e.Handled)
                                     {
-                                        MessageBox.ErrorQuery ("Error", "This button is no longer the Quit button; the Swap Default button is.", "_Ok");
+                                        MessageBox.ErrorQuery ((s as View)?.App, "Error", "This button is no longer the Quit button; the Swap Default button is.", "_Ok");
                                     }
                                 };
         main.Add (swapButton);
@@ -69,7 +69,7 @@ public class Buttons : Scenario
             button.Accepting += (s, e) =>
                              {
                                  string btnText = button.Text;
-                                 MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
+                                 MessageBox.Query ((s as View)?.App, "Message", $"Did you click {txt}?", "Yes", "No");
                                  e.Handled = true;
                              };
         }
@@ -112,7 +112,7 @@ public class Buttons : Scenario
                  );
         button.Accepting += (s, e) =>
                          {
-                             MessageBox.Query ("Message", "Question?", "Yes", "No");
+                             MessageBox.Query ((s as View)?.App, "Message", "Question?", "Yes", "No");
                              e.Handled = true;
                          };
 

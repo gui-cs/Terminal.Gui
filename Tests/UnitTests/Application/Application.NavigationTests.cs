@@ -80,7 +80,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void GetFocused_Returns_Focused_View ()
     {
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance;
 
         app.TopRunnable = new ()
         {
@@ -115,7 +115,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void GetFocused_Returns_Null_If_No_Focused_View ()
     {
-        IApplication app = Application.Create ();
+        IApplication app = ApplicationImpl.Instance; // Force legacy
 
         app.TopRunnable = new ()
         {

@@ -1026,7 +1026,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery ((sender as View)?.App, 60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1165,7 +1165,7 @@ public class TableEditor : Scenario
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery ("Could not find local drives", e.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView?.App, "Could not find local drives", e.Message, "Ok");
         }
 
         _tableView!.Table = source;
@@ -1199,10 +1199,10 @@ public class TableEditor : Scenario
         ok.Accepting += (s, e) =>
                         {
                             accepted = true;
-                            Application.RequestStop ();
+                            (s as View)?.App?.RequestStop ();
                         };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
+        cancel.Accepting += (s, e) => { (s as View)?.App?.RequestStop (); };
 
         var d = new Dialog
         {
@@ -1218,7 +1218,7 @@ public class TableEditor : Scenario
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _tableView.App?.Run (d);
         d.Dispose ();
 
         if (accepted)
@@ -1229,7 +1229,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView.App, 60, 20, "Failed to set", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1512,7 +1512,7 @@ public class TableEditor : Scenario
                                                                              _checkedFileSystemInfos!.Contains,
                                                                              CheckOrUncheckFile
                                                                             )
-                { UseRadioButtons = radio };
+            { UseRadioButtons = radio };
         }
         else
         {

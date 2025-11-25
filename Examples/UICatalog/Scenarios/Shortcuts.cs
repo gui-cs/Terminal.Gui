@@ -566,6 +566,6 @@ public class Shortcuts : Scenario
     {
         e.Handled = true;
         var view = sender as View;
-        MessageBox.Query ("Hi", $"You clicked {view?.Text}", "_Ok");
+        MessageBox.Query ((sender as View)?.App, "Hi", $"You clicked {view?.Text}", "_Ok");
     }
 }

@@ -68,7 +68,7 @@ public partial class GuiTestContext : IDisposable
 
         try
         {
-            InitializeApplication ();
+            App?.Init (GetDriverName ());
             _booting.Release ();
 
             // After Init, Application.Screen should be set by the driver
@@ -119,21 +119,36 @@ public partial class GuiTestContext : IDisposable
                              {
                                  try
                                  {
-                                     InitializeApplication ();
+                                     try
+                                     {
+                                         App?.Init (GetDriverName ());
+                                     }
+                                     catch (Exception e)
+                                     {
+                                         Logging.Error(e.Message);
+                                         _runCancellationTokenSource.Cancel ();
+                                     }
+                                     finally
+                                     {
+                                         _booting.Release ();
+                                     }
 
-                                     _booting.Release ();
+                                     if (App is { Initialized: true })
+                                     {
+                                         Toplevel t = topLevelBuilder ();
+                                         t.Closed += (s, e) => { Finished = true; };
+                                         App?.Run (t); // This will block, but it's on a background thread now
 
-                                     Toplevel t = topLevelBuilder ();
-                                     t.Closed += (s, e) => { Finished = true; };
-                                     App?.Run (t); // This will block, but it's on a background thread now
-
-                                     t.Dispose ();
-                                     Logging.Trace ("Application.Run completed");
-                                     App?.Shutdown ();
-                                     _runCancellationTokenSource.Cancel ();
+                                         t.Dispose ();
+                                         Logging.Trace ("Application.Run completed");
+                                         App?.Shutdown ();
+                                         _runCancellationTokenSource.Cancel ();
+                                     }
                                  }
                                  catch (OperationCanceledException)
-                                 { }
+                                 {
+                                     Logging.Trace ("OperationCanceledException");
+                                 }
                                  catch (Exception ex)
                                  {
                                      _backgroundException = ex;
@@ -142,7 +157,6 @@ public partial class GuiTestContext : IDisposable
                                  finally
                                  {
                                      CleanupApplication ();
-
                                      if (_logWriter != null)
                                      {
                                          WriteOutLogs (_logWriter);
@@ -163,11 +177,6 @@ public partial class GuiTestContext : IDisposable
         {
             throw new ("Application crashed", _backgroundException);
         }
-    }
-
-    private void InitializeApplication ()
-    {
-        App?.Init (GetDriverName ());
     }
 
 
@@ -316,7 +325,7 @@ public partial class GuiTestContext : IDisposable
             throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
-        Logging.Trace ($"WaitIteration started");
+        //Logging.Trace ($"WaitIteration started");
         if (action is null)
         {
             action = (app) => { };
@@ -358,8 +367,9 @@ public partial class GuiTestContext : IDisposable
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
-        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
 
+        int count = 0;
         while (!condition ())
         {
             if (sw.Elapsed > _timeout)
@@ -368,8 +378,10 @@ public partial class GuiTestContext : IDisposable
             }
 
             c = WaitIteration ();
+            count++;
         }
 
+        Logging.Trace ($"WaitUntil completed after {sw.ElapsedMilliseconds}ms and {count} iterations");
         return c ?? this;
     }
 

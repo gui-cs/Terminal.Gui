@@ -37,7 +37,7 @@ public partial class ColorPicker
                         {
                             accept = true;
                             e.Handled = true;
-                            Application.RequestStop ();
+                            (s as View)?.App?.RequestStop ();
                         };
 
         var btnCancel = new Button
@@ -51,7 +51,7 @@ public partial class ColorPicker
         btnCancel.Accepting += (s, e) =>
                             {
                                 e.Handled = true;
-                                Application.RequestStop ();
+                                (s as View)?.App ?.RequestStop ();
                             };
 
         d.Add (btnOk);

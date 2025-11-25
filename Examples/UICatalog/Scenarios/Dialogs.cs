@@ -266,7 +266,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [1..]),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [0..]),
 
                 Buttons = buttons.ToArray ()
             };

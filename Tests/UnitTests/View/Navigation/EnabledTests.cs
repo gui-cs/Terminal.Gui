@@ -1,10 +1,9 @@
-﻿using UnitTests;
-
+﻿#nullable enable
 namespace UnitTests.ViewTests;
 
 public class EnabledTests
 {
-  
+
     [Fact]
     [AutoInitShutdown]
     public void _Enabled_Sets_Also_Sets_SubViews ()
@@ -30,7 +29,7 @@ public class EnabledTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterations++;
 

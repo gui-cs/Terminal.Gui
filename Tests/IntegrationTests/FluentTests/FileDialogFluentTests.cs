@@ -60,10 +60,10 @@ public class FileDialogFluentTests
     public void CancelFileDialog_QuitKey_Quits (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
-            .ScreenShot ("Save dialog", _out)
-            .EnqueueKeyEvent (Application.QuitKey)
-            .AssertTrue (sd!.Canceled);
+        using GuiTestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d, logWriter: _out)
+                                     .ScreenShot ("Save dialog", _out)
+                                     .EnqueueKeyEvent (Application.QuitKey)
+                                     .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -93,7 +93,7 @@ public class FileDialogFluentTests
     public void CancelFileDialog_UsingCancelButton_AltC (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
                           .ScreenShot ("Save dialog", _out)
                           .EnqueueKeyEvent (Key.C.WithAlt)
                           .AssertTrue (sd!.Canceled);
@@ -132,12 +132,13 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .ScreenShot ("Save dialog", _out)
-                          .Focus<Button> (b => b.Text == "_Save")
-                          .EnqueueKeyEvent (Key.Enter)
-                          .AssertFalse (sd!.Canceled)
-                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
+        using GuiTestContext c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
+                                     .ScreenShot ("Save dialog", _out)
+                                     .Focus<Button> (b => b.Text == "_Save")
+                                     .EnqueueKeyEvent (Key.Enter)
+                                     .AssertFalse (sd!.Canceled)
+                                     .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
+                                     ;
     }
 
     private string GetFileSystemRoot (IFileSystem fs)

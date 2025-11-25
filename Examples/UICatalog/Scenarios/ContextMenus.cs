@@ -49,7 +49,7 @@ public class ContextMenus : Scenario
             var text = "Context Menu";
             var width = 20;
 
-            CreateWinContextMenu ();
+            CreateWinContextMenu (ApplicationImpl.Instance);
 
             var label = new Label
             {
@@ -108,7 +108,7 @@ public class ContextMenus : Scenario
         }
     }
 
-    private void CreateWinContextMenu ()
+    private void CreateWinContextMenu (IApplication? app)
     {
         _winContextMenu = new (
                                [
@@ -122,7 +122,7 @@ public class ContextMenus : Scenario
                                    {
                                        Title = "_Configuration...",
                                        HelpText = "Show configuration",
-                                       Action = () => MessageBox.Query (
+                                       Action = () => MessageBox.Query (app,
                                                                         50,
                                                                         10,
                                                                         "Configuration",
@@ -140,7 +140,7 @@ public class ContextMenus : Scenario
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
                                                               Action = () => MessageBox
-                                                                           .Query (
+                                                                           .Query (app,
                                                                                    50,
                                                                                    10,
                                                                                    "Setup",
@@ -154,7 +154,7 @@ public class ContextMenus : Scenario
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
                                                               Action = () => MessageBox
-                                                                           .Query (
+                                                                           .Query (app,
                                                                                    50,
                                                                                    10,
                                                                                    "Maintenance",

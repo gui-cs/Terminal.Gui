@@ -613,7 +613,6 @@ public class ViewDrawingFlowTests () : FakeDriverBase
         IDriver driver = CreateFakeDriver (80, 25);
         var initialClip = new Region (driver.Screen);
         driver.Clip = initialClip;
-        Application.Driver = driver;
 
         var view = new View
         {
@@ -636,8 +635,6 @@ public class ViewDrawingFlowTests () : FakeDriverBase
         // Points inside the view should be excluded
         // Note: This test depends on the DrawContext tracking, which may not exclude if nothing was actually drawn
         // We're verifying the mechanism exists, not that it necessarily excludes in this specific case
-
-        Application.ResetState (true);
     }
 
     #endregion

@@ -122,7 +122,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
     /// <inheritdoc />
-    public virtual void EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    public virtual void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
     {
         // Base implementation: For drivers where TInputRecord cannot represent mouse events
         // (e.g., ConsoleKeyInfo), derived classes should override this method.

@@ -5,7 +5,7 @@ namespace Terminal.Gui.App;
 /// </summary>
 /// <remarks>
 ///     These extensions provide convenience methods for wrapping views in <see cref="RunnableWrapper{TView, TResult}"/>
-///     and running them in a single call, similar to how <see cref="IApplication.Run{TRunnable}()"/> works.
+///     and running them in a single call, similar to how <see cref="IApplication.Run(Func{Exception, bool}, string)"/> works.
 /// </remarks>
 public static class ApplicationRunnableExtensions
 {

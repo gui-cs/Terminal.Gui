@@ -153,9 +153,9 @@ public class ConfigurationEditor : Scenario
                 continue;
             }
 
-            int result = MessageBox.Query (
+            int? result = MessageBox.Query (editor?.App,
                                            "Save Changes",
-                                           $"Save changes to {editor.FileInfo!.Name}",
+                                           $"Save changes to {editor?.FileInfo!.Name}",
                                            "_Yes",
                                            "_No",
                                            "_Cancel"
@@ -164,7 +164,7 @@ public class ConfigurationEditor : Scenario
             switch (result)
             {
                 case 0:
-                    editor.Save ();
+                    editor?.Save ();
 
                     break;
 

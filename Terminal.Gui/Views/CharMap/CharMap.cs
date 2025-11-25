@@ -281,8 +281,8 @@ public class CharMap : View, IDesignable
         }
     }
 
-    private void CopyCodePoint () { Clipboard.Contents = $"U+{SelectedCodePoint:x5}"; }
-    private void CopyGlyph () { Clipboard.Contents = $"{new Rune (SelectedCodePoint)}"; }
+    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData($"U+{SelectedCodePoint:x5}"); }
+    private void CopyGlyph () { App?.Clipboard?.SetClipboardData($"{new Rune (SelectedCodePoint)}"); }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
@@ -335,7 +335,7 @@ public class CharMap : View, IDesignable
     [RequiresDynamicCode ("AOT")]
     private void ShowDetails ()
     {
-        if (!Application.Initialized)
+        if (App is not { Initialized: true })
         {
             // Some unit tests invoke Accept without Init
             return;
@@ -380,15 +380,15 @@ public class CharMap : View, IDesignable
                                    try
                                    {
                                        decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
-                                       Application.Invoke ((_) => waitIndicator.RequestStop ());
+                                       App?.Invoke ((_) => (s as Dialog)?.RequestStop ());
                                    }
                                    catch (HttpRequestException e)
                                    {
                                        getCodePointError = errorLabel.Text = e.Message;
-                                       Application.Invoke ((_) => waitIndicator.RequestStop ());
+                                       App?.Invoke ((_) => (s as Dialog)?.RequestStop ());
                                    }
                                };
-        Application.Run (waitIndicator);
+        App?.Run (waitIndicator);
         waitIndicator.Dispose ();
 
         var name = string.Empty;
@@ -521,7 +521,7 @@ public class CharMap : View, IDesignable
 
         dlg.Add (json);
 
-        Application.Run (dlg);
+        App?.Run (dlg);
         dlg.Dispose ();
     }
 
