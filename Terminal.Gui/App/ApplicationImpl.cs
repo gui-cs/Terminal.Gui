@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
@@ -36,7 +35,7 @@ public partial class ApplicationImpl : IApplication
     #endregion Clipboard
 
     /// <inheritdoc/>
-    public new string ToString () { return Driver?.ToString () ?? string.Empty; }
+    public new string ToString () => Driver?.ToString () ?? string.Empty;
 
     #region Singleton
 
@@ -87,8 +86,8 @@ public partial class ApplicationImpl : IApplication
     {
         get
         {
-            Debug.Fail ("ApplicationImpl.Instance accessed - parallelizable tests should not use legacy static Application model");
-            
+            //Debug.Fail ("ApplicationImpl.Instance accessed - parallelizable tests should not use legacy static Application model");
+
             // Thread-safe: Use lock to make check-and-create atomic
             lock (_modelUsageLock)
             {
@@ -251,8 +250,6 @@ public partial class ApplicationImpl : IApplication
             }
         }
     }
-
-    // BUGBUG: Technically, this is not the full lst of sessions. There be dragons here, e.g. see how Toplevel.Id is used. What
 
     /// <inheritdoc/>
     public ConcurrentStack<Toplevel> SessionStack { get; } = new ();

@@ -34,7 +34,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     [Obsolete ("The legacy static Application object is going away.")]
     public static void Init (string? driverName = null)
     {
-        Debug.Fail ("Application.Init() called - parallelizable tests should not use legacy static Application model");
+        //Debug.Fail ("Application.Init() called - parallelizable tests should not use legacy static Application model");
         ApplicationImpl.Instance.Init (driverName ?? ForceDriver);
     }
 

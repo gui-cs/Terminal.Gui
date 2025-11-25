@@ -13,7 +13,7 @@ public class ApplicationNavigation
     /// </summary>
     public ApplicationNavigation ()
     {
-        // TODO: Move navigation key bindings here from AddApplicationKeyBindings
+        // TODO: Move navigation key bindings here from KeyboardImpl
     }
 
     /// <summary>
