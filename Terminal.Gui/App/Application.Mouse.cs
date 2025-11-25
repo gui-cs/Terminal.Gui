@@ -4,14 +4,24 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Mouse handling
 {
+    private static bool _isMouseDisabled = false; // Resources/config.json overrides
+
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     [Obsolete ("The legacy static Application object is going away.")]
     public static bool IsMouseDisabled
     {
-        get => Mouse.IsMouseDisabled;
-        set => Mouse.IsMouseDisabled = value;
+        get => _isMouseDisabled;
+        set
+        {
+            bool oldValue = _isMouseDisabled;
+            _isMouseDisabled = value;
+            IsMouseDisabledChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, _isMouseDisabled));
+        }
     }
+
+    /// <summary>Raised when <see cref="IsMouseDisabled"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<bool>>? IsMouseDisabledChanged;
 
     /// <summary>
     ///     Gets the <see cref="IMouse"/> instance that manages mouse event handling and state.

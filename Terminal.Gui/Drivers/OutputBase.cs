@@ -90,14 +90,16 @@ public abstract class OutputBase
             }
         }
 
-        foreach (SixelToRender s in Application.Sixel)
-        {
-            if (!string.IsNullOrWhiteSpace (s.SixelData))
-            {
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Out.Write (s.SixelData);
-            }
-        }
+        // BUGBUG: The Sixel impl depends on the legacy static Application object
+        // BUGBUG: Disabled for now
+        //foreach (SixelToRender s in  Application.Sixel)
+        //{
+        //    if (!string.IsNullOrWhiteSpace (s.SixelData))
+        //    {
+        //        SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+        //        Console.Out.Write (s.SixelData);
+        //    }
+        //}
 
         SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
         _cachedCursorVisibility = savedVisibility;

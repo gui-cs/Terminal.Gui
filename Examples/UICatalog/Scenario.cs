@@ -67,7 +67,7 @@ namespace UICatalog;
 ///         };
 /// 
 ///         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
-///         button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "Ok");
+///         button.Accept += (s, e) => MessageBox.ErrorQuery (App, "Error", "You pressed the button!", "Ok");
 ///         appWindow.Add (button);
 /// 
 ///         // Run - Start the application.
@@ -210,12 +210,12 @@ public class Scenario : IDisposable
         void OnClearedContents (object? sender, EventArgs args) => BenchmarkResults.ClearedContentCount++;
     }
 
-    private void OnApplicationOnIteration (object? s, IterationEventArgs a)
+    private void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
     {
         BenchmarkResults.IterationCount++;
         if (BenchmarkResults.IterationCount > BENCHMARK_MAX_NATURAL_ITERATIONS + (_demoKeys!.Count * BENCHMARK_KEY_PACING))
         {
-            Application.RequestStop ();
+            a.Value?.RequestStop ();
         }
     }
 

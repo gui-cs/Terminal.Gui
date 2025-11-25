@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace UnitTests.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
 public class DateFieldTests
 {
@@ -35,25 +35,34 @@ public class DateFieldTests
 
     [Fact]
     [TestDate]
-    [SetupFakeApplication]
     public void Copy_Paste ()
     {
-        var df1 = new DateField (DateTime.Parse ("12/12/1971"));
-        var df2 = new DateField (DateTime.Parse ("12/31/2023"));
+        IApplication app = Application.Create();
+        app.Init("fake");
 
-        // Select all text
-        Assert.True (df2.NewKeyDownEvent (Key.End.WithShift));
-        Assert.Equal (1, df2.SelectedStart);
-        Assert.Equal (10, df2.SelectedLength);
-        Assert.Equal (11, df2.CursorPosition);
+        try
+        {
+            var df1 = new DateField (DateTime.Parse ("12/12/1971")) { App = app };
+            var df2 = new DateField (DateTime.Parse ("12/31/2023")) { App = app };
 
-        // Copy from df2
-        Assert.True (df2.NewKeyDownEvent (Key.C.WithCtrl));
+            // Select all text
+            Assert.True (df2.NewKeyDownEvent (Key.End.WithShift));
+            Assert.Equal (1, df2.SelectedStart);
+            Assert.Equal (10, df2.SelectedLength);
+            Assert.Equal (11, df2.CursorPosition);
 
-        // Paste into df1
-        Assert.True (df1.NewKeyDownEvent (Key.V.WithCtrl));
-        Assert.Equal (" 12/31/2023", df1.Text);
-        Assert.Equal (11, df1.CursorPosition);
+            // Copy from df2
+            Assert.True (df2.NewKeyDownEvent (Key.C.WithCtrl));
+
+            // Paste into df1
+            Assert.True (df1.NewKeyDownEvent (Key.V.WithCtrl));
+            Assert.Equal (" 12/31/2023", df1.Text);
+            Assert.Equal (11, df1.CursorPosition);
+        }
+        finally
+        {
+            app.Shutdown();
+        }
     }
 
     [Fact]

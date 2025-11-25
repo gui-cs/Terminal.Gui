@@ -65,23 +65,18 @@ public class ViewDrawingClippingTests () : FakeDriverBase
 
         Assert.Equal (original, previous);
         Assert.NotEqual (original, driver.Clip);
-
-        Application.ResetState (true);
     }
 
     [Fact]
     public void SetClipToScreen_SetsClipToScreen ()
     {
         IDriver driver = CreateFakeDriver (80, 25);
-        Application.Driver = driver;
         View view = new () { Driver = driver };
 
         view.SetClipToScreen ();
 
         Assert.NotNull (driver.Clip);
         Assert.Equal (driver.Screen, driver.Clip.GetBounds ());
-
-        Application.ResetState (true);
     }
 
     #endregion
@@ -94,8 +89,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
         View view = new () { Driver = null };
         var exception = Record.Exception (() => view.ExcludeFromClip (new Rectangle (5, 5, 10, 10)));
         Assert.Null (exception);
-
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -103,7 +96,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
     {
         IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (new Rectangle (0, 0, 80, 25));
-        Application.Driver = driver;
         View view = new () { Driver = driver };
 
         var toExclude = new Rectangle (10, 10, 20, 20);
@@ -112,8 +104,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
         // Verify the region was excluded
         Assert.NotNull (driver.Clip);
         Assert.False (driver.Clip.Contains (15, 15));
-
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -123,8 +113,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
 
         var exception = Record.Exception (() => view.ExcludeFromClip (new Region (new Rectangle (5, 5, 10, 10))));
         Assert.Null (exception);
-
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -141,8 +129,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
         // Verify the region was excluded
         Assert.NotNull (driver.Clip);
         Assert.False (driver.Clip.Contains (15, 15));
-
-        Application.ResetState (true);
     }
 
     #endregion
@@ -538,7 +524,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
     {
         IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
-        Application.Driver = driver;
 
         var view = new View
         {
@@ -558,7 +543,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
         Assert.NotNull (driver.Clip);
         Assert.False (driver.Clip.Contains (20, 20)); // Point inside excluded rect should not be in clip
 
-        Application.ResetState (true);
     }
 
     [Fact]
@@ -566,7 +550,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
     {
         IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = null!;
-        Application.Driver = driver;
 
         var view = new View
         {
@@ -581,7 +564,6 @@ public class ViewDrawingClippingTests () : FakeDriverBase
 
         Assert.Null (exception);
 
-        Application.ResetState (true);
     }
 
     #endregion

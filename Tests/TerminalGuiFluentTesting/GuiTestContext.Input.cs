@@ -64,7 +64,7 @@ public partial class GuiTestContext
             {
                 mouseEvent.Position = mouseEvent.ScreenPosition;
 
-                app.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+                app.Driver.InputProcessor.EnqueueMouseEvent (app, mouseEvent);
             }
             else
             {
@@ -205,11 +205,6 @@ public partial class GuiTestContext
             App.Driver.EnqueueKeyEvent (key);
             WaitUntil (() => keyReceived);
         }
-        else
-        {
-            Fail ("Expected Application.Driver to be non-null.");
-        }
-
 
         return this;
 

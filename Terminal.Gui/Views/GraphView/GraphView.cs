@@ -8,7 +8,6 @@ public class GraphView : View, IDesignable
     /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
     public GraphView ()
     {
-        App = ApplicationImpl.Instance;
         CanFocus = true;
 
         AxisX = new ();

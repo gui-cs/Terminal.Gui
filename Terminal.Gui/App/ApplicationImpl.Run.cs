@@ -5,15 +5,6 @@ namespace Terminal.Gui.App;
 
 public partial class ApplicationImpl
 {
-    /// <summary>
-    ///     INTERNAL: Gets or sets the managed thread ID of the application's main UI thread, which is set during
-    ///     <see cref="Init"/> and used to determine if code is executing on the main thread.
-    /// </summary>
-    /// <value>
-    ///     The managed thread ID of the main UI thread, or <see langword="null"/> if the application is not initialized.
-    /// </value>
-    internal int? MainThreadId { get; set; }
-
     #region Begin->Run->Stop->End
 
     // TODO: This API is not used anywhere; it can be deleted
@@ -156,11 +147,11 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void RaiseIteration ()
     {
-        Iteration?.Invoke (null, new ());
+        Iteration?.Invoke (null, new (this));
     }
 
     /// <inheritdoc/>
-    public event EventHandler<IterationEventArgs>? Iteration;
+    public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]

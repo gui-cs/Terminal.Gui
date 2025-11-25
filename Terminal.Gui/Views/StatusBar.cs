@@ -9,6 +9,8 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class StatusBar : Bar, IDesignable
 {
+    private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides
+
     /// <inheritdoc/>
     public StatusBar () : this ([]) { }
 
@@ -55,7 +57,11 @@ public class StatusBar : Bar, IDesignable
     ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultSeparatorLineStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultSeparatorLineStyle
+    {
+        get => _defaultSeparatorLineStyle;
+        set => _defaultSeparatorLineStyle = value;
+    }
 
     /// <inheritdoc />
     protected override void OnSubViewLayout (LayoutEventArgs args)
@@ -160,7 +166,7 @@ public class StatusBar : Bar, IDesignable
 
         return true;
 
-        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App, "Hi", $"You clicked {sender}"); }
     }
 
     /// <inheritdoc />

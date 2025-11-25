@@ -21,6 +21,27 @@ public class ClipboardTests
     }
 
     [Fact, AutoInitShutdown (useFakeClipboard: true)]
+    public void IApplication_Clipboard_Property_Works ()
+    {
+        if (Application.Clipboard?.IsSupported != true)
+        {
+            output.WriteLine ($"The Clipboard not supported on this platform.");
+            return;
+        }
+
+        string clipText = "The IApplication_Clipboard_Property_Works unit test pasted this to the OS clipboard.";
+        
+        // Use the new IApplication.Clipboard property
+        Application.Clipboard.SetClipboardData (clipText);
+
+        ApplicationImpl.Instance.Iteration += (s, a) => ApplicationImpl.Instance.RequestStop ();
+        ApplicationImpl.Instance.Run<Toplevel>().Dispose();
+
+        Assert.True(Application.Clipboard.TryGetClipboardData(out string result));
+        Assert.Equal (clipText, result);
+    }
+
+    [Fact, AutoInitShutdown (useFakeClipboard: true)]
     public void Contents_Fake_Gets_Sets ()
     {
         if (!Clipboard.IsSupported)

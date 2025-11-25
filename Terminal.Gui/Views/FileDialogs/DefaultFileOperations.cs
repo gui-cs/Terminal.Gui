@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 public class DefaultFileOperations : IFileOperations
 {
     /// <inheritdoc/>
-    public bool Delete (IEnumerable<IFileSystemInfo> toDelete)
+    public bool Delete (IApplication app, IEnumerable<IFileSystemInfo> toDelete)
     {
         // Default implementation does not allow deleting multiple files
         if (toDelete.Count () != 1)
@@ -18,7 +18,7 @@ public class DefaultFileOperations : IFileOperations
         IFileSystemInfo d = toDelete.Single ();
         string adjective = d.Name;
 
-        int result = MessageBox.Query (
+        int? result = MessageBox.Query (app,
                                        string.Format (Strings.fdDeleteTitle, adjective),
                                        string.Format (Strings.fdDeleteBody, adjective),
                                        Strings.btnYes,
@@ -43,14 +43,14 @@ public class DefaultFileOperations : IFileOperations
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Strings.fdDeleteFailedTitle, ex.Message, Strings.btnOk);
+            MessageBox.ErrorQuery (app, Strings.fdDeleteFailedTitle, ex.Message, Strings.btnOk);
         }
 
         return false;
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename)
+    public IFileSystemInfo Rename (IApplication app, IFileSystem fileSystem, IFileSystemInfo toRename)
     {
         // Don't allow renaming C: or D: or / (on linux) etc
         if (toRename is IDirectoryInfo dir && dir.Parent is null)
@@ -95,7 +95,7 @@ public class DefaultFileOperations : IFileOperations
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.ErrorQuery (Strings.fdRenameFailedTitle, ex.Message, "Ok");
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, "Ok");
                 }
             }
         }
@@ -104,7 +104,7 @@ public class DefaultFileOperations : IFileOperations
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo New (IFileSystem fileSystem, IDirectoryInfo inDirectory)
+    public IFileSystemInfo New (IApplication app, IFileSystem fileSystem, IDirectoryInfo inDirectory)
     {
         if (Prompt (Strings.fdNewTitle, "", out string named))
         {
@@ -122,7 +122,7 @@ public class DefaultFileOperations : IFileOperations
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.ErrorQuery (Strings.fdNewFailed, ex.Message, "Ok");
+                    MessageBox.ErrorQuery (app, Strings.fdNewFailed, ex.Message, "Ok");
                 }
             }
         }
@@ -138,7 +138,7 @@ public class DefaultFileOperations : IFileOperations
         btnOk.Accepting += (s, e) =>
                          {
                              confirm = true;
-                             Application.RequestStop ();
+                             (s as View)?.App?.RequestStop ();
                              // When Accepting is handled, set e.Handled to true to prevent further processing.
                              e.Handled = true;
                          };
@@ -147,7 +147,7 @@ public class DefaultFileOperations : IFileOperations
         btnCancel.Accepting += (s, e) =>
                              {
                                  confirm = false;
-                                 Application.RequestStop ();
+                                 (s as View)?.App?.RequestStop ();
                                  // When Accepting is handled, set e.Handled to true to prevent further processing.
                                  e.Handled = true;
                              };

@@ -2,6 +2,7 @@
 
 public partial class View
 {
+    // TODO: Make this a configuration property
     /// <summary>Gets or sets whether diagnostic information will be drawn. This is a bit-field of <see cref="ViewDiagnosticFlags"/>.e <see cref="View"/> diagnostics.</summary>
     /// <remarks>
     /// <para>
