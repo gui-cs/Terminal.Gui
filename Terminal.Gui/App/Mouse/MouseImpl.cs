@@ -9,15 +9,25 @@ namespace Terminal.Gui.App;
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-internal class MouseImpl : IMouse
+internal class MouseImpl : IMouse, IDisposable
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseImpl"/> class.
+    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration property events.
     /// </summary>
-    public MouseImpl () { }
+    public MouseImpl ()
+    {
+        // Subscribe to Application static property change events
+        Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
+    }
+
+    private IApplication? _app;
 
     /// <inheritdoc/>
-    public IApplication? App { get; set; }
+    public IApplication? App
+    {
+        get => _app;
+        set => _app = value;
+    }
 
     /// <inheritdoc/>
     public Point? LastMousePosition { get; set; }
@@ -390,5 +400,18 @@ internal class MouseImpl : IMouse
         }
 
         return false;
+    }
+
+    // Event handler for Application static property changes
+    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e)
+    {
+        IsMouseDisabled = e.NewValue;
+    }
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        // Unsubscribe from Application static property change events
+        Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
     }
 }

@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -11,10 +10,17 @@ namespace Terminal.Gui.Views;
 ///     <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
 ///     or when one of the views or buttons added to the dialog calls
-///     <see cref="Application.RequestStop"/>.
+///     <see cref="IApplication.RequestStop()"/>.
 /// </remarks>
 public class Dialog : Window
 {
+    private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
+    private static Alignment _defaultButtonAlignment = Alignment.End; // Resources/config.json overrides
+    private static AlignmentModes _defaultButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems; // Resources/config.json overrides
+    private static int _defaultMinimumHeight = 80; // Resources/config.json overrides
+    private static int _defaultMinimumWidth = 80; // Resources/config.json overrides
+    private static ShadowStyle _defaultShadow = ShadowStyle.Transparent; // Resources/config.json overrides
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
     /// </summary>
@@ -107,37 +113,61 @@ public class Dialog : Window
     /// </summary>
 
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+    public new static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+    public static Alignment DefaultButtonAlignment
+    {
+        get => _defaultButtonAlignment;
+        set => _defaultButtonAlignment = value;
+    }
 
     /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+    public static AlignmentModes DefaultButtonAlignmentModes
+    {
+        get => _defaultButtonAlignmentModes;
+        set => _defaultButtonAlignmentModes = value;
+    }
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 80;
+    public static int DefaultMinimumHeight
+    {
+        get => _defaultMinimumHeight;
+        set => _defaultMinimumHeight = value;
+    }
 
     /// <summary>
     ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 80;
+    public static int DefaultMinimumWidth
+    {
+        get => _defaultMinimumWidth;
+        set => _defaultMinimumWidth = value;
+    }
 
     /// <summary>
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+    public new static ShadowStyle DefaultShadow
+    {
+        get => _defaultShadow;
+        set => _defaultShadow = value;
+    }
 
 
     // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the

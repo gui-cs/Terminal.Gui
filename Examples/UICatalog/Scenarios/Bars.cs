@@ -309,7 +309,7 @@ public class Bars : Scenario
     //                                                  new TimeSpan (0),
     //                                                  () =>
     //                                                  {
-    //                                                      MessageBox.Query ("File", "New");
+    //                                                      MessageBox.Query (App, "File", "New");
 
     //                                                      return false;
     //                                                  });
@@ -331,7 +331,7 @@ public class Bars : Scenario
     //                                               new TimeSpan (0),
     //                                               () =>
     //                                               {
-    //                                                   MessageBox.Query ("File", "Open");
+    //                                                   MessageBox.Query (App, "File", "Open");
 
     //                                                   return false;
     //                                               });
@@ -353,7 +353,7 @@ public class Bars : Scenario
     //                                               new TimeSpan (0),
     //                                               () =>
     //                                               {
-    //                                                   MessageBox.Query ("File", "Save");
+    //                                                   MessageBox.Query (App, "File", "Save");
 
     //                                                   return false;
     //                                               });
@@ -375,7 +375,7 @@ public class Bars : Scenario
     //                                                 new TimeSpan (0),
     //                                                 () =>
     //                                                 {
-    //                                                     MessageBox.Query ("File", "Save As");
+    //                                                     MessageBox.Query (App, "File", "Save As");
 
     //                                                     return false;
     //                                                 });
@@ -555,7 +555,7 @@ public class Bars : Scenario
 
         return;
 
-        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ((sender as View)?.App, "Hi", $"You clicked {sender}"); }
 
     }
 

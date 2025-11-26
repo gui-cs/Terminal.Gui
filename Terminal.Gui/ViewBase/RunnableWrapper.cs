@@ -8,7 +8,8 @@ namespace Terminal.Gui.ViewBase;
 /// <typeparam name="TResult">The type of result data returned when the session completes.</typeparam>
 /// <remarks>
 ///     <para>
-///         This class enables any View to be run as a blocking session with <see cref="IApplication.Run"/>
+///         This class enables any View to be run as a blocking session with
+///         <see cref="IApplication.Run(Func{Exception, bool}, string)"/>
 ///         without requiring the View to implement <see cref="IRunnable{TResult}"/> or derive from
 ///         <see cref="Runnable{TResult}"/>.
 ///     </para>

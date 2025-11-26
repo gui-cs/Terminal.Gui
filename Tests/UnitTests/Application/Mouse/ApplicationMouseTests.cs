@@ -267,7 +267,7 @@ public class ApplicationMouseTests
 
         //                                 Assert.Equal (sv, Application.Mouse.MouseGrabView);
 
-        //                                 MessageBox.Query ("Title", "Test", "Ok");
+        //                                 MessageBox.Query (App, "Title", "Test", "Ok");
 
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
         //                             }

@@ -4,21 +4,41 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Run (Begin -> Run -> Layout/Draw -> End -> Stop)
 {
+    private static Key _quitKey = Key.Esc; // Resources/config.json overrides
+
     /// <summary>Gets or sets the key to quit the application.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
     {
-        get => ApplicationImpl.Instance.Keyboard.QuitKey;
-        set => ApplicationImpl.Instance.Keyboard.QuitKey = value;
+        get => _quitKey;
+        set
+        {
+            Key oldValue = _quitKey;
+            _quitKey = value;
+            QuitKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _quitKey));
+        }
     }
+
+    /// <summary>Raised when <see cref="QuitKey"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<Key>>? QuitKeyChanged;
+
+    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
     {
-        get => ApplicationImpl.Instance.Keyboard.ArrangeKey;
-        set => ApplicationImpl.Instance.Keyboard.ArrangeKey = value;
+        get => _arrangeKey;
+        set
+        {
+            Key oldValue = _arrangeKey;
+            _arrangeKey = value;
+            ArrangeKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _arrangeKey));
+        }
     }
+
+    /// <summary>Raised when <see cref="ArrangeKey"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<Key>>? ArrangeKeyChanged;
 
     /// <inheritdoc cref="IApplication.Begin(IRunnable)"/>
     [Obsolete ("The legacy static Application object is going away.")]
@@ -88,7 +108,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.Iteration"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static event EventHandler<IterationEventArgs>? Iteration
+    public static event EventHandler<EventArgs<IApplication?>>? Iteration
     {
         add => ApplicationImpl.Instance.Iteration += value;
         remove => ApplicationImpl.Instance.Iteration -= value;

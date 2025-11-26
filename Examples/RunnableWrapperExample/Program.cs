@@ -13,41 +13,42 @@ var textField = new TextField { Width = 40, Text = "Default text" };
 textField.Title = "Enter your name";
 textField.BorderStyle = LineStyle.Single;
 
-var textRunnable = textField.AsRunnable (tf => tf.Text);
+RunnableWrapper<TextField, string> textRunnable = textField.AsRunnable (tf => tf.Text);
 app.Run (textRunnable);
 
 if (textRunnable.Result is { } name)
 {
-    MessageBox.Query ("Result", $"You entered: {name}", "OK");
+    MessageBox.Query (app, "Result", $"You entered: {name}", "OK");
 }
 else
 {
-    MessageBox.Query ("Result", "Canceled", "OK");
+    MessageBox.Query (app, "Result", "Canceled", "OK");
 }
+
 textRunnable.Dispose ();
 
 // Example 2: Use IApplication.RunView() for one-liner
-var selectedColor = app.RunView (
-    new ColorPicker
-    {
-        Title = "Pick a Color",
-        BorderStyle = LineStyle.Single
-    },
-    cp => cp.SelectedColor);
+Color selectedColor = app.RunView (
+                                   new ColorPicker
+                                   {
+                                       Title = "Pick a Color",
+                                       BorderStyle = LineStyle.Single
+                                   },
+                                   cp => cp.SelectedColor);
 
-MessageBox.Query ("Result", $"Selected color: {selectedColor}", "OK");
+MessageBox.Query (app, "Result", $"Selected color: {selectedColor}", "OK");
 
 // Example 3: FlagSelector with typed enum result
-var flagSelector = new FlagSelector<SelectorStyles>
+FlagSelector<SelectorStyles> flagSelector = new()
 {
     Title = "Choose Styles",
     BorderStyle = LineStyle.Single
 };
 
-var flagsRunnable = flagSelector.AsRunnable (fs => fs.Value);
+RunnableWrapper<FlagSelector<SelectorStyles>, SelectorStyles?> flagsRunnable = flagSelector.AsRunnable (fs => fs.Value);
 app.Run (flagsRunnable);
 
-MessageBox.Query ("Result", $"Selected styles: {flagsRunnable.Result}", "OK");
+MessageBox.Query (app, "Result", $"Selected styles: {flagsRunnable.Result}", "OK");
 flagsRunnable.Dispose ();
 
 // Example 4: Any View without result extraction
@@ -58,26 +59,28 @@ var label = new Label
     Y = Pos.Center ()
 };
 
-var labelRunnable = label.AsRunnable ();
+RunnableWrapper<Label, object> labelRunnable = label.AsRunnable ();
 app.Run (labelRunnable);
 
 // Can still access the wrapped view
-MessageBox.Query ("Result", $"Label text was: {labelRunnable.WrappedView.Text}", "OK");
+MessageBox.Query (app, "Result", $"Label text was: {labelRunnable.WrappedView.Text}", "OK");
 labelRunnable.Dispose ();
 
 // Example 5: Complex custom View made runnable
-var formView = CreateCustomForm ();
-var formRunnable = formView.AsRunnable (ExtractFormData);
+View formView = CreateCustomForm ();
+RunnableWrapper<View, FormData> formRunnable = formView.AsRunnable (ExtractFormData);
 
 app.Run (formRunnable);
 
 if (formRunnable.Result is { } formData)
 {
     MessageBox.Query (
-        "Form Results",
-        $"Name: {formData.Name}\nAge: {formData.Age}\nAgreed: {formData.Agreed}",
-        "OK");
+                      app,
+                      "Form Results",
+                      $"Name: {formData.Name}\nAge: {formData.Age}\nAgreed: {formData.Agreed}",
+                      "OK");
 }
+
 formRunnable.Dispose ();
 
 app.Shutdown ();
@@ -126,10 +129,10 @@ View CreateCustomForm ()
     };
 
     okButton.Accepting += (s, e) =>
-    {
-        form.App?.RequestStop ();
-        e.Handled = true;
-    };
+                          {
+                              form.App?.RequestStop ();
+                              e.Handled = true;
+                          };
 
     form.Add (new Label { Text = "Name:", X = 2, Y = 1 });
     form.Add (nameField);
@@ -148,7 +151,7 @@ FormData ExtractFormData (View form)
     var ageField = form.SubViews.FirstOrDefault (v => v.Id == "ageField") as TextField;
     var agreeCheckbox = form.SubViews.FirstOrDefault (v => v.Id == "agreeCheckbox") as CheckBox;
 
-    return new FormData
+    return new()
     {
         Name = nameField?.Text ?? string.Empty,
         Age = int.TryParse (ageField?.Text, out int age) ? age : 0,
@@ -157,7 +160,7 @@ FormData ExtractFormData (View form)
 }
 
 // Result type for custom form
-record FormData
+internal record FormData
 {
     public string Name { get; init; } = string.Empty;
     public int Age { get; init; }

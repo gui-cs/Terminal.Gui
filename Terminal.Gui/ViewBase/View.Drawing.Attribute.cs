@@ -104,7 +104,7 @@ public partial class View
 
     /// <summary>
     ///     Selects the specified Attribute
-    ///     as the Attribute to use for subsequent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
+    ///     as the Attribute to use for subsequent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr(string)"/>.
     /// </summary>
     /// <param name="attribute">THe Attribute to set.</param>
     /// <returns>The previously set Attribute.</returns>
@@ -112,7 +112,7 @@ public partial class View
 
     /// <summary>
     ///     Selects the Attribute associated with the specified <see cref="VisualRole"/>
-    ///     as the Attribute to use for subsequent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
+    ///     as the Attribute to use for subsequent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr(string)"/>.
     ///     <para>
     ///         Calls <see cref="GetAttributeForRole"/> to get the Attribute associated with the specified role, which will
     ///         raise <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>.

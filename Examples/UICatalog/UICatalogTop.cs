@@ -144,6 +144,7 @@ public class UICatalogTop : Toplevel
                                                               "_About...",
                                                               "About UI Catalog",
                                                               () => MessageBox.Query (
+                                                                                      App,
                                                                                       "",
                                                                                       GetAboutBoxMessage (),
                                                                                       wrapMessage: false,

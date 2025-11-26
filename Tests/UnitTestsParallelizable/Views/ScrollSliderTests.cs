@@ -679,7 +679,6 @@ public class ScrollSliderTests (ITestOutputHelper output) : FakeDriverBase
 
 
     [Theory]
-    [SetupFakeApplication]
     [InlineData (
                     3,
                     10,

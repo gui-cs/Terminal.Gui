@@ -16,7 +16,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -38,7 +38,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -66,7 +66,7 @@ public class ApplicationPopoverTests
         finally
         {
             top?.Dispose ();
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -103,7 +103,7 @@ public class ApplicationPopoverTests
         finally
         {
             top?.Dispose ();
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -127,7 +127,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -156,7 +156,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -185,7 +185,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.Shutdown ();
         }
     }
 
@@ -208,7 +208,8 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.TopRunnable?.Dispose ();
+            Application.Shutdown ();
         }
     }
 
@@ -245,7 +246,8 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.ResetState (true);
+            Application.TopRunnable?.Dispose ();
+            Application.Shutdown ();
         }
     }
 
@@ -317,7 +319,7 @@ public class ApplicationPopoverTests
         {
             popover?.Dispose ();
             Application.TopRunnable?.Dispose ();
-            Application.ResetState (true);
+            Application.Shutdown();
         }
     }
 

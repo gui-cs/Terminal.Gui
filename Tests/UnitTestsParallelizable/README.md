@@ -14,16 +14,13 @@ This project contains unit tests that can run in parallel without interference. 
 - ✅ Use `View.BeginInit()` / `View.EndInit()` for initialization
 
 ### Tests CANNOT be parallelized if they:
-- ❌ Use `[AutoInitShutdown]` - requires `Application.Init/Shutdown` which creates global state
+- ❌ Use `[AutoInitShutdown]` or `[SetupFakeApplication]`- requires `Application.Init/Shutdown` which creates global state
 - ❌ Set `Application.Driver` (global singleton)
 - ❌ Call `Application.Init()`, `Application.Run/Run<T>()`, or `Application.Begin()`
-- ❌ Modify `ConfigurationManager` global state (Enable/Load/Apply/Disable)
+- ❌ Enable `ConfigurationManager` (Enable/Load/Apply/Disable)
 - ❌ Access `ConfigurationManager` including `ThemeManager` and `SchemeManager` - these rely on global state
-- ❌ Access `SchemeManager.GetSchemes()` or dictionary lookups like `schemes["Base"]` - requires module initialization
-- ❌ Access `View.Schemes` - there can be weird interactions with xunit and dotnet module initialization such that tests run before module initialization sets up the Schemes array
 - ❌ Modify static properties like `Key.Separator`, `CultureInfo.CurrentCulture`, etc.
 - ❌ Set static members on View subclasses (e.g., configuration properties like `Dialog.DefaultButtonAlignment`) or any static fields/properties - these are shared across all parallel tests
-- ❌ Use `Application.Top`, `Application.Driver`, `Application.MainLoop`, or `Application.Navigation`
 - ❌ Are true integration tests that test multiple components working together
 
 ### Important Notes
@@ -35,7 +32,7 @@ This project contains unit tests that can run in parallel without interference. 
 ## How to Migrate Tests
 
 1. **Identify** tests in `UnitTests` that don't actually need Application statics
-2. **Rewrite** tests to remove `[AutoInitShutdown]`, `Application.Begin()`, etc. if not needed
+2. **Rewrite** tests to remove `[AutoInitShutdown]` or `[SetupFakeApplication]`, `Application.Begin()`, etc. if not needed
 3. **Move** the test to the equivalent file in `UnitTests.Parallelizable`
 4. **Delete** the old test from `UnitTests` to avoid duplicates
 5. **Verify** no duplicate test names exist (CI will check this)
@@ -62,11 +59,11 @@ public void Constructor_Sets_Defaults ()
 }
 ```
 
-### Remove Unnecessary [SetupFakeDriver]
+### Remove Unnecessary [SetupFakeApplication]
 ```csharp
 // Before (in UnitTests)
 [Fact]
-[SetupFakeDriver]
+[SetupFakeApplication]
 public void Event_Fires_When_Property_Changes ()
 {
     var view = new Button ();
@@ -127,5 +124,5 @@ dotnet test Tests/UnitTestsParallelizable/UnitTests.Parallelizable.csproj
 ```
 
 ## See Also
-- [Category A Migration Summary](../CATEGORY_A_MIGRATION_SUMMARY.md) - Detailed analysis and migration guidelines
+
 - [.NET Unit Testing Best Practices](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
