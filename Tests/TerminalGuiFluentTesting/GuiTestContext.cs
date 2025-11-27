@@ -136,7 +136,7 @@ public partial class GuiTestContext : IDisposable
                                      if (App is { Initialized: true })
                                      {
                                          Toplevel t = topLevelBuilder ();
-                                         t.Closed += (s, e) => { Finished = true; };
+                                         t.IsRunningChanged += (s, e) => { Finished = e.Value; };
                                          App?.Run (t); // This will block, but it's on a background thread now
 
                                          t.Dispose ();

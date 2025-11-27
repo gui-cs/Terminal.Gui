@@ -661,28 +661,9 @@ public class ApplicationTests
 
         void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
-            Assert.True (top.Running);
+            Assert.True (top.IsRunning);
             top.RequestStop ();
         }
-    }
-
-    [Fact]
-    [SetupFakeApplication]
-    public void Run_RunningFalse_Stops ()
-    {
-        var top = new Toplevel ();
-        SessionToken rs = Application.Begin (top);
-        Assert.NotNull (rs);
-
-        Application.Iteration += OnApplicationOnIteration;
-        Application.Run (top);
-        Application.Iteration -= OnApplicationOnIteration;
-
-        top.Dispose ();
-
-        return;
-
-        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a) { top.Running = false; }
     }
 
     [Fact]
@@ -693,9 +674,9 @@ public class ApplicationTests
 
         Toplevel top = new ();
         var count = 0;
-        top.Loaded += (s, e) => count++;
+        top.IsModalChanged += (s, e) => count++;
         top.Ready += (s, e) => count++;
-        top.Unloaded += (s, e) => count++;
+        top.IsRunningChanged += (s, e) => count++;
         Application.Run (top);
         top.Dispose ();
     }
@@ -881,7 +862,7 @@ public class ApplicationTests
         Application.Run<TestToplevel> ();
         Assert.NotNull (Application.Driver);
         Assert.NotNull (Application.TopRunnable);
-        Assert.False (Application.TopRunnable!.Running);
+        Assert.False (Application.TopRunnable!.IsRunning);
         Application.TopRunnable!.Dispose ();
         Application.Shutdown ();
     }

@@ -84,7 +84,11 @@ public class ContextMenus : Scenario
             _appWindow.MouseClick += OnAppWindowOnMouseClick;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
-            _appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
+            _appWindow.IsRunningChanged += (s, e) => {
+                                               if (!e.Value)
+                                               {
+                                                   Thread.CurrentThread.CurrentUICulture = originalCulture;
+                                               } };
         }
 
         void OnAppWindowOnMouseClick (object? s, MouseEventArgs e)

@@ -325,7 +325,7 @@ public partial class ApplicationImpl
     public void Invoke (Action<IApplication>? action)
     {
         // If we are already on the main UI thread
-        if (TopRunnable is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (TopRunnable is { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action?.Invoke (this);
 
@@ -347,7 +347,7 @@ public partial class ApplicationImpl
     public void Invoke (Action action)
     {
         // If we are already on the main UI thread
-        if (TopRunnable is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (TopRunnable is { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
             action?.Invoke ();
 
@@ -422,6 +422,10 @@ public partial class ApplicationImpl
         // If there was a previous top, it's no longer modal
         if (previousTop != null)
         {
+            if (previousTop == runnable)
+            {
+                throw new ArgumentOutOfRangeException (nameof (runnable), runnable, @"Attempt to Run the runnable that's already the top runnable.");
+            }
             // Get old IsModal value (should be true before becoming non-modal)
             bool oldIsModal = previousTop.IsModal;
 

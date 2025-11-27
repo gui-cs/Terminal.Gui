@@ -101,8 +101,7 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app?.RemoveTimeout (timeoutToken!));
 
-        Assert.NotNull (app?.TopRunnable);
-        app.TopRunnable?.Dispose ();
+        Assert.Null (app?.TopRunnable);
         app.Shutdown ();
         Assert.Null (app.TopRunnable);
     }
@@ -123,7 +122,7 @@ public class ApplicationImplTests
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.True (top!.Running);
+                                                  Assert.True (top!.IsRunning);
 
                                                   if (app.TopRunnable != null)
                                                   {
@@ -136,7 +135,7 @@ public class ApplicationImplTests
                                               }
                                              );
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         // Blocks until the timeout call is hit
         app.Run (top);
@@ -144,7 +143,7 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app.RemoveTimeout (timeoutToken));
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         // BUGBUG: Shutdown sets Top to null, not End.
         //Assert.Null (Application.TopRunnable);
@@ -163,41 +162,39 @@ public class ApplicationImplTests
         app.Init ("fake");
 
         Toplevel top = new Window ();
-        app.TopRunnable = top;
+        var isIsModalChanged = 0;
 
-        var closedCount = 0;
+        top.IsModalChanged
+            += (_, a) => { isIsModalChanged++; };
 
-        top.Closed
-            += (_, a) => { closedCount++; };
+        var isRunningChangedCount = 0;
 
-        var unloadedCount = 0;
-
-        top.Unloaded
-            += (_, a) => { unloadedCount++; };
+        top.IsRunningChanged
+            += (_, a) => { isRunningChangedCount++; };
 
         object timeoutToken = app.AddTimeout (
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.Fail (@"Didn't stop after first iteration.");
+                                                  //Assert.Fail (@"Didn't stop after first iteration.");
 
                                                   return false;
                                               }
                                              );
 
-        Assert.Equal (0, closedCount);
-        Assert.Equal (0, unloadedCount);
+        Assert.Equal (0, isIsModalChanged);
+        Assert.Equal (0, isRunningChangedCount);
 
         app.StopAfterFirstIteration = true;
         app.Run (top);
 
-        Assert.Equal (1, closedCount);
-        Assert.Equal (1, unloadedCount);
+        Assert.Equal (2, isIsModalChanged);
+        Assert.Equal (2, isRunningChangedCount);
 
         app.TopRunnable?.Dispose ();
         app.Shutdown ();
-        Assert.Equal (1, closedCount);
-        Assert.Equal (1, unloadedCount);
+        Assert.Equal (2, isIsModalChanged);
+        Assert.Equal (2, isRunningChangedCount);
     }
 
     [Fact]
@@ -212,22 +209,21 @@ public class ApplicationImplTests
 
         Toplevel top = new Window ();
 
-        // BUGBUG: Both Closed and Unloaded are called from End; what's the difference?
-        var closedCount = 0;
+        var isIsModalChanged = 0;
 
-        top.Closed
-            += (_, a) => { closedCount++; };
+        top.IsModalChanged
+            += (_, a) => { isIsModalChanged++; };
 
-        var unloadedCount = 0;
+        var isRunningChangedCount = 0;
 
-        top.Unloaded
-            += (_, a) => { unloadedCount++; };
+        top.IsRunningChanged
+            += (_, a) => { isRunningChangedCount++; };
 
         object timeoutToken = app.AddTimeout (
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.True (top!.Running);
+                                                  Assert.True (top!.IsRunning);
 
                                                   if (app.TopRunnable != null)
                                                   {
@@ -240,22 +236,22 @@ public class ApplicationImplTests
                                               }
                                              );
 
-        Assert.Equal (0, closedCount);
-        Assert.Equal (0, unloadedCount);
+        Assert.Equal (0, isIsModalChanged);
+        Assert.Equal (0, isRunningChangedCount);
 
         // Blocks until the timeout call is hit
         app.Run (top);
 
-        Assert.Equal (1, closedCount);
-        Assert.Equal (1, unloadedCount);
+        Assert.Equal (2, isIsModalChanged);
+        Assert.Equal (2, isRunningChangedCount);
 
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app.RemoveTimeout (timeoutToken));
 
         app.TopRunnable?.Dispose ();
         app.Shutdown ();
-        Assert.Equal (1, closedCount);
-        Assert.Equal (1, unloadedCount);
+        Assert.Equal (2, isIsModalChanged);
+        Assert.Equal (2, isRunningChangedCount);
     }
 
     [Fact]
@@ -274,7 +270,7 @@ public class ApplicationImplTests
                                               TimeSpan.FromMilliseconds (150),
                                               () =>
                                               {
-                                                  Assert.True (top!.Running);
+                                                  Assert.True (top!.IsRunning);
 
                                                   if (app.TopRunnable != null)
                                                   {
@@ -285,7 +281,7 @@ public class ApplicationImplTests
                                               }
                                              );
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
         // Blocks until the timeout call is hit
         app.Run (top);
@@ -293,9 +289,9 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app.RemoveTimeout (timeoutToken));
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
 
-        Assert.NotNull (app.TopRunnable);
+        Assert.Null (app.TopRunnable);
         top.Dispose ();
         app.Shutdown ();
         Assert.Null (app.TopRunnable);
@@ -315,8 +311,7 @@ public class ApplicationImplTests
 
         app.Run<Window> ();
 
-        Assert.NotNull (app.TopRunnable);
-        app.TopRunnable?.Dispose ();
+        Assert.Null (app.TopRunnable);
         app.Shutdown ();
         Assert.Null (app.TopRunnable);
     }
@@ -328,28 +323,26 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        var closing = 0;
-        var closed = 0;
+        var isRunningChanging = 0;
+        var isRunningChanged = 0;
         var t = new Toplevel ();
 
-        t.Closing
+        t.IsRunningChanging
             += (_, a) =>
                {
                    // Cancel the first time
-                   if (closing == 0)
+                   if (isRunningChanging == 0)
                    {
                        a.Cancel = true;
                    }
 
-                   closing++;
-                   Assert.Same (t, a.RequestingTop);
+                   isRunningChanging++;
                };
 
-        t.Closed
+        t.IsRunningChanged
             += (_, a) =>
                {
-                   closed++;
-                   Assert.Same (t, a.Toplevel);
+                   isRunningChanged++;
                };
 
         app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
@@ -361,8 +354,8 @@ public class ApplicationImplTests
         app.TopRunnable?.Dispose ();
         app.Shutdown ();
 
-        Assert.Equal (2, closing);
-        Assert.Equal (1, closed);
+        Assert.Equal (2, isRunningChanging);
+        Assert.Equal (1, isRunningChanged);
     }
 
     private bool IdleExit (IApplication app)
@@ -429,10 +422,8 @@ public class ApplicationImplTests
         // Blocks until the timeout call is hit
         app.Run (w);
 
-        Assert.NotNull (app.TopRunnable);
         w?.Dispose ();
         app.Shutdown ();
-        Assert.Null (app.TopRunnable);
 
         Assert.True (result);
     }

@@ -162,10 +162,10 @@ public class Threading : Scenario
         void Win_Loaded (object sender, EventArgs args)
         {
             _btnActionCancel.SetFocus ();
-            win.Loaded -= Win_Loaded;
+            win.IsModalChanged -= Win_Loaded;
         }
 
-        win.Loaded += Win_Loaded;
+        win.IsModalChanged += Win_Loaded;
 
         Application.Run (win);
         win.Dispose ();

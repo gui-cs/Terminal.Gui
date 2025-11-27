@@ -51,7 +51,6 @@ public class FileDialog : Dialog, IDesignable
     private bool _currentSortIsAsc = true;
     private bool _disposed;
     private string? _feedback;
-    private bool _loaded;
 
     private bool _pushingState;
     private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
@@ -436,18 +435,16 @@ public class FileDialog : Dialog, IDesignable
     }
 
     /// <inheritdoc/>
-    public override void OnLoaded ()
+    protected override void OnIsRunningChanged (bool newIsRunning)
     {
-        base.OnLoaded ();
+        base.OnIsRunningChanged (newIsRunning);
 
-        if (_loaded)
+        if (!newIsRunning)
         {
             return;
         }
 
         Arrangement |= ViewArrangement.Resizable;
-
-        _loaded = true;
 
         // May have been updated after instance was constructed
         _btnOk.Text = Style.OkButtonText;
@@ -1650,8 +1647,7 @@ public class FileDialog : Dialog, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Modal = false;
-        OnLoaded ();
-
+        OnIsRunningChanged (true);
         return true;
     }
 }

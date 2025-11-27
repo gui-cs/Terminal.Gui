@@ -23,7 +23,7 @@ public class TextEffectsScenario : Scenario
             Title = "Text Effects Scenario"
         };
 
-        w.Loaded += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
+        w.IsModalChanged += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
 
         w.SizeChanging += (s, e) =>
                           {

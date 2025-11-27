@@ -60,7 +60,7 @@ public class ConfigurationEditor : Scenario
 
         win.Add (_tabView, statusBar);
 
-        win.Loaded += (s, a) =>
+        win.IsModalChanged += (s, a) =>
                       {
                           Open ();
                       };

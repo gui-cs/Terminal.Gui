@@ -39,8 +39,8 @@ public class UICatalogTop : Toplevel
 
         Add (_menuBar, _categoryList, _scenarioList, _statusBar);
 
-        Loaded += LoadedHandler;
-        Unloaded += UnloadedHandler;
+        IsModalChanged += IsModalChangedHandler;
+        IsRunningChanged += IsRunningChangedHandler;
 
         // Restore previous selections
         if (_categoryList.Source?.Count > 0) {
@@ -57,8 +57,13 @@ public class UICatalogTop : Toplevel
 
     private static bool _isFirstRunning = true;
 
-    private void LoadedHandler (object? sender, EventArgs? args)
+    private void IsModalChangedHandler (object? sender, EventArgs<bool> args)
     {
+        if (args.Value)
+        {
+            return;
+        }
+
         if (_disableMouseCb is { })
         {
             _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
@@ -85,15 +90,18 @@ public class UICatalogTop : Toplevel
             _statusBar.VisibleChanged += (s, e) => { ShowStatusBar = _statusBar.Visible; };
         }
 
-        Loaded -= LoadedHandler;
+        IsModalChanged -= IsModalChangedHandler;
         _categoryList!.EnsureSelectedItemVisible ();
         _scenarioList.EnsureSelectedCellIsVisible ();
     }
 
-    private void UnloadedHandler (object? sender, EventArgs? args)
+    private void IsRunningChangedHandler (object? sender, EventArgs<bool> args)
     {
-        ConfigurationManager.Applied -= ConfigAppliedHandler;
-        Unloaded -= UnloadedHandler;
+        if (!args.Value)
+        {
+            ConfigurationManager.Applied -= ConfigAppliedHandler;
+            IsRunningChanged -= IsRunningChangedHandler;
+        }
     }
 
     #region MenuBar

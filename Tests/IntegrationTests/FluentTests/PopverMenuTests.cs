@@ -139,7 +139,7 @@ public class PopoverMenuTests
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover!.Popovers.Cast<PopoverMenu> ().FirstOrDefault ()!.Visible)
                                      .AssertNull (app?.Popover!.GetActivePopover ())
-                                     .AssertTrue (app?.TopRunnable!.Running);
+                                     .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
     [Theory]
@@ -231,11 +231,11 @@ public class PopoverMenuTests
                                      .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                      .ScreenShot ("PopoverMenu after Show", _out)
                                      .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
-                                     .AssertTrue (app?.TopRunnable!.Running)
+                                     .AssertTrue (app?.TopRunnable!.IsRunning)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertTrue (app?.TopRunnable!.Running);
+                                     .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
     [Theory]

@@ -15,7 +15,7 @@ public class Shortcuts : Scenario
         var quitKey = Application.QuitKey;
         Window app = new ();
 
-        app.Loaded += App_Loaded;
+        app.IsModalChanged += App_Loaded;
 
         Application.Run (app);
         app.Dispose ();

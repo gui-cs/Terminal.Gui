@@ -972,11 +972,11 @@ public class DialogTests (ITestOutputHelper output)
         Application.Iteration += OnApplicationOnIteration;
         var btn = $"{Glyphs.LeftBracket} Ok {Glyphs.RightBracket}";
 
-        win.Loaded += (s, a) =>
+        win.IsModalChanged += (s, a) =>
                       {
                           var dlg = new Dialog { Width = 18, Height = 3, Buttons = [new () { Text = "Ok" }] };
 
-                          dlg.Loaded += (s, a) =>
+                          dlg.IsModalChanged += (s, a) =>
                                         {
                                             AutoInitShutdownAttribute.RunIteration ();
 

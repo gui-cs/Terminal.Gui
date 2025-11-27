@@ -434,11 +434,11 @@ public class MenuBarTests
                                      .ScreenShot ("MenuBar initial state", _out)
                                      .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .AssertEqual ("_New file", app.Navigation!.GetFocused ()!.Title)
-                                     .AssertTrue (app?.TopRunnable!.Running)
+                                     .AssertTrue (app?.TopRunnable!.IsRunning)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertTrue (app!.TopRunnable!.Running);
+                                     .AssertTrue (app!.TopRunnable!.IsRunning);
     }
 
     [Theory]
@@ -480,7 +480,7 @@ public class MenuBarTests
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                      .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .AssertTrue (app?.TopRunnable!.Running);
+                                     .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
     [Theory]

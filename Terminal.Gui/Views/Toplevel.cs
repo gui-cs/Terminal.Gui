@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         Toplevel views can run as modal (popup) views, started by calling
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
-///         <see cref="IApplication.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
+///         <see cref="IApplication.RequestStop(Toplevel)"/> has been called (which sets the <see cref="IsRunning"/>
 ///         property to <c>false</c>).
 ///     </para>
 ///     <para>
@@ -76,11 +76,6 @@ public partial class Toplevel : Runnable<int?>
 
     #region Life Cycle
 
-    // TODO: IRunnable: Re-implement as a property on IRunnable
-    /// <summary>Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.</summary>
-    /// <remarks>Setting this property directly is discouraged. Use <see cref="IApplication.RequestStop()"/> instead.</remarks>
-    public bool Running { get; set; }
-
     // TODO: Deprecate. Other than a few tests, this is not used anywhere.
     /// <summary>
     ///     <see langword="true"/> if was already loaded by the <see cref="IApplication.Begin(Toplevel)"/>
@@ -92,45 +87,6 @@ public partial class Toplevel : Runnable<int?>
     /// <summary>Invoked when the Toplevel <see cref="SessionToken"/> active.</summary>
     public event EventHandler<ToplevelEventArgs>? Activate;
 
-    // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Deactivating/Deactivate?
-    /// <summary>Invoked when the Toplevel<see cref="SessionToken"/> ceases to be active.</summary>
-    public event EventHandler<ToplevelEventArgs>? Deactivate;
-
-    /// <summary>Invoked when the Toplevel's <see cref="SessionToken"/> is closed by <see cref="IApplication.End(SessionToken)"/>.</summary>
-    public event EventHandler<ToplevelEventArgs>? Closed;
-
-    /// <summary>
-    ///     Invoked when the Toplevel's <see cref="SessionToken"/> is being closed by
-    ///     <see cref="IApplication.RequestStop(Toplevel)"/>.
-    /// </summary>
-    public event EventHandler<ToplevelClosingEventArgs>? Closing;
-
-    /// <summary>
-    ///     Invoked when the <see cref="Toplevel"/> <see cref="SessionToken"/> has begun to be loaded. A Loaded event handler
-    ///     is a good place to finalize initialization before calling Run.
-    /// </summary>
-    public event EventHandler? Loaded;
-
-    /// <summary>
-    ///     Called from <see cref="IApplication.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first
-    ///     time.
-    /// </summary>
-    /// <remarks>
-    ///     Overrides must call base.OnLoaded() to ensure any Toplevel subviews are initialized properly and the
-    ///     <see cref="Loaded"/> event is raised.
-    /// </remarks>
-    public virtual void OnLoaded ()
-    {
-        IsLoaded = true;
-
-        foreach (var view in SubViews.Where (v => v is Toplevel))
-        {
-            var tl = (Toplevel)view;
-            tl.OnLoaded ();
-        }
-
-        Loaded?.Invoke (this, EventArgs.Empty);
-    }
 
     /// <summary>
     ///     Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration. Subscribe to this event to
@@ -142,33 +98,7 @@ public partial class Toplevel : Runnable<int?>
     /// </summary>
     public event EventHandler? Ready;
 
-    /// <summary>
-    ///     Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel,
-    ///     <see cref="IApplication.RequestStop(Toplevel)"/> will be called, causing the application to exit.
-    /// </summary>
-    public virtual void RequestStop ()
-    {
-        App?.RequestStop (App?.TopRunnable);
-    }
-
-    /// <summary>
-    ///     Invoked when the Toplevel <see cref="SessionToken"/> has been unloaded. A Unloaded event handler is a good place
-    ///     to dispose objects after calling <see cref="IApplication.End(SessionToken)"/>.
-    /// </summary>
-    public event EventHandler? Unloaded;
-
     internal virtual void OnActivate (Toplevel deactivated) { Activate?.Invoke (this, new (deactivated)); }
-
-    internal virtual void OnClosed (Toplevel top) { Closed?.Invoke (this, new (top)); }
-
-    internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
-    {
-        Closing?.Invoke (this, ev);
-
-        return ev.Cancel;
-    }
-
-    internal virtual void OnDeactivate (Toplevel activated) { Deactivate?.Invoke (this, new (activated)); }
 
     /// <summary>
     ///     Called from run loop after the <see cref="Toplevel"/> has entered the first iteration
@@ -183,18 +113,6 @@ public partial class Toplevel : Runnable<int?>
         }
 
         Ready?.Invoke (this, EventArgs.Empty);
-    }
-
-    /// <summary>Called from <see cref="IApplication.End(SessionToken)"/> before the <see cref="Toplevel"/> is disposed.</summary>
-    internal virtual void OnUnloaded ()
-    {
-        foreach (var view in SubViews.Where (v => v is Toplevel))
-        {
-            var tl = (Toplevel)view;
-            tl.OnUnloaded ();
-        }
-
-        Unloaded?.Invoke (this, EventArgs.Empty);
     }
 
     #endregion

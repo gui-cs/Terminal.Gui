@@ -86,8 +86,8 @@ public class Wizard : Dialog
         BackButton.Accepting += BackBtn_Accepting;
         NextFinishButton.Accepting += NextFinishBtn_Accepting;
 
-        Loaded += Wizard_Loaded;
-        Closing += Wizard_Closing;
+        IsModalChanged += Wizard_IsModalChanged;
+        IsRunningChanged += Wizard_IsRunningChanged;
         TitleChanged += Wizard_TitleChanged;
 
         SetNeedsLayout ();
@@ -541,20 +541,22 @@ public class Wizard : Dialog
         SetNeedsLayout ();
     }
 
-    private void Wizard_Closing (object? sender, ToplevelClosingEventArgs obj)
+    private void Wizard_IsRunningChanged (object? sender, EventArgs<bool> args)
     {
         if (!_finishedPressed)
         {
-            var args = new WizardButtonEventArgs ();
-            Cancelled?.Invoke (this, args);
+            var a = new WizardButtonEventArgs ();
+            Cancelled?.Invoke (this, a);
         }
     }
 
-    private void Wizard_Loaded (object? sender, EventArgs args)
+    private void Wizard_IsModalChanged (object? sender, EventArgs<bool> args)
     {
-        CurrentStep = GetFirstStep ();
-
-        // gets the first step if CurrentStep == null
+        if (args.Value)
+        {
+            CurrentStep = GetFirstStep ();
+            // gets the first step if CurrentStep == null
+        }
     }
 
     private void Wizard_TitleChanged (object? sender, EventArgs<string> e)

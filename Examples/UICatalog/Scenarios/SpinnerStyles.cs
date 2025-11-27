@@ -14,7 +14,7 @@ public class SpinnerViewStyles : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window win = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -40,7 +40,7 @@ public class SpinnerViewStyles : Scenario
             //Title = "Preview",
             BorderStyle = LineStyle.Single
         };
-        app.Add (preview);
+        win.Add (preview);
 
         var spinner = new SpinnerView { X = Pos.Center (), Y = 0 };
         preview.Add (spinner);
@@ -54,7 +54,7 @@ public class SpinnerViewStyles : Scenario
             CheckedState = CheckState.Checked,
             Text = "Ascii Only"
         };
-        app.Add (ckbAscii);
+        win.Add (ckbAscii);
 
         var ckbNoSpecial = new CheckBox
         {
@@ -64,28 +64,28 @@ public class SpinnerViewStyles : Scenario
             CheckedState = CheckState.Checked,
             Text = "No Special"
         };
-        app.Add (ckbNoSpecial);
+        win.Add (ckbNoSpecial);
 
         var ckbReverse = new CheckBox
         {
             X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, CheckedState = CheckState.UnChecked, Text = "Reverse"
         };
-        app.Add (ckbReverse);
+        win.Add (ckbReverse);
 
         var ckbBounce = new CheckBox
         {
             X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, CheckedState = CheckState.UnChecked, Text = "Bounce"
         };
-        app.Add (ckbBounce);
+        win.Add (ckbBounce);
 
         var delayLabel = new Label { X = Pos.Right (ckbBounce) + 2, Y = Pos.Bottom (preview) + 1, Text = "Delay:" };
-        app.Add (delayLabel);
+        win.Add (delayLabel);
 
         var delayField = new TextField
         {
             X = Pos.Right (delayLabel), Y = Pos.Bottom (preview) + 1, Width = 5, Text = DEFAULT_DELAY.ToString ()
         };
-        app.Add (delayField);
+        win.Add (delayField);
 
         delayField.TextChanged += (s, e) =>
                                   {
@@ -96,13 +96,13 @@ public class SpinnerViewStyles : Scenario
                                   };
 
         var customLabel = new Label { X = Pos.Right (delayField) + 2, Y = Pos.Bottom (preview) + 1, Text = "Custom:" };
-        app.Add (customLabel);
+        win.Add (customLabel);
 
         var customField = new TextField
         {
             X = Pos.Right (customLabel), Y = Pos.Bottom (preview) + 1, Width = 12, Text = DEFAULT_CUSTOM
         };
-        app.Add (customField);
+        win.Add (customField);
 
         string [] styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
 
@@ -117,7 +117,7 @@ public class SpinnerViewStyles : Scenario
         };
         styles.SetSource (new ObservableCollection<string> (styleArray));
         styles.SelectedItem = 0; // SpinnerStyle.Custom;
-        app.Add (styles);
+        win.Add (styles);
         SetCustom ();
 
         customField.TextChanged += (s, e) =>
@@ -166,7 +166,7 @@ public class SpinnerViewStyles : Scenario
 
         ckbBounce.CheckedStateChanging += (s, e) => { spinner.SpinBounce = e.Result == CheckState.Checked; };
 
-        app.Unloaded += App_Unloaded;
+        win.IsRunningChanged += WinIsRunningChanged;
 
         void SetCustom ()
         {
@@ -199,23 +199,23 @@ public class SpinnerViewStyles : Scenario
             }
         }
 
-        void App_Unloaded (object sender, EventArgs args)
+        void WinIsRunningChanged (object sender, EventArgs<bool> args)
         {
-            if (spinner is {})
+            if (!args.Value && spinner is {})
             {
                 spinner.Dispose ();
                 spinner = null;
             }
         }
 
-        Application.Run (app);
-        app.Unloaded -= App_Unloaded;
+        Application.Run (win);
+        win.IsRunningChanged -= WinIsRunningChanged;
         if (spinner is { })
         {
             spinner.Dispose ();
             spinner = null;
         }
-        app.Dispose ();
+        win.Dispose ();
 
         Application.Shutdown ();
     }

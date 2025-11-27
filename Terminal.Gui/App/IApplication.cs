@@ -130,29 +130,6 @@ public interface IApplication
 
     #region Begin->Run->Iteration->Stop->End
 
-    ///// <summary>
-    /////     Building block API: Creates a <see cref="SessionToken"/> and prepares the provided <see cref="Toplevel"/> for
-    /////     execution. Not usually called directly by applications. Use <see cref="Run(Toplevel, Func{Exception, bool})"/>
-    /////     instead.
-    ///// </summary>
-    ///// <returns>
-    /////     The <see cref="SessionToken"/> that needs to be passed to the <see cref="End(SessionToken)"/> method upon
-    /////     completion.
-    ///// </returns>
-    ///// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
-    ///// <remarks>
-    /////     <para>
-    /////         This method prepares the provided <see cref="Toplevel"/> for running. It adds this to the
-    /////         list of <see cref="Toplevel"/>s, lays out the SubViews, focuses the first element, and draws the
-    /////         <see cref="Toplevel"/> on the screen. This is usually followed by starting the main loop, and then the
-    /////         <see cref="End(SessionToken)"/> method upon termination which will undo these changes.
-    /////     </para>
-    /////     <para>
-    /////         Raises the <see cref="SessionBegun"/> event before returning.
-    /////     </para>
-    ///// </remarks>
-    //public SessionToken Begin (Toplevel toplevel);
-
     /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
     ///     and calling <see cref="Run(IRunnable, Func{Exception, bool})"/>. When the session is stopped,
@@ -241,22 +218,7 @@ public interface IApplication
     ///     </para>
     /// </remarks>
     void Invoke (Action action);
-
-    ///// <summary>
-    /////     Building block API: Ends a Session and completes the execution of a <see cref="Toplevel"/> that was started with
-    /////     <see cref="Begin(Toplevel)"/>. Not usually called directly by applications.
-    /////     <see cref="Run(Toplevel, Func{Exception, bool})"/>
-    /////     will automatically call this method when the session is stopped.
-    ///// </summary>
-    ///// <param name="sessionToken">The <see cref="SessionToken"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
-    ///// <remarks>
-    /////     <para>
-    /////         This method removes the <see cref="Toplevel"/> from the stack, raises the <see cref="SessionEnded"/>
-    /////         event, and disposes the <paramref name="sessionToken"/>.
-    /////     </para>
-    ///// </remarks>
-    //public void End (SessionToken sessionToken);
-
+    
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>

@@ -132,6 +132,9 @@ public interface IRunnable
     /// </remarks>
     bool IsModal { get; }
 
+    /// <summary>
+    ///     Gets or sets whether a stop has been requested for this runnable session.
+    /// </summary>
     bool StopRequested { get; set; }
 
     /// <summary>
