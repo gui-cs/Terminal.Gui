@@ -518,7 +518,7 @@ Demo Text
 
 ## [Slider\<T\>](~/api/Terminal.Gui.Views.Slider-1.yml)
 
-Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
+Provides a type-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 
 
