@@ -177,9 +177,9 @@ public partial class ApplicationImpl
         TimedEvents?.StopAll ();
 
         // === 1. Stop all running toplevels ===
-        foreach (Toplevel t in SessionStack)
+        foreach (SessionToken token in SessionStack!)
         {
-            t.Running = false;
+            token.Runnable!.StopRequested = true;
         }
 
         // === 2. Close and dispose popover ===
@@ -195,8 +195,7 @@ public partial class ApplicationImpl
         Popover = null;
 
         // === 3. Clean up toplevels ===
-        SessionStack.Clear ();
-        RunnableSessionStack?.Clear ();
+        SessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE
 

@@ -15,7 +15,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = new (runnable);
+        SessionToken token = new (runnable);
 
         // Act & Assert
         var ex = Assert.Throws<InvalidOperationException> (() => token.Dispose ());
@@ -27,7 +27,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         // Arrange
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = new (runnable);
+        SessionToken token = new (runnable);
         token.Runnable = null;
 
         // Act & Assert - Should not throw
@@ -219,7 +219,7 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         Runnable<int> runnable = new ();
 
         // Act
-        RunnableSessionToken token = new (runnable);
+        SessionToken token = new (runnable);
 
         // Assert
         Assert.NotNull (token.Runnable);

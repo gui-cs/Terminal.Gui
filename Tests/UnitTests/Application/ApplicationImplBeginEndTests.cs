@@ -327,11 +327,11 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel = new ();
 
             SessionToken token = app.Begin (toplevel);
-            Assert.Same (toplevel, token.Toplevel);
+            Assert.Same (toplevel, token.Runnable);
 
             app.End (token);
 
-            Assert.Null (token.Toplevel);
+            Assert.Null (token.Runnable);
         }
         finally
         {
@@ -483,11 +483,11 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             Assert.Equal (10, app.SessionStack.Count);
 
             // Verify stack contains all toplevels
-            List<Toplevel> stackList = app.SessionStack.ToList ();
+            List<SessionToken> stackList = app.SessionStack.ToList ();
 
             foreach (Toplevel toplevel in toplevels)
             {
-                Assert.Contains (toplevel, stackList);
+                Assert.Contains (toplevel, stackList.Select(r => r.Runnable));
             }
         }
         finally

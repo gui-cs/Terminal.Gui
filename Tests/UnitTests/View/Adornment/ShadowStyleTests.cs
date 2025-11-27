@@ -66,9 +66,10 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.SetScheme (new (Attribute.Default));
 
         superView.Add (view);
-        Application.SessionStack.Push (superView);
+        Application.Begin (superView);
         Application.LayoutAndDraw (true);
         DriverAssert.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
+        superView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -120,11 +121,11 @@ public class ShadowStyleTests (ITestOutputHelper output)
         };
         view.ShadowStyle = style;
         superView.Add (view);
-        Application.SessionStack.Push (superView);
+        Application.Begin (superView);
         Application.LayoutAndDraw (true);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        view.Dispose ();
+        superView.Dispose ();
         Application.ResetState (true);
     }
 

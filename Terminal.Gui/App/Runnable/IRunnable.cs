@@ -6,7 +6,7 @@ namespace Terminal.Gui.App;
 /// <remarks>
 ///     <para>
 ///         This interface enables storing heterogeneous runnables in collections (e.g.,
-///         <see cref="IApplication.RunnableSessionStack"/>)
+///         <see cref="IApplication.SessionStack"/>)
 ///         while preserving type safety at usage sites via <see cref="IRunnable{TResult}"/>.
 ///     </para>
 ///     <para>
@@ -31,19 +31,25 @@ public interface IRunnable
 
     /// <summary>
     ///     Gets whether this runnable session is currently running (i.e., on the
-    ///     <see cref="IApplication.RunnableSessionStack"/>).
+    ///     <see cref="IApplication.SessionStack"/>).
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         Read-only property derived from stack state. Returns <see langword="true"/> if this runnable
-    ///         is currently on the <see cref="IApplication.RunnableSessionStack"/>, <see langword="false"/> otherwise.
+    ///         is currently on the <see cref="IApplication.SessionStack"/>, <see langword="false"/> otherwise.
     ///     </para>
     ///     <para>
     ///         Runnables are added to the stack during <see cref="IApplication.Begin(IRunnable)"/> and removed in
-    ///         <see cref="IApplication.End(RunnableSessionToken)"/>.
+    ///         <see cref="IApplication.End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
     bool IsRunning { get; }
+
+
+    /// <summary>
+    ///     Requests that this runnable session stop.
+    /// </summary>
+    public void RequestStop ();
 
     /// <summary>
     ///     Called by the framework to raise the <see cref="IsRunningChanging"/> event.
@@ -65,7 +71,7 @@ public interface IRunnable
 
     /// <summary>
     ///     Raised when <see cref="IsRunning"/> is changing (e.g., when <see cref="IApplication.Begin(IRunnable)"/> or
-    ///     <see cref="IApplication.End(RunnableSessionToken)"/> is called).
+    ///     <see cref="IApplication.End(SessionToken)"/> is called).
     ///     Can be canceled by setting `args.Cancel` to <see langword="true"/>.
     /// </summary>
     /// <remarks>
@@ -92,7 +98,7 @@ public interface IRunnable
 
     /// <summary>
     ///     Raised after <see cref="IsRunning"/> has changed (after the runnable has been added to or removed from the
-    ///     <see cref="IApplication.RunnableSessionStack"/>).
+    ///     <see cref="IApplication.SessionStack"/>).
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -112,7 +118,7 @@ public interface IRunnable
     #region Modal or not (top of RunnableSessionStack or not)
 
     /// <summary>
-    ///     Gets whether this runnable session is at the top of the <see cref="IApplication.RunnableSessionStack"/> and thus
+    ///     Gets whether this runnable session is at the top of the <see cref="IApplication.SessionStack"/> and thus
     ///     exclusively receiving mouse and keyboard input.
     /// </summary>
     /// <remarks>
@@ -125,6 +131,8 @@ public interface IRunnable
     ///     </para>
     /// </remarks>
     bool IsModal { get; }
+
+    bool StopRequested { get; set; }
 
     /// <summary>
     ///     Called by the framework to raise the <see cref="IsModalChanging"/> event.

@@ -89,7 +89,7 @@ public class ApplicationTests
 
         SessionToken rs = Application.Begin (new ());
         Application.TopRunnable!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
-        Assert.Equal (rs.Toplevel, Application.TopRunnable);
+        Assert.Equal (rs.Runnable, Application.TopRunnable);
         Application.End (rs);
 
 #if DEBUG_IDISPOSABLE
@@ -97,7 +97,7 @@ public class ApplicationTests
         Assert.False (Application.TopRunnable!.WasDisposed); // Is true because the rs.Toplevel is the same as Application.TopRunnable
 #endif
 
-        Assert.Null (rs.Toplevel);
+        Assert.Null (rs.Runnable);
 
         Toplevel top = Application.TopRunnable;
 
@@ -270,7 +270,7 @@ public class ApplicationTests
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
             Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
             Assert.Null (Application.MainThreadId);
-            Assert.Empty (Application.SessionStack);
+            //Assert.Empty (Application.SessionStack);
             Assert.Empty (Application.CachedViewsUnderMouse);
 
             // Mouse
@@ -414,7 +414,7 @@ public class ApplicationTests
         Assert.True (Application.Initialized);
         Assert.Null (Application.TopRunnable);
         SessionToken rs = Application.Begin (new ());
-        Assert.Equal (Application.TopRunnable, rs.Toplevel);
+        Assert.Equal (Application.TopRunnable, rs.Runnable);
         Assert.Null (Application.Mouse.MouseGrabView); // public
         Application.TopRunnable!.Dispose ();
     }

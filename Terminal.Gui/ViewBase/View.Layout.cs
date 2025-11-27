@@ -437,7 +437,8 @@ public partial class View // Layout APIs
 
     private void NeedsClearScreenNextIteration ()
     {
-        if (App is { TopRunnable: { } } && App.TopRunnable == this && App.SessionStack.Count == 1)
+        if (App is { TopRunnable: { } } && App.TopRunnable == this
+                                        && App.SessionStack!.Select (r => r.Runnable as View).Count() == 1)
         {
             // If this is the only TopLevel, we need to redraw the screen
             App.ClearScreenNextIteration = true;
@@ -1264,11 +1265,11 @@ public partial class View // Layout APIs
         var checkedTop = false;
 
         // Traverse all visible toplevels, topmost first (reverse stack order)
-        if (App?.SessionStack.Count > 0)
+        if (App?.SessionStack!.Count > 0)
         {
-            foreach (Toplevel toplevel in App.SessionStack)
+            foreach (Toplevel? toplevel in App.SessionStack!.Select(r => r.Runnable as Toplevel))
             {
-                if (toplevel.Visible && toplevel.Contains (screenLocation))
+                if (toplevel!.Visible && toplevel.Contains (screenLocation))
                 {
                     List<View?> result = GetViewsUnderLocation (toplevel, screenLocation, excludeViewportSettingsFlags);
 

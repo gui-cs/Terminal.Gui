@@ -714,10 +714,8 @@ public class GetViewsUnderLocationTests
         secondaryToplevel.Margin!.Thickness = new (1);
         secondaryToplevel.Layout ();
 
-        Application.SessionStack.Clear ();
-        Application.SessionStack.Push (topToplevel);
-        Application.SessionStack.Push (secondaryToplevel);
-        Application.TopRunnable = secondaryToplevel;
+        Application.Begin (topToplevel);
+        Application.Begin (secondaryToplevel);
 
         List<View?> found = Application.TopRunnable.GetViewsUnderLocation (new (2, 2), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == topToplevel.Id);
@@ -725,7 +723,6 @@ public class GetViewsUnderLocationTests
 
         topToplevel.Dispose ();
         secondaryToplevel.Dispose ();
-        Application.SessionStack.Clear ();
         Application.ResetState (true);
     }
 
@@ -748,10 +745,8 @@ public class GetViewsUnderLocationTests
         secondaryToplevel.Margin!.Thickness = new (1);
         secondaryToplevel.Layout ();
 
-        Application.SessionStack.Clear ();
-        Application.SessionStack.Push (topToplevel);
-        Application.SessionStack.Push (secondaryToplevel);
-        Application.TopRunnable = secondaryToplevel;
+        Application.Begin (topToplevel);
+        Application.Begin (secondaryToplevel);
 
         List<View?> found = Application.TopRunnable.GetViewsUnderLocation (new (7, 7), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == secondaryToplevel.Id);
@@ -759,7 +754,6 @@ public class GetViewsUnderLocationTests
 
         topToplevel.Dispose ();
         secondaryToplevel.Dispose ();
-        Application.SessionStack.Clear ();
         Application.ResetState (true);
     }
 
@@ -781,10 +775,8 @@ public class GetViewsUnderLocationTests
         };
         secondaryToplevel.Margin!.Thickness = new (1);
 
-        Application.SessionStack.Clear ();
-        Application.SessionStack.Push (topToplevel);
-        Application.SessionStack.Push (secondaryToplevel);
-        Application.TopRunnable = secondaryToplevel;
+        Application.Begin (topToplevel);
+        Application.Begin (secondaryToplevel);
 
         secondaryToplevel.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
@@ -801,7 +793,6 @@ public class GetViewsUnderLocationTests
 
         topToplevel.Dispose ();
         secondaryToplevel.Dispose ();
-        Application.SessionStack.Clear ();
         Application.ResetState (true);
     }
 
@@ -824,17 +815,14 @@ public class GetViewsUnderLocationTests
         secondaryToplevel.Margin!.Thickness = new (1);
         secondaryToplevel.Layout ();
 
-        Application.SessionStack.Clear ();
-        Application.SessionStack.Push (topToplevel);
-        Application.SessionStack.Push (secondaryToplevel);
-        Application.TopRunnable = secondaryToplevel;
+        Application.Begin (topToplevel);
+        Application.Begin (secondaryToplevel);
 
         List<View?> found = Application.TopRunnable.GetViewsUnderLocation (new (20, 20), ViewportSettingsFlags.TransparentMouse);
         Assert.Empty (found);
 
         topToplevel.Dispose ();
         secondaryToplevel.Dispose ();
-        Application.SessionStack.Clear ();
         Application.ResetState (true);
     }
 }

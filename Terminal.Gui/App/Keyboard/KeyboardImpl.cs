@@ -179,9 +179,9 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         {
             if (App?.SessionStack is { })
             {
-                foreach (Toplevel topLevel in App.SessionStack.ToList ())
+                foreach (Toplevel? topLevel in App.SessionStack.Select(r => r.Runnable as Toplevel))
                 {
-                    if (topLevel.NewKeyDownEvent (key))
+                    if (topLevel!.NewKeyDownEvent (key))
                     {
                         return true;
                     }
@@ -230,9 +230,9 @@ internal class KeyboardImpl : IKeyboard, IDisposable
 
         if (App?.SessionStack is { })
         {
-            foreach (Toplevel topLevel in App.SessionStack.ToList ())
+            foreach (Toplevel? topLevel in App.SessionStack.Select (r => r.Runnable as Toplevel))
             {
-                if (topLevel.NewKeyUpEvent (key))
+                if (topLevel!.NewKeyUpEvent (key))
                 {
                     return true;
                 }

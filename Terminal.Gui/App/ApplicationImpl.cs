@@ -251,14 +251,14 @@ public partial class ApplicationImpl : IApplication
         }
     }
 
-    /// <inheritdoc/>
-    public ConcurrentStack<Toplevel> SessionStack { get; } = new ();
+    ///// <inheritdoc/>
+    //public ConcurrentStack<Toplevel> SessionStack { get; } = new ();
 
     /// <inheritdoc/>
     public Toplevel? CachedSessionTokenToplevel { get; set; }
 
     /// <inheritdoc/>
-    public ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; } = new ();
+    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
 
     /// <inheritdoc/>
     public IRunnable? FrameworkOwnedRunnable { get; set; }

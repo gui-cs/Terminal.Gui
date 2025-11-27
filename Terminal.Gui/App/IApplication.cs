@@ -130,28 +130,28 @@ public interface IApplication
 
     #region Begin->Run->Iteration->Stop->End
 
-    /// <summary>
-    ///     Building block API: Creates a <see cref="SessionToken"/> and prepares the provided <see cref="Toplevel"/> for
-    ///     execution. Not usually called directly by applications. Use <see cref="Run(Toplevel, Func{Exception, bool})"/>
-    ///     instead.
-    /// </summary>
-    /// <returns>
-    ///     The <see cref="SessionToken"/> that needs to be passed to the <see cref="End(SessionToken)"/> method upon
-    ///     completion.
-    /// </returns>
-    /// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
-    /// <remarks>
-    ///     <para>
-    ///         This method prepares the provided <see cref="Toplevel"/> for running. It adds this to the
-    ///         list of <see cref="Toplevel"/>s, lays out the SubViews, focuses the first element, and draws the
-    ///         <see cref="Toplevel"/> on the screen. This is usually followed by starting the main loop, and then the
-    ///         <see cref="End(SessionToken)"/> method upon termination which will undo these changes.
-    ///     </para>
-    ///     <para>
-    ///         Raises the <see cref="SessionBegun"/> event before returning.
-    ///     </para>
-    /// </remarks>
-    public SessionToken Begin (Toplevel toplevel);
+    ///// <summary>
+    /////     Building block API: Creates a <see cref="SessionToken"/> and prepares the provided <see cref="Toplevel"/> for
+    /////     execution. Not usually called directly by applications. Use <see cref="Run(Toplevel, Func{Exception, bool})"/>
+    /////     instead.
+    ///// </summary>
+    ///// <returns>
+    /////     The <see cref="SessionToken"/> that needs to be passed to the <see cref="End(SessionToken)"/> method upon
+    /////     completion.
+    ///// </returns>
+    ///// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
+    ///// <remarks>
+    /////     <para>
+    /////         This method prepares the provided <see cref="Toplevel"/> for running. It adds this to the
+    /////         list of <see cref="Toplevel"/>s, lays out the SubViews, focuses the first element, and draws the
+    /////         <see cref="Toplevel"/> on the screen. This is usually followed by starting the main loop, and then the
+    /////         <see cref="End(SessionToken)"/> method upon termination which will undo these changes.
+    /////     </para>
+    /////     <para>
+    /////         Raises the <see cref="SessionBegun"/> event before returning.
+    /////     </para>
+    ///// </remarks>
+    //public SessionToken Begin (Toplevel toplevel);
 
     /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
@@ -242,20 +242,20 @@ public interface IApplication
     /// </remarks>
     void Invoke (Action action);
 
-    /// <summary>
-    ///     Building block API: Ends a Session and completes the execution of a <see cref="Toplevel"/> that was started with
-    ///     <see cref="Begin(Toplevel)"/>. Not usually called directly by applications.
-    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>
-    ///     will automatically call this method when the session is stopped.
-    /// </summary>
-    /// <param name="sessionToken">The <see cref="SessionToken"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
-    /// <remarks>
-    ///     <para>
-    ///         This method removes the <see cref="Toplevel"/> from the stack, raises the <see cref="SessionEnded"/>
-    ///         event, and disposes the <paramref name="sessionToken"/>.
-    ///     </para>
-    /// </remarks>
-    public void End (SessionToken sessionToken);
+    ///// <summary>
+    /////     Building block API: Ends a Session and completes the execution of a <see cref="Toplevel"/> that was started with
+    /////     <see cref="Begin(Toplevel)"/>. Not usually called directly by applications.
+    /////     <see cref="Run(Toplevel, Func{Exception, bool})"/>
+    /////     will automatically call this method when the session is stopped.
+    ///// </summary>
+    ///// <param name="sessionToken">The <see cref="SessionToken"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
+    ///// <remarks>
+    /////     <para>
+    /////         This method removes the <see cref="Toplevel"/> from the stack, raises the <see cref="SessionEnded"/>
+    /////         event, and disposes the <paramref name="sessionToken"/>.
+    /////     </para>
+    ///// </remarks>
+    //public void End (SessionToken sessionToken);
 
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <remarks>
@@ -267,33 +267,32 @@ public interface IApplication
     /// </remarks>
     void RequestStop ();
 
-    /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
-    /// <param name="top">
-    ///     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running
-    ///     <see cref="TopRunnable"/>.
-    /// </param>
-    /// <remarks>
-    ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
-    ///     <para>
-    ///         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
-    ///         property on the specified <see cref="Toplevel"/> to <see langword="false"/>.
-    ///     </para>
-    /// </remarks>
-    void RequestStop (Toplevel? top);
+    ///// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
+    ///// <param name="top">
+    /////     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running
+    /////     <see cref="TopRunnable"/>.
+    ///// </param>
+    ///// <remarks>
+    /////     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
+    /////     <para>
+    /////         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
+    /////         property on the specified <see cref="Toplevel"/> to <see langword="false"/>.
+    /////     </para>
+    ///// </remarks>
+    //void RequestStop (Toplevel? top);
 
     /// <summary>
     ///     Set to <see langword="true"/> to cause the session to stop running after first iteration.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Used primarily for unit testing. When <see langword="true"/>, <see cref="End(RunnableSessionToken)"/> will be
+    ///         Used primarily for unit testing. When <see langword="true"/>, <see cref="End(SessionToken)"/> will be
     ///         called
     ///         automatically after the first main loop iteration.
     ///     </para>
     /// </remarks>
     bool StopAfterFirstIteration { get; set; }
 
-    // TODO: This API is not used anywhere; it can be deleted
     /// <summary>
     ///     Raised when <see cref="Begin(Toplevel)"/> has been called and has created a new <see cref="SessionToken"/>.
     /// </summary>
@@ -304,7 +303,6 @@ public interface IApplication
     /// </remarks>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
-    // TODO: This API is not used anywhere; it can be deleted
     /// <summary>
     ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
     ///     reference to the <see cref="Toplevel"/>
@@ -330,14 +328,14 @@ public interface IApplication
     /// </remarks>
     Toplevel? TopRunnable { get; set; }
 
-    /// <summary>Gets the stack of all active Toplevel sessions.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Toplevels are added to this stack by <see cref="Begin(Toplevel)"/> and removed by
-    ///         <see cref="End(SessionToken)"/>.
-    ///     </para>
-    /// </remarks>
-    ConcurrentStack<Toplevel> SessionStack { get; }
+    ///// <summary>Gets the stack of all active Toplevel sessions.</summary>
+    ///// <remarks>
+    /////     <para>
+    /////         Toplevels are added to this stack by <see cref="Begin(Toplevel)"/> and removed by
+    /////         <see cref="End(SessionToken)"/>.
+    /////     </para>
+    ///// </remarks>
+    //ConcurrentStack<Toplevel> SessionStack { get; }
 
     /// <summary>
     ///     Caches the Toplevel associated with the current Session.
@@ -379,7 +377,7 @@ public interface IApplication
     /// </code>
     ///     </example>
     /// </remarks>
-    ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
+    ConcurrentStack<SessionToken>? SessionStack { get; }
 
     /// <summary>
     ///     Gets or sets the runnable that was created by <see cref="Run{TRunnable}"/> for automatic disposal.
@@ -397,30 +395,30 @@ public interface IApplication
     IRunnable? FrameworkOwnedRunnable { get; set; }
 
     /// <summary>
-    ///     Building block API: Creates a <see cref="RunnableSessionToken"/> and prepares the provided <see cref="IRunnable"/>
+    ///     Building block API: Creates a <see cref="SessionToken"/> and prepares the provided <see cref="IRunnable"/>
     ///     for
     ///     execution. Not usually called directly by applications. Use <see cref="Run(IRunnable, Func{Exception, bool})"/>
     ///     instead.
     /// </summary>
     /// <param name="runnable">The <see cref="IRunnable"/> to prepare execution for.</param>
     /// <returns>
-    ///     The <see cref="RunnableSessionToken"/> that needs to be passed to the <see cref="End(RunnableSessionToken)"/>
+    ///     The <see cref="SessionToken"/> that needs to be passed to the <see cref="End(SessionToken)"/>
     ///     method upon
     ///     completion.
     /// </returns>
     /// <remarks>
     ///     <para>
     ///         This method prepares the provided <see cref="IRunnable"/> for running. It adds this to the
-    ///         <see cref="RunnableSessionStack"/>, lays out the SubViews, focuses the first element, and draws the
+    ///         <see cref="SessionStack"/>, lays out the SubViews, focuses the first element, and draws the
     ///         runnable on the screen. This is usually followed by starting the main loop, and then the
-    ///         <see cref="End(RunnableSessionToken)"/> method upon termination which will undo these changes.
+    ///         <see cref="End(SessionToken)"/> method upon termination which will undo these changes.
     ///     </para>
     ///     <para>
     ///         Raises the <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
     ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
     ///     </para>
     /// </remarks>
-    RunnableSessionToken Begin (IRunnable runnable);
+    SessionToken Begin (IRunnable runnable);
 
     /// <summary>
     ///     Runs a new Session with the provided runnable view.
@@ -439,7 +437,7 @@ public interface IApplication
     ///     <para>
     ///         Calling <see cref="Run(IRunnable, Func{Exception, bool})"/> is equivalent to calling
     ///         <see cref="Begin(IRunnable)"/>, followed by starting the main loop, and then calling
-    ///         <see cref="End(RunnableSessionToken)"/>.
+    ///         <see cref="End(SessionToken)"/>.
     ///     </para>
     ///     <para>
     ///         In RELEASE builds: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
@@ -471,12 +469,12 @@ public interface IApplication
     ///     will automatically call this method when the session is stopped.
     /// </summary>
     /// <param name="sessionToken">
-    ///     The <see cref="RunnableSessionToken"/> returned by the <see cref="Begin(IRunnable)"/>
+    ///     The <see cref="SessionToken"/> returned by the <see cref="Begin(IRunnable)"/>
     ///     method.
     /// </param>
     /// <remarks>
     ///     <para>
-    ///         This method removes the <see cref="IRunnable"/> from the <see cref="RunnableSessionStack"/>,
+    ///         This method removes the <see cref="IRunnable"/> from the <see cref="SessionStack"/>,
     ///         raises the lifecycle events, and disposes the <paramref name="sessionToken"/>.
     ///     </para>
     ///     <para>
@@ -484,7 +482,7 @@ public interface IApplication
     ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
     ///     </para>
     /// </remarks>
-    void End (RunnableSessionToken sessionToken);
+    void End (SessionToken sessionToken);
 
     #endregion IRunnable Management
 

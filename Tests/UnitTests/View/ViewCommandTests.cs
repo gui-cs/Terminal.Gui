@@ -46,8 +46,7 @@ public class ViewCommandTests
 
         w.LayoutSubViews ();
 
-        Application.TopRunnable = w;
-        Application.SessionStack.Push (w);
+        Application.Begin (w);
         Assert.Same (Application.TopRunnable, w);
 
         // Click button 2
@@ -121,8 +120,7 @@ public class ViewCommandTests
 
         w.Add (btn);
 
-        Application.TopRunnable = w;
-        Application.SessionStack.Push (w);
+        Application.Begin (w);
         Assert.Same (Application.TopRunnable, w);
 
         w.LayoutSubViews ();
@@ -154,6 +152,7 @@ public class ViewCommandTests
         Assert.Equal (1, btnAcceptedCount);
         Assert.Equal (0, wAcceptedCount);
 
+        w.Dispose ();
         Application.ResetState (true);
     }
 }

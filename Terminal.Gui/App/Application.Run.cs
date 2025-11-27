@@ -96,7 +96,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("The legacy static Application object is going away.")]
     public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
 
-    /// <inheritdoc cref="IApplication.End(RunnableSessionToken)"/>
+    /// <inheritdoc cref="IApplication.End(SessionToken)"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static void End (SessionToken sessionToken) => ApplicationImpl.Instance.End (sessionToken);
 

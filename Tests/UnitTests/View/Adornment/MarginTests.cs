@@ -15,10 +15,10 @@ public class MarginTests (ITestOutputHelper output)
         view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new (1);
 
-        Application.TopRunnable = new Toplevel ();
-        Application.SessionStack.Push (Application.TopRunnable);
+        Toplevel? top = new Toplevel ();
+        Application.Begin (top);
 
-        Application.TopRunnable.SetScheme (new()
+        Application.TopRunnable.SetScheme (new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         });
@@ -29,7 +29,7 @@ public class MarginTests (ITestOutputHelper output)
 
         Application.TopRunnable.BeginInit ();
         Application.TopRunnable.EndInit ();
-        Application.LayoutAndDraw();
+        Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (
                                              @"",
@@ -37,6 +37,7 @@ public class MarginTests (ITestOutputHelper output)
                                             );
         DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.TopRunnable.GetAttributeForRole (VisualRole.Normal));
 
+        top.Dispose ();
         Application.ResetState (true);
     }
 
@@ -51,8 +52,8 @@ public class MarginTests (ITestOutputHelper output)
         view.Margin.Thickness = new (1);
         view.Margin.ViewportSettings = ViewportSettingsFlags.None;
 
-        Application.TopRunnable = new Toplevel ();
-        Application.SessionStack.Push (Application.TopRunnable);
+        Toplevel? top = new Toplevel ();
+        Application.Begin (top);
 
         Application.TopRunnable.SetScheme (new ()
         {
@@ -76,6 +77,7 @@ MMM",
                                              );
         DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.TopRunnable.GetAttributeForRole (VisualRole.Normal));
 
+        top.Dispose ();
         Application.ResetState (true);
     }
 }

@@ -15,14 +15,22 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 public class Runnable<TResult> : View, IRunnable<TResult>
 {
+    private bool _stopRequested;
+
     /// <inheritdoc/>
     public TResult? Result { get; set; }
 
     #region IRunnable Implementation - IsRunning (from base interface)
 
     /// <inheritdoc/>
-    public bool IsRunning => App?.RunnableSessionStack?.Any (token => token.Runnable == this) ?? false;
+    public bool IsRunning => App?.SessionStack?.Any (token => token.Runnable == this) ?? false;
 
+    /// <inheritdoc />
+    public virtual void RequestStop ()
+    {
+        // Use the IRunnable-specific RequestStop if the App supports it
+        App?.RequestStop (this);
+    }
     /// <inheritdoc/>
     public bool RaiseIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
@@ -133,7 +141,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
 
             // Check if this runnable is at the top of the RunnableSessionStack
             // The top of the stack is the modal runnable
-            if (App.RunnableSessionStack is { } && App.RunnableSessionStack.TryPeek (out RunnableSessionToken? topToken))
+            if (App.SessionStack is { } && App.SessionStack.TryPeek (out SessionToken? topToken))
             {
                 return topToken?.Runnable == this;
             }
@@ -147,6 +155,13 @@ public class Runnable<TResult> : View, IRunnable<TResult>
 
             return false;
         }
+    }
+
+    /// <inheritdoc />
+    public bool StopRequested
+    {
+        get => _stopRequested;
+        set => _stopRequested = value;
     }
 
     /// <inheritdoc/>
@@ -212,12 +227,4 @@ public class Runnable<TResult> : View, IRunnable<TResult>
 
     #endregion
 
-    /// <summary>
-    ///     Requests that this runnable session stop.
-    /// </summary>
-    public virtual void RequestStop ()
-    {
-        // Use the IRunnable-specific RequestStop if the App supports it
-        App?.RequestStop (this);
-    }
 }
