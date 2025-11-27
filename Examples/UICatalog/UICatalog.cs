@@ -346,7 +346,7 @@ public class UICatalog
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
-        if (Application.TopRunnable == null)
+        if (Application.TopRunnableView == null)
         {
             return;
         }
@@ -653,7 +653,6 @@ public class UICatalog
         if (!View.EnableDebugIDisposableAsserts)
         {
             View.Instances.Clear ();
-            SessionToken.Instances.Clear ();
 
             return;
         }
@@ -667,16 +666,6 @@ public class UICatalog
         }
 
         View.Instances.Clear ();
-
-        // Validate there are no outstanding Application sessions
-        // after a scenario was selected to run. This proves the main UI Catalog
-        // 'app' closed cleanly.
-        foreach (SessionToken? inst in SessionToken.Instances)
-        {
-            Debug.Assert (inst.WasDisposed);
-        }
-
-        SessionToken.Instances.Clear ();
 #endif
     }
 }

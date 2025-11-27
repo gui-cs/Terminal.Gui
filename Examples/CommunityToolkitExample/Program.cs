@@ -16,7 +16,7 @@ public static class Program
         Services = ConfigureServices ();
         Application.Init ();
         Application.Run (Services.GetRequiredService<LoginView> ());
-        Application.TopRunnable?.Dispose ();
+        Application.TopRunnableView?.Dispose ();
         Application.Shutdown ();
     }
 

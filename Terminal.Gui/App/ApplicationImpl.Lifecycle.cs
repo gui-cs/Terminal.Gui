@@ -97,23 +97,14 @@ public partial class ApplicationImpl
         SynchronizationContext.SetSynchronizationContext (new ());
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
+        _result = null;
+
         return this;
     }
 
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     public object? Shutdown ()
     {
-        // Extract result from framework-owned runnable before disposal
-        object? result = null;
-        IRunnable? runnableToDispose = FrameworkOwnedRunnable;
-
-        if (runnableToDispose is { })
-        {
-            // Extract the result using reflection to get the Result property value
-            PropertyInfo? resultProperty = runnableToDispose.GetType ().GetProperty ("Result");
-            result = resultProperty?.GetValue (runnableToDispose);
-        }
-
         // Stop the coordinator if running
         Coordinator?.Stop ();
 
@@ -135,17 +126,6 @@ public partial class ApplicationImpl
         }
 #endif
 
-        // Dispose the framework-owned runnable if it exists
-        if (runnableToDispose is { })
-        {
-            if (runnableToDispose is IDisposable disposable)
-            {
-                disposable.Dispose ();
-            }
-
-            FrameworkOwnedRunnable = null;
-        }
-
         // Clean up all application state (including sync context)
         // ResetState handles the case where Initialized is false
         ResetState ();
@@ -163,8 +143,13 @@ public partial class ApplicationImpl
         // Clear the event to prevent memory leaks
         InitializedChanged = null;
 
-        return result;
+        return GetResult();
     }
+
+    private object? _result;
+
+    /// <inheritdoc />
+    public object? GetResult () { return _result; }
 
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
@@ -177,9 +162,12 @@ public partial class ApplicationImpl
         TimedEvents?.StopAll ();
 
         // === 1. Stop all running toplevels ===
-        foreach (SessionToken token in SessionStack!)
+        foreach (SessionToken token in SessionStack!.Reverse())
         {
-            token.Runnable!.StopRequested = true;
+            if (token.Runnable is { })
+            {
+                End (token);
+            }
         }
 
         // === 2. Close and dispose popover ===
@@ -200,21 +188,13 @@ public partial class ApplicationImpl
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the TopRunnable. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnable is { })
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnableView is { })
         {
-            Debug.Assert (TopRunnable.WasDisposed, $"Title = {TopRunnable.Title}, Id = {TopRunnable.Id}");
-
-            // If End wasn't called _CachedSessionTokenToplevel may be null
-            if (CachedSessionTokenToplevel is { })
-            {
-                Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
-                Debug.Assert (CachedSessionTokenToplevel == TopRunnable);
-            }
+            Debug.Assert (TopRunnableView.WasDisposed, $"Title = {TopRunnableView.Title}, Id = {TopRunnableView.Id}");
         }
 #endif
 
-        TopRunnable = null;
-        CachedSessionTokenToplevel = null;
+        TopRunnableView = null;
 
         // === 4. Clean up driver ===
         if (Driver is { })

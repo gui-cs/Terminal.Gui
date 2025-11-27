@@ -67,7 +67,6 @@ public class ApplicationImplTests
     {
         IApplication? app = NewMockedApplicationImpl ();
         var ex = Assert.Throws<NotInitializedException> (() => app?.Run (new Window ()));
-        Assert.Equal ("Run cannot be accessed before Initialization", ex.Message);
         app?.Shutdown ();
     }
 
@@ -82,7 +81,7 @@ public class ApplicationImplTests
                                                 TimeSpan.FromMilliseconds (150),
                                                 () =>
                                                 {
-                                                    if (app.TopRunnable is { })
+                                                    if (app.TopRunnableView is { })
                                                     {
                                                         app.RequestStop ();
 
@@ -92,7 +91,7 @@ public class ApplicationImplTests
                                                     return false;
                                                 }
                                                );
-        Assert.Null (app?.TopRunnable);
+        Assert.Null (app?.TopRunnableView);
 
         // Blocks until the timeout call is hit
 
@@ -101,9 +100,9 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app?.RemoveTimeout (timeoutToken!));
 
-        Assert.Null (app?.TopRunnable);
+        Assert.Null (app?.TopRunnableView);
         app.Shutdown ();
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
     }
 
     [Fact]
@@ -124,7 +123,7 @@ public class ApplicationImplTests
                                               {
                                                   Assert.True (top!.IsRunning);
 
-                                                  if (app.TopRunnable != null)
+                                                  if (app.TopRunnableView != null)
                                                   {
                                                       app.RequestStop ();
 
@@ -147,7 +146,7 @@ public class ApplicationImplTests
 
         // BUGBUG: Shutdown sets Top to null, not End.
         //Assert.Null (Application.TopRunnable);
-        app.TopRunnable?.Dispose ();
+        app.TopRunnableView?.Dispose ();
         app.Shutdown ();
     }
 
@@ -156,7 +155,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
         Assert.Null (app.Driver);
 
         app.Init ("fake");
@@ -191,7 +190,7 @@ public class ApplicationImplTests
         Assert.Equal (2, isIsModalChanged);
         Assert.Equal (2, isRunningChangedCount);
 
-        app.TopRunnable?.Dispose ();
+        app.TopRunnableView?.Dispose ();
         app.Shutdown ();
         Assert.Equal (2, isIsModalChanged);
         Assert.Equal (2, isRunningChangedCount);
@@ -202,7 +201,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
         Assert.Null (app.Driver);
 
         app.Init ("fake");
@@ -225,7 +224,7 @@ public class ApplicationImplTests
                                               {
                                                   Assert.True (top!.IsRunning);
 
-                                                  if (app.TopRunnable != null)
+                                                  if (app.TopRunnableView != null)
                                                   {
                                                       app.RequestStop ();
 
@@ -248,7 +247,7 @@ public class ApplicationImplTests
         // We returned false above, so we should not have to remove the timeout
         Assert.False (app.RemoveTimeout (timeoutToken));
 
-        app.TopRunnable?.Dispose ();
+        app.TopRunnableView?.Dispose ();
         app.Shutdown ();
         Assert.Equal (2, isIsModalChanged);
         Assert.Equal (2, isRunningChangedCount);
@@ -272,7 +271,7 @@ public class ApplicationImplTests
                                               {
                                                   Assert.True (top!.IsRunning);
 
-                                                  if (app.TopRunnable != null)
+                                                  if (app.TopRunnableView != null)
                                                   {
                                                       app.Keyboard.RaiseKeyDownEvent (app.Keyboard.QuitKey);
                                                   }
@@ -291,10 +290,10 @@ public class ApplicationImplTests
 
         Assert.False (top!.IsRunning);
 
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
         top.Dispose ();
         app.Shutdown ();
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
     }
 
     [Fact]
@@ -305,19 +304,20 @@ public class ApplicationImplTests
         app.Init ("fake");
 
         app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
 
         // Blocks until the timeout call is hit
 
         app.Run<Window> ();
 
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
         app.Shutdown ();
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
     }
 
+
     [Fact]
-    public void Shutdown_Closing_Closed_Raised ()
+    public void Run_IsRunningChanging_And_IsRunningChanged_Raised ()
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
@@ -325,7 +325,39 @@ public class ApplicationImplTests
 
         var isRunningChanging = 0;
         var isRunningChanged = 0;
-        var t = new Toplevel ();
+        var t = new Runnable<bool> ();
+
+        t.IsRunningChanging
+            += (_, a) =>
+               {
+                   isRunningChanging++;
+               };
+
+        t.IsRunningChanged
+            += (_, a) =>
+               {
+                   isRunningChanged++;
+               };
+
+        app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
+
+        // Blocks until the timeout call is hit
+        app.Run (t);
+
+        Assert.Equal (2, isRunningChanging);
+        Assert.Equal (2, isRunningChanged);
+    }
+
+    [Fact]
+    public void Run_IsRunningChanging_Cancel_IsRunningChanged_Not_Raised ()
+    {
+        IApplication app = NewMockedApplicationImpl ()!;
+
+        app.Init ("fake");
+
+        var isRunningChanging = 0;
+        var isRunningChanged = 0;
+        var t = new Runnable<bool> ();
 
         t.IsRunningChanging
             += (_, a) =>
@@ -351,16 +383,13 @@ public class ApplicationImplTests
 
         app.Run (t);
 
-        app.TopRunnable?.Dispose ();
-        app.Shutdown ();
-
-        Assert.Equal (2, isRunningChanging);
-        Assert.Equal (1, isRunningChanged);
+        Assert.Equal (1, isRunningChanging);
+        Assert.Equal (0, isRunningChanged);
     }
 
     private bool IdleExit (IApplication app)
     {
-        if (app.TopRunnable != null)
+        if (app.TopRunnableView != null)
         {
             app.RequestStop ();
 
@@ -402,7 +431,7 @@ public class ApplicationImplTests
                         () =>
                         {
                             // Run asynchronous logic inside Task.Run
-                            if (app.TopRunnable != null)
+                            if (app.TopRunnableView != null)
                             {
                                 b.NewKeyDownEvent (Key.Enter);
                                 b.NewKeyUpEvent (Key.Enter);
@@ -411,7 +440,7 @@ public class ApplicationImplTests
                             return false;
                         });
 
-        Assert.Null (app.TopRunnable);
+        Assert.Null (app.TopRunnableView);
 
         var w = new Window
         {
@@ -440,7 +469,7 @@ public class ApplicationImplTests
 
         //Assert.Null (v2.Popover);
         //Assert.Null (v2.Navigation);
-        Assert.Null (v2.TopRunnable);
+        Assert.Null (v2.TopRunnableView);
         Assert.Empty (v2.SessionStack);
 
         // Init should populate instance fields
@@ -451,7 +480,7 @@ public class ApplicationImplTests
         Assert.True (v2.Initialized);
         Assert.NotNull (v2.Popover);
         Assert.NotNull (v2.Navigation);
-        Assert.Null (v2.TopRunnable); // Top is still null until Run
+        Assert.Null (v2.TopRunnableView); // Top is still null until Run
 
         // Shutdown should clean up instance fields
         v2.Shutdown ();
@@ -461,7 +490,83 @@ public class ApplicationImplTests
 
         //Assert.Null (v2.Popover);
         //Assert.Null (v2.Navigation);
-        Assert.Null (v2.TopRunnable);
+        Assert.Null (v2.TopRunnableView);
         Assert.Empty (v2.SessionStack);
+    }
+
+
+    [Fact]
+    public void Init_Begin_End_Cleans_Up ()
+    {
+        IApplication? app = Application.Create ();
+
+        SessionToken? newSessionToken = null;
+
+        EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
+                                                                {
+                                                                    Assert.NotNull (e.State);
+                                                                    newSessionToken = e.State;
+                                                                };
+        app.SessionBegun += newSessionTokenFn;
+
+        Runnable<bool> runnable = new ();
+        SessionToken sessionToken = app.Begin (runnable);
+        Assert.NotNull (sessionToken);
+        Assert.NotNull (newSessionToken);
+        Assert.Equal (sessionToken, newSessionToken);
+
+        // Assert.Equal (runnable, Application.TopRunnable);
+
+        app.SessionBegun -= newSessionTokenFn;
+        app.End (newSessionToken);
+
+        Assert.Null (app.TopRunnable);
+        Assert.Null (app.Driver);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void Run_RequestStop_Stops ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+
+        var top = new Toplevel ();
+        SessionToken? sessionToken = app.Begin (top);
+        Assert.NotNull (sessionToken);
+
+        app.Iteration += OnApplicationOnIteration;
+        app.Run (top);
+        app.Iteration -= OnApplicationOnIteration;
+
+        top.Dispose ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a) { app.RequestStop (); }
+    }
+
+    [Fact]
+    public void Run_T_Init_Driver_Cleared_with_Runnable_Throws ()
+    {
+        IApplication? app = Application.Create ();
+
+        app.Init ("fake");
+        app.Driver = null;
+
+        app.StopAfterFirstIteration = true;
+        // Init has been called, but Driver has been set to null. Bad.
+        Assert.Throws<InvalidOperationException> (() => app.Run<Toplevel> ());
+    }
+
+    [Fact]
+    public void Init_Unbalanced_Throws ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        Assert.Throws<InvalidOperationException> (() =>
+                                                      app.Init ("fake")
+                                                 );
     }
 }

@@ -12,7 +12,7 @@ public class ColorPickerTests
 
         var otherView = new View { CanFocus = true };
 
-        Application.TopRunnable?.Add (otherView); // thi sets focus to otherView
+        Application.TopRunnableView?.Add (otherView); // thi sets focus to otherView
         Assert.True (otherView.HasFocus);
 
         cp.SetFocus ();
@@ -772,11 +772,11 @@ public class ColorPickerTests
         cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
 
-        Application.TopRunnable = new () { Width = 20, Height = 5 };
-        Application.TopRunnable.Add (cp);
+        Application.TopRunnableView = new () { Width = 20, Height = 5 };
+        Application.TopRunnableView.Add (cp);
 
-        Application.TopRunnable.LayoutSubViews ();
-        Application.TopRunnable.SetFocus ();
+        Application.TopRunnableView.LayoutSubViews ();
+        Application.TopRunnableView.SetFocus ();
 
         return cp;
     }

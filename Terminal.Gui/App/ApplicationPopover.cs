@@ -42,7 +42,7 @@ public sealed class ApplicationPopover : IDisposable
         if (popover is { } && !IsRegistered (popover))
         {
             // When created, set IPopover.Toplevel to the current Application.TopRunnable
-            popover.Current ??= App?.TopRunnable;
+            popover.Current ??= App?.TopRunnableView as IRunnable;
 
             if (popover is View popoverView)
             {
@@ -166,7 +166,7 @@ public sealed class ApplicationPopover : IDisposable
         {
             _activePopover = null;
             popoverView.Visible = false;
-            popoverView.App?.TopRunnable?.SetNeedsDraw ();
+            popoverView.App?.TopRunnableView?.SetNeedsDraw ();
         }
     }
 
@@ -215,7 +215,7 @@ public sealed class ApplicationPopover : IDisposable
         {
             if (popover == activePopover
                 || popover is not View popoverView
-                || (popover.Current is { } && popover.Current != App?.TopRunnable))
+                || (popover.Current is { } && popover.Current != App?.TopRunnableView))
             {
                 continue;
             }

@@ -89,13 +89,13 @@ public class CanFocusTests
     public void CanFocus_Set_True_Get_AdvanceFocus_Works ()
     {
         IApplication app = ApplicationImpl.Instance; // Force legacy
-        app.TopRunnable = new () { App = app };
+        app.TopRunnableView = new () { App = app };
 
         Label label = new () { Text = "label" };
         View view = new () { Text = "view", CanFocus = true };
-        app.TopRunnable.Add (label, view);
+        app.TopRunnableView.Add (label, view);
 
-        app.TopRunnable.SetFocus ();
+        app.TopRunnableView.SetFocus ();
         Assert.Equal (view, app.Navigation!.GetFocused ());
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
@@ -125,7 +125,7 @@ public class CanFocusTests
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
-        app.TopRunnable.Dispose ();
+        app.TopRunnableView.Dispose ();
         app.ResetState ();
     }
 }

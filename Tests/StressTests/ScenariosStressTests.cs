@@ -140,7 +140,7 @@ public class ScenariosStressTests
                 }
             }
 
-            SubscribeAllSubViews (Application.TopRunnable!);
+            SubscribeAllSubViews (Application.TopRunnableView!);
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit

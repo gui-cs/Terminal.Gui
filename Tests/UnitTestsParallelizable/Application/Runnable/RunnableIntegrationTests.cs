@@ -83,35 +83,6 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     }
 
     [Fact]
-    public void Begin_RaisesIsModalChangingEvent ()
-    {
-        // Arrange
-        IApplication app = GetApp ();
-        Runnable<int> runnable = new ();
-        var isModalChangingRaised = false;
-        bool? oldValue = null;
-        bool? newValue = null;
-
-        runnable.IsModalChanging += (s, e) =>
-                                    {
-                                        isModalChangingRaised = true;
-                                        oldValue = e.CurrentValue;
-                                        newValue = e.NewValue;
-                                    };
-
-        // Act
-        SessionToken token = app.Begin (runnable);
-
-        // Assert
-        Assert.True (isModalChangingRaised);
-        Assert.False (oldValue);
-        Assert.True (newValue);
-
-        // Cleanup
-        app.End (token);
-    }
-
-    [Fact]
     public void Begin_RaisesIsRunningChangedEvent ()
     {
         // Arrange

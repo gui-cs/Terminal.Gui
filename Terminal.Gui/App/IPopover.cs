@@ -55,7 +55,7 @@ public interface IPopover
     ///     events from the <see cref="IApplication"/>. If set, it will only receive keyboard events the Toplevel would normally
     ///     receive.
     ///     When <see cref="ApplicationPopover.Register"/> is called, the <see cref="Current"/> is set to the current
-    ///     <see cref="IApplication.TopRunnable"/> if not already set.
+    ///     <see cref="IApplication.TopRunnableView"/> if not already set.
     /// </summary>
-    Toplevel? Current { get; set; }
+    IRunnable? Current { get; set; }
 }

@@ -72,7 +72,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run<Toplevel> ();
+        app.Run<Runnable<bool>> ();
         app.Shutdown ();
     }
 

@@ -437,7 +437,7 @@ public partial class View // Layout APIs
 
     private void NeedsClearScreenNextIteration ()
     {
-        if (App is { TopRunnable: { } } && App.TopRunnable == this
+        if (App is { TopRunnableView: { } } && App.TopRunnableView == this
                                         && App.SessionStack!.Select (r => r.Runnable as View).Count() == 1)
         {
             // If this is the only TopLevel, we need to redraw the screen
@@ -1114,8 +1114,8 @@ public partial class View // Layout APIs
     {
         // TODO: Get rid of refs to Top
         Size superViewContentSize = SuperView?.GetContentSize ()
-                                    ?? (App?.TopRunnable is { } && App?.TopRunnable != this && App!.TopRunnable.IsInitialized
-                                            ? App.TopRunnable.GetContentSize ()
+                                    ?? (App?.TopRunnableView is { } && App?.TopRunnableView != this && App!.TopRunnableView.IsInitialized
+                                            ? App.TopRunnableView.GetContentSize ()
                                             : App?.Screen.Size ?? new (2048, 2048));
 
         return superViewContentSize;
@@ -1131,7 +1131,7 @@ public partial class View // Layout APIs
     /// </summary>
     /// <remarks>
     ///     If <paramref name="viewToMove"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
-    ///     <see cref="IApplication.TopRunnable"/> the position will be bound by  <see cref="IApplication.Screen"/>.
+    ///     <see cref="IApplication.TopRunnableView"/> the position will be bound by  <see cref="IApplication.Screen"/>.
     /// </remarks>
     /// <param name="viewToMove">The View that is to be moved.</param>
     /// <param name="targetX">The target x location.</param>
@@ -1139,7 +1139,7 @@ public partial class View // Layout APIs
     /// <param name="nx">The new x location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <param name="ny">The new y location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <returns>
-    ///     Either <see cref="IApplication.TopRunnable"/> (if <paramref name="viewToMove"/> does not have a Super View) or
+    ///     Either <see cref="IApplication.TopRunnableView"/> (if <paramref name="viewToMove"/> does not have a Super View) or
     ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubViews is called on the correct View.
     /// </returns>
     internal static View? GetLocationEnsuringFullVisibility (
@@ -1155,10 +1155,10 @@ public partial class View // Layout APIs
 
         IApplication? app = viewToMove.App;
 
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnable || viewToMove?.SuperView == app?.TopRunnable)
+        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove?.SuperView == app?.TopRunnableView)
         {
             maxDimension = app?.Screen.Width ?? 0;
-            superView = app?.TopRunnable;
+            superView = app?.TopRunnableView;
         }
         else
         {
@@ -1195,7 +1195,7 @@ public partial class View // Layout APIs
 
         ny = Math.Max (targetY, maxDimension);
 
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnable || viewToMove?.SuperView == app?.TopRunnable)
+        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove?.SuperView == app?.TopRunnableView)
         {
             if (app is { })
             {
@@ -1267,7 +1267,7 @@ public partial class View // Layout APIs
         // Traverse all visible toplevels, topmost first (reverse stack order)
         if (App?.SessionStack!.Count > 0)
         {
-            foreach (Toplevel? toplevel in App.SessionStack!.Select(r => r.Runnable as Toplevel))
+            foreach (View? toplevel in App.SessionStack!.Select(r => r.Runnable as View))
             {
                 if (toplevel!.Visible && toplevel.Contains (screenLocation))
                 {
@@ -1280,7 +1280,7 @@ public partial class View // Layout APIs
                     }
                 }
 
-                if (toplevel == App.TopRunnable)
+                if (toplevel == App.TopRunnableView)
                 {
                     checkedTop = true;
                 }
@@ -1288,7 +1288,7 @@ public partial class View // Layout APIs
         }
 
         // Fallback: If TopLevels is empty or Top is not in TopLevels, check Top directly (for test compatibility)
-        if (!checkedTop && App?.TopRunnable is { Visible: true } top)
+        if (!checkedTop && App?.TopRunnableView is { Visible: true } top)
         {
             // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
             List<View?> result = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);

@@ -339,7 +339,7 @@ public interface IApplication
 {
     // Legacy Toplevel support
     Toplevel? Current { get; }
-    ConcurrentStack<Toplevel> SessionStack { get; }
+    ConcurrentStack<Runnable<bool>> SessionStack { get; }
     
     // IRunnable support
     IRunnable? TopRunnable { get; }
@@ -422,7 +422,7 @@ public static partial class Application
     public static Toplevel? Current => ApplicationImpl.Instance.Current;
     
     [Obsolete("The legacy static Application object is going away.")]
-    public static ConcurrentStack<Toplevel> SessionStack => ApplicationImpl.Instance.SessionStack;
+    public static ConcurrentStack<Runnable<bool>> SessionStack => ApplicationImpl.Instance.SessionStack;
     
     // ... other obsolete static members
 }

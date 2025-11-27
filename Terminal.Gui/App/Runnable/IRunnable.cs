@@ -27,6 +27,30 @@ namespace Terminal.Gui.App;
 /// <seealso cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>
 public interface IRunnable
 {
+    #region Result
+
+    /// <summary>
+    ///     Gets or sets the result data extracted when the session was accepted, or <see langword="null"/> if not accepted.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is the non-generic version of the result property. For type-safe access, cast to
+    ///         <see cref="IRunnable{TResult}"/> or access the derived interface's <c>Result</c> property directly.
+    ///     </para>
+    ///     <para>
+    ///         Implementations should set this in the <see cref="RaiseIsRunningChanging"/> method
+    ///         (when stopping, i.e., <c>newIsRunning == false</c>) by extracting data from
+    ///         views before they are disposed.
+    ///     </para>
+    ///     <para>
+    ///         <see langword="null"/> indicates the session was stopped without accepting (ESC key, close without action).
+    ///         Non-<see langword="null"/> contains the result data.
+    ///     </para>
+    /// </remarks>
+    object? Result { get; set; }
+
+    #endregion Result
+
     #region Running or not (added to/removed from RunnableSessionStack)
 
     /// <summary>
@@ -35,8 +59,12 @@ public interface IRunnable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Read-only property derived from stack state. Returns <see langword="true"/> if this runnable
-    ///         is currently on the <see cref="IApplication.SessionStack"/>, <see langword="false"/> otherwise.
+    ///         This property returns a cached value that is updated atomically when the runnable is added to or
+    ///         removed from the session stack. The cached state ensures thread-safe access without race conditions.
+    ///     </para>
+    ///     <para>
+    ///         Returns <see langword="true"/> if this runnable is currently on the <see cref="IApplication.SessionStack"/>,
+    ///         <see langword="false"/> otherwise.
     ///     </para>
     ///     <para>
     ///         Runnables are added to the stack during <see cref="IApplication.Begin(IRunnable)"/> and removed in
@@ -45,6 +73,12 @@ public interface IRunnable
     /// </remarks>
     bool IsRunning { get; }
 
+    /// <summary>
+    ///     Sets the cached IsRunning state. Called by ApplicationImpl within the session stack lock.
+    ///     This method is internal to the framework and should not be called by application code.
+    /// </summary>
+    /// <param name="value">The new IsRunning value.</param>
+    void SetIsRunning (bool value);
 
     /// <summary>
     ///     Requests that this runnable session stop.
@@ -123,8 +157,12 @@ public interface IRunnable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Read-only property derived from stack state. Returns <see langword="true"/> if this runnable
-    ///         is at the top of the stack (i.e., <c>this == app.TopRunnable</c>), <see langword="false"/> otherwise.
+    ///         This property returns a cached value that is updated atomically when the runnable's modal state changes.
+    ///         The cached state ensures thread-safe access without race conditions.
+    ///     </para>
+    ///     <para>
+    ///         Returns <see langword="true"/> if this runnable is at the top of the stack (i.e., <c>this == app.TopRunnable</c>),
+    ///         <see langword="false"/> otherwise.
     ///     </para>
     ///     <para>
     ///         The runnable at the top of the stack gets all mouse/keyboard input and thus is running "modally".
@@ -133,38 +171,16 @@ public interface IRunnable
     bool IsModal { get; }
 
     /// <summary>
+    ///     Sets the cached IsModal state. Called by ApplicationImpl within the session stack lock.
+    ///     This method is internal to the framework and should not be called by application code.
+    /// </summary>
+    /// <param name="value">The new IsModal value.</param>
+    void SetIsModal (bool value);
+
+    /// <summary>
     ///     Gets or sets whether a stop has been requested for this runnable session.
     /// </summary>
     bool StopRequested { get; set; }
-
-    /// <summary>
-    ///     Called by the framework to raise the <see cref="IsModalChanging"/> event.
-    /// </summary>
-    /// <param name="oldIsModal">The current value of <see cref="IsModal"/>.</param>
-    /// <param name="newIsModal">The new value of <see cref="IsModal"/> (true = becoming modal/top, false = no longer modal).</param>
-    /// <returns><see langword="true"/> if the change was canceled; otherwise <see langword="false"/>.</returns>
-    /// <remarks>
-    ///     This method implements the Cancellable Work Pattern. It calls the protected virtual method first,
-    ///     then raises the event if not canceled.
-    /// </remarks>
-    bool RaiseIsModalChanging (bool oldIsModal, bool newIsModal);
-
-    /// <summary>
-    ///     Raised when this runnable is about to become modal (top of stack) or cease being modal.
-    ///     Can be canceled by setting `args.Cancel` to <see langword="true"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Subscribe to this event to participate in modal state transitions before they occur.
-    ///         When <see cref="CancelEventArgs{T}.NewValue"/> is <see langword="true"/>, the runnable is becoming modal (top
-    ///         of stack).
-    ///         When <see langword="false"/>, another runnable is becoming modal and this one will no longer receive input.
-    ///     </para>
-    ///     <para>
-    ///         This event follows the Terminal.Gui Cancellable Work Pattern (CWP).
-    ///     </para>
-    /// </remarks>
-    event EventHandler<CancelEventArgs<bool>>? IsModalChanging;
 
     /// <summary>
     ///     Called by the framework to raise the <see cref="IsModalChanged"/> event.
@@ -240,5 +256,5 @@ public interface IRunnable<TResult> : IRunnable
     ///         Non-<see langword="null"/> contains the type-safe result data.
     ///     </para>
     /// </remarks>
-    TResult? Result { get; set; }
+    new TResult? Result { get; set; }
 }

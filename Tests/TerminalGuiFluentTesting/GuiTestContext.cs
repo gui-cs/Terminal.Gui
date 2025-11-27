@@ -105,7 +105,7 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Constructor for tests that need to run the application with Application.Run.
     /// </summary>
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    internal GuiTestContext (Func<IRunnable> runnableBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _logWriter = logWriter;
         _runApplication = true;
@@ -135,11 +135,14 @@ public partial class GuiTestContext : IDisposable
 
                                      if (App is { Initialized: true })
                                      {
-                                         Toplevel t = topLevelBuilder ();
-                                         t.IsRunningChanged += (s, e) => { Finished = e.Value; };
-                                         App?.Run (t); // This will block, but it's on a background thread now
+                                         IRunnable runnable = runnableBuilder ();
+                                         runnable.IsRunningChanged += (s, e) => { Finished = e.Value; };
+                                         App?.Run (runnable); // This will block, but it's on a background thread now
 
-                                         t.Dispose ();
+                                         if (runnable is View runnableView)
+                                         {
+                                             runnableView.Dispose ();
+                                         }
                                          Logging.Trace ("Application.Run completed");
                                          App?.Shutdown ();
                                          _runCancellationTokenSource.Cancel ();

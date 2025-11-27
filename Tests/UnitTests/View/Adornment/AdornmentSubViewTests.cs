@@ -14,14 +14,14 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     [InlineData (2, 1, true)]
     public void Adornment_WithSubView_Finds (int viewMargin, int subViewMargin, bool expectedFound)
     {
-        Application.TopRunnable = new Toplevel()
+        Application.TopRunnableView = new Toplevel()
         {
             Width = 10,
             Height = 10
         };
-        Application.TopRunnable.Margin!.Thickness = new Thickness (viewMargin);
+        Application.TopRunnableView.Margin!.Thickness = new Thickness (viewMargin);
         // Turn of TransparentMouse for the test
-        Application.TopRunnable.Margin!.ViewportSettings = ViewportSettingsFlags.None;
+        Application.TopRunnableView.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
         var subView = new View ()
         {
@@ -34,26 +34,26 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         // Turn of TransparentMouse for the test
         subView.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
-        Application.TopRunnable.Margin!.Add (subView);
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Margin!.Add (subView);
+        Application.TopRunnableView.Layout ();
 
-        var foundView = Application.TopRunnable.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ();
+        var foundView = Application.TopRunnableView.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ();
 
         bool found = foundView == subView || foundView == subView.Margin;
         Assert.Equal (expectedFound, found);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
     public void Adornment_WithNonVisibleSubView_Finds_Adornment ()
     {
-        Application.TopRunnable = new Toplevel ()
+        Application.TopRunnableView = new Toplevel ()
         {
             Width = 10,
             Height = 10
         };
-        Application.TopRunnable.Padding.Thickness = new Thickness (1);
+        Application.TopRunnableView.Padding.Thickness = new Thickness (1);
 
         var subView = new View ()
         {
@@ -63,11 +63,11 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Height = 1,
             Visible = false
         };
-        Application.TopRunnable.Padding.Add (subView);
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Padding.Add (subView);
+        Application.TopRunnableView.Layout ();
 
-        Assert.Equal (Application.TopRunnable.Padding, Application.TopRunnable.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ());
-        Application.TopRunnable?.Dispose ();
+        Assert.Equal (Application.TopRunnableView.Padding, Application.TopRunnableView.GetViewsUnderLocation (new Point(0, 0), ViewportSettingsFlags.None).LastOrDefault ());
+        Application.TopRunnableView?.Dispose ();
         Application.ResetState (ignoreDisposed: true);
     }
 }

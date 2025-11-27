@@ -234,32 +234,6 @@ public partial class ApplicationImpl : IApplication
         set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    private Toplevel? _topRunnable;
-
-    /// <inheritdoc/>
-    public Toplevel? TopRunnable
-    {
-        get => _topRunnable;
-        set
-        {
-            _topRunnable = value;
-
-            if (_topRunnable is { })
-            {
-                _topRunnable.App = this;
-            }
-        }
-    }
-
-    ///// <inheritdoc/>
-    //public ConcurrentStack<Toplevel> SessionStack { get; } = new ();
-
-    /// <inheritdoc/>
-    public Toplevel? CachedSessionTokenToplevel { get; set; }
-
-    /// <inheritdoc/>
-    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
-
     /// <inheritdoc/>
     public IRunnable? FrameworkOwnedRunnable { get; set; }
 

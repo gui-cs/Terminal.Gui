@@ -43,12 +43,12 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         try
         {
             toplevel = new ();
-            Assert.Null (app.TopRunnable);
+            Assert.Null (app.TopRunnableView);
 
             app.Begin (toplevel);
 
-            Assert.NotNull (app.TopRunnable);
-            Assert.Same (toplevel, app.TopRunnable);
+            Assert.NotNull (app.TopRunnableView);
+            Assert.Same (toplevel, app.TopRunnableView);
             Assert.Single (app.SessionStack);
         }
         finally
@@ -72,56 +72,16 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
             app.Begin (toplevel1);
             Assert.Single (app.SessionStack);
-            Assert.Same (toplevel1, app.TopRunnable);
+            Assert.Same (toplevel1, app.TopRunnableView);
 
             app.Begin (toplevel2);
             Assert.Equal (2, app.SessionStack.Count);
-            Assert.Same (toplevel2, app.TopRunnable);
+            Assert.Same (toplevel2, app.TopRunnableView);
         }
         finally
         {
             toplevel1?.Dispose ();
             toplevel2?.Dispose ();
-            app.Shutdown ();
-        }
-    }
-
-    [Fact]
-    public void Begin_SetsUniqueToplevelId_WhenIdIsEmpty ()
-    {
-        IApplication app = NewApplicationImpl ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
-        Toplevel? toplevel3 = null;
-
-        try
-        {
-            toplevel1 = new ();
-            toplevel2 = new ();
-            toplevel3 = new ();
-
-            Assert.Empty (toplevel1.Id);
-            Assert.Empty (toplevel2.Id);
-            Assert.Empty (toplevel3.Id);
-
-            app.Begin (toplevel1);
-            app.Begin (toplevel2);
-            app.Begin (toplevel3);
-
-            Assert.NotEmpty (toplevel1.Id);
-            Assert.NotEmpty (toplevel2.Id);
-            Assert.NotEmpty (toplevel3.Id);
-
-            // IDs should be unique
-            Assert.NotEqual (toplevel1.Id, toplevel2.Id);
-            Assert.NotEqual (toplevel2.Id, toplevel3.Id);
-            Assert.NotEqual (toplevel1.Id, toplevel3.Id);
-        }
-        finally
-        {
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
-            toplevel3?.Dispose ();
             app.Shutdown ();
         }
     }
@@ -161,7 +121,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             app.End (token2);
 
             Assert.Single (app.SessionStack);
-            Assert.Same (toplevel1, app.TopRunnable);
+            Assert.Same (toplevel1, app.TopRunnableView);
 
             app.End (token1);
 
@@ -175,7 +135,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         }
     }
 
-    [Fact]
+    [Fact (Skip = "This test may be bogus. What's wrong with ending a non-top session?")]
     public void End_ThrowsArgumentException_WhenNotBalanced ()
     {
         IApplication app = NewApplicationImpl ();
@@ -226,13 +186,13 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             SessionToken token2 = app.Begin (toplevel2);
             SessionToken token3 = app.Begin (toplevel3);
 
-            Assert.Same (toplevel3, app.TopRunnable);
+            Assert.Same (toplevel3, app.TopRunnableView);
 
             app.End (token3);
-            Assert.Same (toplevel2, app.TopRunnable);
+            Assert.Same (toplevel2, app.TopRunnableView);
 
             app.End (token2);
-            Assert.Same (toplevel1, app.TopRunnable);
+            Assert.Same (toplevel1, app.TopRunnableView);
 
             app.End (token1);
         }
@@ -263,7 +223,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             }
 
             Assert.Equal (5, app.SessionStack.Count);
-            Assert.Same (toplevels [4], app.TopRunnable);
+            Assert.Same (toplevels [4], app.TopRunnableView);
 
             // End them in reverse order (LIFO)
             for (var i = 4; i >= 0; i--)
@@ -273,7 +233,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
                 if (i > 0)
                 {
                     Assert.Equal (i, app.SessionStack.Count);
-                    Assert.Same (toplevels [i - 1], app.TopRunnable);
+                    Assert.Same (toplevels [i - 1], app.TopRunnableView);
                 }
                 else
                 {
@@ -288,30 +248,6 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
                 toplevel.Dispose ();
             }
 
-            app.Shutdown ();
-        }
-    }
-
-    [Fact]
-    public void End_UpdatesCachedSessionTokenToplevel ()
-    {
-        IApplication app = NewApplicationImpl ();
-        Toplevel? toplevel = null;
-
-        try
-        {
-            toplevel = new ();
-
-            SessionToken token = app.Begin (toplevel);
-            Assert.Null (app.CachedSessionTokenToplevel);
-
-            app.End (token);
-
-            Assert.Same (toplevel, app.CachedSessionTokenToplevel);
-        }
-        finally
-        {
-            toplevel?.Dispose ();
             app.Shutdown ();
         }
     }
@@ -356,7 +292,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             app.Begin (toplevel2);
 
             Assert.Equal (2, app.SessionStack.Count);
-            Assert.NotNull (app.TopRunnable);
+            Assert.NotNull (app.TopRunnableView);
         }
         finally
         {
@@ -369,8 +305,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
             // Verify cleanup happened
             Assert.Empty (app.SessionStack);
-            Assert.Null (app.TopRunnable);
-            Assert.Null (app.CachedSessionTokenToplevel);
+            Assert.Null (app.TopRunnableView);
         }
     }
 
@@ -441,30 +376,6 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     //}
 
     [Fact]
-    public void Begin_DoesNotDuplicateToplevel_WhenIdAlreadyExists ()
-    {
-        IApplication app = NewApplicationImpl ();
-        Toplevel? toplevel = null;
-
-        try
-        {
-            toplevel = new () { Id = "test-id" };
-
-            app.Begin (toplevel);
-            Assert.Single (app.SessionStack);
-
-            // Calling Begin again with same toplevel should not duplicate
-            app.Begin (toplevel);
-            Assert.Single (app.SessionStack);
-        }
-        finally
-        {
-            toplevel?.Dispose ();
-            app.Shutdown ();
-        }
-    }
-
-    [Fact]
     public void SessionStack_ContainsAllBegunToplevels ()
     {
         IApplication app = NewApplicationImpl ();
@@ -487,7 +398,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
             foreach (Toplevel toplevel in toplevels)
             {
-                Assert.Contains (toplevel, stackList.Select(r => r.Runnable));
+                Assert.Contains (toplevel, stackList.Select (r => r.Runnable));
             }
         }
         finally

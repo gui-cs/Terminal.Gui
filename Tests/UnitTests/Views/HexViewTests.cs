@@ -32,9 +32,9 @@ public class HexViewTests
     {
         var hv = new HexView (LoadStream (null, out _, true)) { Width = 20, Height = 20 };
 
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (hv);
-        Application.TopRunnable.SetFocus ();
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (hv);
+        Application.TopRunnableView.SetFocus ();
 
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubViews ();
@@ -69,14 +69,14 @@ public class HexViewTests
         Assert.Empty (hv.Edits);
         Assert.Equal (127, hv.Source.Length);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 
     [Fact]
     public void ApplyEdits_With_Argument ()
     {
-        Application.TopRunnable = new ();
+        Application.TopRunnableView = new ();
 
         byte [] buffer = Encoding.Default.GetBytes ("Fest");
         var original = new MemoryStream ();
@@ -87,8 +87,8 @@ public class HexViewTests
         original.CopyTo (copy);
         copy.Flush ();
         var hv = new HexView (copy) { Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.TopRunnable.Add (hv);
-        Application.TopRunnable.SetFocus ();
+        Application.TopRunnableView.Add (hv);
+        Application.TopRunnableView.SetFocus ();
 
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubViews ();
@@ -119,7 +119,7 @@ public class HexViewTests
         Assert.Equal ("Zest", Encoding.Default.GetString (readBuffer));
         Assert.Equal (Encoding.Default.GetString (buffer), Encoding.Default.GetString (readBuffer));
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -143,10 +143,10 @@ public class HexViewTests
     public void Position_Encoding_Default ()
     {
         var hv = new HexView (LoadStream (null, out _)) { Width = 100, Height = 100 };
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (hv);
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (hv);
 
-        Application.TopRunnable.LayoutSubViews ();
+        Application.TopRunnableView.LayoutSubViews ();
 
         Assert.Equal (63, hv.Source!.Length);
         Assert.Equal (20, hv.BytesPerLine);
@@ -171,7 +171,7 @@ public class HexViewTests
         Assert.Equal (new (3, 3), hv.GetPosition (hv.Address));
 
         Assert.Equal (hv.Source!.Length, hv.Address);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -179,8 +179,8 @@ public class HexViewTests
     public void Position_Encoding_Unicode ()
     {
         var hv = new HexView (LoadStream (null, out _, true)) { Width = 100, Height = 100 };
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (hv);
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (hv);
 
         hv.LayoutSubViews ();
 
@@ -206,7 +206,7 @@ public class HexViewTests
         Assert.Equal (new (6, 6), hv.GetPosition (hv.Address));
 
         Assert.Equal (hv.Source!.Length, hv.Address);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -258,9 +258,9 @@ public class HexViewTests
     [Fact]
     public void KeyBindings_Test_Movement_LeftSide ()
     {
-        Application.TopRunnable = new ();
+        Application.TopRunnableView = new ();
         var hv = new HexView (LoadStream (null, out _)) { Width = 20, Height = 10 };
-        Application.TopRunnable.Add (hv);
+        Application.TopRunnableView.Add (hv);
 
         hv.LayoutSubViews ();
 
@@ -306,7 +306,7 @@ public class HexViewTests
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal (0, hv.Address);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -314,10 +314,10 @@ public class HexViewTests
     public void PositionChanged_Event ()
     {
         var hv = new HexView (LoadStream (null, out _)) { Width = 20, Height = 10 };
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (hv);
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (hv);
 
-        Application.TopRunnable.LayoutSubViews ();
+        Application.TopRunnableView.LayoutSubViews ();
 
         HexViewEventArgs hexViewEventArgs = null!;
         hv.PositionChanged += (s, e) => hexViewEventArgs = e;
@@ -331,7 +331,7 @@ public class HexViewTests
         Assert.Equal (4, hexViewEventArgs.BytesPerLine);
         Assert.Equal (new (1, 1), hexViewEventArgs.Position);
         Assert.Equal (5, hexViewEventArgs.Address);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -339,32 +339,32 @@ public class HexViewTests
     public void Source_Sets_Address_To_Zero_If_Greater_Than_Source_Length ()
     {
         var hv = new HexView (LoadStream (null, out _)) { Width = 10, Height = 5 };
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (hv);
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (hv);
 
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Layout ();
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
         hv.Source = new MemoryStream ();
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Layout ();
         Assert.Equal (0, hv.Address);
 
         hv.Source = LoadStream (null, out _);
         hv.Width = Dim.Fill ();
         hv.Height = Dim.Fill ();
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Layout ();
         Assert.Equal (0, hv.Address);
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
         hv.Source = new MemoryStream ();
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Layout ();
         Assert.Equal (0, hv.Address);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
 

@@ -175,7 +175,7 @@ public interface IApplication
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new ();
+        where TRunnable : IRunnable, new();
 
     /// <summary>
     ///     Raises the <see cref="Iteration"/> event.
@@ -218,30 +218,16 @@ public interface IApplication
     ///     </para>
     /// </remarks>
     void Invoke (Action action);
-    
+
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <remarks>
     ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="TopRunnable"/> as the
+    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="TopRunnableView"/> as the
     ///         parameter.
     ///     </para>
     /// </remarks>
     void RequestStop ();
-
-    ///// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
-    ///// <param name="top">
-    /////     The <see cref="Toplevel"/> to stop. If <see langword="null"/>, stops the currently running
-    /////     <see cref="TopRunnable"/>.
-    ///// </param>
-    ///// <remarks>
-    /////     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
-    /////     <para>
-    /////         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
-    /////         property on the specified <see cref="Toplevel"/> to <see langword="false"/>.
-    /////     </para>
-    ///// </remarks>
-    //void RequestStop (Toplevel? top);
 
     /// <summary>
     ///     Set to <see langword="true"/> to cause the session to stop running after first iteration.
@@ -275,37 +261,29 @@ public interface IApplication
     ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
     ///     when the application is done.
     /// </remarks>
-    public event EventHandler<ToplevelEventArgs>? SessionEnded;
+    public event EventHandler<SessionTokenEventArgs>? SessionEnded;
 
     #endregion Begin->Run->Iteration->Stop->End
 
     #region Toplevel Management
 
+    /// <summary>Gets or sets the View that is on the top of the <see cref="SessionStack"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience property that casts <see cref="TopRunnable"/> to a <see cref="View"/>.
+    ///     </para>
+    /// </remarks>
+    View? TopRunnableView { get; set; }
+
+
     /// <summary>Gets or sets the Toplevel that is on the top of the <see cref="SessionStack"/>.</summary>
     /// <remarks>
     ///     <para>
     ///         The top runnable in the session stack captures all mouse and keyboard input.
-    ///         This is set by <see cref="Begin(Toplevel)"/> and cleared by <see cref="End(SessionToken)"/>.
+    ///         This is set by <see cref="Begin(IRunnable)"/> and cleared by <see cref="End(SessionToken)"/>.
     ///     </para>
     /// </remarks>
-    Toplevel? TopRunnable { get; set; }
-
-    ///// <summary>Gets the stack of all active Toplevel sessions.</summary>
-    ///// <remarks>
-    /////     <para>
-    /////         Toplevels are added to this stack by <see cref="Begin(Toplevel)"/> and removed by
-    /////         <see cref="End(SessionToken)"/>.
-    /////     </para>
-    ///// </remarks>
-    //ConcurrentStack<Toplevel> SessionStack { get; }
-
-    /// <summary>
-    ///     Caches the Toplevel associated with the current Session.
-    /// </summary>
-    /// <remarks>
-    ///     Used internally to optimize Toplevel state transitions.
-    /// </remarks>
-    Toplevel? CachedSessionTokenToplevel { get; set; }
+    IRunnable? TopRunnable { get; set; }
 
     #endregion Toplevel Management
 
@@ -323,7 +301,7 @@ public interface IApplication
     ///         shrinks as they complete.
     ///     </para>
     ///     <para>
-    ///         Only the top session (<see cref="TopRunnable"/>) has exclusive keyboard/mouse input (
+    ///         Only the top session (<see cref="TopRunnableView"/>) has exclusive keyboard/mouse input (
     ///         <see cref="IRunnable.IsModal"/> = true).
     ///         All other sessions on the stack continue to be laid out, drawn, and receive iteration events (
     ///         <see cref="IRunnable.IsRunning"/> = true),
@@ -380,7 +358,8 @@ public interface IApplication
     ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
     ///     </para>
     /// </remarks>
-    SessionToken Begin (IRunnable runnable);
+    /// <returns>The session token. <see langword="null"/> if the operation was cancelled.</returns>
+    SessionToken? Begin (IRunnable runnable);
 
     /// <summary>
     ///     Runs a new Session with the provided runnable view.
@@ -407,19 +386,19 @@ public interface IApplication
     ///         returns <see langword="true"/> the main loop will resume; otherwise this method will exit.
     ///     </para>
     /// </remarks>
-    void Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
+    object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
 
     /// <summary>
     ///     Requests that the specified runnable session stop.
     /// </summary>
-    /// <param name="runnable">The runnable to stop. If <see langword="null"/>, stops the current <see cref="TopRunnable"/>.</param>
+    /// <param name="runnable">The runnable to stop. If <see langword="null"/>, stops the current <see cref="TopRunnableView"/>.</param>
     /// <remarks>
     ///     <para>
     ///         This will cause <see cref="Run(IRunnable, Func{Exception, bool})"/> to return.
     ///     </para>
     ///     <para>
     ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
-    ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
+    ///         and <see cref="IRunnable.IsModalChanged"/> events.
     ///     </para>
     /// </remarks>
     void RequestStop (IRunnable? runnable);
@@ -441,10 +420,13 @@ public interface IApplication
     ///     </para>
     ///     <para>
     ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
-    ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
+    ///         and <see cref="IRunnable.IsModalChanged"/> events. NOTE:
+    ///         ending cannot be cancelled.
     ///     </para>
     /// </remarks>
     void End (SessionToken sessionToken);
+
+    object? GetResult ();
 
     #endregion IRunnable Management
 
@@ -509,7 +491,7 @@ public interface IApplication
     /// <remarks>
     ///     <para>
     ///         This is typically set to <see langword="true"/> when a View's <see cref="View.Frame"/> changes and that view
-    ///         has no SuperView (e.g. when <see cref="TopRunnable"/> is moved or resized).
+    ///         has no SuperView (e.g. when <see cref="TopRunnableView"/> is moved or resized).
     ///     </para>
     ///     <para>
     ///         Automatically reset to <see langword="false"/> after <see cref="LayoutAndDraw"/> processes it.

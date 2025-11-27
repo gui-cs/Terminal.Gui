@@ -223,7 +223,7 @@ public class Scenario : IDisposable
     // BUGBUG: which will be IsRunningChanged with newIsRunning == true
     private void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
     {
-        SubscribeAllSubViews (Application.TopRunnable!);
+        SubscribeAllSubViews (Application.TopRunnableView!);
 
         _demoKeys = GetDemoKeyStrokes ();
 

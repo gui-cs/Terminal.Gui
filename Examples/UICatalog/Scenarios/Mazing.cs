@@ -171,7 +171,7 @@ public class Mazing : Scenario
                 if (_m.PlayerHp <= 0)
                 {
                     _message = "You died!";
-                    Application.TopRunnable!.SetNeedsDraw (); // trigger redraw
+                    Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
                     _dead = true;
 
                     return; // Stop further action if dead
@@ -190,7 +190,7 @@ public class Mazing : Scenario
                 _message = string.Empty;
             }
 
-            Application.TopRunnable!.SetNeedsDraw (); // trigger redraw
+            Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
@@ -200,7 +200,7 @@ public class Mazing : Scenario
             _m = new (); // Generate a new maze
             _m.PlayerHp = hp;
             GenerateNpcs ();
-            Application.TopRunnable!.SetNeedsDraw (); // trigger redraw
+            Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
         }
     }
 }

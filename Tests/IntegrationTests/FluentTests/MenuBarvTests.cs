@@ -137,13 +137,13 @@ public class MenuBarTests
     public void DefaultKey_Activates (TestDriver d)
     {
         MenuBar? menuBar = null;
-        Toplevel? top = null;
+        View? top = null;
 
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((app) =>
                                             {
                                                 menuBar = new MenuBar ();
-                                                top = app.TopRunnable!;
+                                                top = app.TopRunnableView!;
 
                                                 top.Add (
                                                          new View ()
@@ -153,7 +153,7 @@ public class MenuBarTests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (top?.App?.Navigation!.GetFocused ())
@@ -178,7 +178,7 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                Toplevel top = app.TopRunnable!;
+                                                View top = app.TopRunnableView!;
 
                                                 top.Add (
                                                          new View ()
@@ -188,7 +188,7 @@ public class MenuBarTests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
@@ -266,10 +266,10 @@ public class MenuBarTests
                                      .Then ((app) =>
                                             {
                                                 var menuBar = new MenuBar ();
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
 
                                                 // Call EnableForDesign
-                                                Toplevel top = app.TopRunnable!;
+                                                View top = app.TopRunnableView!;
                                                 bool result = menuBar.EnableForDesign (ref top);
 
                                                 // Should return true
@@ -302,9 +302,9 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                Toplevel top = app.TopRunnable!;
+                                                View top = app.TopRunnableView!;
                                                 menuBar.EnableForDesign (ref top);
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .ScreenShot ("MenuBar initial state", _out)
@@ -342,7 +342,7 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                Toplevel top = app.TopRunnable!;
+                                                View top = app.TopRunnableView!;
 
                                                 top.Add (
                                                          new View ()
@@ -352,7 +352,7 @@ public class MenuBarTests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
@@ -386,9 +386,9 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                Toplevel? toplevel = app.TopRunnable;
+                                                View? toplevel = app.TopRunnableView;
                                                 menuBar.EnableForDesign (ref toplevel!);
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
@@ -417,7 +417,7 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                Toplevel top = app.TopRunnable!;
+                                                View top = app.TopRunnableView!;
 
                                                 top.Add (
                                                          new View ()
@@ -427,7 +427,7 @@ public class MenuBarTests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
@@ -453,7 +453,7 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                Toplevel top = app.TopRunnable!;
+                                                View top = app.TopRunnableView!;
 
                                                 top.Add (
                                                          new View ()
@@ -470,7 +470,7 @@ public class MenuBarTests
                                                     item.Key = Key.Empty;
                                                 }
 
-                                                app.TopRunnable!.Add (menuBar);
+                                                app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
@@ -506,9 +506,9 @@ public class MenuBarTests
                                      .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBar ();
-                                                Toplevel top = a.TopRunnable!;
+                                                View top = a.TopRunnableView!;
                                                 menuBar.EnableForDesign (ref top);
-                                                a.TopRunnable!.Add (menuBar);
+                                                a.TopRunnableView!.Add (menuBar);
                                             })
                                      .Add (testView)
                                      .WaitIteration ()
@@ -540,9 +540,9 @@ public class MenuBarTests
                                      .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBar ();
-                                                Toplevel top = a.TopRunnable!;
+                                                View top = a.TopRunnableView!;
                                                 menuBar.EnableForDesign (ref top);
-                                                a.TopRunnable!.Add (menuBar);
+                                                a.TopRunnableView!.Add (menuBar);
                                             })
                                      .Add (testView)
                                      .WaitIteration ()

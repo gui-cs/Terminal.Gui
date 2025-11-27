@@ -11,63 +11,33 @@ public class SessionTokenTests
         View.EnableDebugIDisposableAsserts = true;
 
         View.Instances.Clear ();
-        SessionToken.Instances.Clear ();
 #endif
     }
 
     [Fact]
-    [AutoInitShutdown]
+    public void Begin_Throws_On_Null ()
+    {
+        IApplication? app = Application.Create ();
+        // Test null Toplevel
+        Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
+    }
+
+    [Fact]
     public void Begin_End_Cleans_Up_SessionToken ()
     {
-        // Test null Toplevel
-        Assert.Throws<ArgumentNullException> (() => Application.Begin (null!));
+        IApplication? app = Application.Create ();
 
-        Assert.NotNull (Application.Driver);
+        Runnable<bool> top = new Runnable<bool> ();
+        SessionToken sessionToken = app.Begin (top);
+        Assert.NotNull (sessionToken);
+        app.End (sessionToken);
 
-        Toplevel top = new Toplevel ();
-        SessionToken rs = Application.Begin (top);
-        Assert.NotNull (rs);
-        Application.End (rs);
+        Assert.Null (app.TopRunnableView);
 
-        Assert.NotNull (Application.TopRunnable);
-
-        // v2 does not use main loop, it uses MainLoop<T> and its internal
-        //Assert.NotNull (Application.MainLoop);
-        Assert.NotNull (Application.Driver);
+        Assert.DoesNotContain(sessionToken, app.SessionStack!);
 
         top.Dispose ();
 
-#if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
-#endif
-    }
-
-    [Fact]
-    public void Dispose_Cleans_Up_SessionToken ()
-    {
-        var rs = new SessionToken (null!);
-        Assert.NotNull (rs);
-
-        // Should not throw because Toplevel was null
-        rs.Dispose ();
-#if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
-#endif
-        var top = new Toplevel ();
-        rs = new (top);
-        Assert.NotNull (rs);
-
-        // Should throw because Toplevel was not cleaned up
-        Assert.Throws<InvalidOperationException> (() => rs.Dispose ());
-
-        //rs.Runnable?.Dispose ();
-        top.Dispose ();
-        rs.Runnable = null;
-        rs.Dispose ();
-#if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
-        Assert.True (top.WasDisposed);
-#endif
     }
 
     [Fact]

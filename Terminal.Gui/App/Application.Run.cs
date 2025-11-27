@@ -42,7 +42,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.Begin(IRunnable)"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static SessionToken Begin (Toplevel toplevel) => ApplicationImpl.Instance.Begin (toplevel);
+    public static SessionToken Begin (IRunnable runnable) => ApplicationImpl.Instance.Begin (runnable);
 
     /// <inheritdoc cref="IApplication.PositionCursor"/>
     [Obsolete ("The legacy static Application object is going away.")]
@@ -118,7 +118,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.SessionEnded"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static event EventHandler<ToplevelEventArgs>? SessionEnded
+    public static event EventHandler<SessionTokenEventArgs>? SessionEnded
     {
         add => ApplicationImpl.Instance.SessionEnded += value;
         remove => ApplicationImpl.Instance.SessionEnded -= value;

@@ -14,7 +14,7 @@ public static class With
     /// <param name="testDriver">Which v2 testDriver to use for the test</param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : Toplevel, new()
+    public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : IRunnable, new()
     {
         return new (() => new T ()
         {
@@ -31,7 +31,7 @@ public static class With
     /// <param name="testDriver"></param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static GuiTestContext A (Func<Toplevel> toplevelFactory, int width, int height, TestDriver testDriver, TextWriter? logWriter = null)
+    public static GuiTestContext A (Func<IRunnable> toplevelFactory, int width, int height, TestDriver testDriver, TextWriter? logWriter = null)
     {
         return new (toplevelFactory, width, height, testDriver, logWriter, Timeout);
     }

@@ -16,14 +16,34 @@ namespace Terminal.Gui.ViewBase;
 public class Runnable<TResult> : View, IRunnable<TResult>
 {
     private bool _stopRequested;
+    
+    // Cached state - eliminates race conditions from stack queries
+    private bool _isRunning;
+    private bool _isModal;
 
     /// <inheritdoc/>
     public TResult? Result { get; set; }
 
+    /// <summary>
+    ///     Explicit implementation of the non-generic Result property from <see cref="IRunnable"/>.
+    ///     This allows polymorphic access to results without knowing the concrete type.
+    /// </summary>
+    object? IRunnable.Result
+    {
+        get => Result;
+        set => Result = value is TResult typedValue ? typedValue : default;
+    }
+
     #region IRunnable Implementation - IsRunning (from base interface)
 
     /// <inheritdoc/>
-    public bool IsRunning => App?.SessionStack?.Any (token => token.Runnable == this) ?? false;
+    public bool IsRunning => _isRunning;
+
+    /// <inheritdoc/>
+    public void SetIsRunning (bool value)
+    {
+        _isRunning = value;
+    }
 
     /// <inheritdoc />
     public virtual void RequestStop ()
@@ -31,6 +51,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         // Use the IRunnable-specific RequestStop if the App supports it
         App?.RequestStop (this);
     }
+
     /// <inheritdoc/>
     public bool RaiseIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
@@ -130,31 +151,12 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     #region IRunnable Implementation - IsModal (from base interface)
 
     /// <inheritdoc/>
-    public bool IsModal
+    public bool IsModal => _isModal;
+
+    /// <inheritdoc/>
+    public void SetIsModal (bool value)
     {
-        get
-        {
-            if (App is null)
-            {
-                return false;
-            }
-
-            // Check if this runnable is at the top of the RunnableSessionStack
-            // The top of the stack is the modal runnable
-            if (App.SessionStack is { } && App.SessionStack.TryPeek (out SessionToken? topToken))
-            {
-                return topToken?.Runnable == this;
-            }
-
-            // Fallback: Check if this is the TopRunnable (for Toplevel compatibility)
-            // In Phase 1, TopRunnable is still Toplevel?, so we need to check both cases
-            if (this is Toplevel tl && App.TopRunnable == tl)
-            {
-                return true;
-            }
-
-            return false;
-        }
+        _isModal = value;
     }
 
     /// <inheritdoc />
@@ -163,26 +165,6 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         get => _stopRequested;
         set => _stopRequested = value;
     }
-
-    /// <inheritdoc/>
-    public bool RaiseIsModalChanging (bool oldIsModal, bool newIsModal)
-    {
-        // CWP Phase 1: Virtual method (pre-notification)
-        if (OnIsModalChanging (oldIsModal, newIsModal))
-        {
-            return true; // Canceled
-        }
-
-        // CWP Phase 2: Event notification
-        bool newValue = newIsModal;
-        CancelEventArgs<bool> args = new (in oldIsModal, ref newValue);
-        IsModalChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<bool>>? IsModalChanging;
 
     /// <inheritdoc/>
     public void RaiseIsModalChangedEvent (bool newIsModal)
@@ -196,17 +178,6 @@ public class Runnable<TResult> : View, IRunnable<TResult>
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<bool>>? IsModalChanged;
-
-    /// <summary>
-    ///     Called before <see cref="IsModalChanging"/> event. Override to cancel activation/deactivation.
-    /// </summary>
-    /// <param name="oldIsModal">The current value of <see cref="IsModal"/>.</param>
-    /// <param name="newIsModal">The new value of <see cref="IsModal"/> (true = becoming modal/top, false = no longer modal).</param>
-    /// <returns><see langword="true"/> to cancel; <see langword="false"/> to proceed.</returns>
-    /// <remarks>
-    ///     Default implementation returns <see langword="false"/> (allow change).
-    /// </remarks>
-    protected virtual bool OnIsModalChanging (bool oldIsModal, bool newIsModal) => false;
 
     /// <summary>
     ///     Called after <see cref="IsModal"/> has changed. Override for post-activation logic.
@@ -226,5 +197,4 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     }
 
     #endregion
-
 }

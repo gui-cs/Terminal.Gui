@@ -47,7 +47,7 @@ public class ViewCommandTests
         w.LayoutSubViews ();
 
         Application.Begin (w);
-        Assert.Same (Application.TopRunnable, w);
+        Assert.Same (Application.TopRunnableView, w);
 
         // Click button 2
         Rectangle btn2Frame = btnB.FrameToScreen ();
@@ -121,7 +121,7 @@ public class ViewCommandTests
         w.Add (btn);
 
         Application.Begin (w);
-        Assert.Same (Application.TopRunnable, w);
+        Assert.Same (Application.TopRunnableView, w);
 
         w.LayoutSubViews ();
 

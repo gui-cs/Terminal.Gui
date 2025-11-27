@@ -153,40 +153,6 @@ public class RunnableTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void RaiseIsModalChanging_CanBeCanceled_ByVirtualMethod ()
-    {
-        // Arrange
-        CancelableRunnable runnable = new () { CancelModalChange = true };
-
-        // Act
-        bool canceled = runnable.RaiseIsModalChanging (false, true);
-
-        // Assert
-        Assert.True (canceled);
-    }
-
-    [Fact]
-    public void RaiseIsModalChanging_CanBeCanceled_ByEvent ()
-    {
-        // Arrange
-        Runnable<int> runnable = new ();
-        var eventRaised = false;
-
-        runnable.IsModalChanging += (s, e) =>
-                                    {
-                                        eventRaised = true;
-                                        e.Cancel = true;
-                                    };
-
-        // Act
-        bool canceled = runnable.RaiseIsModalChanging (false, true);
-
-        // Assert
-        Assert.True (eventRaised);
-        Assert.True (canceled);
-    }
-
-    [Fact]
     public void RaiseIsModalChanged_RaisesEvent ()
     {
         // Arrange
@@ -213,10 +179,6 @@ public class RunnableTests (ITestOutputHelper output)
     /// </summary>
     private class CancelableRunnable : Runnable<int>
     {
-        public bool CancelModalChange { get; set; }
-
         protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning) => true; // Always cancel
-
-        protected override bool OnIsModalChanging (bool oldIsModal, bool newIsModal) => CancelModalChange;
     }
 }

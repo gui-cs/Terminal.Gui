@@ -13,7 +13,7 @@ public class CombiningMarks : Scenario
         top.DrawComplete += (s, e) =>
         {
             // Forces reset _lineColsOffset because we're dealing with direct draw
-            Application.TopRunnable!.SetNeedsDraw ();
+            Application.TopRunnableView!.SetNeedsDraw ();
 
             var i = -1;
             top.Move (0, ++i);

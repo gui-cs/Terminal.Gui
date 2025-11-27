@@ -28,7 +28,7 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.TopRunnable!.Title = GetQuitKeyAndName ();
+        Application.TopRunnableView!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
@@ -41,7 +41,7 @@ public class Bars : Scenario
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
-        Application.TopRunnable.Add (eventLog);
+        Application.TopRunnableView.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
         {
@@ -51,7 +51,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent(33),
         };
-        Application.TopRunnable.Add (menuBarLikeExamples);
+        Application.TopRunnableView.Add (menuBarLikeExamples);
 
         Label label = new Label ()
         {
@@ -98,7 +98,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent (33),
         };
-        Application.TopRunnable.Add (menuLikeExamples);
+        Application.TopRunnableView.Add (menuLikeExamples);
 
         label = new Label ()
         {
@@ -212,7 +212,7 @@ public class Bars : Scenario
             Width = Dim.Width (menuLikeExamples),
             Height = Dim.Percent (33),
         };
-        Application.TopRunnable.Add (statusBarLikeExamples);
+        Application.TopRunnableView.Add (statusBarLikeExamples);
 
         label = new Label ()
         {
@@ -249,7 +249,7 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (FrameView frameView in Application.TopRunnable.SubViews.Where (f => f is FrameView)!)
+        foreach (FrameView frameView in Application.TopRunnableView.SubViews.Where (f => f is FrameView)!)
         {
             foreach (Bar barView in frameView.SubViews.Where (b => b is Bar)!)
             {

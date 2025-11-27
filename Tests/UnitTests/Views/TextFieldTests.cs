@@ -84,7 +84,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedRender, output);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Misérables", output);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Theory (Skip = "Broke with ContextMenuv2")]
@@ -133,7 +133,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (content, output);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // All characters in "Enter text" should have the caption attribute
         DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
         DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -256,7 +256,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
         DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]

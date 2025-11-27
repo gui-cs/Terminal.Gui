@@ -15,11 +15,11 @@ public class CheckBoxTests (ITestOutputHelper output)
     [Fact]
     public void Commands_Select ()
     {
-        Application.TopRunnable = new ();
+        Application.TopRunnableView = new ();
         View otherView = new () { CanFocus = true };
         var ckb = new CheckBox ();
-        Application.TopRunnable.Add (ckb, otherView);
-        Application.TopRunnable.SetFocus ();
+        Application.TopRunnableView.Add (ckb, otherView);
+        Application.TopRunnableView.SetFocus ();
         Assert.True (ckb.HasFocus);
 
         var checkedStateChangingCount = 0;
@@ -63,7 +63,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (3, selectCount);
         Assert.Equal (1, acceptCount);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState ();
     }
 

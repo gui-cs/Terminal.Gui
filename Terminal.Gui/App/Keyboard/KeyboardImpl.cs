@@ -175,7 +175,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        if (App?.TopRunnable is null)
+        if (App?.TopRunnableView is null)
         {
             if (App?.SessionStack is { })
             {
@@ -195,7 +195,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         }
         else
         {
-            if (App.TopRunnable.NewKeyDownEvent (key))
+            if (App.TopRunnableView.NewKeyDownEvent (key))
             {
                 return true;
             }

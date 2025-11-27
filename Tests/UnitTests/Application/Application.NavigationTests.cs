@@ -82,7 +82,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         IApplication app = ApplicationImpl.Instance;
 
-        app.TopRunnable = new ()
+        app.TopRunnableView = new ()
         {
             Id = "top",
             CanFocus = true,
@@ -101,10 +101,10 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        app.TopRunnable?.Add (subView1, subView2);
-        Assert.False (app.TopRunnable?.HasFocus);
+        app.TopRunnableView?.Add (subView1, subView2);
+        Assert.False (app.TopRunnableView?.HasFocus);
 
-        app.TopRunnable?.SetFocus ();
+        app.TopRunnableView?.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, app.Navigation?.GetFocused ());
 
@@ -117,7 +117,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         IApplication app = ApplicationImpl.Instance; // Force legacy
 
-        app.TopRunnable = new ()
+        app.TopRunnableView = new ()
         {
             Id = "top",
             CanFocus = true,
@@ -130,20 +130,20 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        app!.TopRunnable.Add (subView1);
-        Assert.False (app.TopRunnable.HasFocus);
+        app!.TopRunnableView.Add (subView1);
+        Assert.False (app.TopRunnableView.HasFocus);
 
-        app.TopRunnable.SetFocus ();
+        app.TopRunnableView.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, app.Navigation!.GetFocused ());
 
         subView1.HasFocus = false;
         Assert.False (subView1.HasFocus);
-        Assert.True (app.TopRunnable.HasFocus);
-        Assert.Equal (app.TopRunnable, app.Navigation.GetFocused ());
+        Assert.True (app.TopRunnableView.HasFocus);
+        Assert.Equal (app.TopRunnableView, app.Navigation.GetFocused ());
 
-        app.TopRunnable.HasFocus = false;
-        Assert.False (app.TopRunnable.HasFocus);
+        app.TopRunnableView.HasFocus = false;
+        Assert.False (app.TopRunnableView.HasFocus);
         Assert.Null (app.Navigation.GetFocused ());
 
     }

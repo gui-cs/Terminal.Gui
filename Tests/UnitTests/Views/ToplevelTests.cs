@@ -150,7 +150,7 @@ public class ToplevelTests
             }
             else if (iterations == 1)
             {
-                Assert.Equal (new (2, 2), Application.TopRunnable!.Frame.Location);
+                Assert.Equal (new (2, 2), Application.TopRunnableView!.Frame.Location);
             }
             else if (iterations == 2)
             {
@@ -159,12 +159,12 @@ public class ToplevelTests
                 // Grab the mouse
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (3, 2), Flags = MouseFlags.Button1Pressed });
 
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (2, 2, 10, 3), Application.TopRunnable.Frame);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (2, 2, 10, 3), Application.TopRunnableView.Frame);
             }
             else if (iterations == 3)
             {
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
 
                 // Drag to left
                 Application.RaiseMouseEvent (
@@ -176,38 +176,38 @@ public class ToplevelTests
                                              });
                 AutoInitShutdownAttribute.RunIteration ();
 
-                Assert.Equal (Application.TopRunnable.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 2, 10, 3), Application.TopRunnable.Frame);
+                Assert.Equal (Application.TopRunnableView.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 2, 10, 3), Application.TopRunnableView.Frame);
             }
             else if (iterations == 4)
             {
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 2), Application.TopRunnable.Frame.Location);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 2), Application.TopRunnableView.Frame.Location);
 
-                Assert.Equal (Application.TopRunnable.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.TopRunnableView.Border, Application.Mouse.MouseGrabView);
             }
             else if (iterations == 5)
             {
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
 
                 // Drag up
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
                 AutoInitShutdownAttribute.RunIteration ();
 
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 1, 10, 3), Application.TopRunnable.Frame);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 1, 10, 3), Application.TopRunnableView.Frame);
             }
             else if (iterations == 6)
             {
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 1), Application.TopRunnable.Frame.Location);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 1), Application.TopRunnableView.Frame.Location);
 
-                Assert.Equal (Application.TopRunnable.Border, Application.Mouse.MouseGrabView);
-                Assert.Equal (new (1, 1, 10, 3), Application.TopRunnable.Frame);
+                Assert.Equal (Application.TopRunnableView.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (new (1, 1, 10, 3), Application.TopRunnableView.Frame);
             }
             else if (iterations == 7)
             {
-                Assert.Equal (Application.TopRunnable!.Border, Application.Mouse.MouseGrabView);
+                Assert.Equal (Application.TopRunnableView!.Border, Application.Mouse.MouseGrabView);
 
                 // Ungrab the mouse
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Released });

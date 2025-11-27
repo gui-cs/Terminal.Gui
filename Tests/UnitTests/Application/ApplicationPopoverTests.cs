@@ -197,18 +197,18 @@ public class ApplicationPopoverTests
             // Arrange
 
             Application.Init ("fake");
-            Application.TopRunnable = new ();
+            Application.TopRunnableView = new ();
             PopoverTestClass? popover = new ();
 
             // Act
             Application.Popover?.Register (popover);
 
             // Assert
-            Assert.Equal (Application.TopRunnable, popover.Current);
+            Assert.Equal (Application.TopRunnableView as IRunnable, popover.Current);
         }
         finally
         {
-            Application.TopRunnable?.Dispose ();
+            Application.TopRunnableView?.Dispose ();
             Application.Shutdown ();
         }
     }
@@ -220,7 +220,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
             Application.Init ("fake");
-            Application.TopRunnable = new () { Id = "initialTop" };
+            Application.TopRunnableView = new () { Id = "initialTop" };
             PopoverTestClass? popover = new ();
             var keyDownEvents = 0;
 
@@ -235,7 +235,7 @@ public class ApplicationPopoverTests
             // Act
             Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
 
-            Application.TopRunnable = new () { Id = "secondaryTop" };
+            Application.TopRunnableView = new () { Id = "secondaryTop" };
             Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
 
             // Test
@@ -246,7 +246,7 @@ public class ApplicationPopoverTests
         }
         finally
         {
-            Application.TopRunnable?.Dispose ();
+            Application.TopRunnableView?.Dispose ();
             Application.Shutdown ();
         }
     }
@@ -269,7 +269,7 @@ public class ApplicationPopoverTests
             // Arrange
             Application.Init ("fake");
 
-            Application.TopRunnable = new ()
+            Application.TopRunnableView = new ()
             {
                 Frame = new (0, 0, 10, 10),
                 Id = "top"
@@ -284,7 +284,7 @@ public class ApplicationPopoverTests
                 Height = 2
             };
 
-            Application.TopRunnable.Add (view);
+            Application.TopRunnableView.Add (view);
 
             popover = new ()
             {
@@ -318,7 +318,7 @@ public class ApplicationPopoverTests
         finally
         {
             popover?.Dispose ();
-            Application.TopRunnable?.Dispose ();
+            Application.TopRunnableView?.Dispose ();
             Application.Shutdown();
         }
     }

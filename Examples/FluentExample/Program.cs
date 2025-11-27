@@ -5,7 +5,6 @@ using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
-#if POST_4148
 // Run the application with fluent API - automatically creates, runs, and disposes the runnable
 
 // Display the result
@@ -20,48 +19,13 @@ else
 {
     Console.WriteLine (@"No color selected");
 }
-#else
 
-// Run using traditional approach
-IApplication app = Application.Create ();
-app.Init ();
-var colorPicker = new ColorPickerView ();
-app.Run (colorPicker);
-
-Color? resultColor = colorPicker.Result;
-
-colorPicker.Dispose ();
-app.Shutdown ();
-
-if (resultColor is { } result)
-{
-    Console.WriteLine (@$"Selected Color: {(Color?)result}");
-}
-else
-{
-    Console.WriteLine (@"No color selected");
-}
-
-#endif
-
-#if POST_4148
 /// <summary>
 ///     A runnable view that allows the user to select a color.
 ///     Demonstrates IRunnable<TResult> pattern with automatic disposal.
 /// </summary>
 public class ColorPickerView : Runnable<Color?>
 {
-
-#else
-/// <summary>
-///     A runnable view that allows the user to select a color.
-///     Uses the traditional approach without automatic disposal/Fluent API.
-/// </summary>
-public class ColorPickerView : Toplevel
-{
-    public Color? Result { get; set; }
-
-#endif
     public ColorPickerView ()
     {
         Title = "Select a Color (Esc to quit)";
@@ -126,7 +90,6 @@ public class ColorPickerView : Toplevel
         Add (instructions, colorPicker, okButton, cancelButton);
     }
 
-#if POST_4148
     protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
         // Alternative place to extract result before stopping
@@ -134,10 +97,9 @@ public class ColorPickerView : Toplevel
         if (!newIsRunning && Result is null)
         {
             // User pressed Esc - could extract current selection here
-            // Result = _colorPicker.SelectedColor;
+            //Result = SelectedColor;
         }
 
         return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
     }
-#endif
 }

@@ -54,9 +54,9 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (10, 3, d, _out)
                                            .Then ((app) =>
                                                   {
-                                                      app.TopRunnable!.BorderStyle = LineStyle.None;
-                                                      app.TopRunnable!.Border!.Thickness = Thickness.Empty;
-                                                      app.TopRunnable.Text = "hello";
+                                                      app.TopRunnableView!.BorderStyle = LineStyle.None;
+                                                      app.TopRunnableView!.Border!.Thickness = Thickness.Empty;
+                                                      app.TopRunnableView.Text = "hello";
                                                   })
                                            .ScreenShot ("ScreenShot", _out)
                                            .AnsiScreenShot ("AnsiScreenShot", _out)

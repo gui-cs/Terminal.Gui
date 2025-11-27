@@ -18,7 +18,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d);
         Assert.True (context.App?.TopRunnable!.IsRunning);
 
-        Toplevel? top = context.App?.TopRunnable;
+        IRunnable? top = context.App?.TopRunnable;
         context.Then ((_) => context!.App?.Keyboard.RaiseKeyDownEvent (Application.QuitKey));
         Assert.False (top!.IsRunning);
     }
@@ -30,7 +30,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (context.App?.TopRunnable!.IsRunning);
 
-        Toplevel? top = context.App?.TopRunnable;
+        IRunnable? top = context.App?.TopRunnable;
         context.EnqueueKeyEvent (Application.QuitKey);
 
         Assert.False (top!.IsRunning);

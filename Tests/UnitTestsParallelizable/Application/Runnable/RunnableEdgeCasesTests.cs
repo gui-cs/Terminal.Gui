@@ -1,7 +1,7 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 /// <summary>
 ///     Tests for edge cases and error conditions in IRunnable implementation.
@@ -9,31 +9,7 @@ namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
 public class RunnableEdgeCasesTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
-
-    [Fact]
-    public void RunnableSessionToken_CannotDisposeWithRunnableSet ()
-    {
-        // Arrange
-        Runnable<int> runnable = new ();
-        SessionToken token = new (runnable);
-
-        // Act & Assert
-        var ex = Assert.Throws<InvalidOperationException> (() => token.Dispose ());
-        Assert.Contains ("Runnable must be null", ex.Message);
-    }
-
-    [Fact]
-    public void RunnableSessionToken_CanDisposeAfterClearingRunnable ()
-    {
-        // Arrange
-        Runnable<int> runnable = new ();
-        SessionToken token = new (runnable);
-        token.Runnable = null;
-
-        // Act & Assert - Should not throw
-        token.Dispose ();
-    }
-
+    
     [Fact]
     public void Runnable_MultipleEventSubscribers_AllInvoked ()
     {
@@ -187,13 +163,11 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         // Act
         bool canceledRunning = runnable.RaiseIsRunningChanging (false, true);
         runnable.RaiseIsRunningChangedEvent (true);
-        bool canceledModal = runnable.RaiseIsModalChanging (false, true);
         runnable.RaiseIsModalChangedEvent (true);
 
         // Assert
         Assert.True (runnable.OnIsRunningChangingCalled);
         Assert.True (runnable.OnIsRunningChangedCalled);
-        Assert.True (runnable.OnIsModalChangingCalled);
         Assert.True (runnable.OnIsModalChangedCalled);
     }
 
@@ -296,7 +270,6 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
     {
         public bool OnIsRunningChangingCalled { get; private set; }
         public bool OnIsRunningChangedCalled { get; private set; }
-        public bool OnIsModalChangingCalled { get; private set; }
         public bool OnIsModalChangedCalled { get; private set; }
 
         protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
@@ -310,13 +283,6 @@ public class RunnableEdgeCasesTests (ITestOutputHelper output)
         {
             OnIsRunningChangedCalled = true;
             base.OnIsRunningChanged (newIsRunning);
-        }
-
-        protected override bool OnIsModalChanging (bool oldIsModal, bool newIsModal)
-        {
-            OnIsModalChangingCalled = true;
-
-            return base.OnIsModalChanging (oldIsModal, newIsModal);
         }
 
         protected override void OnIsModalChanged (bool newIsModal)

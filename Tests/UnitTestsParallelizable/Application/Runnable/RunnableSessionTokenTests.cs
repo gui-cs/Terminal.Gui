@@ -36,27 +36,4 @@ public class RunnableSessionTokenTests (ITestOutputHelper output)
         // Assert
         Assert.Null (token.Runnable);
     }
-
-    [Fact]
-    public void RunnableSessionToken_Dispose_ThrowsIfRunnableNotNull ()
-    {
-        // Arrange
-        Runnable<int> runnable = new ();
-        SessionToken token = new (runnable);
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException> (() => token.Dispose ());
-    }
-
-    [Fact]
-    public void RunnableSessionToken_Dispose_SucceedsIfRunnableIsNull ()
-    {
-        // Arrange
-        Runnable<int> runnable = new ();
-        SessionToken token = new (runnable);
-        token.Runnable = null;
-
-        // Act & Assert - should not throw
-        token.Dispose ();
-    }
 }

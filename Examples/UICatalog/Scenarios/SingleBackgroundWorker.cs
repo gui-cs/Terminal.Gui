@@ -174,7 +174,7 @@ public class SingleBackgroundWorker : Scenario
 
                                                   StagingUIController builderUI =
                                                       new (_startStaging, e.Result as ObservableCollection<string>);
-                                                  Toplevel? top = Application.TopRunnable;
+                                                  View? top = Application.TopRunnableView;
 
                                                   if (top is { })
                                                   {

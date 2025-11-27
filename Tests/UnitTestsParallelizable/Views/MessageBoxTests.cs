@@ -21,7 +21,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var btnAcceptCount = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, result);
@@ -76,7 +76,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var iteration = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Null (result);
@@ -124,7 +124,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var btnAcceptCount = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, result);
@@ -193,7 +193,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var mbFrame = Rectangle.Empty;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (new (expectedX, expectedY, expectedW, expectedH), mbFrame);
@@ -209,7 +209,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                 }
                 else if (iterations == 1)
                 {
-                    mbFrame = app.TopRunnable!.Frame;
+                    mbFrame = app.TopRunnableView!.Frame;
                     app.RequestStop ();
                 }
             }
@@ -426,8 +426,8 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  }
                                  else if (iterations == 1)
                                  {
-                                     Assert.IsType<Dialog> (app.TopRunnable);
-                                     Assert.Equal (new (height, width), app.TopRunnable.Frame.Size);
+                                     Assert.IsType<Dialog> (app.TopRunnableView);
+                                     Assert.Equal (new (height, width), app.TopRunnableView.Frame.Size);
                                      app.RequestStop ();
                                  }
                              };
@@ -467,8 +467,8 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  }
                                  else if (iterations == 1)
                                  {
-                                     Assert.IsType<Dialog> (app.TopRunnable);
-                                     Assert.Equal (new (height, width), app.TopRunnable.Frame.Size);
+                                     Assert.IsType<Dialog> (app.TopRunnableView);
+                                     Assert.Equal (new (height, width), app.TopRunnableView.Frame.Size);
                                      app.RequestStop ();
                                  }
                              };
@@ -504,8 +504,8 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  }
                                  else if (iterations == 1)
                                  {
-                                     Assert.IsType<Dialog> (app.TopRunnable);
-                                     Assert.Equal (new (height, width), app.TopRunnable.Frame.Size);
+                                     Assert.IsType<Dialog> (app.TopRunnableView);
+                                     Assert.Equal (new (height, width), app.TopRunnableView.Frame.Size);
                                      app.RequestStop ();
                                  }
                              };

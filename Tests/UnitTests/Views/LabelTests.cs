@@ -1098,7 +1098,7 @@ t
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnable.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1157,7 +1157,7 @@ t
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnable.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1230,10 +1230,10 @@ t
             CanFocus = true
         };
 
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (otherView, label, nextView);
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (otherView, label, nextView);
 
-        Application.TopRunnable.SetFocus ();
+        Application.TopRunnableView.SetFocus ();
         Assert.True (otherView.HasFocus);
 
         Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
@@ -1241,7 +1241,7 @@ t
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState ();
     }
 
@@ -1251,18 +1251,18 @@ t
         View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
         Label label = new () { X = 0, Y = 1, Text = "_label" };
         View nextView = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true };
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (otherView, label, nextView);
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (otherView, label, nextView);
+        Application.TopRunnableView.Layout ();
 
-        Application.TopRunnable.SetFocus ();
+        Application.TopRunnableView.SetFocus ();
 
         // click on label
         Application.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState ();
     }
 
@@ -1281,8 +1281,8 @@ t
             CanFocus = true
         };
 
-        Application.TopRunnable = new ();
-        Application.TopRunnable.Add (label, view);
+        Application.TopRunnableView = new ();
+        Application.TopRunnableView.Add (label, view);
 
         view.SetFocus ();
         Assert.True (label.CanFocus);
@@ -1295,7 +1295,7 @@ t
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState ();
     }
 
@@ -1320,14 +1320,14 @@ t
             CanFocus = true
         };
 
-        Application.TopRunnable = new ()
+        Application.TopRunnableView = new ()
         {
             Width = 10,
             Height = 10
         };
-        Application.TopRunnable.Add (label, otherView);
-        Application.TopRunnable.SetFocus ();
-        Application.TopRunnable.Layout ();
+        Application.TopRunnableView.Add (label, otherView);
+        Application.TopRunnableView.SetFocus ();
+        Application.TopRunnableView.Layout ();
 
         Assert.True (label.CanFocus);
         Assert.True (label.HasFocus);
@@ -1347,7 +1347,7 @@ t
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
 
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
         Application.ResetState ();
     }
 

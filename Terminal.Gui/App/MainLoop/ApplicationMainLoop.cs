@@ -137,10 +137,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        if (App?.TopRunnable != null)
+        if (App?.TopRunnableView != null)
         {
             bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (App?.TopRunnable)
+                                     || AnySubViewsNeedDrawn (App?.TopRunnableView)
                                      || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
             bool sizeChanged = SizeMonitor.Poll ();
@@ -168,7 +168,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = App?.TopRunnable!.MostFocused;
+        View? mostFocused = App?.TopRunnableView!.MostFocused;
 
         if (mostFocused == null)
         {

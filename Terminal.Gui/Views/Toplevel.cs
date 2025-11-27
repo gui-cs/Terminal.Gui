@@ -13,7 +13,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="IApplication.Init"/>.
-///         The application Toplevel can be accessed via <see cref="IApplication.TopRunnable"/>. Additional Toplevels can be created
+///         The application Toplevel can be accessed via <see cref="IApplication.TopRunnableView"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
 ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
@@ -83,22 +83,15 @@ public partial class Toplevel : Runnable<int?>
     /// </summary>
     public bool IsLoaded { get; private set; }
 
-    // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Activating/Activate
-    /// <summary>Invoked when the Toplevel <see cref="SessionToken"/> active.</summary>
-    public event EventHandler<ToplevelEventArgs>? Activate;
-
-
     /// <summary>
     ///     Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration. Subscribe to this event to
     ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
+    ///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
     public event EventHandler? Ready;
-
-    internal virtual void OnActivate (Toplevel deactivated) { Activate?.Invoke (this, new (deactivated)); }
 
     /// <summary>
     ///     Called from run loop after the <see cref="Toplevel"/> has entered the first iteration
@@ -158,7 +151,7 @@ public partial class Toplevel : Runnable<int?>
         }
 
         // BUGBUG: The && true is a temp hack
-        if ((superView != top || top?.SuperView is { } || (top != App?.TopRunnable && top!.Modal) || (top == App?.TopRunnable && top?.SuperView is null))
+        if ((superView != top || top?.SuperView is { } || (top != App?.TopRunnableView && top!.Modal) || (top == App?.TopRunnableView && top?.SuperView is null))
             && (top!.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
 
         {
@@ -191,59 +184,4 @@ public partial class Toplevel : Runnable<int?>
     public event EventHandler<SizeChangedEventArgs>? SizeChanging;
 
     #endregion
-}
-
-/// <summary>
-///     Implements the <see cref="IEqualityComparer{T}"/> for comparing two <see cref="Toplevel"/>s used by
-///     <see cref="StackExtensions"/>.
-/// </summary>
-public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
-{
-    /// <summary>Determines whether the specified objects are equal.</summary>
-    /// <param name="x">The first object of type <see cref="Toplevel"/> to compare.</param>
-    /// <param name="y">The second object of type <see cref="Toplevel"/> to compare.</param>
-    /// <returns><see langword="true"/> if the specified objects are equal; otherwise, <see langword="false"/>.</returns>
-    public bool Equals (Toplevel? x, Toplevel? y)
-    {
-        if (y is null && x is null)
-        {
-            return true;
-        }
-
-        if (x is null || y is null)
-        {
-            return false;
-        }
-
-        if (x.Id == y.Id)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>Returns a hash code for the specified object.</summary>
-    /// <param name="obj">The <see cref="Toplevel"/> for which a hash code is to be returned.</param>
-    /// <returns>A hash code for the specified object.</returns>
-    /// <exception cref="ArgumentNullException">
-    ///     The type of <paramref name="obj"/> is a reference type and
-    ///     <paramref name="obj"/> is <see langword="null"/>.
-    /// </exception>
-    public int GetHashCode (Toplevel obj)
-    {
-        if (obj is null)
-        {
-            throw new ArgumentNullException ();
-        }
-
-        var hCode = 0;
-
-        if (int.TryParse (obj.Id, out int result))
-        {
-            hCode = result;
-        }
-
-        return hCode.GetHashCode ();
-    }
 }
