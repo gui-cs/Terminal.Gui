@@ -47,13 +47,13 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         CancelableRunnable runnable = new () { CancelStart = true };
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert - Should not be added to stack if canceled
         Assert.False (runnable.IsRunning);
 
-        // Token is still created but runnable not added to stack
-        Assert.NotNull (token);
+        // Token not created
+        Assert.Null (token);
     }
 
     [Fact]

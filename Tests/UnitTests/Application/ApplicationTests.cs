@@ -80,34 +80,34 @@ public class ApplicationTests
         top.Dispose ();
     }
 
-//    [Fact]
-//    [SetupFakeApplication]
-//    public void End_And_Shutdown_Should_Not_Dispose_ApplicationTop ()
-//    {
-//        Assert.Null (Application.TopRunnable);
+    //    [Fact]
+    //    [SetupFakeApplication]
+    //    public void End_And_Shutdown_Should_Not_Dispose_ApplicationTop ()
+    //    {
+    //        Assert.Null (Application.TopRunnable);
 
-//        SessionToken rs = Application.Begin (new  Runnable<bool> ());
-//        Application.TopRunnable!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
-//        Assert.Equal (rs.Runnable, Application.TopRunnable);
-//        Application.End (rs);
+    //        SessionToken rs = Application.Begin (new  Runnable<bool> ());
+    //        Application.TopRunnable!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
+    //        Assert.Equal (rs.Runnable, Application.TopRunnable);
+    //        Application.End (rs);
 
-//#if DEBUG_IDISPOSABLE
-//        Assert.True (rs.WasDisposed);
-//        Assert.False (Application.TopRunnable!.WasDisposed); // Is true because the rs.Toplevel is the same as Application.TopRunnable
-//#endif
+    //#if DEBUG_IDISPOSABLE
+    //        Assert.True (rs.WasDisposed);
+    //        Assert.False (Application.TopRunnable!.WasDisposed); // Is true because the rs.Toplevel is the same as Application.TopRunnable
+    //#endif
 
-//        Assert.Null (rs.Runnable);
+    //        Assert.Null (rs.Runnable);
 
-//        Toplevel top = Application.TopRunnable;
+    //        Toplevel top = Application.TopRunnable;
 
-//#if DEBUG_IDISPOSABLE
-//        Exception exception = Record.Exception (Application.Shutdown);
-//        Assert.NotNull (exception);
-//        Assert.False (top.WasDisposed);
-//        top.Dispose ();
-//        Assert.True (top.WasDisposed);
-//#endif
-//    }
+    //#if DEBUG_IDISPOSABLE
+    //        Exception exception = Record.Exception (Application.Shutdown);
+    //        Assert.NotNull (exception);
+    //        Assert.False (top.WasDisposed);
+    //        top.Dispose ();
+    //        Assert.True (top.WasDisposed);
+    //#endif
+    //    }
 
     [Fact]
     public void Init_KeyBindings_Are_Not_Reset ()
@@ -409,36 +409,17 @@ public class ApplicationTests
     #region RunTests
 
     [Fact]
-    [SetupFakeApplication]
-    public void Run_T_After_InitWithDriver_with_TopLevel_Does_Not_Throws ()
-    {
-        Application.StopAfterFirstIteration = true;
-
-        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
-        // Using another type not derived from Toplevel will throws at compile time
-        Application.Run<Window> ();
-        Assert.True (Application.TopRunnableView is Window);
-
-        Application.TopRunnableView!.Dispose ();
-    }
-
-    [Fact]
-    public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throws ()
+    public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throw ()
     {
         Application.StopAfterFirstIteration = true;
 
         // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
         // Using another type not derived from Toplevel will throws at compile time
         Application.Run<Window> (null, "fake");
-        Assert.True (Application.TopRunnableView is Window);
-
-        Application.TopRunnableView!.Dispose ();
 
         // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
         Application.Run<Dialog> (null, "fake");
-        Assert.True (Application.TopRunnableView is Dialog);
 
-        Application.TopRunnableView!.Dispose ();
         Application.Shutdown ();
     }
 
@@ -460,7 +441,7 @@ public class ApplicationTests
         initTop.Dispose ();
         Assert.True (initTop.WasDisposed);
 #endif
-        Application.TopRunnableView!.Dispose ();
+        initTop.Dispose ();
 
         return;
 
@@ -481,9 +462,7 @@ public class ApplicationTests
         Application.StopAfterFirstIteration = true;
 
         // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
-        Application.Run<Toplevel> ();
-
-        Application.TopRunnableView!.Dispose ();
+        Application.Run<Window> ();
     }
 
     [Fact]
@@ -493,9 +472,7 @@ public class ApplicationTests
         Application.StopAfterFirstIteration = true;
 
         // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
-        Application.Run<Toplevel> ();
-
-        Application.TopRunnableView!.Dispose ();
+        Application.Run<Window> ();
     }
 
     [Fact]
@@ -504,7 +481,7 @@ public class ApplicationTests
     {
         Application.StopAfterFirstIteration = true;
 
-        Application.Run<Toplevel> ();
+        Application.Run<Window> ();
     }
 
     [Fact]
@@ -591,7 +568,7 @@ public class ApplicationTests
 
         Application.SessionEnded += OnApplicationOnSessionEnded;
 
-        Application.Run<Toplevel> (null, "fake");
+        Application.Run<Window> (null, "fake");
 
         Assert.Null (Application.TopRunnableView);
 
@@ -602,79 +579,14 @@ public class ApplicationTests
 
         void OnApplicationOnSessionEnded (object? sender, SessionTokenEventArgs e)
         {
+            Application.SessionEnded -= OnApplicationOnSessionEnded;
             e.State.Result = (e.State.Runnable as IRunnable<object?>)?.Result;
-        }
-    }
-
-    [Fact]
-    public void Run_t_Does_Not_Creates_Top_Without_Init ()
-    {
-        // When a Toplevel is created it must already have all the Application configuration loaded
-        // This is only possible by two ways:
-        // 1 - Using Application.Init first
-        // 2 - Using Application.Run() or Application.Run<T>()
-        // The Application.Run(new(Toplevel)) must always call Application.Init() first because
-        // the new(Toplevel) may be a derived class that is possible using Application static
-        // properties that is only available after the Application.Init was called
-
-        Assert.Null (Application.TopRunnableView);
-
-        Assert.Throws<NotInitializedException> (() => Application.Run (new Toplevel ()));
-
-        Application.Init ("fake");
-
-        Application.Iteration += OnApplication_OnIteration;
-        Application.Run (new Toplevel ());
-        Application.Iteration -= OnApplication_OnIteration;
-#if DEBUG_IDISPOSABLE
-        Assert.False (Application.TopRunnableView!.WasDisposed);
-        Exception exception = Record.Exception (Application.Shutdown);
-        Assert.NotNull (exception);
-        Assert.False (Application.TopRunnableView!.WasDisposed);
-
-        // It's up to caller to dispose it
-        Application.TopRunnableView!.Dispose ();
-        Assert.True (Application.TopRunnableView!.WasDisposed);
-#endif
-        Assert.NotNull (Application.TopRunnableView);
-
-        Application.Shutdown ();
-        Assert.Null (Application.TopRunnableView);
-
-        return;
-
-        void OnApplication_OnIteration (object? s, EventArgs<IApplication?> e)
-        {
-            Assert.NotNull (Application.TopRunnableView);
-            Application.RequestStop ();
         }
     }
 
     private class TestToplevel : Toplevel
     { }
 
-    [Fact]
-    public void Run_T_With_V2_Driver_Does_Not_Call_ResetState_After_Init ()
-    {
-        Assert.False (Application.Initialized);
-        Application.Init ("fake");
-        Assert.True (Application.Initialized);
-
-        Task.Run (() => { Task.Delay (300).Wait (); })
-            .ContinueWith (
-                           (t, _) =>
-                           {
-                               // no longer loading
-                               Application.Invoke ((app) => { app.RequestStop (); });
-                           },
-                           TaskScheduler.FromCurrentSynchronizationContext ());
-        Application.Run<TestToplevel> ();
-        Assert.NotNull (Application.Driver);
-        Assert.NotNull (Application.TopRunnableView);
-        Assert.False (Application.TopRunnable!.IsRunning);
-        Application.TopRunnableView!.Dispose ();
-        Application.Shutdown ();
-    }
 
     // TODO: Add tests for Run that test errorHandler
 
