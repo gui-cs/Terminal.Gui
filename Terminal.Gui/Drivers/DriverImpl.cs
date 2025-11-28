@@ -26,7 +26,7 @@ namespace Terminal.Gui.Drivers;
 ///         Applications interact with drivers through the <see cref="Application"/> class.
 ///     </para>
 /// </remarks>
-internal class DriverImpl : IDriver
+internal class DriverImpl : IDriverInternal
 {
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
@@ -50,6 +50,7 @@ internal class DriverImpl : IDriver
     {
         InputProcessor = inputProcessor;
         _output = output;
+        IsVirtualTerminal = (_output as IOutputInternal)!.IsVirtualTerminal;
         OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
@@ -72,6 +73,8 @@ internal class DriverImpl : IDriver
                                    };
 
         CreateClipboard ();
+
+        (_output as IOutputInternal)!.Driver = this;
     }
 
     /// <inheritdoc/>
@@ -197,16 +200,48 @@ internal class DriverImpl : IDriver
 
     // TODO: Probably not everyone right?
 
+    private bool _isVirtualTerminal = true;
+
+    /// <inheritdoc />
+    public bool IsVirtualTerminal
+    {
+        get => _isVirtualTerminal;
+        set
+        {
+            _isVirtualTerminal = value;
+
+            if (!_isVirtualTerminal)
+            {
+                Force16Colors = true;
+            }
+        }
+    }
+
     /// <inheritdoc/>
 
-    public bool SupportsTrueColor => true;
+    public bool SupportsTrueColor => _isVirtualTerminal;
 
     /// <inheritdoc/>
 
     public bool Force16Colors
     {
-        get => Application.Force16Colors || !SupportsTrueColor;
-        set => Application.Force16Colors = value || !SupportsTrueColor;
+        get => Application.Force16Colors;
+        set
+        {
+            if (!_isVirtualTerminal && !Application.Force16Colors)
+            {
+                Application.Force16Colors = true;
+
+                return;
+            }
+
+            if (!_isVirtualTerminal && !value)
+            {
+                return;
+            }
+
+            Application.Force16Colors = value;
+        }
     }
 
     /// <inheritdoc/>

@@ -7,7 +7,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixOutput : OutputBase, IOutput
+internal class UnixOutput : OutputBase, IOutputInternal
 {
     [StructLayout (LayoutKind.Sequential)]
     private struct WinSize
@@ -35,6 +35,12 @@ internal class UnixOutput : OutputBase, IOutput
 
     [DllImport ("libc", SetLastError = true)]
     private static extern int dup (int fd);
+
+    /// <inheritdoc />
+    public IDriver? Driver { get; set; }
+
+    /// <inheritdoc />
+    public bool IsVirtualTerminal { get; init; } = true;
 
     /// <inheritdoc />
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)

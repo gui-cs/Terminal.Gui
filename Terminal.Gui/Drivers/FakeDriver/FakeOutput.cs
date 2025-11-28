@@ -5,12 +5,18 @@ namespace Terminal.Gui.Drivers;
 /// <summary>
 ///     Fake console output for testing that captures what would be written to the console.
 /// </summary>
-public class FakeOutput : OutputBase, IOutput
+public class FakeOutput : OutputBase, IOutputInternal
 {
     private readonly StringBuilder _output = new ();
     private int _cursorLeft;
     private int _cursorTop;
     private Size _consoleSize = new (80, 25);
+
+    /// <inheritdoc />
+    public IDriver? Driver { get; set; }
+
+    /// <inheritdoc />
+    public bool IsVirtualTerminal { get; init; } = true;
 
     /// <summary>
     /// 

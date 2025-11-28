@@ -18,14 +18,14 @@ public class ApplicationImplTests
         m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
         m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of<IInputProcessor> ());
 
-        Mock<IOutput> consoleOutput = new ();
+        Mock<IOutputInternal> consoleOutput = new ();
         var size = new Size (80, 25);
 
         consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ()))
                      .Callback<int, int> ((w, h) => size = new (w, h));
         consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
         m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
-        m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
+        m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutputInternal> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
         return new ApplicationImpl (m.Object);
     }

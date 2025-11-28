@@ -155,9 +155,9 @@ public class SixelSupportDetector ()
 
     private static bool ResponseIndicatesSupport (string response) { return response.Split (';').Contains ("4"); }
 
-    private static bool IsVirtualTerminal ()
+    private bool IsVirtualTerminal ()
     {
-        return !string.IsNullOrWhiteSpace (Environment.GetEnvironmentVariable ("WT_SESSION"));
+        return (_driver as IDriverInternal)?.IsVirtualTerminal == true;
     }
 
     private static bool IsXtermWithTransparency ()
