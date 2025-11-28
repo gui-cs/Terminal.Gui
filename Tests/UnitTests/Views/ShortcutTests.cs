@@ -23,7 +23,7 @@ public class ShortcutTests
     [InlineData (9, 0)]
     public void MouseClick_Raises_Accepted (int x, int expectedAccepted)
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -74,7 +74,7 @@ public class ShortcutTests
         int expectedShortcutSelected
     )
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -130,7 +130,7 @@ public class ShortcutTests
     [InlineData (9, 0, 0)]
     public void MouseClick_Button_CommandView_Raises_Shortcut_Accepted (int mouseX, int expectedAccept, int expectedButtonAccept)
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -186,7 +186,7 @@ public class ShortcutTests
     [InlineData (10, 1, 0)]
     public void MouseClick_CheckBox_CommandView_Raises_Shortcut_Accepted_Selected_Correctly (int mouseX, int expectedAccepted, int expectedCheckboxAccepted)
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -260,7 +260,7 @@ public class ShortcutTests
     [InlineData (false, KeyCode.F1, 0, 0)]
     public void KeyDown_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -305,7 +305,7 @@ public class ShortcutTests
     [InlineData (false, KeyCode.F1, 0, 0)]
     public void KeyDown_CheckBox_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Toplevel ());
 
         var shortcut = new Shortcut
         {
@@ -318,7 +318,6 @@ public class ShortcutTests
             CanFocus = canFocus
         };
         Application.TopRunnableView.Add (shortcut);
-        shortcut.SetFocus ();
 
         Assert.Equal (canFocus, shortcut.HasFocus);
 
@@ -340,6 +339,7 @@ public class ShortcutTests
         Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
     }
+
     [Theory]
     [InlineData (KeyCode.A, 1)]
     [InlineData (KeyCode.C, 1)]
@@ -349,7 +349,7 @@ public class ShortcutTests
     [InlineData (KeyCode.F1, 0)]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        Application.TopRunnableView = new () { App = ApplicationImpl.Instance };
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -427,7 +427,7 @@ public class ShortcutTests
     [InlineData (false, KeyCode.F1, 0)]
     public void KeyDown_App_Scope_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut
         {
@@ -439,10 +439,6 @@ public class ShortcutTests
         };
 
         Application.TopRunnableView.Add (shortcut);
-
-        // Shortcut requires Init for App scoped hotkeys to work
-        Application.TopRunnableView.BeginInit ();
-        Application.TopRunnableView.EndInit ();
 
         Application.TopRunnableView.SetFocus ();
 
@@ -461,7 +457,7 @@ public class ShortcutTests
     [Fact]
     public void Scheme_SetScheme_Does_Not_Fault_3664 ()
     {
-        Application.TopRunnableView = new ();
+        Application.Begin (new Runnable<bool> ());
 
         var shortcut = new Shortcut ();
 

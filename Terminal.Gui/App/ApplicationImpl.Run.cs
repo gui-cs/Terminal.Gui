@@ -346,6 +346,11 @@ public partial class ApplicationImpl
             return; // Already ended
         }
 
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            ApplicationPopover.HideWithQuitCommand (visiblePopover);
+        }
+
         IRunnable runnable = token.Runnable;
 
         // Get old IsRunning value (safe - cached value)

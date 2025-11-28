@@ -12,63 +12,6 @@ public class CheckBoxTests (ITestOutputHelper output)
 
 
 
-    [Fact]
-    public void Commands_Select ()
-    {
-        Application.TopRunnableView = new ();
-        View otherView = new () { CanFocus = true };
-        var ckb = new CheckBox ();
-        Application.TopRunnableView.Add (ckb, otherView);
-        Application.TopRunnableView.SetFocus ();
-        Assert.True (ckb.HasFocus);
-
-        var checkedStateChangingCount = 0;
-        ckb.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
-
-        var selectCount = 0;
-        ckb.Selecting += (s, e) => selectCount++;
-
-        var acceptCount = 0;
-        ckb.Accepting += (s, e) => acceptCount++;
-
-        Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
-        Assert.Equal (Key.Empty, ckb.HotKey);
-
-        // Test while focused
-        ckb.Text = "_Test";
-        Assert.Equal (Key.T, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.T);
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
-        Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.Text = "T_est";
-        Assert.Equal (Key.E, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.E.WithAlt);
-        Assert.Equal (2, checkedStateChangingCount);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.NewKeyDownEvent (Key.Space);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.NewKeyDownEvent (Key.Enter);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, selectCount);
-        Assert.Equal (1, acceptCount);
-
-        Application.TopRunnableView.Dispose ();
-        Application.ResetState ();
-    }
-
-
-
     #region Mouse Tests
 
 

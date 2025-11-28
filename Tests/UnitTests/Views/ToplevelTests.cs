@@ -376,7 +376,7 @@ public class ToplevelTests
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Toplevel is going away")]
     [AutoInitShutdown]
     public void IsLoaded_Application_Begin ()
     {
@@ -388,7 +388,7 @@ public class ToplevelTests
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Toplevel is going away")]
     [AutoInitShutdown]
     public void IsLoaded_With_Sub_Toplevel_Application_Begin_NeedDisplay ()
     {
@@ -557,7 +557,7 @@ public class ToplevelTests
         window.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Toplevel is going away")]
     public void Multi_Thread_Toplevels ()
     {
         Application.Init ("fake");

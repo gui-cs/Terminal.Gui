@@ -150,9 +150,6 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
-        //ebug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
-        //Logging.Debug ($"{key}");
-
         // TODO: Add a way to ignore certain keys, esp for debugging.
         //#if DEBUG
         //        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
@@ -179,14 +176,14 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         {
             if (App?.SessionStack is { })
             {
-                foreach (Toplevel? topLevel in App.SessionStack.Select(r => r.Runnable as Toplevel))
+                foreach (IRunnable? runnable in App.SessionStack.Select(r => r.Runnable))
                 {
-                    if (topLevel!.NewKeyDownEvent (key))
+                    if (runnable is View view && view.NewKeyDownEvent (key))
                     {
                         return true;
                     }
 
-                    if (topLevel.Modal)
+                    if (runnable!.IsModal)
                     {
                         break;
                     }
@@ -230,14 +227,14 @@ internal class KeyboardImpl : IKeyboard, IDisposable
 
         if (App?.SessionStack is { })
         {
-            foreach (Toplevel? topLevel in App.SessionStack.Select (r => r.Runnable as Toplevel))
+            foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
             {
-                if (topLevel!.NewKeyUpEvent (key))
+                if (runnable is View view && view.NewKeyUpEvent (key))
                 {
                     return true;
                 }
 
-                if (topLevel.Modal)
+                if (runnable!.IsModal)
                 {
                     break;
                 }
