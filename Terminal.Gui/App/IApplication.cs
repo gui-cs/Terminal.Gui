@@ -598,6 +598,11 @@ public interface IApplication
     IClipboard? Clipboard { get; }
 
     /// <summary>
+    ///     Gets or sets whether <see cref="Driver"/> support for virtualized terminal sequences.
+    /// </summary>
+    public bool IsVirtualTerminal { get; }
+
+    /// <summary>
     ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be
     ///     output as long as the selected <see cref="IDriver"/> supports TrueColor.

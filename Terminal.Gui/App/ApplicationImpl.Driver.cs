@@ -7,6 +7,9 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public IDriver? Driver { get; set; }
 
+    /// <inheritdoc />
+    public bool IsVirtualTerminal { get; internal set; } = true;
+
     /// <inheritdoc/>
     public bool Force16Colors { get; set; }
 
