@@ -146,9 +146,16 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
             }
 
-            // Force 16 colors if not in virtual terminal mode.
-            (ApplicationImpl.Instance as ApplicationImpl)!.IsVirtualTerminal = false;
-            ApplicationImpl.Instance.Force16Colors = true;
+            try
+            {
+                // Force 16 colors if not in virtual terminal mode.
+                (ApplicationImpl.Instance as ApplicationImpl)!.IsVirtualTerminal = false;
+                ApplicationImpl.Instance.Force16Colors = true;
+            }
+            catch
+            {
+                // possible running in unit tests
+            }
         }
 
         GetSize ();
@@ -262,7 +269,15 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public override void Write (IOutputBuffer outputBuffer)
     {
-        _force16Colors = ApplicationImpl.Instance.Force16Colors;
+        try
+        {
+            _force16Colors = ApplicationImpl.Instance.Force16Colors;
+        }
+        catch
+        {
+            // possible running in unit tests
+        }
+
         _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
