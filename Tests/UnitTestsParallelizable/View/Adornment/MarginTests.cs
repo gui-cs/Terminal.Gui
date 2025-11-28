@@ -3,8 +3,77 @@ using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 
-public class MarginTests
+public class MarginTests (ITestOutputHelper output)
 {
+    [Fact]
+    public void Margin_Is_Transparent ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        app.Driver!.SetScreenSize (5, 5);
+
+        var view = new View { Height = 3, Width = 3 };
+        view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
+        view.Margin.Thickness = new (1);
+
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        runnable.SetScheme (new ()
+        {
+            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
+        });
+
+        runnable.Add (view);
+        Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, runnable.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+
+        app.LayoutAndDraw ();
+
+        DriverAssert.AssertDriverContentsAre (
+                                             @"",
+                                             output,
+                                             app.Driver
+                                            );
+        DriverAssert.AssertDriverAttributesAre ("0", output, app.Driver, runnable.GetAttributeForRole (VisualRole.Normal));
+    }
+
+    [Fact]
+    public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("fake");
+        app.Driver!.SetScreenSize (5, 5);
+
+        var view = new View { Height = 3, Width = 3 };
+        view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
+        view.Margin.Thickness = new (1);
+        view.Margin.ViewportSettings = ViewportSettingsFlags.None;
+
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        runnable.SetScheme (new ()
+        {
+            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
+        });
+
+        runnable.Add (view);
+        Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, runnable.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+
+        app.LayoutAndDraw ();
+
+        DriverAssert.AssertDriverContentsAre (
+                                              @"
+MMM
+M M
+MMM",
+                                              output,
+                                              app.Driver
+                                             );
+        DriverAssert.AssertDriverAttributesAre ("0", output, app.Driver, runnable.GetAttributeForRole (VisualRole.Normal));
+    }
     [Fact]
     public void Is_Visually_Transparent ()
     {

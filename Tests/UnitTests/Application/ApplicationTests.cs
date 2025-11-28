@@ -80,35 +80,6 @@ public class ApplicationTests
         top.Dispose ();
     }
 
-    //    [Fact]
-    //    [SetupFakeApplication]
-    //    public void End_And_Shutdown_Should_Not_Dispose_ApplicationTop ()
-    //    {
-    //        Assert.Null (Application.TopRunnable);
-
-    //        SessionToken rs = Application.Begin (new  Runnable<bool> ());
-    //        Application.TopRunnable!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
-    //        Assert.Equal (rs.Runnable, Application.TopRunnable);
-    //        Application.End (rs);
-
-    //#if DEBUG_IDISPOSABLE
-    //        Assert.True (rs.WasDisposed);
-    //        Assert.False (Application.TopRunnable!.WasDisposed); // Is true because the rs.Toplevel is the same as Application.TopRunnable
-    //#endif
-
-    //        Assert.Null (rs.Runnable);
-
-    //        Toplevel top = Application.TopRunnable;
-
-    //#if DEBUG_IDISPOSABLE
-    //        Exception exception = Record.Exception (Application.Shutdown);
-    //        Assert.NotNull (exception);
-    //        Assert.False (top.WasDisposed);
-    //        top.Dispose ();
-    //        Assert.True (top.WasDisposed);
-    //#endif
-    //    }
-
     [Fact]
     public void Init_KeyBindings_Are_Not_Reset ()
     {

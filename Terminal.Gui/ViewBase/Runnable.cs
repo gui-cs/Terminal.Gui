@@ -16,11 +16,24 @@ namespace Terminal.Gui.ViewBase;
 public class Runnable<TResult> : View, IRunnable<TResult>
 {
     private bool _stopRequested;
-    
+
     // Cached state - eliminates race conditions from stack queries
     private bool _isRunning;
     private bool _isModal;
 
+    /// <summary>
+    ///     Constructs a new instance of the <see cref="Runnable{TResult}"/> class,
+    /// </summary>
+    public Runnable ()
+    {
+        CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
+        Arrangement = ViewArrangement.Overlapped;
+        Width = Dim.Fill ();
+        Height = Dim.Fill ();
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
+
+    }
     /// <inheritdoc/>
     public TResult? Result { get; set; }
 

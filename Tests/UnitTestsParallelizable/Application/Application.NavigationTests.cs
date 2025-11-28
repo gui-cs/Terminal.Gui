@@ -1,32 +1,31 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace UnitTests.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 public class ApplicationNavigationTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-
-    [AutoInitShutdown]
     [Theory]
     [InlineData (TabBehavior.NoStop)]
     [InlineData (TabBehavior.TabStop)]
     [InlineData (TabBehavior.TabGroup)]
     public void Begin_SetsFocus_On_Deepest_Focusable_View (TabBehavior behavior)
     {
-        var top = new Toplevel
+        IApplication? application = Application.Create ();
+
+        Runnable<bool> runnable = new()
         {
-            TabStop = behavior
+            TabStop = behavior,
+            CanFocus = true
         };
-        Assert.False (top.HasFocus);
 
         View subView = new ()
         {
             CanFocus = true,
             TabStop = behavior
         };
-        top.Add (subView);
+        runnable.Add (subView);
 
         View subSubView = new ()
         {
@@ -35,42 +34,42 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         };
         subView.Add (subSubView);
 
-        SessionToken rs = Application.Begin (top);
-        Assert.True (top.HasFocus);
+        SessionToken rs = application.Begin (runnable);
+        Assert.True (runnable.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.True (subSubView.HasFocus);
 
-        top.Dispose ();
+        runnable.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Begin_SetsFocus_On_Top ()
     {
-        var top = new Toplevel ();
-        Assert.False (top.HasFocus);
+        IApplication? application = Application.Create ();
 
-        SessionToken rs = Application.Begin (top);
-        Assert.True (top.HasFocus);
+        Runnable<bool> runnable = new () { CanFocus = true };
+        Assert.False (runnable.HasFocus);
 
-        top.Dispose ();
+        application.Begin (runnable);
+        Assert.True (runnable.HasFocus);
+
+        runnable.Dispose ();
     }
 
     [Fact]
     public void Focused_Change_Raises_FocusedChanged ()
     {
+        IApplication? application = Application.Create ();
+
         var raised = false;
 
-        Application.Navigation!.FocusedChanged += ApplicationNavigationOnFocusedChanged;
+        application.Navigation!.FocusedChanged += ApplicationNavigationOnFocusedChanged;
 
-        Application.Navigation.SetFocused (new () { CanFocus = true, HasFocus = true });
+        application.Navigation.SetFocused (new () { CanFocus = true, HasFocus = true });
 
         Assert.True (raised);
 
-        Application.Navigation.GetFocused ().Dispose ();
-        Application.Navigation.SetFocused (null);
-
-        Application.Navigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
+        application.Navigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
 
         return;
 
@@ -80,14 +79,15 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void GetFocused_Returns_Focused_View ()
     {
-        IApplication app = ApplicationImpl.Instance;
+        IApplication app = Application.Create ();
 
-        app.TopRunnableView = new ()
-        {
-            Id = "top",
-            CanFocus = true,
-            App = app
-        };
+        app.Begin (
+                   new Runnable<bool>
+                   {
+                       Id = "top",
+                       CanFocus = true,
+                       App = app
+                   });
 
         var subView1 = new View
         {
@@ -102,9 +102,9 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         };
 
         app.TopRunnableView?.Add (subView1, subView2);
-        Assert.False (app.TopRunnableView?.HasFocus);
+        subView1.SetFocus ();
 
-        app.TopRunnableView?.SetFocus ();
+        //app.TopRunnableView?.SetFocus ();
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, app.Navigation?.GetFocused ());
 
@@ -115,14 +115,15 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void GetFocused_Returns_Null_If_No_Focused_View ()
     {
-        IApplication app = ApplicationImpl.Instance; // Force legacy
+        IApplication app = Application.Create ();
 
-        app.TopRunnableView = new ()
-        {
-            Id = "top",
-            CanFocus = true,
-            App = app
-        };
+        app.Begin (
+                   new Runnable<bool>
+                   {
+                       Id = "top",
+                       CanFocus = true,
+                       App = app
+                   });
 
         var subView1 = new View
         {
@@ -131,7 +132,6 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         };
 
         app!.TopRunnableView.Add (subView1);
-        Assert.False (app.TopRunnableView.HasFocus);
 
         app.TopRunnableView.SetFocus ();
         Assert.True (subView1.HasFocus);
@@ -145,6 +145,5 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         app.TopRunnableView.HasFocus = false;
         Assert.False (app.TopRunnableView.HasFocus);
         Assert.Null (app.Navigation.GetFocused ());
-
     }
 }

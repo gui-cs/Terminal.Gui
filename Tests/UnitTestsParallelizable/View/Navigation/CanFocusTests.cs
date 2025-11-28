@@ -238,4 +238,44 @@ public class CanFocusTests () : TestsAllViews
         Assert.False (view.HasFocus);
     }
 
+    [Fact]
+    public void CanFocus_Set_True_Get_AdvanceFocus_Works ()
+    {
+        IApplication app = Application.Create ();
+        app.Begin (new Runnable<bool> () { CanFocus = true });
+
+        Label label = new () { Text = "label" };
+        View view = new () { Text = "view", CanFocus = true };
+        app.TopRunnableView!.Add (label, view);
+
+        app.TopRunnableView.SetFocus ();
+        Assert.Equal (view, app.Navigation!.GetFocused ());
+        Assert.False (label.CanFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
+
+        Assert.False (app.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // Set label CanFocus to true
+        label.CanFocus = true;
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // label can now be focused, so AdvanceFocus should move to it.
+        Assert.True (app.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        // Move back to view
+        view.SetFocus ();
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+    }
 }

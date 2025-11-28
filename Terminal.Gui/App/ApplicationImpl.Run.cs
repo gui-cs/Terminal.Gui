@@ -214,7 +214,7 @@ public partial class ApplicationImpl
         LayoutAndDraw (true);
 
         // Set focus
-        if (runnable is View viewToFocus && !viewToFocus.HasFocus)
+        if (runnable is View { HasFocus: false } viewToFocus)
         {
             viewToFocus.SetFocus ();
         }

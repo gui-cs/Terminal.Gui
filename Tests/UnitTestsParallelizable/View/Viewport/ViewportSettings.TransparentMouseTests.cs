@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace UnitTests.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class TransparentMouseTests
 {
@@ -19,11 +19,12 @@ public class TransparentMouseTests
     public void TransparentMouse_Passes_Mouse_Events_To_Underlying_View ()
     {
         // Arrange
+        IApplication? app = Application.Create ();
         var top = new Toplevel ()
         {
             Id = "top",
         };
-        Application.TopRunnableView = top;
+        app.Begin (top);
 
         var underlying = new MouseTrackingView { Id = "underlying", X = 0, Y = 0, Width = 10, Height = 10 };
         var overlay = new MouseTrackingView { Id = "overlay", X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
@@ -31,8 +32,6 @@ public class TransparentMouseTests
         top.Add (underlying);
         top.Add (overlay);
 
-        top.BeginInit ();
-        top.EndInit ();
         top.Layout ();
 
         var mouseEvent = new MouseEventArgs
@@ -42,21 +41,19 @@ public class TransparentMouseTests
         };
 
         // Act
-        Application.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert
         Assert.True (underlying.MouseEventReceived);
-
-        top.Dispose ();
-        Application.ResetState (true);
     }
 
     [Fact]
     public void NonTransparentMouse_Consumes_Mouse_Events ()
     {
         // Arrange
+        IApplication? app = Application.Create ();
         var top = new Toplevel ();
-        Application.TopRunnableView = top;
+        app.Begin (top);
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10 };
         var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.None };
@@ -64,8 +61,6 @@ public class TransparentMouseTests
         top.Add (underlying);
         top.Add (overlay);
 
-        top.BeginInit ();
-        top.EndInit ();
         top.Layout ();
 
         var mouseEvent = new MouseEventArgs
@@ -75,22 +70,23 @@ public class TransparentMouseTests
         };
 
         // Act
-        Application.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert
         Assert.True (overlay.MouseEventReceived);
         Assert.False (underlying.MouseEventReceived);
-
-        top.Dispose ();
-        Application.ResetState (true);
-    }
+     }
 
     [Fact]
     public void TransparentMouse_Stacked_TransparentMouse_Views ()
     {
         // Arrange
-        var top = new Toplevel ();
-        Application.TopRunnableView = top;
+        IApplication? app = Application.Create ();
+        var top = new Toplevel ()
+        {
+            Id = "top",
+        };
+        app.Begin (top);
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
         var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
@@ -98,8 +94,6 @@ public class TransparentMouseTests
         top.Add (underlying);
         top.Add (overlay);
 
-        top.BeginInit ();
-        top.EndInit ();
         top.Layout ();
 
         var mouseEvent = new MouseEventArgs
@@ -116,14 +110,11 @@ public class TransparentMouseTests
                           };
 
         // Act
-        Application.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert
         Assert.False (overlay.MouseEventReceived);
         Assert.False (underlying.MouseEventReceived);
         Assert.True (topHandled);
-
-        top.Dispose ();
-        Application.ResetState (true);
     }
 }
