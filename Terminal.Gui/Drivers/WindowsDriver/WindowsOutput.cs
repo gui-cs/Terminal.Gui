@@ -279,10 +279,10 @@ internal partial class WindowsOutput : OutputBase, IOutput
             _consoleBuffer = _outputHandle;
         }
 
-        base.Write (outputBuffer);
-
         try
         {
+            base.Write (outputBuffer);
+
             if (_force16Colors && !IsVirtualTerminal)
             {
                 SetConsoleActiveScreenBuffer (_consoleBuffer);
@@ -303,12 +303,17 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
                         return;
                     }
+
                     if (err != 0)
                     {
                         throw new Win32Exception (err);
                     }
                 }
             }
+        }
+        catch (DllNotFoundException)
+        {
+            // Running unit tests or in an environment where writing is not possible.
         }
         catch (Exception e)
         {
