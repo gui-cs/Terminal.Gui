@@ -645,12 +645,6 @@ public interface IApplication
     /// </remarks>
     bool ClearScreenNextIteration { get; set; }
 
-    /// <summary>
-    ///     Collection of sixel images to write out to screen when updating.
-    ///     Only add to this collection if you are sure terminal supports sixel format.
-    /// </summary>
-    List<SixelToRender> Sixel { get; }
-
     #endregion Screen and Driver
 
     #region Layout and Drawing

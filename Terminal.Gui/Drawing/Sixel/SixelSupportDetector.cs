@@ -157,7 +157,7 @@ public class SixelSupportDetector ()
 
     private bool IsVirtualTerminal ()
     {
-        return (_driver as IDriverInternal)?.IsVirtualTerminal == true;
+        return (_driver as DriverImpl)?.IsVirtualTerminal == true;
     }
 
     private static bool IsXtermWithTransparency ()

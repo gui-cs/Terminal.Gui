@@ -51,9 +51,9 @@ public static partial class Application // Driver abstractions
     /// <summary>Raised when <see cref="ForceDriver"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<string>>? ForceDriverChanged;
 
-    /// <inheritdoc cref="IApplication.Sixel"/>
-    [Obsolete ("The legacy static Application object is going away.")] 
-    public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Sixel;
+    /// <inheritdoc cref="IDriver.Sixel"/>
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Driver?.Sixel!;
 
     /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
     /// <returns></returns>

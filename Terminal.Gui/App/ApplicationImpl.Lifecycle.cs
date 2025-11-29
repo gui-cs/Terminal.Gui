@@ -262,17 +262,14 @@ public partial class ApplicationImpl
         Initialized = false;
         MainThreadId = null;
 
-        // === 9. Clear graphics ===
-        Sixel.Clear ();
-
-        // === 10. Reset ForceDriver ===
+        // === 9. Reset ForceDriver ===
         // Note: ForceDriver and Force16Colors are reset
         // If they need to persist across Init/Shutdown cycles
         // then the user of the library should manage that state
         Force16Colors = false;
         ForceDriver = string.Empty;
 
-        // === 11. Reset synchronization context ===
+        // === 10. Reset synchronization context ===
         // IMPORTANT: Always reset sync context, even if not initialized
         // This ensures cleanup works correctly even if Shutdown is called without Init
         // Reset synchronization context to allow the user to run async/await,
@@ -281,7 +278,7 @@ public partial class ApplicationImpl
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
 
-        // === 12. Unsubscribe from Application static property change events ===
+        // === 11. Unsubscribe from Application static property change events ===
         UnsubscribeApplicationEvents ();
     }
 

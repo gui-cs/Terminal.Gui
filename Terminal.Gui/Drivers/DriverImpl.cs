@@ -247,6 +247,9 @@ internal class DriverImpl : IDriver
     }
 
     /// <inheritdoc/>
+    public List<SixelToRender> Sixel { get; } = [];
+
+    /// <inheritdoc/>
 
     public Attribute CurrentAttribute
     {

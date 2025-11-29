@@ -101,6 +101,12 @@ public interface IDriver
     bool Force16Colors { get; set; }
 
     /// <summary>
+    ///     Collection of sixel images to write out to screen when updating.
+    ///     Only add to this collection if you are sure terminal supports sixel format.
+    /// </summary>
+    List<SixelToRender> Sixel { get; }
+
+    /// <summary>
     ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
     ///     call.
     /// </summary>

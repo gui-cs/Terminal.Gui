@@ -13,9 +13,6 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public string ForceDriver { get; set; } = string.Empty;
 
-    /// <inheritdoc/>
-    public List<SixelToRender> Sixel { get; } = new ();
-
     /// <summary>
     ///     Creates the appropriate <see cref="IDriver"/> based on platform and driverName.
     /// </summary>
