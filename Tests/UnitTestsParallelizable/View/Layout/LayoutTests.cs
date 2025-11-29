@@ -1,6 +1,6 @@
 ﻿using UnitTests.Parallelizable;
 
-namespace UnitTests_Parallelizable.LayoutTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class LayoutTests
 {
@@ -36,6 +36,37 @@ public class LayoutTests
 
     #endregion Constructor Tests
 
+
+    [Fact]
+    public void Screen_Size_Change_Causes_Layout ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init ("Fake");
+        Runnable<bool>? runnable = new ();
+        app.Begin (runnable);
+
+        var view = new View
+        {
+            X = 3,
+            Y = 2,
+            Width = 10,
+            Height = 1,
+            Text = "0123456789"
+        };
+        runnable.Add (view);
+
+        app.Driver!.SetScreenSize (80, 25);
+
+        Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, app.Screen.Width, app.Screen.Height));
+        Assert.Equal (new (0, 0, app.Screen.Width, app.Screen.Height), runnable.Frame);
+        Assert.Equal (new (0, 0, 80, 25), runnable.Frame);
+
+        app.Driver!.SetScreenSize (20, 10);
+        app.LayoutAndDraw ();
+        Assert.Equal (new (0, 0, app.Screen.Width, app.Screen.Height), runnable.Frame);
+
+        Assert.Equal (new (0, 0, 20, 10), runnable.Frame);
+    }
     [Fact]
     public void Set_All_Absolute_Sets_Correctly ()
     {

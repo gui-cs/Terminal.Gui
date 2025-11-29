@@ -126,9 +126,8 @@ public partial class ApplicationImpl
     }
 
     /// <summary>
-    ///     INTERNAL: Called when the application's size has changed. Sets the size of all <see cref="Toplevel"/>s and fires
-    ///     the
-    ///     <see cref="ScreenChanged"/> event.
+    ///     INTERNAL: Called when the application's screen has changed.
+    ///     Raises the <see cref="ScreenChanged"/> event.
     /// </summary>
     /// <param name="screen">The new screen size and position.</param>
     private void RaiseScreenChangedEvent (Rectangle screen)
@@ -137,16 +136,14 @@ public partial class ApplicationImpl
 
         ScreenChanged?.Invoke (this, new (screen));
 
-        foreach (SessionToken t in SessionStack)
+        foreach (SessionToken t in SessionStack!)
         {
-            if (t.Runnable is Toplevel toplevel)
+            if (t.Runnable is View runnableView)
             {
-                toplevel.OnSizeChanging (new (screen.Size));
-                toplevel.SetNeedsLayout ();
+                runnableView.SetNeedsLayout ();
             }
         }
-
-        LayoutAndDraw (true);
+//        LayoutAndDraw (true);
     }
 
     private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { RaiseScreenChangedEvent (new (new (0, 0), e.Size!.Value)); }

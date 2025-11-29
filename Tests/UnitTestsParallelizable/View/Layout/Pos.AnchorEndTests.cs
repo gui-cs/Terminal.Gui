@@ -1,7 +1,7 @@
 ﻿using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Pos;
 
-namespace UnitTests_Parallelizable.LayoutTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class PosAnchorEndTests ()
 {
@@ -184,5 +184,29 @@ public class PosAnchorEndTests ()
         var result = pos.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (7, result);
 
+    }
+
+    [Fact]
+    public void PosAnchorEnd_Equal_Inside_Window ()
+    {
+        var viewWidth = 10;
+        var viewHeight = 1;
+
+        var tv = new TextView
+        {
+            X = Pos.AnchorEnd (viewWidth), Y = Pos.AnchorEnd (viewHeight), Width = viewWidth, Height = viewHeight
+        };
+
+        var win = new Window { Width = 80, Height = 25 };
+
+        win.Add (tv);
+
+        win.BeginInit ();
+        win.EndInit ();
+        win.Layout ();
+
+        Assert.Equal (new (0, 0, 80, 25), win.Frame);
+        Assert.Equal (new (68, 22, 10, 1), tv.Frame);
+        win.Dispose ();
     }
 }

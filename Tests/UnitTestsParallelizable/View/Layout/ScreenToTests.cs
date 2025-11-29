@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.LayoutTests;
+﻿namespace UnitTests_Parallelizable.ViewTests;
 
 /// <summary>Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).</summary>
 public class ScreenToTests

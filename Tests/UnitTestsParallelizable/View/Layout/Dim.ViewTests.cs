@@ -1,6 +1,6 @@
 ﻿using static Terminal.Gui.ViewBase.Dim;
 
-namespace UnitTests_Parallelizable.LayoutTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class DimViewTests
 {

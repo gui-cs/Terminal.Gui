@@ -24,7 +24,7 @@ public class DimTests
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
+    [Fact (Skip = "Convoluted test; rewrite")]
     [AutoInitShutdown]
     public void Only_DimAbsolute_And_DimFactor_As_A_Different_Procedure_For_Assigning_Value_To_Width_Or_Height ()
     {

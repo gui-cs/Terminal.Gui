@@ -1,25 +1,15 @@
-﻿#nullable enable
-using System.Diagnostics;
+#nullable enable
 using Xunit.Abstractions;
-using static Terminal.Gui.Configuration.ConfigurationManager;
 
-// Alias Console to MockConsole so we don't accidentally use Console
+namespace UnitTests_Parallelizable.ApplicationTests;
 
-namespace UnitTests.ApplicationTests;
-
-public class ApplicationTests
+/// <summary>
+///     Parallelizable tests for IApplication that don't require the main event loop.
+///     Tests using the modern non-static IApplication API.
+/// </summary>
+public class ApplicationTests (ITestOutputHelper output)
 {
-    public ApplicationTests (ITestOutputHelper output)
-    {
-        _output = output;
-
-#if DEBUG_IDISPOSABLE
-        View.EnableDebugIDisposableAsserts = true;
-        View.Instances.Clear ();
-#endif
-    }
-
-    private readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void AddTimeout_Fires ()
@@ -84,55 +74,12 @@ public class ApplicationTests
         app.Driver!.SetScreenSize (5, 5);
         app.LayoutAndDraw ();
         Assert.Equal (new (0, 0, 5, 5), app.TopRunnableView!.Frame);
-
+        
         if (token is { })
         {
             app.End (token);
         }
-
         top.Dispose ();
-        app.Shutdown ();
-    }
-
-    [Fact]
-    public void Init_KeyBindings_Are_Not_Reset ()
-    {
-        Debug.Assert (!IsEnabled);
-
-        try
-        {
-            // arrange
-            ThrowOnJsonErrors = true;
-
-            IApplication app = Application.Create ();
-
-            // Set via Keyboard property (modern API)
-            app.Keyboard.QuitKey = Key.Q;
-            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
-
-            app.Init ("fake");
-
-            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
-
-            app.Shutdown ();
-        }
-        finally
-        {
-            ThrowOnJsonErrors = false;
-        }
-    }
-
-    [Fact]
-    public void Init_NoParam_ForceDriver_Works ()
-    {
-        IApplication app = Application.Create ();
-
-        // Note: ForceDriver needs to be set before Init
-        // This test validates that Init() without params picks up driver configuration
-        app.ForceDriver = "fake";
-        app.Init ();
-
-        Assert.Equal ("fake", app.Driver!.GetName ());
 
         app.Shutdown ();
     }
@@ -149,14 +96,93 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Init_Shutdown_Resets_Instance_Properties ()
+    public void Init_Shutdown_Cleans_Up ()
     {
-        ThrowOnJsonErrors = true;
+        IApplication app = Application.Create ();
+
+        app.Init ("fake");
+
+        app.Shutdown ();
+
+#if DEBUG_IDISPOSABLE
+        // Validate there are no outstanding Responder-based instances 
+        // after cleanup
+        // Note: We can't check View.Instances in parallel tests as it's a static field
+        // that would be shared across parallel test runs
+#endif
+    }
+
+    [Fact]
+    public void Init_Shutdown_Fire_InitializedChanged ()
+    {
+        var initialized = false;
+        var shutdown = false;
 
         IApplication app = Application.Create ();
 
-        // Init the app
+        app.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        app.Init (driverName: "fake");
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        app.Shutdown ();
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+        app.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
+        {
+            if (a.Value)
+            {
+                initialized = true;
+            }
+            else
+            {
+                shutdown = true;
+            }
+        }
+    }
+
+    [Fact]
+    public void Init_KeyBindings_Are_Not_Reset ()
+    {
+        IApplication app = Application.Create ();
+
+        // Set via Keyboard property (modern API)
+        app.Keyboard.QuitKey = Key.Q;
+        Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+
         app.Init ("fake");
+
+        Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void Init_NoParam_ForceDriver_Works ()
+    {
+        IApplication app = Application.Create ();
+        
+        // Note: Init() without params picks up driver configuration
+        app.Init ();
+
+        Assert.Equal ("fake", app.Driver!.GetName ());
+        
+        app.Shutdown ();
+    }
+
+    [Fact]
+    public void Init_Shutdown_Resets_Instance_Properties ()
+    {
+        IApplication app = Application.Create ();
+
+        // Init the app
+        app.Init (driverName: "fake");
 
         // Verify initialized
         Assert.True (app.Initialized);
@@ -185,8 +211,6 @@ public class ApplicationTests
         app.Shutdown ();
         CheckReset (app);
 
-        ThrowOnJsonErrors = false;
-
         return;
 
         void CheckReset (IApplication application)
@@ -207,67 +231,6 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Init_Shutdown_Cleans_Up ()
-    {
-        IApplication app = Application.Create ();
-
-        // Verify initial state is per spec
-        //Pre_Init_State ();
-
-        app.Init ("fake");
-
-        // Verify post-Init state is correct
-        //Post_Init_State ();
-
-        app.Shutdown ();
-
-        // Verify state is back to initial
-        //Pre_Init_State ();
-#if DEBUG_IDISPOSABLE
-
-        // Validate there are no outstanding Responder-based instances 
-        // after a scenario was selected to run. This proves the main UI Catalog
-        // 'app' closed cleanly.
-        Assert.Empty (View.Instances);
-#endif
-    }
-
-    [Fact]
-    public void Init_Shutdown_Fire_InitializedChanged ()
-    {
-        var initialized = false;
-        var shutdown = false;
-
-        IApplication app = Application.Create ();
-
-        app.InitializedChanged += OnApplicationOnInitializedChanged;
-
-        app.Init ("fake");
-        Assert.True (initialized);
-        Assert.False (shutdown);
-
-        app.Shutdown ();
-        Assert.True (initialized);
-        Assert.True (shutdown);
-
-        app.InitializedChanged -= OnApplicationOnInitializedChanged;
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
-        {
-            if (a.Value)
-            {
-                initialized = true;
-            }
-            else
-            {
-                shutdown = true;
-            }
-        }
-    }
-
-    [Fact]
     public void Internal_Properties_Correct ()
     {
         IApplication app = Application.Create ();
@@ -279,12 +242,9 @@ public class ApplicationTests
         Assert.Equal (app.TopRunnable, rs.Runnable);
         Assert.Null (app.Mouse.MouseGrabView); // public
 
-        app.End (rs);
         app.Shutdown ();
     }
 
-    // Invoke Tests
-    // TODO: Test with threading scenarios
     [Fact]
     public void Invoke_Adds_Idle ()
     {
@@ -295,12 +255,11 @@ public class ApplicationTests
         SessionToken rs = app.Begin (top);
 
         var actionCalled = 0;
-        app.Invoke (_ => { actionCalled++; });
+        app.Invoke ((_) => { actionCalled++; });
         app.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
-
-        app.End (rs);
         top.Dispose ();
+
         app.Shutdown ();
     }
 
@@ -350,16 +309,10 @@ public class ApplicationTests
         driver.Cols = 100;
         driver.Rows = 30;
 
-        // IDriver.Screen isn't assignable
-        //driver.Screen = new (0, 0, driver.Cols, Rows);
-
         app.Driver!.SetScreenSize (100, 30);
 
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
-        // Assert does not make sense
-        // Assert.NotEqual (new (0, 0, 100, 30), app.Screen);
-        // Assert.Equal (new (0, 0, 80, 25), app.Screen);
         app.Screen = new (0, 0, driver.Cols, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
@@ -372,12 +325,6 @@ public class ApplicationTests
         IApplication app = Application.Create ();
         app.Shutdown ();
     }
-
-    //[Fact]
-    //public void InitState_Throws_If_Driver_Is_Null ()
-    //{
-    //    Assert.Throws<ArgumentNullException> (static () => Application.SubscribeDriverEvents ());
-    //}
 
     #region RunTests
 
@@ -509,7 +456,6 @@ public class ApplicationTests
         }
     }
 
-    // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
     [Fact]
     public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
     {
@@ -565,11 +511,6 @@ public class ApplicationTests
             e.State.Result = (e.State.Runnable as IRunnable<object?>)?.Result;
         }
     }
-
-    private class TestToplevel : Toplevel
-    { }
-
-    // TODO: Add tests for Run that test errorHandler
 
     #endregion
 

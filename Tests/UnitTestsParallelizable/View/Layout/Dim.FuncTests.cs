@@ -1,7 +1,7 @@
 ﻿using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
-namespace UnitTests_Parallelizable.LayoutTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class DimFuncTests (ITestOutputHelper output)
 {

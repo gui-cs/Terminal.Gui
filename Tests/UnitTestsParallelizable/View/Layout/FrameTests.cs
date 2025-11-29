@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.LayoutTests;
+﻿namespace UnitTests_Parallelizable.ViewTests;
 
 public class FrameTests
 {

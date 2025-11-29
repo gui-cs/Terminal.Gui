@@ -34,6 +34,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
 
     }
+
     /// <inheritdoc/>
     public TResult? Result { get; set; }
 
@@ -53,10 +54,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     public bool IsRunning => _isRunning;
 
     /// <inheritdoc/>
-    public void SetIsRunning (bool value)
-    {
-        _isRunning = value;
-    }
+    public void SetIsRunning (bool value) { _isRunning = value; }
 
     /// <inheritdoc />
     public virtual void RequestStop ()
@@ -167,10 +165,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     public bool IsModal => _isModal;
 
     /// <inheritdoc/>
-    public void SetIsModal (bool value)
-    {
-        _isModal = value;
-    }
+    public void SetIsModal (bool value) { _isModal = value; }
 
     /// <inheritdoc />
     public bool StopRequested
