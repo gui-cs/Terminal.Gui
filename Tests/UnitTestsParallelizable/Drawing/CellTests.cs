@@ -23,6 +23,7 @@ public class CellTests
     [InlineData ("æ", new uint [] { 0x00E6 })]
     [InlineData ("a︠", new uint [] { 0x0061, 0xFE20 })]
     [InlineData ("e︡", new uint [] { 0x0065, 0xFE21 })]
+    [InlineData ("🇵🇹", new uint [] { 0x1F1F5, 0x1F1F9 })]
     public void Runes_From_Grapheme (string grapheme, uint [] expected)
     {
         // Arrange
@@ -88,6 +89,7 @@ public class CellTests
         yield return ["👨‍👩‍👦‍👦", null, "[\"👨‍👩‍👦‍👦\":]"];
         yield return ["A", new Attribute (Color.Red) { Style = TextStyle.Blink }, "[\"A\":[Red,Red,Blink]]"];
         yield return ["\U0001F469\u200D\u2764\uFE0F\u200D\U0001F48B\u200D\U0001F468", null, "[\"👩‍❤️‍💋‍👨\":]"];
+        yield return ["\uD83C\uDDF5\uD83C\uDDF9", null, "[\"🇵🇹\":]"];
     }
 
     [Fact]
@@ -176,5 +178,4 @@ public class CellTests
         // And if your Grapheme setter normalizes, assignment should throw as well
         Assert.Throws<ArgumentException> (() => new Cell () { Grapheme = s });
     }
-
 }
