@@ -5,6 +5,16 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
+    /// <summary>
+    /// Get or sets the <see cref="IDriver"/> instance associated with this output.
+    /// </summary>
+    internal IDriver? Driver { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
+    /// </summary>
+    internal bool IsVirtualTerminal { get; set; }
+
     private CursorVisibility? _cachedCursorVisibility;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().

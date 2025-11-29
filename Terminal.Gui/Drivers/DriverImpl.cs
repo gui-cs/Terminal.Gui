@@ -26,7 +26,7 @@ namespace Terminal.Gui.Drivers;
 ///         Applications interact with drivers through the <see cref="Application"/> class.
 ///     </para>
 /// </remarks>
-internal class DriverImpl : IDriverInternal
+internal class DriverImpl : IDriver
 {
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
@@ -50,7 +50,7 @@ internal class DriverImpl : IDriverInternal
     {
         InputProcessor = inputProcessor;
         _output = output;
-        IsVirtualTerminal = (_output as IOutputInternal)!.IsVirtualTerminal;
+        IsVirtualTerminal = (_output as OutputBase)!.IsVirtualTerminal;
         OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
@@ -74,7 +74,26 @@ internal class DriverImpl : IDriverInternal
 
         CreateClipboard ();
 
-        (_output as IOutputInternal)!.Driver = this;
+        (_output as OutputBase)!.Driver = this;
+    }
+
+    private bool _isVirtualTerminal = true;
+
+    /// <summary>
+    ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
+    /// </summary>
+    internal bool IsVirtualTerminal
+    {
+        get => _isVirtualTerminal;
+        set
+        {
+            _isVirtualTerminal = value;
+
+            if (!_isVirtualTerminal)
+            {
+                Force16Colors = true;
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -199,23 +218,6 @@ internal class DriverImpl : IDriverInternal
     }
 
     // TODO: Probably not everyone right?
-
-    private bool _isVirtualTerminal = true;
-
-    /// <inheritdoc />
-    public bool IsVirtualTerminal
-    {
-        get => _isVirtualTerminal;
-        set
-        {
-            _isVirtualTerminal = value;
-
-            if (!_isVirtualTerminal)
-            {
-                Force16Colors = true;
-            }
-        }
-    }
 
     /// <inheritdoc/>
 

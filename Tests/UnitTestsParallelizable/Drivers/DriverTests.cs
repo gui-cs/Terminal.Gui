@@ -96,7 +96,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void IsVirtualTerminal_Returns_Expected_Values ()
     {
-        IDriverInternal? driver = CreateFakeDriver () as IDriverInternal;
+        DriverImpl? driver = CreateFakeDriver () as DriverImpl;
         Assert.NotNull (driver?.IsVirtualTerminal);
         Assert.True (driver.IsVirtualTerminal);
 
@@ -107,7 +107,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void IsVirtualTerminal_True_Force16Colors_True_False ()
     {
-        IDriverInternal? driver = CreateFakeDriver () as IDriverInternal;
+        DriverImpl? driver = CreateFakeDriver () as DriverImpl;
         Assert.NotNull (driver?.IsVirtualTerminal);
         Assert.True (driver.IsVirtualTerminal);
         Assert.False (driver.Force16Colors);
@@ -120,7 +120,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void IsVirtualTerminal_False_Force16Colors_Is_Always_True ()
     {
-        IDriverInternal? driver = CreateFakeDriver () as IDriverInternal;
+        DriverImpl? driver = CreateFakeDriver () as DriverImpl;
         Assert.NotNull (driver?.IsVirtualTerminal);
         Assert.True (driver.IsVirtualTerminal);
         Assert.False (driver.Force16Colors);
@@ -135,7 +135,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void IsVirtualTerminal_True_False_SupportsTrueColor_Is_Always_True_False ()
     {
-        IDriverInternal? driver = CreateFakeDriver () as IDriverInternal;
+        DriverImpl? driver = CreateFakeDriver () as DriverImpl;
         Assert.NotNull (driver?.IsVirtualTerminal);
         Assert.True (driver.IsVirtualTerminal);
         Assert.True (driver.SupportsTrueColor);

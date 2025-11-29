@@ -4,15 +4,9 @@ namespace Terminal.Gui.Drivers;
 ///     Implementation of <see cref="IOutput"/> that uses native dotnet
 ///     methods e.g. <see cref="System.Console"/>
 /// </summary>
-public class NetOutput : OutputBase, IOutputInternal
+public class NetOutput : OutputBase, IOutput
 {
     private readonly bool _isWinPlatform;
-
-    /// <inheritdoc />
-    public IDriver? Driver { get; set; }
-
-    /// <inheritdoc />
-    public bool IsVirtualTerminal { get; init; } = true;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="NetOutput"/> class.
@@ -36,6 +30,8 @@ public class NetOutput : OutputBase, IOutputInternal
         {
             _isWinPlatform = true;
         }
+
+        IsVirtualTerminal = true;
     }
 
     /// <inheritdoc/>

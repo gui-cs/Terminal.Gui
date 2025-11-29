@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
-internal partial class WindowsOutput : OutputBase, IOutputInternal
+internal partial class WindowsOutput : OutputBase, IOutput
 {
     [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -99,12 +99,6 @@ internal partial class WindowsOutput : OutputBase, IOutputInternal
     private nint _screenBuffer;
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
-
-    /// <inheritdoc />
-    public IDriver? Driver { get; set; }
-
-    /// <inheritdoc />
-    public bool IsVirtualTerminal { get; init; } = true;
 
     public WindowsOutput ()
     {
