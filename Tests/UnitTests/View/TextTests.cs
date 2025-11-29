@@ -124,6 +124,7 @@ Y
 
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (15, 15);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
         Assert.Equal (new (0, 0, 15, 15), win.Margin!.Frame);
@@ -389,6 +390,7 @@ Y
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (4, 10);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (5, text.Length);
 
@@ -515,6 +517,7 @@ w ";
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 20);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -603,6 +606,7 @@ w ";
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (22, 22);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -787,6 +791,7 @@ w ";
         top.Add (frame);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (width + 2, 6);
+        Application.LayoutAndDraw ();
 
         // frame.Width is width + border wide (20 + 2) and 6 high
 
@@ -917,6 +922,7 @@ w ";
         top.Add (frame);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (9, height + 2);
+        Application.LayoutAndDraw ();
 
         if (autoSize)
         {

@@ -39,6 +39,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver?.SetScreenSize (30, 5);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (Alignment.Center, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -99,7 +100,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 6);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
         Assert.Equal (Alignment.Fill, checkBox2.TextAlignment);
@@ -160,7 +161,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (Alignment.Start, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);
@@ -211,7 +212,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (Alignment.End, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);

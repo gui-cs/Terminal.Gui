@@ -60,7 +60,7 @@ public class LabelTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         var expected = @"
 ┌────────────────────────────┐
 │                            │
@@ -264,7 +264,7 @@ t
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
@@ -296,7 +296,7 @@ t
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
@@ -685,7 +685,7 @@ t
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -733,7 +733,7 @@ t
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
         Assert.Equal (new (0, 7, 29, 1), label.Frame);
@@ -805,6 +805,7 @@ t
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  Application.Driver!.SetScreenSize (22, count + 4);
+                                 Application.LayoutAndDraw ();
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -965,6 +966,7 @@ t
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  Application.Driver!.SetScreenSize (22, count + 4);
+                                 Application.LayoutAndDraw (); 
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1045,7 +1047,7 @@ t
         top.Add (win);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
@@ -1104,7 +1106,7 @@ t
         top.Add (win);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);

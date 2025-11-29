@@ -33,6 +33,7 @@ public class DrawTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
+        Application.LayoutAndDraw ();
 
         const string expectedOutput = """
 
@@ -641,7 +642,7 @@ public class DrawTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
-
+        Application.LayoutAndDraw ();
 
         var expected = """
 

@@ -218,6 +218,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         top.Add (view);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 10);
+        Application.LayoutAndDraw ();
 
         var expected = @"
 ┌──────────────────┐
@@ -283,6 +284,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         top.Add (view);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 10);
+        Application.LayoutAndDraw ();
 
         var expected = @"
 ┌──────────────────┐

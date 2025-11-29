@@ -250,7 +250,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver?.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw();
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{Glyphs.LeftBracket} {btn.Text} {Glyphs.RightBracket}", btn.TextFormatter.Text);

@@ -458,6 +458,7 @@ public class ViewTests
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
         Application.Driver!.SetScreenSize (30, 5);
+        Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

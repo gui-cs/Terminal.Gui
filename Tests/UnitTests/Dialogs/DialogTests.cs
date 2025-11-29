@@ -1243,6 +1243,7 @@ public class DialogTests (ITestOutputHelper output)
         };
         Application.Begin (d);
         Application.Driver?.SetScreenSize (100, 100);
+        Application.LayoutAndDraw ();
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 7;
@@ -1279,6 +1280,7 @@ public class DialogTests (ITestOutputHelper output)
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
         Application.Begin (d);
         Application.Driver?.SetScreenSize (20, 10);
+        Application.LayoutAndDraw ();
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         Assert.Equal (new (expected, expected), d.Frame.Location);
@@ -1421,6 +1423,7 @@ public class DialogTests (ITestOutputHelper output)
 
         Application.Begin (d);
         Application.Driver?.SetScreenSize (100, 100);
+        Application.LayoutAndDraw ();
 
         // Default size is Percent(85) 
         Assert.Equal (new ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);

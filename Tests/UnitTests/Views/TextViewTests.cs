@@ -5524,7 +5524,7 @@ This is the second line.
                                                       );
 
         Application.Driver!.SetScreenSize (6, 25);
-        tv.SetRelativeLayout (Application.Screen.Size);
+        Application.LayoutAndDraw ();
         tv.Draw ();
         Assert.Equal (new (4, 2), tv.CursorPosition);
         Assert.Equal (new (12, 0), cp);
