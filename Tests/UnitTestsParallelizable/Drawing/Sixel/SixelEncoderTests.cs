@@ -1,4 +1,5 @@
-﻿
+﻿#nullable enable
+
 namespace UnitTests_Parallelizable.DrawingTests;
 
 public class SixelEncoderTests
@@ -37,7 +38,7 @@ public class SixelEncoderTests
         {
             for (var y = 0; y < 12; y++)
             {
-                pixels [x, y] = new (255, 0, 0);
+                pixels [x, y] = new (255, 0);
             }
         }
 
@@ -48,7 +49,7 @@ public class SixelEncoderTests
         // Since image is only red we should only have 1 color definition
         Color c1 = Assert.Single (encoder.Quantizer.Palette);
 
-        Assert.Equal (new (255, 0, 0), c1);
+        Assert.Equal (new (255, 0), c1);
         Assert.Equal (expected, result);
     }
 
@@ -124,7 +125,7 @@ public class SixelEncoderTests
                 // Create a 3x3 checkerboard by alternating the color based on pixel coordinates
                 if ((x / 3 + y / 3) % 2 == 0)
                 {
-                    pixels [x, y] = new (0, 0, 0); // Black
+                    pixels [x, y] = new (0, 0); // Black
                 }
                 else
                 {
@@ -142,7 +143,7 @@ public class SixelEncoderTests
         Color black = encoder.Quantizer.Palette.ElementAt (0);
         Color white = encoder.Quantizer.Palette.ElementAt (1);
 
-        Assert.Equal (new (0, 0, 0), black);
+        Assert.Equal (new (0, 0), black);
         Assert.Equal (new (255, 255, 255), white);
 
         // Compare the generated SIXEL string with the expected one
@@ -213,7 +214,7 @@ public class SixelEncoderTests
                 // For simplicity, we'll make every other row transparent
                 if (y % 2 == 0)
                 {
-                    pixels [x, y] = new (255, 0, 0); // Red pixel
+                    pixels [x, y] = new (255, 0); // Red pixel
                 }
                 else
                 {
@@ -228,5 +229,115 @@ public class SixelEncoderTests
 
         // Assert: Expect the result to match the expected sixel output
         Assert.Equal (expected, result);
+    }
+
+    [Fact]
+    public void EncodeSixel_OnePixel_ReturnsExpectedSequence ()
+    {
+        // Arrange: 1x1 red pixel
+        Color [,] pixels = new Color [1, 1];
+        pixels [0, 0] = new (255, 0);
+
+        var encoder = new SixelEncoder ();
+
+        // Act
+        string result = encoder.EncodeSixel (pixels);
+
+        // Build expected output
+        string expected = "\u001bP" // start
+                          + "0;0;0"
+                          + "q"
+                          + "\"1;1;1;1" // no-scaling + width;height
+                          + "#0;2;100;0;0" // palette
+                          + "#0@$" // single column, single row -> code 1 -> char(1+63) = '@', then $ terminator
+                          + "\u001b\\";
+
+        Assert.Equal (expected, result);
+    }
+
+    [Fact]
+    public void EncodeSixel_WidthRepeat_UsesSequenceRepeatSyntax ()
+    {
+        // Arrange: width 5, height 1, all same color so sequence repeat > 3
+        int width = 5;
+        Color [,] pixels = new Color [width, 1];
+
+        for (var x = 0; x < width; x++)
+        {
+            pixels [x, 0] = new (255, 0);
+        }
+
+        var encoder = new SixelEncoder ();
+
+        // Act
+        string result = encoder.EncodeSixel (pixels);
+
+        // Assert contains the repeat sequence for 5 identical columns: "!5"
+        Assert.Contains ("!5", result);
+
+        // And final payload for the color should include the palette definition
+        Assert.Contains ("#0;2;100;0;0", result);
+    }
+
+    [Fact]
+    public void EncodeSixel_HeightNotMultipleOfSix_IncludesBandSeparator ()
+    {
+        // Arrange: width 2, height 7 to force two bands (6 rows + 1 row)
+        Color [,] pixels = new Color [2, 7];
+
+        for (var x = 0; x < 2; x++)
+        {
+            for (var y = 0; y < 7; y++)
+            {
+                pixels [x, y] = new (0, 0, 255);
+            }
+        }
+
+        var encoder = new SixelEncoder ();
+
+        // Act
+        string result = encoder.EncodeSixel (pixels);
+
+        // Assert: there must be a band separator '-' between the bands
+        Assert.Contains ("-", result);
+    }
+
+    [Fact]
+    public void EncodeSixel_AnyTransparentPixel_SetsTransparencyFlagInHeader ()
+    {
+        // Arrange: 2x2 with one fully transparent pixel
+        Color [,] pixels = new Color [2, 2];
+        pixels [0, 0] = new (255, 0);
+        pixels [0, 1] = new (0, 0, 0, 0); // fully transparent
+        pixels [1, 0] = new (0, 255);
+        pixels [1, 1] = new (0, 0, 255);
+
+        var encoder = new SixelEncoder ();
+
+        // Act
+        string result = encoder.EncodeSixel (pixels);
+
+        // defaultRatios should be "0;1;0" when any pixel has alpha == 0
+        Assert.Contains ("\u001bP0;1;0q", result);
+    }
+
+    [Fact]
+    public void EncodeSixel_MaxPaletteHonored_WhenReducedMaxColors ()
+    {
+        // Arrange: create three distinct colors but restrict max palette to 2
+        Color [,] pixels = new Color [3, 1];
+        pixels [0, 0] = new (255, 0);
+        pixels [1, 0] = new (0, 255);
+        pixels [2, 0] = new (0, 0, 255);
+
+        var encoder = new SixelEncoder ();
+        encoder.Quantizer.MaxColors = 2;
+
+        // Act
+        string result = encoder.EncodeSixel (pixels);
+
+        // Assert: palette count must respect MaxColors (<= 2) and encoding must not throw
+        Assert.True (encoder.Quantizer.Palette.Count <= 2);
+        Assert.False (string.IsNullOrEmpty (result));
     }
 }
