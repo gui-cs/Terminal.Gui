@@ -68,8 +68,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                      .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v4.HasFocus)
                                      .EnqueueKeyEvent (Key.F6)
-                                     .AssertTrue (v6.HasFocus)
-                                     .Stop ();
+                                     .AssertTrue (v6.HasFocus);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
