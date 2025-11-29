@@ -107,7 +107,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public override void EndInit ()
     {
         base.EndInit ();
-        App ??= SuperView?.App;
         Debug.Assert (App is { });
         UpdateKeyBindings (Key.Empty);
     }
@@ -634,7 +633,7 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _bindKeyToApplication;
         set
         {
-            App ??= SuperView?.App;
+            Debug.Assert (App is { });
 
             if (value == _bindKeyToApplication)
             {
