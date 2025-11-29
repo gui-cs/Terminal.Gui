@@ -50,7 +50,6 @@ internal class DriverImpl : IDriver
     {
         InputProcessor = inputProcessor;
         _output = output;
-        IsVirtualTerminal = (_output as OutputBase)!.IsVirtualTerminal;
         OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
@@ -74,7 +73,11 @@ internal class DriverImpl : IDriver
 
         CreateClipboard ();
 
-        (_output as OutputBase)!.Driver = this;
+        if (_output is OutputBase outputBase)
+        {
+            IsVirtualTerminal = outputBase.IsVirtualTerminal;
+            outputBase.Driver = this;
+        }
     }
 
     private bool _isVirtualTerminal = true;
