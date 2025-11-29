@@ -353,6 +353,8 @@ internal partial class WindowsOutput : OutputBase, IOutput
             }
             else
             {
+                Write (output);
+                output.Clear ();
                 var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
                 SetConsoleTextAttribute (_screenBuffer, as16ColorInt);
             }

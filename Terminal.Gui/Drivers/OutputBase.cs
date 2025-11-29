@@ -59,7 +59,7 @@ public abstract class OutputBase
                 {
                     if (!buffer.Contents! [row, col].IsDirty)
                     {
-                        if (output.Length > 0)
+                        if (!IsVirtualTerminal && output.Length > 0)
                         {
                             WriteToConsole (output, ref lastCol, row, ref outputWidth);
                         }
@@ -92,11 +92,18 @@ public abstract class OutputBase
 
             if (output.Length > 0)
             {
-                SetCursorPositionImpl (lastCol, row);
+                if (IsVirtualTerminal)
+                {
+                    SetCursorPositionImpl (lastCol, row);
 
-                // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-                Write (processed);
+                    // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+                    StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+                    Write (processed);
+                }
+                else
+                {
+                    Write (output);
+                }
             }
         }
 
