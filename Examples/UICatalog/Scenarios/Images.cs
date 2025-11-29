@@ -246,7 +246,7 @@ public class Images : Scenario
         _sixelSupported.Dispose ();
         _isDisposed = true;
 
-        Application.Sixel.Clear ();
+        Application.Driver?.Sixel.Clear ();
     }
 
     private void OpenImage (object sender, CommandEventArgs e)
