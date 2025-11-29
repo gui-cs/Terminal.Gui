@@ -283,31 +283,24 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             base.Write (outputBuffer);
 
-            if (_force16Colors && !IsVirtualTerminal)
-            {
-                SetConsoleActiveScreenBuffer (_consoleBuffer);
-            }
-            else
-            {
-                ReadOnlySpan<char> span = _everythingStringBuilder.ToString ().AsSpan (); // still allocates the string
+            ReadOnlySpan<char> span = _everythingStringBuilder.ToString ().AsSpan (); // still allocates the string
 
-                bool result = WriteConsole (_consoleBuffer, span, (uint)span.Length, out _, nint.Zero);
+            bool result = WriteConsole (_consoleBuffer, span, (uint)span.Length, out _, nint.Zero);
 
-                if (!result)
+            if (!result)
+            {
+                int err = Marshal.GetLastWin32Error ();
+
+                if (err == 1)
                 {
-                    int err = Marshal.GetLastWin32Error ();
+                    Logging.Logger.LogError ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
 
-                    if (err == 1)
-                    {
-                        Logging.Logger.LogError ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
+                    return;
+                }
 
-                        return;
-                    }
-
-                    if (err != 0)
-                    {
-                        throw new Win32Exception (err);
-                    }
+                if (err != 0)
+                {
+                    throw new Win32Exception (err);
                 }
             }
         }
