@@ -488,21 +488,6 @@ public class ApplicationTests
         }
     }
 
-    [Fact]
-    [SetupFakeApplication]
-    public void Run_Loaded_Ready_Unloaded_Events ()
-    {
-        Application.StopAfterFirstIteration = true;
-
-        Toplevel top = new ();
-        var count = 0;
-        top.IsModalChanged += (s, e) => count++;
-        top.Ready += (s, e) => count++;
-        top.IsRunningChanged += (s, e) => count++;
-        Application.Run (top);
-        top.Dispose ();
-    }
-
     // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
     [Fact]
     [SetupFakeApplication]

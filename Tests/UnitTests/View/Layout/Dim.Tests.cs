@@ -111,7 +111,7 @@ public class DimTests
         w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        Assert.Equal ("Absolute(100)", w.Width.ToString ());
                        Assert.Equal ("Absolute(100)", w.Height.ToString ());

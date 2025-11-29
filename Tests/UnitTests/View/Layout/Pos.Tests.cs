@@ -19,7 +19,7 @@ public class PosTests ()
         w.Add (v);
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        v.Frame = new Rectangle (2, 2, 10, 10);
                        Assert.Equal (2, v.X = 2);
@@ -211,7 +211,7 @@ public class PosTests ()
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        Assert.Equal (2, w.X = 2);
                        Assert.Equal (2, w.Y = 2);
@@ -237,7 +237,7 @@ public class PosTests ()
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        Assert.Equal (2, w.X = 2);
                        Assert.Equal (2, w.Y = 2);

@@ -71,10 +71,13 @@ public class TreeUseCases : Scenario
 
         appWindow.Add (menu, statusBar);
 
-        appWindow.Ready += (sender, args) =>
+        appWindow.IsModalChanged += (sender, args) =>
         {
-            // Start with the most basic use case
-            LoadSimpleNodes ();
+            if (args.Value)
+            {
+                // Start with the most basic use case
+                LoadSimpleNodes ();
+            }
         };
 
         Application.Run (appWindow);

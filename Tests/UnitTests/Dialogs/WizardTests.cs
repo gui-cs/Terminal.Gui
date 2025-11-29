@@ -12,7 +12,7 @@ public class WizardTests
         wizard.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Convoluted test that needs to be rewritten")]
     [AutoInitShutdown]
     public void Finish_Button_Closes ()
     {

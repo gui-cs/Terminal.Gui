@@ -83,31 +83,6 @@ public partial class Toplevel : Runnable<int?>
     /// </summary>
     public bool IsLoaded { get; private set; }
 
-    /// <summary>
-    ///     Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration. Subscribe to this event to
-    ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
-    ///     <para>
-    ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
-    ///     </para>
-    /// </summary>
-    public event EventHandler? Ready;
-
-    /// <summary>
-    ///     Called from run loop after the <see cref="Toplevel"/> has entered the first iteration
-    ///     of the loop.
-    /// </summary>
-    internal virtual void OnReady ()
-    {
-        foreach (var view in SubViews.Where (v => v is Toplevel))
-        {
-            var tl = (Toplevel)view;
-            tl.OnReady ();
-        }
-
-        Ready?.Invoke (this, EventArgs.Empty);
-    }
-
     #endregion
 
     #region Size / Position Management

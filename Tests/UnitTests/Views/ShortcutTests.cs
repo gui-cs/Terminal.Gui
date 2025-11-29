@@ -380,11 +380,12 @@ public class ShortcutTests
 
         var shortcut = new Shortcut
         {
+            App = ApplicationImpl.Instance, // HACK: Move to Parallel and get rid of this
             BindKeyToApplication = true,
             Key = Key.A,
             Text = "0",
             Title = "_C",
-            CanFocus = canFocus
+            CanFocus = canFocus,
         };
 
         Application.TopRunnableView.Add (shortcut);
