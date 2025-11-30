@@ -42,7 +42,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
             Assert.NotNull (app.TopRunnableView);
             Assert.Same (toplevel, app.TopRunnableView);
-            Assert.Single (app.SessionStack);
+            Assert.Single (app.SessionStack!);
         }
         finally
         {
@@ -64,11 +64,11 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel2 = new () { Id = "2" };
 
             app.Begin (toplevel1);
-            Assert.Single (app.SessionStack);
+            Assert.Single (app.SessionStack!);
             Assert.Same (toplevel1, app.TopRunnableView);
 
             app.Begin (toplevel2);
-            Assert.Equal (2, app.SessionStack.Count);
+            Assert.Equal (2, app.SessionStack!.Count);
             Assert.Same (toplevel2, app.TopRunnableView);
         }
         finally
@@ -106,19 +106,19 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel1 = new () { Id = "1" };
             toplevel2 = new () { Id = "2" };
 
-            SessionToken token1 = app.Begin (toplevel1);
-            SessionToken token2 = app.Begin (toplevel2);
+            SessionToken token1 = app.Begin (toplevel1)!;
+            SessionToken token2 = app.Begin (toplevel2)!;
 
-            Assert.Equal (2, app.SessionStack.Count);
+            Assert.Equal (2, app.SessionStack!.Count);
 
             app.End (token2);
 
-            Assert.Single (app.SessionStack);
+            Assert.Single (app.SessionStack!);
             Assert.Same (toplevel1, app.TopRunnableView);
 
             app.End (token1);
 
-            Assert.Empty (app.SessionStack);
+            Assert.Empty (app.SessionStack!);
         }
         finally
         {
@@ -140,12 +140,12 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel1 = new () { Id = "1" };
             toplevel2 = new () { Id = "2" };
 
-            SessionToken token1 = app.Begin (toplevel1);
-            SessionToken token2 = app.Begin (toplevel2);
+            SessionToken? token1 = app.Begin (toplevel1);
+            SessionToken? token2 = app.Begin (toplevel2);
 
             // Trying to end token1 when token2 is on top should throw
             // NOTE: This throws but has the side effect of popping token2 from the stack
-            Assert.Throws<ArgumentException> (() => app.End (token1));
+            Assert.Throws<ArgumentException> (() => app.End (token1!));
 
             // Don't try to clean up with more End calls - the state is now inconsistent
             // Let Shutdown/ResetState handle cleanup
@@ -175,19 +175,19 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel2 = new () { Id = "2" };
             toplevel3 = new () { Id = "3" };
 
-            SessionToken token1 = app.Begin (toplevel1);
-            SessionToken token2 = app.Begin (toplevel2);
-            SessionToken token3 = app.Begin (toplevel3);
+            SessionToken? token1 = app.Begin (toplevel1);
+            SessionToken? token2 = app.Begin (toplevel2);
+            SessionToken? token3 = app.Begin (toplevel3);
 
             Assert.Same (toplevel3, app.TopRunnableView);
 
-            app.End (token3);
+            app.End (token3!);
             Assert.Same (toplevel2, app.TopRunnableView);
 
-            app.End (token2);
+            app.End (token2!);
             Assert.Same (toplevel1, app.TopRunnableView);
 
-            app.End (token1);
+            app.End (token1!);
         }
         finally
         {
@@ -212,10 +212,11 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             {
                 var toplevel = new Toplevel { Id = $"toplevel-{i}" };
                 toplevels.Add (toplevel);
-                tokens.Add (app.Begin (toplevel));
+                SessionToken? token = app.Begin (toplevel);
+                tokens.Add (token!);
             }
 
-            Assert.Equal (5, app.SessionStack.Count);
+            Assert.Equal (5, app.SessionStack!.Count);
             Assert.Same (toplevels [4], app.TopRunnableView);
 
             // End them in reverse order (LIFO)
@@ -255,8 +256,8 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         {
             toplevel = new ();
 
-            SessionToken token = app.Begin (toplevel);
-            Assert.Same (toplevel, token.Runnable);
+            SessionToken? token = app.Begin (toplevel);
+            Assert.Same (toplevel, token!.Runnable);
 
             app.End (token);
 
@@ -284,7 +285,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             app.Begin (toplevel1);
             app.Begin (toplevel2);
 
-            Assert.Equal (2, app.SessionStack.Count);
+            Assert.Equal (2, app.SessionStack!.Count);
             Assert.NotNull (app.TopRunnableView);
         }
         finally
@@ -297,7 +298,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             app.Dispose ();
 
             // Verify cleanup happened
-            Assert.Empty (app.SessionStack);
+            Assert.Empty (app.SessionStack!);
             Assert.Null (app.TopRunnableView);
         }
     }
@@ -384,7 +385,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             }
 
             // All toplevels should be in the stack
-            Assert.Equal (10, app.SessionStack.Count);
+            Assert.Equal (10, app.SessionStack!.Count);
 
             // Verify stack contains all toplevels
             List<SessionToken> stackList = app.SessionStack.ToList ();

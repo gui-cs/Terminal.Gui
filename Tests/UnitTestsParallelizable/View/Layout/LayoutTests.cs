@@ -1,5 +1,4 @@
-﻿using UnitTests.Parallelizable;
-
+﻿#nullable enable
 namespace UnitTests_Parallelizable.ViewTests;
 
 public class LayoutTests

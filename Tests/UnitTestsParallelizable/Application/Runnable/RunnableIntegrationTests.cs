@@ -27,7 +27,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         int stackCountBefore = app.SessionStack?.Count ?? 0;
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.NotNull (token);
@@ -72,7 +72,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                    };
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (isModalChangedRaised);
@@ -98,7 +98,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                      };
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (isRunningChangedRaised);
@@ -126,7 +126,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                       };
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (isRunningChangingRaised);
@@ -145,7 +145,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Runnable<int> runnable = new ();
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (runnable.IsModal);
@@ -162,7 +162,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Runnable<int> runnable = new ();
 
         // Act
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (runnable.IsRunning);
@@ -187,7 +187,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         CancelableRunnable runnable = new () { CancelStop = true };
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         runnable.CancelStop = true; // Enable cancellation
 
         // Act
@@ -207,7 +207,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.End (token);
@@ -222,7 +222,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         var isRunningChangedRaised = false;
         bool? receivedValue = null;
 
@@ -246,7 +246,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         var isRunningChangingRaised = false;
         bool? oldValue = null;
         bool? newValue = null;
@@ -273,7 +273,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         int stackCountBefore = app.SessionStack?.Count ?? 0;
 
         // Act
@@ -289,7 +289,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.End (token);
@@ -304,7 +304,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         Runnable<int> runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.End (token);
@@ -392,7 +392,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         StoppableRunnable runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.RequestStop (runnable);
@@ -411,7 +411,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         // Arrange
         IApplication app = GetApp ();
         StoppableRunnable runnable = new ();
-        SessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.RequestStop ((IRunnable?)null);

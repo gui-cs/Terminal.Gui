@@ -7,15 +7,15 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         Toplevel views can run as modal (popup) views, started by calling
-///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
-///         <see cref="IApplication.RequestStop(Toplevel)"/> has been called (which sets the <see cref="IsRunning"/>
+///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. They return control to the caller when
+///         <see cref="IApplication.RequestStop(IRunnable)"/> has been called (which sets the <see cref="IRunnable.IsRunning"/>
 ///         property to <c>false</c>).
 ///     </para>
 ///     <para>
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="IApplication.Init"/>.
 ///         The application Toplevel can be accessed via <see cref="IApplication.TopRunnableView"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
-///         <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>.
+///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : Runnable<int?>
@@ -78,7 +78,7 @@ public partial class Toplevel : Runnable<int?>
 
     // TODO: Deprecate. Other than a few tests, this is not used anywhere.
     /// <summary>
-    ///     <see langword="true"/> if was already loaded by the <see cref="IApplication.Begin(Toplevel)"/>
+    ///     <see langword="true"/> if was already loaded by the <see cref="IApplication.Begin(IRunnable)"/>
     ///     <see langword="false"/>, otherwise.
     /// </summary>
     public bool IsLoaded { get; private set; }

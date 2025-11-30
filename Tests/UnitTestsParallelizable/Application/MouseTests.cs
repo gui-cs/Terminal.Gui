@@ -1,4 +1,4 @@
-using Terminal.Gui.App;
+#nullable enable
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests;
@@ -9,8 +9,6 @@ namespace UnitTests_Parallelizable.ApplicationTests;
 /// </summary>
 public class MouseTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public void Mouse_Instance_CreatedSuccessfully ()
     {
@@ -76,7 +74,7 @@ public class MouseTests (ITestOutputHelper output)
 
         // Assert - CachedViewsUnderMouse should be cleared
         Assert.Empty (mouse.CachedViewsUnderMouse);
-        
+
         // Event handlers should be cleared
         MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
         mouse.RaiseMouseEvent (mouseEvent);
@@ -141,7 +139,7 @@ public class MouseTests (ITestOutputHelper output)
     [InlineData (0, 10, 0, 0, 0, false)]
     [InlineData (0, 0, 10, 0, 0, false)]
 
-    // view is offset from origin ; click is on border 
+    // view is offset from origin ; click is on border
     [InlineData (1, 1, 1, 0, 0, false)]
     [InlineData (1, 2, 1, 0, 0, false)]
     [InlineData (1, 1, 2, 0, 0, false)]

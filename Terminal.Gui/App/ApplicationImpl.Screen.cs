@@ -151,7 +151,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. SessionStack!.Select(r => r.Runnable as View)!];
+        List<View> tops = [.. SessionStack!.Select(r => r.Runnable! as View)!];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {

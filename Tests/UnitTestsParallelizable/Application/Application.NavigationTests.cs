@@ -34,7 +34,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         };
         subView.Add (subSubView);
 
-        SessionToken rs = application.Begin (runnable);
+        SessionToken? rs = application.Begin (runnable);
         Assert.True (runnable.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.True (subSubView.HasFocus);
@@ -131,7 +131,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
             CanFocus = true
         };
 
-        app!.TopRunnableView.Add (subView1);
+        app.TopRunnableView!.Add (subView1);
 
         app.TopRunnableView.SetFocus ();
         Assert.True (subView1.HasFocus);

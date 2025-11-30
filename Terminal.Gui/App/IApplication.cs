@@ -71,11 +71,6 @@ public interface IApplication : IDisposable
     ///         <see cref="Run{TRunnable}"/> has returned) to ensure resources are cleaned up and terminal settings restored.
     ///     </para>
     ///     <para>
-    ///         The <see cref="Run{TRunnable}"/> function combines <see cref="Init(string)"/> and
-    ///         <see cref=""/> into a single call. An application can use
-    ///         <see cref="Run{TRunnable}"/> without explicitly calling <see cref="Init(string)"/>.
-    ///     </para>
-    ///     <para>
     ///         Supports fluent API: <c>Application.Create().Init().Run&lt;MyView&gt;().Shutdown()</c>
     ///     </para>
     /// </remarks>
@@ -173,8 +168,8 @@ public interface IApplication : IDisposable
     ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
     ///     </para>
     ///     <para>
-    ///         To make <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call
-    ///         <see cref="RequestStop()"/> or <see cref="RequestStop(Toplevel)"/>.
+    ///         To make <see cref="Run(IRunnable, Func{Exception, bool})"/> stop execution, call
+    ///         <see cref="RequestStop()"/> or <see cref="RequestStop(IRunnable)"/>.
     ///     </para>
     ///     <para>
     ///         In RELEASE builds: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
@@ -243,9 +238,9 @@ public interface IApplication : IDisposable
 
     /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
     /// <remarks>
-    ///     <para>This will cause <see cref="Run(Toplevel, Func{Exception, bool})"/> to return.</para>
+    ///     <para>This will cause <see cref="Run(IRunnable, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         This is equivalent to calling <see cref="RequestStop(Toplevel)"/> with <see cref="TopRunnableView"/> as the
+    ///         This is equivalent to calling <see cref="RequestStop(IRunnable)"/> with <see cref="TopRunnableView"/> as the
     ///         parameter.
     ///     </para>
     /// </remarks>
@@ -264,10 +259,10 @@ public interface IApplication : IDisposable
     bool StopAfterFirstIteration { get; set; }
 
     /// <summary>
-    ///     Raised when <see cref="Begin(Toplevel)"/> has been called and has created a new <see cref="SessionToken"/>.
+    ///     Raised when <see cref="Begin(IRunnable)"/> has been called and has created a new <see cref="SessionToken"/>.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(Toplevel)"/>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
     ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
     ///     when the application is done.
     /// </remarks>
@@ -279,7 +274,7 @@ public interface IApplication : IDisposable
     ///     that was active during the session. This can be used to ensure the Toplevel is disposed of properly.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(Toplevel)"/>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
     ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
     ///     when the application is done.
     /// </remarks>
@@ -377,7 +372,7 @@ public interface IApplication : IDisposable
     ///     </para>
     ///     <para>
     ///         Raises the <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
-    ///         <see cref="IRunnable.IsModalChanging"/>, and <see cref="IRunnable.IsModalChanged"/> events.
+    ///         and <see cref="IRunnable.IsModalChanged"/> events.
     ///     </para>
     /// </remarks>
     /// <returns>The session token. <see langword="null"/> if the operation was cancelled.</returns>

@@ -16,14 +16,14 @@ public class ApplicationMouseEnterLeaveTests
             Height = 1;
         }
 
-        public bool CancelOnEnter { get; }
+       // public bool CancelOnEnter { get; }
         public int OnMouseEnterCalled { get; private set; }
         public int OnMouseLeaveCalled { get; private set; }
 
         protected override bool OnMouseEnter (CancelEventArgs eventArgs)
         {
             OnMouseEnterCalled++;
-            eventArgs.Cancel = CancelOnEnter;
+           // eventArgs.Cancel = CancelOnEnter;
 
             base.OnMouseEnter (eventArgs);
 

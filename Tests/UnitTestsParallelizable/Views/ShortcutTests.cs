@@ -1,9 +1,7 @@
-﻿using JetBrains.Annotations;
-using UnitTests.Parallelizable;
+﻿#nullable enable
+using JetBrains.Annotations;
 
 namespace UnitTests_Parallelizable.ViewsTests;
-
-[Collection ("Global Test Setup")]
 
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests

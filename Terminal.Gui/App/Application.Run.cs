@@ -42,7 +42,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.Begin(IRunnable)"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static SessionToken Begin (IRunnable runnable) => ApplicationImpl.Instance.Begin (runnable);
+    public static SessionToken Begin (IRunnable runnable) => ApplicationImpl.Instance.Begin (runnable)!;
 
     /// <inheritdoc cref="IApplication.PositionCursor"/>
     [Obsolete ("The legacy static Application object is going away.")]
@@ -55,7 +55,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     public static IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
         where TRunnable : Toplevel, new() => ApplicationImpl.Instance.Run<TRunnable> (errorHandler, driverName);
 
-    /// <inheritdoc cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>
+    /// <inheritdoc cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static void Run (Toplevel view, Func<Exception, bool>? errorHandler = null) => ApplicationImpl.Instance.Run (view, errorHandler);
 
@@ -92,7 +92,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
         set => ApplicationImpl.Instance.StopAfterFirstIteration = value;
     }
 
-    /// <inheritdoc cref="IApplication.RequestStop(Toplevel)"/>
+    /// <inheritdoc cref="IApplication.RequestStop(IRunnable)"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
 

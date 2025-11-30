@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="IApplication.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
+///     <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
 ///     or when one of the views or buttons added to the dialog calls
 ///     <see cref="IApplication.RequestStop()"/>.

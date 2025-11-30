@@ -114,7 +114,7 @@ public partial class ApplicationImpl
     ///         as <see cref="Shutdown"/>, but without returning a result.
     ///     </para>
     ///     <para>
-    ///         After calling <see cref="Dispose"/>, use <see cref="GetResult"/> or <see cref="IApplication.GetResult{T}"/>
+    ///         After calling <see cref="Dispose()"/>, use <see cref="GetResult"/> or <see cref="IApplication.GetResult{T}"/>
     ///         to retrieve the result from the last run session.
     ///     </para>
     /// </remarks>
@@ -128,7 +128,7 @@ public partial class ApplicationImpl
     ///     Disposes the application instance and releases all resources.
     /// </summary>
     /// <param name="disposing">
-    ///     <see langword="true"/> if called from <see cref="Dispose"/>;
+    ///     <see langword="true"/> if called from <see cref="Dispose()"/>;
     ///     <see langword="false"/> if called from finalizer.
     /// </param>
     protected virtual void Dispose (bool disposing)

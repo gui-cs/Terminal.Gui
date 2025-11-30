@@ -468,7 +468,7 @@ public class ApplicationTests (ITestOutputHelper output)
             Arrangement = ViewArrangement.Movable
         };
         app.Driver!.SetScreenSize (10, 10);
-        SessionToken rs = app.Begin (w);
+        SessionToken? rs = app.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.
         Assert.Equal (new (0, 0), w.Frame.Location);

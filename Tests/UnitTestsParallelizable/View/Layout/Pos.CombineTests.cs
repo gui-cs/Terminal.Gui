@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿
+using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 using static Terminal.Gui.ViewBase.Pos;
 

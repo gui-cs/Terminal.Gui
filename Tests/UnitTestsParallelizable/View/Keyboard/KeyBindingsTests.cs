@@ -1,19 +1,16 @@
-﻿using System.Text;
-using UnitTests;
-using Xunit.Abstractions;
-
+﻿#nullable enable
 namespace UnitTests_Parallelizable.ViewTests;
 
 /// <summary>
 ///     Tests for View.KeyBindings
 /// </summary>
-public class KeyBindingsTests ()
+public class KeyBindingsTests
 {
     [Fact]
     public void Focused_HotKey_Application_All_Work ()
     {
-        IApplication? app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        IApplication app = Application.Create ();
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
@@ -52,7 +49,7 @@ public class KeyBindingsTests ()
     public void KeyBinding_Negative ()
     {
         IApplication? app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
@@ -77,7 +74,7 @@ public class KeyBindingsTests ()
     public void HotKey_KeyBinding ()
     {
         IApplication? app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
         var view = new ScopedKeyBindingView ();
         app!.TopRunnableView!.Add (view);
@@ -106,7 +103,7 @@ public class KeyBindingsTests ()
     public void HotKey_KeyBinding_Negative ()
     {
         IApplication? app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
@@ -143,7 +140,6 @@ public class KeyBindingsTests ()
         Assert.False (view.HotKeyCommand);
     }
 
-
     [Fact]
     public void HotKey_Raises_HotKeyCommand ()
     {
@@ -156,7 +152,7 @@ public class KeyBindingsTests ()
         var view = new View
         {
             CanFocus = true,
-            HotKeySpecifier = new Rune ('_'),
+            HotKeySpecifier = new ('_'),
             Title = "_Test"
         };
         app!.TopRunnableView!.Add (view);
@@ -183,13 +179,13 @@ public class KeyBindingsTests ()
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
-
     }
+
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
 
     public class ScopedKeyBindingView : View
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override void EndInit ()
         {
             base.EndInit ();
