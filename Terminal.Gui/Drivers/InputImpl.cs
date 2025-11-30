@@ -46,8 +46,6 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
 
             do
             {
-                DateTime dt = Now ();
-
                 while (Peek ())
                 {
                     foreach (TInputRecord r in Read ())
@@ -57,6 +55,11 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
                 }
 
                 effectiveToken.ThrowIfCancellationRequested ();
+
+                // Throttle the input loop to avoid CPU spinning when no input is available
+                // This is especially important when multiple ApplicationImpl instances are created
+                // in parallel tests without calling Shutdown() - prevents thread pool exhaustion
+                Task.Delay (20, effectiveToken).Wait (effectiveToken);
             }
             while (!effectiveToken.IsCancellationRequested);
         }
