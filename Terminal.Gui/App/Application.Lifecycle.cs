@@ -50,7 +50,13 @@ public static partial class Application // Lifecycle (Init/Shutdown)
 
     /// <inheritdoc cref="IApplication.Shutdown"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
+    public static void Shutdown ()
+    {
+        ApplicationImpl.Instance.Shutdown ();
+
+        // Use the static reset method to bypass the fence check
+        ApplicationImpl.ResetStateStatic ();
+    }
 
     /// <inheritdoc cref="IApplication.Initialized"/>
     [Obsolete ("The legacy static Application object is going away.")]
