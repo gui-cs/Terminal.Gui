@@ -112,7 +112,7 @@ public abstract class OutputBase
             if (!string.IsNullOrWhiteSpace (s.SixelData))
             {
                 SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Out.Write (s.SixelData);
+                Write ((StringBuilder)new (s.SixelData));
             }
         }
 
