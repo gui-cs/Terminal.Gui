@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Moq;
 
 namespace UnitTests_Parallelizable.ApplicationTests;
@@ -58,7 +57,7 @@ public class ApplicationImplTests
 
         Assert.NotEmpty (app.Keyboard.KeyBindings.GetBindings ());
 
-        app.Dispose();
+        app.Dispose ();
     }
 
     [Fact]
@@ -77,19 +76,19 @@ public class ApplicationImplTests
         app.Init ("fake");
 
         object? timeoutToken = app.AddTimeout (
-                                                TimeSpan.FromMilliseconds (150),
-                                                () =>
-                                                {
-                                                    if (app.TopRunnableView is { })
-                                                    {
-                                                        app.RequestStop ();
+                                               TimeSpan.FromMilliseconds (150),
+                                               () =>
+                                               {
+                                                   if (app.TopRunnableView is { })
+                                                   {
+                                                       app.RequestStop ();
 
-                                                        return false;
-                                                    }
+                                                       return false;
+                                                   }
 
-                                                    return false;
-                                                }
-                                               );
+                                                   return false;
+                                               }
+                                              );
         Assert.Null (app.TopRunnableView);
 
         // Blocks until the timeout call is hit
@@ -116,22 +115,22 @@ public class ApplicationImplTests
             Title = "InitRunShutdown_Running_Set_To_False"
         };
 
-        object timeoutToken = app.AddTimeout (
-                                              TimeSpan.FromMilliseconds (150),
-                                              () =>
-                                              {
-                                                  Assert.True (top!.IsRunning);
+        object? timeoutToken = app.AddTimeout (
+                                               TimeSpan.FromMilliseconds (150),
+                                               () =>
+                                               {
+                                                   Assert.True (top!.IsRunning);
 
-                                                  if (app.TopRunnableView != null)
-                                                  {
-                                                      app.RequestStop ();
+                                                   if (app.TopRunnableView != null)
+                                                   {
+                                                       app.RequestStop ();
 
-                                                      return false;
-                                                  }
+                                                       return false;
+                                                   }
 
-                                                  return false;
-                                              }
-                                             );
+                                                   return false;
+                                               }
+                                              );
 
         Assert.False (top.IsRunning);
 
@@ -170,15 +169,15 @@ public class ApplicationImplTests
         top.IsRunningChanged
             += (_, a) => { isRunningChangedCount++; };
 
-        object timeoutToken = app.AddTimeout (
-                                              TimeSpan.FromMilliseconds (150),
-                                              () =>
-                                              {
-                                                  //Assert.Fail (@"Didn't stop after first iteration.");
+        object? timeoutToken = app.AddTimeout (
+                                               TimeSpan.FromMilliseconds (150),
+                                               () =>
+                                               {
+                                                   //Assert.Fail (@"Didn't stop after first iteration.");
 
-                                                  return false;
-                                              }
-                                             );
+                                                   return false;
+                                               }
+                                              );
 
         Assert.Equal (0, isIsModalChanged);
         Assert.Equal (0, isRunningChangedCount);
@@ -217,22 +216,22 @@ public class ApplicationImplTests
         top.IsRunningChanged
             += (_, a) => { isRunningChangedCount++; };
 
-        object timeoutToken = app.AddTimeout (
-                                              TimeSpan.FromMilliseconds (150),
-                                              () =>
-                                              {
-                                                  Assert.True (top!.IsRunning);
+        object? timeoutToken = app.AddTimeout (
+                                               TimeSpan.FromMilliseconds (150),
+                                               () =>
+                                               {
+                                                   Assert.True (top!.IsRunning);
 
-                                                  if (app.TopRunnableView != null)
-                                                  {
-                                                      app.RequestStop ();
+                                                   if (app.TopRunnableView != null)
+                                                   {
+                                                       app.RequestStop ();
 
-                                                      return false;
-                                                  }
+                                                       return false;
+                                                   }
 
-                                                  return false;
-                                              }
-                                             );
+                                                   return false;
+                                               }
+                                              );
 
         Assert.Equal (0, isIsModalChanged);
         Assert.Equal (0, isRunningChangedCount);
@@ -244,7 +243,7 @@ public class ApplicationImplTests
         Assert.Equal (2, isRunningChangedCount);
 
         // We returned false above, so we should not have to remove the timeout
-        Assert.False (app.RemoveTimeout (timeoutToken));
+        Assert.False (app.RemoveTimeout (timeoutToken!));
 
         app.TopRunnableView?.Dispose ();
         app.Dispose ();
@@ -264,20 +263,20 @@ public class ApplicationImplTests
             Title = "InitRunShutdown_QuitKey_Quits"
         };
 
-        object timeoutToken = app.AddTimeout (
-                                              TimeSpan.FromMilliseconds (150),
-                                              () =>
-                                              {
-                                                  Assert.True (top!.IsRunning);
+        object? timeoutToken = app.AddTimeout (
+                                               TimeSpan.FromMilliseconds (150),
+                                               () =>
+                                               {
+                                                   Assert.True (top!.IsRunning);
 
-                                                  if (app.TopRunnableView != null)
-                                                  {
-                                                      app.Keyboard.RaiseKeyDownEvent (app.Keyboard.QuitKey);
-                                                  }
+                                                   if (app.TopRunnableView != null)
+                                                   {
+                                                       app.Keyboard.RaiseKeyDownEvent (app.Keyboard.QuitKey);
+                                                   }
 
-                                                  return false;
-                                              }
-                                             );
+                                                   return false;
+                                               }
+                                              );
 
         Assert.False (top!.IsRunning);
 
@@ -285,7 +284,7 @@ public class ApplicationImplTests
         app.Run (top);
 
         // We returned false above, so we should not have to remove the timeout
-        Assert.False (app.RemoveTimeout (timeoutToken));
+        Assert.False (app.RemoveTimeout (timeoutToken!));
 
         Assert.False (top!.IsRunning);
 
@@ -459,7 +458,7 @@ public class ApplicationImplTests
         //Assert.Null (v2.Popover);
         //Assert.Null (v2.Navigation);
         Assert.Null (v2.TopRunnableView);
-        Assert.Empty (v2.SessionStack);
+        Assert.Empty (v2.SessionStack!);
 
         // Init should populate instance fields
         v2.Init ("fake");
@@ -480,7 +479,7 @@ public class ApplicationImplTests
         //Assert.Null (v2.Popover);
         //Assert.Null (v2.Navigation);
         Assert.Null (v2.TopRunnableView);
-        Assert.Empty (v2.SessionStack);
+        Assert.Empty (v2.SessionStack!);
     }
 
     [Fact]
@@ -498,7 +497,7 @@ public class ApplicationImplTests
         app.SessionBegun += newSessionTokenFn;
 
         Runnable<bool> runnable = new ();
-        SessionToken sessionToken = app.Begin (runnable);
+        SessionToken sessionToken = app.Begin (runnable)!;
         Assert.NotNull (sessionToken);
         Assert.NotNull (newSessionToken);
         Assert.Equal (sessionToken, newSessionToken);

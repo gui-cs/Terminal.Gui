@@ -1,4 +1,3 @@
-#nullable enable
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests;
