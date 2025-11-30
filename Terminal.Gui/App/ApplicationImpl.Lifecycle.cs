@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace Terminal.Gui.App;
 
 public partial class ApplicationImpl
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public int? MainThreadId { get; set; }
 
     /// <inheritdoc/>
@@ -220,8 +219,8 @@ public partial class ApplicationImpl
 
     private object? _result;
 
-    /// <inheritdoc />
-    public object? GetResult () { return _result; }
+    /// <inheritdoc/>
+    public object? GetResult () => _result;
 
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
@@ -234,7 +233,7 @@ public partial class ApplicationImpl
         TimedEvents?.StopAll ();
 
         // === 1. Stop all running toplevels ===
-        foreach (SessionToken token in SessionStack!.Reverse())
+        foreach (SessionToken token in SessionStack!.Reverse ())
         {
             if (token.Runnable is { })
             {

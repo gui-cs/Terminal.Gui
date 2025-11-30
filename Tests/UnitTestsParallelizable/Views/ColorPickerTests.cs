@@ -3,8 +3,8 @@
 namespace UnitTests_Parallelizable.ViewsTests;
 
 /// <summary>
-/// Pure unit tests for <see cref="ColorPicker"/> that don't require Application.Driver or View context.
-/// These tests can run in parallel without interference.
+///     Pure unit tests for <see cref="ColorPicker"/> that don't require Application.Driver or View context.
+///     These tests can run in parallel without interference.
 /// </summary>
 public class ColorPickerTests
 {
@@ -108,11 +108,11 @@ public class ColorPickerTests
 
         // Click at the end of the Red bar
         cp.Focused!.RaiseMouseEvent (
-                                    new ()
-                                    {
-                                        Flags = MouseFlags.Button1Pressed,
-                                        Position = new (19, 0) // Assuming 0-based indexing
-                                    });
+                                     new ()
+                                     {
+                                         Flags = MouseFlags.Button1Pressed,
+                                         Position = new (19, 0) // Assuming 0-based indexing
+                                     });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -141,11 +141,11 @@ public class ColorPickerTests
 
         // Click beyond the bar
         cp.Focused!.RaiseMouseEvent (
-                                    new ()
-                                    {
-                                        Flags = MouseFlags.Button1Pressed,
-                                        Position = new (21, 0) // Beyond the bar
-                                    });
+                                     new ()
+                                     {
+                                         Flags = MouseFlags.Button1Pressed,
+                                         Position = new (21, 0) // Beyond the bar
+                                     });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -174,11 +174,11 @@ public class ColorPickerTests
 
         // Click on Green bar
         cp.App!.Mouse.RaiseMouseEvent (
-                                     new ()
-                                     {
-                                         Flags = MouseFlags.Button1Pressed,
-                                         ScreenPosition = new (0, 1)
-                                     });
+                                       new ()
+                                       {
+                                           Flags = MouseFlags.Button1Pressed,
+                                           ScreenPosition = new (0, 1)
+                                       });
 
         //cp.SubViews.OfType<GBar> ()
         //  .Single ()
@@ -520,11 +520,11 @@ public class ColorPickerTests
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
         cp.Focused!.RaiseMouseEvent (
-                                    new ()
-                                    {
-                                        Flags = MouseFlags.Button1Pressed,
-                                        Position = new (3, 0)
-                                    });
+                                     new ()
+                                     {
+                                         Flags = MouseFlags.Button1Pressed,
+                                         Position = new (3, 0)
+                                     });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 

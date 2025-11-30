@@ -6,7 +6,8 @@ Terminal.Gui v2 uses an instance-based application architecture with the **IRunn
 
 - **Instance-Based**: Use `Application.Create()` to get an `IApplication` instance instead of static methods
 - **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Toplevel`
-- **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for elegant, concise code
+- **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for elegant, concise code  
+- **IDisposable Pattern**: Proper resource cleanup with `Dispose()` or `using` statements
 - **Automatic Disposal**: Framework-created runnables are automatically disposed
 - **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
 - **CWP Compliance**: All lifecycle events follow the Cancellable Work Pattern
@@ -102,6 +103,13 @@ Color? result = Application.Create()
                            .Init()
                            .Run<ColorPickerDialog>()
                            .Shutdown() as Color?;
+
+// RECOMMENDED (v2 with IDisposable and using statement):
+Color? result;
+using (var app = Application.Create().Init())
+{
+    result = app.Run<ColorPickerDialog>().GetResult<Color>();
+}
 ```
 
 **Note:** The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton). `Application.Create()` creates a **new** `ApplicationImpl` instance, enabling multiple application contexts and better testability.
@@ -487,6 +495,111 @@ public class MyService
         _app.Current?.Title = "Processing...";
     }
 }
+```
+
+## Resource Management and Disposal
+
+Terminal.Gui v2 implements the `IDisposable` pattern for proper resource cleanup. Applications must be disposed after use to:
+- Stop the input thread cleanly
+- Release driver resources
+- Prevent thread leaks in tests
+- Free unmanaged resources
+
+### Using the `using` Statement (Recommended)
+
+```csharp
+// Automatic disposal with using statement
+using (var app = Application.Create().Init())
+{
+    app.Run<MyDialog>();
+    // app.Dispose() automatically called when scope exits
+}
+```
+
+### Manual Disposal
+
+```csharp
+// Manual disposal
+var app = Application.Create();
+try
+{
+    app.Init();
+    app.Run<MyDialog>();
+}
+finally
+{
+    app.Dispose(); // Ensure cleanup even if exception occurs
+}
+```
+
+### Shutdown() vs Dispose()
+
+- **`Shutdown()`** - Obsolete method that calls `Dispose()` and returns the result
+- **`Dispose()`** - Recommended IDisposable pattern for resource cleanup
+- **`GetResult()`** / **`GetResult<T>()`** - Retrieve results after `Dispose()`
+
+```csharp
+// OLD (Shutdown returns result):
+var result = app.Run<MyDialog>().Shutdown() as MyResult;
+
+// NEW (Dispose + GetResult):
+using (var app = Application.Create().Init())
+{
+    app.Run<MyDialog>();
+    var result = app.GetResult<MyResult>();
+}
+```
+
+### Input Thread Lifecycle
+
+When you call `Init()`, Terminal.Gui starts a dedicated input thread that continuously polls for console input. This thread must be stopped properly:
+
+```csharp
+var app = Application.Create();
+app.Init("fake"); // Input thread starts here
+
+// Input thread runs in background at ~50 polls/second (20ms throttle)
+
+app.Dispose(); // Cancels input thread and waits for it to exit
+```
+
+**Important for Tests**: Always dispose applications in tests to prevent thread leaks:
+
+```csharp
+[Fact]
+public void My_Test()
+{
+    using var app = Application.Create();
+    app.Init("fake");
+    
+    // Test code here
+    
+    // app.Dispose() called automatically
+}
+```
+
+### Singleton Re-initialization
+
+The legacy static `Application` singleton can be re-initialized after disposal (for backward compatibility with old tests):
+
+```csharp
+// Test 1
+Application.Init();
+Application.Shutdown();
+
+// Test 2 - singleton resets and can be re-initialized
+Application.Init(); // ✅ Works!
+Application.Shutdown();
+```
+
+However, instance-based applications follow standard `IDisposable` semantics and cannot be reused after disposal:
+
+```csharp
+var app = Application.Create();
+app.Init();
+app.Dispose();
+
+app.Init(); // ❌ Throws ObjectDisposedException
 ```
 
 ## Session Management

@@ -18,7 +18,7 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
     /// </summary>
     public Func<DateTime> Now { get; set; } = () => DateTime.Now;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public CancellationTokenSource? ExternalCancellationTokenSource { get; set; }
 
     /// <inheritdoc/>
@@ -67,7 +67,7 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
         { }
         finally
         {
-            Logging.Trace($"Stopping input processing");
+            Logging.Trace ("Stopping input processing");
             linkedCts?.Dispose ();
         }
     }
