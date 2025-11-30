@@ -36,7 +36,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.Equal (stackCountBefore + 1, app.SessionStack?.Count ?? 0);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.True (receivedValue);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.True (receivedValue);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.True (newValue);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.True (runnable.IsModal);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.True (runnable.IsRunning);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -191,14 +191,14 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         runnable.CancelStop = true; // Enable cancellation
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert - Should still be running if canceled
         Assert.True (runnable.IsRunning);
 
         // Force end by disabling cancellation
         runnable.CancelStop = false;
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -210,10 +210,10 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         SessionToken? token = app.Begin (runnable);
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
-        Assert.Null (token.Runnable);
+        Assert.Null (token!.Runnable);
     }
 
     [Fact]
@@ -233,7 +233,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                      };
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.True (isRunningChangedRaised);
@@ -259,7 +259,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                       };
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.True (isRunningChangingRaised);
@@ -277,7 +277,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         int stackCountBefore = app.SessionStack?.Count ?? 0;
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.Equal (stackCountBefore - 1, app.SessionStack?.Count ?? 0);
@@ -292,7 +292,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         SessionToken? token = app.Begin (runnable);
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.False (runnable.IsModal);
@@ -307,7 +307,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         SessionToken? token = app.Begin (runnable);
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.False (runnable.IsRunning);
@@ -349,8 +349,8 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Runnable<int> runnable2 = new () { Id = "2" };
 
         // Act
-        SessionToken token1 = app.Begin (runnable1);
-        SessionToken token2 = app.Begin (runnable2);
+        SessionToken token1 = app.Begin (runnable1)!;
+        SessionToken token2 = app.Begin (runnable2)!;
 
         // Assert - runnable2 should be on top
         Assert.True (runnable2.IsModal);
@@ -370,8 +370,8 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         IApplication app = GetApp ();
         Runnable<int> runnable1 = new () { Id = "1" };
         Runnable<int> runnable2 = new () { Id = "2" };
-        SessionToken token1 = app.Begin (runnable1);
-        SessionToken token2 = app.Begin (runnable2);
+        SessionToken token1 = app.Begin (runnable1)!;
+        SessionToken token2 = app.Begin (runnable2)!;
 
         // Act - End the top runnable
         app.End (token2);
@@ -402,7 +402,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.NotNull (runnable);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
@@ -420,7 +420,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.NotNull (runnable);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
