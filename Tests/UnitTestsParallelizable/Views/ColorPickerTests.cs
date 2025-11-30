@@ -716,6 +716,7 @@ public class ColorPickerTests
         Assert.NotSame (name, cp.Focused);
 
         Assert.Equal ("#00FFFF", hex.Text);
+
     }
 
     public static IEnumerable<object []> ColorPickerTestData ()
@@ -785,7 +786,7 @@ public class ColorPickerTests
     private static ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields, bool showName = false)
     {
         IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        ///app.Init ("Fake");
 
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
         cp.Style.ColorModel = colorModel;
