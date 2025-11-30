@@ -1410,7 +1410,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         foreach (Cell? cell in cellMap.Values)
         {
             Assert.NotNull (cell);
-            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (foregroundColor, cell.Value.Attribute!.Value.Foreground);
             Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
         }
     }
@@ -1439,7 +1439,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         foreach (Cell? cell in cellMap.Values)
         {
             Assert.NotNull (cell);
-            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (foregroundColor, cell.Value.Attribute!.Value.Foreground);
             Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
         }
     }
@@ -1468,7 +1468,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         foreach (Cell? cell in cellMap.Values)
         {
             Assert.NotNull (cell);
-            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (foregroundColor, cell.Value.Attribute!.Value.Foreground);
             Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
         }
     }

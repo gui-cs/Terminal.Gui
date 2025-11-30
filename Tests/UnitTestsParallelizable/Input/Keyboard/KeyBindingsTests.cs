@@ -210,7 +210,7 @@ public class KeyBindingsTests
         Command [] commands2 = { Command.Up, Command.Down };
         keyBindings.Add (Key.B, commands2);
 
-        Key key = keyBindings.GetFirstFromCommands (commands1);
+        Key? key = keyBindings.GetFirstFromCommands (commands1);
         Assert.Equal (Key.A, key);
 
         key = keyBindings.GetFirstFromCommands (commands2);
@@ -223,7 +223,7 @@ public class KeyBindingsTests
         var keyBindings = new KeyBindings (new ());
         keyBindings.Add (Key.A, Command.Right);
 
-        Key key = keyBindings.GetFirstFromCommands (Command.Right);
+        Key? key = keyBindings.GetFirstFromCommands (Command.Right);
         Assert.Equal (Key.A, key);
     }
 
@@ -240,7 +240,7 @@ public class KeyBindingsTests
     {
         var keyBindings = new KeyBindings (new ());
         keyBindings.Add (Key.A, Command.HotKey);
-        Key resultKey = keyBindings.GetFirstFromCommands (Command.HotKey);
+        Key? resultKey = keyBindings.GetFirstFromCommands (Command.HotKey);
         Assert.Equal (Key.A, resultKey);
     }
 
@@ -298,7 +298,7 @@ public class KeyBindingsTests
         keyBindings.Add (Key.A, Command.Accept);
         keyBindings.Add (Key.B, Command.HotKey);
 
-        keyBindings.Replace (keyBindings.GetFirstFromCommands (Command.Accept), Key.C);
+        keyBindings.Replace (keyBindings.GetFirstFromCommands (Command.Accept)!, Key.C);
         Assert.Empty (keyBindings.GetCommands (Key.A));
         Assert.Contains (Command.Accept, keyBindings.GetCommands (Key.C));
     }

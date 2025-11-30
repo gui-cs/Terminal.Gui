@@ -195,7 +195,7 @@ public static partial class ColorTestsTheoryDataGenerators
 
     public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets ()
     {
-        TheoryData<FieldInfo, int> data = []
+        TheoryData<FieldInfo?, int> data = []
             ;
 
         data.Add (
@@ -246,6 +246,6 @@ public static partial class ColorTestsTheoryDataGenerators
                   3
                  );
 
-        return data;
+        return data!;
     }
 }

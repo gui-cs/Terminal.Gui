@@ -733,16 +733,16 @@ public class RuneTests
     [Theory]
     [InlineData ('\uea85', null, "", false)] // Private Use Area
     [InlineData (0x1F356, new [] { '\ud83c', '\udf56' }, "🍖", true)] // 🍖 Meat On Bone
-    public void Test_DecodeSurrogatePair (int code, char [] charsValue, string runeString, bool isSurrogatePair)
+    public void Test_DecodeSurrogatePair (int code, char []? charsValue, string runeString, bool isSurrogatePair)
     {
         var rune = new Rune (code);
-        char [] chars;
+        char []? chars;
 
         if (isSurrogatePair)
         {
             Assert.True (rune.DecodeSurrogatePair (out chars));
-            Assert.Equal (2, chars.Length);
-            Assert.Equal (charsValue [0], chars [0]);
+            Assert.Equal (2, chars!.Length);
+            Assert.Equal (charsValue! [0], chars [0]);
             Assert.Equal (charsValue [1], chars [1]);
             Assert.Equal (runeString, new Rune (chars [0], chars [1]).ToString ());
         }

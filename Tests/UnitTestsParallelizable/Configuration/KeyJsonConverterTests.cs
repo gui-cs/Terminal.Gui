@@ -49,7 +49,7 @@ public class KeyJsonConverterTests
         var deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
-        Assert.Equal (expectedStringTo, deserializedKey.ToString ());
+        Assert.Equal (expectedStringTo, deserializedKey!.ToString ());
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class KeyJsonConverterTests
 
         // Act
         string json = "\"Ctrl+Q\"";
-        Key deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
+        Key? deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal (key, deserializedKey);

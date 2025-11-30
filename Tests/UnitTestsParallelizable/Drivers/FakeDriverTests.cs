@@ -49,7 +49,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
         driver?.SetScreenSize (100, 30);
 
         // Verify new size
-        Assert.Equal (100, driver.Cols);
+        Assert.Equal (100, driver!.Cols);
         Assert.Equal (30, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
     }
@@ -177,7 +177,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
         driver?.SetScreenSize (100, 30);
 
         // Verify new size
-        Assert.Equal (100, driver.Cols);
+        Assert.Equal (100, driver!.Cols);
         Assert.Equal (30, driver.Rows);
 
         // Verify buffer is clean (no stale runes from previous size)
@@ -192,7 +192,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
         driver?.SetScreenSize (80, 25);
 
         // Verify size is back
-        Assert.Equal (80, driver.Cols);
+        Assert.Equal (80, driver!.Cols);
         Assert.Equal (25, driver.Rows);
 
         // Verify buffer dimensions match
@@ -254,7 +254,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (40, eventSize.Value.Height);
 
         // Verify driver.Screen was updated
-        Assert.Equal (new (0, 0, 120, 40), driver.Screen);
+        Assert.Equal (new (0, 0, 120, 40), driver!.Screen);
         Assert.Equal (120, driver.Cols);
         Assert.Equal (40, driver.Rows);
     }

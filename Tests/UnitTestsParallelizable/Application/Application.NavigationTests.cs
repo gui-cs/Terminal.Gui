@@ -73,7 +73,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
         return;
 
-        void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e) { raised = true; }
+        void ApplicationNavigationOnFocusedChanged (object? sender, EventArgs e) { raised = true; }
     }
 
     [Fact]

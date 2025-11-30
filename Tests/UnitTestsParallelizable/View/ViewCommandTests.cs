@@ -46,7 +46,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnAccept (object sender, CommandEventArgs e)
+        void ViewOnAccept (object? sender, CommandEventArgs e)
         {
             acceptInvoked = true;
             e.Handled = true;
@@ -66,7 +66,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void ViewOnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     // Accept on subview should bubble up to parent
@@ -177,7 +177,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnSelect (object sender, CommandEventArgs e)
+        void ViewOnSelect (object? sender, CommandEventArgs e)
         {
             selectingInvoked = true;
             e.Handled = true;
@@ -197,7 +197,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnSelecting (object sender, CommandEventArgs e) { selecting = true; }
+        void ViewOnSelecting (object? sender, CommandEventArgs e) { selecting = true; }
     }
 
     [Fact]

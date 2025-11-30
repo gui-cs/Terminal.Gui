@@ -160,7 +160,7 @@ public class OptionSelectorTests
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]

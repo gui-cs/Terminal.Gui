@@ -118,7 +118,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { accepted = true; }
+        void Accept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object? sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void TextViewAccept (object sender, CommandEventArgs e)
+        void TextViewAccept (object? sender, CommandEventArgs e)
         {
             tfAcceptedInvoked = true;
             e.Handled = handle;
@@ -291,7 +291,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void HandleJKey (object s, Key arg)
+        void HandleJKey (object? s, Key arg)
         {
             if (arg.AsRune == new Rune ('j'))
             {

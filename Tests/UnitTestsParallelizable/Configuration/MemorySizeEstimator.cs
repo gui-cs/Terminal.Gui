@@ -122,11 +122,11 @@ public static class MemorySizeEstimator
         return false;
     }
 
-    private static long EstimateSimpleTypeSize (object source, Type type)
+    private static long EstimateSimpleTypeSize (object? source, Type type)
     {
         if (type == typeof (string))
         {
-            string str = (string)source;
+            string str = (string)source!;
             // Header + length (4) + char array ref + chars (2 bytes each)
             return OBJECT_HEADER_SIZE + 4 + POINTER_SIZE + (str.Length * 2);
         }
@@ -142,9 +142,9 @@ public static class MemorySizeEstimator
         }
     }
 
-    private static long EstimateArraySize (object source, ConcurrentDictionary<object, long> visited)
+    private static long EstimateArraySize (object? source, ConcurrentDictionary<object, long> visited)
     {
-        Array array = (Array)source;
+        Array array = (Array)source!;
         long size = OBJECT_HEADER_SIZE + 4 + POINTER_SIZE; // Header + length + padding
 
         foreach (object? element in array)
@@ -155,9 +155,9 @@ public static class MemorySizeEstimator
         return size;
     }
 
-    private static long EstimateDictionarySize (object source, ConcurrentDictionary<object, long> visited)
+    private static long EstimateDictionarySize (object? source, ConcurrentDictionary<object, long> visited)
     {
-        IDictionary dict = (IDictionary)source;
+        IDictionary dict = (IDictionary)source!;
         long size = OBJECT_HEADER_SIZE + (POINTER_SIZE * 5); // Header + buckets, entries, comparer, fields
         size += dict.Count * 4; // Bucket array (~4 bytes per entry)
         size += dict.Count * (4 + 4 + POINTER_SIZE * 2); // Entry array: hashcode, next, key, value
@@ -171,9 +171,9 @@ public static class MemorySizeEstimator
         return size;
     }
 
-    private static long EstimateCollectionSize (object source, ConcurrentDictionary<object, long> visited)
+    private static long EstimateCollectionSize (object? source, ConcurrentDictionary<object, long> visited)
     {
-        Type type = source.GetType ();
+        Type type = source!.GetType ();
         long size = OBJECT_HEADER_SIZE + (POINTER_SIZE * 3); // Header + internal array + fields
 
         if (type.IsGenericType && type.GetGenericTypeDefinition () == typeof (Dictionary<,>))
@@ -192,7 +192,7 @@ public static class MemorySizeEstimator
         return size;
     }
 
-    private static long EstimateObjectSize (object source, Type type, ConcurrentDictionary<object, long> visited)
+    private static long EstimateObjectSize (object? source, Type type, ConcurrentDictionary<object, long> visited)
     {
         long size = OBJECT_HEADER_SIZE;
 
