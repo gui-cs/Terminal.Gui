@@ -107,12 +107,15 @@ public abstract class OutputBase
             }
         }
 
-        foreach (SixelToRender s in Driver?.Sixel!)
+        if (Driver is { })
         {
-            if (!string.IsNullOrWhiteSpace (s.SixelData))
+            foreach (SixelToRender s in Driver?.Sixel!)
             {
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Write ((StringBuilder)new (s.SixelData));
+                if (!string.IsNullOrWhiteSpace (s.SixelData))
+                {
+                    SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+                    Write ((StringBuilder)new (s.SixelData));
+                }
             }
         }
 
