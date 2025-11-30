@@ -39,11 +39,11 @@ public static partial class Application // Driver abstractions
     [Obsolete ("The legacy static Application object is going away.")]
     public static string ForceDriver
     {
-        get => _forceDriver;
+        get => ApplicationImpl.Instance.ForceDriver;
         set
         {
             string oldValue = _forceDriver;
-            _forceDriver = value;
+            _forceDriver = ApplicationImpl.Instance.ForceDriver = value;
             ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, _forceDriver));
         }
     }
