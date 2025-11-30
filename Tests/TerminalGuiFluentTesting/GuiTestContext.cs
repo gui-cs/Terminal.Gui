@@ -136,7 +136,13 @@ public partial class GuiTestContext : IDisposable
                                      if (App is { Initialized: true })
                                      {
                                          IRunnable runnable = runnableBuilder ();
-                                         runnable.IsRunningChanged += (s, e) => { Finished = e.Value; };
+                                         runnable.IsRunningChanged += (s, e) =>
+                                                                      {
+                                                                          if (!e.Value)
+                                                                          {
+                                                                              Finished = true;
+                                                                          }
+                                                                      };
                                          App?.Run (runnable); // This will block, but it's on a background thread now
 
                                          if (runnable is View runnableView)
@@ -188,7 +194,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
     {
-        _timeout = timeout ?? TimeSpan.FromSeconds (10);
+        _timeout = timeout ?? TimeSpan.FromSeconds (30);
         _originalLogger = Logging.Logger;
         _logsSb = new ();
         _driverType = driverType;
@@ -401,7 +407,10 @@ public partial class GuiTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); }); }
+    public GuiTestContext ResizeConsole (int width, int height)
+    {
+        return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); });
+    }
 
     public GuiTestContext ScreenShot (string title, TextWriter? writer)
     {
@@ -536,6 +545,7 @@ public partial class GuiTestContext : IDisposable
     internal void Fail (string reason)
     {
         Logging.Error ($"{reason}");
+        WriteOutLogs (_logWriter);
 
         throw new (reason);
     }

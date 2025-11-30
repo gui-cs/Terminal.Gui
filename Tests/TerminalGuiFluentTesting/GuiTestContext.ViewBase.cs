@@ -14,7 +14,7 @@ public partial class GuiTestContext
     {
         WaitIteration ((app) =>
                        {
-                           View top = app.TopRunnableView ?? throw new ("Top was null so could not add view");
+                           View top = App.TopRunnableView ?? throw new ("Top was null so could not add view");
                            top.Add (v);
                            top.Layout ();
                            _lastView = v;
