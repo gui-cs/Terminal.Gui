@@ -12,17 +12,10 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-    private IApplication NewApplicationImpl ()
-    {
-        IApplication app = ApplicationImpl.Instance; // Force legacy
-
-        return app;
-    }
-
     [Fact]
     public void Begin_WithNullToplevel_ThrowsArgumentNullException ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
 
         try
         {
@@ -37,7 +30,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void Begin_SetsCurrent_WhenCurrentIsNull ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel = null;
 
         try
@@ -61,7 +54,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void Begin_PushesToSessionStack ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel1 = null;
         Toplevel? toplevel2 = null;
 
@@ -89,7 +82,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void End_WithNullSessionToken_ThrowsArgumentNullException ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
 
         try
         {
@@ -104,7 +97,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void End_PopsSessionStack ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel1 = null;
         Toplevel? toplevel2 = null;
 
@@ -138,7 +131,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact (Skip = "This test may be bogus. What's wrong with ending a non-top session?")]
     public void End_ThrowsArgumentException_WhenNotBalanced ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel1 = null;
         Toplevel? toplevel2 = null;
 
@@ -171,7 +164,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void End_RestoresCurrentToPreviousToplevel ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel1 = null;
         Toplevel? toplevel2 = null;
         Toplevel? toplevel3 = null;
@@ -208,7 +201,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void MultipleBeginEnd_MaintainsStackIntegrity ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         List<Toplevel> toplevels = new ();
         List<SessionToken> tokens = new ();
 
@@ -255,7 +248,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void End_NullsSessionTokenToplevel ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel = null;
 
         try
@@ -279,7 +272,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void ResetState_ClearsSessionStack ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel1 = null;
         Toplevel? toplevel2 = null;
 
@@ -312,7 +305,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void ResetState_StopsAllRunningToplevels ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         Toplevel? toplevel1 = null;
         Toplevel? toplevel2 = null;
 
@@ -345,7 +338,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     //[Fact]
     //public void Begin_ActivatesNewToplevel_WhenCurrentExists ()
     //{
-    //    IApplication app = NewApplicationImpl ();
+    //    IApplication app = Application.Create ();
     //    Toplevel? toplevel1 = null;
     //    Toplevel? toplevel2 = null;
 
@@ -378,7 +371,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     [Fact]
     public void SessionStack_ContainsAllBegunToplevels ()
     {
-        IApplication app = NewApplicationImpl ();
+        IApplication app = Application.Create ();
         List<Toplevel> toplevels = new ();
 
         try

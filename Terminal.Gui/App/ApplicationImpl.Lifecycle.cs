@@ -102,8 +102,69 @@ public partial class ApplicationImpl
         return this;
     }
 
-    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    public object? Shutdown ()
+    #region IDisposable Implementation
+
+    private bool _disposed;
+
+    /// <summary>
+    ///     Disposes the application instance and releases all resources.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method implements the <see cref="IDisposable"/> pattern and performs the same cleanup
+    ///         as <see cref="Shutdown"/>, but without returning a result.
+    ///     </para>
+    ///     <para>
+    ///         After calling <see cref="Dispose"/>, use <see cref="GetResult"/> or <see cref="IApplication.GetResult{T}"/>
+    ///         to retrieve the result from the last run session.
+    ///     </para>
+    /// </remarks>
+    public void Dispose ()
+    {
+        Dispose (true);
+        GC.SuppressFinalize (this);
+    }
+
+    /// <summary>
+    ///     Disposes the application instance and releases all resources.
+    /// </summary>
+    /// <param name="disposing">
+    ///     <see langword="true"/> if called from <see cref="Dispose"/>;
+    ///     <see langword="false"/> if called from finalizer.
+    /// </param>
+    protected virtual void Dispose (bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            // Dispose managed resources
+            DisposeCore ();
+        }
+
+        // For the singleton instance (legacy Application.Init/Shutdown pattern),
+        // we need to allow re-initialization after disposal. This enables:
+        // Application.Init() -> Application.Shutdown() -> Application.Init()
+        // For modern instance-based usage, this doesn't matter as new instances are created.
+        if (this == _instance)
+        {
+            // Reset disposed flag to allow re-initialization
+            _disposed = false;
+        }
+        else
+        {
+            // For instance-based usage, mark as disposed
+            _disposed = true;
+        }
+    }
+
+    /// <summary>
+    ///     Core disposal logic - same as Shutdown() but without returning result.
+    /// </summary>
+    private void DisposeCore ()
     {
         // Stop the coordinator if running
         Coordinator?.Stop ();
@@ -142,8 +203,19 @@ public partial class ApplicationImpl
 
         // Clear the event to prevent memory leaks
         InitializedChanged = null;
+    }
 
-        return GetResult();
+    #endregion IDisposable Implementation
+
+    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
+    [Obsolete ("Use Dispose() or a using statement instead. This method will be removed in a future version.")]
+    public object? Shutdown ()
+    {
+        // Shutdown is now just a wrapper around Dispose that returns the result
+        object? result = GetResult ();
+        Dispose ();
+
+        return result;
     }
 
     private object? _result;

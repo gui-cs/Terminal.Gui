@@ -166,14 +166,13 @@ public class ApplicationTests (ITestOutputHelper output)
     [Fact]
     public void Init_NoParam_ForceDriver_Works ()
     {
-        IApplication app = Application.Create ();
-        
+        using IApplication app = Application.Create ();
+
+        app.ForceDriver = "fake";
         // Note: Init() without params picks up driver configuration
         app.Init ();
 
         Assert.Equal ("fake", app.Driver!.GetName ());
-        
-        app.Shutdown ();
     }
 
     [Fact]

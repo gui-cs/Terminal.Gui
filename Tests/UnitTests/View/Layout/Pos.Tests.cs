@@ -37,7 +37,6 @@ public class PosTests ()
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
     public void PosCombine_WHY_Throws ()
     {
         Application.Init ("fake");
@@ -127,7 +126,6 @@ public class PosTests ()
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
     public void Pos_Subtract_Operator ()
     {
         Application.Init ("fake");

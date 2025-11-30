@@ -12,7 +12,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [InlineData (TabBehavior.TabGroup)]
     public void Begin_SetsFocus_On_Deepest_Focusable_View (TabBehavior behavior)
     {
-        IApplication? application = Application.Create ();
+        using IApplication? application = Application.Create ();
 
         Runnable<bool> runnable = new()
         {
@@ -45,7 +45,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void Begin_SetsFocus_On_Top ()
     {
-        IApplication? application = Application.Create ();
+        using IApplication? application = Application.Create ();
 
         Runnable<bool> runnable = new () { CanFocus = true };
         Assert.False (runnable.HasFocus);
@@ -59,7 +59,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void Focused_Change_Raises_FocusedChanged ()
     {
-        IApplication? application = Application.Create ();
+        using IApplication? application = Application.Create ();
 
         var raised = false;
 
@@ -79,7 +79,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void GetFocused_Returns_Focused_View ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
 
         app.Begin (
                    new Runnable<bool>
@@ -115,7 +115,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     [Fact]
     public void GetFocused_Returns_Null_If_No_Focused_View ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
 
         app.Begin (
                    new Runnable<bool>

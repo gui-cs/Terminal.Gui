@@ -189,7 +189,7 @@ public class MouseTests (ITestOutputHelper output)
 
         var clicked = false;
 
-        IApplication? application = Application.Create ();
+        using IApplication? application = Application.Create ();
 
         application.Begin (new Window ()
         {

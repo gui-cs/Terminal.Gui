@@ -4559,7 +4559,7 @@ This is the second line.
         }
     }
 
-    [Fact (Skip = "Fake Clipboard is broken")]
+    [Fact]
     [TextViewTestsSetupFakeApplication]
     public void Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ()
     {
@@ -4621,7 +4621,7 @@ This is the second line.
         }
     }
 
-    [Fact (Skip = "FakeClipboard is broken in some way, causing this unit test to fail intermittently.")]
+    [Fact]
     [TextViewTestsSetupFakeApplication]
     public void Kill_To_Start_Delete_Backwards_Copy_To_The_Clipboard_And_Paste ()
     {

@@ -7,7 +7,13 @@ namespace Terminal.Gui.App;
 ///     Interface for instances that provide backing functionality to static
 ///     gateway class <see cref="Application"/>.
 /// </summary>
-public interface IApplication
+/// <remarks>
+///     <para>
+///         Implements <see cref="IDisposable"/> to support automatic resource cleanup via using statements.
+///         Call <see cref="IDisposable.Dispose"/> or use a using statement to properly clean up resources.
+///     </para>
+/// </remarks>
+public interface IApplication : IDisposable
 {
     #region Keyboard
 
@@ -95,6 +101,10 @@ public interface IApplication
     /// </returns>
     /// <remarks>
     ///     <para>
+    ///         <b>OBSOLETE:</b> Use <see cref="IDisposable.Dispose"/> or a using statement instead.
+    ///         This method is kept for backward compatibility and internally calls <see cref="IDisposable.Dispose"/>.
+    ///     </para>
+    ///     <para>
     ///         Shutdown must be called for every call to <see cref="Init"/> or
     ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
     ///         up (Disposed) and terminal settings are restored.
@@ -104,10 +114,22 @@ public interface IApplication
     ///         disposes the runnable instance and extracts its result for return.
     ///     </para>
     ///     <para>
-    ///         Supports fluent API:
-    ///         <c>var result = Application.Create().Init().Run&lt;MyView&gt;().Shutdown() as MyResultType</c>
+    ///         Old pattern (deprecated):
+    ///         <code>var result = Application.Create().Init().Run&lt;MyView&gt;().Shutdown() as MyResultType</code>
+    ///     </para>
+    ///     <para>
+    ///         New pattern (preferred):
+    ///         <code>
+    ///         MyResultType? result;
+    ///         using (var app = Application.Create().Init())
+    ///         {
+    ///             app.Run&lt;MyDialog&gt;();
+    ///             result = app.GetResult&lt;MyResultType&gt;();
+    ///         }
+    ///         </code>
     ///     </para>
     /// </remarks>
+    [Obsolete ("Use Dispose() or a using statement instead. This method will be removed in a future version.")]
     public object? Shutdown ();
 
     /// <summary>
@@ -426,7 +448,37 @@ public interface IApplication
     /// </remarks>
     void End (SessionToken sessionToken);
 
+    /// <summary>
+    ///     Gets the result from the last <see cref="Run(IRunnable, Func{Exception, bool})"/> or
+    ///     <see cref="Run{TRunnable}(Func{Exception, bool}, string)"/> call.
+    /// </summary>
+    /// <returns>
+    ///     The result from the last run session, or <see langword="null"/> if no session has been run or the result was null.
+    /// </returns>
     object? GetResult ();
+
+    /// <summary>
+    ///     Gets the result from the last <see cref="Run(IRunnable, Func{Exception, bool})"/> or
+    ///     <see cref="Run{TRunnable}(Func{Exception, bool}, string)"/> call, cast to type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The expected result type.</typeparam>
+    /// <returns>
+    ///     The result cast to <typeparamref name="T"/>, or <see langword="null"/> if the result is null or cannot be cast.
+    /// </returns>
+    /// <example>
+    ///     <code>
+    ///     using (var app = Application.Create().Init())
+    ///     {
+    ///         app.Run&lt;ColorPickerDialog&gt;();
+    ///         var selectedColor = app.GetResult&lt;Color&gt;();
+    ///         if (selectedColor.HasValue)
+    ///         {
+    ///             // Use the color
+    ///         }
+    ///     }
+    ///     </code>
+    /// </example>
+    T? GetResult<T> () where T : class => GetResult () as T;
 
     #endregion IRunnable Management
 
