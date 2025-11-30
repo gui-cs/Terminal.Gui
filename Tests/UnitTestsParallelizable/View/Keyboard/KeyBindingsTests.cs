@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 /// <summary>
 ///     Tests for View.KeyBindings

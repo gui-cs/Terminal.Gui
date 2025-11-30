@@ -23,6 +23,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// </exception>
     public static IApplication Create ()
     {
+        //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
         return new ApplicationImpl ();

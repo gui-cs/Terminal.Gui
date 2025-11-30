@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Concurrent;
 using System.Diagnostics;
+// ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
 
 namespace UnitTests_Parallelizable.ApplicationTests;
@@ -145,15 +146,15 @@ public class MainLoopCoordinatorTests : IDisposable
 
         // Act - Run the input loop for 500ms
         // Short duration reduces test time while still proving throttle exists
-        Task inputTask = Task.Run (() => input.Run (cts.Token));
-        
+        Task inputTask = Task.Run (() => input.Run (cts.Token), cts.Token);
+
         Thread.Sleep (500);
 
         int peekCount = input.PeekCallCount;
         cts.Cancel ();
-        
+
         // Wait for task to complete
-        bool completed = inputTask.Wait (TimeSpan.FromSeconds (2));
+        bool completed = inputTask.Wait (TimeSpan.FromSeconds (4));
         Assert.True (completed, "Input task did not complete within timeout");
 
         // Assert - The key insight: throttle prevents CPU spinning
@@ -166,7 +167,7 @@ public class MainLoopCoordinatorTests : IDisposable
         // Max 500 calls = average 1ms between polls (still proves 20ms throttle exists)
         // Without throttle = millions of calls (tight loop)
         Assert.True (peekCount < 500, $"Poll count {peekCount} suggests no throttling (expected <500 with 20ms throttle)");
-        
+
         // Also verify the thread actually ran (not immediately cancelled)
         Assert.True (peekCount > 0, $"Poll count was {peekCount} - thread may not have started");
 

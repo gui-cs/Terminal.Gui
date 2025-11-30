@@ -1,7 +1,7 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace UnitTests.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 /// <summary>
 ///     Comprehensive tests for ApplicationImpl.Begin/End logic that manages Current and SessionStack.
@@ -19,11 +19,11 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
         try
         {
-            Assert.Throws<ArgumentNullException> (() => app.Begin ((Toplevel)null!));
+            Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -47,7 +47,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         finally
         {
             toplevel?.Dispose ();
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -75,7 +75,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         {
             toplevel1?.Dispose ();
             toplevel2?.Dispose ();
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -86,11 +86,11 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 
         try
         {
-            Assert.Throws<ArgumentNullException> (() => app.End ((SessionToken)null!));
+            Assert.Throws<ArgumentNullException> (() => app.End (null!));
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -124,7 +124,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         {
             toplevel1?.Dispose ();
             toplevel2?.Dispose ();
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -157,7 +157,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel2?.Dispose ();
 
             // Shutdown will call ResetState which clears any remaining state
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -194,7 +194,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel1?.Dispose ();
             toplevel2?.Dispose ();
             toplevel3?.Dispose ();
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -241,7 +241,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
                 toplevel.Dispose ();
             }
 
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -265,7 +265,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         finally
         {
             toplevel?.Dispose ();
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -294,7 +294,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel2?.Dispose ();
 
             // Shutdown calls ResetState, which will clear SessionStack and set Current to null
-            app.Shutdown ();
+            app.Dispose ();
 
             // Verify cleanup happened
             Assert.Empty (app.SessionStack);
@@ -327,7 +327,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
             toplevel2?.Dispose ();
 
             // Shutdown calls ResetState, which will stop all running toplevels
-            app.Shutdown ();
+            app.Dispose ();
 
             // Verify toplevels were stopped
             Assert.False (toplevel1!.IsRunning);
@@ -364,7 +364,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     //    {
     //        toplevel1?.Dispose ();
     //        toplevel2?.Dispose ();
-    //        app.Shutdown ();
+    //        app.Dispose ();
     //    }
     //}
 
@@ -401,7 +401,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
                 toplevel.Dispose ();
             }
 
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 }
