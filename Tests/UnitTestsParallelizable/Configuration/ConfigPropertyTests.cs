@@ -62,7 +62,7 @@ public class ConfigPropertyTests
         {
             var clone = DeepCloner.DeepClone (configProperty);
             Assert.NotSame (configProperty, clone);
-            Assert.Equal ("DeepCloneValue", clone.PropertyValue);
+            Assert.Equal ("DeepCloneValue", clone!.PropertyValue);
         });
     }
 

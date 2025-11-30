@@ -40,7 +40,7 @@ public class MouseEnterLeaveTests
         public bool MouseEnterRaised { get; private set; }
         public bool MouseLeaveRaised { get; private set; }
 
-        private void OnMouseEnterHandler (object s, CancelEventArgs e)
+        private void OnMouseEnterHandler (object? s, CancelEventArgs e)
         {
             MouseEnterRaised = true;
 
@@ -50,7 +50,7 @@ public class MouseEnterLeaveTests
             }
         }
 
-        private void OnMouseLeaveHandler (object s, EventArgs e) { MouseLeaveRaised = true; }
+        private void OnMouseLeaveHandler (object? s, EventArgs e) { MouseLeaveRaised = true; }
     }
 
     [Fact]

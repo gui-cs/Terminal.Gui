@@ -1,19 +1,10 @@
 
 #nullable enable
-namespace UnitTests.ApplicationTests;
+namespace UnitTests_Parallelizable.ApplicationTests;
 
 /// <summary>These tests focus on Application.SessionToken and the various ways it can be changed.</summary>
 public class SessionTokenTests
 {
-    public SessionTokenTests ()
-    {
-#if DEBUG_IDISPOSABLE
-        View.EnableDebugIDisposableAsserts = true;
-
-        View.Instances.Clear ();
-#endif
-    }
-
     [Fact]
     public void Begin_Throws_On_Null ()
     {
@@ -28,7 +19,7 @@ public class SessionTokenTests
         IApplication? app = Application.Create ();
 
         Runnable<bool> top = new Runnable<bool> ();
-        SessionToken sessionToken = app.Begin (top);
+        SessionToken? sessionToken = app.Begin (top);
         Assert.NotNull (sessionToken);
         app.End (sessionToken);
 

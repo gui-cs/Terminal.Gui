@@ -20,7 +20,7 @@ public class AdornmentSubViewTests ()
         Assert.True (raised);
 
         return;
-        void LayoutStarted (object sender, LayoutEventArgs e)
+        void LayoutStarted (object? sender, LayoutEventArgs e)
         {
             raised = true;
         }

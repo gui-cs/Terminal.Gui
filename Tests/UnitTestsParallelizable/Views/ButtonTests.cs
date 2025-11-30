@@ -318,7 +318,7 @@ public class ButtonTests : FakeDriverBase
 
         return;
 
-        void ButtonAccept (object sender, CommandEventArgs e)
+        void ButtonAccept (object? sender, CommandEventArgs e)
         {
             acceptInvoked = true;
             e.Handled = true;

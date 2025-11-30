@@ -1,4 +1,3 @@
-#nullable enable
 using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ApplicationTests;
@@ -7,7 +6,7 @@ namespace UnitTests_Parallelizable.ApplicationTests;
 ///     Tests for the <see cref="IMouse"/> interface and <see cref="MouseImpl"/> implementation.
 ///     These tests demonstrate the decoupled mouse handling that enables parallel test execution.
 /// </summary>
-public class MouseTests (ITestOutputHelper output)
+public class MouseTests
 {
     [Fact]
     public void Mouse_Instance_CreatedSuccessfully ()

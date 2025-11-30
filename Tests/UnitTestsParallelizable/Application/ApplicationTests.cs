@@ -237,8 +237,8 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.True (app.Initialized);
         Assert.Null (app.TopRunnableView);
-        SessionToken rs = app.Begin (new Runnable<bool> ());
-        Assert.Equal (app.TopRunnable, rs.Runnable);
+        SessionToken? rs = app.Begin (new Runnable<bool> ());
+        Assert.Equal (app.TopRunnable, rs!.Runnable);
         Assert.Null (app.Mouse.MouseGrabView); // public
 
         app.Shutdown ();
@@ -251,7 +251,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Init ("fake");
 
         Toplevel top = new ();
-        SessionToken rs = app.Begin (top);
+        SessionToken? rs = app.Begin (top);
 
         var actionCalled = 0;
         app.Invoke ((_) => { actionCalled++; });
@@ -435,7 +435,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Init ("fake");
 
         var top = new Toplevel ();
-        SessionToken rs = app.Begin (top);
+        SessionToken? rs = app.Begin (top);
         Assert.NotNull (rs);
 
         app.Iteration += OnApplicationOnIteration;
@@ -481,7 +481,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (new (1, 1), w.Frame.Location);
 
-        app.End (rs);
+        app.End (rs!);
         w.Dispose ();
 
         app.Shutdown ();

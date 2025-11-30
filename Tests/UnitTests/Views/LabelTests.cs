@@ -850,7 +850,7 @@ t
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count > -1)
             {
@@ -1012,7 +1012,7 @@ t
 
         return;
 
-        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count < 21)
             {
@@ -1053,7 +1053,7 @@ t
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView!.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1112,7 +1112,7 @@ t
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView!.Frame);
 
         var expected = @"
 ┌────────┐
