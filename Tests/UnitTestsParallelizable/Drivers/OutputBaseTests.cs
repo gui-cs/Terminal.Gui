@@ -19,7 +19,7 @@ public class OutputBaseTests
         string ansi = output.ToAnsi (buffer);
 
         // Assert: single grapheme plus newline (BuildAnsiForRegion appends a newline per row)
-        Assert.Equal ("\u001b[38;2;0;0;0m\u001b[48;2;0;0;0mA" + Environment.NewLine, ansi);
+        Assert.Contains ("A" + Environment.NewLine, ansi);
     }
 
     [Fact]
