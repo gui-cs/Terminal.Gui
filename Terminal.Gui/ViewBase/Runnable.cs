@@ -15,8 +15,6 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 public class Runnable<TResult> : View, IRunnable<TResult>
 {
-    private bool _stopRequested;
-
     // Cached state - eliminates race conditions from stack queries
     private bool _isRunning;
     private bool _isModal;
@@ -168,11 +166,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     public void SetIsModal (bool value) { _isModal = value; }
 
     /// <inheritdoc />
-    public bool StopRequested
-    {
-        get => _stopRequested;
-        set => _stopRequested = value;
-    }
+    public bool StopRequested { get; set; }
 
     /// <inheritdoc/>
     public void RaiseIsModalChangedEvent (bool newIsModal)

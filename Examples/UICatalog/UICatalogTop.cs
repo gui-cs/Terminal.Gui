@@ -59,7 +59,7 @@ public class UICatalogTop : Toplevel
 
     private void IsModalChangedHandler (object? sender, EventArgs<bool> args)
     {
-        if (args.Value)
+        if (!args.Value)
         {
             return;
         }
