@@ -183,7 +183,7 @@ public class Images : Scenario
 
         if (!_sixelSupportResult.SupportsTransparency)
         {
-            if (MessageBox.Query (ApplicationImpl.Instance,
+            if (MessageBox.Query (Application.Instance,
                                   "Transparency Not Supported",
                                   "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
                                   "Yes",
@@ -288,7 +288,7 @@ public class Images : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Could not open file", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Could not open file", ex.Message, "Ok");
 
             return;
         }
@@ -492,7 +492,7 @@ public class Images : Scenario
     {
         if (_imageView.FullResImage == null)
         {
-            MessageBox.Query (ApplicationImpl.Instance, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
+            MessageBox.Query (Application.Instance, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
 
             return;
         }

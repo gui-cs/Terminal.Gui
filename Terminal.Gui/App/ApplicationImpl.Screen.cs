@@ -1,7 +1,7 @@
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;

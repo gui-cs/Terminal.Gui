@@ -79,7 +79,7 @@ public class DynamicStatusBar : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (ApplicationImpl.Instance, "Binding Error", $"Binding failed: {ex}.", "Ok");
+                MessageBox.ErrorQuery (Application.Instance, "Binding Error", $"Binding failed: {ex}.", "Ok");
             }
         }
     }
@@ -140,7 +140,7 @@ public class DynamicStatusBar : Scenario
         public TextView TextAction { get; }
         public TextField TextShortcut { get; }
         public TextField TextTitle { get; }
-        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (ApplicationImpl.Instance, item.Title, item.Action, "Ok"); }
+        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (Application.Instance, item.Title, item.Action, "Ok"); }
 
         public void EditStatusItem (Shortcut statusItem)
         {

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public int? MainThreadId { get; set; }

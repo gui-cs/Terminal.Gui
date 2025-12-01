@@ -11,6 +11,22 @@ namespace Terminal.Gui.App;
 public static partial class Application // Lifecycle (Init/Shutdown)
 {
     /// <summary>
+    ///     Gets the singleton <see cref="IApplication"/> instance used by the legacy static Application model.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         For new code, prefer using <see cref="Create"/> to get an instance-based application.
+    ///         This property is provided for backward compatibility and internal use.
+    ///     </para>
+    ///     <para>
+    ///         This property returns the same singleton instance used by the legacy static <see cref="Application"/>
+    ///         methods like <see cref="Init"/> and <see cref="Run(IRunnable, Func{Exception, bool}?)"/>.
+    ///     </para>
+    /// </remarks>
+    [Obsolete ("The legacy static Application object is going away. Use Application.Create() for new code.")]
+    public static IApplication Instance => ApplicationImpl.Instance;
+
+    /// <summary>
     ///     Creates a new <see cref="IApplication"/> instance.
     /// </summary>
     /// <remarks>
