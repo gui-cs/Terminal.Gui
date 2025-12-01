@@ -5,15 +5,19 @@ using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
-// Run the application with fluent API - automatically creates, runs, and disposes the runnable
+IApplication? app = Application.Create ()
+                               .Init ()
+                               .Run<ColorPickerView> ();
 
-// Display the result
-if (Application.Create ()
-               .Init ()
-               .Run<ColorPickerView> ()
-               .Shutdown () is Color { } result)
+// Run the application with fluent API - automatically creates, runs, and disposes the runnable
+Color? result = app.GetResult () as Color?;
+
+// Shut down the app with Dispose before we can use Console.WriteLine
+app.Dispose ();
+
+if (result is { })
 {
-    Console.WriteLine (@$"Selected Color: {(Color?)result}");
+    Console.WriteLine (@$"Selected Color: {result}");
 }
 else
 {
@@ -22,7 +26,7 @@ else
 
 /// <summary>
 ///     A runnable view that allows the user to select a color.
-///     Demonstrates IRunnable<TResult> pattern with automatic disposal.
+///     Demonstrates the Runnable with type pattern with automatic disposal.
 /// </summary>
 public class ColorPickerView : Runnable<Color?>
 {

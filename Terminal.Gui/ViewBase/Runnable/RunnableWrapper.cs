@@ -9,7 +9,7 @@ namespace Terminal.Gui.ViewBase;
 /// <remarks>
 ///     <para>
 ///         This class enables any View to be run as a blocking session with
-///         <see cref="IApplication.Run(Func{Exception, bool}, string)"/>
+///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>
 ///         without requiring the View to implement <see cref="IRunnable{TResult}"/> or derive from
 ///         <see cref="Runnable{TResult}"/>.
 ///     </para>
