@@ -228,10 +228,10 @@ public partial class ApplicationImpl
         TRunnable runnable = new ();
         object? result = Run (runnable, errorHandler);
 
-        // We created the runnable, so dispose it
-        if (runnable is View runnableView)
+        // We created the runnable, so dispose it if it's disposable
+        if (runnable is IDisposable disposable)
         {
-            runnableView.Dispose ();
+            disposable.Dispose ();
         }
 
         return this;

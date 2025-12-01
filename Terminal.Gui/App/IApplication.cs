@@ -337,21 +337,6 @@ public interface IApplication : IDisposable
     ConcurrentStack<SessionToken>? SessionStack { get; }
 
     /// <summary>
-    ///     Gets or sets the runnable that was created by <see cref="Run{TRunnable}"/> for automatic disposal.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When <see cref="Run{TRunnable}"/> creates a runnable instance, it stores it here so
-    ///         <see cref="Shutdown"/> can automatically dispose it and extract its result.
-    ///     </para>
-    ///     <para>
-    ///         This property is <see langword="null"/> if <see cref="Run(IRunnable, Func{Exception, bool})"/> was used
-    ///         with an externally-created runnable.
-    ///     </para>
-    /// </remarks>
-    IRunnable? FrameworkOwnedRunnable { get; set; }
-
-    /// <summary>
     ///     Building block API: Creates a <see cref="SessionToken"/> and prepares the provided <see cref="IRunnable"/>
     ///     for
     ///     execution. Not usually called directly by applications. Use <see cref="Run(IRunnable, Func{Exception, bool})"/>

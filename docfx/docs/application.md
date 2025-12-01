@@ -343,7 +343,6 @@ public interface IApplication
     IRunnable? TopRunnable { get; }
     View? TopRunnableView { get; }
     ConcurrentStack<SessionToken>? SessionStack { get; }
-    IRunnable? FrameworkOwnedRunnable { get; set; }
     
     // Driver and lifecycle
     IDriver? Driver { get; }

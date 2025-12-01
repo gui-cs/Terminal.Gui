@@ -234,8 +234,5 @@ public partial class ApplicationImpl : IApplication
         set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    /// <inheritdoc/>
-    public IRunnable? FrameworkOwnedRunnable { get; set; }
-
     #endregion View Management
 }
