@@ -1,8 +1,9 @@
 ﻿#nullable enable
 using System.Globalization;
 using System.Runtime.InteropServices;
+using UnitTests_Parallelizable;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class DateFieldTests
 {

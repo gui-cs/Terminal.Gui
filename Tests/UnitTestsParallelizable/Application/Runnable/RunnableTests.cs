@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests.RunnableTests;
+namespace ApplicationTests.RunnableTests;
 
 /// <summary>
 ///     Tests for IRunnable interface and Runnable base class.

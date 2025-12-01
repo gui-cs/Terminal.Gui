@@ -1,6 +1,6 @@
 ﻿using Timeout = Terminal.Gui.App.Timeout;
 
-namespace UnitTests.ViewMouseTests;
+namespace UnitTests.ViewBaseTests.MouseTests;
 
 [Trait ("Category", "Input")]
 public class MouseTests : TestsAllViews

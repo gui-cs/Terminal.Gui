@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using System.Text;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextViewTests
 {

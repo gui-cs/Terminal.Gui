@@ -2,7 +2,7 @@
 #nullable enable
 using JetBrains.Annotations;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 [TestSubject (typeof (TableView))]
 public class TableViewTests

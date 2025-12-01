@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using JetBrains.Annotations;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests

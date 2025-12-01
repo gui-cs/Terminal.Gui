@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace UnitTests_Parallelizable.ConfigurationTests;
+namespace ConfigurationTests;
 
 using System;
 using System.Collections;

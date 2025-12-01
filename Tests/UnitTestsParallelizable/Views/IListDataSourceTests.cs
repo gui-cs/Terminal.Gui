@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 // ReSharper disable InconsistentNaming
 
-namespace UnitTests_Parallelizable.ViewTests;
+namespace ViewsTests;
 
 public class IListDataSourceTests (ITestOutputHelper output)
 {
@@ -74,7 +74,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
             }
         }
 
-        public void Render (ListView listView, bool selected, int item, int col, int line, int width, int viewportX = 0)
+        public void Render (Terminal.Gui.Views.ListView listView, bool selected, int item, int col, int line, int width, int viewportX = 0)
         {
             if (item < 0 || item >= _items.Count)
             {

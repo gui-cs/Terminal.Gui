@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class DrawEventTests

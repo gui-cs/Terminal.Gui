@@ -1,4 +1,4 @@
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class ViewCommandTests
 {

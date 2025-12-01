@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextValidateField_NET_Provider_Tests : FakeDriverBase
 {

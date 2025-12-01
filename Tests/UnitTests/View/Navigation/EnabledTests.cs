@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class EnabledTests
 {

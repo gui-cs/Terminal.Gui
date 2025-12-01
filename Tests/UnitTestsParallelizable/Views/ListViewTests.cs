@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class ListViewTests (ITestOutputHelper output)
 {

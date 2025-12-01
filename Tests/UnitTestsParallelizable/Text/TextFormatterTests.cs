@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 {

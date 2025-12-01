@@ -1,6 +1,6 @@
 
 #nullable enable
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>These tests focus on Application.SessionToken and the various ways it can be changed.</summary>
 public class SessionTokenTests

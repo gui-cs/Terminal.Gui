@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Moq;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 public class ApplicationImplTests
 {

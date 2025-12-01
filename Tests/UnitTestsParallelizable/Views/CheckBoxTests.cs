@@ -2,7 +2,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class CheckBoxTests ()
 {

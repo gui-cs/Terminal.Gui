@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Parallelizable tests for IApplication.ScreenChanged event and Screen property.

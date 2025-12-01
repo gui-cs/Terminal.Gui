@@ -2,7 +2,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Parallelizable tests for IMouse interface.

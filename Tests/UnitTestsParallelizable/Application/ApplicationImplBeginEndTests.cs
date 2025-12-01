@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Comprehensive tests for ApplicationImpl.Begin/End logic that manages Current and SessionStack.

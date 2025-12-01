@@ -4,7 +4,7 @@ using System.Diagnostics;
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Tests for <see cref="MainLoopCoordinator{TInputRecord}"/> to verify input loop lifecycle.

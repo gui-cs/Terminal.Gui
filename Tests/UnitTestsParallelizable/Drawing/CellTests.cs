@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class CellTests
 {

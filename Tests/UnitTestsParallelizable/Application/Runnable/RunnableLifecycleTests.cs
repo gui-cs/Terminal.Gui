@@ -1,7 +1,7 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.RunnableTests;
+namespace RunnableTests;
 
 /// <summary>
 ///     Tests for IRunnable lifecycle behavior.

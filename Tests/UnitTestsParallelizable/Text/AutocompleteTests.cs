@@ -1,7 +1,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 /// <summary>
 /// Pure unit tests for Autocomplete functionality that don't require Application or Driver.

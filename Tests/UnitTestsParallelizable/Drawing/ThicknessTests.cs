@@ -3,7 +3,7 @@ using Terminal.Gui.Drivers;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
 {

@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 /// <summary>
 ///     Pure unit tests for <see cref="LineCanvas"/> that don't require Application.Driver or View context.

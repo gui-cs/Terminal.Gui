@@ -1,7 +1,7 @@
 using System.Globalization;
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="DatePicker"/> that don't require Application.Driver or View context.

@@ -1,7 +1,7 @@
 #nullable disable
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Button"/> that don't require Application static dependencies.

@@ -2,7 +2,7 @@
 using System.Text;
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class HexViewTests : FakeDriverBase
 {
